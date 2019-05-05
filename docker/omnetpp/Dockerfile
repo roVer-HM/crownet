@@ -24,12 +24,14 @@ LABEL maintainer  "wischhof@ieee.org"
 # Note: we currently use jdk-8 due to compatibility problems of omnet with jdk-11
 #       (when these are fixed, openjdk-8-jre should be replaced by default-jre)
 RUN apt-get update && \
-    apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
        git git-lfs \ 
        clang bison flex make qt5-default \
        openjdk-8-jre \
-       libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph osgearth \
+       doxygen graphviz tcl-dev tk-dev python python3 \
+       libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
+       openscenegraph osgearth \
        libopenmpi-dev libxml2-dev libwebkitgtk-1.0-0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -60,7 +62,7 @@ RUN make -j $(nproc)
 
 # now install the Eclipse IDE base
 ADD ide/ide.tar.gz .
-RUN chmod -R a+w /opt/omnetpp/omnetpp/samples
+RUN chmod -R a+rw /opt/omnetpp/omnetpp/samples
 
 # TODO: clean up all files not needed anymore (object files, etc.)
 

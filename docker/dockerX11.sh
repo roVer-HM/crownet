@@ -1,13 +1,15 @@
 #!/bin/bash
 #
 # Run a docker container allowing X11 output.
+# (For an interactive shell, add the options -ti .)
 
 xhost +"local:docker@"
 # xhost +"local:root"
 
 echo "Run docker container with access to X11 and your home directory..."
 
-docker run -it \
+# docker run -ti \
+docker run -t  \
 --user $(id -u) \
 -e DISPLAY=$DISPLAY \
 --workdir=$(pwd) \
