@@ -11,7 +11,7 @@ if [ ! "$(docker ps -q -f name=$CONTNAME)" ]; then
         docker rm $CONTNAME
     fi
     # run the container via the X11 docker script
-    source $SCRIPTDIR/../docker/dockerX11.sh --name $CONTNAME rover/omnetpp
+    source $SCRIPTDIR/../docker/dockerX11.sh --name $CONTNAME --hostname $CONTNAME rover/omnetpp
 else
    # container already exists - start it
    docker start -i $CONTNAME 
