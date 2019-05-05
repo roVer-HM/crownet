@@ -8,6 +8,7 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt update && sudo apt -y install docker-ce
 
 echo "Adding $USER to docker group (change requires to login again or do a reboot!)."
+sudo usermod -a -G docker $USER
 echo "Done."
 
 
