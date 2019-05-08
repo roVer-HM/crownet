@@ -1,18 +1,10 @@
 #!/bin/bash
 
-CONTNAME=omnetpp
-# SCRIPTDIR=`dirname "$0"`
-SCRIPTDIR="$( cd "$(dirname "$0")" ; pwd -P )"
+SHORTNAME=omnetpp
+CONTNAME=$SHORTNAME
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$SHORTNAME
 
-# check if we already have a docker container for omnetpp - run it otherwise
-if [ ! "$(docker ps -q -f name=$CONTNAME)" ]; then
-    if [ "$(docker ps -aq -f status=exited -f name=$CONTNAME)" ]; then
-        # cleanup
-        docker rm $CONTNAME
-    fi
-    # run the container via the X11 docker script
-    source $SCRIPTDIR/../docker/dockerX11.sh --name $CONTNAME --hostname $CONTNAME rover/omnetpp
-else
-   # container already exists - start it
-   docker start -i $CONTNAME 
-fi
+source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
+
+run_start_container $SHORTNAME $CONTNAME $IMAGENAME
+

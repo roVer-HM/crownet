@@ -57,8 +57,9 @@ WORKDIR /opt/omnetpp/omnetpp
 # RUN rm -rf samples
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .
-RUN ./configure
-RUN make -j $(nproc)
+RUN ./configure && \
+    make -j $(nproc) && \
+    find . -type f -name '*.o' -exec rm {} +
 
 # now install the Eclipse IDE base
 ADD ide/ide.tar.gz .
