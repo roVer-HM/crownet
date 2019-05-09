@@ -5,6 +5,6 @@
 docker image pull ubuntu
 docker image pull ubuntu:18.04
 
-docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/omnet
+docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp
 docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/sumo
 docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/vadere
