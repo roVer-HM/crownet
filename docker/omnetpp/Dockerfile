@@ -84,5 +84,9 @@ CMD [ "/init.sh" ]
 # --volume="/etc/shadow:/etc/shadow:ro" \
 # --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 # -v /tmp/.X11-unix:/tmp/.X11-unix \
+#
+# Note: Attaching a debugger to a running simulation requires SYS_PTRACE capabilities:
+#       - run with option --cap-add=SYS_PTRACE
+#       - docker compose with   cap_add: - SYS_PTRACE
 
 

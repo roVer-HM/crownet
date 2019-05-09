@@ -18,6 +18,7 @@ function run_container_X11() {
 
 	# docker run -ti \
 	docker run -t  \
+        --cap-add=SYS_PTRACE \
 	--user $(id -u) \
 	-e DISPLAY=$DISPLAY \
 	--workdir=$(pwd) \
@@ -46,4 +47,14 @@ function run_start_container() {
 	   # container already exists - start it
 	   docker start -i $2
 	fi
+}
+
+
+function check_ptrace() {
+	read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)
+        if [[ $value = 1 ]]
+        then 
+           echo "Warning: It seems that your system does not allow ptrace - debugging will not work."
+           echo "         Edit /etc/sysctl.d/10-ptrace.conf and set ptrace_scope = 0."
+        fi
 }
