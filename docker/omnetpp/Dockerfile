@@ -27,7 +27,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
        git git-lfs \ 
-       nemiver \
+       uncrustify nemiver \
        clang bison flex make qt5-default \
        openjdk-8-jre \
        doxygen graphviz tcl-dev tk-dev python python3 \
