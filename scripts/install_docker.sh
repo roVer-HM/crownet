@@ -11,8 +11,8 @@ echo "When queried, please enter login credentials for accessing the Docker regi
 echo ""
 docker login sam-dev.cs.hm.edu:5023
 
-echo "Adding $USER to docker group (change requires to login again or do a reboot!)."
+echo "Adding $USER to docker group (change requires a reboot!)."
 sudo usermod -a -G docker $USER
-echo "Done."
+echo "Done. Please reboot now and login again."
 
 

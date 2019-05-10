@@ -64,7 +64,8 @@ RUN ./configure && \
 
 # now install the Eclipse IDE base
 ADD ide/ide.tar.gz .
-RUN chmod -R a+rw /opt/omnetpp/omnetpp/samples
+RUN chmod -R a+rw /opt/omnetpp/omnetpp/samples && \
+    chmod -R a+rw /opt/omnetpp/omnetpp/ide
 
 # TODO: clean up all files not needed anymore (object files, etc.)
 
