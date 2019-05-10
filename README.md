@@ -37,21 +37,60 @@ git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:5022/rover/rover-main
 Install Docker (if not already available on your system):
 ```
 cd rover-main/scripts
-./install_docker.sh
+source roverenv
+install_docker.sh
 ```
 
 Pull the required Docker images (due to the large size of some of them, this will take some time - depending on your Internet connection):
 ```
-./pull_images.sh
+pull_images.sh
 ```
+
+It is also recommended to include the script 'rover-main/scripts/roverenv' in the startup file 
+of your shell, e.g. by adding 'source $HOME/rover-main/roverenv' at the end of ~/.bashrc. This will
+include the rover scripts in the search path, allowing you to start the containers easily 
+by simply typing their name.
+
 
 Now you have a completely installed simulation system. Simply start the container which you want to use, e.g. by:
 ```
-./omnetpp
+omnetpp
 ```
 or
 ```
-./vadere
+vadere
 ```
 
 Note: The start script will mount your home directory so that it is visible inside the Docker container.
+
+
+# Running Your First Coupled Simulation
+
+*Note: As a first test for testing coupled mobility and mobile node simulation, we are simply running the 
+VEINS example simulation in the roVer containers. This example will be updated to an example illustrating pedistrian mobility as soon as the required TraCI interfaces have been implemented.*
+
+In this example, we will use the sumo container for simulating the mobility and the omnetpp container for simulating mobile communication (as within the VEINS Erlangen example).
+
+## Step 1: Start the sumo container
+Start the sumo container by executing the sumo start script:
+```
+sumo
+```
+The container will now be listening for incomming TraCi commands and start sumo when a new client connects.
+
+## Step 2: Start the omnetpp container and import the subprojects
+Start the omnetpp container:
+```
+omnetpp
+```
+
+Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'rover-main' folder that have been created when cloning the 'rover-main' repository. (Import of these projects is done via File->Import->Generic->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
+
+
+## Step 3: Run the simulation
+Within the VEINS project, locate the file 'omnetpp.ini' within the 'examples/veins' folder. Run the simulation by doing a right-click and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible, select a configuration and start the simulation. The sumo container will be connected and start a sumo instance automatically. 
+
+*Note: Currently there seems to be a bug which leads to a black window in the configuration-selection dialog
+the first time the simulation is started. Workaround: Simply close the dialog and rebuild the network (File->Setup a configuration...).
+
+ 
