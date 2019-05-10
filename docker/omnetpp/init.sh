@@ -17,7 +17,7 @@ fi
 
 # start shell so user can enter additional commands (in interactive mode)
 # /bin/bash
-
+sleep 3
 PID=`pidof omnetpp`
 
 # omnetpp is special since the start script in its bin directory returns immediately
