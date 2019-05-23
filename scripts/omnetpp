@@ -1,8 +1,24 @@
 #!/bin/bash
+# Start script for the omnetpp container.
+#
+# By default, the latest version will be started. In order to start a different version
+# add the version number as first argument. For example: "omnetpp 5.3" will start 
+# a containter with the 5.3 release. For a list of available containers, refer to the
+# docker registry or the wiki of the project.
 
 SHORTNAME=omnetpp
+
+if [ -z "$1" ]
+then
+      VERSION=latest
+else
+      VERSION=omnetpp-$1
+      SHORTNAME=$SHORTNAME-$1
+fi
+
+
 CONTNAME=$SHORTNAME
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$SHORTNAME
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:$VERSION
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
