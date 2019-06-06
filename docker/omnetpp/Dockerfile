@@ -13,7 +13,7 @@
 FROM ubuntu:18.04
 
 # Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-5.4.1
+ENV OMNETRELEASE omnetpp-5.5
 
 
 
@@ -29,7 +29,7 @@ RUN apt-get update && \
        git git-lfs \ 
        uncrustify nemiver \
        clang bison flex make qt5-default \
-       openjdk-8-jre \
+       openjdk-11-jre \
        doxygen graphviz tcl-dev tk-dev python python3 \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
        openscenegraph osgearth \
