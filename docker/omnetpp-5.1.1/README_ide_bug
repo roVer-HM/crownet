@@ -1,0 +1,8 @@
+Important note: 
+Unfortunately, the IDE in this omnetpp version has a bug that is does not properly add include directories of referenced projects
+to the include path. For the components relevant in the roVer project, this leads to the problem that the INET headers are not
+found when trying to build the simuLTE project.
+
+Workaround: Manually add the INET/src/inet directory to the include path by 
+right-click on simuLTE project, expand C/C++ General tab, slect "Paths and Symbols",
+click "Add" to add new include path
