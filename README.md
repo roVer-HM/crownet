@@ -47,7 +47,7 @@ pull_images.sh
 ```
 
 It is also recommended to include the script 'rover-main/scripts/roverenv' in the startup file 
-of your shell, e.g. by adding 'source $HOME/rover-main/roverenv' at the end of ~/.bashrc. This will
+of your shell, e.g. by adding 'source $HOME/rover-main/scripts/roverenv' at the end of ~/.bashrc. This will
 include the rover scripts in the search path, allowing you to start the containers easily 
 by simply typing their name.
 
