@@ -7,4 +7,4 @@ If you compile OMNeT++ based on the sources in the roVer gitlab repository, the 
 need to be extracted to ./ide in the omnetpp directory. 
 
 ## Version
-Version has been extracted from the OMNeT++ Version 5.5 and is Java 11 compatible
+Version has been extracted from the OMNeT++ Version 5.5.1 and is Java 11 compatible
