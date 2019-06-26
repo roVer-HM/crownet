@@ -13,11 +13,11 @@
 FROM ubuntu:18.04
 
 # Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-5.5
+ENV OMNETRELEASE omnetpp-5.5.1
+# Note: Remember to update the description below when changing OMNETRELEASE
 
 
-
-LABEL description "OMNeT++ Simulation Framework (as used in roVer)"
+LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-5.1.1)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all packages required to compile omnet

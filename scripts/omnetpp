@@ -11,13 +11,13 @@ SHORTNAME=omnetpp
 if [ -z "$1" ]
 then
       VERSION=latest
+      CONTNAME=$SHORTNAME-$VERSION
 else
       VERSION=omnetpp-$1
       SHORTNAME=$SHORTNAME-$1
+      CONTNAME=$SHORTNAME
 fi
 
-
-CONTNAME=$SHORTNAME
 IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:$VERSION
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
