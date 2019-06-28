@@ -3,7 +3,7 @@
 Project collecting general documentation and tooling for the roVer project.
 
 The roVer simulation environment is composed of three simulation frameworks:
-* [OMNeT++](https://omnetpp.org/) - The simulation framework used 
+* [OMNeT++](https://omnetpp.org/) - The simulation framework used
   for modelling communication and information dissemination
 * [VADERE](http://www.vadere.org/) - VADERE Crowd Simulation
 * [SUMO](https://dlr.de/ts/en/sumo/) - Simulation of Urban MObility
@@ -46,11 +46,14 @@ Pull the required Docker images (due to the large size of some of them, this wil
 pull_images.sh
 ```
 
-It is also recommended to include the script 'rover-main/scripts/roverenv' in the startup file 
+It is also recommended to include the script 'rover-main/scripts/roverenv' in the startup file
 of your shell, e.g. by adding 'source $HOME/rover-main/scripts/roverenv' at the end of ~/.bashrc. This will
-include the rover scripts in the search path, allowing you to start the containers easily 
+include the rover scripts in the search path, allowing you to start the containers easily
 by simply typing their name.
 
+If you use a Linux distribution which enables SELinux (Fedoara, RedHat, ...) the X11 Forwarding is blocked.
+For now disable SELinux with `sudo setenforce 0` which will switch SELinux in Persmissive mode. After a
+reboot SELinx will be enabled again. 
 
 Now you have a completely installed simulation system. Simply start the container which you want to use, e.g. by:
 ```
@@ -66,7 +69,7 @@ Note: The start script will mount your home directory so that it is visible insi
 
 # Running Your First Coupled Simulation
 
-*Note: As a first test for testing coupled mobility and mobile node simulation, we are simply running the 
+*Note: As a first test for testing coupled mobility and mobile node simulation, we are simply running the
 VEINS example simulation in the roVer containers. This example will be updated to an example illustrating pedistrian mobility as soon as the required TraCI interfaces have been implemented.*
 
 In this example, we will use the sumo container for simulating the mobility and the omnetpp container for simulating mobile communication (as within the VEINS Erlangen example).
@@ -88,9 +91,7 @@ Open a (new) OMNeT++ workspace (path should be within your home directory!), **d
 
 
 ## Step 3: Run the simulation
-Within the VEINS project, locate the file 'omnetpp.ini' within the 'examples/veins' folder. Run the simulation by doing a right-click and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible, select a configuration and start the simulation. The sumo container will be connected and start a sumo instance automatically. 
+Within the VEINS project, locate the file 'omnetpp.ini' within the 'examples/veins' folder. Run the simulation by doing a right-click and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible, select a configuration and start the simulation. The sumo container will be connected and start a sumo instance automatically.
 
 *Note: Currently there seems to be a bug which leads to a black window in the configuration-selection dialog
 the first time the simulation is started. Workaround: Simply close the dialog and rebuild the network (File->Setup a configuration...).
-
- 
