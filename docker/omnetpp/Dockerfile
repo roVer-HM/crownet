@@ -44,17 +44,25 @@ RUN chmod 400 /root/.ssh/id_rsa
 # clone the OMNeT++ sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/omnetpp
 # enable lfs (must be done before cloning!) and clone the project
-RUN git lfs install && \ 
-    GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
+RUN git lfs install
 
+# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value] 
+ARG NOCACHE_CLONE=0
+RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        clone --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
 
 # add a symbolic link so omnetpp is found in the path
 RUN ln -s /opt/omnetpp/$OMNETRELEASE /opt/omnetpp/omnetpp
 
-# configure and compile
+# pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/omnetpp/omnetpp
-# samples are optional and not needed for compiling - remove for a smaller image
+
+ARG NOCACHE_PULL=0
+RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
+
+# configure and compile
+#  - samples are optional and not needed for compiling - remove for a smaller image
 # RUN rm -rf samples
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .

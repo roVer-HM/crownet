@@ -32,15 +32,22 @@ RUN apt-get update && \
 # clone the vadere sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/vadere
 # enable lfs (must be done before cloning!) and clone the project
-RUN git lfs install && \ 
-    git clone --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
+RUN git lfs install
 
+# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value] 
+ARG NOCACHE_CLONE=0
+RUN git clone --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
 
 # add a symbolic link so vadere is found in the path
 RUN ln -s /opt/vadere/$RELEASE /opt/vadere/vadere
 
-# configure and compile
+# pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/vadere/vadere
+
+ARG NOCACHE_PULL=0
+RUN git pull
+
+# configure and compile
 ENV PATH /opt/vadere/vadere/VadereGui/target:$PATH
 RUN mvn clean package -Dmaven.test.skip
 

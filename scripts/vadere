@@ -6,5 +6,5 @@ IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$SHORTNAME
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
-run_start_container $SHORTNAME $CONTNAME $IMAGENAME
+run_start_container $SHORTNAME $CONTNAME $IMAGENAME /init.sh "$@"
 
