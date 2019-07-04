@@ -95,3 +95,22 @@ Within the VEINS project, locate the file 'omnetpp.ini' within the 'examples/vei
 
 *Note: Currently there seems to be a bug which leads to a black window in the configuration-selection dialog
 the first time the simulation is started. Workaround: Simply close the dialog and rebuild the network (File->Setup a configuration...).
+
+## Step 4: Create and Run Own Coupled Simulations
+Now you are ready to create and run your own coupled simulations. Good starting points are the [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [INET User's Guide](https://inet.omnetpp.org/docs/users-guide/), [INET Developer's Guide](https://inet.omnetpp.org/docs/developers-guide/), and the [VEINS tutorial](https://veins.car2x.org/tutorial/).
+
+*TODO: Create roVer Tutorial and it as primary reference here*
+
+_Important note:_ Since within the roVer project we run the mobility simulation and the network simulation in separate containers, remember to update the respective ``omnetpp.ini`` to refer to the container running the mobility simulation - ``localhost`` *will not work*. This can easily be done by adapting the ``*.manager.host`` parameter.
+
+Example: Connect to sumo within the sumo container
+```
+##########################################################
+#            TraCIScenarioManager parameters             #
+##########################################################
+*.manager.updateInterval = 1s
+# *.manager.host = "localhost"
+*.manager.host = "sumo"
+*.manager.port = 9999
+
+```
