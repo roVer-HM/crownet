@@ -50,16 +50,16 @@ function run_container_X11() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_start_container() {
-	if [ ! "$(docker ps -q -f name=$2)" ]; then
-	    if [ "$(docker ps -aq -f status=exited -f name=$2)" ]; then
+	if [ ! "$(docker ps -q -f name=$1)" ]; then
+	    if [ "$(docker ps -aq -f status=exited -f name=$1)" ]; then
 		# cleanup
-		docker rm $2
+		docker rm $1
 	    fi
 	    # run the container via the X11 docker script
 	    run_container_X11 --name $1 --hostname $1 $3 $4 $5 $6 $7 $8 $9
  	else
 	   # container already exists - start it
-	   docker start -i $2 $4 $5 $6 $7 $8 $9
+	   docker start -i $1 $4 $5 $6 $7 $8 $9
 	fi
 }
 
