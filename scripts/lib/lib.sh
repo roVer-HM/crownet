@@ -28,8 +28,13 @@ function run_container_X11() {
 
 	echo "Run docker container with access to X11 and your home directory..."
 
-	# docker run -ti \
-	docker run -t  \
+	if [[ $@ == *"bash"* ]]; then
+	  MODE="-ti"
+	else
+	  MODE="-t"
+        fi
+
+	docker run $MODE  \
         --cap-add=SYS_PTRACE \
 	--user $(id -u) \
         --network $INTNET \
