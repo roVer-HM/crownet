@@ -114,3 +114,23 @@ Example: Connect to sumo within the sumo container
 *.manager.port = 9999
 
 ```
+
+# Working with the Command Line (instead of using the OMNeT++ IDE)
+If you prefer to work on the command line instead of using the graphical IDE of OMNeT++, you can use the "exec" option
+of the omnetpp Docker container. It allows to execute an arbitrary command within the container.
+
+## Example: Building the INET and SimuLTE Frameworks
+Assuming that you have added the "omnetpp" script to your search path for executibles (see installation instructions above),you can clone and build the INET and SimuLTE models by the following commands:
+```
+git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git
+cd inet
+omnetpp exec make makefiles
+omnetpp exec make -j4
+cd ..
+
+git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/simulte.git
+cd simulte
+omnetpp exec make makefiles
+omnetpp exec make -j4
+
+```
