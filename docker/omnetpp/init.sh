@@ -35,7 +35,7 @@ if [ -z "$SILENT" ]; then
 fi
 
 # execute command
-$CMD
+$CMD $2 $3 $4 $5 $6 $7 $8 $9
 
 if [ "$CMD" == "omnetpp" ]; then
      sleep 3
