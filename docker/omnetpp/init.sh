@@ -14,11 +14,10 @@ export PATH=/opt/omnetpp/omnetpp/bin:$PATH
 
 if [ -z "$1" ]; then
      CMD="omnetpp"
-     SILENT=1
 else
      CMD="$1"
-     if [ "$CMD" == "/bin/bash" ]; then
-          SILENT=1
+     if [[ "$CMD" != "omnetpp" && "$CMD" != "/bin/bash" && "$CMD" != "bash" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
+          SILENT="y"
      fi
 fi
 
