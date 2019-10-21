@@ -55,7 +55,7 @@ function run_container_X11() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_start_container() {
-	if [ ! "$(docker ps -q -f name=$1)" ]; then
+	if [ ! "$(docker ps -q -f name=^$1$)" ]; then
 	    if [ "$(docker ps -aq -f status=exited -f name=$1)" ]; then
 		# cleanup
 		docker rm $1
