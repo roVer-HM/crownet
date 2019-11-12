@@ -35,7 +35,7 @@ if [ -z "$SILENT" ]; then
 fi
 
 # execute command
-$CMD $2 $3 $4 $5 $6 $7 $8 $9
+$CMD $2 $3 $4 $5 $6 $7 $8 $9; TEST_STATUS=${PIPESTATUS[0]}
 
 if [ "$CMD" == "omnetpp" ]; then
      sleep 3
@@ -51,5 +51,7 @@ fi
 
 
 if [ -z "$SILENT" ]; then
-     echo "Container terminated."
+     if [ $TEST_STATUS -eq 0 ]; then echo "Container terminated."; else echo "Container terminated (ERROR: $TEST_STATUS)."; fi
 fi
+
+exit $TEST_STATUS
