@@ -17,7 +17,7 @@ ENV OMNETRELEASE omnetpp-5.5.1
 # Note: Remember to update the description below when changing OMNETRELEASE
 
 
-LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-5.1.1)"
+LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-5.5.1)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all packages required to compile omnet
@@ -80,7 +80,7 @@ RUN chmod -R a+rw /opt/omnetpp/omnetpp/samples && \
 # init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
-CMD [ "/init.sh" ]
+ENTRYPOINT [ "/init.sh" ]
 
 # Note: in order to launch OMNeT with X11 output, the container needs to be launched with:
 # docker run -it \

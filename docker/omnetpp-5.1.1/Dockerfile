@@ -71,7 +71,7 @@ RUN chmod -R a+rw /opt/omnetpp/omnetpp/samples && \
 # init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
-CMD [ "/init.sh" ]
+ENTRYPOINT [ "/init.sh" ]
 
 # Note: in order to launch OMNeT with X11 output, the container needs to be launched with:
 # docker run -it \

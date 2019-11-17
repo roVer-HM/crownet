@@ -95,3 +95,42 @@ Within the VEINS project, locate the file 'omnetpp.ini' within the 'examples/vei
 
 *Note: Currently there seems to be a bug which leads to a black window in the configuration-selection dialog
 the first time the simulation is started. Workaround: Simply close the dialog and rebuild the network (File->Setup a configuration...).
+
+## Step 4: Create and Run Own Coupled Simulations
+Now you are ready to create and run your own coupled simulations. Good starting points are the [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [INET User's Guide](https://inet.omnetpp.org/docs/users-guide/), [INET Developer's Guide](https://inet.omnetpp.org/docs/developers-guide/), and the [VEINS tutorial](https://veins.car2x.org/tutorial/).
+
+*TODO: Create roVer Tutorial and it as primary reference here*
+
+_Important note:_ Since within the roVer project we run the mobility simulation and the network simulation in separate containers, remember to update the respective ``omnetpp.ini`` to refer to the container running the mobility simulation - ``localhost`` *will not work*. This can easily be done by adapting the ``*.manager.host`` parameter.
+
+Example: Connect to sumo within the sumo container
+```
+##########################################################
+#            TraCIScenarioManager parameters             #
+##########################################################
+*.manager.updateInterval = 1s
+# *.manager.host = "localhost"
+*.manager.host = "sumo"
+*.manager.port = 9999
+
+```
+
+# Working with the Command Line (instead of using the OMNeT++ IDE)
+If you prefer to work on the command line instead of using the graphical IDE of OMNeT++, you can use the "exec" option
+of the omnetpp Docker container. It allows to execute an arbitrary command within the container.
+
+## Example: Building the INET and SimuLTE Frameworks
+Assuming that you have added the "omnetpp" script to your search path for executibles (see installation instructions above),you can clone and build the INET and SimuLTE models by the following commands:
+```
+git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git
+cd inet
+omnetpp exec make makefiles
+omnetpp exec make -j4
+cd ..
+
+git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/simulte.git
+cd simulte
+omnetpp exec make makefiles
+omnetpp exec make -j4
+
+```
