@@ -3,3 +3,9 @@ VadereTestingSuite.preferences.xml
 **/__cache__
 **/vadere-server-output
 **/.directory
+
+
+# rover project
+
+rover/out
+rover/**/libROVER*
