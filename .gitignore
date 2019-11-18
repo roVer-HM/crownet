@@ -9,3 +9,6 @@ VadereTestingSuite.preferences.xml
 
 rover/out
 rover/**/libROVER*
+rover/**/results
+rover/**/output
+rover/**/legacy
