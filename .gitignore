@@ -8,7 +8,10 @@ VadereTestingSuite.preferences.xml
 # rover project
 
 rover/out
+rover/src/Makefile
+rover/.settings
 rover/**/libROVER*
 rover/**/results
 rover/**/output
 rover/**/legacy
+rover/**/.qtenvrc
