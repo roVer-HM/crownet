@@ -1,2 +1,14 @@
 log.out
 VadereTestingSuite.preferences.xml
+**/__cache__
+**/vadere-server-output
+**/.directory
+
+
+# rover project
+
+rover/out
+rover/**/libROVER*
+rover/**/results
+rover/**/output
+rover/**/legacy

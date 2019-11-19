@@ -5,7 +5,7 @@
 # - simuLTE
 # - VEINS
 #
-# To be discussed: Split this in two containers: 
+# To be discussed: Split this in two containers:
 #   1) omnetpp-base (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 
@@ -27,11 +27,11 @@ RUN apt-get update && apt-get install -y curl && curl -s https://packagecloud.io
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
-       git git-lfs \ 
+       git git-lfs \
        uncrustify nemiver \
        g++ bison flex make qt5-default \
        openjdk-8-jre \
-       doxygen graphviz tcl-dev tk-dev python python3 \
+       doxygen graphviz tcl-dev tk-dev python python3 valgrind \
        libopenmpi-dev libxml2-dev libwebkitgtk-1.0-0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -43,7 +43,7 @@ RUN chmod 400 /root/.ssh/id_rsa
 # clone the OMNeT++ sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/omnetpp
 # enable lfs (must be done before cloning!) and clone the project
-RUN git lfs install && \ 
+RUN git lfs install && \
     GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
         clone --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
 
@@ -88,5 +88,3 @@ ENTRYPOINT [ "/init.sh" ]
 # Note: Attaching a debugger to a running simulation requires SYS_PTRACE capabilities:
 #       - run with option --cap-add=SYS_PTRACE
 #       - docker compose with   cap_add: - SYS_PTRACE
-
-

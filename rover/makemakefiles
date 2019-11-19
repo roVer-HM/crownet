@@ -1,0 +1,11 @@
+#
+# Usage:
+#    make -f makemakefiles
+# or, for Microsoft Visual C++:
+#    nmake -f makemakefiles MMOPT=-n
+#
+
+MAKEMAKE=opp_makemake $(MMOPT)
+
+all:
+	cd src && $(MAKEMAKE) --make-so -f --deep -o ROVER -O out -pROVER

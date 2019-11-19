@@ -5,7 +5,7 @@
 # - simuLTE
 # - VEINS
 #
-# To be discussed: Split this in two containers: 
+# To be discussed: Split this in two containers:
 #   1) omnetpp-base (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 
@@ -26,11 +26,11 @@ LABEL maintainer  "wischhof@ieee.org"
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
-       git git-lfs \ 
+       git git-lfs \
        uncrustify nemiver \
        clang bison flex make qt5-default \
        openjdk-11-jre \
-       doxygen graphviz tcl-dev tk-dev python python3 \
+       doxygen graphviz tcl-dev tk-dev python python3 valgrind \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
        openscenegraph osgearth \
        libopenmpi-dev libxml2-dev libwebkitgtk-1.0-0 && \
@@ -46,7 +46,7 @@ WORKDIR /opt/omnetpp
 # enable lfs (must be done before cloning!) and clone the project
 RUN git lfs install
 
-# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value] 
+# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
         clone --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
@@ -97,5 +97,3 @@ ENTRYPOINT [ "/init.sh" ]
 # Note: Attaching a debugger to a running simulation requires SYS_PTRACE capabilities:
 #       - run with option --cap-add=SYS_PTRACE
 #       - docker compose with   cap_add: - SYS_PTRACE
-
-
