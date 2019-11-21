@@ -120,17 +120,35 @@ If you prefer to work on the command line instead of using the graphical IDE of 
 of the omnetpp Docker container. It allows to execute an arbitrary command within the container.
 
 ## Example: Building the INET and SimuLTE Frameworks
-Assuming that you have added the "omnetpp" script to your search path for executibles (see installation instructions above),you can clone and build the INET and SimuLTE models by the following commands:
+Assuming that you have added the "omnetpp" script to your search path for executibles and cloned the roVer with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
 ```
-git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git
 cd inet
 omnetpp exec make makefiles
 omnetpp exec make -j4
 cd ..
 
-git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/simulte.git
 cd simulte
 omnetpp exec make makefiles
 omnetpp exec make -j4
 
 ```
+
+## Example: Building the veins (vehicles in network simulation) projects
+The veins framework itself can be built similar to the previously mentioned components. However, it is recommended to create
+the makefiles by calling the *configure* script:
+```
+cd veins
+omnetpp exec ./configure
+omnetpp exec make -j4
+```
+
+Veins includes of several subprojects - for roVer the veins_inet project is required. It needs to have access to the folder where INET 4 is located. The location is specified by the option `--with-inet=../../../inet4` of the *configure* script:
+
+```
+cd subprojects/veins_inet
+omnetpp exec ./configure --with-inet=../../../inet4
+omnetpp exec make -j4
+cd ../../..
+```
+
+

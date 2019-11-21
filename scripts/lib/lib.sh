@@ -28,10 +28,14 @@ function run_container_X11() {
 
 	echo "Run docker container with access to X11 and your home directory..."
 
-	if [[ $@ == *"bash"* ]]; then
-	  MODE="-ti"
+        # We try to guess if we need to connect the console: For all exept omnetpp
+        # we currently connect a console - behavior might need to change in future
+	if [[ $6 == *"omnetpp"* ]]; then
+	   MODE="-t"
+           WRAPPER=""
 	else
-	  MODE="-t"
+	   MODE="-ti"
+           WRAPPER="bash -c"
         fi
 
 	docker run $MODE  \
@@ -46,7 +50,7 @@ function run_container_X11() {
 	--volume="/etc/shadow:/etc/shadow:ro" \
 	--volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix" \
-	"$@"
+	$1 $2 $3 $4 $5 $WRAPPER $6 "$7 $8 $9 ${10} ${11} ${12}"
 }
 
 # check if we already have an existing docker container - run it otherwise
@@ -55,16 +59,16 @@ function run_container_X11() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_start_container() {
-	if [ ! "$(docker ps -q -f name=^$1$)" ]; then
-	    if [ "$(docker ps -aq -f status=exited -f name=$1)" ]; then
+	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
+	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
 		# cleanup
 		docker rm $1
 	    fi
 	    # run the container via the X11 docker script
 	    run_container_X11 --name $1 --hostname $1 $3 $4 $5 $6 $7 $8 $9
  	else
-	   # container already exists - start it
-	   docker start -i $1 $4 $5 $6 $7 $8 $9
+	   # container already exists - execute command within container
+	   docker exec -i $1 bash -c "cd $(pwd);$4 $5 $6 $7 $8 $9"
 	fi
 }
 
