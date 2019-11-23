@@ -30,15 +30,17 @@ function run_container_X11() {
 
         # We try to guess if we need to connect the console: For all exept omnetpp
         # we currently connect a console - behavior might need to change in future
-	if [[ $6 == *"omnetpp"* ]]; then
+	if [[ $6 == *"omnetpp"* || $6 == "" ]]; then
 	   MODE="-t"
            WRAPPER=""
+           WRAPPER_END=""
 	else
 	   MODE="-ti"
-           WRAPPER="bash -c"
+           WRAPPER="bash -c \"cd $(pwd);"
+           WRAPPER_END="\""
         fi
 
-	docker run $MODE  \
+        CMD="docker run $MODE  \
         --cap-add=SYS_PTRACE \
 	--user $(id -u) \
         --network $INTNET \
@@ -50,7 +52,11 @@ function run_container_X11() {
 	--volume="/etc/shadow:/etc/shadow:ro" \
 	--volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix" \
-	$1 $2 $3 $4 $5 $WRAPPER $6 "$7 $8 $9 ${10} ${11} ${12}"
+        $1 $2 $3 $4 $5 $WRAPPER $6 $7 $8 $9 ${10} $WRAPPER_END"
+
+        # echo "Docker CMD: \"$CMD\""
+
+        eval $CMD
 }
 
 # check if we already have an existing docker container - run it otherwise
@@ -59,16 +65,23 @@ function run_container_X11() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_start_container() {
+	if [[ $4 == "omnetpp" || $4 == "" ]]; then
+                # omnetpp is a special case: we must not terminate until the omnetpp process has terminated
+                CMD4="/waitfor.sh $4"
+        else
+                CMD4=$4
+        fi
+
 	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
 	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
 		# cleanup
 		docker rm $1
 	    fi
 	    # run the container via the X11 docker script
-	    run_container_X11 --name $1 --hostname $1 $3 $4 $5 $6 $7 $8 $9
+            run_container_X11 --name $1 --hostname $1 $3 $CMD4 $5 $6 $7 $8 $9 ${10}
  	else
-	   # container already exists - execute command within container
-	   docker exec -i $1 bash -c "cd $(pwd);$4 $5 $6 $7 $8 $9"
+	    # container already exists - execute command within container
+       	    docker exec -i $1 bash -c "cd $(pwd);$CMD4 $5 $6 $7 $8 $9 ${10}"
 	fi
 }
 
