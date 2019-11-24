@@ -17,6 +17,23 @@ function check_create_network() {
 	fi
 }
 
+# Wrap a command so that is executed within a shell
+# @param $1       command to be executed
+# @param $2-${10} arguments to be passed to the executed command
+# @return String with the appropriately wrapped command
+function wrap_command() {
+        # We try to guess if we need to connect the console: For all exept omnetpp
+        # we currently connect a console - behavior might need to change in future
+	if [[ $1 == *"omnetpp"* ]]; then
+           WRAPPER="/waitfor.sh "
+           WRAPPER_END=""
+	else
+           WRAPPER="bash -c \"cd $(pwd);"
+           WRAPPER_END="\""
+        fi
+        echo "$WRAPPER $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10} $WRAPPER_END"
+}
+
 # Run a docker container allowing X11 output.
 # (For an interactive shell, add the options -ti .)
 # @param $@ parameters to be forwarded to the docker run command
@@ -28,19 +45,7 @@ function run_container_X11() {
 
 	echo "Run docker container with access to X11 and your home directory..."
 
-        # We try to guess if we need to connect the console: For all exept omnetpp
-        # we currently connect a console - behavior might need to change in future
-	if [[ $6 == *"omnetpp"* || $6 == "" ]]; then
-	   MODE="-t"
-           WRAPPER=""
-           WRAPPER_END=""
-	else
-	   MODE="-ti"
-           WRAPPER="bash -c \"cd $(pwd);"
-           WRAPPER_END="\""
-        fi
-
-        CMD="docker run $MODE  \
+        CMD="docker run -ti \
         --cap-add=SYS_PTRACE \
 	--user $(id -u) \
         --network $INTNET \
@@ -52,7 +57,7 @@ function run_container_X11() {
 	--volume="/etc/shadow:/etc/shadow:ro" \
 	--volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix" \
-        $1 $2 $3 $4 $5 $WRAPPER $6 $7 $8 $9 ${10} $WRAPPER_END"
+        $@"
 
         # echo "Docker CMD: \"$CMD\""
 
@@ -65,6 +70,27 @@ function run_container_X11() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_start_container() {
+	CMD4="$(wrap_command $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15})"
+	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
+	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
+		# cleanup
+		docker rm $1
+	    fi
+	    # run the container via the X11 docker script
+            run_container_X11 --name $1 --hostname $1 $3 $CMD4
+ 	else
+	    # container already exists - execute command within container
+            echo "CMD4=\"$CMD4\""
+       	    docker exec -i $1 bash -c "cd $(pwd); $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15}"
+	fi
+}
+
+# create a new (randomly named) container and start it with the specified command
+# @param $1 Container short name   (to be used as short container and hostname)
+# @param $2 Container full name
+# @param $3 Docker image name
+# @param $4 - $9 are passed to the container
+function run_individual_container() {
 	if [[ $4 == "omnetpp" || $4 == "" ]]; then
                 # omnetpp is a special case: we must not terminate until the omnetpp process has terminated
                 CMD4="/waitfor.sh $4"
@@ -72,17 +98,8 @@ function run_start_container() {
                 CMD4=$4
         fi
 
-	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
-	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
-		# cleanup
-		docker rm $1
-	    fi
-	    # run the container via the X11 docker script
-            run_container_X11 --name $1 --hostname $1 $3 $CMD4 $5 $6 $7 $8 $9 ${10}
- 	else
-	    # container already exists - execute command within container
-       	    docker exec -i $1 bash -c "cd $(pwd);$CMD4 $5 $6 $7 $8 $9 ${10}"
-	fi
+	CMD4="$(wrap_command $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15})"
+        run_container_X11 --rm --hostname $1 $3 $CMD4
 }
 
 
