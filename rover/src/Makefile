@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for $(LIB_PREFIX)ROVER
 #
 # This file was generated with the command:
-#  opp_makemake --make-so -f --deep -o ROVER -O out -pROVER -KINET_PROJ=../../inet -KVEINS_PROJ=../../veins -KVEINS_INET_PROJ=/home/stsc/repos/rover-main/veins/subprojects/veins_inet -DINET_IMPORT -DVEINS_IMPORT -DVEINS_INET_IMPORT -L$$\(INET_PROJ\)/src -L$$\(VEINS_PROJ\)/src -L$$\(VEINS_PROJ\)/subprojects/veins_inet/src -lINET$$\(D\) -lveins$$\(D\) -lveins_inet$$\(D\)
+#  opp_makemake --make-so -f --deep -o ROVER -O out -pROVER -KINET_PROJ=../../inet -KVEINS_INET_PROJ=/home/stsc/repos/rover-main/veins/subprojects/veins_inet -KVEINS_PROJ=../../veins -DINET_IMPORT -DVEINS_INET_IMPORT -I. -I$$\(INET_PROJ\)/src -I$$\(VEINS_INET_PROJ\)/src -I$$\(VEINS_PROJ\)/src/veins -I$$\(VEINS_PROJ\)/src -I. -L$$\(INET_PROJ\)/src -L$$\(VEINS_INET_PROJ\)/src -lINET$$\(D\) -lveins_inet$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -10,13 +10,19 @@ TARGET = $(LIB_PREFIX)ROVER$(D)$(SHARED_LIB_SUFFIX)
 TARGET_DIR = .
 
 # C++ include paths (with -I)
-INCLUDE_PATH =
+INCLUDE_PATH = \
+    -I. \
+    -I$(INET_PROJ)/src \
+    -I$(VEINS_INET_PROJ)/src \
+    -I$(VEINS_PROJ)/src/veins \
+    -I$(VEINS_PROJ)/src \
+    -I.
 
 # Additional object and library files to link with
 EXTRA_OBJS =
 
 # Additional libraries (-L, -l options)
-LIBS = $(LDFLAG_LIBPATH)$(INET_PROJ)/src $(LDFLAG_LIBPATH)$(VEINS_PROJ)/src $(LDFLAG_LIBPATH)$(VEINS_PROJ)/subprojects/veins_inet/src  -lINET$(D) -lveins$(D) -lveins_inet$(D)
+LIBS = $(LDFLAG_LIBPATH)$(INET_PROJ)/src $(LDFLAG_LIBPATH)$(VEINS_INET_PROJ)/src  -lINET$(D) -lveins_inet$(D)
 
 # Output directory
 PROJECT_OUTPUT_DIR = ../out
@@ -24,7 +30,7 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/rover/rover.o
+OBJS = $O/rover/rover.o $O/rover/applications/udpapp/UdpPubTransInfo.o
 
 # Message files
 MSGFILES =
@@ -34,8 +40,8 @@ SMFILES =
 
 # Other makefile variables (-K)
 INET_PROJ=../../inet
-VEINS_PROJ=../../veins
 VEINS_INET_PROJ=/home/stsc/repos/rover-main/veins/subprojects/veins_inet
+VEINS_PROJ=../../veins
 
 #------------------------------------------------------------------------------
 
@@ -60,10 +66,10 @@ include $(CONFIGFILE)
 # Simulation kernel and user interface libraries
 OMNETPP_LIBS = -loppenvir$D $(KERNEL_LIBS) $(SYS_LIBS)
 ifneq ($(TOOLCHAIN_NAME),clangc2)
-LIBS += -Wl,-rpath,$(abspath $(INET_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_PROJ)/subprojects/veins_inet/src)
+LIBS += -Wl,-rpath,$(abspath $(INET_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_INET_PROJ)/src)
 endif
 
-COPTS = $(CFLAGS) $(IMPORT_DEFINES) -DINET_IMPORT -DVEINS_IMPORT -DVEINS_INET_IMPORT -DROVER_EXPORT $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)
+COPTS = $(CFLAGS) $(IMPORT_DEFINES) -DINET_IMPORT -DVEINS_INET_IMPORT -DROVER_EXPORT $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)
 MSGCOPTS = $(INCLUDE_PATH) -PROVER_API
 SMCOPTS =
 
