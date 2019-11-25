@@ -35,7 +35,8 @@ function wrap_command() {
 }
 
 # Run a docker container allowing X11 output.
-# (For an interactive shell, add the options -ti .)
+# (If an tty is detected, the option -i is automatically added.)
+
 # @param $@ parameters to be forwarded to the docker run command
 function run_container_X11() {
 	check_create_network
@@ -43,9 +44,18 @@ function run_container_X11() {
 	xhost +"local:docker@"
 	# xhost +"local:root"
 
+	# Detect if a tty is connected as standard input
+	# https://gist.github.com/davejamesmiller/1966557
+	if [[ -t 0 ]] # called normally - Terminal input (keyboard) - interactive
+	then
+    		MODE="-ti"
+	else # input from pipe or file - do not allocate a pseudo-terminal
+    		MODE="-i"
+	fi
+
 	echo "Run docker container with access to X11 and your home directory..."
 
-        CMD="docker run -ti \
+        CMD="docker run $MODE \
         --cap-add=SYS_PTRACE \
 	--user $(id -u) \
         --network $INTNET \
