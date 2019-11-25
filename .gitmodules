@@ -1,5 +1,5 @@
 [submodule "inet"]
-	path = inet
+	path = inet4
 	url = ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git
 [submodule "simulte"]
 	path = simulte

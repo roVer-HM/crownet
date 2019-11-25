@@ -40,5 +40,9 @@ IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:$VERSION
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
-run_start_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
+# Variant 1: Try to reuse an existing container (deprecated)
+# run_start_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
+
+# Variant 2: Start an individual container for each run
+run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
 
