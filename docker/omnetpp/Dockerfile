@@ -1,10 +1,4 @@
-# OMNeT++ Simulator with the following extensions:
-# - INET Framework
-#
-# To be done:
-# - simuLTE
-# - VEINS
-#
+# OMNeT++ Simulator (as used within the roVer project)
 # To be discussed: Split this in two containers:
 #   1) omnetpp-base (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
