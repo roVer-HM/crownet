@@ -73,6 +73,9 @@ COPY init.sh /init.sh
 RUN chmod 555 /init.sh
 ENTRYPOINT [ "/init.sh" ]
 
+COPY waitfor.sh /waitfor.sh
+RUN chmod 555 /waitfor.sh
+
 # Note: in order to launch OMNeT with X11 output, the container needs to be launched with:
 # docker run -it \
 # --user $(id -u) \

@@ -101,13 +101,6 @@ function run_start_container() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_individual_container() {
-	if [[ $4 == "omnetpp" || $4 == "" ]]; then
-                # omnetpp is a special case: we must not terminate until the omnetpp process has terminated
-                CMD4="/waitfor.sh $4"
-        else
-                CMD4=$4
-        fi
-
 	CMD4="$(wrap_command $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15})"
         run_container_X11 --rm --hostname $1 $3 $CMD4
 }
