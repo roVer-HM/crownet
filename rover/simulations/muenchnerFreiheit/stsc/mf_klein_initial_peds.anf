@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scave:Analysis xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:scave="http://www.omnetpp.org/omnetpp/scave">
+  <inputs>
+    <inputs name="/rover/simulations/muenchnerFreiheit/stsc/results/mf_klein_initial_peds-*.vec"/>
+    <inputs name="/rover/simulations/muenchnerFreiheit/stsc/results/mf_klein_initial_peds-*.sca"/>
+  </inputs>
+  <datasets/>
+  <chartSheets/>
+</scave:Analysis>
