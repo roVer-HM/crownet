@@ -16,7 +16,7 @@ if [ -z "$1" ]; then
      CMD="omnetpp"
 else
      CMD="$1"
-     if [[ "$CMD" != "omnetpp" && "$CMD" != "/bin/bash" && "$CMD" != "bash" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
+     if [[ "$CMD" != "omnetpp" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
           SILENT="y"
      fi
 fi
@@ -35,9 +35,11 @@ if [ -z "$SILENT" ]; then
 fi
 
 # execute command
-$CMD $2 $3 $4 $5 $6 $7 $8 $9
+CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
 
-if [ "$CMD" == "omnetpp" ]; then
+eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
+
+if [[ "$CMD" == *"omnetpp"* ]]; then
      sleep 3
      PID=`pidof omnetpp`
 
@@ -51,5 +53,7 @@ fi
 
 
 if [ -z "$SILENT" ]; then
-     echo "Container terminated."
+     if [ $TEST_STATUS -eq 0 ]; then echo "Container terminated."; else echo "Container terminated (ERROR: $TEST_STATUS)."; fi
 fi
+
+exit $TEST_STATUS
