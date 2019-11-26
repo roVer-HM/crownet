@@ -39,7 +39,7 @@ CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
-if [[ "$CMD" == *"omnetpp"* ]]; then
+if [[ "$CMD" == "omnetpp" ]]; then
      sleep 3
      PID=`pidof omnetpp`
 
