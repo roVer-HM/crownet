@@ -936,8 +936,8 @@
         "nextTargetListIndex" : 0,
         "isCurrentTargetAnAgent" : false,
         "position" : {
-          "x" : 78.6,
-          "y" : 145.7
+          "x" : 141.5,
+          "y" : 133.9
         },
         "velocity" : {
           "x" : 0.0,
