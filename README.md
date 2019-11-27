@@ -165,6 +165,8 @@ pip install cpplint
 ### Install clang-format for UNIX systems
 
 You can install it through the package manager
+
+For example with Ubuntu:
 ```
 sudo apt-get install clang-format
 ```
@@ -177,11 +179,7 @@ and copying the bin/clang-format into your PATH.
 There is an installer for Windows: https://llvm.org/builds/
 (Not tested how to configure it)
 
-### 
-
-
 ## Configure CppStyle
-
 
 To configure CppStyle globally, go to **Preferences -> C/C++ -> CppStyle** dialog.
 
