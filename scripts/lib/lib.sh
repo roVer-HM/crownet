@@ -55,23 +55,34 @@ function run_container_X11() {
 
 	echo "Run docker container with access to X11 and your home directory..."
 
-        CMD="docker run $MODE \
-        --cap-add=SYS_PTRACE \
-	--user $(id -u) \
-        --network $INTNET \
-	--env DISPLAY=$DISPLAY \
-	--workdir=$(pwd) \
-	--volume="/home/$USER:/home/$USER" \
-	--volume="/etc/group:/etc/group:ro" \
-	--volume="/etc/passwd:/etc/passwd:ro" \
-	--volume="/etc/shadow:/etc/shadow:ro" \
-	--volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
-	--volume="/tmp/.X11-unix:/tmp/.X11-unix" \
-        $@"
+	CMD_ARR=(docker run $MODE)
+	CMD_ARR+=(--cap-add=SYS_PTRACE)
+	CMD_ARR+=(--user $(id -u))
+	CMD_ARR+=(--network $INTNET)
+	CMD_ARR+=(--env DISPLAY=$DISPLAY)
+	CMD_ARR+=(--workdir=$(pwd))
+	CMD_ARR+=(--volume="/home/$USER:/home/$USER")
+	CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
+	CMD_ARR+=(--volume="/etc/passwd:/etc/passwd:ro")
+	CMD_ARR+=(--volume="/etc/shadow:/etc/shadow:ro")
+	CMD_ARR+=(--volume="/etc/sudoers.d:/etc/sudoers.d:ro")
+	CMD_ARR+=(--volume="/tmp/.X11-unix:/tmp/.X11-unix")
+	if [[ ! -z ${DOCKER_VADERE_CACHE_LOCATION} && $2 == *"vadere"* ]];then
+		# (default not set.) only used for vadere containers.
+		# set DOCKER_VADERE_CACHE_LOCATION to new location of vadere cache.
+		# the default location of the chache is in '/home/$USER/.cache/vadere' and
+		# is alrady accessable to the container. If the cache is symlinked to another
+		# location outside of /home/$USER/ the container cannot follow the link.
+		# Adding a volume at the location of the symlink will allow access to the
+		# new cache location. (e.g. DOCKER_VADERE_CACHE_LOCATION=/opt/vadere-cache)
+		echo "Use custome cache location for vadere. Mount -> /home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}"
+		CMD_ARR+=(--volume="/home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
+	fi
+	CMD_ARR+=($@)
 
-        # echo "Docker CMD: \"$CMD\""
+	echo "docker run ${CMD_ARR[@]} $@"
+	eval ${CMD_ARR[@]}
 
-        eval $CMD
 }
 
 # check if we already have an existing docker container - run it otherwise
@@ -109,7 +120,7 @@ function run_individual_container() {
 function check_ptrace() {
 	read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)
         if [[ $value = 1 ]]
-        then 
+        then
            echo "Warning: It seems that your system does not allow ptrace - debugging will not work."
            echo "         Edit /etc/sysctl.d/10-ptrace.conf and set ptrace_scope = 0."
         fi
