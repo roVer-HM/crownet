@@ -12,8 +12,8 @@ function check_create_network() {
 	if [ ! "$(docker network ls | grep $INTNET)" ]; then
 	  echo "Creating $INTNET network ..."
 	  docker network create $INTNET
-	else
-	  echo "Network $INTNET for communication between the roVer containers exists."
+	# else
+	  # echo "Network $INTNET for communication between the roVer containers exists."
 	fi
 }
 
@@ -35,25 +35,32 @@ function wrap_command() {
 }
 
 # Run a docker container allowing X11 output.
-# (If an tty is detected, the option -i is automatically added.)
+# (If an tty in foreground is detected, the option -i is automatically added.)
 
 # @param $@ parameters to be forwarded to the docker run command
 function run_container_X11() {
 	check_create_network
 	# allow X11 access for the docker user
-	xhost +"local:docker@"
+	xhost +"local:docker@" >/dev/null
 	# xhost +"local:root"
 
 	# Detect if a tty is connected as standard input
 	# https://gist.github.com/davejamesmiller/1966557
 	if [[ -t 0 ]] # called normally - Terminal input (keyboard) - interactive
 	then
-    		MODE="-ti"
+    		MODE="-t"
 	else # input from pipe or file - do not allocate a pseudo-terminal
-    		MODE="-i"
+    		MODE=""
 	fi
 
-	echo "Run docker container with access to X11 and your home directory..."
+	# Detect if we are running in foreground or background
+        # (running --interactive in background leads to a high load docker process)
+	case $(ps -o stat= -p $$) in
+	  *+*) MODE="$MODE --interactive" ;;
+	  *) # Running in background - do not add the --interactive flag ;;
+	esac
+
+	# echo "Running docker container with access to X11 and your home directory..."
 
 	CMD_ARR=(docker run $MODE)
 	CMD_ARR+=(--cap-add=SYS_PTRACE)
@@ -80,7 +87,7 @@ function run_container_X11() {
 	fi
 	CMD_ARR+=($@)
 
-	echo "docker run ${CMD_ARR[@]} $@"
+	# echo "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
 
 }
