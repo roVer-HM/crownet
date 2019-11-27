@@ -150,5 +150,55 @@ omnetpp exec ./configure --with-inet=../../../inet4
 omnetpp exec make -j4
 cd ../../..
 ```
+# Coding Style
+
+To ensure a standardized code style we use the Google C++ Style Guide. 
+CppStyle is our recommended Eclipse Plugin. It uses the Formatter [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint).
+
+## Installation
+
+### Install cpplint.py
+```
+pip install cpplint
+```
+
+### Install clang-format for UNIX systems
+
+You can install it through the package manager
+```
+sudo apt-get install clang-format
+```
+Other ways installing it are building it from source or extracting it from the LLVM toolchain
+and copying the bin/clang-format into your PATH.
 
 
+### Install clang-format for Windows
+
+There is an installer for Windows: https://llvm.org/builds/
+(Not tested how to configure it)
+
+### 
+
+
+## Configure CppStyle
+
+
+To configure CppStyle globally, go to **Preferences -> C/C++ -> CppStyle** dialog.
+
+To configure CppSytle for a C/C++ project, go to **Project properties -> CppStyle** dialog.
+
+To enable CppStyle(clang-format) as default C/C++ code formatter, go to **Preferences -> C/C++ -> Code Style -> Formatter** page and switch **"Code Formatter"** from **[built-in]** to **"CppStyle (clang-format)"**
+
+To enable CppStyle(clang-format) as C/C++ code formatter for a project, go to **Project properties -> C/C++ General -> Formatter** page and switch **"Code Formatter"** from **[built-in] **to **"CppStyle (clang-format)"**
+
+## How to use CppStyle
+
+Style check with cpplint.py
+By pressing the  **Run C/C++ Code Analysis** when you right-click a file, cpplint.py will check the file and display differences in the editor.
+In the Properties of CppStyle an automatic analysis can be set to trigger when saving the file.
+
+formatting with clang-format
+The whole file or marked code can be formated using the shortcut **Command + Shift + f** on MacOS or **Ctrl + Shift + f** on Linux and other systems.
+
+Further information: https://github.com/wangzw/CppStyle, http://www.cppstyle.com/
+ 
