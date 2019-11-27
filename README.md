@@ -87,7 +87,7 @@ Start the omnetpp container:
 omnetpp
 ```
 
-Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'rover-main' folder that have been created when cloning the 'rover-main' repository. (Import of these projects is done via File->Import->Generic->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
+Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'rover-main' folder that have been created when cloning the 'rover-main' repository. (Import of these projects is done via File->Import->General->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
 
 
 ## Step 3: Run the simulation
