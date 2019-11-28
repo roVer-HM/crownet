@@ -34,6 +34,24 @@ function wrap_command() {
         echo "$WRAPPER $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10} $WRAPPER_END"
 }
 
+# Create name for container by adding incrementing numbers to the base name.
+# Needed because network dns is based on the container name not on the
+# hostname inside the container. See https://stackoverflow.com/a/43033828/12079469
+# $1 shortname
+function create_name(){
+	CURR_NAME=$1
+	i=0
+	while [[ "$(docker ps -aq -f name=^/${CURR_NAME}$)" ]]; do
+		if [ $i -gt 200 ]; then
+				echo "Error finding a new name for container $1. (Stopt at ${CURR_NAME})"
+				exit -1
+		fi
+		CURR_NAME="${CURR_NAME}${i}"
+		((i++))
+	done
+	echo $CURR_NAME
+}
+
 # Run a docker container allowing X11 output.
 # (If an tty in foreground is detected, the option -i is automatically added.)
 
@@ -120,7 +138,8 @@ function run_start_container() {
 # @param $4 - $9 are passed to the container
 function run_individual_container() {
 	CMD4="$(wrap_command $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15})"
-        run_container_X11 --rm --hostname $1 $3 $CMD4
+				NAME=$(create_name $1)
+        run_container_X11 --rm --name $NAME --hostname $NAME $3 $CMD4
 }
 
 
