@@ -157,7 +157,20 @@ CppStyle is our recommended Eclipse Plugin. It uses the Formatter [clang-format]
 
 ## Installation
 
-Within the omnetpp Docker container, [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint) are already installed. Therefore, the following installation steps are only required if the omnetpp Docker container is *not* used.
+Within the omnetpp Docker container, [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint) are already installed. 
+
+If you additionally want to guarantee that only correctly formatted code is committed, you can set-up a git pre-commit hook 
+which checks the files you are about to commit. A suitable script is available within the `scripts` subdirectory. Execute:
+
+```
+user@host:~/rover-main$ scripts/git-format/git-pre-commit-format install
+```
+
+If your are using the (recommended) execution of the simulation based on the provided Docker containers, you are done now. In order to disable the style check for individual projects (for example containing legacy code or code of other projects not conforming to the style guide), go to
+**Project properties -> C/C++ General -> Formatter** and disable the style checks.
+
+
+If the omnetpp Docker container is *not* used, the style check tools can manually be installed by the commands in the following subsections.
 
 ### Manual Installation of cpplint.py
 ```
