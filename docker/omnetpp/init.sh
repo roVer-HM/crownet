@@ -8,7 +8,7 @@
 # omnetpp (default)      starts the OMNeT++ IDE
 # /bin/bash              starts an interactive shell
 
-export PATH=/opt/omnetpp/omnetpp/bin:$PATH
+export PATH=/opt/omnetpp/omnetpp/bin:~/.local/bin:$PATH
 
 # echo "Command: $1"
 

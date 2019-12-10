@@ -25,6 +25,7 @@ RUN apt-get update && \
        uncrustify nemiver \
        clang bison flex make qt5-default \
        libstdc++6-8-dbg \
+       python3-pip clang-format curl wget \
        openjdk-11-jre \
        doxygen graphviz tcl-dev tk-dev python python3 valgrind \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
@@ -68,10 +69,15 @@ RUN ./configure && \
 
 # now install the Eclipse IDE base
 ADD ide/ide.tar.gz .
-RUN chmod -R a+rw /opt/omnetpp/omnetpp/samples && \
-    chmod -R a+rw /opt/omnetpp/omnetpp/ide
 
 # TODO: clean up all files not needed anymore (object files, etc.)
+
+# installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
+RUN pip3 install cpplint
+RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group ; PID=`pidof omnetpp`; while [ -e /proc/$PID ]; do sleep 0.1; done
+
+# update permissions so that the omnetpp directory becomes writable
+RUN chmod -R a+rw /opt/omnetpp/omnetpp
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
