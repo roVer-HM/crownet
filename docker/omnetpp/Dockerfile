@@ -15,14 +15,16 @@ LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-5
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all packages required to compile omnet
-# Note: we currently use jdk-8 due to compatibility problems of omnet with jdk-11
-#       (when these are fixed, openjdk-8-jre should be replaced by default-jre)
+# Note: Since clang does not emit debug info for types within the standard libraries,
+#       we must include debug info for the installed libraries (versions must match!)
+#       by manually installing the libstdc++6-8-dbg package
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
        git git-lfs \
        uncrustify nemiver \
        clang bison flex make qt5-default \
+       libstdc++6-8-dbg \
        openjdk-11-jre \
        doxygen graphviz tcl-dev tk-dev python python3 valgrind \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
