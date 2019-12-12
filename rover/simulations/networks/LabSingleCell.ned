@@ -14,6 +14,7 @@ import inet.node.ethernet.Eth10G;
 import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
+import inet.common.misc.ThruputMeteringChannel;
 import lte.corenetwork.binder.LteBinder;
 import lte.corenetwork.nodes.Ue;
 import lte.corenetwork.nodes.eNodeB;
@@ -26,6 +27,13 @@ network LabSingleCell
     parameters:
         int numUe = default(1);
         @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");
+    types:
+        channel Eth1GMetered extends ThruputMeteringChannel
+        {
+            delay = 25us;
+            datarate = 1024Mbps;
+            thruputDisplayFormat = "u";
+        }
     submodules:
         channelControl: LteChannelControl {
             @display("p=8,1;is=s");
@@ -51,13 +59,13 @@ network LabSingleCell
             @display("p=1.0457151,5.8167906;i=device/smallrouter");
         }
         server: StandardHost {
-            @display("p=1.0457151,6.7154517;is=n;i=device/server");
+            @display("p=1.0457151,7;is=n;i=device/server");
         }
         ue[numUe]: Ue {
             @display("p=6,3");
         }
     connections:
-        server.pppg++ <--> Eth10G <--> router.pppg++;
-        router.pppg++ <--> Eth10G <--> pgw.filterGate;
-        pgw.pppg++ <--> Eth10G <--> eNB.ppp;
+        server.pppg++ <--> Eth1GMetered <--> router.pppg++;
+        router.pppg++ <--> Eth1GMetered <--> pgw.filterGate;
+        pgw.pppg++ <--> Eth1GMetered <--> eNB.ppp; 
 }
