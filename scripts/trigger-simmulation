@@ -1,0 +1,51 @@
+#!/bin/bash
+# send POST request to gitlab-ci API to execut a simulation campaign.
+
+if [[ -z $ROVER_MAIN ]];then
+  echo "Variable ROVER_MAIN not set. Did you source roverenv?"
+  exit -1
+fi
+
+if [[ -z $1 ]];then
+  echo "No simulation script provided for execution"
+  exit -1
+fi
+
+if [[ ! -f "$ROVER_MAIN/${1}" ]];then
+  echo "Given simulation script does not exist or is not relative to rover-main: '$ROVER_MAIN/${1}'"
+  exit -1
+fi
+SIM_CMD="${1}"
+
+if [[ ! -f "$ROVER_MAIN/.tokens/sim-trigger" ]];then
+  echo "No gitlab-ci pipeline trigger token found"
+  exit -1
+fi
+PIPLINE_TRIGGER_TOKEN=$(cat "$ROVER_MAIN/.tokens/sim-trigger" | tr -d '\r' )
+URL='https://sam-dev.cs.hm.edu/api/v4/projects/45/trigger/pipeline'
+
+
+pushd $ROVER_MAIN > /dev/null
+
+if [[ ! -d .git ]];then
+  echo "no git repo found."
+  exit -1
+fi
+
+if [[ -z $GIT_REF ]];then
+    GIT_REF=$(git symbolic-ref --short HEAD)
+    echo "using branch $GIT_REF"
+fi
+
+CMD_ARR=(curl)
+CMD_ARR+=(-X POST)
+CMD_ARR+=(-F token=$PIPLINE_TRIGGER_TOKEN)
+CMD_ARR+=(-F "ref=$GIT_REF")
+CMD_ARR+=(-F "variables[SIM_TRIGGER]=true") # value is ignored.
+CMD_ARR+=(-F "variables[SIM_SCRIPT]=$SIM_CMD") # value is ignored.
+CMD_ARR+=($URL)
+
+echo "call gitlab-runner: ${CMD_ARR[@]}"
+eval ${CMD_ARR[@]}
+
+popd > /dev/null

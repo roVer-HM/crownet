@@ -13,18 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-
 package rover.simulations.networks;
 
-import rover.nodes.MobileUe;
-
-import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
-import inet.visualizer.contract.IIntegratedVisualizer;
-import inet.environment.common.PhysicalEnvironment;
-import org.car2x.veins.subprojects.veins_inet.VeinsInetPerson;
-import org.car2x.veins.modules.mobility.traci.ITraCIManager;
-import org.car2x.veins.subprojects.veins_inet.vadere.TraCIScenarioManagerVadere;
 import inet.node.inet.StandardHost;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.networklayer.ipv4.RoutingTableRecorder;
@@ -38,8 +28,10 @@ import lte.corenetwork.nodes.Ue;
 import lte.corenetwork.nodes.eNodeB;
 import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
+import rover.nodes.MobileUe;
+import org.car2x.veins.modules.mobility.traci.ITraCIManager;
 
-network mucFreiNetLTE2dMulticast
+network LTE_d2d
 {
     parameters:
         int numUeCell = default(1);
@@ -47,17 +39,8 @@ network mucFreiNetLTE2dMulticast
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
 		@figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
        
-        
     submodules:
-        visualization: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
-            @display("p=300,165");           
-        }
 
-        physicalEnvironment: PhysicalEnvironment {
-
-            @display("p=300,281");
-        }
-        
         channelControl: LteChannelControl {
             @display("p=50,25;is=s");
         }
@@ -88,15 +71,14 @@ network mucFreiNetLTE2dMulticast
             @display("p=292,367;is=vs");
         }
         ueD2D[numUeD2D]: MobileUe {
-            @display("p=477,367;is=vs");
-            
+            @display("p=477,367;is=vs");  
         }
-        manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager {
+        manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
             @display("p=300,38");
         }
+        
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++;
         router.pppg++ <--> Eth10G <--> pgw.filterGate;
         pgw.pppg++ <--> Eth10G <--> eNB.ppp;
-
 }

@@ -1,0 +1,91 @@
+variables:
+ GIT_SUBMODULE_STRATEGY: recursive    # clone submodules
+ GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vader submodule)
+ ROVER_MAIN: '${CI_PROJECT_DIR}'      # all files relative to this.
+
+
+
+stages:
+  - build
+  - simulation-campaign
+
+
+# Build all dependencies of the rover project (default: release mode)
+# This is the base for running simulation campaings on a dedicated
+# gitlab runner with more cores and memmory. Use latest version of containers
+build-for-sim:
+  stage: build
+  variables:
+    INET_M: '${CI_PROJECT_DIR}/inet4'
+    LTE_M: '${CI_PROJECT_DIR}/simulte'
+    ROVER_M: '${CI_PROJECT_DIR}/rover'
+    VEINS_M: '${CI_PROJECT_DIR}/veins'
+    VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
+    MODE: 'release'
+    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
+  script:
+    # ## build inet
+    - "cd ${INET_M}"
+    - "export INET_VERSION=$(./_scripts/get_version)"
+    - "${OPP} make makefiles"
+    - "${OPP} make MODE=${MODE} -j $(nproc)"
+    # inet> cleanup not needed directories
+    - rm -rf doc examples showcases tutorials
+    # ## build simulte
+    - "cd ${LTE_M}"
+    - "${OPP} make makefiles"
+    - "${OPP} make MODE=${MODE} -j $(nproc)"
+    # ## build veins
+    - "cd ${VEINS_M}"
+    - "${OPP} ./configure"
+    - "${OPP} make MODE=${MODE} -j $(nproc)"
+    # inet> cleanup not needed directories
+    - rm -rf doc examples subprojects/veins_catch subprojects/veins_inet3 subprojects/veins_testsims
+    # ## build veins_inet
+    - "cd ${VEINS_INET_M}"
+    - "${OPP} ./configure --with-inet ${INET_M}"
+    - "${OPP} make MODE=${MODE} -j $(nproc)"
+    # ## build rover
+    - "cd ${ROVER_M}"
+    - "${OPP} make makefiles-cmdOnly"
+    - "${OPP} make MODE=${MODE} -j $(nproc)"
+    - "cd ${ROVER_MAIN}"
+    # ## global clenaup
+    - "find . -name \"*.o\" -type f -delete"
+    - "cd ${INET_M}"
+    # inet> only delete inet sources for artefacts. We may need the other ones.
+    - "find . -name \"*.cc\" -type f -delete"
+  artifacts:
+    paths:
+    - ${ROVER_MAIN}/scripts
+    - ${ROVER_MAIN}/simulte
+    - ${ROVER_MAIN}/inet4
+    - ${ROVER_MAIN}/rover
+    - ${ROVER_MAIN}/veins
+    expire_in: 1 weeks
+
+
+
+# run given simulation-campaign
+simulation-campaign:
+  stage: simulation-campaign
+  tags:
+    - rover-sim
+  rules:
+    - if: '$SIM_TRIGGER'
+  script:
+    - "/bin/bash ${ROVER_MAIN}/$SIM_SCRIPT"
+    - "echo ${CI_COMMIT_SHA} > ${ROVER_MAIN}/$SIM_SCRIPT-results/commit-hash"
+    - "echo ${CI_PIPELINE_IID} > ${ROVER_MAIN}/$SIM_SCRIPT-results/pipeline-id"
+    - "cat /proc/cpuinfo > > ${ROVER_MAIN}/$SIM_SCRIPT-results/cpuinfo"
+  artifacts:
+    paths:
+      - ${ROVER_MAIN}/$SIM_SCRIPT
+      - ${ROVER_MAIN}/$SIM_SCRIPT-results
+      - ${ROVER_MAIN}/scripts
+      - ${ROVER_MAIN}/simulte/src
+      - ${ROVER_MAIN}/inet4/src
+      - ${ROVER_MAIN}/rover
+      - ${ROVER_MAIN}/veins/src
+      - ${ROVER_MAIN}/veins/subprojects/veins_inet/src
+    expire_in: 60 minutes

@@ -1,0 +1,42 @@
+#!/bin/bash
+# Start script for the omnetpp container. (redefined handling of first argument)
+# First arguement will be interpreted as tag (or RepoDigests) instead of version
+# for different omnetpp images. see omnetpp for
+#
+# Examples:
+#
+# "omnetpp"		will start the OMNeT++ IDE in the latest OMNeT++ container
+# "omnetpp :191206-1200"		will start the OMNeT++ IDE with the tag :191206-1200
+# "omnetpp :191206-1200 exec ls"	will start the command "ls" in the tag :191206-1200
+# "omnetpp @sha256:2da8c... exec ls"	will start the command "ls" in OMNeT++ container
+#                             given by the RepoDigests (Unique identifier.) This is
+#                             needed to identif container to  reproduce  simulation cmapaings
+
+SHORTNAME=omnetpp
+COMMAND=omnetpp
+
+if [[ -z "$1" || "$1" == "exec" ]]; then
+      TAG_DIGEST=:latest
+      CONTNAME=$SHORTNAME
+else
+      TAG_DIGEST=$1
+      SHORTNAME=$SHORTNAME
+      CONTNAME=$SHORTNAME
+fi
+
+if [[ "$1" == "exec" ]]; then
+      COMMAND="${@:2:${#@}+1-2}"
+      # COMMAND="$2 $3 $4 $5 $6 $7 $8 $9"
+fi
+
+if [[ "$2" == "exec" ]]; then
+      COMMAND="${@:3:${#@}+1-3}"
+      # COMMAND="$3 $4 $5 $6 $7 $8 $9"
+fi
+
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:$SHORTNAME$TAG_DIGEST
+
+source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
+
+# Variant 2: Start an individual container for each run
+run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND

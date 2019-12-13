@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -jar /opt/vadere/vadere/VadereGui/target/vadere-gui.jar

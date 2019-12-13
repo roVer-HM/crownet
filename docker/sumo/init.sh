@@ -1,20 +1,30 @@
 #!/bin/bash
-# 
-PORT=9999
-COMMAND=sumo-gui
 # IP=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'
 
 echo "Welcome to the roVer sumo Docker Container."
 echo ""
-echo "The sumo-launchd is waiting for incoming TraCI connections on port: $PORT"
-echo "($COMMAND will be started automatically for incoming TraCI connections.)"
+echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI'"
 echo ""
 echo "If you want to start sumo-gui manually, you can do this via docker exec:"
-echo "  docker exec sumo sumo-gui" 
+echo "  docker exec sumo sumo-gui"
 
 export PATH=/opt/sumo/sumo/bin:$PATH
 
 # start sumo-launchd (command: sumo-gui, sumo)
-/opt/veins/sumo-launchd.py -v --bind=0.0.0.0 --command=sumo-gui 
+CMD_ARR=(/opt/veins/sumo-launchd.py -v)
+CMD_ARR+=(--bind=0.0.0.0)
+if [[ -z $TRACI_PORT ]];then
+  CMD_ARR+=(--port=9999)
+else
+  CMD_ARR+=(--port=$TRACI_PORT)
+fi
+if [[ ${TRACI_GUI} == "true" ]];then
+  CMD_ARR+=(--command=sumo-gui)
+else
+  CMD_ARR+=(--command=sumo)
+fi
+
+# echo "${CMD_ARR[@]}"
+eval ${CMD_ARR[@]}
 
 echo "Container terminated."

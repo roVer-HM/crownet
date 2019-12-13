@@ -31,7 +31,7 @@ function wrap_command() {
            WRAPPER="bash -c \"cd $(pwd);"
            WRAPPER_END="\""
         fi
-        echo "$WRAPPER $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10} $WRAPPER_END"
+        echo "$WRAPPER $@ $WRAPPER_END"
 }
 
 # Create name for container by adding incrementing numbers to the base name.
@@ -85,6 +85,19 @@ function run_container_X11() {
 	CMD_ARR+=(--user $(id -u))
 	CMD_ARR+=(--network $INTNET)
 	CMD_ARR+=(--env DISPLAY=$DISPLAY)
+	if [[ ! -z ${NEDPATH} ]];then
+	  # set NEDPATH in container to simplify opp_run commands.
+		CMD_ARR+=(--env NEDPATH=$NEDPATH)
+	fi
+	if [[ ! -z ${TRACI_PORT} ]];then
+		echo "container> set var TRACI_PORT=$TRACI_PORT"
+		CMD_ARR+=(--env TRACI_PORT=$TRACI_PORT)
+	fi
+	if [[ -z ${TRACI_GUI} ]];then
+		CMD_ARR+=(--env TRACI_GUI="true")
+	else
+		CMD_ARR+=(--env TRACI_GUI=${TRACI_GUI})
+	fi
 	CMD_ARR+=(--workdir=$(pwd))
 	CMD_ARR+=(--volume="/home/$USER:/home/$USER")
 	CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
@@ -92,7 +105,7 @@ function run_container_X11() {
 	CMD_ARR+=(--volume="/etc/shadow:/etc/shadow:ro")
 	CMD_ARR+=(--volume="/etc/sudoers.d:/etc/sudoers.d:ro")
 	CMD_ARR+=(--volume="/tmp/.X11-unix:/tmp/.X11-unix")
-	if [[ ! -z ${DOCKER_VADERE_CACHE_LOCATION} && $2 == *"vadere"* ]];then
+	if [[ ! -z ${DOCKER_VADERE_CACHE_LOCATION} && ($2 == *"vadere"* || $3 == *"vadere"* ) ]];then
 		# (default not set.) only used for vadere containers.
 		# set DOCKER_VADERE_CACHE_LOCATION to new location of vadere cache.
 		# the default location of the chache is in '/home/$USER/.cache/vadere' and
@@ -100,36 +113,39 @@ function run_container_X11() {
 		# location outside of /home/$USER/ the container cannot follow the link.
 		# Adding a volume at the location of the symlink will allow access to the
 		# new cache location. (e.g. DOCKER_VADERE_CACHE_LOCATION=/opt/vadere-cache)
-		echo "Use custome cache location for vadere. Mount -> /home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}"
+		echo "container> mount cache location '${DOCKER_VADERE_CACHE_LOCATION}' to '/home/$USER/.cache/vadere'"
 		CMD_ARR+=(--volume="/home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
 	fi
 	CMD_ARR+=($@)
-
 	# echo "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
 
 }
 
-# check if we already have an existing docker container - run it otherwise
-# @param $1 Container short name   (to be used as short container and hostname)
-# @param $2 Container full name
-# @param $3 Docker image name
-# @param $4 - $9 are passed to the container
-function run_start_container() {
-	CMD4="$(wrap_command $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15})"
-	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
-	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
-		# cleanup
-		docker rm $1
-	    fi
-	    # run the container via the X11 docker script
-            run_container_X11 --name $1 --hostname $1 $3 $CMD4
- 	else
-	    # container already exists - execute command within container
-            echo "CMD4=\"$CMD4\""
-       	    docker exec -i $1 bash -c "cd $(pwd); $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15}"
-	fi
-}
+# Deprecated.
+# # check if we already have an existing docker container - run it otherwise
+# # @param $1 Container short name   (to be used as short container and hostname)
+# # @param $2 Container full name
+# # @param $3 Docker image name
+# # @param $4 - $9 are passed to the container
+# function run_start_container() {
+# 	COMMAND="${@:4:${#@}+1-4}"
+# 	CMD4="$(wrap_command $COMMAND)"
+# 	echo "$1"
+# 	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
+# 	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
+# 		# cleanup
+# 		docker rm $1
+# 	    fi
+# 	    # run the container via the X11 docker script
+#             run_container_X11 --name $1 --hostname $1 $3 $CMD4
+#  	else
+# 	    # container already exists - execute command within container
+# 						COMMAND="${@:4:${#@}+1-4}"
+# 						echo "CMD4=\"$CMD4\""
+#        	    docker exec -i $1 bash -c "cd $(pwd); $COMMAND"
+# 	fi
+# }
 
 # create a new (randomly named) container and start it with the specified command
 # @param $1 Container short name   (to be used as short container and hostname)
@@ -137,7 +153,8 @@ function run_start_container() {
 # @param $3 Docker image name
 # @param $4 - $9 are passed to the container
 function run_individual_container() {
-	CMD4="$(wrap_command $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15})"
+	COMMAND="${@:4:${#@}+1-4}"
+	CMD4="$(wrap_command $COMMAND)"
 				NAME=$(create_name $1)
         run_container_X11 --rm --name $NAME --hostname $NAME $3 $CMD4
 }

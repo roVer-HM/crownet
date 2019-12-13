@@ -1,0 +1,23 @@
+#!/bin/bash
+# set NEDPATH variable to all nedfolders found in $ROVER_MAIN.
+# Ignore directories containing any of the following strings.
+
+if [[ -z $ROVER_MAIN ]];then
+  echo "Variable ROVER_MAIN not set. Did you source roverenv?"
+  exit -1
+fi
+
+IGNORE_PATH='veins_inet3|veins_catch|veins_testsims|rover-main/builds'
+
+if [ -z $ROVER_MAIN ]; then
+  echo "ROVER_MAIN not set"
+  exit -1
+fi
+
+NEDPATH='.'
+ned_folders=$(find $ROVER_MAIN  -name ".nedfolders" | grep -Ev -- $IGNORE_PATH)
+for folder in $ned_folders; do
+  NEDPATH="$NEDPATH:$(sed -e "s~^~${folder%%.nedfolders}~g" "$folder" | paste -sd ':')"
+done
+echo "exported NEDPATH=$NEDPATH"
+export NEDPATH
