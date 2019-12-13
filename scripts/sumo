@@ -4,15 +4,15 @@ SHORTNAME=sumo
 CONTNAME=$SHORTNAME
 
 if [[ -z "$1" || "$1" == "exec" ]]; then
-      VERSION=latest
-      CONTNAME=$SHORTNAME-$VERSION
+    TAG_DIGEST=:latest
+    CONTNAME=$SHORTNAME
 else
-      VERSION=omnetpp-$1
-      SHORTNAME=$SHORTNAME-$1
-      CONTNAME=$SHORTNAME
+    TAG_DIGEST=$1
+    SHORTNAME=$SHORTNAME
+    CONTNAME=$SHORTNAME
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$SHORTNAME
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$SHORTNAME$TAG_DIGEST
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
@@ -30,4 +30,4 @@ if [[ "$2" == "exec" ]]; then
       exit $?
 fi
 
-run_start_container $SHORTNAME $CONTNAME $IMAGENAME /init.sh
+run_individual_container $SHORTNAME $CONTNAME $IMAGENAME /init.sh $@

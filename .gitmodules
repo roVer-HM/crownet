@@ -1,12 +1,12 @@
 [submodule "inet"]
 	path = inet4
-	url = ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git
+	url = ../../rover/inet.git
 [submodule "simulte"]
 	path = simulte
-	url = ssh://git@sam-dev.cs.hm.edu:5022/rover/simulte.git
+	url = ../../rover/simulte.git
 [submodule "veins"]
 	path = veins
-	url = ssh://git@sam-dev.cs.hm.edu:5022/rover/veins.git
+	url = ../../rover/veins.git
 [submodule "vadere"]
 	path = vadere
 	url = https://gitlab.lrz.de/vadere/vadere.git

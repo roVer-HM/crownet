@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Thu Nov 28 12:35:38 2019 by Eclipse SUMO netconvert Version 1.0.1
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="mf_base.net.xml"/>
+    </input>
+
+    <output>
+        <plain-output-prefix value="plain"/>
+    </output>
+
+    <processing>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+    </processing>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="5.5"/>
+        <rectangular-lane-cut value="false"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="false"/>
+    </pedestrian>
+
+</configuration>
+-->
+
+<nodes version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+    <location netOffset="-691444.68,-5335504.47" convBoundary="658.02,1716.92,1151.23,2379.07" origBoundary="11.548225,48.117927,11.594341,48.171410" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+
+    <node id="1156427688" x="857.13" y="2050.33" type="priority"/>
+    <node id="1305556368" x="948.33" y="2178.20" type="priority"/>
+    <node id="1404411555" x="832.29" y="2026.33" type="priority"/>
+    <node id="1452374268" x="820.11" y="1781.10" type="dead_end"/>
+    <node id="1955585" x="866.11" y="2285.47" type="dead_end"/>
+    <node id="21092022" x="880.08" y="2283.29" type="dead_end"/>
+    <node id="2203963817" x="795.39" y="1734.20" type="dead_end"/>
+    <node id="2509348138" x="753.53" y="1953.82" type="priority"/>
+    <node id="2509348140" x="758.26" y="1969.98" type="priority"/>
+    <node id="2518516445" x="817.47" y="1929.84" type="right_before_left"/>
+    <node id="2562202576" x="861.54" y="1912.91" type="priority"/>
+    <node id="2579753000" x="1089.88" y="1978.64" type="priority"/>
+    <node id="259839368" x="1054.20" y="1991.41" type="priority"/>
+    <node id="260827624" x="960.06" y="2174.70" type="priority"/>
+    <node id="2635397004" x="929.92" y="2101.26" type="priority"/>
+    <node id="2635397020" x="899.16" y="2180.90" type="right_before_left"/>
+    <node id="2640786637" x="906.34" y="2086.91" type="priority"/>
+    <node id="2640786646" x="912.35" y="2105.17" type="right_before_left"/>
+    <node id="2640786724" x="918.99" y="2121.58" type="right_before_left"/>
+    <node id="2640786734" x="893.34" y="2116.32" type="priority"/>
+    <node id="2709447006" x="865.80" y="2128.45" type="priority"/>
+    <node id="27154468" x="815.54" y="1724.57" type="dead_end"/>
+    <node id="28090804" x="716.73" y="2161.97" type="dead_end"/>
+    <node id="2904937024" x="996.63" y="1986.79" type="priority"/>
+    <node id="2962877945" x="905.32" y="2071.37" type="right_before_left"/>
+    <node id="3050661412" x="796.42" y="2010.33" type="priority"/>
+    <node id="3100813935" x="746.22" y="2255.45" type="priority"/>
+    <node id="3100813936" x="742.54" y="2221.96" type="priority"/>
+    <node id="3122562430" x="747.80" y="2001.56" type="priority"/>
+    <node id="3122562529" x="770.09" y="2005.14" type="priority"/>
+    <node id="3136710229" x="822.75" y="2122.09" type="right_before_left"/>
+    <node id="3136710630" x="824.81" y="2132.23" type="priority"/>
+    <node id="337203265" x="767.00" y="2298.81" type="dead_end"/>
+    <node id="371644443" x="799.86" y="1732.52" type="traffic_light" tl="371644443"/>
+    <node id="371644475" x="821.89" y="1721.22" type="traffic_light" tl="371644475"/>
+    <node id="372811156" x="888.88" y="2276.83" type="priority"/>
+    <node id="372811165" x="1006.98" y="2313.82" type="dead_end"/>
+    <node id="3746906183" x="852.88" y="1936.22" type="priority"/>
+    <node id="3746970768" x="860.11" y="2132.37" type="dead_end"/>
+    <node id="3746970769" x="858.88" y="2132.42" type="priority"/>
+    <node id="3779376116" x="894.07" y="2057.08" type="priority"/>
+    <node id="3816982441" x="895.61" y="2129.56" type="priority"/>
+    <node id="3816989497" x="939.30" y="2143.06" type="right_before_left"/>
+    <node id="4209636487" x="967.11" y="2270.15" type="priority"/>
+    <node id="457516630" x="722.63" y="2188.54" type="priority"/>
+    <node id="4956635667" x="667.80" y="2062.60" type="traffic_light" tl="4956635667"/>
+    <node id="506827152" x="966.22" y="2235.66" type="priority"/>
+    <node id="614343873" x="861.20" y="2270.68" type="priority"/>
+    <node id="6578728" x="771.45" y="2188.15" type="right_before_left"/>
+    <node id="658951458" x="1093.41" y="2208.56" type="priority"/>
+    <node id="871975368" x="893.22" y="2046.43" type="priority"/>
+    <node id="cluster_1305556358_2478824421_3816989554_3816989669" x="944.52" y="2167.11" type="priority"/>
+    <node id="cluster_1644583591_2042190232" x="882.79" y="2179.61" type="priority"/>
+    <node id="cluster_1987363465_cluster_45321481_gneJ38" x="1077.02" y="1959.97" type="priority"/>
+    <node id="cluster_2064177032_260827627_3392905427_3746970764" x="923.65" y="2072.66" type="priority"/>
+    <node id="cluster_2242609956_gneJ59_gneJ62" x="828.52" y="1719.53" type="dead_end"/>
+    <node id="cluster_3100814033_3100831730_4738777392_4738777393" x="769.71" y="2224.57" type="priority"/>
+    <node id="cluster_3112873735_gneJ130" x="726.64" y="2056.93" type="dead_end"/>
+    <node id="cluster_3136710231_gneJ122" x="802.62" y="2179.14" type="dead_end"/>
+    <node id="cluster_3136710929_gneJ121_gneJ140_gneJ143" x="854.55" y="2153.08" type="right_before_left"/>
+    <node id="cluster_3136711129_gneJ120_gneJ123_gneJ125" x="818.64" y="2150.41" type="priority"/>
+    <node id="cluster_3746970770_gneJ133_gneJ142_gneJ145" x="854.03" y="2133.49" type="right_before_left"/>
+    <node id="cluster_45310085_gneJ124" x="987.38" y="2230.70" type="priority"/>
+    <node id="cluster_45334623_gneJ125" x="1132.59" y="2075.39" type="priority"/>
+    <node id="cluster_45338551_gneJ122" x="1150.49" y="2119.22" type="priority"/>
+    <node id="cluster_45341878_gneJ121_gneJ123" x="1004.19" y="2165.58" type="priority"/>
+    <node id="cluster_cluster_1078797621_cluster_28092165_3050661415_3392905426_3689041237_5174766995_gneJ128_gneJ131_gneJ134_gneJ137" x="802.85" y="2031.70" type="priority"/>
+    <node id="cluster_cluster_1987363467_27194086_gneJ5_gneJ116" x="1057.46" y="1968.29" type="priority"/>
+    <node id="cluster_cluster_2203963782_cluster_371663701_6578727_gneJ118_gneJ141" x="858.10" y="2184.93" type="priority"/>
+    <node id="cluster_cluster_27154463_gneJ6_gneJ82" x="972.54" y="1792.81" type="priority"/>
+    <node id="cluster_cluster_27154465_gneJ8_gneJ74_gneJ78" x="923.15" y="1812.88" type="priority"/>
+    <node id="cluster_cluster_27194082_gneJ39_gneJ110" x="1108.43" y="1942.15" type="priority"/>
+    <node id="cluster_cluster_27194092_gneJ1_gneJ4_gneJ7_gneJ107" x="1025.26" y="1888.80" type="priority"/>
+    <node id="cluster_cluster_312385385_gneJ24_gneJ94" x="1008.41" y="1979.59" type="priority"/>
+    <node id="cluster_cluster_3691000711_gneJ18_gneJ96" x="957.47" y="1993.98" type="priority"/>
+    <node id="cluster_cluster_45334608_gneJ115_gneJ126_gneJ127" x="1032.02" y="2080.77" type="priority"/>
+    <node id="cluster_cluster_cluster_3122562232_3122562233_cluster_3689041238_3689041239_5174656858_5174656859_gneJ136_gneJ139" x="762.88" y="2032.25" type="priority"/>
+    <node id="cluster_cluster_cluster_cluster_2607185468_cluster_27194225_gneJ2_gneJ9_gneJ21_gneJ73_gneJ79_gneJ90" x="939.81" y="1918.78" type="priority"/>
+    <node id="cluster_cluster_cluster_cluster_312385387_gneJ0_gneJ3_gneJ25_gneJ80_gneJ91" x="972.74" y="1911.65" type="priority"/>
+    <node id="cluster_gneJ114_gneJ117" x="1059.30" y="1992.03" type="priority"/>
+    <node id="gneJ119" x="861.27" y="2304.26" type="dead_end"/>
+    <node id="gneJ132" x="858.96" y="2136.42" type="dead_end"/>
+    <node id="gneJ133" x="815.88" y="2346.05" type="dead_end"/>
+    <node id="gneJ134" x="836.86" y="2362.10" type="dead_end"/>
+    <node id="gneJ135" x="862.56" y="2379.07" type="dead_end"/>
+    <node id="gneJ136" x="871.28" y="2376.29" type="dead_end"/>
+    <node id="gneJ137" x="1001.79" y="2339.96" type="dead_end"/>
+    <node id="gneJ138" x="1012.48" y="2333.53" type="dead_end"/>
+    <node id="gneJ139" x="658.02" y="2057.61" type="dead_end"/>
+    <node id="gneJ140" x="797.45" y="1722.53" type="dead_end"/>
+    <node id="gneJ141" x="807.63" y="1716.92" type="dead_end"/>
+    <node id="j001" x="906.46" y="2008.68" type="priority"/>
+    <node id="j002" x="884.13" y="1926.39" type="priority"/>
+    <node id="j003" x="852.56" y="1921.96" type="priority"/>
+    <node id="j004" x="866.89" y="2024.65" type="traffic_light" tl="gneJ161"/>
+    <node id="j005" x="857.76" y="2098.41" type="traffic_light"/>
+</nodes>

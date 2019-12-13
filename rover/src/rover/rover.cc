@@ -5,12 +5,6 @@
  *      Author: stsc
  */
 
-
 #include <iostream>
 
-
-void foo(){
-    std::cout << "foo" << std::endl;
-}
-
-
+void foo() { std::cout << "foo" << std::endl; }

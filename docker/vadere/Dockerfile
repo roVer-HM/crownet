@@ -21,7 +21,7 @@ LABEL maintainer  "wischhof@ieee.org"
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
-       git git-lfs \ 
+       git git-lfs \
        default-jre \
        maven \
        clinfo mesa-opencl-icd ocl-icd-opencl-dev \
@@ -34,7 +34,7 @@ WORKDIR /opt/vadere
 # enable lfs (must be done before cloning!) and clone the project
 RUN git lfs install
 
-# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value] 
+# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN git clone --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
 
@@ -50,6 +50,10 @@ RUN git pull
 # configure and compile
 ENV PATH /opt/vadere/vadere/VadereGui/target:$PATH
 RUN mvn clean package -Dmaven.test.skip
+
+# create script to start vadere gui and add it to the path.
+COPY vadere-gui /usr/local/bin/vadere-gui
+RUN chmod 555 /usr/local/bin/vadere-gui
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
@@ -67,5 +71,3 @@ CMD [ "/init.sh" ]
 # --volume="/etc/shadow:/etc/shadow:ro" \
 # --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
 # -v /tmp/.X11-unix:/tmp/.X11-unix \
-
-

@@ -4,6 +4,6 @@
 #       e.g. by adding "source [path to this script]/roverenv" at the end of ~/.bashrc
 
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ROVER_MAIN="$(dirname $MYDIR)"
+export ROVER_MAIN
 export PATH=$PATH:$MYDIR
-
-
