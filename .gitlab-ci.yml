@@ -70,10 +70,10 @@ build-for-sim:
 fingerprints:
   stage: test
   variables:
-    RV: 'rover-main/scripts'
+    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:
     - "cd ${ROVER_MAIN}/rover/tests/fingerprint"
-    - "${ROVER_MAIN}/rover/scripts/omnetpp exec ./fingerprints"
+    - "${OPP} ./fingerprints"
   artifacts:
     paths:
     - ${ROVER_MAIN}/rover/tests/fingerprint
