@@ -7,6 +7,7 @@ variables:
 
 stages:
   - build
+  - test
   - simulation-campaign
 
 
@@ -64,6 +65,19 @@ build-for-sim:
     - ${ROVER_MAIN}/veins
     expire_in: 1 weeks
 
+
+# run the fingerprint tests
+fingerprints:
+  stage: test
+  variables:
+    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
+  script:
+    - "cd ${ROVER_MAIN}/rover/tests/fingerprint"
+    - "${OPP} ./fingerprints"
+  artifacts:
+    paths:
+    - ${ROVER_MAIN}/rover/tests/fingerprint
+    expire_in: 8 weeks
 
 
 # run given simulation-campaign

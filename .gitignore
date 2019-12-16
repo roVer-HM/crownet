@@ -29,7 +29,7 @@ rover/**/legacy
 rover/**/.qtenvrc
 rover/**/.cmdenv-log
 rover/**/*.log
-
+rover/**/test.out
 
 
 
