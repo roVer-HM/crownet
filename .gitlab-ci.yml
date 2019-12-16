@@ -72,12 +72,12 @@ fingerprints:
   variables:
     RV: 'rover-main/scripts'
   script:
-    - "cd ${ROVER_MAIN}/tests/fingerprint"
-    - "${ROVER_MAIN}/scripts/omnetpp exec ./fingerprints"
+    - "cd ${ROVER_MAIN}/rover/tests/fingerprint"
+    - "${ROVER_MAIN}/rover/scripts/omnetpp exec ./fingerprints"
   artifacts:
     paths:
-    - ${ROVER_MAIN}/tests/fingerprint
-    expire_in: 2 weeks
+    - ${ROVER_MAIN}/rover/tests/fingerprint
+    expire_in: 8 weeks
 
 
 # run given simulation-campaign
