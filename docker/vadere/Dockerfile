@@ -21,6 +21,7 @@ LABEL maintainer  "wischhof@ieee.org"
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo \
+       python3.7 \
        git git-lfs \
        default-jre \
        maven \
@@ -40,6 +41,9 @@ RUN git clone --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
 
 # add a symbolic link so vadere is found in the path
 RUN ln -s /opt/vadere/$RELEASE /opt/vadere/vadere
+
+# add a symbolic link to /usr/bin/python3 from /usr/bin/python3.7
+RUN ln -s /usr/bin/python3.7 /usr/bin/python3
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/vadere/vadere
