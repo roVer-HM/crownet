@@ -96,7 +96,12 @@ function run_container_X11() {
 	if [[ -z ${TRACI_GUI} ]];then
 		CMD_ARR+=(--env TRACI_GUI="true")
 	else
+		echo "container> set var TRACI_GUI=$TRACI_GUI"
 		CMD_ARR+=(--env TRACI_GUI=${TRACI_GUI})
+	fi
+	if [[ ! -z ${TRACI_DEBUG} ]];then
+  	echo "container> set var TRACI_DEBUG=$TRACI_DEBUG"
+		CMD_ARR+=(--env TRACI_DEBUG-${TRACI_DEBUG})
 	fi
 	CMD_ARR+=(--workdir=$(pwd))
 	CMD_ARR+=(--volume="/home/$USER:/home/$USER")
