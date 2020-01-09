@@ -3,6 +3,9 @@ VadereTestingSuite.preferences.xml
 **/__cache__
 **/vadere-server-output
 **/.directory
+tags
+tags*
+compile_commands.json
 
 # ignore gitlab-runner local test directory
 /builds
@@ -16,6 +19,7 @@ simulation-campaigns/*-results
 # python analysis
 
 analysis/**/venv
+analysis/**/test-data
 
 # rover project
 
@@ -29,8 +33,11 @@ rover/**/legacy
 rover/**/.qtenvrc
 rover/**/.cmdenv-log
 rover/**/*.log
-rover/**/test.out
 
+# Python
+rover/**/test.out
+**/*.pcy
+__pycache__
 
 
 # IDEA
