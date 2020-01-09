@@ -1,8 +1,9 @@
+#!/usr/bin/python3
+
 import os
 import random
 import argparse
 import sys
-
 
 def main(arg_dict):
     if arg_dict['seed'] is None:
@@ -18,18 +19,42 @@ def main(arg_dict):
 
     with open(arg_dict['input'], 'r') as f:
         lines = f.readlines()
+        # sort lines based on first field (first timestep)
+        lines.sort(key=lambda row: float(row.split(' ')[0]))
 
     draw = set()
     while len(draw) < arg_dict['n']:
         draw.add(rnd.randint(0, len(lines) - 1))
 
+    draw_list = list(draw)
+    draw_list.sort()
+    data=list()
+    for d in draw_list:
+        data.append(lines[d])
+
+
     with open(arg_dict['output'], 'w') as f:
         # if arg_dict['log-settings']:
         #     f.write(f"# Args: {arg_dict}. With seed={seed}\n")
-        for d in draw:
-            f.write(lines[d])
+        for d in data:
+            f.write(d)
 
-    print(f"done.")
+    second_wave=list()
+    for idx, row in enumerate(data):
+        time = float(row.split(' ')[0])
+        if (time >= arg_dict['time']):
+            second_wave.append(idx)
+
+    print()
+    print(f"# new Config")
+    print(f"[Config conf_{arg_dict['output'].split('.')[-1]}]")
+    print(f"extends = {arg_dict['extend']}")
+    print(f"*.p.app[0..{min(second_wave)-1}].startTime = 0.0")
+    print(f"*.p.app[{min(second_wave)}..{max(second_wave)}].startTime = {arg_dict['time']}")
+    print()
+
+
+    # print(f"done.")
 
 def str2bool(v):
     # see https://stackoverflow.com/a/43357954
@@ -79,6 +104,16 @@ def parse_args(args):
                         default=True,
                         nargs="?",
                         help="add command info to output file.")
+    parser.add_argument("--time",
+                        dest="time",
+                        type=float,
+                        default=80.400000,
+                        help="Set starttime of second wave of peds. default=80.400000")
+
+    parser.add_argument("--extends",
+                        dest="extend",
+                        default="general",
+                        help="Set name of parent configuration.")
 
     return parser.parse_args(args)
 
