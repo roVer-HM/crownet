@@ -71,7 +71,7 @@ Note: The start script will mount your home directory so that it is visible insi
 
 Information about omnet can be found in https:/ometpp.org/download. In the subfolder doc documenation can be found. The command 
 ```
-omnetpp
+opp_run
 ```
 used in these documentations needs to be replaced by 
 ```
