@@ -69,9 +69,13 @@ network LTE_d2d
         }
         ueCell[numUeCell]: Ue {
             @display("p=292,367;is=vs");
+            ipv4.configurator.typename = "HostAutoConfigurator";
+	    ipv4.configurator.interfaces = "wlan";
         }
         ueD2D[numUeD2D]: MobileUe {
             @display("p=477,367;is=vs");  
+            ipv4.configurator.typename = "HostAutoConfigurator";
+            ipv4.configurator.interfaces = "wlan";
         }
         manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
             @display("p=300,38");
