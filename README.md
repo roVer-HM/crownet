@@ -159,7 +159,8 @@ Assuming that you have added the "omnetpp" script to your search path for execut
 ```
 cd inet
 omnetpp exec make makefiles
-omnetpp exec make -j4
+omnetpp exec make -j4 MODE=release
+omnetpp exec make -j4 MODE=debug
 cd ..
 
 cd simulte
