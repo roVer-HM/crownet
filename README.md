@@ -56,6 +56,7 @@ For now disable SELinux with `sudo setenforce 0` which will switch SELinux in Pe
 reboot SELinx will be enabled again. 
 
 Now you have a completely installed simulation system. Simply start the container which you want to use, e.g. by:
+OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
 ```
 omnetpp
 ```
@@ -65,6 +66,40 @@ vadere
 ```
 
 Note: The start script will mount your home directory so that it is visible inside the Docker container.
+
+# Information about omnet and omnet container
+
+Information about omnet can be found in https:/ometpp.org/download. In the subfolder doc documenation can be found. The command 
+```
+opp_run
+```
+used in these documentations needs to be replaced by 
+```
+omnetpp exec opp_run
+```
+
+# Configure the Eclipse-Environment for a certain project
+The eclipse environment OMNeT++ IDE uses a workspace directory to store its preferences and development artifacts. Do the following steps to create and save a project.
+## Step 1: Create folder for meta-files
+Create a folder in your repository
+```
+mkdir omnetpp-ws
+```
+## Step 2: Start the omnetpp container and import the subprojects
+Start the omnetpp container:
+```
+omnetpp
+```
+## Step 3: Import project with submodules
+Choose General>Exising files> and import following folders:
+*rover-main/inet4
+*roVer
+*simulte
+When importing the folder veins only import the modules 1 (veins) and 3 (inet).
+*veins
+
+## Step 4: Close and restart the Environment
+Choose the folder omnetpp-ws to see the project which was just created.
 
 
 # Running Your First Coupled Simulation
@@ -215,3 +250,11 @@ The whole file or marked code can be formated using the shortcut **Command + Shi
 
 Further information: https://github.com/wangzw/CppStyle, http://www.cppstyle.com/
  
+ # Start SSH agent automtically
+ When logging in into your profile, you are asked for your passphrase for your key:
+ ```
+eval `ssh-agent`
+SSH_ASKPASS='ssh-askpass'
+ssh-add ~/.ssh/id_rsa
+```
+with id_rsa as your private key.
