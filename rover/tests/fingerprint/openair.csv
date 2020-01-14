@@ -1,6 +1,6 @@
 # Fingerprint tests for the "Mobile Communications Lab (R1.009a@MUAS)" scenario
 # (for 
 # workingdir,                        args,                                     simtimelimit,    fingerprint
-/simulations/openair/,                  -f omnetpp.ini -c OpenAirInterface-CAM-DL-1 -r 0,    30s,              653f-46c1/tplx, PASS,
-/simulations/openair/,                  -f omnetpp.ini -c OpenAirInterface-CAM-DL-2 -r 0,    15s,              cd48-3efb/tplx, PASS,
-/simulations/openair/,                  -f omnetpp.ini -c OpenAirInterface-CAM-UL-1 -r 0,    30s,              99c1-611e/tplx, PASS,
+/simulations/openair/,                  -f omnetpp.ini -c OpenAirInterface-CAM-DL-1 -r 0,    30s,              791d-09a7/tplx, PASS,
+/simulations/openair/,                  -f omnetpp.ini -c OpenAirInterface-CAM-DL-2 -r 0,    15s,              d96f-f475/tplx, PASS,
+/simulations/openair/,                  -f omnetpp.ini -c OpenAirInterface-CAM-UL-1 -r 0,    30s,              3c85-aa8c/tplx, PASS,
