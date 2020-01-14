@@ -250,3 +250,11 @@ The whole file or marked code can be formated using the shortcut **Command + Shi
 
 Further information: https://github.com/wangzw/CppStyle, http://www.cppstyle.com/
  
+ # Start SSH agent automtically
+ When logging in into your profile, you are asked for your passphrase for your key:
+ ```
+eval `ssh-agent`
+SSH_ASKPASS='ssh-askpass'
+ssh-add ~/.ssh/id_rsa
+```
+with id_rsa as your private key.
