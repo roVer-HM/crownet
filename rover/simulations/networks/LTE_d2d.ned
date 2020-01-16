@@ -30,12 +30,15 @@ import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
 import rover.nodes.MobileUe;
 import org.car2x.veins.modules.mobility.traci.ITraCIManager;
+import org.car2x.veins.subprojects.veins_inet.mapping.ModuleMappingChooser;
 
 network LTE_d2d
 {
     parameters:
         int numUeCell = default(1);
-        int numUeD2D = default(0);
+        int numUeD2DReceiver = default(0);
+        int numUeD2DSender = default(0);
+        int numMappings = default(0);
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
 		@figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
        
@@ -70,12 +73,23 @@ network LTE_d2d
         ueCell[numUeCell]: Ue {
             @display("p=292,367;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
-	    ipv4.configurator.interfaces = "wlan";
+	    	ipv4.configurator.interfaces = "wlan";
         }
-        ueD2D[numUeD2D]: MobileUe {
+        
+        ueD2DReceiver[numUeD2DReceiver]: MobileUe {
             @display("p=477,367;is=vs");  
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
+        }
+        
+        ueD2DSender[numUeD2DSender]: MobileUe {
+            @display("p=477,367;is=vs");  
+            ipv4.configurator.typename = "HostAutoConfigurator";
+            ipv4.configurator.interfaces = "wlan";
+        }
+        
+        mappings[numMappings]: ModuleMappingChooser{
+        
         }
         manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
             @display("p=300,38");
