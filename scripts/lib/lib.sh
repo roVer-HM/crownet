@@ -41,6 +41,20 @@ function wrap_command() {
 function create_name(){
 	CURR_NAME=$1
 	i=0
+
+    #{
+        #flock --verbose -w 10 200 || { echo "lock timeout on $lock"; exit -1; }
+        #echo "$$: Lock recieved $lock"
+        #echo "$$: received fd"
+        #echo "$$: $1"
+        #echo "$$: $1" > "$nfile"
+        #sleep 1
+        #prev=$(cat $nfile)
+        #echo "$$: prev $prev"
+        #echo "$$: Lock released"
+        #flock -u 200
+    #} 200>"$lock"
+
 	while [[ "$(docker ps -aq -f name=^/${CURR_NAME}$)" ]]; do
 		if [ $i -gt 200 ]; then
 				echo "Error finding a new name for container $1. (Stopt at ${CURR_NAME})"
@@ -122,7 +136,7 @@ function run_container_X11() {
 		CMD_ARR+=(--volume="/home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
 	fi
 	CMD_ARR+=($@)
-	# echo "${CMD_ARR[@]}"
+	#echo "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
 
 }
@@ -160,15 +174,20 @@ function run_container_X11() {
 function run_individual_container() {
 	COMMAND="${@:4:${#@}+1-4}"
 	CMD4="$(wrap_command $COMMAND)"
-				NAME=$(create_name $1)
+    if [[ "$1" == *_rnd ]];then
+        # let docker create random names.
+        run_container_X11 --rm $3 $CMD4
+    else
+        NAME=$(create_name $1)
+        # echo "Container name: $NAME"
         run_container_X11 --rm --name $NAME --hostname $NAME $3 $CMD4
+    fi
 }
 
 
 function check_ptrace() {
 	read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)
-        if [[ $value = 1 ]]
-        then
+        if [[ $value = 1 ]]; then
            echo "Warning: It seems that your system does not allow ptrace - debugging will not work."
            echo "         Edit /etc/sysctl.d/10-ptrace.conf and set ptrace_scope = 0."
         fi

@@ -16,6 +16,8 @@ stages:
 # gitlab runner with more cores and memmory. Use latest version of containers
 build-for-sim:
   stage: build
+  tags:
+    - rover-sim
   variables:
     INET_M: '${CI_PROJECT_DIR}/inet4'
     LTE_M: '${CI_PROJECT_DIR}/simulte'
@@ -74,6 +76,8 @@ build-for-sim:
 # run the fingerprint tests
 fingerprints:
   stage: test
+  tags:
+    - rover-sim
   variables:
     OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:

@@ -21,15 +21,32 @@ def parse_if_number(s):
 
 
 def parse_ndarray(s):
-    return np.fromstring(s, sep=' ') if s else None
+    return np.fromstring(s, sep=" ") if s else None
 
 
 class ScaveTool:
-    _EXPORT = 'x'
-    _QUERY = 'q'
-    _INDEX = 'i'
-    _OUTPUT = '-o'
-    _FILTER = '--filter'
+    """
+    Python wrapper for OMNeT++ scavetool.
+
+    Allows simple access to query and export functions defined in the scavetool.
+    See #print_help, #print_export_help and #print_filter_help for scavetool usage.
+
+    Use #create_or_get_csv_file to create (or use existing) csv files from one or
+    many OMNeT++ result files. The method  accepts multiple glob patters which are
+    search recursive (default) for files ending in *.vec and *.sca.
+    If given a scave_filter is applied to reduce the amount of imported data. See #print_print_filter_help
+    on usage.
+
+    Use #load_csv to load an existing OMNeT++ csv file. The following columns are expected to exist.
+      'run', 'type', 'module', 'name', 'attrname', 'attrvalue', 'value', 'count', 'sumweights',
+      'mean', 'stddev', 'min', 'max', 'binedges', 'binvalues', 'vectime', 'vecvalue'.
+    """
+
+    _EXPORT = "x"
+    _QUERY = "q"
+    _INDEX = "i"
+    _OUTPUT = "-o"
+    _FILTER = "--filter"
 
     def __init__(self, config: Config = None):
         if config is None:
@@ -37,11 +54,6 @@ class ScaveTool:
         else:
             self._config = config
         self._SCAVE_TOOL = self._config.scave_cmd
-
-    def load_csv(self, csv_file):
-        df = pd.read_csv(csv_file, converters=self._converters())
-        df.opp.set_attr('scave_filter', 'N/A')
-        return df
 
     @staticmethod
     def _converters():
@@ -51,7 +63,7 @@ class ScaveTool:
             # 'module': ,
             # 'name': ,
             # 'attrname': ,
-            'attrvalue': parse_if_number,
+            "attrvalue": parse_if_number,
             # 'value': ,                    # scalar data
             # 'count': ,                    # scalar data
             # 'sumweights': ,               # scalar data
@@ -59,19 +71,52 @@ class ScaveTool:
             # 'stddev': ,                   # scalar data
             # 'min': ,                      # scalar data
             # 'max': ,                      # scalar data
-            'binedges': parse_ndarray,      # histogram data
-            'binvalues': parse_ndarray,     # histogram data
-            'vectime': parse_ndarray,       # vector data
-            'vecvalue': parse_ndarray}      # vector data
+            "binedges": parse_ndarray,  # histogram data
+            "binvalues": parse_ndarray,  # histogram data
+            "vectime": parse_ndarray,  # vector data
+            "vecvalue": parse_ndarray,
+        }  # vector data
 
     @classmethod
     def _is_valid(cls, file: str):
-        if file.endswith('.sca') or file.endswith('.vec'):
+        if file.endswith(".sca") or file.endswith(".vec"):
             if os.path.exists(file):
                 return True
         return False
 
-    def create_or_get_csv_file(self, csv_path, input_paths: List[str], override=False, scave_filter: str = None):
+    def load_csv(self, csv_file) -> pd.DataFrame:
+        """
+        #load_csv to load an existing OMNeT++ csv file. The following columns are expected to exist.
+          'run', 'type', 'module', 'name', 'attrname', 'attrvalue', 'value', 'count', 'sumweights',
+          'mean', 'stddev', 'min', 'max', 'binedges', 'binvalues', 'vectime', 'vecvalue'.
+        :param csv_file:    Path to csv file
+        :return:            pd.DataFrame with extra namespace 'opp' (an OppAccessor object with helpers)
+        """
+        df = pd.read_csv(csv_file, converters=self._converters())
+        df.opp.attr.set("csv_path", csv_file)
+        return df
+
+    def create_or_get_csv_file(
+        self,
+        csv_path,
+        input_paths: List[str],
+        override=False,
+        scave_filter: str = None,
+        recursive=True,
+    ):
+        """
+        #create_or_get_csv_file to create (or use existing) csv files from one or
+        many OMNeT++ result files. The method  accepts multiple glob patters which are
+         search recursive (default) for files ending in *.vec and *.sca.
+        If given a scave_filter is applied to reduce the amount of imported data. See #print_print_filter_help
+        on usage.
+        :param csv_path:        path to existing csv file or path to new csv file (see :param override)
+        :param input_paths:     List of glob patters search for *.vec and *.sca files
+        :param override:        override existing csv_path
+        :param scave_filter:    string based filter for scavetool see #print_filter_help for syntax
+        :param recursive:       use recursive glob patterns
+        :return:
+        """
         if os.path.isfile(csv_path) and not override:
             return os.path.abspath(csv_path)
 
@@ -88,28 +133,45 @@ class ScaveTool:
 
         opp_result_files = list()
         for file in input_paths:
-            opp_result_files.extend(glob.glob(file, recursive=True))
+            opp_result_files.extend(glob.glob(file, recursive=recursive))
 
-        opp_result_files = [f for f in opp_result_files if f.endswith(".vec") or f.endswith(".sca")]
+        opp_result_files = [
+            f for f in opp_result_files if f.endswith(".vec") or f.endswith(".sca")
+        ]
 
         cmd.extend(opp_result_files)
         self.exec(cmd)
 
         return os.path.abspath(csv_path)
 
+    def print_help(self):
+        cmd = self._SCAVE_TOOL
+        cmd.append("--help")
+        self.exec(cmd)
+
+    def print_export_help(self):
+        cmd = self._SCAVE_TOOL
+        cmd.append(self._EXPORT)
+        cmd.append("--help")
+        self.exec(cmd)
+
     def print_filter_help(self):
         cmd = self._SCAVE_TOOL
-        cmd.append('help')
-        cmd.append('filter')
+        cmd.append("help")
+        cmd.append("filter")
         self.exec(cmd)
 
     @staticmethod
     def exec(cmd):
-        scave_cmd = subprocess.Popen(cmd, cwd=os.path.curdir, shell=False,
-                                           stdin=None,
-                                           env=os.environ.copy(),
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE)
+        scave_cmd = subprocess.Popen(
+            cmd,
+            cwd=os.path.curdir,
+            shell=False,
+            stdin=None,
+            env=os.environ.copy(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
         try:
             scave_cmd.wait(20)
@@ -117,12 +179,12 @@ class ScaveTool:
                 logging.error(f"return code was {scave_cmd.returncode}")
                 logging.error("command:")
                 logging.error(f"{pp.pprint(cmd)}")
-                print(scave_cmd.stdout.read().decode('utf-8'))
-                print(scave_cmd.stderr.read().decode('utf-8'))
+                print(scave_cmd.stdout.read().decode("utf-8"))
+                print(scave_cmd.stderr.read().decode("utf-8"))
 
             else:
                 logging.info(f"return code was {scave_cmd.returncode}")
-                print(scave_cmd.stdout.read().decode('utf-8'))
+                print(scave_cmd.stdout.read().decode("utf-8"))
 
         except subprocess.TimeoutExpired:
             logging.info(f"scavetool timeout reached. Kill it")
@@ -133,4 +195,3 @@ class ScaveTool:
                 raise
 
         logging.info(f"return code: {scave_cmd.returncode}")
-

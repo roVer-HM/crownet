@@ -53,7 +53,7 @@ by simply typing their name.
 
 If you use a Linux distribution which enables SELinux (Fedoara, RedHat, ...) the X11 Forwarding is blocked.
 For now disable SELinux with `sudo setenforce 0` which will switch SELinux in Persmissive mode. After a
-reboot SELinx will be enabled again. 
+reboot SELinx will be enabled again.
 
 Now you have a completely installed simulation system. Simply start the container which you want to use, e.g. by:
 OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
@@ -69,11 +69,11 @@ Note: The start script will mount your home directory so that it is visible insi
 
 # Information about omnet and omnet container
 
-Information about omnet can be found in https:/ometpp.org/download. In the subfolder doc documenation can be found. The command 
+Information about omnet can be found in https:/ometpp.org/download. In the subfolder doc documenation can be found. The command
 ```
 opp_run
 ```
-used in these documentations needs to be replaced by 
+used in these documentations needs to be replaced by
 ```
 omnetpp exec opp_run
 ```
@@ -188,14 +188,16 @@ cd ../../..
 ```
 # Coding Style
 
-To ensure a standardized code style, we use the Google C++ Style Guide. 
+To ensure a standardized code style, we use the Google C++ Style Guide.
 CppStyle is our recommended Eclipse Plugin. It uses the Formatter [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint).
 
-## Installation
+## C++
 
-Within the omnetpp Docker container, [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint) are already installed. 
+### Installation
 
-If you additionally want to guarantee that only correctly formatted code is committed, you can set-up a git pre-commit hook 
+Within the omnetpp Docker container, [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint) are already installed.
+
+If you additionally want to guarantee that only correctly formatted code is committed, you can set-up a git pre-commit hook
 which checks the files you are about to commit. A suitable script is available within the `scripts` subdirectory. Execute:
 
 ```
@@ -208,12 +210,12 @@ If your are using the (recommended) execution of the simulation based on the pro
 
 If the omnetpp Docker container is *not* used, the style check tools can manually be installed by the commands in the following subsections.
 
-### Manual Installation of cpplint.py
+#### Manual Installation of cpplint.py
 ```
 pip3 install cpplint
 ```
 
-### Manual Installation of clang-format for UNIX systems
+#### Manual Installation of clang-format for UNIX systems
 
 You can install it through the package manager
 
@@ -225,12 +227,12 @@ Other ways installing it are building it from source or extracting it from the L
 and copying the bin/clang-format into your PATH.
 
 
-### Manual Installation of clang-format for Windows
+#### Manual Installation of clang-format for Windows
 
 There is an installer for Windows: https://llvm.org/builds/
 (untested)
 
-## Configure CppStyle
+### Configure CppStyle
 
 To configure CppStyle globally, go to **Preferences -> C/C++ -> CppStyle** dialog.
 
@@ -240,18 +242,32 @@ To enable CppStyle(clang-format) as default C/C++ code formatter, go to **Prefer
 
 To enable CppStyle(clang-format) as C/C++ code formatter for a project, go to **Project properties -> C/C++ General -> Formatter** page and switch **"Code Formatter"** from **[built-in] **to **"CppStyle (clang-format)"**
 
-## How to use CppStyle
+### How to use CppStyle
 
-### Style Check with cpplint.py
+#### Style Check with cpplint.py
 By pressing the  **Run C/C++ Code Analysis** when you right-click a file, cpplint.py will check the file and display differences in the editor.
 In the Properties of CppStyle an automatic analysis can be set to trigger when saving the file.
 
-### Formatting Code with clang-format
+#### Formatting Code with clang-format
 The whole file or marked code can be formated using the shortcut **Command + Shift + f** on MacOS or **Ctrl + Shift + f** on Linux and other systems.
 
 Further information: https://github.com/wangzw/CppStyle, http://www.cppstyle.com/
- 
- # Start SSH agent automtically
+
+## Python
+
+Use [Black](https://github.com/psf/black) Python code formatter.
+
+### Installation
+
+```
+pip install black
+```
+For IDE support see Black [Editor integration](https://black.readthedocs.io/en/stable/editor_integration.html).
+
+ToDo: add git hook to check formatting of python files.  
+
+
+# Start SSH agent automtically
  When logging in into your profile, you are asked for your passphrase for your key:
  ```
 eval `ssh-agent`

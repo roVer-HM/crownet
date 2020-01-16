@@ -10,7 +10,7 @@ if [ -f $DIR/libROVER.so -o -f $DIR/libROVER.dll -o -f $DIR/libROVER.dylib ]; th
 elif [ -x $DIR/ROVER -o -x $DIR/ROVER.exe ]; then
   $DIR/lte $COMMAND_LINE_OPTIONS $*
 elif [ -f $DIR/libROVER_dbg.so -o -f $DIR/libROVER_dbg.dll -o -f $DIR/libROVER_dbg.dylib ]; then
-  opp_run -l $DIR/ROVER_dbg $COMMAND_LINE_OPTIONS $*
+  exec opp_run -l $DIR/ROVER_dbg $COMMAND_LINE_OPTIONS $*
 elif [ -x $DIR/ROVER_dbg -o -x $DIR/ROVER_dbg.exe ]; then
   $DIR/ROVER_dbg $COMMAND_LINE_OPTIONS $*
 fi
