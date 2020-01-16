@@ -6,19 +6,28 @@ if [[ -z $ROVER_MAIN ]];then
 fi
 
 
-if [[ ! "${#@}" -eq 2 ]];then
+if [[ ! "${#@}" -ge 2 ]];then
   echo "need omnetpp.ini and config"
   exit -1
 fi
 
+if [[ -z $3 ]];then
+    EXPERIMENT="experiment-$(date +"%Y-%m-%d-%s")"
+else
+    EXPERIMENT=$3
+fi
+
 OPP_INI="$1"
 CONFIG="$2"
+
+echo "$EXPERIMENT"
+
 source $ROVER_MAIN/scripts/nedpath > /dev/null
 
 CMD_ARR=(exec opp_run)
 CMD_ARR+=(-u Cmdenv)
 CMD_ARR+=(-c "$CONFIG")
-# CMD_ARR+=("--cmdenv-redirect-output=true")
+CMD_ARR+=("--experiment-label=$EXPERIMENT")
 CMD_ARR+=("--cmdenv-stop-batch-on-error=true")
 CMD_ARR+=(-l "$ROVER_MAIN/inet4/src/INET")
 CMD_ARR+=(-l "$ROVER_MAIN/rover/src/ROVER")
@@ -27,6 +36,7 @@ CMD_ARR+=(-l "$ROVER_MAIN/veins/src/veins")
 CMD_ARR+=(-l "$ROVER_MAIN/veins/subprojects/veins_inet/src/veins_inet")
 CMD_ARR+=("$OPP_INI")
 echo "workingdir: $PWD"
+echo "running command:"
 echo "$ROVER_MAIN/scripts/omnetpp ${CMD_ARR[@]}"
 echo ""
 $ROVER_MAIN/scripts/omnetpp "${CMD_ARR[@]}"
