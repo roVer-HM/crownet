@@ -30,7 +30,7 @@ RUN apt-get update && \
        doxygen graphviz tcl-dev tk-dev python python3 valgrind \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
        openscenegraph osgearth \
-       libopenmpi-dev libxml2-dev libwebkitgtk-1.0-0 && \
+       libopenmpi-dev libxml2-dev libwebkitgtk-3.0-0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
