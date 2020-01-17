@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+
 from oppanalyzer import Config, ScaveTool
 
 cnf = Config()
@@ -14,6 +15,7 @@ csv = scave.create_or_get_csv_file(
     recursive=True,
 )
 df = scave.load_csv(csv)
+# df.opp.tex.create_module_summary("mf_D2D_1to2_Vadere_00-0-20191217-10:07:37-7")
 
 #%% Create time series and histogram of receive SINR at the eNB
 
