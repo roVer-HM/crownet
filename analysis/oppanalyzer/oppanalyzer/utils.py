@@ -1,15 +1,15 @@
-import os
+import glob
+import io
 import logging
-import subprocess
-import signal
-import time
+import os
 import pprint as pp
+import signal
+import subprocess
+import time
 from typing import List
 
 import numpy as np
 import pandas as pd
-import glob
-import io
 
 from .configuration import Config
 
