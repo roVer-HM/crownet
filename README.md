@@ -154,7 +154,32 @@ Example: Connect to sumo within the sumo container
 If you prefer to work on the command line instead of using the graphical IDE of OMNeT++, you can use the "exec" option
 of the omnetpp Docker container. It allows to execute an arbitrary command within the container.
 
-## Example: Building the INET and SimuLTE Frameworks
+## Building all roVer Components using the Top-Level Makefile
+The simplest way to build the system is to use the top-level Makefile. Preserving the required build-order,
+it builds all the required models. Note that it also auto-detects the number of available processor cores and
+starts a sufficient number of threads.
+
+Therefore, building all models in one step is quite simple:
+
+```
+omnetpp exec make makefiles
+omnetpp exec make
+```
+
+If you want to build specifically the "release" or "debug" versions, add a MODE parameter, i.e.
+```
+omnetpp make MODE=debug
+```
+
+That's all - now you can change to the "simulations" subfolder and start running the simulations.
+
+## Individually building the models
+Instead of using the top-level Makefile, the models can also be built individually. Therefore, one must
+first switch to the model subdirectory and than execute make locally.
+
+
+*Example: Building the INET and SimuLTE Frameworks*
+
 Assuming that you have added the "omnetpp" script to your search path for executibles and cloned the roVer with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
 ```
 cd inet
@@ -169,7 +194,9 @@ omnetpp exec make -j4
 
 ```
 
-## Example: Building the veins (vehicles in network simulation) projects
+
+*Example: Building the veins (vehicles in network simulation) projects*
+
 The veins framework itself can be built similar to the previously mentioned components. However, it is recommended to create
 the makefiles by calling the *configure* script:
 ```
