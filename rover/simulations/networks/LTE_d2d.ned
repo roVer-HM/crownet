@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 package rover.simulations.networks;
 
@@ -30,15 +30,18 @@ import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
 import rover.nodes.MobileUe;
 import org.car2x.veins.modules.mobility.traci.ITraCIManager;
+import org.car2x.veins.subprojects.veins_inet.mapping.NodeMappingDistribution;
 
 network LTE_d2d
 {
     parameters:
         int numUeCell = default(1);
-        int numUeD2D = default(0);
+        int numUeD2DReceiver = default(0);
+        int numUeD2DSender = default(0);
+        int numMappings = default(0);
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
 		@figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
-       
+
     submodules:
 
         channelControl: LteChannelControl {
@@ -70,17 +73,28 @@ network LTE_d2d
         ueCell[numUeCell]: Ue {
             @display("p=292,367;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
-	    ipv4.configurator.interfaces = "wlan";
+	    	ipv4.configurator.interfaces = "wlan";
         }
-        ueD2D[numUeD2D]: MobileUe {
-            @display("p=477,367;is=vs");  
+
+        ueD2DReceiver[numUeD2DReceiver]: MobileUe {
+            @display("p=477,367;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
+        }
+
+        ueD2DSender[numUeD2DSender]: MobileUe {
+            @display("p=477,367;is=vs");
+            ipv4.configurator.typename = "HostAutoConfigurator";
+            ipv4.configurator.interfaces = "wlan";
+        }
+
+        mappingDistribution[numMappings]: NodeMappingDistribution{
+
         }
         manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
             @display("p=300,38");
         }
-        
+
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++;
         router.pppg++ <--> Eth10G <--> pgw.filterGate;
