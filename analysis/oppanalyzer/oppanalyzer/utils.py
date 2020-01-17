@@ -9,6 +9,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 import glob
+import io
 
 from .configuration import Config
 
@@ -48,12 +49,13 @@ class ScaveTool:
     _OUTPUT = "-o"
     _FILTER = "--filter"
 
-    def __init__(self, config: Config = None):
+    def __init__(self, config: Config = None, timeout=60):
         if config is None:
             self._config = Config()  # default
         else:
             self._config = config
         self._SCAVE_TOOL = self._config.scave_cmd
+        self.timeout = timeout
 
     @staticmethod
     def _converters():
@@ -112,21 +114,70 @@ class ScaveTool:
         on usage.
         :param csv_path:        path to existing csv file or path to new csv file (see :param override)
         :param input_paths:     List of glob patters search for *.vec and *.sca files
-        :param override:        override existing csv_path
-        :param scave_filter:    string based filter for scavetool see #print_filter_help for syntax
-        :param recursive:       use recursive glob patterns
+        :param override:        (default: False) override existing csv_path
+        :param scave_filter:    (default: None) string based filter for scavetool see #print_filter_help for syntax
+        :param recursive:       (default: True) use recursive glob patterns
         :return:
         """
         if os.path.isfile(csv_path) and not override:
             return os.path.abspath(csv_path)
 
+        cmd = self.export_cmd(
+            input_paths=input_paths,
+            output=os.path.abspath(csv_path),
+            scave_filter=scave_filter,
+            recursive=recursive,
+        )
+        self.exec(cmd)
+
+        return os.path.abspath(csv_path)
+
+    def load_df_from_scave(
+        self, input_paths: List[str], scave_filter: str = None, recursive=True,
+    ) -> pd.DataFrame:
+        """
+         Directly load data into Dataframe from *.vec and *.sca files without creating a
+         csv file first. Use stdout of scavetool to create Dataframe.
+
+         Helpful variant for automated scripts to reduce memory footprint.
+
+        :param input_paths:     List of glob patters search for *.vec and *.sca files
+        :param scave_filter:    (default: None) string based filter for scavetool see #print_filter_help for syntax
+        :param recursive:       (default: True) use recursive glob patterns
+        :return:
+        """
+        cmd = self.export_cmd(
+            input_paths=input_paths,
+            output="-",  # read from stdout of scavetool
+            scave_filter=scave_filter,
+            recursive=recursive,
+            options=["-F", "CSV-R"],
+        )
+        stdout, stderr = self.read_stdout(cmd)
+        if stdout == b"":
+            logging.error("error executing scavetool")
+            print(str(stderr, encoding="utf8"))
+            return pd.DataFrame
+
+        df = pd.read_csv(
+            io.BytesIO(stdout), encoding="utf-8", converters=self._converters()
+        )
+        df.opp.attr.set("cmd", " ".join(cmd))
+        return df
+
+    def export_cmd(
+        self, input_paths, output, scave_filter=None, recursive=True, options=None
+    ):
         cmd = self._SCAVE_TOOL
         cmd.append(self._EXPORT)
         cmd.append(self._OUTPUT)
-        cmd.append(os.path.abspath(csv_path))
+        cmd.append(output)
         if scave_filter is not None:
             cmd.append(self._FILTER)
             cmd.append(self._config.escape(scave_filter))
+
+        if options is not None:
+            cmd.extend(options)
 
         if len(input_paths) == 0:
             raise ValueError("no *.vec or *.sca files given.")
@@ -140,9 +191,7 @@ class ScaveTool:
         ]
 
         cmd.extend(opp_result_files)
-        self.exec(cmd)
-
-        return os.path.abspath(csv_path)
+        return cmd
 
     def print_help(self):
         cmd = self._SCAVE_TOOL
@@ -161,8 +210,24 @@ class ScaveTool:
         cmd.append("filter")
         self.exec(cmd)
 
-    @staticmethod
-    def exec(cmd):
+    def read_stdout(self, cmd):
+        scave_cmd = subprocess.Popen(
+            cmd,
+            cwd=os.path.curdir,
+            stdin=None,
+            env=os.environ.copy(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        try:
+            out, err = scave_cmd.communicate(timeout=self.timeout)
+            return out, err
+        except subprocess.TimeoutExpired:
+            logging.error("Timout reached")
+            scave_cmd.kill()
+            return b"", io.StringIO("timeout reached")
+
+    def exec(self, cmd):
         scave_cmd = subprocess.Popen(
             cmd,
             cwd=os.path.curdir,
@@ -174,7 +239,7 @@ class ScaveTool:
         )
 
         try:
-            scave_cmd.wait(20)
+            scave_cmd.wait(self.timeout)
             if scave_cmd.returncode != 0:
                 logging.error(f"return code was {scave_cmd.returncode}")
                 logging.error("command:")
