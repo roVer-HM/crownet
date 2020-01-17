@@ -32,33 +32,19 @@ build-for-sim:
     - docker pull $CI_REGISTRY/rover/rover-main/omnetpp
     - docker pull $CI_REGISTRY/rover/rover-main/sumo
     - docker pull $CI_REGISTRY/rover/rover-main/vadere
-    # ## build inet
+    # ## build all models
+    - "${OPP} make makefiles"
+    - "${OPP} make MODE=${MODE}"
+    # ## export inet version
     - "cd ${INET_M}"
     - "export INET_VERSION=$(./_scripts/get_version)"
-    - "${OPP} make makefiles"
-    - "${OPP} make MODE=${MODE} -j $(nproc)"
     # inet> cleanup not needed directories
     - rm -rf doc examples showcases tutorials
-    # ## build simulte
-    - "cd ${LTE_M}"
-    - "${OPP} make makefiles"
-    - "${OPP} make MODE=${MODE} -j $(nproc)"
-    # ## build veins
+    # ## cleanup not needed directories in veins
     - "cd ${VEINS_M}"
-    - "${OPP} ./configure"
-    - "${OPP} make MODE=${MODE} -j $(nproc)"
-    # inet> cleanup not needed directories
     - rm -rf doc examples subprojects/veins_catch subprojects/veins_inet3 subprojects/veins_testsims
-    # ## build veins_inet
-    - "cd ${VEINS_INET_M}"
-    - "${OPP} ./configure --with-inet ${INET_M}"
-    - "${OPP} make MODE=${MODE} -j $(nproc)"
-    # ## build rover
-    - "cd ${ROVER_M}"
-    - "${OPP} make makefiles-cmdOnly"
-    - "${OPP} make MODE=${MODE} -j $(nproc)"
+    # ## global cleanup
     - "cd ${ROVER_MAIN}"
-    # ## global clenaup
     - "find . -name \"*.o\" -type f -delete"
     - "cd ${INET_M}"
     # inet> only delete inet sources for artefacts. We may need the other ones.
