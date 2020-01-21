@@ -1,9 +1,12 @@
 import re
+from string import Template
 from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 import pandas as pd
+from oppanalyzer import utils
 
 
 class OppFilterItem:
@@ -23,6 +26,122 @@ class OppFilterItem:
         return (
             f"FilterItem(name: {self.name}, value: {self.value}, regex: {self.regex})"
         )
+
+
+class OppTex:
+    def __init__(self, opp=None):
+        self._opp = opp
+
+    @staticmethod
+    def esc_tex(val: str):
+        val = val.replace("&", "\&")
+        val = val.replace("%", "\%")
+        val = val.replace("$", "\$")
+        val = val.replace("#", "\#")
+        val = val.replace("_", "\_")
+        val = val.replace("{", "\{")
+        val = val.replace("}", "\}")
+        val = val.replace("~", "\~")
+        val = val.replace("^", "\^")
+        val = val.replace("\\", "\\")
+
+        return val
+
+    @classmethod
+    def write_module_summary(cls, run_id, module_dict: dict):
+
+        module_list = []
+        tex_mod_item = utils.tex_module_item_tmpl
+        for _, v in module_dict.items():
+            module_list.append(
+                Template(tex_mod_item,).substitute(
+                    module=cls.esc_tex(str(v["module"])),
+                    scalar=cls.esc_tex(str(v["scalar"])),
+                    vector=cls.esc_tex(str(v["vector"])),
+                    histogram=cls.esc_tex(str(v["histogram"])),
+                )
+            )
+
+        tex_mod = utils.tex_module_tmpl
+        return Template(tex_mod).substitute(
+            run=cls.esc_tex(run_id), module_items="".join(module_list)
+        )
+
+    @classmethod
+    def write_attribute_tabular(cls, run_id, runattr_dict, itervars_dict, param_dict):
+        tex_tmpl = utils.tex_tabluar_tmpl
+
+        runattrs = "   \\\\ \n".join(
+            [
+                f"\t\t{cls.esc_tex(k)} & {cls.esc_tex(str(v))}"
+                for (k, v) in runattr_dict.items()
+            ]
+        )
+
+        itervars = "   \\\\ \n".join(
+            [
+                f"\t\t{cls.esc_tex(k)} & {cls.esc_tex(str(v))}"
+                for (k, v) in itervars_dict.items()
+            ]
+        )
+
+        params = "   \\\\ \n".join(
+            [
+                f"\t\t{cls.esc_tex(k)} & {cls.esc_tex(str(v))}"
+                for (k, v) in param_dict.items()
+            ]
+        )
+
+        return Template(tex_tmpl).substitute(
+            runattrs=runattrs,
+            itervars=itervars,
+            params=params,
+            run=cls.esc_tex(run_id),
+        )
+
+    def create_module_summary(self, run_id, output_file=None):
+        """
+        Create latex table for module summary.
+        :param run_id:      run_id for which tex is created
+        :param output_file: if not set use to stdout
+        """
+
+        modType = np.array(self._opp._obj[["module", "type"]])
+        module_dict = {}
+        for m in modType:
+            data = module_dict.get(
+                m[0], {"module": m[0], "scalar": 0, "vector": 0, "histogram": 0}
+            )
+            data[m[1]] = data.get(m[1], 0) + 1
+            module_dict.setdefault(m[0], data)
+
+        tmpl = self.write_module_summary(run_id=run_id, module_dict=module_dict)
+
+        if output_file is None:
+            print(tmpl)
+        else:
+            with open(output_file, "w") as f:
+                f.write(tmpl)
+
+    def create_attribute_tabular(self, run_id, output_file=None):
+        """
+        Create latex table for attribute data.
+        :param run_id:      run_id for which tex is created
+        :param output_file: if not set use to stdout
+        """
+
+        tmpl = self.write_attribute_tabular(
+            run_id=run_id,
+            runattr_dict=self._opp.attr[run_id]["runattr"],
+            itervars_dict=self._opp.attr[run_id]["itervar"],
+            param_dict=self._opp.attr[run_id]["param"],
+        )
+
+        if output_file is None:
+            print(tmpl)
+        else:
+            with open(output_file, "w") as f:
+                f.write(tmpl)
 
 
 class OppFilter:
@@ -105,7 +224,7 @@ class OppFilter:
             raise ValueError("no Dataframe set")
 
         bool_filter = pd.Series(
-            [True for i in range(0, self._df.shape[0])], self._df.index
+            [True for _ in range(0, self._df.shape[0])], self._df.index
         )
         for key, filter_item in self._filter_dict.items():
             if filter_item.regex:
@@ -124,22 +243,20 @@ class OppFilter:
         return ret
 
 
-class OppAttributes:
+class OppAttributes(dict):
     """
     OMNeT++ Attributes for vectors, scalars and histograms
     """
 
-    def __init__(self, attribute_dict, obj):
-        self._opp_attr_dict = attribute_dict
+    def __init__(self, _opp_attr_dict, obj):
+        # self._opp_attr_dict = attribute_dict
+        super(OppAttributes, self).__init__(_opp_attr_dict)
         self._obj = obj
 
-    def set(self, key, value):
-        self._opp_attr_dict.setdefault(key, value)
-
     def run(self, run_id):
-        return self._opp_attr_dict.get(run_id, {})
+        return self.get(run_id, {})
 
-    def get(self, df_row_label):
+    def module_attr(self, df_row_label):
         """
         :param df_row_label: row label (loc) of data frame.
         :return: attribute dictionary for given row label or empty dictionary if not found.
@@ -155,13 +272,13 @@ class OppAttributes:
             return {}
 
     def attr_for_series(self, s: pd.Series):
-        return self.get(s.name)
+        return self.module_attr(s.name)
 
     def unit(self, df_row_label):
-        return self.get(df_row_label).get("unit", "???")
+        return self.module_attr(df_row_label).get("unit", "???")
 
     def title(self, df_row_label):
-        return self.get(df_row_label).get("title", "???")
+        return self.module_attr(df_row_label).get("title", "???")
 
 
 class OppPlot:
@@ -249,7 +366,8 @@ class OppAccessor:
     def __init__(self, pandas_obj):
         self._validate(pandas_obj)
         self._obj: pd.DataFrame = pandas_obj
-        self.plot = OppPlot(self)
+        self.plot: OppPlot = OppPlot(self)
+        self.tex: OppTex = OppTex(self)
 
         # subset of attribute information
         run_cnf = self._obj.loc[
