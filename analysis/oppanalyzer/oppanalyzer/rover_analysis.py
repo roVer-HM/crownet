@@ -159,6 +159,8 @@ class OppFilter:
         self._filter_dict = {}
         self._name = None
         self._name_regex = None
+        self._run = None
+        self._run_regex = None
         self._type = None
         self._module = None
         self._module_regex = None
@@ -194,6 +196,17 @@ class OppFilter:
             name = self._apply_number_range(name)
 
         self._add_filter(OppFilterItem("name", name, True))
+        return self
+
+    def run(self, run):
+        self._add_filter(OppFilterItem("run", run, False))
+        return self
+
+    def run_regex(self, run: str, allow_number_range=True):
+        if allow_number_range:
+            run = self._apply_number_range(run)
+
+        self._add_filter(OppFilterItem("run", run, True))
         return self
 
     def module(self, module):
@@ -349,6 +362,7 @@ class OppPlot:
         ax.hist(
             s.vecvalue, bins, density=True,
         )
+        ax.set_title(self._opp.attr.title(s.name))
         ax.set_xlabel(f"[{self._opp.attr.unit(s.name)}]")
 
 
