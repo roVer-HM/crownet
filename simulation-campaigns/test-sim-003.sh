@@ -5,30 +5,27 @@ if [[ -z $ROVER_MAIN ]];then
   exit -1
 fi
 
+SIM_DIR="$ROVER_MAIN/rover/simulations/mucFreiNetdLTE2dMulticast"
+OPP_INI="omnetpp.ini"
+CONFIG="vadere00"
 
-if [[ ! "${#@}" -ge 2 ]];then
-  echo "need omnetpp.ini and config"
-  exit -1
+
+EXPERIMENT="experiment-$(date +"%Y-%m-%d-%s")"
+RESULT_DIR="$(realpath "$0-results")"
+if [[ -d "$RESULT_DIR" ]];then
+	rm -rf "$RESULT_DIR"
 fi
+mkdir "$RESULT_DIR"
 
-if [[ -z $3 ]];then
-    EXPERIMENT="experiment-$(date +"%Y-%m-%d-%s")"
-else
-    EXPERIMENT=$3
-fi
-
-OPP_INI="$1"
-CONFIG="$2"
-
-echo "$EXPERIMENT"
-
+# run
+pushd $SIM_DIR > /dev/null
 source $ROVER_MAIN/scripts/nedpath > /dev/null
 
 CMD_ARR=(exec opp_runall -j $(nproc) opp_run)
 CMD_ARR+=(-u Cmdenv)
 CMD_ARR+=(-c "$CONFIG")
 CMD_ARR+=("--experiment-label=$EXPERIMENT")
-CMD_ARR+=("--cmdenv-stop-batch-on-error=true")
+CMD_ARR+=("--result-dir=$RESULT_DIR")
 CMD_ARR+=(-l "$ROVER_MAIN/inet4/src/INET")
 CMD_ARR+=(-l "$ROVER_MAIN/rover/src/ROVER")
 CMD_ARR+=(-l "$ROVER_MAIN/simulte/src/lte")
@@ -40,3 +37,8 @@ echo "running command:"
 echo "$ROVER_MAIN/scripts/omnetpp ${CMD_ARR[@]}"
 echo ""
 $ROVER_MAIN/scripts/omnetpp "${CMD_ARR[@]}"
+
+if [[ -f ".cmdenv-log" ]];then
+	mv -v ".cmdenv-log" "$RESULT_DIR"
+fi
+popd > /dev/null
