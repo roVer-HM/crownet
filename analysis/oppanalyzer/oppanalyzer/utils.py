@@ -158,7 +158,7 @@ class ScaveTool:
         if stdout == b"":
             logging.error("error executing scavetool")
             print(str(stderr, encoding="utf8"))
-            return pd.DataFrame
+            return pd.DataFrame()
 
         df = pd.read_csv(
             io.BytesIO(stdout), encoding="utf-8", converters=self._converters()
