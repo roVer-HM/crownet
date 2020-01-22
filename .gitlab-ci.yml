@@ -97,4 +97,4 @@ simulation-campaign:
       - ${ROVER_MAIN}/rover
       - ${ROVER_MAIN}/veins/src
       - ${ROVER_MAIN}/veins/subprojects/veins_inet/src
-    expire_in: 60 minutes
+    expire_in: 4 weeks
