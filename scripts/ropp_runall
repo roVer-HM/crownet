@@ -24,7 +24,7 @@ echo "$EXPERIMENT"
 
 source $ROVER_MAIN/scripts/nedpath > /dev/null
 
-CMD_ARR=(exec opp_runall -j 4 opp_run)
+CMD_ARR=(exec opp_runall -j $(nproc) opp_run)
 CMD_ARR+=(-u Cmdenv)
 CMD_ARR+=(-c "$CONFIG")
 CMD_ARR+=("--experiment-label=$EXPERIMENT")
