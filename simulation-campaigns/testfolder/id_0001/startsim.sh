@@ -9,7 +9,7 @@ echo "$PWD"
 
 #SIM_DIR="$ROVER_MAIN/simulation-campaigns/testfolder/template2/input"
 SIM_DIR="$PWD/input"
-OPP_INI="omnetpp1.ini"
+OPP_INI="omnetpp.ini"
 CONFIG="vadere00"
 
 
