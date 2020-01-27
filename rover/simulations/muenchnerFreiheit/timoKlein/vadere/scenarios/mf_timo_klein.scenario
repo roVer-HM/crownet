@@ -1,7 +1,7 @@
 {
   "name" : "mf_timo_klein",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -39,7 +39,11 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 9
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -110,8 +114,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : false,
       "fixedSeed" : -7492697142818052001,
-      "simulationSeed" : 0,
-      "usePsychologyLayer" : false
+      "simulationSeed" : 0
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {

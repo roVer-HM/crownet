@@ -19,7 +19,9 @@ simulation-campaigns/*-results
 # python analysis
 
 analysis/**/venv
-analysis/**/test-data
+analysis/**/dist
+analysis/**/test_data
+*.egg-info
 
 # rover project
 
