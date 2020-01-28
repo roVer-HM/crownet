@@ -1,6 +1,7 @@
 
 import os, shutil,subprocess
 from distutils.dir_util import copy_tree
+from VariableExtraction import create_VariableExtraction
 
 
 def overwrite_basis_input( FileName, basis_vector, samples_array,x ):
@@ -90,4 +91,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    create_VariableExtraction("omnet")
+    create_VariableExtraction("vadere")
+    #main()

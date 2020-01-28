@@ -23,18 +23,31 @@ def extract_data():
     if save_file is True:
         file = os.path.splitext(FileName)
         pathnewfile =  file[0] + ".mapping"
-        print(pathnewfile)
         f = open(pathnewfile , "w+")
         f.write(extraction)
         f.close()
-        root.destroy()
+        messagebox.showinfo("Export file", "Exported variable selection to \n" + os.path.basename(pathnewfile))
+        root.withdraw()
+        root.quit()
 
 
-def create_VariableExtraction():
+def create_VariableExtraction(inputtype=None):
+
     global root, extraction, choice,frame, FileName
+
+    if inputtype is None:
+        inputtype = [("input file", "*.scenario"), ("input file", "*.ini")]
+    if "omnet" in inputtype or "ini" in inputtype :
+        inputtype = [("input file", "*.ini")]
+
+    if "vadere" in inputtype or "scenario" in inputtype:
+        inputtype = [("input file", "*.scenario")]
+
+
     root = Tk()
     root.withdraw()
-    FileName = askopenfilename(filetypes = [("input file","*.scenario"),("input file","*.ini")])
+    messagebox.showinfo("Input file", "Choose an input file from which you want to extract variables.")
+    FileName = askopenfilename(title= "Open input file",filetypes = inputtype)
 
     with open(FileName) as f:
         newText = f.read().split("\n")
@@ -60,8 +73,6 @@ def create_VariableExtraction():
     screen_width = int( 0.9* frame.winfo_screenwidth() /60 )
     screen_height = frame.winfo_screenmmheight()
 
-    print(screen_width)
-
     # create listbox
     listbox = Listbox(frame,selectmode="multiple", height= 70, width=100)
     listbox.pack(side = LEFT,expand=TRUE,fill="both")
@@ -79,7 +90,6 @@ def create_VariableExtraction():
 
     choice = Text(frame,  height=70, width = 100)
     choice.pack( side = LEFT, padx=20 )
-
 
     extraction = ""
 
