@@ -1,0 +1,101 @@
+#!/usr/bin/python3
+"""
+Search for all scenario files in ROVER_MAIN and list them in a tkinter
+Listbox. Open selected project via 'Enter' inside the vadere container.
+"""
+import tkinter as tk
+import glob
+import os
+import subprocess
+
+
+class App(tk.Frame):
+    def __init__(self, data, master=None):
+        super().__init__(master)
+
+        max_len = 0
+        self._data = data
+        for d in data:
+            if len(d) > max_len:
+                max_len = len(d)
+
+        self.listbox = tk.Listbox(master, height=len(data), width=max_len)
+        self.listbox.pack(fill=tk.BOTH)
+
+        for item in data:
+            self.listbox.insert(tk.END, item)
+
+        self.selection = 0
+        self.val = data[0]
+        self.closed_clean = False
+        self.listbox.select_set(self.selection)
+        self.listbox.bind("<Return>", self.on_enter)
+        self.listbox.focus_set()
+
+        self.listbox.bind("<Escape>", self.on_esc)
+
+        # Positions the window in the center of the page.
+        master.geometry("+{}+{}".format(400, 300))
+
+    def on_esc(self, event):
+        self.closed_clean = False
+        self.master.destroy()
+
+    def on_enter(self, event):
+        print(self.listbox.get(tk.ACTIVE))
+        self.val = self.listbox.get(tk.ACTIVE)
+        self.closed_clean = True
+        self.master.destroy()
+
+
+if __name__ == "__main__":
+    project_dirs = glob.glob(
+        f"{os.environ['ROVER_MAIN']}/**/vadere.project", recursive=True
+    )
+
+    project_filtered = [
+        i
+        for i in project_dirs
+        if "target/test-classes" not in i
+        and "rover-main/builds" not in i
+        and "ModelTests" not in i
+        and "tools/ContinuousIntegration"
+        and "testResources" not in i
+        and "ModelCalibration"
+        and "vadere/Tools" not in i
+    ]
+
+    project_filtered.sort()
+
+    app = App(project_filtered, master=tk.Tk())
+    app.mainloop()
+
+    if not app.closed_clean:
+        exit()
+
+    cmd = [
+        f"{os.environ['ROVER_MAIN']}/scripts/vadere",
+        "exec",
+        "java",
+        "-jar",
+        "/opt/vadere/vadere/VadereGui/target/vadere-gui.jar",
+        "--project",
+        app.val,
+    ]
+    p = subprocess.Popen(
+        cmd,
+        cwd=os.path.curdir,
+        stdin=None,
+        env=os.environ.copy(),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    while p.poll() is None:
+        sout = p.stdout.readline()
+        print(sout.decode("utf-8"), end="")
+
+    print(p.stdout.read().decode("utf-8"), end="")
+    for err in p.stderr.readlines():
+        print(err.decode('utf-8'), end="")
+    p.kill()
