@@ -30,6 +30,7 @@ rover/src/Makefile
 rover/.settings
 rover/**/libROVER*
 rover/**/results
+rover/**/measurements
 rover/**/output
 rover/**/legacy
 rover/**/.qtenvrc
