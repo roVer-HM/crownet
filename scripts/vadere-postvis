@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ -z $ROVER_MAIN ]];then
+    echo "ROVER_MAIN not set"
+    exit -1
+fi
+
+$ROVER_MAIN/scripts/vadere exec java -jar /opt/vadere/master/VadereGui/target/vadere-postvis.jar
