@@ -358,9 +358,11 @@ class OppPlot:
             kwargs.setdefault("label", self.create_label(s.module, []))
         ax.plot(s.vectime, s.vecvalue, **self.plt_args(idx=0, **kwargs))
 
-    def create_histogram(self, ax: plt.axes, s: pd.Series, bins=40):
+    def create_histogram(self, ax: plt.axes, s: pd.Series, bins=40, **kwargs):
+        if "density" not in kwargs:
+            kwargs.setdefault("density", True)
         ax.hist(
-            s.vecvalue, bins, density=True,
+            s.vecvalue, bins, **kwargs
         )
         ax.set_title(self._opp.attr.title(s.name))
         ax.set_xlabel(f"[{self._opp.attr.unit(s.name)}]")

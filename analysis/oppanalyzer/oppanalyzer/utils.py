@@ -100,12 +100,12 @@ class ScaveTool:
         return df
 
     def create_or_get_csv_file(
-        self,
-        csv_path,
-        input_paths: List[str],
-        override=False,
-        scave_filter: str = None,
-        recursive=True,
+            self,
+            csv_path,
+            input_paths: List[str],
+            override=False,
+            scave_filter: str = None,
+            recursive=True,
     ):
         """
         #create_or_get_csv_file to create (or use existing) csv files from one or
@@ -134,7 +134,7 @@ class ScaveTool:
         return os.path.abspath(csv_path)
 
     def load_df_from_scave(
-        self, input_paths: List[str], scave_filter: str = None, recursive=True,
+            self, input_paths: List[str], scave_filter: str = None, recursive=True,
     ) -> pd.DataFrame:
         """
          Directly load data into Dataframe from *.vec and *.sca files without creating a
@@ -167,7 +167,7 @@ class ScaveTool:
         return df
 
     def export_cmd(
-        self, input_paths, output, scave_filter=None, recursive=True, options=None
+            self, input_paths, output, scave_filter=None, recursive=True, options=None
     ):
         cmd = self._SCAVE_TOOL
         cmd.append(self._EXPORT)
@@ -261,6 +261,40 @@ class ScaveTool:
                 raise
 
         logging.info(f"return code: {scave_cmd.returncode}")
+
+
+class StatsTool:
+    """
+    Toolset for calculating and nicely printing statistics
+    """
+
+    @staticmethod
+    def stats_table(data, unit: str = "", name: str = "") -> str:
+        """
+        Create a table listing the most important statistic values
+
+        :param data:    data to calculate the statistics on
+        :param unit:    SI unit of data (optional)
+        :param name:    name of the data to be printed (optional)
+        :return:        string with statistics table
+        """
+        table = "============================================================\n"
+        if len(name) > 0:
+            table += (f"! Data: {name:50} !\n"
+                      "------------------------------------------------------------\n"
+                      )
+
+        table += (
+            f"! arith. mean : {np.mean(data):15.6f} {unit:>4}                       !\n"
+            f"! minimum     : {np.min(data):15.6f} {unit:>4}                       !\n"
+            f"! maximum     : {np.max(data):15.6f} {unit:>4}                       !\n"
+            f"! median      : {np.median(data):15.6f} {unit:>4}                       !\n"
+            f"! std. dev.   : {np.std(data):15.6f} {unit:>4}                       !\n"
+            f"! variance    : {np.var(data):15.6f} {unit:>4}^2                     !\n"
+            "============================================================\n"
+        )
+
+        return table
 
 
 tex_module_item_tmpl = """
