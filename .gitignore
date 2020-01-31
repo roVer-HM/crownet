@@ -3,6 +3,7 @@ VadereTestingSuite.preferences.xml
 **/__cache__
 **/vadere-server-output
 **/.directory
+**/*.legacy
 tags
 tags*
 compile_commands.json
@@ -12,6 +13,7 @@ compile_commands.json
 # ignore api token directory for gitlab-ci
 .tokens
 simulation-campaigns/*-results
+simulation-campaigns/*results*
 .cmdenv-log
 
 .idea
