@@ -38,6 +38,9 @@ rover/**/legacy
 rover/**/.qtenvrc
 rover/**/.cmdenv-log
 rover/**/*.log
+rover/**/simulations/*/*.png
+rover/**/simulations/*/*.pdf
+rover/**/venv
 
 # Python
 rover/**/test.out
