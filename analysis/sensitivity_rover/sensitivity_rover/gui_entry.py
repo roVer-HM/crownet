@@ -4,83 +4,145 @@ import sensitivity_rover.Preprocessing as prep
 
 class SensitivityAnalysisGui:
     preprocess = prep.Project()
+
     status = "undefined"
 
-    def __init__(self):
+    def __init__(self, root):
 
-        self.root = Tk()
+        self.root = root
         self.root.title("Sensitivity analsis helper")
         self.root.geometry("1000x300")
 
-        self.menu = Menu(self.root)
-        self.root.config(menu=self.menu)
+        menu = Menu(self.root)
+        self.root.config(menu=menu)
 
-        self.filemenu = Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Project", menu=self.filemenu)
-        self.filemenu.add_command(label="New", command=lambda: self.__create())
-        self.filemenu.add_command(label="Open", command=lambda: self.__open())
-        self.filemenu.add_command(label="Close", command=self.root.quit)
+        filemenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Project", menu=filemenu)
+        filemenu.add_command(label="New", command=lambda: self.__create())
+        filemenu.add_command(label="Open", command=lambda: self.__open())
+        filemenu.add_command(label="Close", command=self.root.destroy)
 
-        self.helpmenu = Menu(self.menu)
-        self.menu.add_cascade(label="Help", menu=self.helpmenu)
-        self.helpmenu.add_command(label="About", )
+        helpmenu = Menu(menu)
+        menu.add_cascade(label="Help", menu=helpmenu)
+        helpmenu.add_command(label="About", )
 
-        mainloop()
 
     def __create(self):
         self.preprocess.createProject()
         directory = self.preprocess.getDirectory()
         directory = "Created project in: \t" + directory
-        Label(self.root, height=5, width=100, text=directory).grid(row=0, column=0, columnspan=2)
-        self.__show()
+        label = Label(self.root, height=5, width=100, text=directory)
+        label.pack()
+        self.__show("create")
 
     def __open(self):
         self.preprocess.openProject()
         directory = self.preprocess.getDirectory()
         directory = "Opened project: \t" + directory
-        Label(self.root, height=5, width=120, text=directory).grid(row=0, column=0, columnspan=2)
-        self.__show()
+        label = Label(self.root, height=5, width=120, text=directory)
+        label.pack()
+        self.__show("open")
 
-    def __show(self):
-        statusPreprocessing, statusSolving, statusPostprocessing = self.preprocess.getProjectStatus()
+    def __show(self, state):
+        statusPreprocessing, statusSampling, statusSolving, statusPostprocessing = self.preprocess.getProjectStatus()
 
-        print([statusPreprocessing, statusSolving, statusPostprocessing])
-
-        Button(self.root, text="Preprocessing", relief=RIDGE, width=100,
-               command=lambda: self.__prepareSolverNode()).grid(row=1, column=0, padx=(20, 5))
-
-        Button(self.root, text="Run simulations", relief=RIDGE, width=100,
-               command=lambda: self.__runSimulations()).grid(row=2, column=0,
-                                                             padx=(20, 5))
-
-        Button(self.root, text="Postprocessing", relief=RIDGE, width=100,
-               command=lambda: self.__runPostProcessing()).grid(row=3, column=0,
-                                                                padx=(20, 5))
 
         if statusPreprocessing == "none":
-            color1 = "red"
+            color_prep = "red"
         else:
-            color1 = "green"
+            color_prep = "green"
+
+        statusParameter = "none"
+
+        if statusParameter == "none":
+            color_para = "red"
+            status_para = "normal"
+        else:
+            color_para = "green"
+            status_para = "normal"
+
+        if statusSampling == "none":
+            color_samp = "red"
+            status_samp = "normal"
+        else:
+            color_samp = "green"
+            status_samp = "normal"
 
         if statusSolving == "none":
-            color2 = "red"
+            color_run = "red"
+            status_run = "normal"
         else:
-            color2 = "green"
+            color_run = "green"
+            status_run = "normal"
 
         if statusPostprocessing == "none":
-            color3 = "red"
+            color_post = "red"
+            status_post = "disabled"
         else:
-            color3 = "green"
+            color_post = "green"
+            status_post = "normal"
 
-        Entry(self.root, bg=color1, relief=SUNKEN, width=4).grid(row=1, column=1)
-        Entry(self.root, bg=color2, relief=SUNKEN, width=4).grid(row=2, column=1)
-        Entry(self.root, bg=color3, relief=SUNKEN, width=4).grid(row=3, column=1)
+        if state == "create":
+            self.button_prep = Button(self.root, text="Define simulation", relief=RIDGE, width=100, bg = color_prep,
+                                               command=lambda: self.__prepareSolverNode())
+
+            self.button_para = Button(self.root, text="Define parameters", relief=RIDGE, width=100, bg=color_samp,
+                                      state = status_para, command=lambda: self.__define_parameters())
+
+            self.button_prep.pack()
+            self.button_para.pack()
+
+        elif state == "open":
+            self.button_update = Button(self.root, text="Update", relief=RIDGE, width=100, bg=color_prep,
+                                      command=lambda: self.__update_preprocessing())
+            self.button_update.pack()
+
+
+
+        self.button_samp = Button(self.root, text="Define sampling", relief=RIDGE, width=100, bg=color_samp, state = status_samp,
+                                  command=lambda: self.__prepareSampling())
+
+        self.button_run = Button(self.root, text="Run simulations", relief=RIDGE, width=100, bg = color_run,
+                              command=lambda: self.__runSimulations(), state = status_run)
+
+        self.button_post = Button(self.root, text="Postprocessing", relief=RIDGE, width=100, bg = color_post,
+                              command=lambda: self.__runPostProcessing(), state = status_post )
+
+
+        self.button_samp.pack()
+        self.button_run.pack()
+        self.button_post.pack()
+
+    def __update_preprocessing(self):
+        print("Update simulation and parameters")
+        self.preprocess.update_simulation_parameters()
 
     def __prepareSolverNode(self):
-        print("Start preprocessing")
+        print("Define simulation")
+        self.preprocess.copy_simulation()
+
+    def __define_parameters(self):
+        print("Define parameters")
+        self.preprocess.extract_variables()
+
+    def __prepareSampling(self):
+        print("Define sampling")
+
+        self.preprocess.createSampling()
+
+        print(dir)
+
 
     def __runSimulations(self):
         print("Run simulations")
 
     def __runPostProcessing(self):
         print("Start postprocessing")
+
+def run_SensitivityAnalysisGui():
+    root = Tk()
+    app = SensitivityAnalysisGui(root)
+    root.mainloop()
+
+if __name__ == '__main__':
+    run_SensitivityAnalysisGui()
