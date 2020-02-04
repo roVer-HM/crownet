@@ -1,9 +1,10 @@
 
 
-import os,sys,tkinter, datetime, shutil
+import os,sys,tkinter, datetime, shutil, re, time
 from tkinter.filedialog import askdirectory, askopenfilename
 from tkinter import messagebox
-
+from pyDOE import *
+import matplotlib.pyplot as plt
 
 class Project:
 
@@ -262,21 +263,78 @@ class Project:
     def createSampling(self):
 
         default_omnetpp, default_vadere, __, __ = self.get_default_values()
+        file_sampling = os.path.join( self.dirname , "sampling.dat" )
 
-        master = tkinter.Tk()
-        line = dict()
+        sampling = Sampling(default_omnetpp, default_vadere, file_sampling  )
 
-        for row in range(len(default_omnetpp)):
-            tkinter.Label(master, text=("Omnett - Variable" +str(row+1) + " =(" + default_omnetpp[row] + ")" )).grid(row=row)
+        if os.path.exists(file_sampling):
+            sampling.load()
+        else:
+            sampling.create()
 
-            variable[row] = tkinter.StringVar(master)
-            variable[row].set("continous")  # default value
+        state_omnett, ranges_omnett, state_vadere, ranges_vadere = sampling.get_parameter_ranges()
 
-            w[row] = tkinter.OptionMenu(master, variable[row], "continous", "discrete").grid(row=row, column =1 )
-            e = tkinter.Entry(master)
-            e.grid(row=row, column=2)
+        self.createParametercombinations(state_omnett, ranges_omnett, state_vadere, ranges_vadere)
 
-        print("grgregre")
+
+
+    def createParametercombinations(self, state_omnett, ranges_omnett, state_vadere, ranges_vadere):
+        l  = lhs( len(ranges_omnett) + len(ranges_vadere), samples =10 )
+
+        ranges_omnett.extend(ranges_vadere)
+        ranges = ranges_omnett
+
+        scaled_lhs = []
+
+        for item in l:
+            scaled_lhs. append( self.scale_to_parameter_space(item, ranges) )
+
+        filename = os.path.join( self.dirname, "samples.dat")
+
+        f = open(filename, "w+")
+
+        for item in scaled_lhs:
+            f.write("%s\n" % item)
+        f.close()
+
+
+
+
+    def scale_to_parameter_space(self, sample, ranges):
+
+
+        scaled_sample = []
+        for k in range(len(sample)):
+            range_s = ranges[k]
+            value = range_s[0] + ( range_s[1] - range_s[0] ) * sample[k]
+            scaled_sample.append( value )
+
+        print(scaled_sample)
+        return scaled_sample
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -516,6 +574,132 @@ class GUI_ProjectDirectory:
 
     def getProjectDirectory(self):
         return self.dirname
+
+class Sampling:
+
+    def __init__(self, default_omnetpp, default_vadere, projefilepath ):
+
+        self.projectfilepath = projefilepath
+        self.default_omnetpp = default_omnetpp
+        self.default_vadere = default_vadere
+
+    def load(self):
+
+        state_omnett, ranges_omnett, state_vadere, ranges_vadere  = self.get_parameter_ranges()
+        self.create(state_omnett, ranges_omnett, state_vadere, ranges_vadere)
+
+
+    def get_parameter_ranges(self):
+
+        with open(self.projectfilepath) as f:
+            text = f.read()
+        text = text.splitlines()
+
+        state_omnett = []
+        ranges_omnett = []
+
+        state_vadere = []
+        ranges_vadere = []
+
+        p = re.compile(r'(\d+(?:\.\d+)?)')  # Compile a pattern to capture float values
+
+        for line in text:
+            line = line.split(" : ")
+            simulator = line[0]
+            line = line[1].split("\t")
+            floats = [float(i) for i in p.findall(line[2])]  # Convert strings to float
+
+            if simulator == "Omnett":
+                state_omnett.append( line[1] )
+                ranges_omnett.append(floats)
+
+            if simulator == "Vadere":
+                state_vadere.append( line[1] )
+                ranges_vadere.append(floats)
+
+
+        return state_omnett, ranges_omnett, state_vadere, ranges_vadere
+
+
+
+    def create(self, state_omnett = None ,ranges_omnett = None, state_vadere = None, ranges_vadere = None):
+
+        self.master = tkinter.Tk()
+        self.labels_omnetpp = []
+        self.menus_omnetpp = []
+        self.entries_omnetpp = []
+        self.vars_omnetpp = []
+
+        for row in range(len(self.default_omnetpp)):
+            label = tkinter.Label(self.master, text=("Omnett VARIABLE" + str(row + 1) + " =(" + self.default_omnetpp[row] + ")")).grid( row=row)
+            self.labels_omnetpp.append(label)
+            var = tkinter.StringVar(self.master)
+
+            if state_omnett is None:
+                var.set("continous")  # default value
+            else:
+                var.set( state_omnett[row] )
+
+            self.vars_omnetpp.append(var)
+            menu = tkinter.OptionMenu(self.master, self.vars_omnetpp[row], "continous", "discrete").grid(row=row, column=1)
+            self.menus_omnetpp.append(menu)
+            entry = tkinter.Entry(self.master)
+            if ranges_omnett is not None:
+                entry.insert("end", str( ranges_omnett[row] ) )
+            entry.grid(row=row, column=2)
+            self.entries_omnetpp.append(entry)
+
+        self.labels_vadere = []
+        self.menus_vadere = []
+        self.entries_vadere= []
+        self.vars_vadere = []
+
+        for k in range(len(self.default_vadere)):
+            row = k + len(self.default_omnetpp)
+            label = tkinter.Label(self.master,text=("Vadere VARIABLE" + str(k + 1) + " =(" + self.default_vadere[k] + ")")).grid(
+                row=row)
+            self.labels_vadere.append(label)
+            var = tkinter.StringVar(self.master)
+
+            if state_vadere is None:
+                var.set("continous")  # default value
+            else:
+                var.set( state_vadere[k] )
+
+
+            self.vars_vadere.append(var)
+            menu = tkinter.OptionMenu(self.master, self.vars_vadere[k], "continous", "discrete").grid(row=row, column=1)
+            self.menus_vadere.append(menu)
+            entry = tkinter.Entry(self.master)
+            if ranges_vadere is not None:
+                entry.insert("end", str(ranges_vadere[k]))
+            entry.grid(row=row, column=2)
+            self.entries_vadere.append(entry)
+
+        greenbutton = tkinter.Button(self.master, text="Save", command= lambda: self.__write_sampling_file(), width=40, ).grid(row = len(self.default_omnetpp) + len(self.default_vadere), columnspan = 2)
+        self.master.mainloop()
+
+
+    def __write_sampling_file(self):
+
+        write = ""
+
+        for k in range(len(self.vars_omnetpp)):
+            printout =  "Omnett : Variable"+ str(k) + "\t" + self.vars_omnetpp[k].get() + "\t" + self.entries_omnetpp[k].get() + "\n"
+            write = write + printout
+
+        for k in range(len(self.vars_vadere)):
+            printout = "Vadere : Variable" + str(k) + "\t" + self.vars_vadere[k].get() + "\t" + self.entries_vadere[
+                k].get() + "\n"
+            write = write + printout
+
+        print(write)
+
+        f = open(self.projectfilepath, "w+")
+        f.write(write)
+        f.close()
+
+        self.master.destroy()
 
 
 
