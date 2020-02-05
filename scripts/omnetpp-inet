@@ -4,7 +4,7 @@
 # projects inet, simulte and veins.
 #
 # By default, the latest version will be started. In order to start a different version
-# add the version number as first argument. For example: "omnetpp 5.3" will start 
+# add the version number as first argument. For example: "omnetpp 5.3" will start
 # a containter with the 5.3 release. For a list of available containers, refer to the
 # docker registry or the wiki of the project.
 #
@@ -12,7 +12,7 @@
 # command to be executed within the container.
 #
 # Examples:
-# 
+#
 # "omnetpp"		will start the OMNeT++ IDE in the latest OMNeT++ container
 # "omnetpp 5.3"		will start the OMNeT++ IDE in the OMNeT++ 5.3 container
 # "omnetpp exec ls"	will start the command "ls" in the latest OMNeT++ container
