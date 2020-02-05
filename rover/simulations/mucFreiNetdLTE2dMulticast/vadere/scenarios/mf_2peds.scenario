@@ -1,5 +1,5 @@
 {
-  "name" : "mf_klein_initial_peds",
+  "name" : "mf_2peds",
   "description" : "",
   "release" : "1.10",
   "processWriters" : {
@@ -105,7 +105,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 540.0,
+      "finishTime" : 350.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -694,7 +694,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 99.0 ],
-        "spawnNumber" : 5,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
         "endTime" : 300.0,
@@ -752,7 +752,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 5,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -781,7 +781,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 99.0 ],
-        "spawnNumber" : 5,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
         "endTime" : 300.0,
@@ -810,7 +810,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 99.0 ],
-        "spawnNumber" : 5,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 20,
         "startTime" : 0.0,
         "endTime" : 400.0,
@@ -830,7 +830,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 3.0 ],
-        "spawnNumber" : 5,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
         "endTime" : 10.0,
@@ -841,102 +841,6 @@
         "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ {
-        "attributes" : {
-          "id" : 1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2005 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 143.5,
-          "y" : 131.9
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.0896201063724036,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 2,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2005 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 84.1,
-          "y" : 87.5
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.2029270720587326,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "attributes" : {
           "id" : 3,
           "radius" : 0.2,
@@ -952,450 +856,18 @@
           "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
-        "targetIds" : [ 2005 ],
+        "targetIds" : [ 2012 ],
         "nextTargetListIndex" : 0,
         "isCurrentTargetAnAgent" : false,
         "position" : {
-          "x" : 141.5,
-          "y" : 133.9
+          "x" : 200.5,
+          "y" : 227.9
         },
         "velocity" : {
           "x" : 0.0,
           "y" : 0.0
         },
         "freeFlowSpeed" : 1.1973141738303876,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 4,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2006 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 217.91792096216884,
-          "y" : 4.800849294212341
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.5582679486361832,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 5,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2004 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 37.7748168149102,
-          "y" : 111.3456171164097
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.5952712939885072,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 6,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2012 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 55.93974109867143,
-          "y" : 10.105614967470213
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.6758591662739777,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 7,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2005 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 29.473449528616296,
-          "y" : 20.710566804976633
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.2676251141710637,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 8,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2006 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 71.49147543021445,
-          "y" : 209.7747249905329
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.2083413553087978,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 9,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2012 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 229.68030880506842,
-          "y" : 20.908671244620734
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.5859652874370158,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 10,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2006 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 174.5139729343256,
-          "y" : 63.004738696368655
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.4975503673036963,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 11,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2010 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 229.14689722566328,
-          "y" : 34.814190023193326
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 1.3582926680654095,
-        "followers" : [ ],
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "psychologyStatus" : {
-          "mostImportantStimulus" : null,
-          "threatMemory" : {
-            "allThreats" : [ ],
-            "latestThreatUnhandled" : false
-          },
-          "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
-        },
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "attributes" : {
-          "id" : 12,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
-        },
-        "source" : null,
-        "targetIds" : [ 2005 ],
-        "nextTargetListIndex" : 0,
-        "isCurrentTargetAnAgent" : false,
-        "position" : {
-          "x" : 252.81207446528708,
-          "y" : 3.4256529823346735
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "freeFlowSpeed" : 0.8371063489734752,
         "followers" : [ ],
         "idAsTarget" : -1,
         "isChild" : false,
@@ -1432,12 +904,12 @@
           "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
-        "targetIds" : [ 2010 ],
+        "targetIds" : [ 2006 ],
         "nextTargetListIndex" : 0,
         "isCurrentTargetAnAgent" : false,
         "position" : {
-          "x" : 56.98746348039798,
-          "y" : 24.95550690603379
+          "x" : 255.987463480398,
+          "y" : 8.95550690603379
         },
         "velocity" : {
           "x" : 0.0,

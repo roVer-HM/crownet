@@ -1,7 +1,12 @@
 <config>
-    <interface hosts='*' address='10.x.x.x' netmask='255.255.255.0'/>
-    <!-- <route hosts="*"> -->
-    
-    <!-- all D2D-capable UEs participate in the multicast group --> 
+    <interface hosts='*' address='10.10.x.x' netmask='255.255.255.0'/>
+
+    <!-- Add routes so that dynamic nodes can reach the server  -->
+    <route hosts='router' destination='20.0.0.0' netmask='255.0.0.0' interface='ppp1' metric='1'/>
+    <route hosts='pgw' destination='20.0.0.0' netmask='255.0.0.0' interface='ppp0' metric='1'/>
+    <route hosts='eNB' destination='20.0.0.0' netmask='255.0.0.0' interface='wlan' metric='1'/>
+
+    <!-- all D2D-capable UEs participate in the multicast group -->
     <multicast-group hosts="ueD2D[*]" interfaces="wlan" address="224.0.0.10"/>
+    <multicast-group hosts="ueCell[*]" interfaces="wlan" address="224.0.0.10"/>
 </config>
