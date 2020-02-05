@@ -3,49 +3,38 @@
 Search for all scenario files in ROVER_MAIN and list them in a tkinter
 Listbox. Open selected project via 'Enter' inside the vadere container.
 """
-import tkinter as tk
 import glob
 import os
 import subprocess
+import sys
 
-
-class App(tk.Frame):
-    def __init__(self, data, master=None):
-        super().__init__(master)
-
-        max_len = 0
-        self._data = data
-        for d in data:
-            if len(d) > max_len:
-                max_len = len(d)
-
-        self.listbox = tk.Listbox(master, height=len(data), width=max_len)
-        self.listbox.pack(fill=tk.BOTH)
-
-        for item in data:
-            self.listbox.insert(tk.END, item)
-
-        self.selection = 0
-        self.val = data[0]
-        self.closed_clean = False
-        self.listbox.select_set(self.selection)
-        self.listbox.bind("<Return>", self.on_enter)
-        self.listbox.focus_set()
-
-        self.listbox.bind("<Escape>", self.on_esc)
-
-        # Positions the window in the center of the page.
-        master.geometry("+{}+{}".format(400, 300))
-
-    def on_esc(self, event):
-        self.closed_clean = False
-        self.master.destroy()
-
-    def on_enter(self, event):
-        print(self.listbox.get(tk.ACTIVE))
-        self.val = self.listbox.get(tk.ACTIVE)
-        self.closed_clean = True
-        self.master.destroy()
+# ###########################load rover_utils##################################
+# #############################################################################
+if "ROVER_MAIN" not in os.environ:
+    print("ROVER_MAIN not set")
+    exit(-1)
+rover_utils_path = os.path.join(
+    os.environ["ROVER_MAIN"], "scripts/lib/python/rover_utils/rover_utils"
+)
+if os.path.isdir(rover_utils_path):
+    sys.path.append(rover_utils_path)
+else:
+    print(f"Cannot find rover_utils at {rover_utils_path}")
+    exit(-1)
+try:
+    import rover_utils as utl
+except ModuleNotFoundError as e:
+    rover_utils_readme = os.path.join(
+        os.environ["ROVER_MAIN"], "scripts/lib/python/rover_utils/README"
+    )
+    print(e.msg)
+    print(
+        "  -> some requirements of rover_utils are not met. Did you install all requirements?"
+    )
+    print(f"  -> see {rover_utils_readme} for help")
+    exit(-1)
+# ##############################################################################
+# ##############################################################################
 
 
 if __name__ == "__main__":
@@ -67,10 +56,8 @@ if __name__ == "__main__":
 
     project_filtered.sort()
 
-    app = App(project_filtered, master=tk.Tk())
-    app.mainloop()
-
-    if not app.closed_clean:
+    selected_path = utl.gui_select(project_filtered)
+    if selected_path == "":
         exit()
 
     cmd = [
@@ -80,7 +67,7 @@ if __name__ == "__main__":
         "-jar",
         "/opt/vadere/vadere/VadereGui/target/vadere-gui.jar",
         "--project",
-        app.val,
+        selected_path,
     ]
     p = subprocess.Popen(
         cmd,
@@ -97,5 +84,5 @@ if __name__ == "__main__":
 
     print(p.stdout.read().decode("utf-8"), end="")
     for err in p.stderr.readlines():
-        print(err.decode('utf-8'), end="")
+        print(err.decode("utf-8"), end="")
     p.kill()
