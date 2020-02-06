@@ -18,7 +18,7 @@ def process_scenario(name: str, id: str, sim_subpath: str, measure_subpath: str,
             f"{cnf.rover_main}/rover/simulations/openair/results/{sim_subpath}/*.vec",
         ],
         scave_filter=None,
-        override=False,
+        override=True,
         recursive=True,
     )
     df = scave.load_csv(csv)
@@ -95,10 +95,13 @@ def process_scenario(name: str, id: str, sim_subpath: str, measure_subpath: str,
 # %% Process all scenarios
 
 # Scenario 1: UDP 300 B CAM Packets, no other traffic
-process_scenario("Scenario 1", "S1", "OpenAirInterface-CAM-DL-1", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
+# process_scenario("Scenario 1", "S1", "OpenAirInterface-CAM-DL-1", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
+
+# Scenario 1: UDP 300 B CAM Packets, no other traffic
+process_scenario("Scenario 1B", "S1B", "OpenAirInterface-CAM-DL-1B", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
 
 # Scenario 2: UDP 300 B CAM Packets, overload due to 512B background traffic
-process_scenario("Scenario 2", "S2", "OpenAirInterface-CAM-DL-2", "2018-06-28/measurement2/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv")
+# process_scenario("Scenario 2", "S2", "OpenAirInterface-CAM-DL-2", "2018-06-28/measurement2/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv")
 
 
 

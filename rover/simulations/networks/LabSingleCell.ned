@@ -30,7 +30,9 @@ network LabSingleCell
     types:
         channel Eth1GMetered extends ThruputMeteringChannel
         {
-            delay = 25us;
+            // delay = 25us;
+            // adapted to lab measurements: approx. 500us
+            delay = 500us;
             datarate = 1024Mbps;
             thruputDisplayFormat = "u";
         }
