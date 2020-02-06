@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# run all configurations/scenarios of this simulation
+
+confs=( OpenAirInterface-CAM-DL-1 OpenAirInterface-CAM-DL-2 OpenAirInterface-CAM-DL-3 \
+        OpenAirInterface-CAM-UL-1 )
+
+for i in "${confs[@]}"
+do
+   : 
+   echo "Running $i"
+   opp_runall ./run -c $i &
+done
+
+echo "All configs are started -- waiting for completion..."
+wait
+echo "Done."
