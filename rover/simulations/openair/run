@@ -2,3 +2,6 @@
 cd `dirname $0`
 ../../src/run_rover -n .:../src $*
 # for shared lib, use: opp_run -l ../../src/ROVER -n .:../src $*
+
+# in order to perform all runs of a configuration, use opp_runall to start this script, e.g.:
+# omnetpp exec opp_runall ./run -c OpenAirInterface-CAM-UL-1
