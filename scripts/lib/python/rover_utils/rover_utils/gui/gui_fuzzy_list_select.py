@@ -1,7 +1,10 @@
 
-from fuzzywuzzy import process
 import tkinter as tk
+
+from fuzzywuzzy import process
+
 from rover_utils.gui import gui_common as gui
+
 
 class TkFuzzySelectList(tk.Frame):
     """
@@ -134,4 +137,3 @@ class TkFuzzySelectList(tk.Frame):
 if __name__ == "__main__":
     app = TkFuzzySelectList.get_selected(['aa', 'b', 'baa', 'bcc', 'c', 'd'])
     app.mainloop()
-

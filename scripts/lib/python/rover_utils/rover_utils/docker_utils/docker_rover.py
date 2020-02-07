@@ -1,11 +1,12 @@
-from enum import Enum
-
-from docker_utils.common import Cfg
-import docker
 import argparse
 import os
-import sys
 import subprocess
+import sys
+from enum import Enum
+
+import docker
+
+from docker_utils.common import Cfg
 
 
 class CmdWrapper(Enum):

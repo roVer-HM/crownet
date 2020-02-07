@@ -1,8 +1,8 @@
 import argparse
-
-from docker_utils.docker_rover import RoverClient, CmdWrapper
-from docker_utils.common import Cfg
 import os
+
+from docker_utils.common import Cfg
+from docker_utils.docker_rover import CmdWrapper, RoverClient
 
 
 def main_omnetpp(ns):
