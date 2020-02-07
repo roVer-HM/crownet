@@ -114,8 +114,16 @@ function run_container_X11() {
 		CMD_ARR+=(--env TRACI_GUI=${TRACI_GUI})
 	fi
 	if [[ ! -z ${TRACI_DEBUG} ]];then
-  	echo "container> set var TRACI_DEBUG=$TRACI_DEBUG"
-		CMD_ARR+=(--env TRACI_DEBUG-${TRACI_DEBUG})
+  	    echo "container> set var TRACI_DEBUG=$TRACI_DEBUG"
+		CMD_ARR+=(--env TRACI_DEBUG=${TRACI_DEBUG})
+	fi
+    if [[ ! -z ${VADERE_LOG_LEVEL} ]];then
+        echo "container> set var VADERE_LOG_LEVEL=$VADERE_LOG_LEVEL"
+        CMD_ARR+=(--env VADERE_LOG_LEVEL=${VADERE_LOG_LEVEL})
+	fi
+    if [[ ! -z ${VADERE_LOG} ]];then
+        echo "container> set var VADERE_LOG=$VADERE_LOG"
+        CMD_ARR+=(--env VADERE_LOG=${VADERE_LOG})
 	fi
 	CMD_ARR+=(--workdir=$(pwd))
 	CMD_ARR+=(--volume="/home/$USER:/home/$USER")

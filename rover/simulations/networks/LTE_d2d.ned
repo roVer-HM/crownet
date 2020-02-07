@@ -35,7 +35,7 @@ import org.car2x.veins.subprojects.veins_inet.mapping.NodeMappingDistribution;
 network LTE_d2d
 {
     parameters:
-        int numUeCell = default(1);
+        int numUeCell = default(0);
         int numUeD2DReceiver = default(0);
         int numUeD2DSender = default(0);
         int numMappings = default(0);
@@ -72,8 +72,6 @@ network LTE_d2d
         }
         ueCell[numUeCell]: Ue {
             @display("p=292,367;is=vs");
-            ipv4.configurator.typename = "HostAutoConfigurator";
-	    	ipv4.configurator.interfaces = "wlan";
         }
 
         ueD2DReceiver[numUeD2DReceiver]: MobileUe {
@@ -88,8 +86,9 @@ network LTE_d2d
             ipv4.configurator.interfaces = "wlan";
         }
 
-        mappingDistribution[numMappings]: NodeMappingDistribution{
+        mappingDistribution[numMappings]: NodeMappingDistribution {
 
+            @display("p=520,38");
         }
         manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
             @display("p=300,38");

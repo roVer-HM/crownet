@@ -1,0 +1,5 @@
+fuzzywuzzy>=0.17.0
+python-Levenshtein-wheels>=0.13.1
+docker>=4.1.0
+py-sysctl
+tkinter
