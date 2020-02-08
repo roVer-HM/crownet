@@ -1,7 +1,7 @@
 {
   "name" : "Test001",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -93,7 +93,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 20.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -123,32 +123,36 @@
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 3.5,
+            "y" : 2.9
+          }, {
+            "x" : 2.1,
+            "y" : 4.1
+          }, {
+            "x" : 5.8,
+            "y" : 7.4
+          }, {
+            "x" : 6.0,
+            "y" : 7.5
+          }, {
+            "x" : 7.7,
+            "y" : 5.9
+          } ]
+        },
+        "id" : 3
+      } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 3,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 2.8,
-          "y" : 8.4,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 4.0,
-          "y" : 5.7,
+          "x" : 8.0,
+          "y" : 1.9,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -163,7 +167,28 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
-      "sources" : [ ],
+      "sources" : [ {
+        "id" : 1,
+        "shape" : {
+          "x" : 2.0,
+          "y" : 8.2,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN"
+      } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.2,

@@ -3,7 +3,7 @@
 
 echo "Welcome to the roVer vadere Docker Container."
 echo ""
-echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI' TRACI_DEBUG='$TRACI_DEBUG'"
+echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI' TRACI_DEBUG='$TRACI_DEBUG' VADERE_LOG_LEVEL='$VADERE_LOG_LEVEL'  VADERE_LOG='$VADERE_LOG'"
 echo ""
 echo "To launch vadere-gui call vadere exec vadere-gui"
 
@@ -29,6 +29,14 @@ fi
 
 if [[ ${TRACI_GUI} == "true" ]];then
   CMD_ARR+=(--gui-mode)
+fi
+
+if [[ ! -z $VADERE_LOG_LEVEL ]];then
+    CMD_ARR+=(--vadere-log-level $VADERE_LOG_LEVEL)
+fi
+
+if [[ ! -z $VADERE_LOG ]];then
+    CMD_ARR+=(--vadere-log $VADERE_LOG)
 fi
 
 # echo "${CMD_ARR[@]}"

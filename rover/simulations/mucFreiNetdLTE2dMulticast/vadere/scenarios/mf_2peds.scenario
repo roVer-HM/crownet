@@ -1,5 +1,5 @@
 {
-  "name" : "mf_timo_klein",
+  "name" : "mf_2peds",
   "description" : "",
   "release" : "1.11",
   "processWriters" : {
@@ -105,7 +105,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 350.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -268,57 +268,6 @@
           } ]
         },
         "id" : -2146909512
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 173.0324382625986,
-            "y" : 216.90788922645152
-          }, {
-            "x" : 146.36105633247644,
-            "y" : 211.18728642631322
-          }, {
-            "x" : 118.22253324370831,
-            "y" : 209.47087133210152
-          }, {
-            "x" : 67.41563127504196,
-            "y" : 207.55477807018906
-          }, {
-            "x" : 63.4801616508048,
-            "y" : 191.3448637779802
-          }, {
-            "x" : 60.16722558485344,
-            "y" : 177.64818987809122
-          }, {
-            "x" : 57.20784526085481,
-            "y" : 164.73688931483775
-          }, {
-            "x" : 73.28275829530321,
-            "y" : 160.62373653333634
-          }, {
-            "x" : 74.83682320057414,
-            "y" : 156.92423631995916
-          }, {
-            "x" : 110.46622780198231,
-            "y" : 149.23708425927907
-          }, {
-            "x" : 190.7618675532285,
-            "y" : 124.80099873896688
-          }, {
-            "x" : 194.20352301141247,
-            "y" : 133.7845619544387
-          }, {
-            "x" : 184.5933474684134,
-            "y" : 173.34852800425142
-          }, {
-            "x" : 180.61082071368583,
-            "y" : 188.37948899995536
-          }, {
-            "x" : 176.72245256369933,
-            "y" : 203.0464565390721
-          } ]
-        },
-        "id" : -2146909513
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -538,6 +487,57 @@
           } ]
         },
         "id" : 258747568
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 173.0324382625986,
+            "y" : 216.90788922645152
+          }, {
+            "x" : 146.36105633247644,
+            "y" : 211.18728642631322
+          }, {
+            "x" : 118.22253324370831,
+            "y" : 209.47087133210152
+          }, {
+            "x" : 67.41563127504196,
+            "y" : 207.55477807018906
+          }, {
+            "x" : 63.4801616508048,
+            "y" : 191.3448637779802
+          }, {
+            "x" : 60.16722558485344,
+            "y" : 177.64818987809122
+          }, {
+            "x" : 57.20784526085481,
+            "y" : 164.73688931483775
+          }, {
+            "x" : 73.28275829530321,
+            "y" : 160.62373653333634
+          }, {
+            "x" : 74.83682320057414,
+            "y" : 156.92423631995916
+          }, {
+            "x" : 110.46622780198231,
+            "y" : 149.23708425927907
+          }, {
+            "x" : 190.7618675532285,
+            "y" : 124.80099873896688
+          }, {
+            "x" : 194.20352301141247,
+            "y" : 133.7845619544387
+          }, {
+            "x" : 184.5933474684134,
+            "y" : 173.34852800425142
+          }, {
+            "x" : 180.61082071368583,
+            "y" : 188.37948899995536
+          }, {
+            "x" : 176.72245256369933,
+            "y" : 203.0464565390721
+          } ]
+        },
+        "id" : -2146909513
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -693,11 +693,11 @@
           } ]
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
-        "maxSpawnNumberTotal" : -1,
+        "distributionParameters" : [ 99.0 ],
+        "spawnNumber" : 0,
+        "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -724,7 +724,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -754,7 +754,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
+        "spawnNumber" : 0,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -783,11 +783,11 @@
           } ]
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
-        "maxSpawnNumberTotal" : -1,
+        "distributionParameters" : [ 99.0 ],
+        "spawnNumber" : 0,
+        "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -813,11 +813,11 @@
           } ]
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
-        "maxSpawnNumberTotal" : -1,
+        "distributionParameters" : [ 99.0 ],
+        "spawnNumber" : 0,
+        "maxSpawnNumberTotal" : 20,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 400.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -827,18 +827,18 @@
       }, {
         "id" : 1014,
         "shape" : {
-          "x" : 256.1,
-          "y" : 16.4,
+          "x" : 20.9,
+          "y" : 95.7,
           "width" : 7.0,
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
-        "maxSpawnNumberTotal" : -1,
+        "distributionParameters" : [ 3.0 ],
+        "spawnNumber" : 0,
+        "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 10.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -846,7 +846,103 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
+      "dynamicElements" : [ {
+        "attributes" : {
+          "id" : 3,
+          "radius" : 0.2,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0,
+          "footstepHistorySize" : 4,
+          "searchRadius" : 1.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        },
+        "source" : null,
+        "targetIds" : [ 2012 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
+        "position" : {
+          "x" : 200.5,
+          "y" : 227.9
+        },
+        "velocity" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "freeFlowSpeed" : 1.1973141738303876,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychologyStatus" : {
+          "mostImportantStimulus" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
+        },
+        "groupIds" : [ ],
+        "groupSizes" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
+        "attributes" : {
+          "id" : 13,
+          "radius" : 0.2,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0,
+          "footstepHistorySize" : 4,
+          "searchRadius" : 1.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        },
+        "source" : null,
+        "targetIds" : [ 2006 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
+        "position" : {
+          "x" : 255.987463480398,
+          "y" : 8.95550690603379
+        },
+        "velocity" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "freeFlowSpeed" : 0.9821084804541385,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychologyStatus" : {
+          "mostImportantStimulus" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
+        },
+        "groupIds" : [ ],
+        "groupSizes" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      } ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -863,6 +959,16 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ {
+      "timeframe" : {
+        "startTime" : 0.0,
+        "endTime" : 10.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "stimuli" : [ {
+        "type" : "Wait"
+      } ]
+    } ]
   }
 }
