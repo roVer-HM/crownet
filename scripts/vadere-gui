@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     project_filtered.sort()
 
-    selected_path = utl.gui_select(project_filtered)
+    selected_path = utl.gui_select_string(project_filtered)
     if selected_path == "":
         exit()
 
