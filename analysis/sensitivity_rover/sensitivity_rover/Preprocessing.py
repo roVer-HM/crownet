@@ -6,18 +6,55 @@ from tkinter import messagebox
 from pyDOE import *
 import matplotlib.pyplot as plt
 
+class Status:
+
+    def __init__(self, projectfilepath):
+
+        self.projectfilepath = projectfilepath
+
+        self.Simulation = "none"
+        self.Parameter = "none"
+        self.Sampling = "none"
+        self.Solving = "none"
+        self.Postprocessing = "none"
+
+    def read_status(self):
+
+        f = open(self.projectfilepath, "r")
+        status = f.read().splitlines()
+
+        for k in range(2, len(status)):
+            status[k] = status[k].split(": ")[1]
+
+        self.Simulation = status[2]
+        self.Parameter = status[3]
+        self.Sampling = status[4]
+        self.Solving = status[5]
+        self.Postprocessing = status[6]
+
+    def write_status(self):
+
+        f = open(self.projectfilepath, "w+")
+        f.write("This is a sensitivity project file used for parameter studies.\nUse this file to identify your sensitivity project. \n")
+        f.write("Simulation: none\n")
+        f.write("Parameter: none\n")
+        f.write("Sampling: none\n")
+        f.write("Solving: none\n")
+        f.write("Postprocessing: none\n")
+        f.close()
+
+
+
+
+
 class Project:
+
 
     def __init__(self):
         self.dirname = None
         self.projectfilepath = None
         self.projectfilename = "sensitivity.project"
         self.logfilename = "data.log"
-
-        self.statusPreprocessing = "none"
-        self.statusSampling = "none"
-        self.statusSolving = "none"
-        self.statusPostprocessing = "none"
 
 
     def setupProject(self):
@@ -39,16 +76,23 @@ class Project:
         os.mkdir( dirname )
         projectfilepath = os.path.join(dirname, self.projectfilename)
 
-        f = open(projectfilepath, "w+")
-        f.write( f"Project created: {str(timestemp) }\nUse this file to identify your sensitivity project. \n")
-        f.write("Preprocessing: none\n")
-        f.write("Sampling: none\n")
-        f.write("Solving: none\n")
-        f.write("Postprocessing: none\n")
-        f.close()
+        self.status = Status(projectfilepath)
+        self.status.write_status()
 
         self.dirname = dirname
         self.projectfilepath = projectfilepath
+
+
+    def isempty_Project(self):
+        basis_folder = os.path.join(self.dirname, "basis_simulation")
+        sim_folder = os.path.join(self.dirname, "simulation")
+
+        if os.path.isdir(basis_folder) == False:
+            return_code = 0
+        else:
+            return_code = 1
+        return return_code
+
 
 
 
@@ -63,25 +107,19 @@ class Project:
         else:
             print("Located sensitivity project in " + filename )
 
+        self.status = Status(filename)
+        self.status.read_status()
+
         self.dirname = os.path.dirname(filename)
         self.projectfilepath = filename
 
-        f = open(filename, "r")
-        status = f.read().splitlines()
-
-        for k in range(2,6):
-            status[k] = status[k].split(": ")[1]
-
-        self.statusPreprocessing = status[2]
-        self.statusSampling = status[3]
-        self.statusSolving = status[4]
-        self.statusPostprocessing = status[5]
 
     def getDirectory(self):
         return self.dirname
 
     def getProjectStatus(self):
-        return  self.statusPreprocessing, self.statusSampling, self.statusSolving, self.statusPostprocessing
+        self.status.read_status()
+        return self.status
 
     def copy_simulation(self):
 

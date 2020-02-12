@@ -44,69 +44,64 @@ class SensitivityAnalysisGui:
         self.__show("open")
 
     def __show(self, state):
-        statusPreprocessing, statusSampling, statusSolving, statusPostprocessing = self.preprocess.getProjectStatus()
+        status = self.preprocess.getProjectStatus()
+        isempty_Project = self.preprocess.isempty_Project()
 
 
-        if statusPreprocessing == "none":
-            color_prep = "red"
+        if status.Sampling == "none":
+            color_Sampling = "red"
         else:
-            color_prep = "green"
+            color_Sampling = "green"
 
-        statusParameter = "none"
-
-        if statusParameter == "none":
-            color_para = "red"
-            status_para = "normal"
+        if status.Solving == "none":
+            color_Solving = "red"
         else:
-            color_para = "green"
-            status_para = "normal"
+            color_Solving = "green"
 
-        if statusSampling == "none":
-            color_samp = "red"
-            status_samp = "normal"
+        if status.Postprocessing == "none":
+            color_PostProcessing = "red"
         else:
-            color_samp = "green"
-            status_samp = "normal"
+            color_PostProcessing = "green"
 
-        if statusSolving == "none":
-            color_run = "red"
-            status_run = "normal"
-        else:
-            color_run = "green"
-            status_run = "normal"
+        if state == "create" or isempty_Project == 0:
 
-        if statusPostprocessing == "none":
-            color_post = "red"
-            status_post = "disabled"
-        else:
-            color_post = "green"
-            status_post = "normal"
+            if status.Simulation == "none":
+                color_Simulation = "red"
+            else:
+                color_Simulation = "green"
 
-        if state == "create":
-            self.button_prep = Button(self.root, text="Define simulation", relief=RIDGE, width=100, bg = color_prep,
+            if status.Parameter == "none":
+                color_Parameter = "red"
+            else:
+                color_Parameter = "green"
+
+            self.button_prep = Button(self.root, text="Define simulation", relief=RIDGE, width=100, bg = color_Simulation,
                                                command=lambda: self.__prepareSolverNode())
 
-            self.button_para = Button(self.root, text="Define parameters", relief=RIDGE, width=100, bg=color_samp,
-                                      state = status_para, command=lambda: self.__define_parameters())
+            self.button_para = Button(self.root, text="Define parameters", relief=RIDGE, width=100, bg=color_Sampling, command=lambda: self.__define_parameters())
 
             self.button_prep.pack()
             self.button_para.pack()
 
         elif state == "open":
-            self.button_update = Button(self.root, text="Update", relief=RIDGE, width=100, bg=color_prep,
+
+
+            color_Update = "red"
+
+            self.button_update = Button(self.root, text="Update", relief=RIDGE, width=100, bg= color_Update,
                                       command=lambda: self.__update_preprocessing())
             self.button_update.pack()
 
 
 
-        self.button_samp = Button(self.root, text="Define sampling", relief=RIDGE, width=100, bg=color_samp, state = status_samp,
+        self.button_samp = Button(self.root, text="Define sampling", relief=RIDGE, width=100, bg=color_Sampling, state = "disabled",
                                   command=lambda: self.__prepareSampling())
 
-        self.button_run = Button(self.root, text="Run simulations", relief=RIDGE, width=100, bg = color_run,
-                              command=lambda: self.__runSimulations(), state = status_run)
+        self.button_run = Button(self.root, text="Run simulations", relief=RIDGE, width=100, bg = color_Solving,
+                              command=lambda: self.__runSimulations(), state = "disabled")
 
-        self.button_post = Button(self.root, text="Postprocessing", relief=RIDGE, width=100, bg = color_post,
-                              command=lambda: self.__runPostProcessing(), state = status_post )
+        self.button_post = Button(self.root, text="Postprocessing", relief=RIDGE, width=100, bg = color_PostProcessing,
+                              command=lambda: self.__runPostProcessing(), state = "disabled" )
 
 
         self.button_samp.pack()
@@ -128,7 +123,7 @@ class SensitivityAnalysisGui:
     def __prepareSampling(self):
         print("Define sampling")
 
-        self.preprocess.createSampling()
+        self.preprocess.creaFteSampling()
 
         print(dir)
 
