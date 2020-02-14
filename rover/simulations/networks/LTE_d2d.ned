@@ -40,58 +40,59 @@ network LTE_d2d
         int numUeD2DSender = default(0);
         int numMappings = default(0);
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
-		@figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
+        @figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
 
+        @display("bgb=899,473");
     submodules:
 
         channelControl: LteChannelControl {
-            @display("p=50,25;is=s");
+            @display("p=412,110;is=s");
         }
         routingRecorder: RoutingTableRecorder {
-            @display("p=50,75;is=s");
+            @display("p=364,91;is=s");
         }
         configurator: Ipv4NetworkConfigurator {
-            @display("p=50,125");
+            @display("p=357,164;is=s");
             config = xmldoc("demo.xml");
         }
         binder: LteBinder {
-            @display("p=50,175;is=s");
+            @display("p=403,164;is=s");
         }
         server: StandardHost {
-            @display("p=212,118;is=n;i=device/server");
+            @display("p=315,150;is=s;i=device/server");
         }
         router: Router {
-            @display("p=321,136;i=device/smallrouter");
+            @display("p=315,110;is=s;i=device/smallrouter");
         }
         pgw: PgwStandardSimplified {
             nodeType = "PGW";
-            @display("p=519,175;is=l");
+            @display("p=314,43;is=l");
         }
         eNB: eNodeB {
-            @display("p=391,259;is=vl");
+            @display("p=37,51;is=vl");
         }
         ueCell[numUeCell]: Ue {
-            @display("p=292,367;is=vs");
+            @display("p=357,312;is=vs");
         }
 
         ueD2DReceiver[numUeD2DReceiver]: MobileUe {
-            @display("p=477,367;is=vs");
+            @display("p=356,277;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
         }
 
         ueD2DSender[numUeD2DSender]: MobileUe {
-            @display("p=477,367;is=vs");
+            @display("p=356,245;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
         }
 
         mappingDistribution[numMappings]: NodeMappingDistribution {
 
-            @display("p=520,38");
+            @display("p=357,207;is=s;i=block/square");
         }
         manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
-            @display("p=300,38");
+            @display("p=364,25;is=s;i=block/square");
         }
 
     connections:

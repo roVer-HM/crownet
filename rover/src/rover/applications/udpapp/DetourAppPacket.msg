@@ -11,30 +11,20 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
+import inet.common.INETDefs;
+import inet.common.packet.chunk.Chunk;
+import inet.applications.base.ApplicationPacket;
 
-package rover.simulations.networks;
+namespace rover;
 
-import rover.simulations.networks.LTE_d2d;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
-import inet.visualizer.contract.IIntegratedVisualizer;
-import inet.environment.common.PhysicalEnvironment;
-
-
-
-
-network LTE_d2d_Vadere extends LTE_d2d
+class DetourAppPacket extends inet::ApplicationPacket
 {
-    parameters:
-        manager.typename = "TraCIScenarioManagerVadere";
-
-    submodules:
-        visualization: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
-            @display("p=366,114;is=s");
-        }
-
-        physicalEnvironment: PhysicalEnvironment {
-            @display("p=366,62;is=s");
-        }
+ 	   string reason;
+ 	   simtime_t eventTime;
+ 	   simtime_t repeatTime;
+ 	   simtime_t repeateInterval = 20.0;
+ 	   int closedTarget;
+ 	   int alternativeRoute[];
 }
