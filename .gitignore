@@ -37,6 +37,8 @@ rover/**/legacy
 rover/**/.qtenvrc
 rover/**/.cmdenv-log
 rover/**/*.log
+rover/**/*_m.cc
+rover/**/*_m.h
 
 # Python
 rover/**/test.out
