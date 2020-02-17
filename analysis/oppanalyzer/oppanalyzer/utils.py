@@ -277,20 +277,21 @@ class StatsTool:
         :param name:    name of the data to be printed (optional)
         :return:        string with statistics table
         """
-        table = "============================================================\n"
+        table = "=============================================================\n"
         if len(name) > 0:
-            table += (f"! Data: {name:50} !\n"
-                      "------------------------------------------------------------\n"
+            table += (f"! Data: {name:51} !\n"
+                      "-------------------------------------------------------------\n"
                       )
 
         table += (
-            f"! arith. mean : {np.mean(data):15.6f} {unit:>4}                       !\n"
-            f"! minimum     : {np.min(data):15.6f} {unit:>4}                       !\n"
-            f"! maximum     : {np.max(data):15.6f} {unit:>4}                       !\n"
-            f"! median      : {np.median(data):15.6f} {unit:>4}                       !\n"
-            f"! std. dev.   : {np.std(data):15.6f} {unit:>4}                       !\n"
-            f"! variance    : {np.var(data):15.6f} {unit:>4}^2                     !\n"
-            "============================================================\n"
+            f"! nr of values : {len(data):15}                            !\n"
+            f"! arith. mean  : {np.mean(data):15.6f} {unit:>4}                       !\n"
+            f"! minimum      : {np.min(data):15.6f} {unit:>4}                       !\n"
+            f"! maximum      : {np.max(data):15.6f} {unit:>4}                       !\n"
+            f"! median       : {np.median(data):15.6f} {unit:>4}                       !\n"
+            f"! std. dev.    : {np.std(data):15.6f} {unit:>4}                       !\n"
+            f"! variance     : {np.var(data):15.6f} {unit:>4}^2                     !\n"
+            "=============================================================\n"
         )
 
         return table

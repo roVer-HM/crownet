@@ -2,6 +2,7 @@ import re
 from string import Template
 from typing import List
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -356,16 +357,25 @@ class OppPlot:
         self._set_labels(ax, s)
         if "label" not in kwargs:
             kwargs.setdefault("label", self.create_label(s.module, []))
-        ax.plot(s.vectime, s.vecvalue, **self.plt_args(idx=0, **kwargs))
+        return ax.plot(s.vectime, s.vecvalue, **self.plt_args(idx=0, **kwargs))
 
     def create_histogram(self, ax: plt.axes, s: pd.Series, bins=40, **kwargs):
         if "density" not in kwargs:
             kwargs.setdefault("density", True)
-        ax.hist(
+        ret = ax.hist(
             s.vecvalue, bins, **kwargs
         )
         ax.set_title(self._opp.attr.title(s.name))
         ax.set_xlabel(f"[{self._opp.attr.unit(s.name)}]")
+
+        if "cumulative" in kwargs and kwargs["cumulative"] == True:
+            # cumulative histograms sometimes have a bug which shows an annoying line down to
+            # zero at the end - this removes the invalid line at the end
+            axpolygons = [poly for poly in ax.get_children() if isinstance(poly, mpl.patches.Polygon)]
+            for poly in axpolygons:
+                poly.set_xy(poly.get_xy()[:-1])
+
+        return ret
 
 
 @pd.api.extensions.register_dataframe_accessor("opp")
