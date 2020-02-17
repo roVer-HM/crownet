@@ -56,12 +56,25 @@ void UdpDetourApp::initialize(int stage) {
 void UdpDetourApp::handleMessageWhenUp(cMessage *msg) {
   if (msg->isSelfMessage()) {
     ASSERT(msg == selfMsg | msg == selfMsgIncident);
-    switch (selfMsg->getKind()) {
+    switch (msg->getKind()) {
       case PROPAGATE:
         processPropagate();
         break;
+      case START:
+        processStart();
+        break;
+
+      case SEND:
+        processSend();
+        break;
+
+      case STOP:
+        processStop();
+        break;
+
       default:
-        UdpBasicApp::handleMessageWhenUp(msg);
+        throw cRuntimeError("Invalid kind %d in self message",
+                            (int)selfMsg->getKind());
     }
   } else
     socket.processMessage(msg);
@@ -88,6 +101,7 @@ void UdpDetourApp::sendPacket() {
   //  payload->setChunkLength(B(par("messageLength")));
   payload->setSequenceNumber(numSent);
   payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
+  payload->setChunkLength(B(par("messageLength")));
   packet->insertAtBack(payload);
   L3Address destAddr = chooseDestAddr();
   emit(packetSentSignal, packet);

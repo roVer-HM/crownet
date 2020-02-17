@@ -225,15 +225,6 @@
           } ]
         },
         "id" : 9
-      }, {
-        "shape" : {
-          "x" : 19.0,
-          "y" : 20.0,
-          "width" : 8.4,
-          "height" : 3.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 2
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -296,6 +287,23 @@
           "y" : 22.99367237801711,
           "width" : 3.0,
           "height" : 20.9918689259393,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2002,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 20.0,
+          "y" : 20.0,
+          "width" : 5.0,
+          "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
