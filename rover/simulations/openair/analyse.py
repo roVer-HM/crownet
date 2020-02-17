@@ -6,10 +6,12 @@ from oppanalyzer import Config, ScaveTool, StatsTool, OaiMeasurement
 STARTUP_TIME = 60
 
 cnf = Config()
-scave = ScaveTool()
 
 
 def process_scenario(name: str, id: str, sim_subpath: str, measure_subpath: str, **kwargs):
+    # %% initialize
+    std_figsize = [6.4, 2.4]
+    scave = ScaveTool()
     # %% Read simulation data
     csv = scave.create_or_get_csv_file(
         csv_path=f"{cnf.rover_main}/rover/simulations/openair/results/results_{id}.csv",
@@ -40,72 +42,157 @@ def process_scenario(name: str, id: str, sim_subpath: str, measure_subpath: str,
     camdelay_ue_measure.vectime = camdelay_ue_measure.vectime[valid_values]
     camdelay_ue_measure.vecvalue = camdelay_ue_measure.vecvalue[valid_values]
 
-    fig_adelay, axes = plt.subplots(nrows=2)
-    ax_time = axes[0]
-    ax_hist = axes[1]
-
-
-
-    # %% Process corresponding measurements
-    print(StatsTool.stats_table(camdelay_ue_measure.vecvalue, "s", f"{id} (measurement): CAM Delay  (time_difference)"))
-
-    # fig_adelay_measure, axes = plt.subplots(nrows=2)
+    # use subplots:
+    # fig_adelay, axes = plt.subplots(nrows=2)
     # ax_time = axes[0]
-    # ax_time.set_label("Measurement: CAM Delay")
-    # ax_time.set_xlabel("time [s]");
+    # ax_hist = axes[1]
 
-    df.opp.plot.create_time_series(ax_time, camdelay_ue_measure, label="measurement", color="r", marker=".")
+    # use individual figures:
+    figures = {
+        "delay" : plt.figure(figsize=std_figsize),
+        "delay_hist": plt.figure(figsize=std_figsize),
+        "delay_cdf": plt.figure(figsize=std_figsize),
+        "iat_hist" : plt.figure(figsize=std_figsize)
+    }
 
+    axes = {
+    }
+
+    # create axes for all figures
+    for name, fig in figures.items():
+        plt.figure(fig.number)
+        axes[name] = plt.axes()
+
+
+    # %% statistics
+    print(StatsTool.stats_table(camdelay_ue_measure.vecvalue, "s", f"{id} (measurement): CAM Delay  (time_difference)"))
+    print(StatsTool.stats_table(alertdelay_ue.vecvalue, "s", f"{id} (simulation): CAM Delay  (alertDelay)"))
+
+    # %% figure: delay over time
+
+    df.opp.plot.create_time_series(axes["delay"], camdelay_ue_measure, label="measurement", color="r", marker=".")
+
+    # Process corresponding simulation data
+    df.opp.plot.create_time_series(axes["delay"], alertdelay_ue, label="simulation", color="b", marker="x")
+    axes["delay"].legend()
+    axes["delay"].set_title(f"{id}: Packet Delay")
+    axes["delay"].set_ylabel("delay [s]");
+    axes["delay"].legend(loc='upper right')
+    axes["delay"].set_ylim(bottom=0)
+
+    # %% figure: delay histogram
+    #  measurements
     hist_add_args = kwargs
 
     if "hist_range"  in hist_add_args:
         hist_add_args["range"] = hist_add_args.pop("hist_range")
 
-    df.opp.plot.create_histogram(ax_hist, camdelay_ue_measure, label="measurement", color="r", density=False, histtype='step', fill=False, **hist_add_args)
+    (n, bins, patches) = df.opp.plot.create_histogram(axes["delay_hist"], camdelay_ue_measure, label="measurement", color="r", density=False, histtype='step', fill=False, **hist_add_args)
 
-    # %% Simulation: Create time series and histogram of receive SINR at the eNB
+    # simulation
+    df.opp.plot.create_histogram(axes["delay_hist"], alertdelay_ue, label="simulation", color="b", density=False, histtype='step', fill=False, bins=bins, **hist_add_args)
 
-    print(StatsTool.stats_table(alertdelay_ue.vecvalue, "s", f"{id} (simulation): CAM Delay  (alertDelay)"))
+    # format plot
+    axes["delay_hist"].set_title(f"{id}: Packet Delay Histogram")
+    axes["delay_hist"].set_xlabel("delay [s]");
+    axes["delay_hist"].set_ylabel("number of values");
+    axes["delay_hist"].legend()
 
-    df.opp.plot.create_time_series(ax_time, alertdelay_ue, label="simulation", color="b", marker="x")
-    ax_time.legend()
+    # %% figure: delay histogram cumulative
+    hist_add_args = kwargs
 
-    df.opp.plot.create_histogram(ax_hist, alertdelay_ue, label="simulation", color="b", density=False, histtype='step', fill=False, **hist_add_args)
+    if "hist_range"  in hist_add_args:
+        hist_add_args["range"] = hist_add_args.pop("hist_range")
 
-    # %% format plot and save it to PDF and PNG files
-    ax_time.set_title(f"{id}: Packet Delay")
-    ax_time.set_ylabel("delay [s]");
-    ax_time.legend(loc='upper right')
-    ax_time.set_ylim(bottom=0)
+    # measurement
+    (n, bins, patches) = df.opp.plot.create_histogram(axes["delay_cdf"], camdelay_ue_measure, label="measurement", color="r", density=True, cumulative=True, histtype='step', fill=False, **hist_add_args)
 
-    ax_hist.set_title(f"{id}: Packet Delay Histogram")
-    ax_hist.set_xlabel("delay [s]");
-    ax_hist.set_ylabel("number of values");
-    ax_hist.legend()
+    # simulation
+    df.opp.plot.create_histogram(axes["delay_cdf"], alertdelay_ue, label="simulation", color="b", density=True, histtype='step', cumulative=True, fill=False, bins=bins, **hist_add_args)
 
-    # fig_adelay_measure.show()
-    fig_adelay.show()
+    # format plot
+    axes["delay_cdf"].set_title(f"{id}: Packet Delay CDF")
+    axes["delay_cdf"].set_xlabel("delay [s]");
+    axes["delay_cdf"].set_ylabel("P(X<x)");
+    axes["delay_cdf"].legend()
+
+
+    # %% figure: packet inter-arrival time histogram
+
+    # calculate inter-arrival times: measurements
+    nr_values = len(camdelay_ue_measure['vecvalue'])-1
+    iat_time = np.zeros(nr_values)
+    iat_value = np.zeros(nr_values)
+    for i, time in enumerate(iat_value):
+        iat_time[i] = (camdelay_ue_measure['vectime']).iloc[i]
+        iat_value[i] = ((camdelay_ue_measure['vectime']).iloc[i+1] - (camdelay_ue_measure['vectime']).iloc[i])*1000
+
+    iat = pd.Series({
+            "vectime": iat_time,
+            "vecvalue": iat_value
+        })
+
+    hist_add_args = kwargs
+
+    if "range" in hist_add_args:
+        hist_add_args.pop("range")
+
+    # TODO: should be dynamic
+    # hist_add_args["range"] = [0.0, 200]
+
+    (n, bins, patches) = df.opp.plot.create_histogram(axes["iat_hist"], iat, label="measurement",
+                                                      color="r", density=False, histtype='step', fill=False,
+                                                      **hist_add_args)
+
+    # simulation
+
+    # calculate inter-arrival times: simulation
+    nr_values = len(alertdelay_ue['vecvalue']) - 1
+    iat_time = np.zeros(nr_values)
+    iat_value = np.zeros(nr_values)
+    for i, time in enumerate(iat_value):
+        iat_time[i] = (alertdelay_ue['vectime'])[i]
+        iat_value[i] = ((alertdelay_ue['vectime'])[i + 1] - (alertdelay_ue['vectime'])[i])*1000
+
+    iat = pd.Series({
+        "vectime": iat_time,
+        "vecvalue": iat_value
+    })
+
+    df.opp.plot.create_histogram(axes["iat_hist"], iat, label="simulation", color="b", density=False,
+                                 histtype='step', fill=False, bins=bins, **hist_add_args)
+
+    # format plot
+    axes["iat_hist"].set_title(f"{id}: Packet Inter-Arrival Time Histogram")
+    axes["iat_hist"].set_xlabel("inter-arrival time [ms]");
+    axes["iat_hist"].set_ylabel("number of values");
+    axes["iat_hist"].legend()
+
+
+
+    # %% create figures in PDF and PNG formats
     plt.show()
-
-    # create figure in PDF and PNG formats
-    fig_adelay.savefig(f"delay_{id}.pdf", bbox_inches='tight')
-    fig_adelay.savefig(f"delay_{id}.png")
+    for name, fig in figures.items():
+        filename_base = id + "_" + name
+        print(f"Saving figure \"{filename_base}.pdf\"")
+        fig.savefig(f"{filename_base}.pdf", bbox_inches='tight')
+        print(f"Saving figure \"{filename_base}.png\"")
+        fig.savefig(f"{filename_base}.png")
 
 
 # %% Process all scenarios
 
 # Scenario 1: UDP 300 B CAM Packets, no other traffic
-# process_scenario("Scenario 1", "S1", "OpenAirInterface-CAM-DL-1", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
+process_scenario("Scenario 1", "S1", "OpenAirInterface-CAM-DL-1", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
 
 # Scenario 1: UDP 300 B CAM Packets, no other traffic
-process_scenario("Scenario 1B", "S1B", "OpenAirInterface-CAM-DL-1B", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
+# process_scenario("Scenario 1B", "S1B", "OpenAirInterface-CAM-DL-1B", "2018-06-28/measurement1/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", range=[0.0,0.015]);
 
 # Scenario 2: UDP 300 B CAM Packets, overload due to 512B background traffic
-# process_scenario("Scenario 2", "S2", "OpenAirInterface-CAM-DL-2", "2018-06-28/measurement2/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv")
+process_scenario("Scenario 2", "S2", "OpenAirInterface-CAM-DL-2", "2018-06-28/measurement2/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv", range=[2.0,3.0])
 
 
-
-
+# + number of values in general stats
 
 # possible datagram types
 # - standard statistics
