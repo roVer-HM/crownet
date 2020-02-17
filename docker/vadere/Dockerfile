@@ -59,6 +59,11 @@ RUN mvn clean package -Dmaven.test.skip
 COPY vadere-gui /usr/local/bin/vadere-gui
 RUN chmod 555 /usr/local/bin/vadere-gui
 
+# add ide (intellij)
+WORKDIR /opt/intellij
+ADD ide/ideaIU-2019.3.3.tar.gz .
+ENV PATH="/opt/intellij/idea-IU-193.6494.35/bin:${PATH}"
+
 # init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
