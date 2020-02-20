@@ -16,15 +16,26 @@
 import inet.common.INETDefs;
 import inet.common.packet.chunk.Chunk;
 import inet.applications.base.ApplicationPacket;
+import inet.common.geometry.Geometry;
+import inet.common.TagBase;
+
 
 namespace rover;
 
+class DetourIncident extends inet::TagBase
+{}
+
+class DetourPropagate extends inet::TagBase
+{}
+
 class DetourAppPacket extends inet::ApplicationPacket
 {
- 	   string reason;
- 	   simtime_t eventTime;
+ 	   string incidentReason;
+ 	   simtime_t incidentTime;
  	   simtime_t repeatTime;
  	   simtime_t repeateInterval = 20.0;
  	   int closedTarget;
  	   int alternativeRoute[];
+ 	   inet::Coord incidentOrigin;
+ 	   inet::Coord lastHopOrigin;
 }

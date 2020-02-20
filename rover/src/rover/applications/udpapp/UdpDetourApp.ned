@@ -21,10 +21,19 @@ simple UdpDetourApp extends UdpBasicApp
 {
 	parameters:
 	    @class(rover::UdpDetourApp);
+	    // sender parameters
 	    double incidentTime @unit(s) = default(-1s); // time at which the incident (see reason) is triggerd. If -1 no incident is triggerd and app only performs passive task (receive and repeate)
-	    string reason = default("Closed Entrance");
+	    string reason = default("");		 // unique identifier
 	    int closedTarget = default(-1);		 // 42
-	    string alternativeRoute = default(""); // 1,3,4 (replace 42 with 1->3->4 
-	    double repeatTime @unit(s)= default(60.0s); // time how long a received message will be hold and repated until it discarded.
-	    volatile double repeateInterval @unit(s) = default(10.0s); // repeate interval to resend received messages util timeToLive is reached.
+	    string alternativeRoute = default(""); // comma seperated list (no spaces!)
+	    // receiver|source parameters
+	    
+	    // Timeinterval in which the message should be retransmitted to keep the information alive.
+	    // As sender: Value must be greate than 0! This is transmitted in the packet and will be followed by the receiver if not overwritten
+	    // As receiver: -1.0 use information in received packet, otherwise use value set here.
+	    double repeatTime @unit(s)= default(-1.0s); // As sender: must be set if -1.0 use information in received message
+	    // Time between retransmission. Number of retransmission are calculated as repeatTime / repeteInterval
+	    // As sender: Value must be greate than 0! This is transmitted in the packet and will be followed by the receiver if not overwritten
+	    // As receiver: -1.0 use information in received packet, otherwise use value set here.
+	    volatile double repeateInterval @unit(s) = default(-1.0s); // if -1.0 use information in received message.
 }
