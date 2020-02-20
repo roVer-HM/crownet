@@ -26,9 +26,12 @@ namespace rover {
 Define_Module(UdpDetourApp);
 
 UdpDetourApp::~UdpDetourApp() {
+  cancelAndDelete(selfMsg);
   cancelAndDelete(selfMsgIncident);
+  for (auto &item : handlerMap) {
+    cancelAndDelete(item.second.msg);
+  }
   // todo delete cMessages in PropagationHandle
-  delete packetName;
 }
 
 void UdpDetourApp::initialize(int stage) {
@@ -65,8 +68,10 @@ void UdpDetourApp::initialize(int stage) {
       }
     }
     // ensure sender is correctly configured.
-    if (incidentTime > 0.0 && (reason.empty() || closedTarget == -1 ||
-                               alternativeRoute.size() == 0)) {
+    if (incidentTime > SIMTIME_ZERO &&
+        (reason.empty() || closedTarget == -1 || alternativeRoute.size() == 0 ||
+         repeatTime <= SIMTIME_ZERO ||
+         (simtime_t)(par("repeateInterval").doubleValue()) <= SIMTIME_ZERO)) {
       throw cRuntimeError(
           "UdpDetorApp(sender config) must provide a reason, closedTarget and "
           "alternativeRoute. Some of these parameters are not set correctly");
@@ -207,23 +212,12 @@ void UdpDetourApp::handleCrashOperation(LifecycleOperation *operation) {
 }
 
 void UdpDetourApp::socketDataArrived(UdpSocket *socket, Packet *packet) {
-  // todo Maybe use packet->peekData(); instead of popAtFront???
-  // todo Tags dont work! why?
-
-  auto tt1 = packet->findTag<CreationTimeTag>();
-  auto tt2 = packet->findTag<DetourIncident>();
-
-  auto data = packet->peekData();
-  int num = data->getNumTags();
-  auto t1 = data->findTag<CreationTimeTag>();
-  auto t2 = data->findTag<DetourIncident>();
-
   IntrusivePtr<const DetourAppPacket> pkt =
       packet->popAtFront<DetourAppPacket>();
-  // todo Tags dont work???? why???
-  if (pkt->findTag<DetourIncident>()) {
+
+  if (pkt->getType() == DetourPktType::INCIDENT) {
     nextState = fsmIncidentRxExit(pkt);
-  } else if (pkt->findTag<DetourPropagate>()) {
+  } else if (pkt->getType() == DetourPktType::PROPAGATE) {
     nextState = fsmPropagateRxExit(pkt);
   } else {
     throw new cRuntimeError("DetorTags not found");
@@ -325,12 +319,11 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
   payload->setRepeateInterval(par("repeateInterval").doubleValue());
   payload->setIncidentOrigin(getCurrentLocation());
   payload->setLastHopOrigin(getCurrentLocation());
+  payload->setType(DetourPktType::INCIDENT);
   for (int i = 0; i < alternativeRoute.size(); i++) {
     payload->setAlternativeRoute(i, alternativeRoute.at(i));
   }
   payload->setSequenceNumber(numSent);
-  payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
-  payload->addTag<DetourIncident>();
   payload->setChunkLength(B(par("messageLength")));
 
   std::ostringstream str;
@@ -339,14 +332,7 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
   if (dontFragment) packet->addTag<FragmentationReq>()->setDontFragment(true);
   packet->insertAtBack(payload);
   L3Address destAddr = destAddresses[0];
-  packet->addTag<CreationTimeTag>()->setCreationTime(simTime());
-  packet->addTag<DetourIncident>();
   emit(packetSentSignal, packet);
-
-  auto t1 = payload->findTag<CreationTimeTag>();
-  auto t2 = packet->findTag<CreationTimeTag>();
-  PacketPrinter printer;
-  printer.printPacket(std::cout, packet);
 
   socket.sendTo(packet, destAddr, destPort);
   numSent++;
@@ -359,8 +345,8 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
 UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentRxExit(
     IntrusivePtr<const DetourAppPacket> pkt) {
   // do I know this incident already?
-  if (propagationQueue.find(pkt->getIncidentReason()) !=
-      propagationQueue.end()) {
+  PropagationHandleMap::iterator it = handlerMap.find(pkt->getIncidentReason());
+  if (it != handlerMap.end()) {
     // reason is known. for now do nothing
 
   } else {
@@ -373,37 +359,39 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentRxExit(
 
     msg->setKind(FsmStates::PROPAGATE_TX);
     newHandle.restTime -= newHandle.pkt->getRepeateInterval();
-    scheduleAt(simTime() + newHandle.pkt->getRepeateInterval(), msg);
+    simtime_t nextEvent = simTime() + newHandle.pkt->getRepeateInterval();
+    ASSERT(nextEvent > simTime());
+    scheduleAt(nextEvent, msg);
 
-    propagationQueue.insert(std::pair<std::string, PropagationHandle>(
+    handlerMap.insert(std::pair<std::string, PropagationHandle>(
         pkt->getIncidentReason(), newHandle));
   }
   return FsmStates::WAIT_ACTIVE;
 }
 
 UdpDetourApp::FsmStates UdpDetourApp::fsmPropagateTxExit(cMessage *msg) {
-  if (propagationQueue.find(msg->getName()) != propagationQueue.end()) {
+  PropagationHandleMap::iterator it = handlerMap.find(msg->getName());
+  if (it != handlerMap.end()) {
     // Propagate message
-    auto handle = propagationQueue[msg->getName()];
-    ASSERT(msg == handle.msg);
-    auto payload = IntrusivePtr<DetourAppPacket>(handle.pkt->dup());
+    ASSERT(msg == it->second.msg);
+    auto payload = IntrusivePtr<DetourAppPacket>(it->second.pkt->dup());
     payload->setLastHopOrigin(getCurrentLocation());
     payload->setSequenceNumber(numSent);
-    payload->removeTag<DetourIncident>(b(0), b(-1));  // todo better way?
-    payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
-    payload->addTag<DetourPropagate>();
+    payload->setType(DetourPktType::PROPAGATE);
     sendPayload(payload);
 
     // schedule next if time budget is there.
-    handle.restTime -= handle.pkt->getRepeateInterval();
-    if (handle.restTime > 0.0) {
-      scheduleAt(simTime() + handle.pkt->getRepeateInterval(), handle.msg);
+    it->second.restTime -= it->second.pkt->getRepeateInterval();
+    if (it->second.restTime > 0.0) {
+      simtime_t nextEvent = simTime() + it->second.pkt->getRepeateInterval();
+      ASSERT(nextEvent > simTime());
+      scheduleAt(nextEvent, it->second.msg);
     } else {
-      // budget is gone. remove handle from propagationQueue and delete msg.
-      propagationQueue.erase(msg->getName());
-      cancelAndDelete(msg);
+      // budget is gone. cancelEvent but do not delete it (may be needed later
+      // on). do not remove it PropagationHandle from map so new messages will
+      // not be Registered as new once.
+      cancelEvent(msg);
     }
-
   } else {
     throw cRuntimeError(
         "PropagateTxExit for reason: %s was scheduled but PropagationHandle "

@@ -22,11 +22,11 @@ import inet.common.TagBase;
 
 namespace rover;
 
-class DetourIncident extends inet::TagBase
-{}
 
-class DetourPropagate extends inet::TagBase
-{}
+enum DetourPktType {
+	INCIDENT = 0;
+	PROPAGATE = 1;
+}
 
 class DetourAppPacket extends inet::ApplicationPacket
 {
@@ -38,4 +38,5 @@ class DetourAppPacket extends inet::ApplicationPacket
  	   int alternativeRoute[];
  	   inet::Coord incidentOrigin;
  	   inet::Coord lastHopOrigin;
+ 	   DetourPktType type;
 }

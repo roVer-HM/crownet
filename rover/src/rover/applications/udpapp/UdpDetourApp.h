@@ -84,7 +84,8 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   cMessage *selfMsg = nullptr;
   cMessage *selfMsgIncident = nullptr;     // owned
   MobilityBase *mobilityModule = nullptr;  // not managed here do not delete.
-  std::map<std::string, PropagationHandle> propagationQueue;  // key=msgName
+  typedef std::map<std::string, PropagationHandle> PropagationHandleMap;
+  PropagationHandleMap handlerMap;  // key=msgName
 
   // statistics
   int numSent = 0;
