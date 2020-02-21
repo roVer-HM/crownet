@@ -13,28 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+package rover.applications.udpapp;
 
-package rover.simulations.networks;
+import rover.applications.udpapp.UdpDetourApp;
 
-import rover.simulations.networks.LTE_d2d;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
-import inet.visualizer.contract.IIntegratedVisualizer;
-import inet.environment.common.PhysicalEnvironment;
-
-
-
-
-network LTE_d2d_Vadere extends LTE_d2d
+simple UdpDetourAppVadere extends UdpDetourApp
 {
-    parameters:
-        manager.typename = "TraCIScenarioManagerVadere";
-
-    submodules:
-        visualization: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
-            @display("p=366,114;is=s");
-        }
-
-        physicalEnvironment: PhysicalEnvironment {
-            @display("p=366,62;is=s");
-        }
+	parameters:
+	    @class(rover::UdpDetourAppVadere);
+	    // sender parameters
+	    notifyMobilityProvider = default(true);
 }

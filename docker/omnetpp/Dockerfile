@@ -4,7 +4,7 @@
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 
 
-FROM ubuntu:18.04
+FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
 ENV OMNETRELEASE omnetpp-5.6
@@ -18,25 +18,7 @@ LABEL maintainer  "wischhof@ieee.org"
 # Note: Since clang does not emit debug info for types within the standard libraries,
 #       we must include debug info for the installed libraries (versions must match!)
 #       by manually installing the libstdc++6-8-dbg package
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-       sudo \
-       git git-lfs \
-       uncrustify nemiver \
-       clang bison flex make qt5-default \
-       libstdc++6-8-dbg \
-       python3-pip clang-format curl wget \
-       openjdk-11-jre \
-       doxygen graphviz tcl-dev tk-dev python python3 valgrind \
-       libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
-       openscenegraph osgearth \
-       libopenmpi-dev libxml2-dev libwebkitgtk-3.0-0 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# for read access to the (non-public) roVer repos, we need to copy the key of the rover-readonly user:
-COPY id_rsa /root/.ssh/id_rsa
-RUN chmod 400 /root/.ssh/id_rsa
+# see rover-base-cpp and rover-base-min
 
 # clone the OMNeT++ sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/omnetpp
@@ -46,7 +28,7 @@ RUN git lfs install
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
+        clone --depth 1 --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
 
 # add a symbolic link so omnetpp is found in the path
 RUN ln -s /opt/omnetpp/$OMNETRELEASE /opt/omnetpp/omnetpp
@@ -65,16 +47,16 @@ ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .
 RUN ./configure && \
     make -j $(nproc) && \
-    find . -type f -name '*.o' -exec rm {} +
+    find . -type f -name '*.o' -exec rm {} + && \
+    find . -type f -name '*.o.d' -exec rm {} +
 
 # now install the Eclipse IDE base
-ADD ide/ide.tar.gz .
+# ADD ide/ide.tar.gz .
 
-# TODO: clean up all files not needed anymore (object files, etc.)
 
 # installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
-RUN pip3 install cpplint
-RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group ; PID=`pidof omnetpp`; while [ -e /proc/$PID ]; do sleep 0.1; done
+# RUN pip3 install cpplint
+# RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group ; PID=`pidof omnetpp`; while [ -e /proc/$PID ]; do sleep 0.1; done
 
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
@@ -87,19 +69,3 @@ ENTRYPOINT [ "/init.sh" ]
 # waitfor script (in order to wait for non-child processes)
 COPY waitfor.sh /waitfor.sh
 RUN chmod 555 /waitfor.sh
-
-# Note: in order to launch OMNeT with X11 output, the container needs to be launched with:
-# docker run -it \
-# --user $(id -u) \
-# -e DISPLAY=unix$DISPLAY \
-# --workdir=$(pwd) \
-# --volume="/home/$USER:/home/$USER" \
-# --volume="/etc/group:/etc/group:ro" \
-# --volume="/etc/passwd:/etc/passwd:ro" \
-# --volume="/etc/shadow:/etc/shadow:ro" \
-# --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
-# -v /tmp/.X11-unix:/tmp/.X11-unix \
-#
-# Note: Attaching a debugger to a running simulation requires SYS_PTRACE capabilities:
-#       - run with option --cap-add=SYS_PTRACE
-#       - docker compose with   cap_add: - SYS_PTRACE

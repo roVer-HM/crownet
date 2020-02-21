@@ -5,17 +5,18 @@
 #
 # Examples
 #
-# /bin/bash (default)      starts an interactive shell
+# omnetpp (default)      starts the OMNeT++ IDE
+# /bin/bash              starts an interactive shell
 
 export PATH=/opt/omnetpp/omnetpp/bin:~/.local/bin:$PATH
 
 # echo "Command: $1"
 
 if [ -z "$1" ]; then
-     CMD="/bin/bash"
+     CMD="omnetpp"
 else
      CMD="$1"
-     if [[ "$CMD" != "/bin/bash" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
+     if [[ "$CMD" != "omnetpp" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
           SILENT="y"
      fi
 fi
@@ -37,6 +38,18 @@ fi
 CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
+
+if [[ "$CMD" == "omnetpp" ]]; then
+     sleep 3
+     PID=`pidof omnetpp`
+
+     # omnetpp is special since the start script in its bin directory returns immediately
+     # Therefore, we wait until the omnetpp process terminates. (cannot use wait since it is not a child process)
+
+     if [ -n "$PID" ]; then
+          while [ -e /proc/$PID ]; do sleep 0.1; done
+     fi
+fi
 
 
 if [ -z "$SILENT" ]; then
