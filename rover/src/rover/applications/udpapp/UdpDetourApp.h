@@ -104,6 +104,7 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   bool dontFragment = false;
   const char *packetName = nullptr;
   simtime_t repeatTime;
+  bool notifyMobilityProvider;
 };  // namespace rover
 
 } /* namespace rover */

@@ -36,4 +36,5 @@ simple UdpDetourApp extends UdpBasicApp
 	    // As sender: Value must be greate than 0! This is transmitted in the packet and will be followed by the receiver if not overwritten
 	    // As receiver: -1.0 use information in received packet, otherwise use value set here.
 	    volatile double repeateInterval @unit(s) = default(-1.0s); // if -1.0 use information in received message.
+	    bool notifyMobilityProvider = default(false);
 }

@@ -55,6 +55,7 @@ void UdpDetourApp::initialize(int stage) {
     reason = par("reason").stdstringValue();
     closedTarget = par("closedTarget").intValue();
     repeatTime = par("repeatTime").doubleValue();
+    notifyMobilityProvider = par("notifyMobilityProvider").boolValue();
     cStringTokenizer tokenizer(par("alternativeRoute").stringValue(), ",");
     const char *token;
     while ((token = tokenizer.nextToken()) != nullptr) {
@@ -251,6 +252,7 @@ const bool UdpDetourApp::isSender() { return incidentTime > 0.0; }
 void UdpDetourApp::actOnIncident(IntrusivePtr<const DetourAppPacket> pkt) {
   // check if Incident id meant for me (default yes)
 }
+
 void UdpDetourApp::sendPayload(IntrusivePtr<const DetourAppPacket> payload) {
   std::ostringstream str;
   str << payload->getIncidentReason() << "-" << numSent;
