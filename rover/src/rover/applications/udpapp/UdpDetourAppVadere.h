@@ -27,8 +27,7 @@ namespace rover {
 
 class UdpDetourAppVadere : public UdpDetourApp {
  public:
-  UdpDetourAppVadere()
-      : traciPerson(nullptr), mobility(nullptr), traci(nullptr) {}
+  UdpDetourAppVadere();
   virtual ~UdpDetourAppVadere();
 
  protected:

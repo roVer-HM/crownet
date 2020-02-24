@@ -9,8 +9,8 @@
 
 FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-java:latest
 
-# Specify the version/tag of vadere to be put in the container:
-ENV RELEASE master
+# Specify the version/tag of vadere to be put in the container. defaut master
+ARG BRANCH
 
 LABEL description "vadere Crowd Simulator (as used in roVer)"
 LABEL maintainer  "wischhof@ieee.org"
@@ -22,10 +22,10 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN git clone --depth 1 --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
+RUN git clone --depth 1 --branch $BRANCH https://gitlab.lrz.de/vadere/vadere.git $BRANCH
 
 # add a symbolic link so vadere is found in the path
-RUN ln -f -s /opt/vadere/$RELEASE /opt/vadere/vadere
+RUN ln -f -s /opt/vadere/$BRANCH /opt/vadere/vadere
 
 # add a symbolic link to /usr/bin/python3 from /usr/bin/python3.7
 RUN ln -f -s /usr/bin/python3.7 /usr/bin/python3
