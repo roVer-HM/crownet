@@ -24,7 +24,7 @@ simple UdpDetourApp extends UdpBasicApp
 	    // sender parameters
 	    double incidentTime @unit(s) = default(-1.0s); // time at which the incident (see reason) is triggerd. If -1 no incident is triggerd and app only performs passive task (receive and repeate)
 	    string reason = default("");		 // unique identifier
-	    int closedTarget = default(-1);		 // 42
+	    string closedTarget = default("-1");		 // 42
 	    string alternativeRoute = default(""); // comma seperated list (no spaces!)
 	    // receiver|source parameters
 	    

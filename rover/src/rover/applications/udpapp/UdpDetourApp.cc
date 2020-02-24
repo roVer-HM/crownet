@@ -53,14 +53,14 @@ void UdpDetourApp::initialize(int stage) {
     // DetoureApp
     incidentTime = par("incidentTime").doubleValue();
     reason = par("reason").stdstringValue();
-    closedTarget = par("closedTarget").intValue();
+    closedTarget = par("closedTarget").stringValue();
     repeatTime = par("repeatTime").doubleValue();
     notifyMobilityProvider = par("notifyMobilityProvider").boolValue();
     cStringTokenizer tokenizer(par("alternativeRoute").stringValue(), ",");
     const char *token;
     while ((token = tokenizer.nextToken()) != nullptr) {
       try {
-        alternativeRoute.push_back(std::stoi(token));
+        alternativeRoute.push_back(token);
       } catch (const std::exception &e) {
         EV_ERROR << "cannot parse alternativeRoute parameter: "
                  << "alternativeRoute" << std::endl;
@@ -70,8 +70,8 @@ void UdpDetourApp::initialize(int stage) {
     }
     // ensure sender is correctly configured.
     if (incidentTime > SIMTIME_ZERO &&
-        (reason.empty() || closedTarget == -1 || alternativeRoute.size() == 0 ||
-         repeatTime <= SIMTIME_ZERO ||
+        (reason.empty() || closedTarget == "-1" ||
+         alternativeRoute.size() == 0 || repeatTime <= SIMTIME_ZERO ||
          (simtime_t)(par("repeateInterval").doubleValue()) <= SIMTIME_ZERO)) {
       throw cRuntimeError(
           "UdpDetorApp(sender config) must provide a reason, closedTarget and "
@@ -315,7 +315,7 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
   // application data
   payload->setIncidentReason(reason.c_str());
   payload->setIncidentTime(simTime());
-  payload->setClosedTarget(closedTarget);
+  payload->setClosedTarget(closedTarget.c_str());
   payload->setAlternativeRouteArraySize(alternativeRoute.size());
   payload->setRepeatTime(repeatTime);
   payload->setRepeateInterval(par("repeateInterval").doubleValue());
@@ -323,21 +323,35 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
   payload->setLastHopOrigin(getCurrentLocation());
   payload->setType(DetourPktType::INCIDENT);
   for (int i = 0; i < alternativeRoute.size(); i++) {
-    payload->setAlternativeRoute(i, alternativeRoute.at(i));
+    payload->setAlternativeRoute(i, alternativeRoute.at(i).c_str());
   }
   payload->setSequenceNumber(numSent);
   payload->setChunkLength(B(par("messageLength")));
 
   std::ostringstream str;
   str << payload->getIncidentReason() << "-" << numSent;
-  Packet *packet = new Packet(str.str().c_str());
-  if (dontFragment) packet->addTag<FragmentationReq>()->setDontFragment(true);
-  packet->insertAtBack(payload);
+  Packet *pkt = new Packet(str.str().c_str());
+  if (dontFragment) pkt->addTag<FragmentationReq>()->setDontFragment(true);
+  pkt->insertAtBack(payload);
   L3Address destAddr = destAddresses[0];
-  emit(packetSentSignal, packet);
+  emit(packetSentSignal, pkt);
 
-  socket.sendTo(packet, destAddr, destPort);
+  socket.sendTo(pkt, destAddr, destPort);
   numSent++;
+
+  // Setup Propagation
+  cMessage *propagationMsg = new cMessage(payload->getIncidentReason());
+  PropagationHandle newHandle{payload, propagationMsg,
+                              payload->getRepeatTime()};
+
+  propagationMsg->setKind(FsmStates::PROPAGATE_TX);
+  newHandle.restTime -= newHandle.pkt->getRepeateInterval();
+  simtime_t nextEvent = simTime() + newHandle.pkt->getRepeateInterval();
+  ASSERT(nextEvent > simTime());
+  scheduleAt(nextEvent, propagationMsg);
+
+  handlerMap.insert(std::pair<std::string, PropagationHandle>(
+      payload->getIncidentReason(), newHandle));
 
   //  sendPayload(payload);
 
@@ -355,7 +369,7 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentRxExit(
     // reason is new
     actOnIncident(pkt);
 
-    // Prepare Propagation
+    // Setup Propagation
     cMessage *msg = new cMessage(pkt->getIncidentReason());
     PropagationHandle newHandle{pkt, msg, pkt->getRepeatTime()};
 

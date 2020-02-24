@@ -94,8 +94,8 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   // parameters
   simtime_t incidentTime;
   std::string reason;
-  int closedTarget;
-  std::vector<int> alternativeRoute;
+  std::string closedTarget;
+  std::vector<std::string> alternativeRoute;
   std::vector<L3Address> destAddresses;
   std::vector<std::string> destAddressStr;
   int localPort = -1, destPort = -1;

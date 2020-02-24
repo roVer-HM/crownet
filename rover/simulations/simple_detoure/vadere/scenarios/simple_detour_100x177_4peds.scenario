@@ -127,16 +127,64 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 20.0,
+            "x" : 150.0,
+            "y" : 44.0
+          }, {
+            "x" : 150.0,
+            "y" : 74.0
+          }, {
+            "x" : 115.0,
+            "y" : 74.0
+          }, {
+            "x" : 115.0,
+            "y" : 44.0
+          } ]
+        },
+        "id" : 3
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 75.0,
+            "y" : 71.0
+          }, {
+            "x" : 75.0,
+            "y" : 74.0
+          }, {
+            "x" : 10.0,
+            "y" : 74.0
+          }, {
+            "x" : 10.0,
+            "y" : 71.0
+          } ]
+        },
+        "id" : 4
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 152.0,
             "y" : 20.0
           }, {
-            "x" : 20.0,
+            "x" : 152.0,
             "y" : 23.0
           }, {
-            "x" : 0.0,
+            "x" : 95.0,
             "y" : 23.0
           }, {
-            "x" : 0.0,
+            "x" : 95.0,
+            "y" : 50.0
+          }, {
+            "x" : 55.0,
+            "y" : 50.0
+          }, {
+            "x" : 55.0,
+            "y" : 23.0
+          }, {
+            "x" : 25.0,
+            "y" : 23.0
+          }, {
+            "x" : 25.0,
             "y" : 20.0
           } ]
         },
@@ -145,17 +193,29 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 177.0,
-            "y" : 20.0
-          }, {
-            "x" : 177.0,
+            "x" : 0.0,
             "y" : 23.0
           }, {
-            "x" : 157.0,
+            "x" : 0.0,
+            "y" : 20.0
+          }, {
+            "x" : 20.0,
+            "y" : 20.0
+          }, {
+            "x" : 20.0,
             "y" : 23.0
           }, {
-            "x" : 157.0,
-            "y" : 20.0
+            "x" : 17.5,
+            "y" : 23.0
+          }, {
+            "x" : 17.5,
+            "y" : 50.4
+          }, {
+            "x" : 0.3,
+            "y" : 50.4
+          }, {
+            "x" : 0.3,
+            "y" : 23.0
           } ]
         },
         "id" : 6
@@ -163,68 +223,32 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 155.0,
-            "y" : 44.0
+            "x" : 157.0,
+            "y" : 23.0
           }, {
-            "x" : 155.0,
-            "y" : 74.0
+            "x" : 157.0,
+            "y" : 20.0
           }, {
-            "x" : 115.0,
-            "y" : 74.0
+            "x" : 177.0,
+            "y" : 20.0
           }, {
-            "x" : 115.0,
-            "y" : 44.0
+            "x" : 177.0,
+            "y" : 23.0
+          }, {
+            "x" : 176.5,
+            "y" : 23.0
+          }, {
+            "x" : 176.5,
+            "y" : 50.4
+          }, {
+            "x" : 159.3,
+            "y" : 50.4
+          }, {
+            "x" : 159.3,
+            "y" : 23.0
           } ]
         },
         "id" : 7
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 75.0,
-            "y" : 71.0
-          }, {
-            "x" : 75.0,
-            "y" : 74.0
-          }, {
-            "x" : 10.0,
-            "y" : 74.0
-          }, {
-            "x" : 10.0,
-            "y" : 71.0
-          } ]
-        },
-        "id" : 8
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 152.0,
-            "y" : 20.0
-          }, {
-            "x" : 152.0,
-            "y" : 23.0
-          }, {
-            "x" : 95.0,
-            "y" : 23.0
-          }, {
-            "x" : 95.0,
-            "y" : 50.0
-          }, {
-            "x" : 55.0,
-            "y" : 50.0
-          }, {
-            "x" : 55.0,
-            "y" : 23.0
-          }, {
-            "x" : 25.0,
-            "y" : 23.0
-          }, {
-            "x" : 25.0,
-            "y" : 20.0
-          } ]
-        },
-        "id" : 9
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -263,40 +287,6 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 2004,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 70.1,
-          "y" : 49.98832835564973,
-          "width" : 3.0,
-          "height" : 21.05658532184755,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2005,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 133.2,
-          "y" : 22.99367237801711,
-          "width" : 3.0,
-          "height" : 20.9918689259393,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 2002,
         "absorbing" : false,
         "shape" : {
@@ -317,15 +307,15 @@
       "targetChangers" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 17.5,
-          "y" : 23.7,
-          "width" : 10.0,
+          "x" : 17.49810945273632,
+          "y" : 40.0,
+          "width" : 37.46626865671641,
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
-        "nextTarget" : [ 2004, 2003, 2001 ],
+        "nextTarget" : [ 2003, 2001 ],
         "probabilityToChangeTarget" : 1.0
       } ],
       "absorbingAreas" : [ ],
@@ -347,7 +337,7 @@
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2001 ],
+        "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -368,7 +358,7 @@
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2001 ],
+        "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {

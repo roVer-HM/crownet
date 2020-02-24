@@ -25,6 +25,9 @@ using omnetpp::cStringTokenizer;
 namespace rover {
 Define_Module(UdpDetourAppVadere);
 
+UdpDetourAppVadere::UdpDetourAppVadere()
+    : traciPerson(nullptr), mobility(nullptr), traci(nullptr) {}
+
 UdpDetourAppVadere::~UdpDetourAppVadere() { delete traciPerson; }
 
 void UdpDetourAppVadere::initialize(int stage) {
@@ -43,7 +46,17 @@ void UdpDetourAppVadere::initialize(int stage) {
 
 void UdpDetourAppVadere::actOnIncident(
     IntrusivePtr<const DetourAppPacket> pkt) {
-  // check if Incident id meant for me (default yes)
+  std::string blocked = std::string(pkt->getClosedTarget());
+  std::vector<std::string> targetLists = traciPerson->getTargetList();
+  if (std::find(targetLists.begin(), targetLists.end(), blocked) !=
+      targetLists.end()) {
+    // blocked target found on traget list.
+    std::vector<std::string> newTargetlist{};
+    for (int i = 0; i < pkt->getAlternativeRouteArraySize(); i++) {
+      newTargetlist.push_back(pkt->getAlternativeRoute(i));
+    }
+    traciPerson->setTargetList(newTargetlist);
+  }
 }
 
 } /* namespace rover */

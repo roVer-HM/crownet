@@ -34,8 +34,8 @@ class DetourAppPacket extends inet::ApplicationPacket
  	   simtime_t incidentTime;
  	   simtime_t repeatTime;
  	   simtime_t repeateInterval = 20.0;
- 	   int closedTarget;
- 	   int alternativeRoute[];
+ 	   string closedTarget;
+ 	   string alternativeRoute[];
  	   inet::Coord incidentOrigin;
  	   inet::Coord lastHopOrigin;
  	   DetourPktType type;
