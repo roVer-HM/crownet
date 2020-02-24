@@ -2,7 +2,7 @@
 RANDOM=$(date +%s)
 IMAGE='sam-dev.cs.hm.edu:5023/rover/rover-main/vadere'
 DATE_TAG="$(date "+%y%m%d-%H%M")"
-docker build -t "$IMAGE:latest" -t "$IMAGE:$DATE_TAG" --build-arg NOCACHE_PULL=$RANDOM --build-arg BRANCH=master .
+docker build -t "$IMAGE:latest" -t "$IMAGE:$DATE_TAG" --build-arg NOCACHE_PULL=$RANDOM --build-arg BRANCH=$1 .
 
 if [ $? -eq 0 ]; then
    docker login sam-dev.cs.hm.edu:5023
