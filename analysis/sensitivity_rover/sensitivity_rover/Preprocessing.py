@@ -1,10 +1,15 @@
 
 
-import os,sys,tkinter, datetime, shutil, re, time
+
+import os,sys,tkinter, datetime, shutil, re, time, subprocess
 from tkinter.filedialog import askdirectory, askopenfilename
 from tkinter import messagebox
 from pyDOE import *
 import matplotlib.pyplot as plt
+
+
+
+
 
 class Status:
 
@@ -36,14 +41,18 @@ class Status:
 
         f = open(self.projectfilepath, "w+")
         f.write("This is a sensitivity project file used for parameter studies.\nUse this file to identify your sensitivity project. \n")
-        f.write("Simulation: none\n")
-        f.write("Parameter: none\n")
-        f.write("Sampling: none\n")
-        f.write("Solving: none\n")
-        f.write("Postprocessing: none\n")
+        # f.write("Simulation: none\n")
+        # f.write("Parameter: none\n")
+        # f.write("Sampling: none\n")
+        # f.write("Solving: none\n")
+        # f.write("Postprocessing: none\n")
+
+        f.write(f"Simulation: {self.Simulation}\n")
+        f.write(f"Parameter: {self.Parameter}\n")
+        f.write(f"Sampling: {self.Sampling}\n")
+        f.write(f"Solving: {self.Solving}\n")
+        f.write(f"Postprocessing: {self.Postprocessing}\n")
         f.close()
-
-
 
 
 
@@ -121,14 +130,29 @@ class Project:
         self.status.read_status()
         return self.status
 
-    def copy_simulation(self):
 
-        Messagebox("Copy simulation from directory")
-        dirname = GUI_ProjectDirectory().getProjectDirectory()
-        input_files = os.path.join(self.dirname, "basis_simulation")
+    def prepare_solver(self):
+
+        self.copy_simulation()
+        self.status.Simulation = "yes"
+        self.status.write_status()
+
+    def copy_simulation(self, folder_name = "basis_simulation"):
+        if folder_name == "basis_simulation":
+            Messagebox("Copy simulation from directory")
+            dirname = GUI_ProjectDirectory().getProjectDirectory()
+        else:
+            dirname = os.path.join(self.dirname, "simulation")
+
+        input_files = os.path.join(self.dirname, folder_name)
         print("Copy folder " + dirname )
         print("to " + input_files )
-        shutil.copytree(dirname, input_files)
+
+        if os.path.exists(input_files):
+            shutil.rmtree(input_files)
+
+        shutil.copytree(dirname, input_files )
+
 
     def extract_variables(self):
 
@@ -145,6 +169,9 @@ class Project:
         input_file = os.path.join(self.dirname, "basis_simulation/input/omnetpp.ini")
         new_input_file = os.path.join(self.dirname, "simulation/input/omnetpp.ini")
         GUI_VariableExtraction(input_file=input_file, new_input_file=new_input_file)
+
+        self.status.Parameter = "yes"
+        self.status.write_status()
 
     def extract_variables_update(self,  omnett_index , vadere_index ):
 
@@ -163,14 +190,33 @@ class Project:
         new_input_file = os.path.join(self.dirname, "simulation/input/omnetpp.ini")
         GUI_VariableExtraction(input_file=input_file, new_input_file=new_input_file,  preselection = omnett_index)
 
+        self.status.Parameter = "yes"
+        self.status.write_status()
+
     def update_simulation_parameters(self):
         diff_omnettpp, diff_vadere = self.check_Difference()
 
         if diff_omnettpp == 0 and diff_vadere == 0 :
             print("No difference found.")
         else:
-            omnett_index , vadere_index = self.findVariableIndex()
-            self.extract_variables_update(omnett_index, vadere_index)
+
+            root = tkinter.Tk()
+            root.withdraw()
+            update_file = messagebox.askokcancel("Project update possible", "Changes in input files detected. Update project?")
+            root.destroy()
+
+            if update_file is True:
+
+                root = tkinter.Tk()
+                root.withdraw()
+                update_check = messagebox.askokcancel("Project update",
+                                                     "All simulation results are deleted when updating. Continue?")
+                root.destroy()
+
+                if update_check is True:
+
+                    omnett_index , vadere_index = self.findVariableIndex()
+                    self.extract_variables_update(omnett_index, vadere_index)
 
 
 
@@ -219,9 +265,9 @@ class Project:
     def findOldVariablesInNewFile(self):
 
         # get lines to be found
-        __,__, index_omnetpp, index_vadere = self.get_default_values()
+        default_omnetpp, default_vadere, index_omnetpp, index_vadere = self.get_default_values()
 
-        omnetpp, vadere = self.createSample()
+        omnetpp, vadere = self.createSample(default_omnetpp, default_vadere)
         omnetpp = omnetpp.splitlines()
         vadere = vadere.splitlines()
 
@@ -242,7 +288,9 @@ class Project:
 
     def check_Difference(self):
 
-        sample_omnettpp, sample_vadere = self.createSample()
+        default_omnetpp, default_vadere, index_omnetpp, index_vadere = self.get_default_values()
+
+        sample_omnettpp, sample_vadere = self.createSample(default_omnetpp, default_vadere)
         basis_omnettpp, basis_vadere = self.getBasisFiles()
 
         if sample_omnettpp == basis_omnettpp:
@@ -277,19 +325,16 @@ class Project:
 
 
 
-    def createSample(self, default_omnetpp = None, default_vadere = None):
+    def createSample(self, default_omnetpp, default_vadere, folder = "simulation" ):
 
-        if default_omnetpp is None or default_vadere is None:
-            default_omnetpp, default_vadere, __, __ = self.get_default_values()
-
-        file = os.path.join(self.dirname, "simulation/input/omnetpp.ini")
+        file = os.path.join(self.dirname, folder + "/input/omnetpp.ini")
         with open(file) as f:
             sample_omnettpp = f.read()
 
         for k in range(len(default_omnetpp) ):
             sample_omnettpp = sample_omnettpp.replace( "VARIABLE" + str(k) , default_omnetpp[k] )
 
-        file = os.path.join(self.dirname, "simulation/input/vadere.scenario")
+        file = os.path.join(self.dirname, folder + "/input/vadere.scenario")
         with open(file) as f:
             sample_vadere = f.read()
 
@@ -314,10 +359,15 @@ class Project:
 
         self.createParametercombinations(state_omnett, ranges_omnett, state_vadere, ranges_vadere)
 
+        self.status.Sampling = "yes"
+        self.status.write_status()
+
 
 
     def createParametercombinations(self, state_omnett, ranges_omnett, state_vadere, ranges_vadere):
-        l  = lhs( len(ranges_omnett) + len(ranges_vadere), samples =10 )
+        l  = lhs( len(ranges_omnett) + len(ranges_vadere), samples = 3)
+
+
 
         ranges_omnett.extend(ranges_vadere)
         ranges = ranges_omnett
@@ -331,9 +381,131 @@ class Project:
 
         f = open(filename, "w+")
 
+        k = 0
+        for item in state_omnett:
+            f.write( "Omnet" + str(k) + "," )
+            k += 1
+
+        k = 0
+        for item in state_vadere:
+            f.write("Vadere" + str(k) + ",")
+            k += 1
+        f.write("\n")
+
         for item in scaled_lhs:
             f.write("%s\n" % item)
         f.close()
+
+
+    def runSimulation(self):
+        samples_omnet, samples_vadere =  self.readParametercombinations()
+        self.prepare_runs(samples_omnet, samples_vadere)
+        self.run_runs( len(samples_omnet))
+
+
+    def run_runs(self, number):
+
+        #os.system("TRACI_GUI=false vadere")
+
+        if print(os.getenv('ROVER_MAIN')) is None:
+            #print("Please add variable ROVER_MAIN to your e.g. /etc/environment")
+
+            #print("Alternative: add ROVER_MAIN with python")
+            os.environ['ROVER_MAIN'] = '/home/christina/repos/rover-main'
+
+        #print(os.getenv('ROVER_MAIN'))
+
+        for k in range(number):
+
+            run_id = "run__" + str(k)
+            os.chdir(os.path.join(self.dirname, run_id))
+            os.system('echo ""')
+            os.system('echo "------------------- started -----------------------"')
+            os.system("chmod +x startsim.sh")
+            process = subprocess.Popen(["./startsim.sh"], env=os.environ)
+            process.wait()
+            os.chdir('..')
+            os.system('echo "------------------ finished -----------------------"')
+            os.system('echo ""')
+
+        self.status.Solving = "yes"
+        self.status.write_status()
+
+
+
+
+
+
+    def prepare_runs(self,samples_omnet, samples_vadere):
+
+        for k in range( len(samples_omnet) ):
+
+            folder_name = "run__" + str(k)
+
+            self.copy_simulation(folder_name = folder_name)
+            sample_om, sample_va = self.createSample(samples_omnet[k], samples_vadere[k])
+
+            vadere = os.path.join(self.dirname,folder_name + "/input/vadere.scenario")
+            omnet = os.path.join(self.dirname,folder_name + "/input/omnetpp.ini")
+
+            with open(omnet,"w") as f:
+                values = f.write(sample_om)
+
+            with open(vadere,"w") as f:
+                values = f.write(sample_va)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def readParametercombinations(self):
+        filename = os.path.join(self.dirname, "samples.dat")
+
+        with open(filename) as f:
+            values = f.read().splitlines()
+
+        variables = values[0].split(",")
+
+        a = list()
+        for var in variables:
+            if "Omnet" in var:
+                a.append(0)
+
+            if "Vadere" in var:
+                a.append(1)
+
+        aa = a.index(1)
+
+
+        samples_omnet = list()
+        samples_vadere = list()
+
+        for line in values[1:]:
+            line = line.replace("[", "")
+            line = line.replace("]", "")
+            line = line.split(", ")
+
+            samples_omnet.append(line[:aa])
+            samples_vadere.append(line[aa:])
+
+        print(samples_omnet)
+        print(samples_vadere)
+
+
+
+        return samples_omnet, samples_vadere
+
+
 
 
 
@@ -715,6 +887,7 @@ class Sampling:
             self.entries_vadere.append(entry)
 
         greenbutton = tkinter.Button(self.master, text="Save", command= lambda: self.__write_sampling_file(), width=40, ).grid(row = len(self.default_omnetpp) + len(self.default_vadere), columnspan = 2)
+
         self.master.mainloop()
 
 
@@ -737,7 +910,9 @@ class Sampling:
         f.write(write)
         f.close()
 
+        self.master.quit()
         self.master.destroy()
+
 
 
 
