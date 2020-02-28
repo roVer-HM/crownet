@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+"""
+Search for all scenario files in ROVER_MAIN and list them in a tkinter
+Listbox. Open selected project via 'Enter' inside the vadere container.
+"""
+import glob
+import os
+import subprocess
+import sys
+
+# ###########################load rover_utils##################################
+# #############################################################################
+if "ROVER_MAIN" not in os.environ:
+    print("ROVER_MAIN not set")
+    exit(-1)
+rover_utils_path = os.path.join(
+    os.environ["ROVER_MAIN"], "scripts/lib/python/rover_utils"
+)
+if os.path.isdir(rover_utils_path):
+    sys.path.append(rover_utils_path)
+else:
+    print(f"Cannot find rover_utils at {rover_utils_path}")
+    exit(-1)
+try:
+    import rover_utils as utl
+except ModuleNotFoundError as e:
+    rover_utils_readme = os.path.join(
+        os.environ["ROVER_MAIN"], "scripts/lib/python/rover_utils/README"
+    )
+    print(e.msg)
+    print(
+        "  -> some requirements of rover_utils are not met. Did you install all requirements?"
+    )
+    print(f"  -> see {rover_utils_readme} for help")
+    exit(-1)
+# ##############################################################################
+# ##############################################################################
+
+
+if __name__ == "__main__":
+    project_dirs = glob.glob(
+        f"{os.environ['ROVER_MAIN']}/**/vadere.project", recursive=True
+    )
+
+    project_filtered = [
+        i
+        for i in project_dirs
+        if "target/test-classes" not in i
+        and "rover-main/builds" not in i
+        and "ModelTests" not in i
+        and "tools/ContinuousIntegration"
+        and "testResources" not in i
+        and "ModelCalibration"
+        and "vadere/Tools" not in i
+    ]
+
+    project_filtered.sort()
+
+    selected_path = utl.gui_select_string(project_filtered)
+    if selected_path == "":
+        exit()
+
+    cmd = [
+        f"{os.environ['ROVER_MAIN']}/scripts/vadere",
+        "exec",
+        "java",
+        "-jar",
+        "/opt/vadere/vadere/VadereGui/target/vadere-gui.jar",
+        "--project",
+        selected_path,
+    ]
+    p = subprocess.Popen(
+        cmd,
+        cwd=os.path.curdir,
+        stdin=None,
+        env=os.environ.copy(),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    while p.poll() is None:
+        sout = p.stdout.readline()
+        print(sout.decode("utf-8"), end="")
+
+    print(p.stdout.read().decode("utf-8"), end="")
+    for err in p.stderr.readlines():
+        print(err.decode("utf-8"), end="")
+    p.kill()

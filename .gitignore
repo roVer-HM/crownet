@@ -3,6 +3,7 @@ VadereTestingSuite.preferences.xml
 **/__cache__
 **/vadere-server-output
 **/.directory
+**/*.legacy
 tags
 tags*
 compile_commands.json
@@ -12,6 +13,7 @@ compile_commands.json
 # ignore api token directory for gitlab-ci
 .tokens
 simulation-campaigns/*-results
+simulation-campaigns/*results*
 .cmdenv-log
 
 .idea
@@ -35,6 +37,8 @@ rover/**/legacy
 rover/**/.qtenvrc
 rover/**/.cmdenv-log
 rover/**/*.log
+rover/**/*_m.cc
+rover/**/*_m.h
 
 # Python
 rover/**/test.out
@@ -114,3 +118,7 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+build
+dist
+

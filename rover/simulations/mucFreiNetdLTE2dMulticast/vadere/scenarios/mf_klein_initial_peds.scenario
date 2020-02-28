@@ -1,7 +1,7 @@
 {
   "name" : "mf_klein_initial_peds",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -699,6 +699,7 @@
         "startTime" : 0.0,
         "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2010 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -728,6 +729,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2012 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -751,12 +753,13 @@
           } ]
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 99.0 ],
         "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : -1,
+        "maxSpawnNumberTotal" : 15,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2010 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -786,6 +789,7 @@
         "startTime" : 0.0,
         "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2006 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -815,6 +819,7 @@
         "startTime" : 0.0,
         "endTime" : 400.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2005 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -822,19 +827,20 @@
       }, {
         "id" : 1014,
         "shape" : {
-          "x" : 256.1,
-          "y" : 16.4,
+          "x" : 222.0,
+          "y" : 21.0,
           "width" : 7.0,
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 99.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : 15,
+        "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
         "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2004 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -874,7 +880,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -917,7 +928,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -960,7 +976,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1003,7 +1024,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1046,7 +1072,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1089,7 +1120,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1132,7 +1168,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1175,7 +1216,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1218,7 +1264,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1261,7 +1312,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1304,7 +1360,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1347,7 +1408,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1390,7 +1456,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
