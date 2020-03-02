@@ -155,7 +155,7 @@ class OppFilter:
     Note: All special characters must be escaped if literal brackets or dots should be matched.
     """
 
-    def __init__(self, df: pd.DataFrame = None):
+    def __init__(self, df: pd.DataFrame = None, data_only=True):
         self._filter_dict = {}
         self._name = None
         self._name_regex = None
@@ -164,10 +164,15 @@ class OppFilter:
         self._type = None
         self._module = None
         self._module_regex = None
+        self._data_only = data_only
         self._number_range_pattern = re.compile(
             "(?P<n_range>(?P<start>\d+)\.\.(?P<end>\d+))"
         )
         self._df = df
+        if data_only:
+            self._add_filter(
+                OppFilterItem("type", "(scalar|vector|histogram)", regex=True)
+            )
 
     def _apply_number_range(self, val):
         matches = re.findall(self._number_range_pattern, val)
@@ -241,10 +246,12 @@ class OppFilter:
         )
         for key, filter_item in self._filter_dict.items():
             if filter_item.regex:
-                bool_filter = bool_filter & self._df[key].str.match(filter_item.value)
+                bool_filter = bool_filter & self._df.loc[:, key].str.match(
+                    filter_item.value
+                )
             else:
-                bool_filter = bool_filter & (self._df[key] == filter_item.value)
-        return self._df[bool_filter]
+                bool_filter = bool_filter & (self._df.loc[:, key] == filter_item.value)
+        return self._df.loc[bool_filter]
 
     def __str__(self) -> str:
         return self._filter_dict.__str__()
@@ -256,42 +263,64 @@ class OppFilter:
         return ret
 
 
-class OppAttributes(dict):
+class OppAttributes:
     """
-    OMNeT++ Attributes for vectors, scalars and histograms
+    Helper to access Attributes from OMNeT++ DataFrame
     """
 
-    def __init__(self, _opp_attr_dict, obj):
-        # self._opp_attr_dict = attribute_dict
-        super(OppAttributes, self).__init__(_opp_attr_dict)
-        self._obj = obj
+    def __init__(self, df):
+        self._df = df
 
-    def run(self, run_id):
-        return self.get(run_id, {})
+    def run_parameter(self, run):
+        ret = self._df.loc[
+            (self._df["run"] == run) & (self._df["type"] == "param"),
+            ("attrname", "attrvalue"),
+        ]
+        if ret.shape[0] == 0:
+            raise ValueError(f"no data for run={run}")
+        return ret
 
-    def module_attr(self, df_row_label):
-        """
-        :param df_row_label: row label (loc) of data frame.
-        :return: attribute dictionary for given row label or empty dictionary if not found.
-        """
-        try:
-            full_data_path = (
-                self._obj.loc[df_row_label]["module"]
-                + "."
-                + self._obj.loc[df_row_label]["name"]
+    def run_parameter_dict(self, run):
+        ret = self.run_parameter(run)
+        return {r[1][0]: r[1][1] for r in ret.iterrows()}
+
+    def run_attr(self, run):
+        ret = self._df.loc[
+            (self._df["run"] == run) & (self._df["type"] == "runattr"),
+            ("attrname", "attrvalue"),
+        ]
+        if ret.shape[0] == 0:
+            raise ValueError(f"no data for run={run}")
+        return ret
+
+    def run_attr_dict(self, run):
+        ret = self.run_attr(run)
+        return {r[1][0]: r[1][1] for r in ret.iterrows()}
+
+    def statistics_meta_data(self, run, module, stat_name):
+        r = {
+            "run": run,
+            "module": module,
+            "name": stat_name,
+            "title": "???",
+            "unit": "???",
+        }
+        ret = self._df.loc[
+            (self._df["run"] == run)
+            & (self._df["type"] == "attr")
+            & (self._df["module"] == module)
+            & (self._df["name"] == stat_name),
+            ("attrname", "attrvalue"),
+        ]
+        if ret.shape[0] == 0:
+            raise ValueError(
+                f"no meta data for run={run}, module={module}, name={stat_name}"
             )
-            return self.run(self._obj.loc[df_row_label]["run"]).get(full_data_path, {})
-        except:
-            return {}
+        r.update({r[1][0]: r[1][1] for r in ret.iterrows()})
+        return r
 
     def attr_for_series(self, s: pd.Series):
-        return self.module_attr(s.name)
-
-    def unit(self, df_row_label):
-        return self.module_attr(df_row_label).get("unit", "???")
-
-    def title(self, df_row_label):
-        return self.module_attr(df_row_label).get("title", "???")
+        return self.statistics_meta_data(run=s.run, module=s.module, stat_name=s.name)
 
 
 class OppPlot:
@@ -349,8 +378,9 @@ class OppPlot:
 
     def _set_labels(self, ax: plt.axes, s: pd.Series, xlabel="time [s]"):
         ax.set_xlabel(xlabel)
-        ax.set_ylabel(f"[{self._opp.attr.unit(s.name)}]")
-        ax.set_title(self._opp.attr.title(s.name))
+        attr = self._opp.attr_for_series(s)
+        ax.set_ylabel(f"[{attr['unit']}]")
+        ax.set_title(attr["title"])
 
     def create_time_series(self, ax: plt.axes, s: pd.Series, *args, **kwargs):
         self._set_labels(ax, s)
@@ -362,8 +392,9 @@ class OppPlot:
         ax.hist(
             s.vecvalue, bins, density=True,
         )
-        ax.set_title(self._opp.attr.title(s.name))
-        ax.set_xlabel(f"[{self._opp.attr.unit(s.name)}]")
+        attr = self._opp.attr_for_series(s)
+        ax.set_title(attr["title"])
+        ax.set_xlabel(f"[{attr['unit']}]")
 
 
 @pd.api.extensions.register_dataframe_accessor("opp")
@@ -382,67 +413,90 @@ class OppAccessor:
         self._obj: pd.DataFrame = pandas_obj
         self.plot: OppPlot = OppPlot(self)
         self.tex: OppTex = OppTex(self)
+        self.attr: OppAttributes = OppAttributes(self)
 
-        # subset of attribute information
-        run_cnf = self._obj.loc[
-            (self._obj.type == "runattr")
-            | (self._obj.type == "param")
-            | (self._obj.type == "itervar"),
-            ["run", "type", "attrname", "attrvalue"],
-        ]
+    # @property
+    # def plot(self):
+    #     if self._plot is None:
+    #         raise ValueError(
+    #             "OppAccessor not fully initialized. Did you call opp.pre_process()?"
+    #         )
+    #     return self._plot
+    #
+    # @property
+    # def tex(self):
+    #     if self._tex is None:
+    #         raise ValueError(
+    #             "OppAccessor not fully initialized. Did you call opp.pre_process()?"
+    #         )
+    #     return self._tex
 
-        self._obj.drop(self._obj.loc[(self._obj.type == "runattr")].index, inplace=True)
-        self._obj.drop(self._obj.loc[(self._obj.type == "param")].index, inplace=True)
-        self._obj.drop(self._obj.loc[(self._obj.type == "itervar")].index, inplace=True)
-
-        attr = self._obj.loc[
-            self._obj.type == "attr", ["run", "module", "name", "attrname", "attrvalue"]
-        ]
-        attr["full_data_path"] = attr.module + "." + attr.name
-
-        # drop rows with attribute information
-        self._obj.drop(self._obj.loc[self._obj.type == "attr"].index, inplace=True)
-
-        # add run_id column
-        self._obj["run_id"] = self._obj["run"]
-        runs = self._obj["run_id"].unique()
-        runs.sort()
-        self._obj["run_id"] = self._obj["run_id"].apply(
-            lambda x: np.where(runs == x)[0][0]
-        )
-
-        _opp_attr_dict = {}
-        for _, row in run_cnf.iterrows():
-            # get dictionary for run or create new one
-            run_dict = _opp_attr_dict.get(row["run"], {})
-
-            # write item
-            item = run_dict.get(row["type"], {})
-            item.setdefault(row["attrname"], row["attrvalue"])
-
-            # write back
-            run_dict.setdefault(row["type"], item)
-            _opp_attr_dict.setdefault(row["run"], run_dict)
-
-        for _, row in attr.iterrows():
-            # get dictionary for run or create new one
-            run_dict = _opp_attr_dict.get(row["run"], {})
-
-            # write item
-            item = run_dict.get(row["full_data_path"], {})
-            item.setdefault(row["attrname"], row["attrvalue"])
-            item.setdefault("module", row["module"])
-            item.setdefault("name", row["name"])
-
-            # write back
-            run_dict.setdefault(row["full_data_path"], item)
-            _opp_attr_dict.setdefault(row["run"], run_dict)
-
-        # run->runattr->{all run attributes for run}
-        # run->full_data_path->{all attributes for full_module_path in run}
-        # full_data_path is the combination of "<module>.<name>" columns were name is the name of the data point.
-        self.attr: OppAttributes = OppAttributes(_opp_attr_dict, self._obj)
-        print("OppAccessor initialized")
+    #
+    # def pre_process(self):
+    #     """
+    #     :return: returns copy!
+    #     """
+    #     # subset of attribute information
+    #     run_cnf = self._obj.loc[
+    #         (self._obj.type == "runattr")
+    #         | (self._obj.type == "param")
+    #         | (self._obj.type == "itervar"),
+    #         ["run", "type", "attrname", "attrvalue"],
+    #     ]
+    #
+    #     self._obj.drop(self._obj.loc[(self._obj.type == "runattr")].index, inplace=True)
+    #     self._obj.drop(self._obj.loc[(self._obj.type == "param")].index, inplace=True)
+    #     self._obj.drop(self._obj.loc[(self._obj.type == "itervar")].index, inplace=True)
+    #
+    #     attr = self._obj.loc[
+    #         self._obj.type == "attr", ["run", "module", "name", "attrname", "attrvalue"]
+    #     ]
+    #     attr["full_data_path"] = attr.module + "." + attr.name
+    #
+    #     # drop rows with attribute information
+    #     self._obj.drop(self._obj.loc[self._obj.type == "attr"].index, inplace=True)
+    #
+    #     # add run_id column
+    #     self._obj["run_id"] = self._obj["run"].copy()
+    #     runs = self._obj["run_id"].unique()
+    #     runs.sort()
+    #     self._obj["run_id"] = self._obj["run_id"].apply(
+    #         lambda x: np.where(runs == x)[0][0]
+    #     )
+    #
+    #     _opp_attr_dict = {}
+    #     for _, row in run_cnf.iterrows():
+    #         # get dictionary for run or create new one
+    #         run_dict = _opp_attr_dict.get(row["run"], {})
+    #
+    #         # write item
+    #         item = run_dict.get(row["type"], {})
+    #         item.setdefault(row["attrname"], row["attrvalue"])
+    #
+    #         # write back
+    #         run_dict.setdefault(row["type"], item)
+    #         _opp_attr_dict.setdefault(row["run"], run_dict)
+    #
+    #     for _, row in attr.iterrows():
+    #         # get dictionary for run or create new one
+    #         run_dict = _opp_attr_dict.get(row["run"], {})
+    #
+    #         # write item
+    #         item = run_dict.get(row["full_data_path"], {})
+    #         item.setdefault(row["attrname"], row["attrvalue"])
+    #         item.setdefault("module", row["module"])
+    #         item.setdefault("name", row["name"])
+    #
+    #         # write back
+    #         run_dict.setdefault(row["full_data_path"], item)
+    #         _opp_attr_dict.setdefault(row["run"], run_dict)
+    #
+    #     # run->runattr->{all run attributes for run}
+    #     # run->full_data_path->{all attributes for full_module_path in run}
+    #     # full_data_path is the combination of "<module>.<name>" columns were name is the name of the data point.
+    #     self.attr: OppAttributes = OppAttributes(_opp_attr_dict, self._obj)
+    #     print("OppAccessor initialized")
+    #     return self._obj.copy()
 
     @staticmethod
     def _validate(obj: pd.DataFrame):
@@ -465,8 +519,8 @@ class OppAccessor:
         ret.sort()
         return ret
 
-    def filter(self, f: OppFilter = None):
+    def filter(self, f: OppFilter = None, data_only=True):
         if f is not None:
             return f.apply(self._obj)
         else:
-            return OppFilter(self._obj)
+            return OppFilter(self._obj, data_only)

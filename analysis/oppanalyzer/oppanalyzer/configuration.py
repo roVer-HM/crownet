@@ -1,5 +1,6 @@
 import os
 import subprocess
+from pathlib import Path
 
 _default_scavetool_cmd = "scavetool"
 _default_use_docker_container = True
@@ -11,9 +12,16 @@ if "ROVER_MAIN" in os.environ:
     )
 else:
 
-    _default_rover_main = os.path.join(os.environ.get("HOME"), "rover-main")
-    print(f"ROVER_MAIN not set, use  default {_default_rover_main}")
-    _default_opp_container_path = "omnetpp"
+    _default_rover_main = os.path.join(str(Path.home().absolute()), "rover-main")
+    if not os.path.exists(_default_rover_main):
+        print(
+            f"ROVER_MAIN not set and not in default location. Deactivate docker support"
+        )
+        _default_use_docker_container = False
+        _default_opp_container_path = ""
+    else:
+        print(f"ROVER_MAIN not set, use  default {_default_rover_main}")
+        os.path.join(os.environ.get("ROVER_MAIN"), "scripts/omnetpp")
 
 
 class ConfigException(Exception):
