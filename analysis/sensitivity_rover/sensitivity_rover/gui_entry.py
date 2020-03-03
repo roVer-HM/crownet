@@ -96,7 +96,12 @@ class SensitivityAnalysisGui:
 
     def __define_parameters(self):
         print("Define parameters")
-        self.preprocess.extract_variables()
+
+        if  self.preprocess.getProjectStatus().Parameter == "none":
+            self.preprocess.extract_variables()
+        else:
+            omnett_index, vadere_index = self.preprocess.findVariableIndex()
+            self.preprocess.extract_variables_update(omnett_index, vadere_index)
         self.update_buttons()
 
 
