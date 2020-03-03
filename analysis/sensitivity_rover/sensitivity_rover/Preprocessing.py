@@ -366,7 +366,7 @@ class Project:
     def findOldVariablesInNewFile(self):
 
         # get lines to be found
-        default_omnetpp, default_vadere, index_omnetpp, index_vadere = self.get_default_values()
+        default_omnetpp, default_vadere, index_omnetpp, index_vadere,__,__ = self.get_default_values()
 
         omnetpp, vadere = self.createSample(default_omnetpp, default_vadere)
         omnetpp = omnetpp.splitlines()
@@ -428,7 +428,6 @@ class Project:
 
     def createSample(self, default_omnetpp, default_vadere, folder = "simulation" ):
 
-       # file = os.path.join(self.dirname, folder + "/input/omnetpp.ini")
         file = self.__get_ini_files_in_simulation("simulation","ini")
         with open(file) as f:
             sample_omnettpp = f.read()
@@ -436,7 +435,6 @@ class Project:
         for k in range(len(default_omnetpp) ):
             sample_omnettpp = sample_omnettpp.replace( "VARIABLE" + str(k) , default_omnetpp[k] )
 
-        #file = os.path.join(self.dirname, folder + "/input/vadere.scenario")
         file = self.__get_ini_files_in_simulation("simulation", "scenario")
         with open(file) as f:
             sample_vadere = f.read()
@@ -449,7 +447,7 @@ class Project:
     def createSampling(self):
 
         default_omnetpp, default_vadere, __, __, var_omnetpp, var_vadere = self.get_default_values()
-        file_sampling = os.path.join( self.dirname , "sampling.dat" )
+        file_sampling = os.path.join( self.dirname , "parameter_ranges.dat")
 
         sampling = Sampling(default_omnetpp, default_vadere, var_omnetpp, var_vadere ,file_sampling  )
 
@@ -462,30 +460,39 @@ class Project:
 
         self.createParametercombinations(state_omnett, ranges_omnett, state_vadere, ranges_vadere)
 
-        self.status.Sampling = "yes"
+        if os.path.exists(os.path.join(self.dirname,"parameter_ranges.dat")) and os.path.exists(os.path.join(self.dirname,"sampling.dat")):
+            self.status.Sampling = "yes"
+        else:
+            self.status.Sampling = "none"
+
         self.status.write_status()
 
-    def __read_sampleNrs_Method(self):
-
-        filename = os.path.join(self.dirname, "samples.dat")
-        f = open(filename, "r+")
-        text = f.read().splitlines()
-        method = text[0].split(",")[0]
-        samples = text[0].split(",")[1]
-        samples = samples.split(" number of samples: ")[1]
-
-        return method, int(samples)
+    # def __read_sampleNrs_Method(self):
+    #
+    #     filename = os.path.join(self.dirname, "sampling.dat")
+    #     f = open(filename, "r+")
+    #     text = f.read().splitlines()
+    #     samples = text[0].split(",")[0]
+    #     method = text[0].split(",")[1]
+    #     method = method.split(" number of samples: ")[1]
+    #
+    #     return method, int(samples)
 
     def createParametercombinations(self, state_omnett, ranges_omnett, state_vadere, ranges_vadere):
 
         samplingMethod = SamplingMethod(self.dirname)
         samplingMethod.create()
-        method, samples = samplingMethod.read()
-        samples = int(samples)
-
+        samples, method = samplingMethod.read()
 
         if method == "Latin Hypercube":
-            l  = lhs( len(state_omnett) + len(state_vadere) , samples )
+            self.create_Latin_Hypercube(state_omnett, ranges_omnett, state_vadere, ranges_vadere, samples, method)
+
+
+
+    def create_Latin_Hypercube(self, state_omnett, ranges_omnett, state_vadere, ranges_vadere, samples, method):
+
+
+        l = lhs(len(state_omnett) + len(state_vadere), samples)
 
         ranges_omnett.extend(ranges_vadere)
         ranges = ranges_omnett
@@ -495,12 +502,10 @@ class Project:
         for item in l:
             scaled_lhs.append( self.scale_to_parameter_space(item, ranges) )
 
-        print("----------")
 
-        filename = os.path.join( self.dirname, "samples.dat")
+        filename = os.path.join( self.dirname, "sampling.dat")
         f = open(filename, "w+")
         f.write(method + ", number of samples: " + str(samples) + "\n")
-
 
 
         k = 0
@@ -555,10 +560,14 @@ class Project:
 
 
 
-
-
-
     def prepare_runs(self ,samples_omnet, samples_vadere):
+
+        for folder in os.listdir(self.dirname):
+
+            if "run__" in folder:
+                print(folder)
+                shutil.rmtree(os.path.join(self.dirname,folder),ignore_errors=True)
+
 
         for k in range( len(samples_omnet) ):
 
@@ -579,19 +588,8 @@ class Project:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     def readParametercombinations(self):
-        filename = os.path.join(self.dirname, "samples.dat")
+        filename = os.path.join(self.dirname, "sampling.dat")
 
         with open(filename) as f:
             values = f.read().splitlines()
@@ -620,10 +618,8 @@ class Project:
             samples_omnet.append(line[:aa])
             samples_vadere.append(line[aa:])
 
-        print(samples_omnet)
-        print(samples_vadere)
-
-
+        #print(samples_omnet)
+        #print(samples_vadere)
 
         return samples_omnet, samples_vadere
 
@@ -638,7 +634,7 @@ class Project:
             value = range_s[0] + ( range_s[1] - range_s[0] ) * sample[k]
             scaled_sample.append( value )
 
-        print(scaled_sample)
+        #print(scaled_sample)
         return scaled_sample
 
 
@@ -930,7 +926,7 @@ class Sampling:
         state_vadere = []
         ranges_vadere = []
 
-        p = re.compile(r'(\d+(?:\.\d+)?)')  # Compile a pattern to capture float values
+        p = re.compile(r'([+-]?\d+(?:\.\d+)?)')  # Compile a pattern to capture float values
 
         for line in text:
             line = line.split(" : ")
@@ -1057,20 +1053,20 @@ class SamplingMethod():
 
     def read(self):
 
-        filename = os.path.join(self.dirname, "samples.dat")
+        filename = os.path.join(self.dirname, "sampling.dat")
         f = open(filename, "r+")
         text = f.read().splitlines()
         method = text[0].split(",")[0]
         numbers = text[0].split(",")[1]
         numbers = numbers.split(" number of samples: ")[1]
-        return numbers, method
+        return int(numbers), method
 
 
 
 
     def create(self):
 
-        if os.path.exists(os.path.join(self.dirname, "samples.dat")) == True:
+        if os.path.exists(os.path.join(self.dirname, "sampling.dat")) == True:
             samples, method = self.read()
         else:
             samples = None
@@ -1078,28 +1074,35 @@ class SamplingMethod():
 
         self.master = tkinter.Tk()
         self.master.title("Sampling method")
+        self.master.geometry("500x200")
 
         label = tkinter.Label(self.master, text = "Number of samples").grid(sticky="w", row=0, column=0)
         self.entry = tkinter.Entry(self.master)
         if samples is not None:
             self.entry.insert("end", str(samples))
+        else:
+            self.entry.insert("end", "100")
         self.entry.grid(row=0, column=1)
 
 
         self.method = tkinter.StringVar(self.master)
         if method is not None:
             self.method.set(method)
+        else:
+            self.method.set("Latin Hypercube")
         label = tkinter.Label(self.master, text="Sampling method").grid(sticky="w", row=1, column=0)
         menu = tkinter.OptionMenu(self.master, self.method, "Latin Hypercube", "other").grid(row=1, column=1)
 
 
         greenbutton = tkinter.Button(self.master, text="Save", command=lambda: self.getMethod() ).grid(sticky="w", row=2, column=1)
 
+        self.master.mainloop()
+
     def getMethod(self):
         method = self.method.get()
         samples = self.entry.get()
 
-        filename = os.path.join(self.dirname, "samples.dat")
+        filename = os.path.join(self.dirname, "sampling.dat")
         f = open(filename, "w+")
         f.write(method + ", number of samples: " + samples + "\n" )
         f.close()
