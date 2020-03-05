@@ -38,8 +38,8 @@ rover/**/legacy
 rover/**/.qtenvrc
 rover/**/.cmdenv-log
 rover/**/*.log
-rover/**/simulations/*/*.png
-rover/**/simulations/*/*.pdf
+rover/**/simulations/*/plots/*.png
+rover/**/simulations/*/plots/*.pdf
 rover/**/venv
 
 # Python
