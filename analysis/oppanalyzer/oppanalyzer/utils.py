@@ -168,7 +168,7 @@ class ScaveTool:
     def export_cmd(
             self, input_paths, output, scave_filter=None, recursive=True, options=None
     ):
-        cmd = self._SCAVE_TOOL
+        cmd = self._SCAVE_TOOL[:]
         cmd.append(self._EXPORT)
         cmd.append(self._OUTPUT)
         cmd.append(output)
