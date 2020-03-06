@@ -19,6 +19,7 @@ package rover.simulations.networks;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.node.inet.AdhocHost;
 import org.car2x.veins.subprojects.veins_inet.VeinsInetPerson;
+import inet.physicallayer.contract.packetlevel.IRadioMedium;
 import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import inet.visualizer.contract.IIntegratedVisualizer;
 import org.car2x.veins.modules.mobility.traci.ITraCIManager;
@@ -34,7 +35,7 @@ network IEEE80211_AdHoc
             parameters:
                 @display("p=298,23;is=s");
         }
-        radioMedium: Ieee80211ScalarRadioMedium {
+        radioMedium: <default(Ieee80211ScalarRadioMedium)> like IRadioMedium {
             parameters:
                 @display("p=217,65;is=s");
         }

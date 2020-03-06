@@ -28,15 +28,23 @@ enum DetourPktType {
 	PROPAGATE = 1;
 }
 
+class CurrentLocationTag extends inet::TagBase
+{
+    inet::Coord location;
+}
+
 class DetourAppPacket extends inet::ApplicationPacket
 {
  	   string incidentReason;
- 	   simtime_t incidentTime;
  	   simtime_t repeatTime;
  	   simtime_t repeateInterval = 20.0;
  	   string closedTarget;
  	   string alternativeRoute[];
- 	   inet::Coord incidentOrigin;
+ 	   simtime_t firstHopTime;
+ 	   uint32_t firstHopId;
+ 	   inet::Coord firstHopOrigin;
+ 	   simtime_t lastHopTime;
+ 	   uint32_t lastHopId;
  	   inet::Coord lastHopOrigin;
  	   DetourPktType type;
 }
