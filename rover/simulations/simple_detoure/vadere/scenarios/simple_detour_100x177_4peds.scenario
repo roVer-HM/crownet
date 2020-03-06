@@ -140,7 +140,7 @@
             "y" : 44.0
           } ]
         },
-        "id" : 3
+        "id" : 12
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -157,86 +157,77 @@
             "x" : 10.0,
             "y" : 71.0
           } ]
+        },
+        "id" : 13
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 0.3,
+            "y" : 50.4
+          }, {
+            "x" : 0.3,
+            "y" : 22.0
+          }, {
+            "x" : 17.5,
+            "y" : 22.0
+          }, {
+            "x" : 17.5,
+            "y" : 50.4
+          } ]
+        },
+        "id" : 5009
+      }, {
+        "shape" : {
+          "x" : -0.4,
+          "y" : 20.1,
+          "width" : 20.5,
+          "height" : 2.9,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      }, {
+        "shape" : {
+          "x" : 24.9,
+          "y" : 20.007617896009677,
+          "width" : 126.99052806952889,
+          "height" : 2.9790810157194727,
+          "type" : "RECTANGLE"
+        },
+        "id" : 3
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 55.0,
+            "y" : 50.0
+          }, {
+            "x" : 55.0,
+            "y" : 22.0
+          }, {
+            "x" : 95.0,
+            "y" : 22.0
+          }, {
+            "x" : 95.0,
+            "y" : 50.0
+          } ]
+        },
+        "id" : 5002
+      }, {
+        "shape" : {
+          "x" : 157.0012091898428,
+          "y" : 20.0,
+          "width" : 19.84943688533687,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 152.0,
-            "y" : 20.0
-          }, {
-            "x" : 152.0,
-            "y" : 23.0
-          }, {
-            "x" : 95.0,
-            "y" : 23.0
-          }, {
-            "x" : 95.0,
-            "y" : 50.0
-          }, {
-            "x" : 55.0,
-            "y" : 50.0
-          }, {
-            "x" : 55.0,
-            "y" : 23.0
-          }, {
-            "x" : 25.0,
-            "y" : 23.0
-          }, {
-            "x" : 25.0,
-            "y" : 20.0
-          } ]
-        },
-        "id" : 5
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 0.0,
-            "y" : 23.0
-          }, {
-            "x" : 0.0,
-            "y" : 20.0
-          }, {
-            "x" : 20.0,
-            "y" : 20.0
-          }, {
-            "x" : 20.0,
-            "y" : 23.0
-          }, {
-            "x" : 17.5,
-            "y" : 23.0
-          }, {
-            "x" : 17.5,
-            "y" : 50.4
-          }, {
-            "x" : 0.3,
-            "y" : 50.4
-          }, {
-            "x" : 0.3,
-            "y" : 23.0
-          } ]
-        },
-        "id" : 6
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 157.0,
-            "y" : 23.0
-          }, {
-            "x" : 157.0,
-            "y" : 20.0
-          }, {
-            "x" : 177.0,
-            "y" : 20.0
-          }, {
-            "x" : 177.0,
-            "y" : 23.0
-          }, {
             "x" : 176.5,
-            "y" : 23.0
+            "y" : 22.0
           }, {
             "x" : 176.5,
             "y" : 50.4
@@ -244,11 +235,11 @@
             "x" : 159.3,
             "y" : 50.4
           }, {
-            "x" : 159.3,
-            "y" : 23.0
+            "x" : 159.0,
+            "y" : 22.0
           } ]
         },
-        "id" : 7
+        "id" : 11
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -329,11 +320,11 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : 75,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
+        "distributionParameters" : [ 40.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : 4,
+        "startTime" : 5.0,
+        "endTime" : 500.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -371,11 +362,11 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : 75,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
+        "distributionParameters" : [ 40.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : 4,
+        "startTime" : 3.0,
+        "endTime" : 500.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -392,11 +383,11 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
+        "distributionParameters" : [ 40.0 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 75,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
+        "maxSpawnNumberTotal" : 4,
+        "startTime" : 13.0,
+        "endTime" : 500.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
