@@ -14,10 +14,17 @@ class OppFilterItem:
     Filter item applicable to OMNeT++ based data frame. #name corresponds to column of df.
     """
 
+    @classmethod
+    def list_filter(cls, name, value):
+        ret = cls(name, value, regex=False)
+        ret.is_list = True
+        return ret
+
     def __init__(self, name, value, regex):
         self.name = name
         self.value = value
         self.regex = regex
+        self.is_list = False
 
     def __str__(self):
         return self.value
@@ -26,6 +33,45 @@ class OppFilterItem:
         return (
             f"FilterItem(name: {self.name}, value: {self.value}, regex: {self.regex})"
         )
+
+
+class Opp:
+    @staticmethod
+    def module_path(m_path, index, tuple_on_vector=False):
+        """
+
+        :param m_path: some string representing a module name. Each path element is separated by dots
+        :param index: 0-Based index of path element to return
+        :param tuple_on_vector: If true a vector path element is returned as a tuple. Otherwise as a string
+        :return: string of module path element or
+                 tuple if tuple_on_vector is true an selected path element is a vector or
+                 full path as list of tuples of size 1 or 2.
+        """
+        items = m_path.split(".")
+        if index > len(items):
+            raise IndexError(f"m_path has no index {index}. Path was {m_path}")
+        match = re.compile("(?P<base>.*?)(?P<vector>\[\d+\])")
+        path_list = []
+        for i in items:
+            m = match.findall(i)
+            if m:
+                path_list.append((m[0][0], m[0][1]))
+            else:
+                path_list.append((i,))
+        if index == -1:
+            return path_list
+
+        ret = path_list[index]
+        if tuple_on_vector:
+            if len(ret) == 2:
+                return ret
+            else:
+                return f"{ret[0]}{ret[1]}"
+        else:
+            if len(ret) == 2:
+                return f"{ret[0]}{ret[1]}"
+            else:
+                return ret[0]
 
 
 class OppTex:
@@ -192,6 +238,10 @@ class OppFilter:
     def _add_filter(self, f: OppFilterItem):
         self._filter_dict[f.name] = f
 
+    def name_in(self, name_list):
+        self._add_filter(OppFilterItem.list_filter("name", name_list))
+        return self
+
     def name(self, name):
         self._add_filter(OppFilterItem("name", name, False))
         return self
@@ -218,6 +268,10 @@ class OppFilter:
         self._add_filter(OppFilterItem("module", module, False))
         return self
 
+    def module_in(self, module_list):
+        self._add_filter(OppFilterItem.list_filter("module", module_list))
+        return self
+
     def module_regex(self, module: str, allow_number_range=True):
         if allow_number_range:
             module = self._apply_number_range(module)
@@ -233,7 +287,7 @@ class OppFilter:
         self._add_filter(OppFilterItem("type", "vector", False))
         return self
 
-    def apply(self, df: pd.DataFrame = None):
+    def apply(self, df: pd.DataFrame = None, columns=None, copy=False):
 
         if df is not None:
             self._df = df
@@ -249,9 +303,18 @@ class OppFilter:
                 bool_filter = bool_filter & self._df.loc[:, key].str.match(
                     filter_item.value
                 )
+            elif filter_item.is_list:
+                bool_filter = bool_filter & (
+                    self._df.loc[:, key].isin(filter_item.value)
+                )
             else:
                 bool_filter = bool_filter & (self._df.loc[:, key] == filter_item.value)
-        return self._df.loc[bool_filter]
+        if columns is not None:
+            ret = self._df.loc[bool_filter, columns]
+        else:
+            ret = self._df.loc[bool_filter]
+
+        return ret.copy() if copy else ret
 
     def __str__(self) -> str:
         return self._filter_dict.__str__()
@@ -320,7 +383,9 @@ class OppAttributes:
         return r
 
     def attr_for_series(self, s: pd.Series):
-        return self.statistics_meta_data(run=s.run, module=s.module, stat_name=s.name)
+        return self.statistics_meta_data(
+            run=s["run"], module=s["module"], stat_name=s["name"]
+        )
 
 
 class OppPlot:
@@ -388,11 +453,25 @@ class OppPlot:
             kwargs.setdefault("label", self.create_label(s.module, []))
         ax.plot(s.vectime, s.vecvalue, **self.plt_args(idx=0, **kwargs))
 
-    def create_histogram(self, ax: plt.axes, s: pd.Series, bins=40):
+    def create_histogram(
+        self,
+        ax: plt.axes,
+        s: pd.Series,
+        bins=40,
+        use_path_in_title=-1,
+        attr_override=None,
+    ):
         ax.hist(
             s.vecvalue, bins, density=True,
         )
-        attr = self._opp.attr_for_series(s)
+        attr = self._opp.attr.attr_for_series(s)
+        if attr_override is not None:
+            attr.update(attr_override)
+        if use_path_in_title != -1:
+            attr[
+                "title"
+            ] += f" - {Opp.module_path(s['module'], use_path_in_title, tuple_on_vector=False)}"
+
         ax.set_title(attr["title"])
         ax.set_xlabel(f"[{attr['unit']}]")
 
@@ -413,7 +492,7 @@ class OppAccessor:
         self._obj: pd.DataFrame = pandas_obj
         self.plot: OppPlot = OppPlot(self)
         self.tex: OppTex = OppTex(self)
-        self.attr: OppAttributes = OppAttributes(self)
+        self.attr: OppAttributes = OppAttributes(self._obj)
 
     # @property
     # def plot(self):
