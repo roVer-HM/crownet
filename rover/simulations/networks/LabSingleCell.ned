@@ -22,20 +22,12 @@ import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
 
 
-network LabSingleCell
+network LabSingleCellBase
 {
     parameters:
         int numUe = default(1);
-        @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");
-    types:
-        channel Eth1GMetered extends ThruputMeteringChannel
-        {
-            // delay = 25us;
-            // adapted to lab measurements: approx. 500us
-            delay = 500us;
-            datarate = 1024Mbps;
-            thruputDisplayFormat = "u";
-        }
+        @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");       
+          
     submodules:
         channelControl: LteChannelControl {
             @display("p=8,1;is=s");
@@ -66,8 +58,51 @@ network LabSingleCell
         ue[numUe]: Ue {
             @display("p=6,3");
         }
-    connections:
+}
+
+network LabSingleCell extends LabSingleCellBase
+{
+        types:
+            channel Eth1GMetered extends ThruputMeteringChannel
+            {
+                datarate = 1024Mbps;
+                thruputDisplayFormat = "u";
+            }
+    
+        connections:
         server.pppg++ <--> Eth1GMetered <--> router.pppg++;
         router.pppg++ <--> Eth1GMetered <--> pgw.filterGate;
         pgw.pppg++ <--> Eth1GMetered <--> eNB.ppp; 
+}
+
+network LabSingleCellAdaptedRB25 extends LabSingleCellBase
+{
+        types:
+            channel Eth1GMeteredAdapted extends ThruputMeteringChannel
+            {
+                // adapted to lab measurements with 25 RBs: approx. 500us
+                delay = 500us;
+                datarate = 1024Mbps;
+                thruputDisplayFormat = "u";
+            }
+        connections:
+        server.pppg++ <--> Eth1GMeteredAdapted <--> router.pppg++;
+        router.pppg++ <--> Eth1GMeteredAdapted <--> pgw.filterGate;
+        pgw.pppg++ <--> Eth1GMeteredAdapted <--> eNB.ppp; 
+}
+
+network LabSingleCellAdaptedRB50 extends LabSingleCellBase
+{
+        types:
+            channel Eth1GMeteredAdapted extends ThruputMeteringChannel
+            {
+                // adapted to lab measurements with 50 RBs: approx. 733us
+                delay = 733us;
+                datarate = 1024Mbps;
+                thruputDisplayFormat = "u";
+            }
+        connections:
+        server.pppg++ <--> Eth1GMeteredAdapted <--> router.pppg++;
+        router.pppg++ <--> Eth1GMeteredAdapted <--> pgw.filterGate;
+        pgw.pppg++ <--> Eth1GMeteredAdapted <--> eNB.ppp; 
 }

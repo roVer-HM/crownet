@@ -2,8 +2,7 @@
 #
 # run all configurations/scenarios of this simulation
 
-confs=( OpenAirInterface-CAM-DL-1 OpenAirInterface-CAM-DL-2-1UE OpenAirInterface-CAM-DL-3 \
-        OpenAirInterface-CAM-UL-1 )
+confs=( S1 S1-UA S1-25 S1-25-UA S2 S2-UA S2-25 S2-25-UA S3 S3-UA)
 
 for i in "${confs[@]}"
 do
