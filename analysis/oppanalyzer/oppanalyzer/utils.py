@@ -14,6 +14,33 @@ import pandas as pd
 from .configuration import Config
 
 
+class OppDict(dict):
+    """
+    run1
+      -> runattr
+      -> param
+      -> mod1
+      -> mod2
+         -> module
+         -> name
+         -> title
+         -> interpolatin...
+      -> mod3
+    """
+
+    def __init__(self, df):
+        self._df = df
+
+    def __getitem__(self, k):
+        return super().__getitem__(k)
+
+    def __setitem__(self, k, v) -> None:
+        raise NotImplemented("Read Only Access")
+
+    def __delitem__(self, v) -> None:
+        raise NotImplemented("Read Only Access")
+
+
 def parse_if_number(s):
     try:
         return float(s)
@@ -95,7 +122,7 @@ class ScaveTool:
         :return:            pd.DataFrame with extra namespace 'opp' (an OppAccessor object with helpers)
         """
         df = pd.read_csv(csv_file, converters=self._converters())
-        df.opp.attr["csv_path"] = csv_file
+        # df.opp.attr["csv_path"] = csv_file
         return df
 
     def create_or_get_csv_file(
@@ -162,7 +189,8 @@ class ScaveTool:
         df = pd.read_csv(
             io.BytesIO(stdout), encoding="utf-8", converters=self._converters()
         )
-        df.opp.attr["cmd"] = cmd
+        df = df.opp.pre_process()
+        # df.opp.attr["cmd"] = cmd
         return df
 
     def export_cmd(
@@ -189,6 +217,8 @@ class ScaveTool:
         opp_result_files = [
             f for f in opp_result_files if f.endswith(".vec") or f.endswith(".sca")
         ]
+        log = "\n".join(opp_result_files)
+        logging.info(f"found *.vec and *.sca:\n {log}")
 
         cmd.extend(opp_result_files)
         return cmd

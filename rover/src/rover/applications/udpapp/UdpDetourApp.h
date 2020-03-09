@@ -53,6 +53,8 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   virtual Coord getCurrentLocation();
   virtual void actOnIncident(IntrusivePtr<const DetourAppPacket> pkt);
   virtual void sendPayload(IntrusivePtr<const DetourAppPacket> payload);
+  virtual void registerPropagationTimer(
+      IntrusivePtr<const DetourAppPacket> pkt);
 
   //  Finite State Machine setup omnetpp::cFSM fsm;
   omnetpp::cFSM fsm;

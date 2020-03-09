@@ -18,6 +18,7 @@
 #include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "rover/applications/udpapp/DetourAppPacket_m.h"
+#include "rover/common/Simsignals.h"
 
 using namespace inet;
 using omnetpp::cStringTokenizer;
@@ -38,7 +39,7 @@ void UdpDetourApp::initialize(int stage) {
   ApplicationBase::initialize(stage);
 
   if (stage == INITSTAGE_LOCAL) {
-    // Statistics
+    // GUI...
     numSent = 0;
     numReceived = 0;
     WATCH(numSent);
@@ -135,11 +136,7 @@ void UdpDetourApp::handleMessageWhenUp(cMessage *msg) {
   }
 }
 
-void UdpDetourApp::finish() {
-  recordScalar("packets sent", numSent);
-  recordScalar("packets received", numReceived);
-  ApplicationBase::finish();
-}
+void UdpDetourApp::finish() { ApplicationBase::finish(); }
 
 void UdpDetourApp::refreshDisplay() const {
   ApplicationBase::refreshDisplay();
@@ -213,6 +210,7 @@ void UdpDetourApp::handleCrashOperation(LifecycleOperation *operation) {
 }
 
 void UdpDetourApp::socketDataArrived(UdpSocket *socket, Packet *packet) {
+  emit(packetReceivedSignal, packet);
   IntrusivePtr<const DetourAppPacket> pkt =
       packet->popAtFront<DetourAppPacket>();
 
@@ -221,8 +219,10 @@ void UdpDetourApp::socketDataArrived(UdpSocket *socket, Packet *packet) {
   } else if (pkt->getType() == DetourPktType::PROPAGATE) {
     nextState = fsmPropagateRxExit(pkt);
   } else {
-    throw new cRuntimeError("DetorTags not found");
+    throw new cRuntimeError("DetourTags not found");
   }
+
+  delete packet;
 }
 
 void UdpDetourApp::socketErrorArrived(UdpSocket *socket,
@@ -255,7 +255,7 @@ void UdpDetourApp::actOnIncident(IntrusivePtr<const DetourAppPacket> pkt) {
 
 void UdpDetourApp::sendPayload(IntrusivePtr<const DetourAppPacket> payload) {
   std::ostringstream str;
-  str << payload->getIncidentReason() << "-" << numSent;
+  str << payload->getIncidentReason() << "_" << getId() << "#" << numSent;
   Packet *packet = new Packet(str.str().c_str());
   if (dontFragment) packet->addTag<FragmentationReq>()->setDontFragment(true);
   packet->insertAtBack(payload);
@@ -313,47 +313,31 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmSetupExit(cMessage *msg) {
 UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
   const auto &payload = makeShared<DetourAppPacket>();
   // application data
+  payload->setSequenceNumber(numSent);
+
+  payload->setChunkLength(B(par("messageLength")));  // do this first
+
   payload->setIncidentReason(reason.c_str());
-  payload->setIncidentTime(simTime());
   payload->setClosedTarget(closedTarget.c_str());
   payload->setAlternativeRouteArraySize(alternativeRoute.size());
   payload->setRepeatTime(repeatTime);
   payload->setRepeateInterval(par("repeateInterval").doubleValue());
-  payload->setIncidentOrigin(getCurrentLocation());
+  payload->setFirstHopTime(simTime());
+  payload->setFirstHopId(getId());
+  payload->setFirstHopOrigin(getCurrentLocation());
+  payload->setLastHopTime(simTime());
   payload->setLastHopOrigin(getCurrentLocation());
+  payload->setLastHopId(getId());
   payload->setType(DetourPktType::INCIDENT);
   for (int i = 0; i < alternativeRoute.size(); i++) {
     payload->setAlternativeRoute(i, alternativeRoute.at(i).c_str());
   }
-  payload->setSequenceNumber(numSent);
-  payload->setChunkLength(B(par("messageLength")));
+  payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
 
-  std::ostringstream str;
-  str << payload->getIncidentReason() << "-" << numSent;
-  Packet *pkt = new Packet(str.str().c_str());
-  if (dontFragment) pkt->addTag<FragmentationReq>()->setDontFragment(true);
-  pkt->insertAtBack(payload);
-  L3Address destAddr = destAddresses[0];
-  emit(packetSentSignal, pkt);
-
-  socket.sendTo(pkt, destAddr, destPort);
-  numSent++;
+  sendPayload(payload);
 
   // Setup Propagation
-  cMessage *propagationMsg = new cMessage(payload->getIncidentReason());
-  PropagationHandle newHandle{payload, propagationMsg,
-                              payload->getRepeatTime()};
-
-  propagationMsg->setKind(FsmStates::PROPAGATE_TX);
-  newHandle.restTime -= newHandle.pkt->getRepeateInterval();
-  simtime_t nextEvent = simTime() + newHandle.pkt->getRepeateInterval();
-  ASSERT(nextEvent > simTime());
-  scheduleAt(nextEvent, propagationMsg);
-
-  handlerMap.insert(std::pair<std::string, PropagationHandle>(
-      payload->getIncidentReason(), newHandle));
-
-  //  sendPayload(payload);
+  registerPropagationTimer(payload);
 
   return FsmStates::WAIT_ACTIVE;
 }
@@ -370,17 +354,7 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentRxExit(
     actOnIncident(pkt);
 
     // Setup Propagation
-    cMessage *msg = new cMessage(pkt->getIncidentReason());
-    PropagationHandle newHandle{pkt, msg, pkt->getRepeatTime()};
-
-    msg->setKind(FsmStates::PROPAGATE_TX);
-    newHandle.restTime -= newHandle.pkt->getRepeateInterval();
-    simtime_t nextEvent = simTime() + newHandle.pkt->getRepeateInterval();
-    ASSERT(nextEvent > simTime());
-    scheduleAt(nextEvent, msg);
-
-    handlerMap.insert(std::pair<std::string, PropagationHandle>(
-        pkt->getIncidentReason(), newHandle));
+    registerPropagationTimer(pkt);
   }
   return FsmStates::WAIT_ACTIVE;
 }
@@ -391,8 +365,10 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmPropagateTxExit(cMessage *msg) {
     // Propagate message
     ASSERT(msg == it->second.msg);
     auto payload = IntrusivePtr<DetourAppPacket>(it->second.pkt->dup());
-    payload->setLastHopOrigin(getCurrentLocation());
     payload->setSequenceNumber(numSent);
+    payload->setLastHopTime(simTime());
+    payload->setLastHopOrigin(getCurrentLocation());
+    payload->setLastHopId(getId());
     payload->setType(DetourPktType::PROPAGATE);
     sendPayload(payload);
 
@@ -422,6 +398,22 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmPropagateRxExit(
   // for now treat a Propagation Packet the same way as an Incided.
   // Meaning: act on incident if not seen before and setup propagation.
   return fsmIncidentRxExit(pkt);
+}
+
+void UdpDetourApp::registerPropagationTimer(
+    IntrusivePtr<const DetourAppPacket> pkt) {
+  // Setup Propagation
+  cMessage *msg = new cMessage(pkt->getIncidentReason());
+  PropagationHandle newHandle{pkt, msg, pkt->getRepeatTime()};
+
+  msg->setKind(FsmStates::PROPAGATE_TX);
+  newHandle.restTime -= newHandle.pkt->getRepeateInterval();
+  simtime_t nextEvent = simTime() + newHandle.pkt->getRepeateInterval();
+  ASSERT(nextEvent > simTime());
+  scheduleAt(nextEvent, msg);
+
+  handlerMap.insert(std::pair<std::string, PropagationHandle>(
+      pkt->getIncidentReason(), newHandle));
 }
 
 } /* namespace rover */
