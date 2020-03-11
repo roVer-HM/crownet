@@ -28,7 +28,7 @@ struct PropagationHandle {
 
 class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
  public:
-  UdpDetourApp() {}
+  UdpDetourApp(){};
   virtual ~UdpDetourApp();
 
  protected:
@@ -104,7 +104,6 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   simtime_t startTime;
   simtime_t stopTime;
   bool dontFragment = false;
-  const char *packetName = nullptr;
   simtime_t repeatTime;
   bool notifyMobilityProvider;
 };  // namespace rover
