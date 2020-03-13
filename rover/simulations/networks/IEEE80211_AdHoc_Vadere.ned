@@ -24,6 +24,7 @@ network IEEE80211_AdHoc_Vadere extends IEEE80211_AdHoc
     parameters:
         manager.typename = "TraCIScenarioManagerVadere";
         hostMobile[*].mobility.typename = "VaderePersonMobility";
+        hUeq[*].mobility.typename = "VaderePersonMobility";
 
     submodules:
         visualizer: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {

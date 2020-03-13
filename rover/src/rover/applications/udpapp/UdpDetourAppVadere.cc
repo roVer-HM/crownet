@@ -26,9 +26,9 @@ namespace rover {
 Define_Module(UdpDetourAppVadere);
 
 UdpDetourAppVadere::UdpDetourAppVadere()
-    : traciPerson(nullptr), mobility(nullptr), traci(nullptr) {}
+    : mobility(nullptr), traci(nullptr) {}
 
-UdpDetourAppVadere::~UdpDetourAppVadere() { delete traciPerson; }
+UdpDetourAppVadere::~UdpDetourAppVadere() { }
 
 void UdpDetourAppVadere::initialize(int stage) {
   UdpDetourApp::initialize(stage);
@@ -40,12 +40,13 @@ void UdpDetourAppVadere::initialize(int stage) {
         veins::VeinsInetMobilityAccess().get<veins::VaderePersonMobility*>(
             getParentModule());
     traci = mobility->getCommandInterface();
-    traciPerson = mobility->getPersonCommandInterface();
   }
 }
 
 void UdpDetourAppVadere::actOnIncident(
     IntrusivePtr<const DetourAppPacket> pkt) {
+
+  veins::VaderePersonItfc* traciPerson = mobility->getPersonCommandInterface();
   std::string blocked = std::string(pkt->getClosedTarget());
   std::vector<std::string> targetLists = traciPerson->getTargetList();
   if (std::find(targetLists.begin(), targetLists.end(), blocked) !=

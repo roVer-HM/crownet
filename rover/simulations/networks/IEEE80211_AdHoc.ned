@@ -23,12 +23,16 @@ import inet.physicallayer.contract.packetlevel.IRadioMedium;
 import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import inet.visualizer.contract.IIntegratedVisualizer;
 import org.car2x.veins.modules.mobility.traci.ITraCIManager;
+import rover.nodes.UnequippedHost;
+import org.car2x.veins.subprojects.veins_inet.mapping.NodeMappingDistribution;
 
 network IEEE80211_AdHoc
 {
     parameters:
         int numStationary = default(0);
         int numMobile = default(0);
+        int numUeq = default(0);
+        int numMappings = default(0);
 
     submodules:
         configurator: Ipv4NetworkConfigurator {
@@ -41,14 +45,21 @@ network IEEE80211_AdHoc
         }
         station[numStationary]: AdhocHost {
             parameters:
-                @display("r=,,#707070;p=453,75;i=device/accesspoint_s;t1=t");
+                @display("r=,,#707070;p=527,64;i=device/accesspoint_s;t1=t");
         }
         hostMobile[numMobile]: VeinsInetPerson {
             parameters:
                 @display("r=,,#707070;p=453,23;i=veins/node/pedestrian_s");
         }
+        hUeq[numUeq]: UnequippedHost {
+            parameters:
+                @display("r=,,#707070;p=380,76;i=rover/node/hostUnequipped_s");
+        }
         manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
             @display("p=218,23;is=s;i=block/square");
+        }
+        mappingDistribution[numMappings]: NodeMappingDistribution {
+            @display("p=357,207;is=s;i=block/square");
         }
 
 }
