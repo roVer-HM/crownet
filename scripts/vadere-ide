@@ -8,9 +8,8 @@ if [[ -z "$1" || "$1" == "exec" ]]; then
       VERSION=latest
       CONTNAME=$CONTNAME:$VERSION
 else
-      VERSION=omnetpp-$1
       SHORTNAME=$SHORTNAME-$1
-      CONTNAME=$CONTNAME
+      CONTNAME=$CONTNAME:$1
 fi
 
 if [[ "$1" == "exec" ]]; then
@@ -24,6 +23,8 @@ if [[ "$2" == "exec" ]]; then
 fi
 
 IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$CONTNAME
+
+echo "container> used image: $IMAGENAME"
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
