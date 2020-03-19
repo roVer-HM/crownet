@@ -21,16 +21,6 @@ using namespace inet;
 
 namespace rover {
 
-// struct IncidentRecord {
-//  long count;
-//  simtime_t incidentDelta;
-//  simtime_t incidentStartTime;
-//  simtime_t incidentReceivedTime;
-//  Coord incidentOrigin;
-//  Coord lastHopOrigin;
-//  Coord currentLocation;
-//};
-
 class IncidentRecorder : public cResultRecorder {
  protected:
   typedef std::map<opp_string, void *> IncidentVectors;

@@ -40,6 +40,16 @@ void UdpDetourAppVadere::initialize(int stage) {
         veins::VeinsInetMobilityAccess().get<veins::VaderePersonMobility*>(
             getParentModule());
     traci = mobility->getCommandInterface();
+
+    // record internal identifier for node.
+    std::string exId = mobility->getExternalId();
+    try {
+        recordScalar("externalId", std::stod(exId));
+    } catch (std::invalid_argument const &e){
+        throw cRuntimeError("Cannot convert given id '%s' to long", exId.c_str());
+    } catch (std::out_of_range const &e){
+        throw cRuntimeError("Given id '%s' out of range", exId.c_str());
+    }
   }
 }
 

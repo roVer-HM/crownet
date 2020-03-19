@@ -78,15 +78,9 @@ void UdpDetourApp::initialize(int stage) {
           "alternativeRoute. Some of these parameters are not set correctly");
     }
 
-    // check application penetration
-    double pRate = par("penetrationRate").doubleValue();
-    ASSERT(pRate >=0 && pRate <=1);
-    if (uniform(0.0, 1.0) > pRate){
-        startTime = -1.0; // deactivate application.
-        recordScalar("applicationActive", 0.0);
-    } else {
-        recordScalar("applicationActive", 1.0);
-    }
+    // record internal identifier for node.
+    recordScalar("internalId", getId());
+    recordScalar("moduleCreationTime", simTime().dbl(), "s");
 
     if (stopTime >= SIMTIME_ZERO && startTime >= SIMTIME_ZERO && stopTime < startTime)
       throw cRuntimeError("Invalid startTime/stopTime parameters");
@@ -193,18 +187,14 @@ void UdpDetourApp::setSocketOptions() {
 
 void UdpDetourApp::handleStartOperation(LifecycleOperation *operation) {
   // start application. startTime of -1.0 means deactivated application.
-    if (startTime >= SIMTIME_ZERO){
-        simtime_t start = std::max(startTime, simTime());
-        selfMsg->setKind(FsmStates::SETUP);
-        scheduleAt(start, selfMsg);
+    simtime_t start = std::max(startTime, simTime());
+    selfMsg->setKind(FsmStates::SETUP);
+    scheduleAt(start, selfMsg);
 
-        // start incidentTimer if node is the source of the information.
-        if (isSender()) {
-          selfMsgIncident->setKind(FsmStates::INCIDENT_TX);
-          scheduleAt(incidentTime, selfMsgIncident);
-        }
-    } else {
-        EV_INFO << "application deactivated. " << std::endl;
+    // start incidentTimer if node is the source of the information.
+    if (isSender()) {
+      selfMsgIncident->setKind(FsmStates::INCIDENT_TX);
+      scheduleAt(incidentTime, selfMsgIncident);
     }
 }
 
