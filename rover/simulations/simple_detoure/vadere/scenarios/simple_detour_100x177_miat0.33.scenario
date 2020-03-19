@@ -1,5 +1,5 @@
 {
-  "name" : "simple_detour_100x177_4peds",
+  "name" : "simple_detour_100x177_miat0.33",
   "description" : "",
   "release" : "1.11",
   "processWriters" : {
@@ -8,13 +8,17 @@
       "filename" : "postvis.traj",
       "processors" : [ 1, 2 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "startEndtime.csv",
+      "processors" : [ 5, 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "targetIds.csv",
       "processors" : [ 3 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "overlapCount.txt",
-      "processors" : [ 4 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
+      "filename" : "gridDensity.csv",
+      "processors" : [ 8 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -23,14 +27,20 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
       "id" : 3
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridCountingProcessor",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
       "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
+        "cellSize" : 15.0
       }
     } ],
     "isTimestamped" : true,
@@ -95,7 +105,7 @@
     "attributesSimulation" : {
       "finishTime" : 300.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.3,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -319,12 +329,12 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
+        "distributionParameters" : [ 0.33 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 4,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 5.0,
-        "endTime" : 500.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -340,12 +350,12 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
+        "distributionParameters" : [ 0.33 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 4,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 500.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -361,33 +371,33 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
+        "distributionParameters" : [ 0.33 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 4,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 3.0,
-        "endTime" : 500.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2001 ],
+        "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
         "id" : 3004,
         "shape" : {
-          "x" : 132.75,
-          "y" : 114.0,
+          "x" : 132.95,
+          "y" : 114.2,
           "width" : 44.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
+        "distributionParameters" : [ 0.33 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 4,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 13.0,
-        "endTime" : 500.0,
+        "endTime" : 300.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,

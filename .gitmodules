@@ -10,3 +10,6 @@
 [submodule "vadere"]
 	path = vadere
 	url = https://gitlab.lrz.de/vadere/vadere.git
+[submodule "analysis/roveranalyzer"]
+	path = analysis/roveranalyzer
+	url = ../../rover/roveranalyzer.git

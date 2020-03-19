@@ -28,7 +28,7 @@ struct PropagationHandle {
 
 class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
  public:
-  UdpDetourApp() {}
+  UdpDetourApp(){};
   virtual ~UdpDetourApp();
 
  protected:
@@ -53,6 +53,8 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   virtual Coord getCurrentLocation();
   virtual void actOnIncident(IntrusivePtr<const DetourAppPacket> pkt);
   virtual void sendPayload(IntrusivePtr<const DetourAppPacket> payload);
+  virtual void registerPropagationTimer(
+      IntrusivePtr<const DetourAppPacket> pkt);
 
   //  Finite State Machine setup omnetpp::cFSM fsm;
   omnetpp::cFSM fsm;
@@ -102,7 +104,6 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   simtime_t startTime;
   simtime_t stopTime;
   bool dontFragment = false;
-  const char *packetName = nullptr;
   simtime_t repeatTime;
   bool notifyMobilityProvider;
 };  // namespace rover

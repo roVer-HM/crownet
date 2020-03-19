@@ -34,7 +34,6 @@ class UdpDetourAppVadere : public UdpDetourApp {
   virtual void initialize(int stage) override;
   virtual void actOnIncident(IntrusivePtr<const DetourAppPacket> pkt) override;
 
-  veins::VaderePersonItfc* traciPerson;
   veins::VaderePersonMobility* mobility;
   veins::TraCICommandInterface* traci;
 
