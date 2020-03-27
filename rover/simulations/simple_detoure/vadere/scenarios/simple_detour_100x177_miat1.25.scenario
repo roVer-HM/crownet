@@ -19,6 +19,26 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
       "filename" : "gridDensity.csv",
       "processors" : [ 8 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "footsteps.csv",
+      "processors" : [ 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
+      "filename" : "Density_trias1.csv",
+      "processors" : [ 10 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "Mesh_trias1.txt",
+      "processors" : [ 11 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
+      "filename" : "Density_trias2.csv",
+      "processors" : [ 13 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "Mesh_trias2.txt",
+      "processors" : [ 12 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -40,7 +60,44 @@
       "id" : 8,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
       "attributes" : {
-        "cellSize" : 15.0
+        "cellSize" : 22.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshDensityCountingProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshDensityCountingProcessor",
+      "attributes" : {
+        "meshProcessorId" : 11
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshProcessor",
+      "id" : 11,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
+      "attributes" : {
+        "measurementAreaId" : 11,
+        "edgeLength" : 5.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshProcessor",
+      "id" : 12,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
+      "attributes" : {
+        "measurementAreaId" : 10,
+        "edgeLength" : 5.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshDensityCountingProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshDensityCountingProcessor",
+      "attributes" : {
+        "meshProcessorId" : 12
       }
     } ],
     "isTimestamped" : true,
@@ -103,7 +160,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 250.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -251,7 +308,127 @@
         },
         "id" : 11
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 152.0,
+            "y" : 20.0
+          }, {
+            "x" : 0.5,
+            "y" : 20.0
+          }, {
+            "x" : 0.6,
+            "y" : 0.4
+          }, {
+            "x" : 176.3,
+            "y" : 0.4
+          }, {
+            "x" : 176.5,
+            "y" : 20.0
+          }, {
+            "x" : 156.6,
+            "y" : 20.0
+          }, {
+            "x" : 156.6,
+            "y" : 23.0
+          }, {
+            "x" : 159.0,
+            "y" : 23.0
+          }, {
+            "x" : 159.0,
+            "y" : 50.0
+          }, {
+            "x" : 150.0,
+            "y" : 50.0
+          }, {
+            "x" : 150.2,
+            "y" : 44.0
+          }, {
+            "x" : 115.0,
+            "y" : 44.0
+          }, {
+            "x" : 115.2,
+            "y" : 71.0
+          }, {
+            "x" : 0.5,
+            "y" : 71.0
+          }, {
+            "x" : 0.2,
+            "y" : 50.2
+          }, {
+            "x" : 17.0,
+            "y" : 50.0
+          }, {
+            "x" : 17.0,
+            "y" : 23.0
+          }, {
+            "x" : 55.0,
+            "y" : 23.0
+          }, {
+            "x" : 55.0,
+            "y" : 50.0
+          }, {
+            "x" : 94.9,
+            "y" : 50.0
+          }, {
+            "x" : 94.5,
+            "y" : 23.0
+          }, {
+            "x" : 152.0,
+            "y" : 23.0
+          }, {
+            "x" : 152.0,
+            "y" : 20.0
+          } ]
+        },
+        "id" : 10
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 0.8,
+            "y" : 113.6
+          }, {
+            "x" : 176.1,
+            "y" : 113.8
+          }, {
+            "x" : 176.3,
+            "y" : 50.4
+          }, {
+            "x" : 150.4,
+            "y" : 51.0
+          }, {
+            "x" : 150.0,
+            "y" : 74.4
+          }, {
+            "x" : 115.2,
+            "y" : 74.6
+          }, {
+            "x" : 115.2,
+            "y" : 71.1
+          }, {
+            "x" : 75.0,
+            "y" : 71.3
+          }, {
+            "x" : 75.0,
+            "y" : 74.2
+          }, {
+            "x" : 9.6,
+            "y" : 74.4
+          }, {
+            "x" : 9.4,
+            "y" : 71.5
+          }, {
+            "x" : 0.8,
+            "y" : 71.6
+          }, {
+            "x" : 1.0,
+            "y" : 113.6
+          } ]
+        },
+        "id" : 11
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2001,
