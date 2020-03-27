@@ -159,10 +159,10 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     for sim in sims:
         df.opp.plot.create_time_series(axes["delay"], alertdelay_ue[sim.id], label=sim.desc, color=att.get_color(),
                                    marker=att.get_marker())
-    axes["delay"].legend()
+    axes["delay"].legend(loc='lower right')
     axes["delay"].set_title(f"{id}: Packet Delay")
     axes["delay"].set_ylabel("delay [s]");
-    axes["delay"].legend(loc='upper right')
+    axes["delay"].legend(loc='lower right')
     axes["delay"].set_ylim(bottom=0)
 
     # %% figure: delay histogram
@@ -187,7 +187,7 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     axes["delay_hist"].set_title(f"{id}: Packet Delay Histogram")
     axes["delay_hist"].set_xlabel("delay [s]");
     axes["delay_hist"].set_ylabel("number of values");
-    axes["delay_hist"].legend()
+    axes["delay_hist"].legend(loc='upper center')
 
     # %% figure: delay histogram cumulative
     att.reset()
@@ -210,7 +210,7 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     axes["delay_cdf"].set_title(f"{id}: Packet Delay CDF")
     axes["delay_cdf"].set_xlabel("delay [s]");
     axes["delay_cdf"].set_ylabel("P(X<x)");
-    axes["delay_cdf"].legend()
+    axes["delay_cdf"].legend(loc='lower center')
 
     # %% figure: packet inter-arrival time histogram
     att.reset()
@@ -285,41 +285,57 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
 # Scenario 1: UDP 300 B CAM Packets, no other traffic
 simList = [Simulation("S1.UA", "S1-UA", "simulation (default model)"),
            Simulation("S1", "S1", "simulation (adapted model)")]
-# process_scenario("Scenario 1", "S1", "S1/2020-01-31_16-53-24_cam_receive_log.csv", simList, range=[0.0, 0.015]);
+
+if False:
+    process_scenario("Scenario 1", "S1", "S1/2020-01-31_16-53-24_cam_receive_log.csv", simList, range=[0.0, 0.015]);
 
 # Scenario 1.25: UDP 300 B CAM Packets, no other traffic, 25 RBs only
 simList = [Simulation("S1.25.UA", "S1-25-UA", "simulation (default model)"),
            Simulation("S1.25", "S1-25", "simulation (adapted model)")]
-# process_scenario("Scenario 1.25 (25 RBs)", "S1.25",
-#                 "S1/25RBs/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", simList, range=[0.0,0.015]);
+
+if False:
+    process_scenario("Scenario 1.25 (25 RBs)", "S1.25",
+                    "S1/25RBs/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", simList, range=[0.0,0.015]);
 
 # Scenario 2: UDP 300 B CAM Packets, overload due to 512B background traffic
 # process_scenario("Scenario 2", "S2", "OpenAirInterface-CAM-DL-2-1UE", "S2/2020-01-31_16-59-44_cam_receive_log.csv", range=[2.0,3.0])
-simList = [#Simulation("S2.UA", "S2-UA", "simulation (default model)"),
+simList = [Simulation("S2.UA", "S2-UA", "simulation (default model)"),
            Simulation("S2", "S2", "simulation (adapted model)")]
-process_scenario("Scenario 2", "S2",
-                 "S2/2020-01-31_16-59-44_cam_receive_log.csv", simList, range=[1.0,1.5]);
+
+if False:
+    process_scenario("Scenario 2", "S2",
+                     "S2/2020-01-31_16-59-44_cam_receive_log.csv", simList, range=[0.0,1.2]);
 
 # Scenario 2.25: UDP 300 B CAM Packets, overload due to 512B background traffic, 25 RBs only
 # process_scenario("Scenario 2 (25 RBs)", "S2.25", "OpenAirInterface-CAM-DL-2-1UE", "S2/25RBs/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv", range=[2.0,3.0])
 simList = [Simulation("S2.25.UA", "S2-25-UA", "simulation (default model)"),
            Simulation("S2.25", "S2-25", "simulation (adapted model)")]
-# process_scenario("Scenario 2.25 (25 RBs)", "S2.25",
-#                  "S2/25RBs/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv", simList,
-#                 range=[2.0,3.0]);
+
+if False:
+    process_scenario("Scenario 2.25 (25 RBs)", "S2.25",
+                     "S2/25RBs/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv", simList,
+                     range=[0.0,2.4])
 
 # Scenario 3: UE-2-UE Traffic (UE1 sends via uplink to eNodeB, eNodeB sends to UE0), low-rate UDP traffic
+# measurement 5: 2020-01-31_15-39-18_cam_receive_log.csv
+# measurement 6: 2020-01-31_15-44-49_cam_receive_log.csv
+simList = [Simulation("S3.UA", "S3-UA", "simulation (default model)"),
+           Simulation("S3", "S3", "simulation (adapted model)")]
+
+if False:
+    process_scenario("Scenario 3", "S3",
+                     "S3/Measurement5/2020-01-31_15-39-18_cam_receive_log.csv", simList, range=[0.0,0.2])
 
 # Scenario 4: UE-2-UE Traffic (UE1 sends via uplink to eNodeB, eNodeB sends to UE0), overload due to background traffic
+# 2020-01-31_16-13-32_cam_receive_log.csv
+simList = [Simulation("S4.UA", "S4-UA", "simulation (default model)"),
+           Simulation("S4", "S4", "simulation (adapted model)")]
 
+if True:
+    process_scenario("Scenario 4", "S4",
+                     "S4/2020-01-31_16-13-32_cam_receive_log.csv", simList)
 
-# + number of values in general stats
-
-# possible datagram types
-# - standard statistics
-# - CAM Delay (delay vs. time, delay histogram)
-# - CAM data rate (bit/s)
-# - CAM inter-packet times (inter-packet time vs. time, inter-packet time histogram)
+# possible further datagram types
+# - CAM data rate (bit/s)  (info already available in inter-arrival plots)
 # - background traffic data rate (bit/s)
-#
-# single plots instead of two in one?
+
