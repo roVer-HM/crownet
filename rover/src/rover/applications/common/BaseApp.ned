@@ -21,7 +21,6 @@ simple BaseApp like IApp
 {
     parameters:
         @display("i=block/app");
-        double penetrationRate = default(1.0);
 	 gates:
    		input socketIn @labels(UdpControlInfo/up);
         output socketOut @labels(UdpControlInfo/down);

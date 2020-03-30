@@ -25,14 +25,12 @@ simple UdpDetourApp extends BaseApp
 	    @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=inet::Packet);
         @signal[detourIncident](type=inet::Packet);
-//        @statistic[incidentCreated](title="incidentAge"; source="incidentAge(packetReceived)"; record=scalar); // save values used to create an incident (repate cound, ....)
 	    @statistic[incidentAge](title="incidentAge"; source="incidentAge(packetReceived)"; unit=s; record=vector,stats; interpolationmode=none);
 	    @statistic[lastHopAge](title="lastHopAge"; source="lastHopAge(packetReceived)"; unit=s; record=vector,stats; interpolationmode=none);
 	    @statistic[incidentReceived](title="incidentReceived"; source="packetReceived"; record=incident; interpolationmode=none);
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-//        @statistic[endToEndDelay](title="end-to-end-delay"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
         @lifecycleSupport;
 	    // sender parameters
 	    double incidentTime @unit(s) = default(-1.0s); // time at which the incident (see reason) is triggerd. If -1 no incident is triggerd and app only performs passive task (receive and repeate)
