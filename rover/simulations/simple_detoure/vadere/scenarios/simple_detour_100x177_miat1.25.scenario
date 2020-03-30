@@ -31,14 +31,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "Mesh_trias1.txt",
       "processors" : [ 11 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
-      "filename" : "Density_trias2.csv",
-      "processors" : [ 13 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "Mesh_trias2.txt",
-      "processors" : [ 12 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -81,23 +73,8 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
       "attributes" : {
-        "measurementAreaId" : 11,
-        "edgeLength" : 5.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshProcessor",
-      "id" : 12,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
-      "attributes" : {
         "measurementAreaId" : 10,
         "edgeLength" : 5.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshDensityCountingProcessor",
-      "id" : 13,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshDensityCountingProcessor",
-      "attributes" : {
-        "meshProcessorId" : 12
       }
     } ],
     "isTimestamped" : true,
@@ -312,50 +289,80 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 152.0,
+            "x" : 151.0,
+            "y" : 20.0
+          }, {
+            "x" : 0.3,
             "y" : 20.0
           }, {
             "x" : 0.5,
-            "y" : 20.0
+            "y" : 0.5
           }, {
-            "x" : 0.6,
-            "y" : 0.4
-          }, {
-            "x" : 176.3,
-            "y" : 0.4
+            "x" : 176.5,
+            "y" : 0.5
           }, {
             "x" : 176.5,
             "y" : 20.0
           }, {
-            "x" : 156.6,
+            "x" : 157.0,
             "y" : 20.0
           }, {
-            "x" : 156.6,
+            "x" : 157.0,
             "y" : 23.0
           }, {
-            "x" : 159.0,
+            "x" : 159.2,
             "y" : 23.0
           }, {
-            "x" : 159.0,
+            "x" : 159.2,
             "y" : 50.0
           }, {
             "x" : 150.0,
             "y" : 50.0
           }, {
-            "x" : 150.2,
+            "x" : 150.0,
             "y" : 44.0
           }, {
             "x" : 115.0,
             "y" : 44.0
           }, {
-            "x" : 115.2,
-            "y" : 71.0
+            "x" : 115.0,
+            "y" : 74.0
+          }, {
+            "x" : 150.0,
+            "y" : 74.0
+          }, {
+            "x" : 150.0,
+            "y" : 50.0
+          }, {
+            "x" : 176.5,
+            "y" : 50.0
+          }, {
+            "x" : 176.5,
+            "y" : 114.0
           }, {
             "x" : 0.5,
+            "y" : 114.0
+          }, {
+            "x" : 0.5,
+            "y" : 74.0
+          }, {
+            "x" : 75.0,
+            "y" : 74.0
+          }, {
+            "x" : 75.0,
             "y" : 71.0
           }, {
-            "x" : 0.2,
-            "y" : 50.2
+            "x" : 10.0,
+            "y" : 71.0
+          }, {
+            "x" : 10.0,
+            "y" : 74.0
+          }, {
+            "x" : 0.5,
+            "y" : 74.0
+          }, {
+            "x" : 0.0,
+            "y" : 50.0
           }, {
             "x" : 17.0,
             "y" : 50.0
@@ -369,65 +376,20 @@
             "x" : 55.0,
             "y" : 50.0
           }, {
-            "x" : 94.9,
+            "x" : 95.0,
             "y" : 50.0
           }, {
-            "x" : 94.5,
+            "x" : 95.0,
             "y" : 23.0
           }, {
-            "x" : 152.0,
+            "x" : 151.8,
             "y" : 23.0
           }, {
-            "x" : 152.0,
+            "x" : 151.8,
             "y" : 20.0
           } ]
         },
         "id" : 10
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 0.8,
-            "y" : 113.6
-          }, {
-            "x" : 176.1,
-            "y" : 113.8
-          }, {
-            "x" : 176.3,
-            "y" : 50.4
-          }, {
-            "x" : 150.4,
-            "y" : 51.0
-          }, {
-            "x" : 150.0,
-            "y" : 74.4
-          }, {
-            "x" : 115.2,
-            "y" : 74.6
-          }, {
-            "x" : 115.2,
-            "y" : 71.1
-          }, {
-            "x" : 75.0,
-            "y" : 71.3
-          }, {
-            "x" : 75.0,
-            "y" : 74.2
-          }, {
-            "x" : 9.6,
-            "y" : 74.4
-          }, {
-            "x" : 9.4,
-            "y" : 71.5
-          }, {
-            "x" : 0.8,
-            "y" : 71.6
-          }, {
-            "x" : 1.0,
-            "y" : 113.6
-          } ]
-        },
-        "id" : 11
       } ],
       "stairs" : [ ],
       "targets" : [ {
