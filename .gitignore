@@ -7,6 +7,7 @@ VadereTestingSuite.preferences.xml
 tags
 tags*
 compile_commands.json
+*.h5
 
 # ignore gitlab-runner local test directory
 /builds
