@@ -1,0 +1,33 @@
+#!/bin/bash
+
+SHORTNAME=vadere
+COMMAND=idea.sh
+CONTNAME=vadere-ide
+
+if [[ -z "$1" || "$1" == "exec" ]]; then
+      VERSION=latest
+      CONTNAME=$CONTNAME:$VERSION
+else
+      SHORTNAME=$SHORTNAME-$1
+      CONTNAME=$CONTNAME:$1
+fi
+
+if [[ "$1" == "exec" ]]; then
+      COMMAND="${@:2:${#@}+1-2}"
+      # COMMAND="$2 $3 $4 $5 $6 $7 $8 $9"
+fi
+
+if [[ "$2" == "exec" ]]; then
+      COMMAND="${@:3:${#@}+1-3}"
+      # COMMAND="$3 $4 $5 $6 $7 $8 $9"
+fi
+
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$CONTNAME
+
+echo "container> used image: $IMAGENAME"
+
+source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
+
+# Variant 2: Start an individual container for each run
+#echo $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
+run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND

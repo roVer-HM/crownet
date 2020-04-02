@@ -7,28 +7,13 @@
 # - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
 
 
-FROM ubuntu:18.04
+FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-java:latest
 
-# Specify the version/tag of vadere to be put in the container:
-ENV RELEASE master
-
-
+# Specify the version/tag of vadere to be put in the container. defaut master
+ARG BRANCH
 
 LABEL description "vadere Crowd Simulator (as used in roVer)"
 LABEL maintainer  "wischhof@ieee.org"
-
-# install all dependencies
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-       sudo \
-       python3.7 \
-       git git-lfs \
-       default-jre \
-       maven \
-       clinfo mesa-opencl-icd ocl-icd-opencl-dev \
-       liblwjgl-java liblwjgl-java-doc liblwjgl-java-jni && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # clone the vadere sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/vadere
@@ -37,13 +22,13 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN git clone --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
+RUN git clone --depth 1 --branch $BRANCH https://gitlab.lrz.de/vadere/vadere.git $BRANCH
 
 # add a symbolic link so vadere is found in the path
-RUN ln -s /opt/vadere/$RELEASE /opt/vadere/vadere
+RUN ln -f -s /opt/vadere/$BRANCH /opt/vadere/vadere
 
 # add a symbolic link to /usr/bin/python3 from /usr/bin/python3.7
-RUN ln -s /usr/bin/python3.7 /usr/bin/python3
+RUN ln -f -s /usr/bin/python3.7 /usr/bin/python3
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/vadere/vadere
@@ -55,28 +40,14 @@ RUN git pull
 ENV PATH /opt/vadere/vadere/VadereGui/target:$PATH
 RUN mvn clean package -Dmaven.test.skip
 
+# cleanup class files
+RUN find . -type f -name '*.class' -exec rm {} +
+
 # create script to start vadere gui and add it to the path.
 COPY vadere-gui /usr/local/bin/vadere-gui
 RUN chmod 555 /usr/local/bin/vadere-gui
-
-# add ide (intellij)
-WORKDIR /opt/intellij
-ADD ide/ideaIU-2019.3.3.tar.gz .
-ENV PATH="/opt/intellij/idea-IU-193.6494.35/bin:${PATH}"
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
 CMD [ "/init.sh" ]
-
-# Note: in order to launch vadere with X11 output, the container needs to be launched with:
-# docker run -it \
-# --user $(id -u) \
-# -e DISPLAY=unix$DISPLAY \
-# --workdir=$(pwd) \
-# --volume="/home/$USER:/home/$USER" \
-# --volume="/etc/group:/etc/group:ro" \
-# --volume="/etc/passwd:/etc/passwd:ro" \
-# --volume="/etc/shadow:/etc/shadow:ro" \
-# --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
-# -v /tmp/.X11-unix:/tmp/.X11-unix \

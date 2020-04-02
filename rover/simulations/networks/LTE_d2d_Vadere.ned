@@ -27,14 +27,14 @@ import inet.environment.common.PhysicalEnvironment;
 network LTE_d2d_Vadere extends LTE_d2d
 {
     parameters:
-  		manager.typename = "TraCIScenarioManagerVadere";
-  		
+        manager.typename = "TraCIScenarioManagerVadere";
+
     submodules:
         visualization: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
-            @display("p=300,165");           
+            @display("p=366,114;is=s");
         }
 
         physicalEnvironment: PhysicalEnvironment {
-            @display("p=300,281");
+            @display("p=366,62;is=s");
         }
 }

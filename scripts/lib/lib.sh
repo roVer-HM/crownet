@@ -108,7 +108,7 @@ function run_container_X11() {
 		CMD_ARR+=(--env TRACI_PORT=$TRACI_PORT)
 	fi
 	if [[ -z ${TRACI_GUI} ]];then
-		CMD_ARR+=(--env TRACI_GUI="true")
+		CMD_ARR+=(--env TRACI_GUI="false")
 	else
 		echo "container> set var TRACI_GUI=$TRACI_GUI"
 		CMD_ARR+=(--env TRACI_GUI=${TRACI_GUI})

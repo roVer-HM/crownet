@@ -1,9 +1,11 @@
 import os
+import errno
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from oppanalyzer import Config, ScaveTool, StatsTool, OaiMeasurement
-from typing import List
+from roveranalyzer.oppanalyzer.utils import Config, ScaveTool, StatsTool
+from roveranalyzer.oppanalyzer.rover_measurements import OaiMeasurement
+from typing import List, Dict
 
 """
 The Simulation class specifies the information required to read and plot a simulation scenario.
@@ -20,9 +22,12 @@ class Simulation(object):
         self.path = path
         self.desc = description
 
+
 """
 PlotAttrs is a singleton guaranteeing unique plot parameters
 """
+
+
 class PlotAttrs:
     class __PlotAttrs:
         plot_marker = [".", "*", "o", "v", "1", "2", "3", "4"]
@@ -56,9 +61,10 @@ class PlotAttrs:
             self.idx_c = 0
         return ret
 
-    def reset(self):
+    def reset(self) -> object:
         self.idx_c = 0;
         self.idx_m = 0;
+
 
 # Type definitions
 SimList = List[Simulation]
@@ -88,6 +94,7 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     scave = ScaveTool()
     # %% Read simulation data of all simulations within specified list of simulations
     alertdelay_ue = {}  # dictionary for storing the delays for alerts (application layer)
+    df_sims: Dict[str, pd.DataFrame] = {}  # dictionary for storing the dataframes of simulations
     for sim in sims:
         input_sca = f"{cnf.rover_main}/rover/simulations/openair/results/{sim.path}/*.sca"
         input_vec = f"{cnf.rover_main}/rover/simulations/openair/results/{sim.path}/*.vec"
@@ -96,21 +103,25 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
         csv = scave.create_or_get_csv_file(
             csv_path=output_csv,
             input_paths=[
-                input_sca,
+                # input_sca,
                 input_vec,
             ],
-            scave_filter=None,
+            scave_filter='module("*.app[*]") AND '
+                         'name("*Delay:vector")'
+            ,
             override=True,
             recursive=True,
         )
-        df = scave.load_csv(csv)
+        df_sims[sim.id] = scave.load_csv(csv)
+        df_sims[sim.id].opp.info()
 
-        alertdelay_ue[sim.id] = df.opp.filter().vector().name_regex("alertDelay.*").apply().iloc[0]
+        alertdelay_ue[sim.id] = df_sims[sim.id].opp.filter().vector().name_regex("alertDelay.*").apply().iloc[0]
+        # alertdelay_ue[sim.id] = df.iloc[0]
 
         # consider only values after the startup-time
-        valid_values = alertdelay_ue[sim.id].vectime > STARTUP_TIME
-        alertdelay_ue[sim.id].vectime = alertdelay_ue[sim.id].vectime[valid_values]
-        alertdelay_ue[sim.id].vecvalue = alertdelay_ue[sim.id].vecvalue[valid_values]
+        # valid_values = alertdelay_ue[sim.id].vectime > STARTUP_TIME
+        # alertdelay_ue[sim.id].vectime = alertdelay_ue[sim.id].vectime[valid_values]
+        # alertdelay_ue[sim.id].vecvalue = alertdelay_ue[sim.id].vecvalue[valid_values]
 
     # %% Read measurement data
     input_trace = f"{cnf.rover_main}/rover/simulations/openair/measurements/{measure_subpath}"
@@ -127,21 +138,12 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     # ax_time = axes[0]
     # ax_hist = axes[1]
 
-    # use individual figures:
+    # use individual figures: dictionaries for figures and their axes
     figures = {
-        "delay": plt.figure(figsize=std_figsize),
-        "delay_hist": plt.figure(figsize=std_figsize),
-        "delay_cdf": plt.figure(figsize=std_figsize),
-        "iat_hist": plt.figure(figsize=std_figsize)
     }
 
     axes = {
     }
-
-    # create axes for all figures
-    for name, fig in figures.items():
-        plt.figure(fig.number)
-        axes[name] = plt.axes()
 
     # %% statistics
     print(StatsTool.stats_table(camdelay_ue_measure.vecvalue, "s", f"{id} (measurement): CAM Delay  (time_difference)"))
@@ -150,22 +152,35 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
                                     f"{sim.id} (simulation): CAM Delay  (alertDelay)"))
 
     # %% figure: delay over time
+    figures.update ({"delay": plt.figure(figsize=std_figsize)})
+    plt.figure(figures["delay"].number)
+    axes.update({"delay" : plt.axes()})
     att.reset()
-    # Process measurement data
-    df.opp.plot.create_time_series(axes["delay"], camdelay_ue_measure, label="measurement", color=att.get_color(),
-                                   marker=att.get_marker())
+    # Process measurement data  (ugly: we "misuse" the dataframe of the first simulation)
+    df_sims[sims[0].id].opp.plot.create_time_series(axes["delay"], camdelay_ue_measure, label="measurement",
+                                                    color=att.get_color(),
+                                                    marker=att.get_marker(), auto_labels=False)
 
     # Process corresponding simulation data
     for sim in sims:
-        df.opp.plot.create_time_series(axes["delay"], alertdelay_ue[sim.id], label=sim.desc, color=att.get_color(),
-                                   marker=att.get_marker())
+        df_sims[sim.id].opp.plot.create_time_series(axes["delay"], alertdelay_ue[sim.id], label=sim.desc,
+                                                    color=att.get_color(),
+                                                    marker=att.get_marker())
     axes["delay"].legend(loc='lower right')
     axes["delay"].set_title(f"{id}: Packet Delay")
     axes["delay"].set_ylabel("delay [s]");
     axes["delay"].legend(loc='lower right')
-    axes["delay"].set_ylim(bottom=0)
+
+    if "range" in kwargs:
+        yrange = kwargs.get("range")
+        axes["delay"].set_ylim(yrange)
+
+    plt.show()
 
     # %% figure: delay histogram
+    figures.update({"delay_hist": plt.figure(figsize=std_figsize)})
+    plt.figure(figures["delay_hist"].number)
+    axes.update({"delay_hist": plt.axes()})
     att.reset()
     #  measurements
     hist_add_args = kwargs
@@ -173,23 +188,30 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     if "hist_range" in hist_add_args:
         hist_add_args["range"] = hist_add_args.pop("hist_range")
 
-    (n, bins, patches) = df.opp.plot.create_histogram(axes["delay_hist"], camdelay_ue_measure, label="measurement",
+    (n, bins, patches) = df_sims[sims[0].id].opp.plot.create_histogram(axes["delay_hist"], camdelay_ue_measure, label="measurement",
                                                       color=att.get_color(), density=False, histtype='step', fill=False,
-                                                      bins=DEFAULT_NR_BINS, **hist_add_args)
+                                                      bins=DEFAULT_NR_BINS, auto_labels=False, **hist_add_args)
 
     # simulation
     for sim in sims:
-        df.opp.plot.create_histogram(axes["delay_hist"], alertdelay_ue[sim.id], label=sim.desc, color=att.get_color(),
-                                     density=False,
-                                     histtype='step', fill=False, bins=bins, **hist_add_args)
+        df_sims[sim.id].opp.plot.create_histogram(axes["delay_hist"], alertdelay_ue[sim.id], label=sim.desc,
+                                                  color=att.get_color(),
+                                                  density=False,
+                                                  histtype='step', fill=False, bins=bins,
+                                                  **hist_add_args)
 
     # format plot
     axes["delay_hist"].set_title(f"{id}: Packet Delay Histogram")
     axes["delay_hist"].set_xlabel("delay [s]");
     axes["delay_hist"].set_ylabel("number of values");
-    axes["delay_hist"].legend(loc='upper center')
+    axes["delay_hist"].legend(loc='upper left')
+
+    plt.show()
 
     # %% figure: delay histogram cumulative
+    figures.update({"delay_cdf": plt.figure(figsize=std_figsize)})
+    plt.figure(figures["delay_cdf"].number)
+    axes.update({"delay_cdf": plt.axes()})
     att.reset()
     hist_add_args = kwargs
 
@@ -197,22 +219,30 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
         hist_add_args["range"] = hist_add_args.pop("hist_range")
 
     # measurement
-    (n, bins, patches) = df.opp.plot.create_histogram(axes["delay_cdf"], camdelay_ue_measure, label="measurement",
-                                                      color=att.get_color(), density=True, cumulative=True, histtype='step',
-                                                      fill=False, bins=DEFAULT_NR_BINS, **hist_add_args)
+    (n, bins, patches) = df_sims[sims[0].id].opp.plot.create_histogram(axes["delay_cdf"], camdelay_ue_measure, label="measurement",
+                                                      color=att.get_color(), density=True, cumulative=True,
+                                                      histtype='step',
+                                                      fill=False, bins=DEFAULT_NR_BINS, auto_labels=False, **hist_add_args)
 
     # simulation
     for sim in sims:
-        df.opp.plot.create_histogram(axes["delay_cdf"], alertdelay_ue[sim.id], label=sim.desc, color=att.get_color(), density=True,
-                                     histtype='step', cumulative=True, fill=False, bins=bins, **hist_add_args)
+        df_sims[sim.id].opp.plot.create_histogram(axes["delay_cdf"], alertdelay_ue[sim.id], label=sim.desc, color=att.get_color(),
+                                     density=True,
+                                     histtype='step', cumulative=True, fill=False,  bins=bins,
+                                     **hist_add_args)
 
     # format plot
     axes["delay_cdf"].set_title(f"{id}: Packet Delay CDF")
     axes["delay_cdf"].set_xlabel("delay [s]");
     axes["delay_cdf"].set_ylabel("P(X<x)");
-    axes["delay_cdf"].legend(loc='lower center')
+    axes["delay_cdf"].legend(loc='lower right')
+
+    plt.show()
 
     # %% figure: packet inter-arrival time histogram
+    figures.update({"iat_hist": plt.figure(figsize=std_figsize)})
+    plt.figure(figures["iat_hist"].number)
+    axes.update({"iat_hist": plt.axes()})
     att.reset()
     # calculate inter-arrival times: measurements
     nr_values = len(camdelay_ue_measure['vecvalue']) - 1
@@ -233,11 +263,11 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
         hist_add_args.pop("range")
 
     # TODO: should be dynamic
-    # hist_add_args["range"] = [0.0, 200]
+    hist_add_args["range"] = [0.0, 200]
 
-    (n, bins, patches) = df.opp.plot.create_histogram(axes["iat_hist"], iat, label="measurement",
+    (n, bins, patches) = df_sims[sims[0].id].opp.plot.create_histogram(axes["iat_hist"], iat, label="measurement",
                                                       color=att.get_color(), density=False, histtype='step', fill=False,
-                                                      bins=DEFAULT_NR_BINS,
+                                                      bins=DEFAULT_NR_BINS, auto_labels=False,
                                                       **hist_add_args)
 
     # simulation
@@ -255,8 +285,9 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
             "vecvalue": iat_value
         })
 
-        df.opp.plot.create_histogram(axes["iat_hist"], iat, label=sim.desc, color=att.get_color(), density=False,
-                                     histtype='step', fill=False, bins=bins, **hist_add_args)
+        df_sims[sim.id].opp.plot.create_histogram(axes["iat_hist"], iat, label=sim.desc, color=att.get_color(), density=False,
+                                  histtype='step', fill=False, bins=bins, auto_labels=False,
+                                  **hist_add_args)
 
     # format plot
     axes["iat_hist"].set_title(f"{id}: Packet Inter-Arrival Time Histogram")
@@ -264,12 +295,12 @@ def process_scenario(name: str, id: str, measure_subpath: str, sims: SimList, **
     axes["iat_hist"].set_ylabel("number of values");
     axes["iat_hist"].legend()
 
-    # %% create figures in PDF and PNG formats
     plt.show()
+    # %% create figures in PDF and PNG formats
     try:
         os.makedirs(OUTPUT_FOLDER)
     except OSError as e:
-        if e.errno != os.errno.EEXIST:
+        if e.errno != errno.EEXIST:
             raise
 
     for name, fig in figures.items():
@@ -287,7 +318,7 @@ simList = [Simulation("S1.UA", "S1-UA", "simulation (default model)"),
            Simulation("S1", "S1", "simulation (adapted model)")]
 
 if False:
-    process_scenario("Scenario 1", "S1", "S1/2020-01-31_16-53-24_cam_receive_log.csv", simList, range=[0.0, 0.015]);
+    process_scenario("Scenario 1", "S1", "S1/2020-01-31_16-53-24_cam_receive_log.csv", simList, range=[0.0, 0.01]);
 
 # Scenario 1.25: UDP 300 B CAM Packets, no other traffic, 25 RBs only
 simList = [Simulation("S1.25.UA", "S1-25-UA", "simulation (default model)"),
@@ -295,7 +326,8 @@ simList = [Simulation("S1.25.UA", "S1-25-UA", "simulation (default model)"),
 
 if False:
     process_scenario("Scenario 1.25 (25 RBs)", "S1.25",
-                    "S1/25RBs/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", simList, range=[0.0,0.015]);
+                     "S1/25RBs/2018-06-28_13-08-53_cam_receive_log__no_general_traffic.csv", simList,
+                     range=[0.0, 0.015]);
 
 # Scenario 2: UDP 300 B CAM Packets, overload due to 512B background traffic
 # process_scenario("Scenario 2", "S2", "OpenAirInterface-CAM-DL-2-1UE", "S2/2020-01-31_16-59-44_cam_receive_log.csv", range=[2.0,3.0])
@@ -304,7 +336,7 @@ simList = [Simulation("S2.UA", "S2-UA", "simulation (default model)"),
 
 if False:
     process_scenario("Scenario 2", "S2",
-                     "S2/2020-01-31_16-59-44_cam_receive_log.csv", simList, range=[0.0,1.2]);
+                     "S2/2020-01-31_16-59-44_cam_receive_log.csv", simList, range=[0.0, 1.2]);
 
 # Scenario 2.25: UDP 300 B CAM Packets, overload due to 512B background traffic, 25 RBs only
 # process_scenario("Scenario 2 (25 RBs)", "S2.25", "OpenAirInterface-CAM-DL-2-1UE", "S2/25RBs/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv", range=[2.0,3.0])
@@ -314,7 +346,7 @@ simList = [Simulation("S2.25.UA", "S2-25-UA", "simulation (default model)"),
 if False:
     process_scenario("Scenario 2.25 (25 RBs)", "S2.25",
                      "S2/25RBs/2018-06-28_14-42-39_cam_receive_log__send_general_traffic_freq=0.00017.csv", simList,
-                     range=[0.0,2.4])
+                     range=[0.0, 2.4])
 
 # Scenario 3: UE-2-UE Traffic (UE1 sends via uplink to eNodeB, eNodeB sends to UE0), low-rate UDP traffic
 # measurement 5: 2020-01-31_15-39-18_cam_receive_log.csv
@@ -324,7 +356,7 @@ simList = [Simulation("S3.UA", "S3-UA", "simulation (default model)"),
 
 if False:
     process_scenario("Scenario 3", "S3",
-                     "S3/Measurement5/2020-01-31_15-39-18_cam_receive_log.csv", simList, range=[0.0,0.2])
+                     "S3/Measurement5/2020-01-31_15-39-18_cam_receive_log.csv", simList, range=[0.0, 0.2])
 
 # Scenario 4: UE-2-UE Traffic (UE1 sends via uplink to eNodeB, eNodeB sends to UE0), overload due to background traffic
 # 2020-01-31_16-13-32_cam_receive_log.csv
@@ -338,4 +370,3 @@ if True:
 # possible further datagram types
 # - CAM data rate (bit/s)  (info already available in inter-arrival plots)
 # - background traffic data rate (bit/s)
-

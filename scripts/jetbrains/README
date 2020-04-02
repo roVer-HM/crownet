@@ -1,0 +1,28 @@
+# JetBrains IDE config files.
+
+## Externals Tools for Python Linters
+
+### manually
+
+replace or merge! `External Tools.xml` with file located in
+`$HOME/.PyCharYYYY.N/config/tools` to configure the tools
+`black` and `isort` to manage python source code styles.
+
+### with ide
+
+- open project and go to File > Settings... > Tools > External Tools
+- at the top add a new tool (`+` button)
+- use whenver possible Macros such as `$FilePath$` to allow exporting of
+  Tools settings via `External Tools.xml`
+
+
+## Install Watchers
+
+- Ensure the external tools are set correctly.
+- open project and go to File > Settings... > Tools > File Watchers
+- on the right select `Import` (arrow down left)
+- import `watchers.xml` and ensure both tools are enabled.
+- at each file save of a *.py file contained in the project
+  the tools `black` and `isort` are executed.
+
+

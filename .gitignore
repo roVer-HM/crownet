@@ -41,6 +41,9 @@ rover/**/*.log
 rover/**/simulations/*/plots/*.png
 rover/**/simulations/*/plots/*.pdf
 rover/**/venv
+rover/**/*_m.cc
+rover/**/*_m.h
+
 
 # Python
 rover/**/test.out

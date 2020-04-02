@@ -5,4 +5,9 @@ if [[ -z $ROVER_MAIN ]];then
     exit -1
 fi
 
-$ROVER_MAIN/scripts/vadere exec java -jar /opt/vadere/master/VadereGui/target/vadere-postvis.jar
+if [[ -z "$1" ]]; then
+    $ROVER_MAIN/scripts/vadere exec java -jar /opt/vadere/vadere/VadereGui/target/vadere-postvis.jar
+else
+    $ROVER_MAIN/scripts/vadere $1 exec java -jar /opt/vadere/vadere/VadereGui/target/vadere-postvis.jar
+fi
+
