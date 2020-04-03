@@ -25,10 +25,9 @@ using omnetpp::cStringTokenizer;
 namespace rover {
 Define_Module(UdpDetourAppVadere);
 
-UdpDetourAppVadere::UdpDetourAppVadere()
-    : mobility(nullptr), traci(nullptr) {}
+UdpDetourAppVadere::UdpDetourAppVadere() : mobility(nullptr), traci(nullptr) {}
 
-UdpDetourAppVadere::~UdpDetourAppVadere() { }
+UdpDetourAppVadere::~UdpDetourAppVadere() {}
 
 void UdpDetourAppVadere::initialize(int stage) {
   UdpDetourApp::initialize(stage);
@@ -37,26 +36,31 @@ void UdpDetourAppVadere::initialize(int stage) {
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     // traci
     mobility =
-        veins::VeinsInetMobilityAccess().get<veins::VaderePersonMobility*>(
+        veins::VeinsInetMobilityAccess().get<veins::VaderePersonMobility *>(
             getParentModule());
     traci = mobility->getCommandInterface();
 
     // record internal identifier for node.
     std::string exId = mobility->getExternalId();
     try {
-        recordScalar("externalId", std::stod(exId));
-    } catch (std::invalid_argument const &e){
-        throw cRuntimeError("Cannot convert given id '%s' to long", exId.c_str());
-    } catch (std::out_of_range const &e){
-        throw cRuntimeError("Given id '%s' out of range", exId.c_str());
+      recordScalar("externalId", std::stod(exId));
+    } catch (std::invalid_argument const &e) {
+      throw cRuntimeError("Cannot convert given id '%s' to long", exId.c_str());
+    } catch (std::out_of_range const &e) {
+      throw cRuntimeError("Given id '%s' out of range", exId.c_str());
     }
   }
 }
 
 void UdpDetourAppVadere::actOnIncident(
     IntrusivePtr<const DetourAppPacket> pkt) {
+  veins::VaderePersonItfc *traciPerson = mobility->getPersonCommandInterface();
 
-  veins::VaderePersonItfc* traciPerson = mobility->getPersonCommandInterface();
+  // inform mobility provider about received information
+  traciPerson->setInformation(simTime().dbl(), -1.0,
+                              std::string(pkt->getIncidentReason()));
+
+  // check and act if needed.
   std::string blocked = std::string(pkt->getClosedTarget());
   std::vector<std::string> targetLists = traciPerson->getTargetList();
   if (std::find(targetLists.begin(), targetLists.end(), blocked) !=

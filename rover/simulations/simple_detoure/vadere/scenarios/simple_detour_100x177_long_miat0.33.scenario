@@ -340,7 +340,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3002,
         "shape" : {
@@ -361,7 +362,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3003,
         "shape" : {
@@ -382,7 +384,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3004,
         "shape" : {
@@ -403,7 +406,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

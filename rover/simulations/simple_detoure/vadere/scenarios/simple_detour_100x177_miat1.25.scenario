@@ -26,7 +26,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
       "filename" : "Density_trias1.csv",
-      "processors" : [ 10 ]
+      "processors" : [ 10, 12 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "Mesh_trias1.txt",
@@ -76,9 +76,18 @@
         "measurementAreaId" : 10,
         "edgeLength" : 5.0
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshPedStimulusCountingProcessor",
+      "id" : 12,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshPedStimulusCountingProcessor",
+      "attributes" : {
+        "meshProcessorId" : 11,
+        "informationFilter" : "E2002_closed",
+        "isRegexFilter" : false
+      }
     } ],
     "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isWriteMetaData" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -137,7 +146,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 250.0,
+      "finishTime" : 301.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -479,7 +488,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3002,
         "shape" : {
@@ -500,7 +510,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3003,
         "shape" : {
@@ -521,7 +532,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3004,
         "shape" : {
@@ -542,7 +554,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
