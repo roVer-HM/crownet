@@ -25,6 +25,12 @@ models := $(models_l3) $(models_l2) $(models_l1)
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
 
+# check if omnetpp is found
+ifeq (, $(shell which opp_configfilepath))
+ $(error opp_configfilepath not found. In order to run the command within the roVer docker container, try "omnetpp exec make")
+endif
+
+
 target clean : TARGET = clean
 target makefiles : TARGET = makefiles
 
