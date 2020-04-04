@@ -74,35 +74,3 @@ network LabSingleCell extends LabSingleCellBase
         router.pppg++ <--> Eth1GMetered <--> pgw.filterGate;
         pgw.pppg++ <--> Eth1GMetered <--> eNB.ppp; 
 }
-
-network LabSingleCellAdaptedRB25 extends LabSingleCellBase
-{
-        types:
-            channel Eth1GMeteredAdapted extends ThruputMeteringChannel
-            {
-                // adapted to lab measurements with 25 RBs: approx. 500us
-                delay = 500us;
-                datarate = 1024Mbps;
-                thruputDisplayFormat = "u";
-            }
-        connections:
-        server.pppg++ <--> Eth1GMeteredAdapted <--> router.pppg++;
-        router.pppg++ <--> Eth1GMeteredAdapted <--> pgw.filterGate;
-        pgw.pppg++ <--> Eth1GMeteredAdapted <--> eNB.ppp; 
-}
-
-network LabSingleCellAdaptedRB50 extends LabSingleCellBase
-{
-        types:
-            channel Eth1GMeteredAdapted extends ThruputMeteringChannel
-            {
-                // adapted to lab measurements with 50 RBs: approx. 733us
-                delay = 733us;
-                datarate = 1024Mbps;
-                thruputDisplayFormat = "u";
-            }
-        connections:
-        server.pppg++ <--> Eth1GMeteredAdapted <--> router.pppg++;
-        router.pppg++ <--> Eth1GMeteredAdapted <--> pgw.filterGate;
-        pgw.pppg++ <--> Eth1GMeteredAdapted <--> eNB.ppp; 
-}
