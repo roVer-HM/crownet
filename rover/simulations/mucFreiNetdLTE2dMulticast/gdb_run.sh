@@ -40,22 +40,3 @@ echo "$ROVER_MAIN/scripts/omnetpp ${CMD_ARR[@]}"
 echo ""
 $ROVER_MAIN/scripts/omnetpp "${CMD_ARR[@]}"
 
-if [[ -f ".cmdenv-log" ]];then
-	mv -v ".cmdenv-log" "${RESULT_DIR}/${CONFIG}_${EXPERIMENT}"
-fi
-popd > /dev/null
-
-if [ "${RESULT_DIR}/${CONFIG}_${EXPERIMENT}" ];then
-    pushd ${RESULT_DIR}/${CONFIG}_${EXPERIMENT} > /dev/null
-    for x in ./* ;do
-        tmp="${x//,/_}"
-        mv -- "$x" "$tmp"
-        tmp2="${tmp//=/}"
-        mv -- "$tmp" "$tmp2"
-        tmp3="${tmp2//-/_}"
-        mv -- "$tmp2" "$tmp3"
-    done
-    popd > /dev/null
-else
-    echo "result dir not found for renaming..."
-fi
