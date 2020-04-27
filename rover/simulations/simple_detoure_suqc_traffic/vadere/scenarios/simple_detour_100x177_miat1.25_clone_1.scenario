@@ -1,18 +1,103 @@
 {
-  "name" : "simple_detour_100x177_miat1.25",
+  "name" : "simple_detour_100x177_miat1.25_clone_1",
   "description" : "",
   "release" : "1.12",
   "processWriters" : {
     "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 1, 2 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "startEndtime.csv",
+      "processors" : [ 5, 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "targetIds.csv",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
+      "filename" : "gridDensity.csv",
+      "processors" : [ 8 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "footsteps.csv",
+      "processors" : [ 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
+      "filename" : "Density_trias1.csv",
+      "processors" : [ 10 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "Mesh_trias1.txt",
+      "processors" : [ 11 ]
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "DegreeInformed.txt",
       "processors" : [ 12 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
+      "filename" : "Mesh_trias_informed.txt",
+      "processors" : [ 13 ]
     } ],
     "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 1
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
+      "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridCountingProcessor",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
+      "attributes" : {
+        "cellSize" : 22.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshDensityCountingProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshDensityCountingProcessor",
+      "attributes" : {
+        "meshProcessorId" : 11
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshProcessor",
+      "id" : 11,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
+      "attributes" : {
+        "measurementAreaId" : 10,
+        "edgeLength" : 5.0
+      }
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedStimulusCountingProcessor",
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
+        "informationFilter" : "E2002_closed",
+        "isRegexFilter" : false
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshPedStimulusCountingProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshPedStimulusCountingProcessor",
+      "attributes" : {
+        "meshProcessorId" : 11,
         "informationFilter" : "E2002_closed",
         "isRegexFilter" : false
       }
@@ -225,7 +310,112 @@
         },
         "id" : 11
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 151.0,
+            "y" : 20.0
+          }, {
+            "x" : 0.3,
+            "y" : 20.0
+          }, {
+            "x" : 0.5,
+            "y" : 0.5
+          }, {
+            "x" : 176.5,
+            "y" : 0.5
+          }, {
+            "x" : 176.5,
+            "y" : 20.0
+          }, {
+            "x" : 157.0,
+            "y" : 20.0
+          }, {
+            "x" : 157.0,
+            "y" : 23.0
+          }, {
+            "x" : 159.2,
+            "y" : 23.0
+          }, {
+            "x" : 159.2,
+            "y" : 50.0
+          }, {
+            "x" : 150.0,
+            "y" : 50.0
+          }, {
+            "x" : 150.0,
+            "y" : 44.0
+          }, {
+            "x" : 115.0,
+            "y" : 44.0
+          }, {
+            "x" : 115.0,
+            "y" : 74.0
+          }, {
+            "x" : 150.0,
+            "y" : 74.0
+          }, {
+            "x" : 150.0,
+            "y" : 50.0
+          }, {
+            "x" : 176.5,
+            "y" : 50.0
+          }, {
+            "x" : 176.5,
+            "y" : 114.0
+          }, {
+            "x" : 0.5,
+            "y" : 114.0
+          }, {
+            "x" : 0.5,
+            "y" : 74.0
+          }, {
+            "x" : 75.0,
+            "y" : 74.0
+          }, {
+            "x" : 75.0,
+            "y" : 71.0
+          }, {
+            "x" : 10.0,
+            "y" : 71.0
+          }, {
+            "x" : 10.0,
+            "y" : 74.0
+          }, {
+            "x" : 0.5,
+            "y" : 74.0
+          }, {
+            "x" : 0.0,
+            "y" : 50.0
+          }, {
+            "x" : 17.0,
+            "y" : 50.0
+          }, {
+            "x" : 17.0,
+            "y" : 23.0
+          }, {
+            "x" : 55.0,
+            "y" : 23.0
+          }, {
+            "x" : 55.0,
+            "y" : 50.0
+          }, {
+            "x" : 95.0,
+            "y" : 50.0
+          }, {
+            "x" : 95.0,
+            "y" : 23.0
+          }, {
+            "x" : 151.8,
+            "y" : 23.0
+          }, {
+            "x" : 151.8,
+            "y" : 20.0
+          } ]
+        },
+        "id" : 10
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2001,
@@ -304,7 +494,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -326,7 +516,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -348,7 +538,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -370,7 +560,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 30.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
