@@ -13,7 +13,7 @@
       "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
-        "informationFilter" : "",
+        "informationFilter" : "E2002_closed",
         "isRegexFilter" : false,
         "stopIfPercentageIsInformed" : 0.95,
         "numberOfAdditionalTimeFrames" : 0
