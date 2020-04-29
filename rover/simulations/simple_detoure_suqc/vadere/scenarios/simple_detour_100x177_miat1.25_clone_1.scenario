@@ -90,7 +90,9 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
         "informationFilter" : "E2002_closed",
-        "isRegexFilter" : false
+        "isRegexFilter" : false,
+        "stopIfPercentageIsInformed" : 0.95,
+        "numberOfAdditionalTimeFrames" : 20
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshPedStimulusCountingProcessor",

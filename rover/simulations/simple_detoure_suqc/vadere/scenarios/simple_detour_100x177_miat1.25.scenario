@@ -6,15 +6,17 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "DegreeInformed.txt",
-      "processors" : [ 12 ]
+      "processors" : [ 1 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedStimulusCountingProcessor",
-      "id" : 12,
+      "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
-        "informationFilter" : "E2002_closed",
-        "isRegexFilter" : false
+        "informationFilter" : "",
+        "isRegexFilter" : false,
+        "stopIfPercentageIsInformed" : 0.95,
+        "numberOfAdditionalTimeFrames" : 0
       }
     } ],
     "isTimestamped" : true,

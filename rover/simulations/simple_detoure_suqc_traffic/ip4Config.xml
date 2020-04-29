@@ -1,10 +1,8 @@
-<config>
-    <interface hosts='*' address='10.10.x.x' netmask='255.255.255.0'/>
-    
-    <!-- Add routes so that dynamic nodes can reach the server  -->
-    <route hosts="hostMobile[*]" destination='10.0.0.0' netmask='255.0.0.0' interface='wlan' metric='1'/>
-    
 
+<config>
+    <interface hosts='*' address='20.0.x.x' netmask='255.255.255.0'/>
+    <!-- Add routes so that dynamic nodes can reach the server  -->
+    <!-- <route hosts="hostMobile[*]" destination='10.0.0.0' netmask='255.0.0.0' interface='wlan' metric='1'/> -->
     <!-- all D2D-capable UEs participate in the multicast group -->
     <multicast-group hosts="hostMobile[*]" interfaces="wlan" address="224.0.0.10"/>
     <multicast-group hosts="station[*]" interfaces="wlan" address="224.0.0.10"/>
