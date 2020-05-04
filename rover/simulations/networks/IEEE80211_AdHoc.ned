@@ -38,6 +38,7 @@ network IEEE80211_AdHoc
         configurator: Ipv4NetworkConfigurator {
             parameters:
                 @display("p=298,23;is=s");
+                config = xmldoc("ip4Config.xml");
         }
         radioMedium: <default(Ieee80211ScalarRadioMedium)> like IRadioMedium {
             parameters:
