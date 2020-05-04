@@ -1,5 +1,5 @@
 {
-  "name" : "simple_detour_100x177_miat1.25_without_mesh_only",
+  "name" : "simple_detour_100x177_miat1.25",
   "description" : "",
   "release" : "1.12",
   "commithash" : "b9caa8a4cfce808c1f707dc60bcd6332b142d392",
@@ -125,7 +125,7 @@
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : true,
+      "useFixedSeed" : false,
       "fixedSeed" : 7572244723134245826,
       "simulationSeed" : 0
     },

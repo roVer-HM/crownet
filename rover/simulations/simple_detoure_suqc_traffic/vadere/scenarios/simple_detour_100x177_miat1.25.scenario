@@ -2,19 +2,60 @@
   "name" : "simple_detour_100x177_miat1.25",
   "description" : "",
   "release" : "1.12",
+  "commithash" : "b9caa8a4cfce808c1f707dc60bcd6332b142d392",
   "processWriters" : {
     "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 1, 2 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "startEndtime.csv",
+      "processors" : [ 5, 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "targetIds.csv",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "footsteps.csv",
+      "processors" : [ 9 ]
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "DegreeInformed.txt",
       "processors" : [ 12 ]
     } ],
     "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 1
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
+      "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedStimulusCountingProcessor",
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
         "informationFilter" : "E2002_closed",
-        "isRegexFilter" : false
+        "isRegexFilter" : false,
+        "stopIfPercentageIsInformed" : 0.95,
+        "numberOfAdditionalTimeFrames" : 1
       }
     } ],
     "isTimestamped" : true,
@@ -84,7 +125,7 @@
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : true,
+      "useFixedSeed" : false,
       "fixedSeed" : 7572244723134245826,
       "simulationSeed" : 0
     },
@@ -225,7 +266,16 @@
         },
         "id" : 11
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 176.0,
+          "height" : 115.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 10
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2001,
@@ -304,7 +354,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 0.6 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -326,7 +376,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 0.6 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -348,7 +398,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 0.6 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -370,7 +420,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 40.0 ],
+        "distributionParameters" : [ 0.6 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
