@@ -55,7 +55,7 @@
         "informationFilter" : "E2002_closed",
         "isRegexFilter" : false,
         "stopIfPercentageIsInformed" : 0.95,
-        "numberOfAdditionalTimeFrames" : 10
+        "numberOfAdditionalTimeFrames" : 1
       }
     } ],
     "isTimestamped" : true,
