@@ -28,7 +28,7 @@ function wrap_command() {
            WRAPPER="/waitfor.sh "
            WRAPPER_END=""
 	else
-           WRAPPER="bash -c \"cd $(pwd);"
+           WRAPPER="/bin/bash -c \"cd $(pwd);"
            WRAPPER_END="\""
         fi
         echo "$WRAPPER $@ $WRAPPER_END"
@@ -125,6 +125,7 @@ function run_container_X11() {
         echo "container> set var VADERE_LOG=$VADERE_LOG"
         CMD_ARR+=(--env VADERE_LOG=${VADERE_LOG})
 	fi
+    CMD_ARR+=(--env ROVER_MAIN=${ROVER_MAIN})
 	CMD_ARR+=(--workdir=$(pwd))
 	CMD_ARR+=(--volume="/home/$USER:/home/$USER")
 	CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
@@ -144,7 +145,7 @@ function run_container_X11() {
 		CMD_ARR+=(--volume="/home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
 	fi
 	CMD_ARR+=($@)
-	#echo "${CMD_ARR[@]}"
+	# echo "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
 
 }
