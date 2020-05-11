@@ -36,9 +36,9 @@ CMD_ARR+=(-l "$ROVER_MAIN/veins/subprojects/veins_inet/src/veins_inet")
 CMD_ARR+=("$OPP_INI")
 echo "workingdir: $PWD"
 echo "running command:"
-echo "$ROVER_MAIN/scripts/omnetpp ${CMD_ARR[@]}"
+echo "$ROVER_MAIN/scripts/omnetpp_rnd ${CMD_ARR[@]}"
 echo ""
-$ROVER_MAIN/scripts/omnetpp "${CMD_ARR[@]}"
+$ROVER_MAIN/scripts/omnetpp_rnd "${CMD_ARR[@]}"
 
 
 if [[ -f ".cmdenv-log" ]];then
