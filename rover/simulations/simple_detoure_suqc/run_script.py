@@ -33,7 +33,7 @@ def wait_for_qoi(filename):
         secs += 1
 
     if (len(file) < 1):
-        file = None # prevent from infinite loop
+        file = None  # prevent from infinite loop
     else:
         file = file[0]
 
@@ -41,7 +41,6 @@ def wait_for_qoi(filename):
 
 
 def get_DegreeInformed_Dataframe(filepath):
-
     df_r = pd.read_csv(filepath, delimiter=" ", header=[0], comment="#")
     dt = 0.4  # one time frame = 0.4s
     df_r = df_r.iloc[249:-1, :]
@@ -53,23 +52,20 @@ def get_DegreeInformed_Dataframe(filepath):
 
 
 def DegreeInformed_extract():
-
     filename = "DegreeInformed.txt"
     # wait for file
     filepath = wait_for_qoi(filename)
     # replace it with file extraction
     df_r = get_DegreeInformed_Dataframe(filepath)
-    df_r.to_csv(os.path.join(os.path.dirname(filepath),"DegreeInformed_extract.txt"), sep=" ")
+    df_r.to_csv(os.path.join(os.path.dirname(filepath), "DegreeInformed_extract.txt"), sep=" ")
 
     # plot
-    plt.plot(df_r.iloc[:, 0],df_r.iloc[:, 3])
+    plt.plot(df_r.iloc[:, 0], df_r.iloc[:, 3])
     plt.axhline(y=0.95, c="r")
     plt.xlabel("Time [s] (Time = 0s : start of information dissemination)")
     plt.ylabel("Percentage of pedestrians informed [%]")
     plt.title("Information degree")
-    plt.savefig(os.path.join(os.path.dirname(filepath),"InformationDegree.png"))
-
-
+    plt.savefig(os.path.join(os.path.dirname(filepath), "InformationDegree.png"))
 
 
 def Time95Informed():
@@ -96,18 +92,44 @@ def post_processing():
     Time95Informed()
 
 
-
 def pre_processing():
     shutil.rmtree(os.path.join(os.getcwd(), "results"), ignore_errors=True)
+
+
+def clean_dir():
+    patterns = [
+        "*.ini",
+        "*.scenario",
+        "*.sca",
+        "*.vci",
+        "*.vec",
+        "vadere",
+        "sumo",
+        "*.traj",
+        "*.csv",
+        "*.xml",
+        "*.sh",
+    ]
+    outputfolder_path = os.getcwd()
+    shutil.copytree(
+        outputfolder_path,
+        outputfolder_path + "temp",
+        ignore=shutil.ignore_patterns(*patterns),
+    )
+    shutil.rmtree(outputfolder_path)
+    os.rename(outputfolder_path + "temp", outputfolder_path)
 
 
 if __name__ == "__main__":
 
     os.environ["ROVER_MAIN"] = "/home/christina/repos/rover-main"
+    clean = True
     try:
         pre_processing()
         run_sim()
         post_processing()
+        if clean is True:
+            clean_dir()
     except:
         sys.exit(-1)
     sys.exit(0)  # ok
