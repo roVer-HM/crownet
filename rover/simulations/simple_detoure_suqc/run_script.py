@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import time
 import glob
+import argparse
 
 
 def run_sim():
@@ -122,8 +123,21 @@ def clean_dir():
 
 if __name__ == "__main__":
 
+    #print(sys.argv[0])  # prints python_script.py
+    #print(sys.argv[1])  # prints python_script.py
+    #print(sys.argv[2])  # prints python_script.py
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--qoi", action="append",nargs='+', help="specify qoi files")
+    args = parser.parse_args()
+
+    if args.qoi:
+        for qoi in args.qoi:
+            print(qoi)
+
+
     os.environ["ROVER_MAIN"] = "/home/christina/repos/rover-main"
-    clean = True
+    clean = False
     try:
         pre_processing()
         run_sim()
