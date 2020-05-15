@@ -434,3 +434,86 @@ if True:
 # possible further datagram types
 # - CAM data rate (bit/s)  (info already available in inter-arrival plots)
 # - background traffic data rate (bit/s)
+#
+
+########################################################################################################################
+# D2D Scenarios: These scenarios evaluate the communication over the PC5 interface
+########################################################################################################################
+#
+### Scenario Direct Communication 1 (D1)
+#  This scenario measures characteristics of a low-rate data traffic on the PC5 sidelink in an off-network scenario. Data is sent from
+#  one UE to another UE within an otherwise unused cell.
+simList = [Simulation("D1.UA", "D1-UA", "simulation (default model)"),
+           Simulation("D1", "D1", "simulation (adapted model)")]
+
+plot_args = {
+    'delay': {'ylim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_hist': {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_cdf' : {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'lower right'},
+    'iat_hist'  : {'loc': 'upper right'}
+}
+
+
+if True:
+    process_scenario("D2D Scenario 1", "D1", "D1/Measurement1/2019-12-04_15-29-22_cam_receive_log.csv", simList,
+                     plot_args);
+    # process_scenario("D2D Scenario 1", "D1", "D1/Measurement2/2020-02-07_18-39-30_cam_receive_log.csv", simList,
+    #                  plot_args);
+    # process_scenario("D2D Scenario 1", "D1", "D1/Measurement3/2020-02-07_18-48-57_cam_receive_log.csv", simList,
+    #                  plot_args);
+
+### Scenario Direct Communication 2 (D2)
+# This scenario mesures the impact of a second, low-datarate UDP data stream
+# on the measured foreground traffic.
+simList = [Simulation("D2.UA", "D2-UA", "simulation (default model)"),
+           Simulation("D2", "D2", "simulation (adapted model)")]
+
+plot_args = {
+    'delay': {'ylim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_hist': {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_cdf' : {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'lower right'},
+    'iat_hist'  : {'loc': 'upper right'}
+}
+
+if True:
+    process_scenario("D2D Scenario 2", "D2", "D2/Measurement1/2020-02-14_21-11-22_cam_receive_log.csv", simList,
+                     plot_args);
+
+
+### Scenario Direct Communication 3 (D3)
+# This scenario mesures the impact of a second, medium-datarate UDP data stream on the measured foreground traffic.
+# Despite the data rate for the background traffic, this scenario is identical to D2.
+simList = [Simulation("D3.UA", "D3-UA", "simulation (default model)"),
+           Simulation("D3", "D3", "simulation (adapted model)")]
+
+plot_args = {
+    'delay': {'ylim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_hist': {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_cdf' : {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'lower right'},
+    'iat_hist'  : {'loc': 'upper right'}
+}
+
+
+if True:
+    process_scenario("D2D Scenario 3", "D3", "D3/Measurement1/2020-02-14_20-45-23_cam_receive_log.csv", simList,
+                     plot_args);
+    # process_scenario("D2D Scenario 3", "D3", "D3/Measurement2/2020-02-14_21-19-06_cam_receive_log.csv", simList,
+    #                  plot_args);
+
+### Scenario Direct Communication 4 (D4)
+# This scenario mesures the impact of a second, high-datarate UDP data stream on the measured foreground traffic.
+# Despite the data rate for the background traffic, this scenario is identical to D2.
+simList = [Simulation("D4.UA", "D4-UA", "simulation (default model)"),
+           Simulation("D4", "D4", "simulation (adapted model)")]
+
+plot_args = {
+    'delay': {'ylim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_hist': {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'upper right'},
+    'delay_cdf' : {'range': [0.0, 0.055], 'xlim': [0.0, 0.055], 'loc': 'lower right'},
+    'iat_hist'  : {'loc': 'upper right'}
+}
+
+
+if True:
+    process_scenario("D2D Scenario 4", "D4", "D4/Measurement1/2020-02-14_20-34-01_cam_receive_log.csv", simList,
+                     plot_args);
