@@ -6,6 +6,7 @@ if [[ -z $ROVER_MAIN ]];then
 fi
 
 SIM_DIR="$(dirname $(realpath $0))"
+echo "$SIM_DIR"
 OPP_INI="omnetpp.ini"
 
 if [[ -z "$1" ]];then

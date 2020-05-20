@@ -14,11 +14,15 @@ import shutil
 
 class SimulationRun:
 
-    def __init__(self, qoi, remove = False ):
+    def __init__(self, qoi, remove = False, config = "final" ):
 
         self.qoi = qoi
         self._set_old_files()
         self.remove = remove
+        self.config = config
+
+    def get_config(self):
+        return self.config
 
     def _set_old_files(self):
         filepath = f"{os.getcwd()}/results/**/*.scenario"
@@ -30,7 +34,7 @@ class SimulationRun:
     def _get_old_files(self):
         return self.old_files
 
-    def run_sim(self):
+    def run_sim_old(self):
         os.system("chmod +x runScript.sh")
         return_code = subprocess.check_call(
             ["./runScript.sh"],
@@ -38,6 +42,63 @@ class SimulationRun:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
         )
+
+    def run_sim(self):
+        # !/bin/bash
+
+        if os.getenv("ROVER_MAIN") is None:
+            print("Variable ROVER_MAIN not set.")
+            sys.exit(-1)
+
+
+        SIM_DIR = os.getcwd()
+        OPP_INI = "omnetpp.ini"
+
+        CONFIG = self.get_config()
+        EXPERIMENT = "out"
+        RESULT_DIR = os.path.join(SIM_DIR,"results")
+
+        if not os.path.exists(RESULT_DIR):
+            os.mkdir(RESULT_DIR)
+
+        rv = os.environ["ROVER_MAIN"]
+        os.chdir(f"{rv}/scripts")
+        subprocess.check_call("./nedpath")
+
+        os.chdir(SIM_DIR)
+
+
+
+        CMD_ARR = f'exec opp_runall -j 1 opp_run'
+        CMD_ARR += f' -u Cmdenv'
+        CMD_ARR += f' -c "{CONFIG}"'
+        CMD_ARR += f' --experiment-label={EXPERIMENT}"'
+        CMD_ARR += f' --result-dir={RESULT_DIR}"'
+        CMD_ARR += f' -l "{rv}/inet4/src/INET"'
+        CMD_ARR += f' -l "{rv}/rover/src/ROVER"'
+        CMD_ARR += f' -l "{rv}/simulte/src/lte"'
+        CMD_ARR += f' -l "{rv}/veins/src/veins"'
+        CMD_ARR += f' -l "{rv}/veins/subprojects/veins_inet/src/veins_inet"'
+        CMD_ARR += f' "{OPP_INI}"'
+
+        os.chdir(f"{rv}/scripts")
+        print(os.listdir(os.getcwd()))
+        command = f'./omnetpp_rnd "{CMD_ARR}"'
+
+
+        subprocess.check_call(command)
+
+
+        print("fsdvsd")
+
+
+
+
+
+
+
+
+
 
     def _get_current_filepath(self, qoi):
         filepath = f"{os.getcwd()}/results/**/{qoi}"
@@ -169,6 +230,8 @@ if __name__ == "__main__":
     # start simulation
     simulation_run = SimulationRun(qoi=qoi, remove = remove)
     os.environ["ROVER_MAIN"] = "/home/christina/repos/rover-main"
+
+    simulation_run.run_sim()
 
     try:
         simulation_run.pre_processing()
