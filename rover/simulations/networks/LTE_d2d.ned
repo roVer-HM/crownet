@@ -54,7 +54,7 @@ network LTE_d2d
         }
         configurator: Ipv4NetworkConfigurator {
             @display("p=357,164;is=s");
-            config = xmldoc("demo.xml");
+            config = xmldoc("ip4Config.xml");
         }
         binder: LteBinder {
             @display("p=403,164;is=s");
