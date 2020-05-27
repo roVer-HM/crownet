@@ -1,5 +1,5 @@
 {
-  "name" : "simple_detour_100x177_miat1.25_clone_1",
+  "name" : "simple_detour_poisson_dist_0.2",
   "description" : "",
   "release" : "1.12",
   "processWriters" : {
@@ -16,28 +16,16 @@
       "filename" : "targetIds.csv",
       "processors" : [ 3 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
-      "filename" : "gridDensity.csv",
-      "processors" : [ 8 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "footsteps.csv",
       "processors" : [ 9 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
-      "filename" : "Density_trias1.csv",
-      "processors" : [ 10 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "Mesh_trias1.txt",
-      "processors" : [ 11 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "DegreeInformed.txt",
       "processors" : [ 12 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
-      "filename" : "Mesh_trias_informed.txt",
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "numberPedsGen.txt",
       "processors" : [ 13 ]
     } ],
     "processors" : [ {
@@ -56,33 +44,11 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 7
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridCountingProcessor",
-      "id" : 8,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
-      "attributes" : {
-        "cellSize" : 22.0
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
       "id" : 9,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
       "attributes" : {
         "interpolate" : true
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshDensityCountingProcessor",
-      "id" : 10,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshDensityCountingProcessor",
-      "attributes" : {
-        "meshProcessorId" : 11
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshProcessor",
-      "id" : 11,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
-      "attributes" : {
-        "measurementAreaId" : 10,
-        "edgeLength" : 5.0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedStimulusCountingProcessor",
@@ -92,16 +58,15 @@
         "informationFilter" : "E2002_closed",
         "isRegexFilter" : false,
         "stopIfPercentageIsInformed" : 0.95,
-        "numberOfAdditionalTimeFrames" : 20
+        "numberOfAdditionalTimeFrames" : 1
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshPedStimulusCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfGeneratedPedsProcessor",
       "id" : 13,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshPedStimulusCountingProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOfGeneratedPedsProcessor",
       "attributes" : {
-        "meshProcessorId" : 11,
-        "informationFilter" : "E2002_closed",
-        "isRegexFilter" : false
+        "startTime" : 0.0,
+        "endTime" : -1.0
       }
     } ],
     "isTimestamped" : true,
@@ -164,14 +129,14 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 3000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : true,
+      "useFixedSeed" : false,
       "fixedSeed" : 7572244723134245826,
       "simulationSeed" : 0
     },
@@ -188,7 +153,7 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 177.0,
-          "height" : 120.0
+          "height" : 135.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -312,112 +277,7 @@
         },
         "id" : 11
       } ],
-      "measurementAreas" : [ {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 151.0,
-            "y" : 20.0
-          }, {
-            "x" : 0.3,
-            "y" : 20.0
-          }, {
-            "x" : 0.5,
-            "y" : 0.5
-          }, {
-            "x" : 176.5,
-            "y" : 0.5
-          }, {
-            "x" : 176.5,
-            "y" : 20.0
-          }, {
-            "x" : 157.0,
-            "y" : 20.0
-          }, {
-            "x" : 157.0,
-            "y" : 23.0
-          }, {
-            "x" : 159.2,
-            "y" : 23.0
-          }, {
-            "x" : 159.2,
-            "y" : 50.0
-          }, {
-            "x" : 150.0,
-            "y" : 50.0
-          }, {
-            "x" : 150.0,
-            "y" : 44.0
-          }, {
-            "x" : 115.0,
-            "y" : 44.0
-          }, {
-            "x" : 115.0,
-            "y" : 74.0
-          }, {
-            "x" : 150.0,
-            "y" : 74.0
-          }, {
-            "x" : 150.0,
-            "y" : 50.0
-          }, {
-            "x" : 176.5,
-            "y" : 50.0
-          }, {
-            "x" : 176.5,
-            "y" : 114.0
-          }, {
-            "x" : 0.5,
-            "y" : 114.0
-          }, {
-            "x" : 0.5,
-            "y" : 74.0
-          }, {
-            "x" : 75.0,
-            "y" : 74.0
-          }, {
-            "x" : 75.0,
-            "y" : 71.0
-          }, {
-            "x" : 10.0,
-            "y" : 71.0
-          }, {
-            "x" : 10.0,
-            "y" : 74.0
-          }, {
-            "x" : 0.5,
-            "y" : 74.0
-          }, {
-            "x" : 0.0,
-            "y" : 50.0
-          }, {
-            "x" : 17.0,
-            "y" : 50.0
-          }, {
-            "x" : 17.0,
-            "y" : 23.0
-          }, {
-            "x" : 55.0,
-            "y" : 23.0
-          }, {
-            "x" : 55.0,
-            "y" : 50.0
-          }, {
-            "x" : 95.0,
-            "y" : 50.0
-          }, {
-            "x" : 95.0,
-            "y" : 23.0
-          }, {
-            "x" : 151.8,
-            "y" : 23.0
-          }, {
-            "x" : 151.8,
-            "y" : 20.0
-          } ]
-        },
-        "id" : 10
-      } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2001,
@@ -470,6 +330,23 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 5000,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 116.0,
+          "width" : 175.0,
+          "height" : 2.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ {
         "id" : 1,
@@ -484,93 +361,53 @@
         "nextTargetIsPedestrian" : false,
         "nextTarget" : [ 2003, 2001 ],
         "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 6,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 118.0,
+          "width" : 87.5,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "nextTargetIsPedestrian" : false,
+        "nextTarget" : [ 2002, 2001 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 7,
+        "shape" : {
+          "x" : 88.5,
+          "y" : 118.0,
+          "width" : 87.5,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "nextTargetIsPedestrian" : false,
+        "nextTarget" : [ 2003, 2001 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 3001,
+        "id" : 5,
         "shape" : {
-          "x" : 0.0,
-          "y" : 114.0,
-          "width" : 44.0,
-          "height" : 5.0,
+          "x" : 1.0,
+          "y" : 124.0,
+          "width" : 175.0,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 30.0 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.15 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2002, 2001 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 3002,
-        "shape" : {
-          "x" : 44.25,
-          "y" : 114.0,
-          "width" : 44.0,
-          "height" : 5.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 30.0 ],
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2002, 2001 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 3003,
-        "shape" : {
-          "x" : 88.5,
-          "y" : 114.0,
-          "width" : 44.0,
-          "height" : 5.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 30.0 ],
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2003, 2001 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 3004,
-        "shape" : {
-          "x" : 132.95,
-          "y" : 114.2,
-          "width" : 44.0,
-          "height" : 5.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 30.0 ],
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2003, 2001 ],
+        "targetIds" : [ 5000 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null

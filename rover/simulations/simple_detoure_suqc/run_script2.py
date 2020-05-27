@@ -2,13 +2,15 @@
 # import roveranalzer
 # import logging # <-- runSim.py erzeuge logfile runSim.log
 import os
-import shutil
+import sys
+
+import numpy
 from datetime import datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from runner.opprunner import BaseRunner, process_as
+from roveranalyzer.runner.opprunner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):
@@ -53,8 +55,9 @@ class SimulationRun(BaseRunner):
         filename = "DegreeInformed.txt"
         # wait for file
         filepath = self.wait_for_file(
-            os.path.join(self.result_base_dir(), "vadere.d", filename)
+            os.path.join(self.result_base_dir(), "vadere.d", filename),
         )
+
         # replace it with file extraction
         df_r = self.get_degree_informed_dataframe(filepath)
 
@@ -69,38 +72,39 @@ class SimulationRun(BaseRunner):
         f.write(f" timeToInform95PercentAgents\n0 {time95}")
         f.close()
 
-    @process_as({"prio": -99, "type": "post"})
-    def clean_dir(self):
-        if not self.ns["keep"]:
-            shutil.rmtree("vadere")
-            shutil.rmtree("sumo")
+    @process_as({"prio": 30, "type": "post"})
+    def PoissonParameter(self):
+        filename = "numberPedsGen.txt"
+        # wait for file
+        filepath = self.wait_for_file(
+            os.path.join(self.result_base_dir(), "vadere.d", filename),
+        )
 
-            file_list = []
-            for root, d_names, f_names in os.walk(os.getcwd()):
-                for f in f_names:
-                    file_list.append(os.path.join(root, f))
+        # replace it with file extraction
+        df_r = pd.read_csv(filepath, delimiter=" ", header=[0], comment="#")
 
-            for file_path in file_list:
-                file_name = os.path.basename(file_path)
-                if os.path.splitext(file_name)[0] not in self.ns["qoi"]:
-                    os.remove(file_path)
+        poisson_parameter = numpy.mean(df_r.iloc[:, 1])
+
+        f = open(os.path.join(os.path.dirname(filepath), "PoissonParameter.txt"), "x")
+        f.write(f" PoissonParameter\n0 {poisson_parameter}")
+        f.close()
+
 
 
 if __name__ == "__main__":
 
-    # runner = SimulationRun(os.getcwd(), sys.argv)
+
     runner = SimulationRun(
-        "/home/sts/repos/rover-main/rover/simulations/mucFreiNetdLTE2dMulticast/",
+        os.getcwd(),
         [
             "--qoi",
             "DegreeInformed_extract.txt",
             "Time95Informed.txt",
-            "--config",
-            "vadere01",
-            "--keep",
-            "--debug",
+            "PoissonParameter.txt",
             "--experiment-label",
             datetime.now().isoformat().replace(":", "").replace("-", ""),
-        ],
+            "--run-name",
+            "run_0_0"
+        ]
     )
     runner.run()
