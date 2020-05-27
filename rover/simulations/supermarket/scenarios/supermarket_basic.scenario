@@ -15,6 +15,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
+      "filename" : "contacts.txt",
+      "processors" : [ 5 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -31,6 +35,16 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.5,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
       }
     } ],
     "isTimestamped" : true,
@@ -62,13 +76,13 @@
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
-        "pedPotentialPersonalSpaceWidth" : 1.2,
-        "pedPotentialHeight" : 50.0,
+        "pedPotentialPersonalSpaceWidth" : 1.5,
+        "pedPotentialHeight" : 130.0,
         "obstPotentialWidth" : 0.8,
-        "obstPotentialHeight" : 4.0,
+        "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,
-        "personalSpacePower" : 1,
-        "intimateSpacePower" : 1
+        "personalSpacePower" : 2.0,
+        "intimateSpacePower" : 0.95
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
