@@ -38,7 +38,7 @@ class SimulationRun(BaseRunner):
         # replace it with file extraction
         df_r = self.get_degree_informed_dataframe(filepath)
         df_r.to_csv(
-            os.path.join(os.path.dirname(filepath), "DegreeInformed_extract.txt"),
+            os.path.join(os.path.dirname(filepath), "degree_informed_extract.txt"),
             sep=" ",
         )
 
@@ -68,12 +68,12 @@ class SimulationRun(BaseRunner):
                 break
             time95 += dt
 
-        f = open(os.path.join(os.path.dirname(filepath), "Time95Informed.txt"), "x")
+        f = open(os.path.join(os.path.dirname(filepath), "time_95_informed.txt"), "x")
         f.write(f" timeToInform95PercentAgents\n0 {time95}")
         f.close()
 
     @process_as({"prio": 30, "type": "post"})
-    def PoissonParameter(self):
+    def poisson_parameter(self):
         filename = "numberPedsGen.txt"
         # wait for file
         filepath = self.wait_for_file(
@@ -85,26 +85,23 @@ class SimulationRun(BaseRunner):
 
         poisson_parameter = numpy.mean(df_r.iloc[:, 1])
 
-        f = open(os.path.join(os.path.dirname(filepath), "PoissonParameter.txt"), "x")
+        f = open(os.path.join(os.path.dirname(filepath), "poisson_parameter.txt"), "x")
         f.write(f" PoissonParameter\n0 {poisson_parameter}")
         f.close()
 
-
-
 if __name__ == "__main__":
 
+    sys0 = [ar for ar in sys.argv if ar not in ["python3", __file__]]
 
-    runner = SimulationRun(
-        os.getcwd(),
-        [
+    if len(sys0) == 0:
+        # define default behavior of script here:
+        sys0 = [
             "--qoi",
-            "DegreeInformed_extract.txt",
-            "Time95Informed.txt",
-            "PoissonParameter.txt",
+            "degree_informed_extract.txt",
+            "poisson_parameter.txt",
             "--experiment-label",
             datetime.now().isoformat().replace(":", "").replace("-", ""),
-            "--run-name",
-            "run_0_0"
         ]
-    )
+
+    runner = SimulationRun(os.getcwd(), sys0)
     runner.run()
