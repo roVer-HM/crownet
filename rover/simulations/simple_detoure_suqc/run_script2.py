@@ -14,7 +14,7 @@ from roveranalyzer.runner.opprunner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):
-    def __init__(self, working_dir, args):
+    def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
     @staticmethod
@@ -89,19 +89,23 @@ class SimulationRun(BaseRunner):
         f.write(f" PoissonParameter\n0 {poisson_parameter}")
         f.close()
 
+
 if __name__ == "__main__":
 
-    sys0 = [ar for ar in sys.argv if ar not in ["python3", __file__]]
+    if len(sys.argv) == 1:
+        # default behavior of script
+        runner = SimulationRun(
+            os.getcwd(),
+            [
+                "--qoi",
+                "degree_informed_extract.txt",
+                "poisson_parameter.txt",
+                "--experiment-label",
+                datetime.now().isoformat().replace(":", "").replace("-", ""),
+            ],
+        )
+    else:
+        # use arguments from command line
+        runner = SimulationRun(os.getcwd())
 
-    if len(sys0) == 0:
-        # define default behavior of script here:
-        sys0 = [
-            "--qoi",
-            "degree_informed_extract.txt",
-            "poisson_parameter.txt",
-            "--experiment-label",
-            datetime.now().isoformat().replace(":", "").replace("-", ""),
-        ]
-
-    runner = SimulationRun(os.getcwd(), sys0)
     runner.run()
