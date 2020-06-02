@@ -17,6 +17,8 @@ RUN apt-get update && \
        clang bison flex make qt5-default \
        libstdc++6-8-dbg \
        clang-format \
+       googletest libgtest-dev google-mock \
+       bear cmake \
        doxygen graphviz tcl-dev tk-dev  valgrind \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
        openscenegraph osgearth \
@@ -24,3 +26,5 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN cd /usr/src/googletest/googletest && cmake CMakeLists.txt && make install
+RUN cd /usr/src/googletest/googlemock && cmake CMakeLists.txt && make install

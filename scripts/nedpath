@@ -19,5 +19,5 @@ ned_folders=$(find $ROVER_MAIN  -name ".nedfolders" | grep -Ev -- $IGNORE_PATH)
 for folder in $ned_folders; do
   NEDPATH="$NEDPATH:$(sed -e "s~^~${folder%%.nedfolders}~g" "$folder" | paste -sd ':')"
 done
-echo "exported NEDPATH=$NEDPATH"
+echo "$NEDPATH"
 export NEDPATH
