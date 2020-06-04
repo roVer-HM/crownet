@@ -1,5 +1,5 @@
 {
-  "name" : "supermarket_basic",
+  "name" : "supermarket_basic_clone_1",
   "description" : "",
   "release" : "1.12",
   "processWriters" : {
@@ -93,7 +93,7 @@
         "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "UNIT",
+          "type" : "NAVIGATION",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
@@ -107,9 +107,9 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1000.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.9,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -119,7 +119,7 @@
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : true,
+      "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
@@ -2339,8 +2339,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
-        "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "searchRadius" : 2.0,
+        "walkingDirectionCalculation" : "BY_GRADIENT",
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
       "teleporter" : null,

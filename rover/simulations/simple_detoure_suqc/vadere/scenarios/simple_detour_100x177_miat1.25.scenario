@@ -2,7 +2,6 @@
   "name" : "simple_detour_100x177_miat1.25",
   "description" : "",
   "release" : "1.12",
-  "commithash" : "b9caa8a4cfce808c1f707dc60bcd6332b142d392",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
