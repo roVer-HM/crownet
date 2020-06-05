@@ -1,5 +1,5 @@
 {
-  "name" : "simple_detour_poisson_dist_0.2",
+  "name" : "simple_detour_poisson_dist_0.2_small",
   "description" : "",
   "release" : "1.12",
   "processWriters" : {
@@ -129,9 +129,9 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 3000.0,
+      "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -152,8 +152,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 177.0,
-          "height" : 135.0
+          "width" : 125.0,
+          "height" : 81.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -161,121 +161,76 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 150.0,
-            "y" : 44.0
-          }, {
-            "x" : 150.0,
-            "y" : 74.0
-          }, {
-            "x" : 115.0,
-            "y" : 74.0
-          }, {
-            "x" : 115.0,
-            "y" : 44.0
-          } ]
-        },
-        "id" : 12
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 75.0,
-            "y" : 71.0
-          }, {
-            "x" : 75.0,
-            "y" : 74.0
-          }, {
-            "x" : 10.0,
-            "y" : 74.0
-          }, {
-            "x" : 10.0,
-            "y" : 71.0
-          } ]
-        },
-        "id" : 13
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 0.3,
-            "y" : 50.0
-          }, {
-            "x" : 0.3,
-            "y" : 21.6
-          }, {
-            "x" : 17.5,
-            "y" : 21.6
-          }, {
-            "x" : 17.5,
-            "y" : 50.0
-          } ]
-        },
-        "id" : 5009
-      }, {
-        "shape" : {
-          "x" : -0.4,
-          "y" : 20.1,
-          "width" : 20.5,
-          "height" : 2.9,
+          "x" : 0.0,
+          "y" : 10.0,
+          "width" : 20.0,
+          "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "id" : 2
       }, {
         "shape" : {
           "x" : 24.9,
-          "y" : 20.007617896009677,
-          "width" : 126.99052806952889,
-          "height" : 2.9790810157194727,
+          "y" : 10.0,
+          "width" : 80.0,
+          "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "id" : 3
       }, {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 55.0,
-            "y" : 50.0
-          }, {
-            "x" : 55.0,
-            "y" : 22.0
-          }, {
-            "x" : 95.0,
-            "y" : 22.0
-          }, {
-            "x" : 95.0,
-            "y" : 50.0
-          } ]
+          "x" : 5.9,
+          "y" : 55.0,
+          "width" : 52.8,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 5002
+        "id" : 8
       }, {
         "shape" : {
-          "x" : 157.0012091898428,
-          "y" : 20.0,
-          "width" : 19.84943688533687,
+          "x" : 43.0,
+          "y" : 12.0,
+          "width" : 17.0,
+          "height" : 23.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 9
+      }, {
+        "shape" : {
+          "x" : 119.3,
+          "y" : 12.0,
+          "width" : 8.0,
+          "height" : 23.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 10
+      }, {
+        "shape" : {
+          "x" : 115.0,
+          "y" : 10.0,
+          "width" : 11.0,
           "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 11
+      }, {
+        "shape" : {
+          "x" : 76.1,
+          "y" : 33.3,
+          "width" : 30.0,
+          "height" : 25.0,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 176.5,
-            "y" : 22.0
-          }, {
-            "x" : 176.5,
-            "y" : 50.4
-          }, {
-            "x" : 159.3,
-            "y" : 50.4
-          }, {
-            "x" : 159.0,
-            "y" : 22.0
-          } ]
+          "x" : 0.0,
+          "y" : 12.0,
+          "width" : 10.962167689161555,
+          "height" : 23.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 11
+        "id" : 7
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -283,10 +238,10 @@
         "id" : 2001,
         "absorbing" : true,
         "shape" : {
-          "x" : 73.0,
-          "y" : 0.0,
-          "width" : 31.0,
-          "height" : 8.0,
+          "x" : 32.5,
+          "y" : 0.7,
+          "width" : 65.0,
+          "height" : 9.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -300,9 +255,9 @@
         "id" : 2003,
         "absorbing" : false,
         "shape" : {
-          "x" : 151.9,
-          "y" : 20.0,
-          "width" : 5.0,
+          "x" : 105.0,
+          "y" : 10.0,
+          "width" : 10.0,
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
@@ -318,26 +273,9 @@
         "absorbing" : false,
         "shape" : {
           "x" : 20.0,
-          "y" : 20.0,
+          "y" : 10.0,
           "width" : 5.0,
           "height" : 3.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 5000,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 1.0,
-          "y" : 116.0,
-          "width" : 175.0,
-          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -351,36 +289,10 @@
       "targetChangers" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 17.49810945273632,
-          "y" : 23.0,
-          "width" : 37.46626865671641,
-          "height" : 27.0,
-          "type" : "RECTANGLE"
-        },
-        "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
-        "nextTarget" : [ 2003, 2001 ],
-        "probabilityToChangeTarget" : [ 1.0 ]
-      }, {
-        "id" : 6,
-        "shape" : {
-          "x" : 1.0,
-          "y" : 118.0,
-          "width" : 87.5,
-          "height" : 6.0,
-          "type" : "RECTANGLE"
-        },
-        "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
-        "nextTarget" : [ 2002, 2001 ],
-        "probabilityToChangeTarget" : [ 1.0 ]
-      }, {
-        "id" : 7,
-        "shape" : {
-          "x" : 88.5,
-          "y" : 118.0,
-          "width" : 87.5,
-          "height" : 6.0,
+          "x" : 11.0,
+          "y" : 13.0,
+          "width" : 32.0,
+          "height" : 22.0,
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
@@ -390,24 +302,90 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 5,
+        "id" : 1,
         "shape" : {
-          "x" : 1.0,
-          "y" : 124.0,
-          "width" : 175.0,
-          "height" : 10.0,
+          "x" : 0.59,
+          "y" : 73.0,
+          "width" : 30.5,
+          "height" : 7.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
-        "distributionParameters" : [ 0.15 ],
+        "distributionParameters" : [ 0.0375 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 10000.0,
-        "spawnAtRandomPositions" : true,
+        "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 5000 ],
+        "targetIds" : [ 2002, 2001 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 2,
+        "shape" : {
+          "x" : 31.5,
+          "y" : 73.0,
+          "width" : 30.5,
+          "height" : 7.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 10000.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2002, 2001 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 5,
+        "shape" : {
+          "x" : 62.5,
+          "y" : 73.0,
+          "width" : 30.5,
+          "height" : 7.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 10000.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2003, 2001 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 6,
+        "shape" : {
+          "x" : 93.5,
+          "y" : 73.0,
+          "width" : 30.5,
+          "height" : 7.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 10000.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
