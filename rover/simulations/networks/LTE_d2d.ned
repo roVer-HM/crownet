@@ -37,11 +37,11 @@ network LTE_d2d
 {
     parameters:
         int numUeCell = default(0);
-        int numUeD2DReceiver = default(0);
-        int numUeD2DSender = default(0);
+        int numUeD2D_a = default(0);
+        int numUeD2D_b = default(0);
         int numMappings = default(0);
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
-        @figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,18; textFormat="packets received: %g"; initialValue=0);
+        //@figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,10; textFormat="packets received: %g"; initialValue=0);
 
         @display("bgb=899,473");
     submodules:
@@ -54,7 +54,7 @@ network LTE_d2d
         }
         configurator: Ipv4NetworkConfigurator {
             @display("p=357,164;is=s");
-            config = xmldoc("demo.xml");
+            config = xmldoc("ip4Config.xml");
         }
         binder: LteBinder {
             @display("p=403,164;is=s");
@@ -76,13 +76,13 @@ network LTE_d2d
             @display("p=357,312;is=vs");
         }
 
-        ueD2DReceiver[numUeD2DReceiver]: MobileUe {
+        ueD2D_a[numUeD2D_a]: MobileUe {
             @display("p=356,277;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
         }
 
-        ueD2DSender[numUeD2DSender]: MobileUe {
+        ueD2D_b[numUeD2D_a]: MobileUe {
             @display("p=356,245;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";

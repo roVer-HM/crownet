@@ -1,7 +1,7 @@
 {
   "name" : "simple_detour_100x177_long_miat0.33",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -317,7 +317,7 @@
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
         "nextTarget" : [ 2003, 2001 ],
-        "probabilityToChangeTarget" : 1.0
+        "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -340,7 +340,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3002,
         "shape" : {
@@ -361,7 +362,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2002, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3003,
         "shape" : {
@@ -382,7 +384,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3004,
         "shape" : {
@@ -403,7 +406,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2003, 2001 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

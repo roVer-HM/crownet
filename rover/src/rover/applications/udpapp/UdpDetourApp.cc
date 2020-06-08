@@ -82,9 +82,9 @@ void UdpDetourApp::initialize(int stage) {
     recordScalar("internalId", getId());
     recordScalar("moduleCreationTime", simTime().dbl(), "s");
 
-    if (stopTime >= SIMTIME_ZERO && startTime >= SIMTIME_ZERO && stopTime < startTime)
+    if (stopTime >= SIMTIME_ZERO && startTime >= SIMTIME_ZERO &&
+        stopTime < startTime)
       throw cRuntimeError("Invalid startTime/stopTime parameters");
-
 
     // application life cycle (selfMsg)
     selfMsg = new cMessage("applicationTimer");
@@ -187,15 +187,15 @@ void UdpDetourApp::setSocketOptions() {
 
 void UdpDetourApp::handleStartOperation(LifecycleOperation *operation) {
   // start application. startTime of -1.0 means deactivated application.
-    simtime_t start = std::max(startTime, simTime());
-    selfMsg->setKind(FsmStates::SETUP);
-    scheduleAt(start, selfMsg);
+  simtime_t start = std::max(startTime, simTime());
+  selfMsg->setKind(FsmStates::SETUP);
+  scheduleAt(start, selfMsg);
 
-    // start incidentTimer if node is the source of the information.
-    if (isSender()) {
-      selfMsgIncident->setKind(FsmStates::INCIDENT_TX);
-      scheduleAt(incidentTime, selfMsgIncident);
-    }
+  // start incidentTimer if node is the source of the information.
+  if (isSender()) {
+    selfMsgIncident->setKind(FsmStates::INCIDENT_TX);
+    scheduleAt(incidentTime, selfMsgIncident);
+  }
 }
 
 void UdpDetourApp::handleStopOperation(LifecycleOperation *operation) {

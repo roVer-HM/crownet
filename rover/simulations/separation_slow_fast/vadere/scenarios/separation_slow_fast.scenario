@@ -1,8 +1,7 @@
 {
   "name" : "separation_slow_fast",
   "description" : "",
-  "release" : "1.11",
-  "commithash" : "f1fb53d68af6f8f4b84898b4e1c6a4be0bc89982",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

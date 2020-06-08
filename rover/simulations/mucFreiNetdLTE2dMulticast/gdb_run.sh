@@ -5,25 +5,25 @@ if [[ -z $ROVER_MAIN ]];then
   exit -1
 fi
 
-echo "$PWD"
-
-SIM_DIR="$PWD"
+SIM_DIR="$(dirname $(realpath $0))"
 OPP_INI="omnetpp.ini"
-CONFIG="vadere-01"
 
-
-EXPERIMENT="experiment-$(date +"%Y-%m-%d-%s")"
-RESULT_DIR="$(realpath "output")"
-if [[ -d "$RESULT_DIR" ]];then
-	rm -rf "$RESULT_DIR"
+if [[ -z "$1" ]];then
+    CONFIG="vadere00"
+else
+    CONFIG="$1"
 fi
-mkdir "$RESULT_DIR"
+
+
+EXPERIMENT="$(date +"%Y-%m-%d-%s")"
+RESULT_DIR="$(realpath "results")"
+mkdir -p "$RESULT_DIR"
 
 # run
 pushd $SIM_DIR > /dev/null
 source $ROVER_MAIN/scripts/nedpath > /dev/null
 
-CMD_ARR=(exec opp_runall -j $(nproc) opp_run)
+CMD_ARR=(exec gdb --args opp_run_dbg)
 CMD_ARR+=(-u Cmdenv)
 CMD_ARR+=(-c "$CONFIG")
 CMD_ARR+=("--experiment-label=$EXPERIMENT")
@@ -40,7 +40,3 @@ echo "$ROVER_MAIN/scripts/omnetpp ${CMD_ARR[@]}"
 echo ""
 $ROVER_MAIN/scripts/omnetpp "${CMD_ARR[@]}"
 
-if [[ -f ".cmdenv-log" ]];then
-	mv -v ".cmdenv-log" "$RESULT_DIR"
-fi
-popd > /dev/null
