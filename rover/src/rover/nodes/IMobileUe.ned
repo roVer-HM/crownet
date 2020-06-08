@@ -15,25 +15,11 @@
 
 package rover.nodes;
 
-import rover.nodes.IMobileUe;
-import lte.corenetwork.nodes.Ue;
-import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 
-// see lte.corenetwork.nodes.cars;
-module MobileUe extends Ue like IMobileUe{
-	
-	parameters:
-	    @display("i=misc/smartphone;is=vs");
-	    
-	    mobilityType = default("VaderePersonMobility");
-	    
-	    // Network Layer specs
-        *.routingTableModule = default(absPath(".ipv4.routingTable"));
-	    
-	submodules:
-	    configurator: HostAutoConfigurator {
-            @display("p=126.4,413.96");
-        }
-	
+moduleinterface IMobileUe
+{
+    parameters:
+        @display("i=block/app");        
+        //# Mobility
+        string mobilityType;
 }
-

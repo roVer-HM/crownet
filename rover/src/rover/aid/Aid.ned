@@ -13,27 +13,28 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.nodes;
+package rover.aid;
 
-import rover.nodes.IMobileUe;
-import lte.corenetwork.nodes.Ue;
-import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
-
-// see lte.corenetwork.nodes.cars;
-module MobileUe extends Ue like IMobileUe{
-	
-	parameters:
-	    @display("i=misc/smartphone;is=vs");
-	    
-	    mobilityType = default("VaderePersonMobility");
-	    
-	    // Network Layer specs
-        *.routingTableModule = default(absPath(".ipv4.routingTable"));
-	    
-	submodules:
-	    configurator: HostAutoConfigurator {
-            @display("p=126.4,413.96");
-        }
-	
+moduleinterface IAid
+{
+    parameters:
+        @display("i=block/app");
+    gates:
+        input upperIn;
+        output upperOut;
+        input lowerIn;
+        output lowerOut;
 }
 
+simple SimpleAid like IAid {
+    parameters:
+    @display("i=block/app");
+    @class(rover::SimpleAid);
+    string aidConfigModule = default("^.aidCfg");
+    
+    gates:
+    input upperIn;
+    output upperOut;
+    input lowerIn;
+    output lowerOut;
+}

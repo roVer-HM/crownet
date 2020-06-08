@@ -28,7 +28,7 @@ import lte.corenetwork.nodes.Ue;
 import lte.corenetwork.nodes.eNodeB;
 import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
-import rover.nodes.MobileUe;
+import rover.nodes.IMobileUe;
 import rover.nodes.UnequippedHost;
 import org.car2x.veins.modules.mobility.traci.ITraCIManager;
 import org.car2x.veins.subprojects.veins_inet.mapping.NodeMappingDistribution;
@@ -40,6 +40,7 @@ network LTE_d2d
         int numUeD2D_a = default(0);
         int numUeD2D_b = default(0);
         int numMappings = default(0);
+        string ueType = default("MobileUe");
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
         //@figure[rcvdPkText](type=indicatorText; pos=380,20; anchor=w; font=,10; textFormat="packets received: %g"; initialValue=0);
 
@@ -76,13 +77,13 @@ network LTE_d2d
             @display("p=357,312;is=vs");
         }
 
-        ueD2D_a[numUeD2D_a]: MobileUe {
+        ueD2D_a[numUeD2D_a]: <ueType> like IMobileUe { 
             @display("p=356,277;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
         }
 
-        ueD2D_b[numUeD2D_a]: MobileUe {
+        ueD2D_b[numUeD2D_b]: <ueType> like IMobileUe { 
             @display("p=356,245;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
