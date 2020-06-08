@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.applications.udpapp;
+package rover.applications.udpapp.detour;
 
 import inet.applications.contract.IApp;
 import rover.applications.common.BaseApp;
@@ -65,4 +65,12 @@ simple UdpDetourApp extends BaseApp
         bool joinLocalMulticastGroups = default(false); // if true, makes the socket receive packets from all multicast groups set on local interfaces
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation    
+}
+
+simple UdpDetourAppVadere extends UdpDetourApp
+{
+	parameters:
+	    @class(rover::UdpDetourAppVadere);
+	    // sender parameters
+	    notifyMobilityProvider = default(true);
 }
