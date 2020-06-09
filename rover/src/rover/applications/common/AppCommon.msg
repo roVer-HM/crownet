@@ -19,27 +19,7 @@ import inet.applications.base.ApplicationPacket;
 import inet.common.geometry.Geometry;
 import inet.common.TagBase;
 
-
-namespace rover;
-
-
-enum DetourPktType {
-	INCIDENT = 0;
-	PROPAGATE = 1;
-}
-
-class DetourAppPacket extends inet::ApplicationPacket
+class CurrentLocationTag extends inet::TagBase
 {
- 	   string incidentReason;
- 	   simtime_t repeatTime;
- 	   simtime_t repeateInterval = 20.0;
- 	   string closedTarget;
- 	   string alternativeRoute[];
- 	   simtime_t firstHopTime;
- 	   uint32_t firstHopId;
- 	   inet::Coord firstHopOrigin;
- 	   simtime_t lastHopTime;
- 	   uint32_t lastHopId;
- 	   inet::Coord lastHopOrigin;
- 	   DetourPktType type;
+    inet::Coord location;
 }

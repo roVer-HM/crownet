@@ -14,8 +14,9 @@
 //
 
 #include "ResultFilters.h"
+
 #include "inet/common/packet/Packet.h"
-#include "rover/applications/udpapp/DetourAppPacket_m.h"
+#include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
 
 using namespace inet;
 
@@ -38,7 +39,7 @@ void LastHopAgeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
   if (auto packet = dynamic_cast<Packet *>(object)) {
     auto data = packet->peekData<DetourAppPacket>();
     simtime_t delta = simTime() - data->getLastHopTime();
-    ASSERT(delta >= 0); // delta == 0 if packet comes with loopback
+    ASSERT(delta >= 0);  // delta == 0 if packet comes with loopback
     fire(this, t, delta, details);
   }
 }

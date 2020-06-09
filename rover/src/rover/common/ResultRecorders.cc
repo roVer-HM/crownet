@@ -14,8 +14,9 @@
 //
 
 #include "ResultRecorders.h"
+
 #include "inet/common/packet/Packet.h"
-#include "rover/applications/udpapp/DetourAppPacket_m.h"
+#include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
 
 using namespace inet;
 using namespace omnetpp::common;  // Expression
