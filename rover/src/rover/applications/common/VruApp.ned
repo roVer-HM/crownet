@@ -29,6 +29,9 @@ simple VruAid extends BaseApp like IVRU {
 	    sendInterval =  default(0.1s);
 	    messageLength = default(1000B);
 	    packetName = default("VRU_AID");
+	    double minRate = default(1); // Hz
+	    double maxRate = default(10); // Hz
+	    
 
 }
 

@@ -37,10 +37,7 @@ simple BaseApp like IApp
         string packetName = default("BasicAppData");
         volatile int messageLength @unit(B); // length of messages to generate, in bytes
         // IP Setting
-        bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing
-        int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
-        int dscp = default(-1); // if not -1, set the DSCP field (on IPv4/IPv6) of sent packets to this value
-        int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
+        bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing       
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
@@ -58,10 +55,20 @@ simple BaseApp like IApp
         output socketOut;
 }
 
+simple AidBaseApp extends BaseApp {
+      parameters:
+        @class(rover::AidBaseApp);
+        @display("i=block/app");
+}
+
 simple UdpBaseApp extends BaseApp {
       parameters:
         @class(rover::UdpBaseApp);
         @display("i=block/app");
+        // udp socket options
+        int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
+        int dscp = default(-1); // if not -1, set the DSCP field (on IPv4/IPv6) of sent packets to this value
+        int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
         string multicastInterface = default("");  // if not empty, set the multicast output interface option on the socket (interface name expected)
         bool receiveBroadcast = default(true); // if true, makes the socket receive broadcast packets
         bool joinLocalMulticastGroups = default(false); // if true, makes the socket receive packets from all multicast groups set on local interfaces		

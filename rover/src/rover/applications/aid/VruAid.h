@@ -13,17 +13,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "IAidConfig.h"
+#pragma once
 
-using namespace inet;
+#include "inet/mobility/base/MobilityBase.h"
+#include "rover/applications/common/AidBaseApp.h"
 
 namespace rover {
 
-IAidConfig::IAidConfig() {
-  // TODO Auto-generated constructor stub
-}
+class VruAid : public AidBaseApp {
+ public:
+  VruAid();
+  virtual ~VruAid();
 
-IAidConfig::~IAidConfig() {
-  // TODO Auto-generated destructor stub
-}
+ protected:
+  MobilityBase *mobilityModule = nullptr;
+
+ protected:
+  virtual void initialize(int stage) override;
+  virtual FsmState fsmSend(cMessage *msg) override;
+  virtual Coord getCurrentLocation();
+
+  virtual void setAppRequirements() override;
+  virtual void setAppCapabilities() override;
+};
 }  // namespace rover

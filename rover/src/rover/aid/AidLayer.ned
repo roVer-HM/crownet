@@ -15,7 +15,6 @@
 
 package rover.aid;
 import rover.aid.IAid;
-import rover.aid.SimpleAidConfig;
 import inet.common.MessageDispatcher;
 
 moduleinterface IAidLayer
@@ -39,12 +38,9 @@ module SimpleAidLayer like IAidLayer
         output lowerOut;
 
     submodules:
-        aid: <default("SimpleAid")> like IAid {
+        aid: <default("Aid")> like IAid {
             parameters:
                 @display("p=164,121;is=s");
-        }
-        aidCfg: <default("SimpleAidConfig")> like IAidConfig {
-            @display("p=394,121;is=s");
         }
         // Message Dispatcher 
         upper: MessageDispatcher {

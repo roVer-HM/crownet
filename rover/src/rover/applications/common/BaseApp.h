@@ -62,9 +62,6 @@ class BaseApp : public ApplicationBase {
   std::vector<std::string> destAddressStr;
   const char *packetName = nullptr;
   bool dontFragment;
-  int timeToLive;
-  int dscp;
-  int tos;
 
   // state
   cMessage *selfMsgAppTimer = nullptr;

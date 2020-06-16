@@ -1,8 +1,8 @@
 /*
- * SimpleAidConfig_test.cc
+ * SimpleAid_test.cc
  *
  *  Created on: Jun 5, 2020
  *      Author: sts
  */
 
-#include "SimpleAidConfig.h"
+#include "Aid.h"

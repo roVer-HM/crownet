@@ -38,9 +38,6 @@ void BaseApp::initialize(int stage) {
     // packet and IP options
     packetName = par("packetName");
     dontFragment = par("dontFragment").boolValue();
-    timeToLive = par("timeToLive").intValue();
-    dscp = par("dscp").intValue();
-    tos = par("tos").intValue();
 
     if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
       throw cRuntimeError("Invalid startTime/stopTime parameters");
@@ -180,8 +177,6 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
 // FSM
 
 BaseApp::FsmState BaseApp::fsmSetup(cMessage *msg) {
-  initSocket();
-
   const char *destAddrs = par("destAddresses");
   cStringTokenizer tokenizer(destAddrs);
   const char *token;
@@ -194,6 +189,8 @@ BaseApp::FsmState BaseApp::fsmSetup(cMessage *msg) {
       EV_ERROR << "cannot resolve destination address: " << token << endl;
     destAddresses.push_back(result);
   }
+
+  initSocket();
 
   if (stopTime >= SIMTIME_ZERO) {
     selfMsgAppTimer->setKind(FsmRootStates::TEARDOWN);

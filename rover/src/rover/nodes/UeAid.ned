@@ -73,7 +73,8 @@ module UeAid
         //# Network Layer specs
         bool hasIpv4 = default(true);
         bool hasIpv6 = default(false);
-        *.interfaceTableModule = default(absPath(".interfaceTable"));
+//        *.interfaceTableModule = default(absPath(".interfaceTable"));
+        **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.ipv4.routingTable");
 
     gates:

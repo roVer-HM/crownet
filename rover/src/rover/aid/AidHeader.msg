@@ -3,27 +3,27 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#pragma once
+import inet.common.INETDefs;
+import inet.common.packet.chunk.Chunk;
 
-#include "inet/common/INETDefs.h"
+namespace rover;
 
-using namespace inet;
+class AidHeader extends inet::FieldsChunk
+{
+    
+}
 
-namespace rover {
-
-class IAidConfig : public cSimpleModule {
- public:
-  IAidConfig();
-  virtual ~IAidConfig();
-};
-}  // namespace rover
+cplusplus(AidHeader) {{
+    public:
+    virtual std::string str() const override;
+}}
