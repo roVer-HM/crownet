@@ -77,12 +77,17 @@ void BaseApp::scheduleNextSendEvent(simtime_t time) {
 }
 
 void BaseApp::sendPayload(IntrusivePtr<const ApplicationPacket> payload) {
+  L3Address destAddr = chooseDestAddr();
+  sendPayload(payload, destAddr, destPort);
+}
+
+void BaseApp::sendPayload(IntrusivePtr<const ApplicationPacket> payload,
+                          L3Address destAddr, int destPort) {
   std::ostringstream str;
   str << packetName << "-" << getId() << "#" << numSent;
   Packet *packet = new Packet(str.str().c_str());
   if (dontFragment) packet->addTag<FragmentationReq>()->setDontFragment(true);
   packet->insertAtBack(payload);
-  L3Address destAddr = chooseDestAddr();
   emit(packetSentSignal, packet);
   EV_TRACE << "send packet: " << str.str().c_str()
            << " to destAddr: " << destAddr << " destPort: " << destPort << endl;

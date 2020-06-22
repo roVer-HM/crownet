@@ -61,7 +61,7 @@ class BaseApp : public ApplicationBase {
   std::vector<L3Address> destAddresses;
   std::vector<std::string> destAddressStr;
   const char *packetName = nullptr;
-  bool dontFragment;
+  bool dontFragment = false;
 
   // state
   cMessage *selfMsgAppTimer = nullptr;
@@ -100,6 +100,8 @@ class BaseApp : public ApplicationBase {
    */
   virtual void scheduleNextSendEvent(simtime_t time = -1);
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
+  virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload,
+                           L3Address destAddr, int destPort);
   virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
   virtual L3Address chooseDestAddr();
 

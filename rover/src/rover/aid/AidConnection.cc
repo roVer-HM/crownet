@@ -17,6 +17,7 @@
 #include "inet/applications/common/SocketTag_m.h"
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/Simsignals.h"
+#include "inet/common/Simsignals_m.h"
 #include "rover/aid/AidCommand_m.h"
 #include "rover/aid/AidHeader_m.h"
 #include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
@@ -203,6 +204,7 @@ bool AidConnection::performStateTransition(const AidEventCode& event) {
           break;
         case AID_E_CLOSE:
           FSM_Goto(fsm, AID_S_CLOSED);
+          break;
         case AID_E_DESTROY:
           FSM_Goto(fsm, AID_S_DESTROYED);
           break;

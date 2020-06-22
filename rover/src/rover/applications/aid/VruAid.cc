@@ -54,7 +54,8 @@ Coord VruAid::getCurrentLocation() {
 
 void VruAid::setAppRequirements() {
   L3Address destAddr = chooseDestAddr();
-  socket.setAppRequirements(par("minRate"), par("maxRate"),
+  socket.setAppRequirements(par("minRate").doubleValue(),
+                            par("maxRate").doubleValue(),
                             AidRecipientClass::ALL_LOCAL, destAddr, destPort);
 }
 
