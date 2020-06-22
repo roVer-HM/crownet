@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-# import roveranalzer
-# import logging # <-- runSim.py erzeuge logfile runSim.log
 import os
 import sys
 
@@ -10,7 +8,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from roveranalyzer.runner.opprunner import BaseRunner, process_as
+from roveranalyzer.runner.roverrunner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):
