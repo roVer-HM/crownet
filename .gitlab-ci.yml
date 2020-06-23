@@ -70,6 +70,7 @@ fingerprints:
     - "cd ${ROVER_MAIN}/rover/tests/fingerprint"
     - "${OPP} ./fingerprints"
   artifacts:
+    when: always
     paths:
     - ${ROVER_MAIN}/rover/tests/fingerprint
     expire_in: 8 weeks
