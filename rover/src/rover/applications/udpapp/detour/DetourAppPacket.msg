@@ -11,29 +11,35 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
-package rover.nodes;
+import inet.common.INETDefs;
+import inet.common.packet.chunk.Chunk;
+import inet.applications.base.ApplicationPacket;
+import inet.common.geometry.Geometry;
+import inet.common.TagBase;
 
-import rover.nodes.IMobileUe;
-import lte.corenetwork.nodes.Ue;
-import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 
-// see lte.corenetwork.nodes.cars;
-module MobileUe extends Ue like IMobileUe{
-	
-	parameters:
-	    @display("i=misc/smartphone;is=vs");
-	    
-	    mobilityType = default("VaderePersonMobility");
-	    
-	    // Network Layer specs
-        *.routingTableModule = default(absPath(".ipv4.routingTable"));
-	    
-	submodules:
-	    configurator: HostAutoConfigurator {
-            @display("p=126.4,413.96");
-        }
-	
+namespace rover;
+
+
+enum DetourPktType {
+	INCIDENT = 0;
+	PROPAGATE = 1;
 }
 
+class DetourAppPacket extends inet::ApplicationPacket
+{
+ 	   string incidentReason;
+ 	   simtime_t repeatTime;
+ 	   simtime_t repeateInterval = 20.0;
+ 	   string closedTarget;
+ 	   string alternativeRoute[];
+ 	   simtime_t firstHopTime;
+ 	   uint32_t firstHopId;
+ 	   inet::Coord firstHopOrigin;
+ 	   simtime_t lastHopTime;
+ 	   uint32_t lastHopId;
+ 	   inet::Coord lastHopOrigin;
+ 	   DetourPktType type;
+}

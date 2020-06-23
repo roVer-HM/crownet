@@ -5,6 +5,6 @@
  *      Author: sts
  */
 
-#include "UdpDetourApp.h"
+#include "rover/applications/udpapp/detour/UdpDetourApp.h"
 
 namespace rover {} /* namespace rover */
