@@ -22,7 +22,8 @@ import org.car2x.veins.base.modules.BaseWorldUtility;
 import org.car2x.veins.modules.mobility.traci.TraCIScenarioManager*;
 import org.car2x.veins.modules.obstacle.ObstacleControl;
 import org.car2x.veins.modules.world.annotations.AnnotationManager;
-
+import org.car2x.veins.modules.mobility.traci.ITraCIManager;
+import org.car2x.veins.subprojects.veins_inet.mapping.NodeMappingDistribution;
 
 
 network LTE_d2d_SUMO extends LTE_d2d
@@ -50,6 +51,13 @@ network LTE_d2d_SUMO extends LTE_d2d
                 playgroundSizeY = playgroundSizeY;
                 playgroundSizeZ = playgroundSizeZ;
                 @display("p=30,0;i=misc/globe");
+        }
+                mappingDistribution[numMappings]: NodeMappingDistribution {
+            @display("p=357,207;is=s;i=block/square");
+        }
+        
+        manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
+            @display("p=364,25;is=s;i=block/square");
         }
 
 }

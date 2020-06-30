@@ -1,7 +1,7 @@
 {
   "name" : "supermarket_basic",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.13",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -81,8 +81,8 @@
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,
-        "personalSpacePower" : 2.0,
-        "intimateSpacePower" : 0.95
+        "personalSpacePower" : 2,
+        "intimateSpacePower" : 0
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
@@ -2110,7 +2110,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 300, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 200 ],
         "probabilityToChangeTarget" : [ 0.2, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.6, 0.4, 0.4, 0.3, 1.0 ]
       }, {
@@ -2123,7 +2123,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 300, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 200 ],
         "probabilityToChangeTarget" : [ 0.2, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.6, 0.4, 0.3, 1.0 ]
       }, {
@@ -2136,7 +2136,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 101, 102, 103, 104, 105, 106, 107, 200, 201 ],
         "probabilityToChangeTarget" : [ 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 1.0, 1.0 ]
       }, {
@@ -2149,7 +2149,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 201, 301, 302, 303, 304, 305, 800, 803 ],
         "probabilityToChangeTarget" : [ 0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 1.0, 1.0 ]
       }, {
@@ -2162,7 +2162,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 801, 802, 803, 804, 805 ],
         "probabilityToChangeTarget" : [ 0.2, 0.2, 0.2, 0.2, 0.2 ]
       }, {
@@ -2175,7 +2175,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 801, 811, 999, 1000 ],
         "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
       }, {
@@ -2188,7 +2188,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 802, 812, 999, 1000 ],
         "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
       }, {
@@ -2201,7 +2201,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 803, 813, 999, 1000 ],
         "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
       }, {
@@ -2214,7 +2214,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 805, 815, 999, 1000 ],
         "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
       }, {
@@ -2227,7 +2227,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 804, 814, 999, 1000 ],
         "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
       }, {
@@ -2240,7 +2240,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 202 ],
         "probabilityToChangeTarget" : [ 0.5 ]
       }, {
@@ -2253,7 +2253,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 301, 400, 402, 404, 405, 505, 406, 601, 602, 603, 604, 407, 408, 409, 509, 410, 411, 412, 413, 513, 414, 415, 900, 800, 899, 804 ],
         "probabilityToChangeTarget" : [ 0.1, 0.4, 0.4, 0.4, 0.8, 0.4, 0.8, 0.1, 0.1, 0.1, 0.1, 0.8, 0.4, 0.8, 0.8, 0.4, 0.6, 0.4, 0.6, 0.4, 0.4, 0.4, 0.3, 1.0, 1.0, 1.0 ]
       }, {
@@ -2266,7 +2266,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 301, 1100, 1101, 400, 402, 404, 405, 505, 406, 601, 602, 603, 604, 407, 408, 409, 509, 410, 411, 412, 413, 513, 414, 415, 900, 800, 899, 803 ],
         "probabilityToChangeTarget" : [ 1.0, 0.5, 0.5, 0.8, 0.8, 0.8, 0.4, 0.8, 0.4, 0.9, 0.4, 0.4, 0.5, 0.4, 0.8, 0.4, 0.2, 0.8, 0.4, 0.8, 0.4, 0.2, 0.8, 0.4, 0.3, 1.0, 1.0, 1.0 ]
       }, {
@@ -2279,7 +2279,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 899, 801 ],
         "probabilityToChangeTarget" : [ 0.7, 0.7, 0.7, 0.3, 0.3, 0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 1.0, 1.0 ]
       } ],

@@ -1,7 +1,7 @@
 {
   "name" : "simple_detour_100x177_miat1.25_clone_1",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.13",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -90,7 +90,9 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
         "informationFilter" : "E2002_closed",
-        "isRegexFilter" : false
+        "isRegexFilter" : false,
+        "stopIfPercentageIsInformed" : 0.95,
+        "numberOfAdditionalTimeFrames" : 20
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.MeshPedStimulusCountingProcessor",
@@ -479,7 +481,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 2003, 2001 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       } ],
