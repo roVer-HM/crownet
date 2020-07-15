@@ -3,37 +3,34 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
-package rover.nodes;
+#pragma once
 
-import rover.nodes.IMobileUe;
-import lte.corenetwork.nodes.Ue;
-import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
+#include "inet/mobility/base/MobilityBase.h"
+#include "rover/applications/common/UdpBaseApp.h"
 
-// see lte.corenetwork.nodes.cars;
-module MobileUe extends Ue like IMobileUe{
-	
-	parameters:
-	    @display("i=misc/smartphone;is=vs");
-	    
-	    mobilityType = default("VaderePersonMobility");
-	    
-	    // Network Layer specs
-        *.routingTableModule = default(absPath(".ipv4.routingTable"));
-	    
-	submodules:
-	    configurator: HostAutoConfigurator {
-            @display("p=126.4,413.96");
-        }
-	
-}
+namespace rover {
 
+class VruUdp : public UdpBaseApp {
+ public:
+  VruUdp();
+  virtual ~VruUdp();
+
+ protected:
+  MobilityBase *mobilityModule = nullptr;
+
+ protected:
+  virtual void initialize(int stage) override;
+  virtual FsmState fsmSend(cMessage *msg) override;
+  virtual Coord getCurrentLocation();
+};
+}  // namespace rover

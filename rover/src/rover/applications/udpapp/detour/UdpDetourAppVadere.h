@@ -10,13 +10,13 @@
 
 #define FSM_DEBUG  // enables debug output from FSMs
 #include <omnetpp.h>
-#include "UdpDetourApp.h"
 #include "inet/applications/base/ApplicationBase.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/geometry/common/Coord.h"
 #include "inet/mobility/base/MobilityBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
-#include "rover/applications/udpapp/DetourAppPacket_m.h"
+#include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
+#include "rover/applications/udpapp/detour/UdpDetourApp.h"
 
 #include "veins_inet/VeinsInetApplicationBase.h"
 #include "veins_inet/vadere/VaderePersonMobility.h"

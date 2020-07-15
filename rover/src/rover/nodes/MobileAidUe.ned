@@ -16,11 +16,11 @@
 package rover.nodes;
 
 import rover.nodes.IMobileUe;
-import lte.corenetwork.nodes.Ue;
+import rover.nodes.UeAid;
 import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 
 // see lte.corenetwork.nodes.cars;
-module MobileUe extends Ue like IMobileUe{
+module MobileAidUe extends UeAid like IMobileUe{
 	
 	parameters:
 	    @display("i=misc/smartphone;is=vs");

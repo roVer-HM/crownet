@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-# import roveranalzer
-# import logging # <-- runSim.py erzeuge logfile runSim.log
 import os
 import sys
 
@@ -10,7 +8,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from roveranalyzer.runner.opprunner import BaseRunner, process_as
+from roveranalyzer.runner.roverrunner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):
@@ -102,6 +100,9 @@ if __name__ == "__main__":
                 "poisson_parameter.txt",
                 "--experiment-label",
                 datetime.now().isoformat().replace(":", "").replace("-", ""),
+                "--run-name",
+                "Sample__0_0",
+                "--create-vadere-container"
             ],
         )
     else:
@@ -109,3 +110,4 @@ if __name__ == "__main__":
         runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
+

@@ -5,7 +5,8 @@
  *      Author: sts
  */
 
-#include "UdpDetourAppVadere.h"
+#include "rover/applications/udpapp/detour/UdpDetourAppVadere.h"
+
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/TagBase_m.h"
 #include "inet/common/TimeTag_m.h"
@@ -17,7 +18,7 @@
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
-#include "rover/applications/udpapp/DetourAppPacket_m.h"
+#include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
 
 using namespace inet;
 using omnetpp::cStringTokenizer;
