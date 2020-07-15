@@ -342,14 +342,13 @@ def process_scenario(name: str, id: str, measurements: CsvList, sims: SimList,
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
+    figure_formats = ["pdf","eps","svg","png"]
 
-    for name, fig in figures.items():
-        filename_base = OUTPUT_FOLDER + os.path.sep + id + "_" + name
-        print(f"Saving figure \"{filename_base}.pdf\"")
-        fig.savefig(f"{filename_base}.pdf", bbox_inches='tight')
-        print(f"Saving figure \"{filename_base}.png\"")
-        fig.savefig(f"{filename_base}.png")
-
+    for oformat in figure_formats:
+        for name, fig in figures.items():
+            filename_base = OUTPUT_FOLDER + os.path.sep + id + "_" + name
+            print(f"Saving figure \"{filename_base}.{oformat}\"")
+            fig.savefig(f"{filename_base}.{oformat}", bbox_inches='tight')
 
 # %% Format plot
 def format_plot(name: str, axes, plot_args):
