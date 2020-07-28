@@ -61,6 +61,40 @@ RUN ./configure && \
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
 
+
+# Install artery
+WORKDIR /opt/artery
+# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
+ARG NOCACHE_CLONE=0
+RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        clone --recurse-submodules -j8 --depth 1 --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git
+
+
+# pull again (so a cached layer having the clone gets updated)
+WORKDIR /opt/artery/artery
+
+ARG NOCACHE_PULL=0
+RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git
+
+# build externals (release)
+RUN make inet -j $(nproc) && make veins -j $(nproc) && make vanetza -j $(nproc)
+# build vanetz  (debug)
+RUN make VANETZA_BUILD_TYPE=debug VANETZA_BUILD_DIR=extern/vanetza/debug vanetza -j $(nproc)
+
+# build artery release
+RUN mkdir build-release
+WORKDIR /opt/artery/artyer/build-release
+RUN cmake -DCMAKE_BUILD_TYPE=Release VANETZA_BUILD_TYPE=release ..
+RUN make -j $(nproc)
+
+# build artery debug
+RUN mkdir build-debug
+WORKDIR /opt/artery/artyer/build-release
+RUN cmake -DCMAKE_BUILD_TYPE=Debug VANETZA_BUILD_TYPE=debug ..
+RUN make -j $(nproc)
+
+
 # init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
