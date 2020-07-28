@@ -60,15 +60,19 @@ void BaseApp::refreshDisplay() const {
   getDisplayString().setTagArg("t", 0, buf);
 }
 
-void BaseApp::scheduleNextSendEvent(simtime_t time) {
+void BaseApp::scheduleNextAppMainEvent(simtime_t time) {
+  if (par("appMainInterval").doubleValue() < 0.0) {
+    EV_INFO << "AppMain processing deactivated" << endl;
+    return;
+  }
   simtime_t base = time < 0.0 ? omnetpp::simTime() : time;
-  simtime_t nextSend = base + par("sendInterval");
+  simtime_t nextSend = base + par("appMainInterval");
 
   if (nextSend <= stopTime) {
     if (selfMsgSendTimer->isScheduled()) {
       throw cRuntimeError("Cannot reschedule selfMsgSendTimer message.");
     }
-    selfMsgSendTimer->setKind(FsmRootStates::SEND);
+    selfMsgSendTimer->setKind(FsmRootStates::APP_MAIN);
     scheduleAt(nextSend, selfMsgSendTimer);
   } else {
     EV_INFO << "Next send time after stopTime. Do not schedule new send event."
@@ -167,8 +171,8 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
     case FSM_Exit(FsmRootStates::SETUP):
       FSM_Goto(fsmRoot, fsmSetup(msg));
       break;
-    case FSM_Exit(FsmRootStates::SEND):
-      FSM_Goto(fsmRoot, fsmSend(msg));
+    case FSM_Exit(FsmRootStates::APP_MAIN):
+      FSM_Goto(fsmRoot, fsmAppMain(msg));
       break;
     case FSM_Exit(FsmRootStates::TEARDOWN):
       FSM_Goto(fsmRoot, fsmTeardown(msg));
@@ -207,8 +211,14 @@ BaseApp::FsmState BaseApp::fsmSetup(cMessage *msg) {
             << endl;
   } else {
     // schedule at startTime or current time, whatever is bigger.
-    scheduleNextSendEvent(std::max(startTime, simTime()));
+    scheduleNextAppMainEvent(std::max(startTime, simTime()));
   }
+  return FsmRootStates::WAIT_ACTIVE;
+}
+
+BaseApp::FsmState BaseApp::fsmAppMain(cMessage *msg) {
+  // do nothing just reschedule
+  scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
 }
 

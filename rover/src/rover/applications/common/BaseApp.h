@@ -78,7 +78,8 @@ class BaseApp : public ApplicationBase {
     WAIT_INACTIVE = FSM_Steady(2),
     ERR = FSM_Steady(3),
     SETUP = FSM_Transient(101),  // socket and stopTime
-    SEND = FSM_Transient(102),   // send data with Interval
+    APP_MAIN = FSM_Transient(
+        102),  // send data with Interval or more elaborate functions
     TEARDOWN = FSM_Transient(110),
     DESTROY = FSM_Transient(120),
     SUBSTATE = 200  // sub states must be outside of +-200
@@ -98,11 +99,11 @@ class BaseApp : public ApplicationBase {
    * base = -1 defaults to the current time.
    * negative par("sendInterval") will cause errors.
    */
-  virtual void scheduleNextSendEvent(simtime_t time = -1);
+  virtual void scheduleNextAppMainEvent(simtime_t time = -1);
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload,
                            L3Address destAddr, int destPort);
-  virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
+
   virtual L3Address chooseDestAddr();
 
   // fsmRoot actions
@@ -111,13 +112,14 @@ class BaseApp : public ApplicationBase {
   virtual FsmState fsmHandleSelfMsg(cMessage *msg) = 0;
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
-  virtual FsmState fsmSend(cMessage *msg) = 0;
+  virtual FsmState fsmAppMain(cMessage *msg) = 0;
   virtual FsmState fsmTeardown(cMessage *msg);
   virtual FsmState fsmDestroy(cMessage *msg);
 
   // socket actions.
   virtual void initSocket() = 0;
   virtual ISocket &getSocket() = 0;
+  virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
 
   // Lifecycle management
   virtual void handleStartOperation(

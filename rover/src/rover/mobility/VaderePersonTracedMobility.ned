@@ -3,34 +3,27 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
+// 
 
-#pragma once
+package rover.mobility;
 
-#include "inet/mobility/base/MobilityBase.h"
-#include "rover/applications/common/UdpBaseApp.h"
+import inet.mobility.base.MobilityBase;
+import org.car2x.veins.subprojects.veins_inet.vadere.VaderePersonMobility;
 
-namespace rover {
-
-class VruUdp : public UdpBaseApp {
- public:
-  VruUdp();
-  virtual ~VruUdp();
-
- protected:
-  MobilityBase *mobilityModule = nullptr;
-
- protected:
-  virtual void initialize(int stage) override;
-  virtual FsmState fsmAppMain(cMessage *msg) override;
-  virtual Coord getCurrentLocation();
-};
-}  // namespace rover
+simple VaderePersonTracedMobility extends VaderePersonMobility
+{
+    parameters:
+        @class(rover::VaderePersonTracedMobility);
+        int ringBufferSize = default(40); // number of position / time pairs to save in 
+        								  // nodes for easy application access.
+        double recordThreshold @unit(s) = default(100ms); // minimal time delta needed to write new location 
+        												  // in ringBuffer.
+}

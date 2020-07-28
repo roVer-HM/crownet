@@ -19,6 +19,7 @@ RUN apt-get update && \
        clang-format \
        googletest libgtest-dev google-mock \
        bear cmake \
+       libboost-all-dev  \
        doxygen graphviz tcl-dev tk-dev  valgrind \
        libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
        openscenegraph osgearth \

@@ -13,6 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
+#include <vanetza/asn1/cam.hpp>
+
 #include "VruAid.h"
 #include "rover/aid/AidCommand_m.h"
 #include "rover/applications/common/AppCommon_m.h"
@@ -32,20 +34,63 @@ VruAid::~VruAid() {
 void VruAid::initialize(int stage) {
   AidBaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
-    mobilityModule = check_and_cast<MobilityBase*>(
+    mobilityModule = check_and_cast<VaderePersonTracedMobility*>(
         getParentModule()->getSubmodule("mobility"));
   }
 }
 
-BaseApp::FsmState VruAid::fsmSend(cMessage* msg) {
-  const auto& payload = makeShared<ApplicationPacket>();
-  payload->setSequenceNumber(numSent);
-  payload->setChunkLength(B(par("messageLength")));
-  payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
-  payload->addTag<CurrentLocationTag>()->setLocation(getCurrentLocation());
-  sendPayload(payload);
-  scheduleNextSendEvent();
+BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
+  vanetza::asn1::Cam message;
+
+  ItsPduHeader_t h = (*message).header;
+  h.protocolVersion = 2;
+  h.messageID = ItsMessageId::VAM;
+  inet::findModuleFromPar(par, from, required)
+
+      const auto& vam = makeShared<ItsVam>();
+  vam->setSequenceNumber(numSent);
+  vam->setChunkLength(B(par("messageLength")));  // todo calc?
+  vam->addTag<CreationTimeTag>()->setCreationTime(simTime());
+
+  vam->setGenerationDeltaTime(simTime());
+  // VAM Header
+  ItsPduHeader itsHeader{};
+  itsHeader.setMessageId(ItsMessageId::VAM);
+  itsHeader.setProtocolVersion(1);
+  itsHeader.setStationId(getId());  // componentId
+  vam->setItsHeader(itsHeader);
+  //
+  ItsVamBasicContainer basicContainer{};
+  basicContainer.setRole(ItsVehicleRole::DEFAULT);
+  // todo Mixup CAM/VAM
+  basicContainer.setStationType(ItsStationType::PEDSTRIAN);
+  basicContainer.setVruDeviceType(ItsVruDeviceType::VRU_ST);
+  basicContainer.setVruProfile(ItsVruProfile::PEDESTRIAN);
+  basicContainer.setVruType(ItsVruType::ADULT);
+  ReferencePosition ref{};
+  ref.setHeadingValue(mobilityModule->getCurrentVelocity().normalize());
+  ref.setReferencePosition(mobilityModule->getCurrentPosition());
+  ref.setSemiMajorConf(0.3);
+  ref.setSemiMajorConf(0.3);
+  basicContainer.setReferencePosition(ref);
+  int k = 0;
+  for (const auto& p : mobilityModule->getDeltaPositionHistory()) {
+    basicContainer.setPathHistory(k, p);
+  }
+  vam->setBasicContainer(basicContainer);
+
+  sendPayload(vam);
+  scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
+}
+
+void VruAid::socketDataArrived(AidSocket* socket, Packet* packet) {
+  emit(packetReceivedSignal, packet);
+  numReceived++;
+  // todo log received coordiantes.
+  delete packet;
+  socketFsmResult =
+      FsmRootStates::WAIT_ACTIVE;  // GoTo WAIT_ACTIVE steady state
 }
 
 Coord VruAid::getCurrentLocation() {

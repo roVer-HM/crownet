@@ -15,30 +15,17 @@
 
 #pragma once
 
-#include "inet/mobility/base/MobilityBase.h"
-#include "rover/applications/common/AidBaseApp.h"
-#include "rover/common/ItsPdu_m.h"
-#include "rover/mobility/VaderePersonTracedMobility.h"
+#include "rover/common/util/rover_util_m.h"
 
 namespace rover {
-
-class VruAid : public AidBaseApp {
+class ROVER_API PathPoint : public PathPoint_Base {
  public:
-  VruAid();
-  virtual ~VruAid();
+  PathPoint() : PathPoint_Base(){};
+  PathPoint(inet::Coord referencePoint, omnetpp::simtime_t referenceTime);
 
- protected:
-  VaderePersonTracedMobility* mobilityModule = nullptr;
-
- protected:
-  virtual void initialize(int stage) override;
-  virtual FsmState fsmAppMain(cMessage* msg) override;
-  virtual void socketDataArrived(AidSocket* socket, Packet* packet) override;
-  virtual Coord getCurrentLocation();
-
-  virtual void setAppRequirements() override;
-  virtual void setAppCapabilities() override;
-
-  // VAM
+  PathPoint operator+(const PathPoint& other);
+  PathPoint operator-(const PathPoint& other);
+  PathPoint& operator=(const PathPoint& other);
 };
+
 }  // namespace rover

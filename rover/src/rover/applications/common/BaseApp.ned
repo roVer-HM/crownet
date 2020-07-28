@@ -27,7 +27,9 @@ simple BaseApp like IApp
         // Application runtime settings
         double startTime @unit(s) = default(0.0s); // start first packet, afterwarts time + sendIntervall. Negative values raises cRuntimeError.
         double stopTime @unit(s) = default(-1s); // time of finishing sending, -1s means forever
-        volatile double sendInterval @unit(s); // should usually be a random value, e.g. exponential(1).
+        volatile double appMainInterval @unit(s) = default(-1s); // intervall to enter fsmAppMain to process app logic. 
+        										  // if set to -1 fsmAppMain will not be used and user must provide own 
+        										  // handling. fsmAppMain does nothing on default.
         // Base addressing paramters
         string localAddress = default("");
         int localPort = default(-1);  // local port (-1: use ephemeral port)

@@ -13,32 +13,29 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#pragma once
-
-#include "inet/mobility/base/MobilityBase.h"
-#include "rover/applications/common/AidBaseApp.h"
-#include "rover/common/ItsPdu_m.h"
-#include "rover/mobility/VaderePersonTracedMobility.h"
+#include "rover_util.h"
 
 namespace rover {
 
-class VruAid : public AidBaseApp {
- public:
-  VruAid();
-  virtual ~VruAid();
+PathPoint::PathPoint(inet::Coord referencePoint,
+                     omnetpp::simtime_t referenceTime) {
+  this->referencePoint = referencePoint;
+  this->referenceTime = referenceTime;
+}
 
- protected:
-  VaderePersonTracedMobility* mobilityModule = nullptr;
+PathPoint PathPoint::operator+(const PathPoint& other) {
+  return PathPoint(this->referencePoint + other.referencePoint,
+                   this->referenceTime + other.referenceTime);
+}
 
- protected:
-  virtual void initialize(int stage) override;
-  virtual FsmState fsmAppMain(cMessage* msg) override;
-  virtual void socketDataArrived(AidSocket* socket, Packet* packet) override;
-  virtual Coord getCurrentLocation();
+PathPoint PathPoint::operator-(const PathPoint& other) {
+  return PathPoint(this->referencePoint - other.referencePoint,
+                   this->referenceTime - other.referenceTime);
+}
 
-  virtual void setAppRequirements() override;
-  virtual void setAppCapabilities() override;
+PathPoint& PathPoint::operator=(const PathPoint& other) {
+  PathPoint_Base::operator=(other);
+  return *this;
+}
 
-  // VAM
-};
 }  // namespace rover
