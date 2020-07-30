@@ -13,8 +13,6 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include <vanetza/asn1/cam.hpp>
-
 #include "VruAid.h"
 #include "rover/aid/AidCommand_m.h"
 #include "rover/applications/common/AppCommon_m.h"
@@ -42,12 +40,7 @@ void VruAid::initialize(int stage) {
 BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   vanetza::asn1::Cam message;
 
-  ItsPduHeader_t h = (*message).header;
-  h.protocolVersion = 2;
-  h.messageID = ItsMessageId::VAM;
-  inet::findModuleFromPar(par, from, required)
-
-      const auto& vam = makeShared<ItsVam>();
+  const auto& vam = makeShared<ItsVam>();
   vam->setSequenceNumber(numSent);
   vam->setChunkLength(B(par("messageLength")));  // todo calc?
   vam->addTag<CreationTimeTag>()->setCreationTime(simTime());
