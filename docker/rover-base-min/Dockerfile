@@ -14,6 +14,7 @@ RUN apt-get update && \
        git git-lfs \
        python3.7 python python3 python3-pip\
        curl wget \
+       vim \
        openjdk-11-jre \
        linux-tools-common linux-tools-generic linux-cloud-tools-generic && \
     apt-get clean && \

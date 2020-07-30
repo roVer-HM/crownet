@@ -8,6 +8,7 @@ FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
 ENV OMNETRELEASE omnetpp-5.6
+ENV ARTERY_BRANCH hm_master
 # Note: Remember to update the description below when changing OMNETRELEASE
 
 
@@ -38,7 +39,7 @@ WORKDIR /opt/omnetpp/omnetpp
 
 ARG NOCACHE_PULL=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
+            pull ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
 
 # configure and compile
 #  - samples are optional and not needed for compiling - remove for a smaller image
@@ -46,9 +47,9 @@ RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyCheckin
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .
 RUN ./configure && \
-    make -j $(nproc) && \
-    find . -type f -name '*.o' -exec rm {} + && \
-    find . -type f -name '*.o.d' -exec rm {} +
+     make -j $(nproc) && \
+     find . -type f -name '*.o' -exec rm {} + && \
+     find . -type f -name '*.o.d' -exec rm {} +
 
 # now install the Eclipse IDE base
 # ADD ide/ide.tar.gz .
@@ -67,7 +68,7 @@ WORKDIR /opt/artery
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --recurse-submodules -j8 --depth 1 --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git
+        clone --recurse-submodules --depth 1 --branch $ARTERY_BRANCH ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git
 
 
 # pull again (so a cached layer having the clone gets updated)
@@ -75,25 +76,36 @@ WORKDIR /opt/artery/artery
 
 ARG NOCACHE_PULL=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git
+        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git $ARTERY_BRANCH
+
+ENV ARTERY_HOME /opt/artery/artery
+ENV VANTEZA_HOME /opt/artery/artery/extern/vanetza
 
 # build externals (release)
-RUN make inet -j $(nproc) && make veins -j $(nproc) && make vanetza -j $(nproc)
+RUN make  -j $(nproc) all MODE=release
 # build vanetz  (debug)
-RUN make VANETZA_BUILD_TYPE=debug VANETZA_BUILD_DIR=extern/vanetza/debug vanetza -j $(nproc)
+RUN make  -j $(nproc) all MODE=debug
 
 # build artery release
-RUN mkdir build-release
-WORKDIR /opt/artery/artyer/build-release
-RUN cmake -DCMAKE_BUILD_TYPE=Release VANETZA_BUILD_TYPE=release ..
+RUN mkdir -p build/Release
+WORKDIR /opt/artery/artery/build/Release
+RUN cmake -DCMAKE_BUILD_TYPE=Release ../..
 RUN make -j $(nproc)
+RUN find . -type f -name '*.o' -exec rm {} + && \
+    find . -type f -name '*.o.d' -exec rm {} +
+
+WORKDIR /opt/artery/artery
 
 # build artery debug
-RUN mkdir build-debug
-WORKDIR /opt/artery/artyer/build-release
-RUN cmake -DCMAKE_BUILD_TYPE=Debug VANETZA_BUILD_TYPE=debug ..
+RUN mkdir -p build/Debug
+WORKDIR /opt/artery/artery/build/Debug
+RUN cmake -DCMAKE_BUILD_TYPE=Debug ../..
 RUN make -j $(nproc)
+RUN find . -type f -name '*.o' -exec rm {} + && \
+    find . -type f -name '*.o.d' -exec rm {} +
 
+# update permissions so that the omnetpp directory becomes writable
+RUN chmod -R a+rw /opt/artery/artery
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
