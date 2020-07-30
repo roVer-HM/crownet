@@ -3,6 +3,7 @@
 	<name>rover</name>
 	<comment></comment>
 	<projects>
+		<project>artery</project>
 		<project>inet</project>
 		<project>lte</project>
 		<project>veins</project>
