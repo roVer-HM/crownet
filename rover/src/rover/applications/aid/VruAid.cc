@@ -38,7 +38,7 @@ void VruAid::initialize(int stage) {
 }
 
 BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
-  vanetza::asn1::Cam message;
+//  vanetza::asn1::Cam message;
 
   const auto& vam = makeShared<ItsVam>();
   vam->setSequenceNumber(numSent);
