@@ -1,7 +1,7 @@
 {
   "name" : "simple_detour_100x177_miat1.25_clone_1",
   "description" : "",
-  "release" : "1.13",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -181,6 +181,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

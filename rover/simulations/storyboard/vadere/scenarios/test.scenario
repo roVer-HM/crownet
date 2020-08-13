@@ -1,8 +1,7 @@
 {
   "name" : "test",
   "description" : "",
-  "release" : "1.13",
-  "commithash" : "b9caa8a4cfce808c1f707dc60bcd6332b142d392",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -147,6 +146,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
