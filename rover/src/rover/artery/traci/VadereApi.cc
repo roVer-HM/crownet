@@ -258,8 +258,8 @@ void VadereApi::VaderSimulationScope::sendSimulationConfig(
   content.writeByte(TYPE_UBYTE);
   content.writeUnsignedByte(cfg.useVadereSeed);
 
-  send_commandSetValue(myCmdSetID, rover::constants::VAR_SIM_CONFIG, "",
-                       content);
+  send_commandSetValueExtLenghtField(
+      myCmdSetID, rover::constants::VAR_SIM_CONFIG, "", content);
   tcpip::Storage inMsg;
   check_resultState(inMsg, myCmdSetID);
 }
