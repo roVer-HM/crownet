@@ -1,7 +1,7 @@
 {
   "name" : "mf_base_initial_peds",
   "description" : "",
-  "release" : "1.13",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -111,6 +111,10 @@
         "cognition" : "CooperativeCognitionModel"
       }
     },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
+    },
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -122,8 +126,8 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : {
-          "epsgCode" : "UTM Zone 32U",
-          "description" : "OpenStreetMap export osm2vadere.py-e334fa4c0c0e35481fe999dcbac0b1f6a6eeedd7-dirty",
+          "epsgCode" : "EPSG:32632",
+          "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
           "translation" : {
             "x" : 692152.0894735109,
             "y" : 5337384.6661008
