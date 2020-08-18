@@ -25,4 +25,8 @@ simple MobilityRoverArtery like IMobility, artery.traci.Mobility
         @signal[mobilityStateChanged];
         string visualRepresentation = default("^");
         bool updateDisplayString = default(true);
+        int ringBufferSize = default(40); // number of position / time pairs to save in 
+        								  // nodes for easy application access.
+        double recordThreshold @unit(s) = default(100ms); // minimal time delta needed to write new location 
+        												  // in ringBuffer.
 }

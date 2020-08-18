@@ -16,13 +16,15 @@
 #pragma once
 
 #include "../common/util/rover_util.h"
+#include "IPositionHistoryProvider.h"
 #include "rover/rover.h"
 
 #include "veins_inet/vadere/VaderePersonMobility.h"
 
 namespace rover {
 
-class VaderePersonTracedMobility : public veins::VaderePersonMobility {
+class VaderePersonTracedMobility : public veins::VaderePersonMobility,
+                                   public IPositionHistoryProvider {
  public:
   VaderePersonTracedMobility(){};
   virtual ~VaderePersonTracedMobility(){};
@@ -38,11 +40,18 @@ class VaderePersonTracedMobility : public veins::VaderePersonMobility {
 
   virtual void moveAndUpdate() override;
 
-  virtual void recoredTimeCoord(simtime_t time, inet::Coord coord);
+  virtual void recoredTimeCoord(simtime_t time, inet::Coord coord) override;
 
-  virtual std::vector<PathPoint> getPositionHistory();
-  virtual std::vector<PathPoint> getDeltaPositionHistory();
-  virtual int historySize();
+  virtual std::vector<PathPoint> getPositionHistory() override;
+  virtual std::vector<PathPoint> getDeltaPositionHistory() override;
+  virtual int historySize() override;
+
+  virtual inet::Coord getCurrentPosition() override {
+    return veins::VaderePersonMobility::getCurrentPosition();
+  }  // MobilityBase
+  virtual inet::Coord getCurrentVelocity() override {
+    return veins::VaderePersonMobility::getCurrentVelocity();  // MobilityBase
+  }
 
  private:
   simtime_t recordThreshold;

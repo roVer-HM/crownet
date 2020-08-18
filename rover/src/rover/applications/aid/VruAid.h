@@ -15,10 +15,10 @@
 
 #pragma once
 
+#include "../../mobility/IPositionHistoryProvider.h"
 #include "inet/mobility/base/MobilityBase.h"
 #include "rover/applications/common/AidBaseApp.h"
 #include "rover/common/ItsPdu_m.h"
-#include "rover/mobility/VaderePersonTracedMobility.h"
 
 namespace rover {
 
@@ -28,7 +28,7 @@ class VruAid : public AidBaseApp {
   virtual ~VruAid();
 
  protected:
-  VaderePersonTracedMobility* mobilityModule = nullptr;
+  IPositionHistoryProvider* mobilityModule = nullptr;
 
  protected:
   virtual void initialize(int stage) override;

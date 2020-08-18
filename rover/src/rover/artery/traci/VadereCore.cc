@@ -28,7 +28,10 @@ Define_Module(VadereCore);
 
 void VadereCore::handleMessage(omnetpp::cMessage* msg) {
   if (msg == m_updateEvent) {
-    m_traci->simulationStep();
+    // mobility provider is ahead dt = updateInterval
+    // needed to interpolate between NOW(=simTime()) and NOW+updateInterval
+    simtime_t targetTime = simTime() + m_updateInterval;
+    m_traci->simulationStep(targetTime.dbl());
     if (m_subscriptions) {
       m_subscriptions->step();
     }

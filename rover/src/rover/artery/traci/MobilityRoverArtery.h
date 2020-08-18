@@ -9,19 +9,25 @@
 
 #include <artery/traci/MobilityBase.h>
 #include <omnetpp/csimplemodule.h>
+
+#include "../../mobility/IPositionHistoryProvider.h"
 #include "inet/mobility/contract/IMobility.h"
+#include "rover/common/util/rover_util.h"
+#include "rover/rover.h"
 
 namespace inet {
 class CanvasProjection;
 }
 
 using namespace artery;
+using namespace omnetpp;
 
 namespace rover {
 
 class MobilityRoverArtery : public artery::MobilityBase,
                             public omnetpp::cSimpleModule,
-                            public inet::IMobility {
+                            public inet::IMobility,
+                            public IPositionHistoryProvider {
  public:
   virtual ~MobilityRoverArtery() = default;
 
@@ -46,17 +52,38 @@ class MobilityRoverArtery : public artery::MobilityBase,
   int numInitStages() const override;
   //  void setInitialPosition() override;
 
+  virtual void move();
+  virtual void moveAndUpdate();
+
+  virtual void recoredTimeCoord(simtime_t time, inet::Coord coord) override;
+
+  virtual std::vector<PathPoint> getPositionHistory() override;
+  virtual std::vector<PathPoint> getDeltaPositionHistory() override;
+  virtual int historySize() override;
+
  protected:
   //  virtual void handleSelfMessage(omnetpp::cMessage* message) override;
   void refreshDisplay() const override;
 
+  virtual void emitMobilityStateChangedSignal();
+
+  simtime_t lastUpdate;
+  inet::Coord lastPosition;
+  inet::Coord lastVelocity;
+  inet::Quaternion lastOrientation;
+
+  simtime_t nextPosTime;
+  inet::Coord nextPosition;
+
+  simtime_t recordThreshold;
+  simtime_t lastRecordedTime;
+  RingBuffer<PathPoint> coordBuffer;
+
  private:
   void initialize(const Position& pos, Angle heading, double speed) override;
   void update(const Position& pos, Angle heading, double speed) override;
+  simtime_t getUpdateTime();
 
-  inet::Coord mPosition;
-  inet::Coord mSpeed;
-  inet::Quaternion mOrientation;
   double mAntennaHeight = 1.5;
   omnetpp::cModule* mVisualRepresentation = nullptr;
   const inet::CanvasProjection* mCanvasProjection = nullptr;

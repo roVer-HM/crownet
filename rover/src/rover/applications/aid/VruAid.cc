@@ -32,13 +32,13 @@ VruAid::~VruAid() {
 void VruAid::initialize(int stage) {
   AidBaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
-    mobilityModule = check_and_cast<VaderePersonTracedMobility*>(
+    mobilityModule = check_and_cast<IPositionHistoryProvider*>(
         getParentModule()->getSubmodule("mobility"));
   }
 }
 
 BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
-//  vanetza::asn1::Cam message;
+  //  vanetza::asn1::Cam message;
 
   const auto& vam = makeShared<ItsVam>();
   vam->setSequenceNumber(numSent);
