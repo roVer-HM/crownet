@@ -22,10 +22,13 @@
 
 namespace rover {
 
+class VadereNodeManager;
+
 class VadereSubscriptionManager : public traci::Listener,
                                   public traci::ISubscriptionManager,
                                   public omnetpp::cSimpleModule {
  public:
+  friend VadereNodeManager;
   VadereSubscriptionManager();
   virtual ~VadereSubscriptionManager();
 
@@ -42,6 +45,11 @@ class VadereSubscriptionManager : public traci::Listener,
   void initialize() override;
   void finish() override;
 
+  void subscribePerson(const std::string& id);
+  void unsubscribePerson(const std::string& id, bool person_exists);
+  void updatePersonSubscription(const std::string& id,
+                                const std::vector<int>& vars);
+
  private:
   VadereSubscriptionManager(const VadereSubscriptionManager&) = delete;
 
@@ -49,11 +57,6 @@ class VadereSubscriptionManager : public traci::Listener,
   void traciInit() override;
   void traciStep() override;
   void traciClose() override;
-
-  void subscribePerson(const std::string& id);
-  void unsubscribePerson(const std::string& id, bool person_exists);
-  void updatePersonSubscription(const std::string& id,
-                                const std::vector<int>& vars);
 
   VadereLiteApi* m_api;
   std::unordered_set<std::string> m_subscribed_persons;

@@ -68,8 +68,8 @@ void VadereSubscriptionManager::subscribeSimulationVariables(
   ASSERT(m_sim_vars.size() >= tmp_vars.size());
 
   if (m_sim_vars.size() != tmp_vars.size()) {
-    m_api->simulation().subscribe("", m_sim_vars, INVALID_DOUBLE_VALUE,
-                                  INVALID_DOUBLE_VALUE);
+    m_api->vSimulation().subscribe("", m_sim_vars, INVALID_DOUBLE_VALUE,
+                                   INVALID_DOUBLE_VALUE);
   }
 }
 
@@ -119,7 +119,7 @@ void VadereSubscriptionManager::traciInit() {
   static const std::set<int> vars{VAR_DELTA_T, VAR_TIME};
   subscribeSimulationVariables(vars);
 
-  // subscribe already running vehicles
+  // subscribe already running persons
   if (!m_person_vars.empty()) {
     for (const std::string& id : m_api->vPerson().getIDList()) {
       subscribePerson(id);

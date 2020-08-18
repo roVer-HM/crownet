@@ -49,11 +49,11 @@ const simsignal_t VadereNodeManager::updateNodeSignal =
 const simsignal_t VadereNodeManager::removeNodeSignal =
     cComponent::registerSignal("traci.node.remove");
 const simsignal_t VadereNodeManager::addPersonSignal =
-    cComponent::registerSignal("traci.vehicle.add");
+    cComponent::registerSignal("traci.person.add");
 const simsignal_t VadereNodeManager::updatePersonSignal =
-    cComponent::registerSignal("traci.vehicle.update");
+    cComponent::registerSignal("traci.person.update");
 const simsignal_t VadereNodeManager::removePersonSignal =
-    cComponent::registerSignal("traci.vehicle.remove");
+    cComponent::registerSignal("traci.person.remove");
 
 void VadereNodeManager::initialize() {
   VadereCore* core =
@@ -79,11 +79,11 @@ void VadereNodeManager::traciInit() {
   m_subscriptions->subscribeSimulationVariables(sSimulationVariables);
   m_subscriptions->subscribePersonVariables(sVehicleVariables);
 
-  // insert already running vehicles
+  // insert and subscribe to already running nodes
   for (const std::string& id : m_api->vPerson().getIDList()) {
     addMovingObject(id);
+    m_subscriptions->subscribePerson(id);
   }
-  m_subscriptions->step();  // will update subscriptions for first time
 }
 
 void VadereNodeManager::traciStep() {
@@ -92,13 +92,13 @@ void VadereNodeManager::traciStep() {
   //    ASSERT(checkTimeSync(*sim_cache, omnetpp::simTime()));
 
   const auto& departed = sim_cache->get<VAR_DEPARTED_VEHICLES_IDS>();
-  EV_DETAIL << "TraCI: " << departed.size() << " vehicles departed" << endl;
+  EV_DETAIL << "TraCI: " << departed.size() << " persons departed" << endl;
   for (const auto& id : departed) {
     addMovingObject(id);
   }
 
   const auto& arrived = sim_cache->get<VAR_ARRIVED_VEHICLES_IDS>();
-  EV_DETAIL << "TraCI: " << arrived.size() << " vehicles arrived" << endl;
+  EV_DETAIL << "TraCI: " << arrived.size() << " persons arrived" << endl;
   for (const auto& id : arrived) {
     removeMovingObject(id);
   }
