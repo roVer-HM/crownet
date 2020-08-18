@@ -29,18 +29,18 @@ network World
 
         radioMedium: <default("Ieee80211ScalarRadioMedium")> like IRadioMedium {
             parameters:
-                @display("p=60,20");
+                @display("p=352,25");
                 mediumLimitCache.carrierFrequency = 5.9GHz;
         }
 
         physicalEnvironment: <default("PhysicalEnvironment")> like IPhysicalEnvironment if withPhysicalEnvironment {
             parameters:
-                @display("p=100,20");
+                @display("p=117,25");
         }
 
         storyboard: Storyboard if withStoryboard {
             parameters:
-                @display("p=140,20");
+                @display("p=242,20");
         }
 
         rsu[numRoadSideUnits]: RSU {
