@@ -6,9 +6,10 @@
  */
 
 #include "rover/artery/traci/VadereLauchner.h"
+#include "inet/common/ModuleAccess.h"
 #include "rover/artery/traci/VadereApi.h"
-
 #include "rover/artery/traci/VadereUtils.h"
+#include "rover/common/OsgCoordConverter.h"
 
 using namespace traci;
 using namespace omnetpp;
@@ -101,6 +102,30 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
   m_lite->vSimulation().sendSimulationConfig(simCfg);
 
   m_api->sendFile(scenario);
+
+  auto converter_m = inet::getModuleFromPar<OsgCoordConverter>(
+      par("coordConverterModule"), this, false);
+
+  if (!converter_m) {
+    // no OsgCoordConverter module found --> not set create
+    // OsgCoordianteTransformer only for TraCI
+    CoordRef ref = m_api->v_simulation.getCoordRef();
+
+    auto transformer = std::make_shared<OsgCoordianteTransformer>(
+        ref.epsg_code, inet::Coord{ref.offset.x, ref.offset.y, ref.offset.z});
+    m_api->setConverter(converter_m->getTransformer());
+  } else {
+    // OsgCoordConverter present check if OsgCoordianteTransformer was set
+    // locally or if TraCI should create it.
+    if (!converter_m->isInitialized()) {
+      CoordRef ref = m_api->v_simulation.getCoordRef();
+
+      auto transformer = std::make_shared<OsgCoordianteTransformer>(
+          ref.epsg_code, inet::Coord{ref.offset.x, ref.offset.y, ref.offset.z});
+      converter_m->initializeTransformer(transformer);
+      m_api->setConverter(converter_m->getTransformer());
+    }
+  }
 }
 
 } /* namespace rover */

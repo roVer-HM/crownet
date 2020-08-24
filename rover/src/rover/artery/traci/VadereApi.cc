@@ -9,6 +9,31 @@
 
 namespace rover {
 
+TraCIGeoPosition VadereApi::convertGeo(const TraCIPosition& pos) const {
+  if (converter == nullptr) {
+    return API::convertGeo(pos);
+  } else {
+    inet::GeoCoord p = converter->convertGeo(pos.x, pos.y, pos.z);
+    TraCIGeoPosition geo;
+    geo.latitude = p.latitude.get();
+    geo.longitude = p.longitude.get();
+    return geo;
+  }
+}
+
+TraCIPosition VadereApi::convert2D(const TraCIGeoPosition& pos) const {
+  if (converter != nullptr) {
+    return API::convert2D(pos);
+  } else {
+    inet::Coord p = converter->convert2D(pos.longitude, pos.latitude);
+    TraCIPosition out;
+    out.x = p.x;
+    out.y = p.y;
+    out.z = p.z;
+    return out;
+  }
+}
+
 VadereApi::VadereApi() : API(), v_simulation(*this), v_person(*this) {
   // override domain response
   myDomains[RESPONSE_SUBSCRIBE_SIM_VARIABLE] = &v_simulation;
@@ -230,6 +255,24 @@ std::string VadereApi::VaderSimulationScope::getScenarioHash(
   tcpip::Storage inMsg;
   processGET(inMsg, myCmdGetID, TYPE_STRING);
   return inMsg.readString();
+}
+
+CoordRef VadereApi::VaderSimulationScope::getCoordRef() const {
+  send_commandGetVariable(myCmdGetID, constants::VAR_COORD_REF, "");
+  tcpip::Storage inMsg;
+  processGET(inMsg, myCmdGetID, TYPE_COMPOUND, true);
+  CoordRef ref;
+
+  inMsg.readInt();           // number of vars (3)
+  inMsg.readUnsignedByte();  // type
+
+  ref.epsg_code = inMsg.readString();
+  inMsg.readUnsignedByte();
+  ref.offset.x = inMsg.readDouble();
+  inMsg.readUnsignedByte();
+  ref.offset.y = inMsg.readDouble();
+  ref.offset.z = 0.0;
+  return ref;
 }
 
 void VadereApi::VaderSimulationScope::sendSimulationConfig(

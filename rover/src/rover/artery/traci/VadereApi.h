@@ -10,6 +10,7 @@
 #include <traci/API.h>
 #include <traci/sumo/utils/traci/TraCIAPI.h>
 #include "rover/artery/traci/VadereUtils.h"
+#include "rover/common/OsgCoordianteTransformer.h"
 
 using namespace traci;
 
@@ -25,8 +26,14 @@ constexpr ubyte VAR_PERSON_STIMULUS = 0xfd;
 constexpr ubyte CMD_FILE_SEND = 0x75;
 constexpr ubyte VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
 constexpr ubyte VAR_DEPARTED_PEDESTRIANS_IDS = 0x74;
+constexpr ubyte VAR_COORD_REF = 0x90;
 
 }  // namespace constants
+
+struct CoordRef {
+  std::string epsg_code;
+  libsumo::TraCIPosition offset;
+};
 
 class VadereApi : public API {
  public:
@@ -34,7 +41,17 @@ class VadereApi : public API {
   virtual ~VadereApi() {}
 
   void sendFile(const vadere::VadereScenario&) const;
+  virtual TraCIGeoPosition convertGeo(const TraCIPosition&) const override;
+  virtual TraCIPosition convert2D(const TraCIGeoPosition&) const override;
 
+  void setConverter(std::shared_ptr<OsgCoordianteTransformer> _c) {
+    converter = _c;
+  }
+
+ private:
+  std::shared_ptr<OsgCoordianteTransformer> converter;
+
+ public:
   class VaderePersonScope : public TraCIScopeWrapper {
    public:
     VaderePersonScope(API& parent)
@@ -93,6 +110,7 @@ class VadereApi : public API {
     double getDistance2D(double x1, double y1, double x2, double y2,
                          bool isGeo = false, bool isDriving = false);
     std::string getScenarioHash(const std::string& scenario) const;
+    CoordRef getCoordRef() const;
     void sendSimulationConfig(const vadere::SimCfg& cfg) const;
 
    private:

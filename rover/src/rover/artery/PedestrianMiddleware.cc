@@ -27,6 +27,7 @@ void PedestrianMiddleware::initialize(int stage) {
     findHost()->subscribe(MobilityBase::stateChangedSignal, this);
     initializeController(par("mobilityModule"));
     mDataProvider.setStationType(StationType::Pedestrian);
+    setStationType(StationType::Pedestrian);
     getFacilities().register_const(&mDataProvider);
     mDataProvider.update(mPersonController);
 

@@ -51,7 +51,7 @@ module PedestrianFull like INetworkNode
         int numRadios = default(1);
         bool withAntennaMobility = default(false);
         *.mobility.visualRepresentation = "^";
-        
+
 
         //# AID layer
         string aidType = default("SimpleAidLayer");
@@ -98,13 +98,13 @@ module PedestrianFull like INetworkNode
         }
         middleware: <default("PedestrianMiddleware")> like IMiddleware if hasGeoNet {
             parameters:
-                @display("p=111,275");
+                @display("p=109.76,296.352");
                 routerModule = ".vanetza.router";
                 mobilityModule = ".mobility";
         }
         vanetza: <default("Vanetza")> like IVanetza if hasGeoNet {
             parameters:
-                @display("p=111,370");
+                @display("p=109.76,393.568");
                 *.middlewareModule = absPath("^.middleware");
                 *.mobilityModule = absPath("^.mobility");
                 *.radioDriverModule = absPath("^.radioDriver[0]");
@@ -119,7 +119,7 @@ module PedestrianFull like INetworkNode
             @display("p=346.69598,74.895996,row,140");
         }
         aid: <aidType> like IAidLayer {
-            @display("p=346.69598,225.896");
+            @display("p=407.68,205.408");
         }
         udp: <default(firstAvailableOrEmpty("Udp"))> like IUdp if hasUdp {
             parameters:

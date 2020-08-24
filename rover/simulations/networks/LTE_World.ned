@@ -35,6 +35,7 @@ import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
 import rover.nodes.IMobileUe;
 import rover.nodes.UnequippedHost;
+import rover.common.ICoordConverter;
 
 import artery.storyboard.Storyboard;
 import traci.Manager;
@@ -53,7 +54,7 @@ network LTE_World
 
         bool withStoryboard = default(false);
         bool withCoreNetwork = default(true);
-        
+
         traci.nodes.typename = default("VadereNodeManager");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
         traci.core.typename = default("VadereCore");
@@ -64,35 +65,40 @@ network LTE_World
         storyboard.middlewareModule = default(".middleware");
 
     submodules:
+
+        coordConverter: <default("OsgCoordConverterRemote")> like ICoordConverter if typename != "" {
+            @display("p=308.14874,207.69;i=block/table2;is=s");
+        }
+
         visualization: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
-            @display("p=518,32;is=s");
+            @display("p=523.74,89.17125;is=s");
         }
 
         physicalEnvironment: PhysicalEnvironment {
             @display("p=413,32;is=s");
         }
         channelControl: LteChannelControl {
-            @display("p=412,110;is=s");
+            @display("p=410.865,148.995;is=s");
         }
         routingRecorder: RoutingTableRecorder {
-            @display("p=426,78;is=s");
+            @display("p=411.99374,89.17125;is=s");
         }
         configurator: Ipv4NetworkConfigurator {
-            @display("p=524,173;is=s");
+            @display("p=523.74,198.66;is=s");
             config = xmldoc("ip4Config.xml");
         }
         binder: LteBinder {
-            @display("p=403,164;is=s");
+            @display("p=411.99374,198.66;is=s");
         }
         server: StandardHost if withCoreNetwork {
-            @display("p=315,150;is=s;i=device/server");
+            @display("p=308.14874,148.995;is=s;i=device/server");
         }
         router: Router if withCoreNetwork {
-            @display("p=315,110;is=s;i=device/smallrouter");
+            @display("p=308.14874,110.6175;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandardSimplified if withCoreNetwork{
+        pgw: PgwStandardSimplified if withCoreNetwork {
             nodeType = "PGW";
-            @display("p=314,43;is=l");
+            @display("p=307.02,42.892498;is=l");
         }
         eNB: eNodeB {
             @display("p=37,51;is=vl");
@@ -100,12 +106,12 @@ network LTE_World
 
         traci: Manager {
             parameters:
-                @display("p=584,32");
+                @display("p=523.74,31.605");
         }
 
         storyboard: Storyboard if withStoryboard {
             parameters:
-                @display("p=524,101");
+                @display("p=523.74,148.995");
         }
 
     connections:

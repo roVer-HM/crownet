@@ -10,9 +10,9 @@
 #include <artery/traci/MobilityBase.h>
 #include <omnetpp/csimplemodule.h>
 
-#include "../../mobility/IPositionHistoryProvider.h"
 #include "inet/mobility/contract/IMobility.h"
 #include "rover/common/util/rover_util.h"
+#include "rover/mobility/IPositionHistoryProvider.h"
 #include "rover/rover.h"
 
 namespace inet {
