@@ -11,8 +11,7 @@
 #
 # Examples:
 #
-# "omnetpp"		will start the OMNeT++ IDE in the latest OMNeT++ container
-# "omnetpp 5.3"		will start the OMNeT++ IDE in the OMNeT++ 5.3 container
+# "omnetpp-ide"		will start the OMNeT++ IDE in the latest OMNeT++ container
 # "omnetpp exec ls"	will start the command "ls" in the latest OMNeT++ container
 # "omnetpp 5.3 exec ls"	will start the command "ls" in the OMNeT++ 5.3 container
 

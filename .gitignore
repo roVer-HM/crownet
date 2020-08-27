@@ -41,6 +41,8 @@ rover/**/.cmdenv-log
 rover/**/*.log
 rover/**/simulations/*/plots/*.png
 rover/**/simulations/*/plots/*.pdf
+rover/**/simulations/*/plots/*.svg
+rover/**/simulations/*/plots/*.eps
 rover/**/venv
 rover/**/*_m.cc
 rover/**/*_m.h

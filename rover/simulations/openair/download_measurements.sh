@@ -1,9 +1,11 @@
 #/bin/bash
 # Small script to download measurement data from a cloud ressource.
 
-RES="https://sam.cs.hm.edu/samcloud/index.php/s/rjAeQQ4mcCjaTzK/download?files=measurements_pub_1.tar.gz"
-# RES="https://sam.cs.hm.edu/samcloud/index.php/s/j3oNKycwebpe5kL/download?path=%2FOpenAirInterface&files=Schaipp_Project_1_2018-06-28.zip"
-# RES="https://sam.cs.hm.edu/samcloud/index.php/s/j3oNKycwebpe5kL/download?path=%2FOpenAirInterface&files=Schaipp_Project_2_2019-10-25.zip"
+# Initial measurement results for cellular communication via eNodeB
+# RES="https://sam.cs.hm.edu/samcloud/index.php/s/rjAeQQ4mcCjaTzK/download?files=measurements_pub_1.tar.gz"
+# Extended measurement results (cellular and direct communication, measurements in Feb.-Apr. 2020)
+RES="https://sam.cs.hm.edu/samcloud/index.php/s/rjAeQQ4mcCjaTzK/download?files=measurements_pub_2.tar.gz"
+
 TARGET_DIR="measurements"
 BASE_DIR=$(dirname "$0")
 

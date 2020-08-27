@@ -26,6 +26,7 @@ network LabSingleCellBase
 {
     parameters:
         int numUe = default(1);
+        int numENB = default(1);
         @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");       
           
     submodules:
@@ -42,7 +43,7 @@ network LabSingleCellBase
         binder: LteBinder {
             @display("p=8,4;is=s");
         }
-        eNB: eNodeB {
+        eNB[numENB]: eNodeB {
             @display("p=1.0457151,2.6142879;is=vl");
         }
         pgw: PgwStandardSimplified {
@@ -72,5 +73,7 @@ network LabSingleCell extends LabSingleCellBase
         connections:
         server.pppg++ <--> Eth1GMetered <--> router.pppg++;
         router.pppg++ <--> Eth1GMetered <--> pgw.filterGate;
-        pgw.pppg++ <--> Eth1GMetered <--> eNB.ppp; 
+        for i=0..numENB-1 {
+            pgw.pppg++ <--> Eth1GMetered <--> eNB[i].ppp; 
+        }
 }
