@@ -23,17 +23,7 @@ class DensityMeasure : public IEntry<omnetpp::simtime_t> {
   DensityMeasure();
   DensityMeasure(int, omnetpp::simtime_t&, omnetpp::simtime_t&);
 
-  void reset() override;
-  const bool valid() const override;
-  void incrementCount(const omnetpp::simtime_t& t) override;
-
   friend std::ostream& operator<<(std::ostream& os, const DensityMeasure& obj);
-
- private:
-  int count;
-  omnetpp::simtime_t measurement_time;
-  omnetpp::simtime_t received_time;
-  bool _valid;
 };
 
 template <typename NodeID>

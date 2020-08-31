@@ -10,8 +10,10 @@
 #include <omnetpp/cexception.h>
 #include <omnetpp/clog.h>
 #include <boost/heap/binomial_heap.hpp>
+#include <boost/range.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/min_element.hpp>
 #include <boost/range/iterator_range_core.hpp>
 #include <map>
 #include <type_traits>
@@ -24,10 +26,73 @@ template <typename T>
 class IEntry {
  public:
   using time_type = T;
-  virtual void reset() = 0;
-  virtual const bool valid() const = 0;
-  virtual void incrementCount(const time_type& t) = 0;
+  IEntry();
+  IEntry(int, time_type&, time_type&);
+  virtual void reset() {
+    count = 0;
+    _valid = false;
+  }
+  virtual const bool valid() const { return _valid; }
+  virtual void incrementCount(const time_type& t);
+
+  virtual const time_type& getMeasureTime() const;
+  virtual const time_type& getReceivedTime() const;
+
+  virtual int compareMeasureTime(const IEntry& other) const;
+  virtual int compareReceivedTime(const IEntry& other) const;
+
+ protected:
+  int count;
+  time_type measurement_time;
+  time_type received_time;
+  bool _valid;
 };
+
+template <typename T>
+IEntry<T>::IEntry()
+    : count(0), measurement_time(), received_time(), _valid(false) {}
+
+template <typename T>
+IEntry<T>::IEntry(int count, time_type& m_t, time_type& r_t)
+    : count(count), measurement_time(m_t), received_time(r_t), _valid(true) {}
+
+template <typename T>
+void IEntry<T>::incrementCount(const time_type& t) {
+  count++;
+  measurement_time = t;
+  received_time = t;
+  _valid = true;
+}
+
+template <typename T>
+const typename IEntry<T>::time_type& IEntry<T>::getMeasureTime() const {
+  return measurement_time;
+}
+
+template <typename T>
+const typename IEntry<T>::time_type& IEntry<T>::getReceivedTime() const {
+  return received_time;
+}
+
+template <typename T>
+int IEntry<T>::compareMeasureTime(const IEntry& other) const {
+  if (measurement_time == other.measurement_time) return 0;
+  if (measurement_time < other.measurement_time) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
+
+template <typename T>
+int IEntry<T>::compareReceivedTime(const IEntry& other) const {
+  if (received_time == other.received_time) return 0;
+  if (received_time < other.received_time) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
 
 template <typename VALUE>
 class EntryDefaultCtor {
@@ -47,6 +112,24 @@ class CellEntry {
   using value_type = std::pair<const key_type&, mapped_type&>;
   using entry_ctor = ENTRY_CTOR;
 
+ private:
+  using map_type = std::map<key_type, mapped_type>;
+  map_type _data;
+  key_type _localKey;
+  entry_ctor _entryCtor;
+  mapped_type* _localEntry = nullptr;
+
+ public:
+  using map_unary_filter =
+      std::function<bool(const typename map_type::value_type&)>;
+  using map_binary_filter =
+      std::function<bool(const typename map_type::value_type&,
+                         const typename map_type::value_type&)>;
+  using map_iter = typename map_type::iterator;
+  using map_range = boost::iterator_range<typename map_type::iterator>;
+  using map_range_filterd = boost::filtered_range<map_unary_filter, map_range>;
+
+ public:
   template <typename T = ENTRY_CTOR>
   CellEntry(
       key_type localKey,
@@ -61,12 +144,12 @@ class CellEntry {
   const bool hasValidLocalMeasure() const {
     return hasLocalMeasure() && local().valid();
   }
+
   void resetLocalMeasure() {
     if (hasLocalMeasure()) _localEntry->reset();
   }
-  const key_type localKey() const { return _localKey; }
 
-  void updateLocalMeasure(mapped_type& m) { local() = m; }
+  const key_type localKey() const { return _localKey; }
 
   mapped_type& local() {
     if (!hasLocalMeasure()) {
@@ -81,17 +164,42 @@ class CellEntry {
 
     return *_localEntry;
   }
-
   const mapped_type& local() const {
     return const_cast<CellEntry*>(this)->local();
   }
 
- private:
-  using map_type = std::map<key_type, mapped_type>;
-  map_type _data;
-  key_type _localKey;
-  entry_ctor _entryCtor;
-  mapped_type* _localEntry = nullptr;
+  mapped_type& youngestMeasureFirst(bool prefereLocal = true) {
+    map_binary_filter _f = [](const typename map_type::value_type lhs,
+                              const typename map_type::value_type rhs) -> bool {
+      return lhs.second.compareMeasureTime(rhs.second);
+    };
+    auto range = validRange();
+    auto ret = boost::range::min_element(range, _f);
+
+    if (prefereLocal && ret->second.compareMeasureTime(*_localEntry) <= 0) {
+      // return local measure if it has the same age.
+      return *_localEntry;
+    } else {
+      return ret->second;
+    }
+  }
+  const mapped_type& youngestMeasureFirst() const {
+    return const_cast<CellEntry*>(this)->youngestMeasureFirst();
+  }
+
+  const bool hasValid() const { return boost::size(validRange()); }
+
+  map_range_filterd validRange() {
+    map_unary_filter _f = [](const typename map_type::value_type val) -> bool {
+      return val.second.valid();
+    };
+    using namespace boost::adaptors;
+    map_range rng = boost::make_iterator_range(_data.begin(), _data.end());
+    return rng | filtered(_f);
+  }
+  const map_range_filterd validRange() const {
+    return const_cast<CellEntry*>(this)->validRange();
+  }
 };
 
 template <typename VALUE, typename ENTRY_KEY>
@@ -185,15 +293,38 @@ class PositionMap {
   }
 
   entry_map_range localMap() {
+    // filter: only valid and local measure
+    data_filter _f = [](const typename map_type::value_type& map_value) {
+      auto& value = map_value.second;
+      return value.hasValidLocalMeasure();
+    };
+
+    // transform
     entry_transform _t = [](typename map_type::value_type& map_value) {
       view_value_type ret =
           view_value_type{map_value.first, map_value.second.local()};
       return ret;
     };
 
+    using namespace boost::adaptors;
+    data_range range_all = boost::make_iterator_range(_map.begin(), _map.end());
+
+    return range_all | filtered(_f) | transformed(_t);
+  }
+
+  // youngest measure first
+  entry_map_range ymfMap() {
+    // filter: only valid measurements
     data_filter _f = [](const typename map_type::value_type& map_value) {
       auto& value = map_value.second;
-      return value.hasValidLocalMeasure();
+      return value.hasValid();
+    };
+
+    // transform
+    entry_transform _t = [](typename map_type::value_type& map_value) {
+      view_value_type ret = view_value_type{
+          map_value.first, map_value.second.youngestMeasureFirst()};
+      return ret;
     };
 
     using namespace boost::adaptors;
@@ -204,7 +335,7 @@ class PositionMap {
 
   void printLocalMap() {
     using namespace omnetpp;
-    for (auto entry : localMap()) {
+    for (auto entry : ymfMap()) {
       EV_DEBUG << "   Cell(" << entry.first.first << ", " << entry.first.second
                << ") " << entry.second << std::endl;
     }
