@@ -106,25 +106,17 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
   auto converter_m = inet::getModuleFromPar<OsgCoordConverter>(
       par("coordConverterModule"), this, false);
 
-  if (!converter_m) {
+  if (!converter_m || !converter_m->isInitialized()) {
     // no OsgCoordConverter module found --> not set create
     // OsgCoordianteTransformer only for TraCI
     CoordRef ref = m_api->v_simulation.getCoordRef();
+    traci::Boundary netBound =
+        traci::Boundary(m_api->v_simulation.getNetBoundary());
 
-    auto transformer = std::make_shared<OsgCoordianteTransformer>(
-        ref.epsg_code, inet::Coord{ref.offset.x, ref.offset.y, ref.offset.z});
-    m_api->setConverter(converter_m->getTransformer());
-  } else {
-    // OsgCoordConverter present check if OsgCoordianteTransformer was set
-    // locally or if TraCI should create it.
-    if (!converter_m->isInitialized()) {
-      CoordRef ref = m_api->v_simulation.getCoordRef();
-
-      auto transformer = std::make_shared<OsgCoordianteTransformer>(
-          ref.epsg_code, inet::Coord{ref.offset.x, ref.offset.y, ref.offset.z});
-      converter_m->initializeTransformer(transformer);
-      m_api->setConverter(converter_m->getTransformer());
-    }
+    auto converter = std::make_shared<OsgCoordinateConverter>(
+        ref.offset, netBound, ref.epsg_code);
+    m_api->setConverter(converter);
+    if (converter_m) converter_m->initializeConverter(converter);
   }
 }
 

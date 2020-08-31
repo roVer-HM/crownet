@@ -9,8 +9,9 @@
 
 #include <traci/API.h>
 #include <traci/sumo/utils/traci/TraCIAPI.h>
+
+#include "../../common/OsgCoordinateConverter.h"
 #include "rover/artery/traci/VadereUtils.h"
-#include "rover/common/OsgCoordianteTransformer.h"
 
 using namespace traci;
 
@@ -32,7 +33,7 @@ constexpr ubyte VAR_COORD_REF = 0x90;
 
 struct CoordRef {
   std::string epsg_code;
-  libsumo::TraCIPosition offset;
+  traci::TraCIPosition offset;
 };
 
 class VadereApi : public API {
@@ -44,12 +45,12 @@ class VadereApi : public API {
   virtual TraCIGeoPosition convertGeo(const TraCIPosition&) const override;
   virtual TraCIPosition convert2D(const TraCIGeoPosition&) const override;
 
-  void setConverter(std::shared_ptr<OsgCoordianteTransformer> _c) {
+  void setConverter(std::shared_ptr<OsgCoordinateConverter> _c) {
     converter = _c;
   }
 
  private:
-  std::shared_ptr<OsgCoordianteTransformer> converter;
+  std::shared_ptr<OsgCoordinateConverter> converter;
 
  public:
   class VaderePersonScope : public TraCIScopeWrapper {

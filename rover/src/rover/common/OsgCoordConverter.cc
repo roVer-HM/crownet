@@ -15,33 +15,32 @@ namespace rover {
 
 Define_Module(OsgCoordConverter);
 
-OsgCoordConverter::OsgCoordConverter() : _transformer(nullptr) {}
+OsgCoordConverter::OsgCoordConverter() : _converter(nullptr) {}
 
 void OsgCoordConverter::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
     if (hasPar("epgs_code")) {
-      _transformer = std::make_shared<OsgCoordianteTransformer>(
-          par("epsg_code").stdstringValue(),
+      _converter = std::make_shared<OsgCoordinateConverter>(
           inet::Coord{par("offset_x").doubleValue(),
-                      par("offset_y").doubleValue()});
+                      par("offset_y").doubleValue()},
+          inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
+          par("epsg_code").stdstringValue());
     }
   }
 }
 
-std::shared_ptr<OsgCoordianteTransformer> OsgCoordConverter::getTransformer()
+std::shared_ptr<OsgCoordinateConverter> OsgCoordConverter::getConverter()
     const {
-  return _transformer;
+  return _converter;
 }
 
-bool OsgCoordConverter::isInitialized() const {
-  return _transformer != nullptr;
-}
+bool OsgCoordConverter::isInitialized() const { return _converter != nullptr; }
 
-void OsgCoordConverter::initializeTransformer(
-    std::shared_ptr<OsgCoordianteTransformer> transformer) {
-  if (!_transformer) {
-    _transformer = transformer;
+void OsgCoordConverter::initializeConverter(
+    std::shared_ptr<OsgCoordinateConverter> converter) {
+  if (!_converter) {
+    _converter = converter;
   } else {
     throw omnetpp::cRuntimeError(
         "OsgCoordianteTransformer already initialized.");

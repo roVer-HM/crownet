@@ -132,7 +132,7 @@
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
-                "referenceCoordinateSystem" : {
+        "referenceCoordinateSystem" : {
           "epsgCode" : "EPSG:32632",
           "description" : "UTM Zone 32U ",
           "translation" : {

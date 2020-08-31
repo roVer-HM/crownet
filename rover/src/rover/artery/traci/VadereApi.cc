@@ -13,11 +13,7 @@ TraCIGeoPosition VadereApi::convertGeo(const TraCIPosition& pos) const {
   if (converter == nullptr) {
     return API::convertGeo(pos);
   } else {
-    inet::GeoCoord p = converter->convertGeo(pos.x, pos.y, pos.z);
-    TraCIGeoPosition geo;
-    geo.latitude = p.latitude.get();
-    geo.longitude = p.longitude.get();
-    return geo;
+    return converter->convertToGeoTraCi(pos);
   }
 }
 
@@ -25,12 +21,13 @@ TraCIPosition VadereApi::convert2D(const TraCIGeoPosition& pos) const {
   if (converter != nullptr) {
     return API::convert2D(pos);
   } else {
-    inet::Coord p = converter->convert2D(pos.longitude, pos.latitude);
-    TraCIPosition out;
-    out.x = p.x;
-    out.y = p.y;
-    out.z = p.z;
-    return out;
+    return converter->convertToCartTraCIPosition(pos);
+    //    inet::Coord p = converter->convert2D(pos.longitude, pos.latitude);
+    //    TraCIPosition out;
+    //    out.x = p.x;
+    //    out.y = p.y;
+    //    out.z = p.z;
+    //    return out;
   }
 }
 

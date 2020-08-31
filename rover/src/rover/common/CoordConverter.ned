@@ -28,6 +28,8 @@ simple OsgCoordConverterLocal like ICoordConverter {
         string epsg_code = default("EPSG:32632");
         double offset_x = default(0.0);
         double offset_y = default(0.0);
+        double xBound;
+        double yBound;
 }
 
 // remotly defined converter. The converter is configured dynamically using TraCI.

@@ -15,6 +15,7 @@
 
 package rover.aid;
 import rover.aid.IAid;
+import rover.aid.INeighbourhood;
 import inet.common.MessageDispatcher;
 
 moduleinterface IAidLayer
@@ -42,6 +43,9 @@ module SimpleAidLayer like IAidLayer
             parameters:
                 @display("p=164,121;is=s");
         }
+        neighbourhood: <default("ArteryNeighbourhood")> like INeighbourhood {
+            @display("p=423,90;is=s");
+        }
         // Message Dispatcher 
         upper: MessageDispatcher {
             parameters:
@@ -61,7 +65,7 @@ module SimpleAidLayer like IAidLayer
         upper.out++ --> aid.upperIn;
         upper.in++ <-- aid.upperOut;
 
-		aid.lowerOut --> lower.in++;
-		aid.lowerIn <-- lower.out++;
+        aid.lowerOut --> lower.in++;
+        aid.lowerIn <-- lower.out++;
 
 }

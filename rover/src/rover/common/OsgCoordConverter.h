@@ -10,8 +10,8 @@
 #include <omnetpp/csimplemodule.h>
 
 #include <memory>
+#include "OsgCoordinateConverter.h"
 #include "inet/common/InitStages.h"
-#include "rover/common/OsgCoordianteTransformer.h"
 
 namespace rover {
 
@@ -23,13 +23,12 @@ class OsgCoordConverter : public omnetpp::cSimpleModule {
   virtual void initialize(int stage) override;
   virtual void handleMessage(omnetpp::cMessage*) override;
 
-  std::shared_ptr<OsgCoordianteTransformer> getTransformer() const;
+  std::shared_ptr<OsgCoordinateConverter> getConverter() const;
   bool isInitialized() const;
-  void initializeTransformer(
-      std::shared_ptr<OsgCoordianteTransformer> transformer);
+  void initializeConverter(std::shared_ptr<OsgCoordinateConverter> converter);
 
  private:
-  std::shared_ptr<OsgCoordianteTransformer> _transformer;
+  std::shared_ptr<OsgCoordinateConverter> _converter;
 };
 
 } /* namespace rover */
