@@ -100,6 +100,12 @@ if __name__ == "__main__":
                 "poisson_parameter.txt",
                 "--experiment-label",
                 datetime.now().isoformat().replace(":", "").replace("-", ""),
+                "--delete-existing-containers",
+                "--create-vadere-container",
+                "--vadere-tag",
+                "200527-1424",
+                "--omnet-tag",
+                "200221-1642",
             ],
         )
     else:
