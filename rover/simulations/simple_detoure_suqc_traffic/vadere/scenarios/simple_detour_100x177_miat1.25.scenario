@@ -24,6 +24,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "DegreeInformed.txt",
       "processors" : [ 12 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "numberPedsGen.txt",
+      "processors" : [ 13 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -56,6 +60,14 @@
         "isRegexFilter" : false,
         "stopIfPercentageIsInformed" : 0.95,
         "numberOfAdditionalTimeFrames" : 1
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfGeneratedPedsProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOfGeneratedPedsProcessor",
+      "attributes" : {
+        "startTime" : 0.0,
+        "endTime" : -1.0
       }
     } ],
     "isTimestamped" : true,
@@ -345,7 +357,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 3001,
+        "id" : 1,
         "shape" : {
           "x" : 0.0,
           "y" : 114.0,
@@ -353,12 +365,12 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 0.6 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 1000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -367,7 +379,7 @@
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 3002,
+        "id" : 2,
         "shape" : {
           "x" : 44.25,
           "y" : 114.0,
@@ -375,12 +387,12 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 0.6 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 1000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -389,7 +401,7 @@
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 3003,
+        "id" : 5,
         "shape" : {
           "x" : 88.5,
           "y" : 114.0,
@@ -397,12 +409,12 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 0.6 ],
+	"interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 1000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -411,7 +423,7 @@
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 3004,
+        "id" : 6,
         "shape" : {
           "x" : 132.95,
           "y" : 114.2,
@@ -419,12 +431,12 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 0.6 ],
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "distributionParameters" : [ 0.0375 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 1000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
