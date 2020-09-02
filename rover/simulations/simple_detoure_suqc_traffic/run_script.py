@@ -102,10 +102,7 @@ if __name__ == "__main__":
                 datetime.now().isoformat().replace(":", "").replace("-", ""),
                 "--delete-existing-containers",
                 "--create-vadere-container",
-                "--vadere-tag",
-                "latest",
-                "--omnet-tag",
-                "latest",
+		# docker container tags: both latest
             ],
         )
     else:
