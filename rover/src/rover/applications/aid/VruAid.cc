@@ -40,11 +40,11 @@ void VruAid::initialize(int stage) {
 BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   //  vanetza::asn1::Cam message;
 
-  const auto& vam = makeShared<ItsVam>();
-  vam->setSequenceNumber(numSent);
-  vam->setChunkLength(B(par("messageLength")));  // todo calc?
-  vam->addTag<CreationTimeTag>()->setCreationTime(simTime());
+  //  const auto& vam = makeShared<ItsVam>();
+  //  vam->setSequenceNumber(numSent);
+  //  vam->addTag<CreationTimeTag>()->setCreationTime(simTime());
 
+  const auto& vam = createPacket<ItsVam>();
   vam->setGenerationDeltaTime(simTime());
   // VAM Header
   ItsPduHeader itsHeader{};
@@ -72,14 +72,16 @@ BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   }
   vam->setBasicContainer(basicContainer);
 
+  vam->setChunkLength(B(par("messageLength")));  // todo calc?
   sendPayload(vam);
   scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
 }
 
 void VruAid::socketDataArrived(AidSocket* socket, Packet* packet) {
-  emit(packetReceivedSignal, packet);
-  numReceived++;
+  auto payload = checkEmitGetReceived<ItsVam>(packet);
+  //  emit(packetReceivedSignal, packet);
+  //  numReceived++;
   // todo log received coordiantes.
   delete packet;
   socketFsmResult =

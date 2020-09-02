@@ -21,7 +21,8 @@ namespace rover {
 class DensityMeasure : public IEntry<omnetpp::simtime_t> {
  public:
   DensityMeasure();
-  DensityMeasure(int, omnetpp::simtime_t&, omnetpp::simtime_t&);
+  DensityMeasure(int, omnetpp::simtime_t& measurement_time,
+                 omnetpp::simtime_t& received_time);
 
   friend std::ostream& operator<<(std::ostream& os, const DensityMeasure& obj);
 };
@@ -33,6 +34,16 @@ class GridDensityMap {
   using nodeId = NodeID;
   using map_type = PositionMap<cellId, CellEntry<nodeId, DensityMeasure>>;
 
+  using MapView = typename map_type::View;
+  using view_visitor =
+      std::function<void(const cellId&, const DensityMeasure&)>;
+
+ private:
+  map_type _map;
+  double gridSize;
+  cellId nodeCurrentCell;
+
+ public:
   virtual ~GridDensityMap() = default;
   GridDensityMap(nodeId id, double gridSize)
       : _nodeId(id), _map(id), gridSize(gridSize) {}
@@ -40,6 +51,11 @@ class GridDensityMap {
   void resetLocalMap() { _map.resetLocalMap(); }
   void updateLocalMap(const cellId& _cellId, DensityMeasure& measure) {
     _map.updateLocal(_cellId, measure);
+  }
+
+  void updateMap(const cellId& _cellId, const nodeId& _nodeId,
+                 DensityMeasure& measure) {
+    _map.update(_cellId, _nodeId, measure);
   }
 
   void incrementLocal(const inet::Coord& coord, const omnetpp::simtime_t& t,
@@ -57,14 +73,23 @@ class GridDensityMap {
     _map.printLocalMap();
   }
 
+  void printYfmMap() {
+    using namespace omnetpp;
+    EV_DEBUG << "GridDensityMap (NodeId: " << _nodeId << " Cell("
+             << nodeCurrentCell.first << ", " << nodeCurrentCell.second
+             << ")\n";
+    _map.printYfmMap();
+  }
+
+  void visit(const view_visitor v, const MapView& view) const {
+    _map.visit(v, view);
+  }
+
+  const int size() const { return _map.size(); }
+
   const std::string& getId() const { return _nodeId; }
 
   std::string _nodeId;
-
- private:
-  map_type _map;
-  double gridSize;
-  cellId nodeCurrentCell;
 };
 
 } /* namespace rover */

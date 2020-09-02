@@ -13,6 +13,7 @@
 #include <boost/range.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/algorithm/min_element.hpp>
 #include <boost/range/iterator_range_core.hpp>
 #include <map>
@@ -37,6 +38,7 @@ class IEntry {
 
   virtual const time_type& getMeasureTime() const;
   virtual const time_type& getReceivedTime() const;
+  virtual const int getCount() const;
 
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
@@ -72,6 +74,11 @@ const typename IEntry<T>::time_type& IEntry<T>::getMeasureTime() const {
 template <typename T>
 const typename IEntry<T>::time_type& IEntry<T>::getReceivedTime() const {
   return received_time;
+}
+
+template <typename T>
+const int IEntry<T>::getCount() const {
+  return count;
 }
 
 template <typename T>
@@ -168,15 +175,34 @@ class CellEntry {
     return const_cast<CellEntry*>(this)->local();
   }
 
+  mapped_type& get(const key_type& key) {
+    auto measure = _data.find(key);
+    if (measure != _data.end()) {
+      return measure->second;
+    } else {
+      auto newMeasure =
+          _data.emplace(std::piecewise_construct, std::forward_as_tuple(key),
+                        std::forward_as_tuple(_entryCtor()));
+      if (!newMeasure.second) {
+        throw omnetpp::cRuntimeError("error inserting newMeasure");
+      } else {
+        return newMeasure.first->second;
+      }
+    }
+  }
+  const mapped_type& get() const { return const_cast<CellEntry*>(this)->get(); }
+
   mapped_type& youngestMeasureFirst(bool prefereLocal = true) {
     map_binary_filter _f = [](const typename map_type::value_type lhs,
                               const typename map_type::value_type rhs) -> bool {
       return lhs.second.compareMeasureTime(rhs.second);
     };
     auto range = validRange();
-    auto ret = boost::range::min_element(range, _f);
+    //    auto ret = boost::range::min_element(rangge, _f);
+    auto ret = boost::range::max_element(range, _f);
 
-    if (prefereLocal && ret->second.compareMeasureTime(*_localEntry) <= 0) {
+    if (prefereLocal && hasValidLocalMeasure() &&
+        ret->second.compareMeasureTime(*_localEntry) == 0) {
       // return local measure if it has the same age.
       return *_localEntry;
     } else {
@@ -231,6 +257,12 @@ class PositionMap {
   // used by boost::iterator_ranges to filter/aggregate the correct
   // entry_mapped_type based on given predicate/transformer.
   using view_value_type = std::pair<const key_type&, entry_mapped_type&>;
+  using view_visitor = std::function<void(const key_type&, entry_mapped_type&)>;
+
+  enum View {
+    LOCAL,
+    YMF,  // youngest measurement first
+  };
 
  private:
   using map_type = std::map<key_type, mapped_type>;
@@ -288,6 +320,11 @@ class PositionMap {
     getCellEntry(cell_key).local() = measure_value;
   }
 
+  void update(const key_type& cell_key, const entry_key_type& node_key,
+              entry_mapped_type& measure_value) {
+    getCellEntry(cell_key).get(node_key) = measure_value;
+  }
+
   void incrementLocal(const key_type& cell_key, const omnetpp::simtime_t& t) {
     getCellEntry(cell_key).local().incrementCount(t);
   }
@@ -311,6 +348,9 @@ class PositionMap {
 
     return range_all | filtered(_f) | transformed(_t);
   }
+  const entry_map_range localMap() const {
+    return const_cast<PositionMap*>(this)->localMap();
+  }
 
   // youngest measure first
   entry_map_range ymfMap() {
@@ -332,10 +372,51 @@ class PositionMap {
 
     return range_all | filtered(_f) | transformed(_t);
   }
+  const entry_map_range ymfMap() const {
+    return const_cast<PositionMap*>(this)->ymfMap();
+  }
+
+  const int size() const {
+    //    data_filter _f = [](const typename map_type::value_type& map_value) {
+    //      auto& value = map_value.second;
+    //      return value.hasValid();
+    //    };
+    //
+    //    using namespace boost::adaptors;
+    //    data_range range_all = boost::make_iterator_range(_map.begin(),
+    //    _map.end());
+
+    return boost::size(ymfMap());
+  }
+
+  void visit(const view_visitor& visitor,
+             const View& view = View::LOCAL) const {
+    // todo:
+    //    entry_map_range* r = nullptr;
+    //    switch (view) {
+    //      case View::YMF:
+    //        r = &ymfMap();
+    //        break;
+    //      default:
+    //        r = &localMap();
+    //    }
+
+    for (const auto& entry : ymfMap()) {
+      visitor(entry.first, entry.second);
+    }
+  }
+
+  void printYfmMap() {
+    using namespace omnetpp;
+    for (auto entry : ymfMap()) {
+      EV_DEBUG << "   Cell(" << entry.first.first << ", " << entry.first.second
+               << ") " << entry.second << std::endl;
+    }
+  }
 
   void printLocalMap() {
     using namespace omnetpp;
-    for (auto entry : ymfMap()) {
+    for (auto entry : localMap()) {
       EV_DEBUG << "   Cell(" << entry.first.first << ", " << entry.first.second
                << ") " << entry.second << std::endl;
     }

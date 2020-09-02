@@ -19,7 +19,7 @@ using namespace inet;
 
 namespace rover {
 BaseApp::~BaseApp() {
-  if (selfMsgAppTimer) cancelAndDelete(selfMsgAppTimer);
+  if (appLifeTime) cancelAndDelete(appLifeTime);
 }
 
 void BaseApp::initialize(int stage) {
@@ -39,10 +39,10 @@ void BaseApp::initialize(int stage) {
     packetName = par("packetName");
     dontFragment = par("dontFragment").boolValue();
 
-    if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
+    if (stopTime > SIMTIME_ZERO && stopTime < startTime)
       throw cRuntimeError("Invalid startTime/stopTime parameters");
-    selfMsgAppTimer = new cMessage("applicationTimer");
-    selfMsgSendTimer = new cMessage("sendTimer");
+    appLifeTime = new cMessage("applicationTimer");
+    appMainTimer = new cMessage("sendTimer");
   }
 }
 
@@ -68,16 +68,20 @@ void BaseApp::scheduleNextAppMainEvent(simtime_t time) {
   simtime_t base = time < 0.0 ? omnetpp::simTime() : time;
   simtime_t nextSend = base + par("appMainInterval");
 
-  if (nextSend <= stopTime) {
-    if (selfMsgSendTimer->isScheduled()) {
+  if ((stopTime == SIMTIME_ZERO) || (nextSend < stopTime)) {
+    if (appMainTimer->isScheduled()) {
       throw cRuntimeError("Cannot reschedule selfMsgSendTimer message.");
     }
-    selfMsgSendTimer->setKind(FsmRootStates::APP_MAIN);
-    scheduleAt(nextSend, selfMsgSendTimer);
+    appMainTimer->setKind(FsmRootStates::APP_MAIN);
+    scheduleAt(nextSend, appMainTimer);
   } else {
     EV_INFO << "Next send time after stopTime. Do not schedule new send event."
             << endl;
   }
+}
+
+void BaseApp::cancelAppMainEvent() {
+  if (appMainTimer->isScheduled()) cancelEvent(appMainTimer);
 }
 
 void BaseApp::sendPayload(IntrusivePtr<const ApplicationPacket> payload) {
@@ -111,23 +115,25 @@ L3Address BaseApp::chooseDestAddr() {
 
 void BaseApp::handleStartOperation(LifecycleOperation *operation) {
   simtime_t start = std::max(startTime, simTime());
-  if ((stopTime < SIMTIME_ZERO) || (start < stopTime) ||
+  if ((stopTime == SIMTIME_ZERO) || (start <= stopTime) ||
       (start == stopTime && startTime == stopTime)) {
-    selfMsgAppTimer->setKind(FsmRootStates::SETUP);
-    scheduleAt(start, selfMsgAppTimer);
+    appLifeTime->setKind(FsmRootStates::SETUP);
+    scheduleAt(start, appLifeTime);
+  } else {
+    EV << "Lifecycle not started for BaseApp" << endl;
   }
 }
 
 void BaseApp::handleStopOperation(LifecycleOperation *operation) {
-  cancelEvent(selfMsgAppTimer);
-  selfMsgAppTimer->setKind(FsmRootStates::TEARDOWN);
-  handleMessageWhenUp(selfMsgAppTimer);
+  cancelEvent(appLifeTime);
+  appLifeTime->setKind(FsmRootStates::TEARDOWN);
+  handleMessageWhenUp(appLifeTime);
 }
 
 void BaseApp::handleCrashOperation(LifecycleOperation *operation) {
-  cancelEvent(selfMsgAppTimer);
-  selfMsgAppTimer->setKind(FsmRootStates::DESTROY);
-  handleMessageWhenUp(selfMsgAppTimer);
+  cancelEvent(appLifeTime);
+  appLifeTime->setKind(FsmRootStates::DESTROY);
+  handleMessageWhenUp(appLifeTime);
 }
 
 /**
@@ -183,6 +189,16 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
   }
 }
 
+void BaseApp::setupTimers() {
+  if (destAddresses.empty()) {
+    EV_WARN << "no destination address found. Module will not send packets"
+            << endl;
+  } else {
+    // schedule at startTime or current time, whatever is bigger.
+    scheduleNextAppMainEvent(std::max(startTime, simTime()));
+  }
+}
+
 // FSM
 
 BaseApp::FsmState BaseApp::fsmSetup(cMessage *msg) {
@@ -201,18 +217,12 @@ BaseApp::FsmState BaseApp::fsmSetup(cMessage *msg) {
 
   initSocket();
 
-  if (stopTime >= SIMTIME_ZERO) {
-    selfMsgAppTimer->setKind(FsmRootStates::TEARDOWN);
-    scheduleAt(stopTime, selfMsgAppTimer);
+  if (stopTime > SIMTIME_ZERO) {
+    appLifeTime->setKind(FsmRootStates::TEARDOWN);
+    scheduleAt(stopTime, appLifeTime);
   }
 
-  if (destAddresses.empty()) {
-    EV_WARN << "no destination address found. Module will not send packets"
-            << endl;
-  } else {
-    // schedule at startTime or current time, whatever is bigger.
-    scheduleNextAppMainEvent(std::max(startTime, simTime()));
-  }
+  setupTimers();
   return FsmRootStates::WAIT_ACTIVE;
 }
 

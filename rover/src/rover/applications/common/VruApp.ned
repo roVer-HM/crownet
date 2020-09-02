@@ -27,7 +27,7 @@ simple VruAid extends BaseApp like IVRU {
     parameters:
         @class(rover::VruAid);
 	    appMainInterval =  default(0.1s);
-	    messageLength = default(1000B);
+	    volatile int messageLength @unit(B) = default(1000B); // length of messages to generate, in bytes
 	    packetName = default("VRU_AID");
 	    double minRate = default(1); // Hz
 	    double maxRate = default(10); // Hz

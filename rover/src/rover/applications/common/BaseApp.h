@@ -40,11 +40,6 @@ using namespace inet;
 
 namespace rover {
 
-class IRoverSocket : public ISocket {
- public:
-  virtual ~IRoverSocket() {}
-};
-
 class BaseApp : public ApplicationBase {
  public:
   BaseApp(){};
@@ -64,8 +59,8 @@ class BaseApp : public ApplicationBase {
   bool dontFragment = false;
 
   // state
-  cMessage *selfMsgAppTimer = nullptr;
-  cMessage *selfMsgSendTimer = nullptr;
+  cMessage *appLifeTime = nullptr;
+  cMessage *appMainTimer = nullptr;
 
   // statistics
   int numSent = 0;
@@ -84,7 +79,7 @@ class BaseApp : public ApplicationBase {
     DESTROY = FSM_Transient(120),
     SUBSTATE = 200  // sub states must be outside of +-200
   };
-  typedef int FsmState;  // state for each FSM.
+  using FsmState = int;  // state for each FSM.
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
 
@@ -100,11 +95,17 @@ class BaseApp : public ApplicationBase {
    * negative par("sendInterval") will cause errors.
    */
   virtual void scheduleNextAppMainEvent(simtime_t time = -1);
+  virtual void cancelAppMainEvent();
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload,
                            L3Address destAddr, int destPort);
-
   virtual L3Address chooseDestAddr();
+
+  template <typename T>
+  IntrusivePtr<T> createPacket();
+
+  template <typename T>
+  IntrusivePtr<const T> checkEmitGetReceived(Packet *pkt);
 
   // fsmRoot actions
 
@@ -115,6 +116,8 @@ class BaseApp : public ApplicationBase {
   virtual FsmState fsmAppMain(cMessage *msg) = 0;
   virtual FsmState fsmTeardown(cMessage *msg);
   virtual FsmState fsmDestroy(cMessage *msg);
+
+  virtual void setupTimers();  // called in fsmSetup
 
   // socket actions.
   virtual void initSocket() = 0;
@@ -127,4 +130,21 @@ class BaseApp : public ApplicationBase {
   virtual void handleStopOperation(LifecycleOperation *operation) override;
   virtual void handleCrashOperation(LifecycleOperation *operation) override;
 };
+
+template <typename T>
+inline IntrusivePtr<T> BaseApp::createPacket() {
+  auto payload = makeShared<T>();
+  payload->setSequenceNumber(numSent);
+  payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
+  return payload;
+}
+
+template <typename T>
+inline IntrusivePtr<const T> BaseApp::checkEmitGetReceived(Packet *pkt) {
+  emit(packetReceivedSignal, pkt);
+  numReceived++;
+
+  return pkt->popAtFront<T>();
+}
+
 }  // namespace rover

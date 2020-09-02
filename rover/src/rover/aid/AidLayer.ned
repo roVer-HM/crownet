@@ -44,7 +44,7 @@ module SimpleAidLayer like IAidLayer
                 @display("p=164,121;is=s");
         }
         neighbourhood: <default("ArteryNeighbourhood")> like INeighbourhood {
-            @display("p=423,90;is=s");
+            @display("p=432,98;i=block/table;is=s");
         }
         // Message Dispatcher 
         upper: MessageDispatcher {
@@ -67,5 +67,8 @@ module SimpleAidLayer like IAidLayer
 
         aid.lowerOut --> lower.in++;
         aid.lowerIn <-- lower.out++;
+        
+        neighbourhood.socketIn <-- upper.out++;
+        neighbourhood.socketOut --> upper.in++;
 
 }

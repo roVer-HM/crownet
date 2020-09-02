@@ -14,13 +14,15 @@
 // 
 
 package rover.aid;
+import rover.applications.common.AidBaseApp;
+import inet.applications.contract.IApp;
 
-moduleinterface INeighbourhood {
+moduleinterface INeighbourhood extends IApp {
     parameters:
     	
 }
 
-simple ArteryNeighbourhood like INeighbourhood {
+simple ArteryNeighbourhood  extends AidBaseApp like INeighbourhood  {
     
     parameters:
         @class(rover::ArteryNeighbourhood);
@@ -31,9 +33,12 @@ simple ArteryNeighbourhood like INeighbourhood {
         											   // state of the map.
         double sendInterval = default(1.0s) @unit(s); // interval to query artery router for current 
         											   // state of the map.
-        											   
         double gridSize = default(3.0) @units(m);
-    
+        
+        destPort = 30001;
+        localPort = 30001;
+        appMainInterval = default(1.0s);
+            
 }
 
 
