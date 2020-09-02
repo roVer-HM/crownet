@@ -17,18 +17,12 @@ namespace rover {
 
 Define_Module(ArteryNeighbourhood);
 
-ArteryNeighbourhood::~ArteryNeighbourhood() {
-  cancelAndDelete(localMapUpdate);
-  cancelAndDelete(sendMap);
-}
+ArteryNeighbourhood::~ArteryNeighbourhood() {}
 
 void ArteryNeighbourhood::initialize(int stage) {
   AidBaseApp::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
     std::string x = par("coordConverterModule").stdstringValue();
-    localMapUpdate = new cMessage("localMapUpdate");
-    sendMap = new cMessage("sendMap");
-    updateInterval = par("updateInterval").doubleValue();
     gridSize = par("gridSize").doubleValue();
   } else if (stage == INITSTAGE_TRANSPORT_LAYER) {
     middleware = inet::findModuleFromPar<artery::Middleware>(
@@ -47,7 +41,7 @@ void ArteryNeighbourhood::initialize(int stage) {
                    .getConst<artery::Identity>()
                    .host->getId();
     dMap = std::make_shared<ArteryGridDensityMap>(node_id.str(), gridSize);
-    id = dMap->_nodeId;
+    id = dMap->getId();
   }
 }
 
@@ -78,7 +72,7 @@ BaseApp::FsmState ArteryNeighbourhood::fsmAppMain(cMessage *msg) {
   // send Message
   updateLocalMap();
   sendLocalMap();
-  scheduleNextAppMainEvent(simTime() + updateInterval);
+  scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
 }
 
@@ -101,13 +95,13 @@ void ArteryNeighbourhood::socketDataArrived(AidSocket *socket, Packet *packet) {
       << "[ "
       << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
       << "] (YMF) ";
-  dMap->printYfmMap();
+  dMap->printView(ArteryGridDensityMap::MapView::YMF);
 
   EV_DEBUG
       << "[ "
       << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
       << "] (LOCAL) ";
-  dMap->printLocalMap();
+  dMap->printView(ArteryGridDensityMap::MapView::LOCAL);
 
   delete packet;
   socketFsmResult =
@@ -151,14 +145,14 @@ void ArteryNeighbourhood::updateLocalMap() {
       << "[ "
       << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
       << "] ";
-  dMap->printLocalMap();
+  dMap->printView(ArteryGridDensityMap::MapView::LOCAL);
 }
 
 void ArteryNeighbourhood::sendLocalMap() {
   const auto &payload = createPacket<DensityCount>();
-  int numValidCells = dMap->size();
+  int numValidCells = dMap->size(ArteryGridDensityMap::MapView::YMF);
   payload->setNumCells(numValidCells);
-  payload->setNodeId(dMap->_nodeId.c_str());
+  payload->setNodeId(dMap->getId().c_str());
   payload->setCellCountArraySize(numValidCells);
   payload->setCellXArraySize(numValidCells);
   payload->setCellYArraySize(numValidCells);

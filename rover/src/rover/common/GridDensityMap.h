@@ -39,6 +39,7 @@ class GridDensityMap {
       std::function<void(const cellId&, const DensityMeasure&)>;
 
  private:
+  std::string _nodeId;
   map_type _map;
   double gridSize;
   cellId nodeCurrentCell;
@@ -49,14 +50,6 @@ class GridDensityMap {
       : _nodeId(id), _map(id), gridSize(gridSize) {}
 
   void resetLocalMap() { _map.resetLocalMap(); }
-  void updateLocalMap(const cellId& _cellId, DensityMeasure& measure) {
-    _map.updateLocal(_cellId, measure);
-  }
-
-  void updateMap(const cellId& _cellId, const nodeId& _nodeId,
-                 DensityMeasure& measure) {
-    _map.update(_cellId, _nodeId, measure);
-  }
 
   void incrementLocal(const inet::Coord& coord, const omnetpp::simtime_t& t,
                       bool ownPosition = false) {
@@ -65,31 +58,35 @@ class GridDensityMap {
     _map.incrementLocal(id, t);
     if (ownPosition) nodeCurrentCell = id;
   }
-  void printLocalMap() {
-    using namespace omnetpp;
-    EV_DEBUG << "GridDensityMap (NodeId: " << _nodeId << " Cell("
-             << nodeCurrentCell.first << ", " << nodeCurrentCell.second
-             << ")\n";
-    _map.printLocalMap();
+
+  void updateMap(const cellId& _cellId, const nodeId& _nodeId,
+                 DensityMeasure& measure) {
+    _map.update(_cellId, _nodeId, measure);
   }
 
-  void printYfmMap() {
+  std::string strView(MapView view = MapView::LOCAL) {
+    std::stringstream s;
+    s << "GridDensityMap[ " << view << "] (NodeId: " << _nodeId << " Cell("
+      << nodeCurrentCell.first << ", " << nodeCurrentCell.second << ")\n";
+    s << _map.strView(view);
+    return s.str();
+  }
+
+  void printView(MapView view = MapView::LOCAL) {
     using namespace omnetpp;
-    EV_DEBUG << "GridDensityMap (NodeId: " << _nodeId << " Cell("
-             << nodeCurrentCell.first << ", " << nodeCurrentCell.second
-             << ")\n";
-    _map.printYfmMap();
+    EV_DEBUG << strView(view);
   }
 
   void visit(const view_visitor v, const MapView& view) const {
-    _map.visit(v, view);
+    for (const auto& entry : _map.getView(view)) {
+      v(entry.first, entry.second);
+    }
+  }
+  const int size(MapView view = MapView::LOCAL) const {
+    return _map.size(view);
   }
 
-  const int size() const { return _map.size(); }
-
   const std::string& getId() const { return _nodeId; }
-
-  std::string _nodeId;
 };
 
 } /* namespace rover */

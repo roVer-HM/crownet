@@ -195,11 +195,14 @@ class CellEntry {
   mapped_type& youngestMeasureFirst(bool prefereLocal = true) {
     map_binary_filter _f = [](const typename map_type::value_type lhs,
                               const typename map_type::value_type rhs) -> bool {
-      return lhs.second.compareMeasureTime(rhs.second);
+      // Comparator true if lhs lessThan rhs
+      return lhs.second.compareMeasureTime(rhs.second) < 0;
     };
     auto range = validRange();
     //    auto ret = boost::range::min_element(rangge, _f);
     auto ret = boost::range::max_element(range, _f);
+
+    std::string s = str();
 
     if (prefereLocal && hasValidLocalMeasure() &&
         ret->second.compareMeasureTime(*_localEntry) == 0) {
@@ -225,6 +228,14 @@ class CellEntry {
   }
   const map_range_filterd validRange() const {
     return const_cast<CellEntry*>(this)->validRange();
+  }
+
+  std::string str() const {
+    std::ostringstream s;
+    for (const auto entry : _data) {
+      s << entry.second << "\n";
+    }
+    return s.str();
   }
 };
 
@@ -293,12 +304,6 @@ class PositionMap {
   PositionMap(entry_key_type localId, creator_type&& ctor)
       : _localId(localId), _cellCtor(ctor) {}
 
-  void resetLocalMap() {
-    for (auto& entry : _map) {
-      entry.second.resetLocalMeasure();
-    }
-  }
-
   mapped_type& getCellEntry(const key_type& cell_key) {
     auto cellEntry = _map.find(cell_key);
     if (cellEntry != _map.end()) {
@@ -316,17 +321,24 @@ class PositionMap {
     }
   }
 
-  void updateLocal(const key_type& cell_key, entry_mapped_type& measure_value) {
-    getCellEntry(cell_key).local() = measure_value;
+  void resetLocalMap() {
+    for (auto& entry : _map) {
+      entry.second.resetLocalMeasure();
+    }
+  }
+
+  //  void updateLocal(const key_type& cell_key, entry_mapped_type&
+  //  measure_value) {
+  //    getCellEntry(cell_key).local() = measure_value;
+  //  }
+
+  void incrementLocal(const key_type& cell_key, const omnetpp::simtime_t& t) {
+    getCellEntry(cell_key).local().incrementCount(t);
   }
 
   void update(const key_type& cell_key, const entry_key_type& node_key,
               entry_mapped_type& measure_value) {
     getCellEntry(cell_key).get(node_key) = measure_value;
-  }
-
-  void incrementLocal(const key_type& cell_key, const omnetpp::simtime_t& t) {
-    getCellEntry(cell_key).local().incrementCount(t);
   }
 
   entry_map_range localMap() {
@@ -376,34 +388,32 @@ class PositionMap {
     return const_cast<PositionMap*>(this)->ymfMap();
   }
 
-  const int size() const {
-    //    data_filter _f = [](const typename map_type::value_type& map_value) {
-    //      auto& value = map_value.second;
-    //      return value.hasValid();
-    //    };
-    //
-    //    using namespace boost::adaptors;
-    //    data_range range_all = boost::make_iterator_range(_map.begin(),
-    //    _map.end());
+  entry_map_range getView(View view = View::LOCAL) {
+    if (view == View::LOCAL) return localMap();
+    if (view == View::YMF) return ymfMap();
 
-    return boost::size(ymfMap());
+    throw omnetpp::cRuntimeError("unkonwn View.");
+  }
+  const entry_map_range getView(View view = View::LOCAL) const {
+    return const_cast<PositionMap*>(this)->getView(view);
   }
 
-  void visit(const view_visitor& visitor,
-             const View& view = View::LOCAL) const {
-    // todo:
-    //    entry_map_range* r = nullptr;
-    //    switch (view) {
-    //      case View::YMF:
-    //        r = &ymfMap();
-    //        break;
-    //      default:
-    //        r = &localMap();
-    //    }
+  const int size(View view = View::LOCAL) const {
+    return boost::size(getView(view));
+  }
 
-    for (const auto& entry : ymfMap()) {
-      visitor(entry.first, entry.second);
+  std::string strView(View view = View::LOCAL) {
+    std::stringstream s;
+    for (auto entry : getView(view)) {
+      s << "   Cell(" << entry.first.first << ", " << entry.first.second << ") "
+        << entry.second << std::endl;
     }
+    return s.str();
+  }
+
+  void printView(View view = View::LOCAL) {
+    using namespace omnetpp;
+    EV_DEBUG << strView(view);
   }
 
   void printYfmMap() {

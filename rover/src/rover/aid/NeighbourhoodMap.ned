@@ -29,10 +29,6 @@ simple ArteryNeighbourhood  extends AidBaseApp like INeighbourhood  {
         string middelwareModule = default("^.^.middleware"); //node internal
         string traciCoreModule = default("traci.core");
         string coordConverterModule;
-        double updateInterval = default(1.0s) @unit(s); // interval to query artery router for current 
-        											   // state of the map.
-        double sendInterval = default(1.0s) @unit(s); // interval to query artery router for current 
-        											   // state of the map.
         double gridSize = default(3.0) @units(m);
         
         destPort = 30001;

@@ -43,13 +43,6 @@ class ArteryNeighbourhood : public AidBaseApp {
   virtual void sendLocalMap();
 
  private:
-  // timer
-  cMessage *localMapUpdate;
-  cMessage *sendMap;
-  simtime_t updateInterval;
-
-  // aid socket
-
   // application
   artery::Middleware *middleware;
   OsgCoordConverter *converter_m;
