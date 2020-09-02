@@ -103,9 +103,9 @@ if __name__ == "__main__":
                 "--delete-existing-containers",
                 "--create-vadere-container",
                 "--vadere-tag",
-                "200527-1424",
+                "latest",
                 "--omnet-tag",
-                "200221-1642",
+                "latest",
             ],
         )
     else:
