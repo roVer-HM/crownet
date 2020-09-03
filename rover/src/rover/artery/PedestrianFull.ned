@@ -85,6 +85,11 @@ module PedestrianFull like INetworkNode
         **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.ipv4.routingTable");
 
+        //# Ext Interface
+        bool enableExtInterface = default(false);
+        string extHostAddress = default("");
+        
+        int numPcapRecorders = default(0); // no of PcapRecorders
     gates:
         input radioIn @directIn;     // connection to master
 

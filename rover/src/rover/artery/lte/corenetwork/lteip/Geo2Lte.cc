@@ -17,13 +17,13 @@ namespace rover {
 
 Define_Module(Geo2Lte);
 
-void Geo2Lte::toStackUe(inet::Packet* datagram) {
+void Geo2Lte::toStackUe(inet::Packet* pkt) {
   // if IP let parent handle it.
-  auto pTag = datagram->findTag<inet::PacketProtocolTag>();
+  auto pTag = pkt->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2lte::toStackUe(datagram);
+    IP2lte::toStackUe(pkt);
   } else if (pTag->getProtocol() == &artery::InetRadioDriver::geonet) {
-    auto geoTag = datagram->getTag<rover::GeoNetTag>();
+    auto geoTag = pkt->getTag<rover::GeoNetTag>();
     // if needed, create a new structure for the flow
 
     AddressPair pair(inet::Ipv4Address(geoTag->getSrcAddrIp()),
@@ -34,21 +34,17 @@ void Geo2Lte::toStackUe(inet::Packet* datagram) {
     }
     int headerSize = B(10).get();  // todo: set correct
 
-    FlowControlInfo* controlInfo = new FlowControlInfo();
-    controlInfo->setSrcAddr(geoTag->getSrcAddrIp());
-    controlInfo->setDstAddr(geoTag->getDstAddrIp());
-    controlInfo->setSrcPort(-1);
-    controlInfo->setDstPort(-1);
-    controlInfo->setSequenceNumber(seqNums_[pair]++);
-    controlInfo->setHeaderSize(headerSize);
-    printControlInfo(controlInfo);
+    pkt->addTagIfAbsent<FlowControlInfo>()->setSrcAddr(geoTag->getSrcAddrIp());
+    pkt->addTagIfAbsent<FlowControlInfo>()->setDstAddr(geoTag->getDstAddrIp());
+    pkt->addTagIfAbsent<FlowControlInfo>()->setSrcPort(-1);
+    pkt->addTagIfAbsent<FlowControlInfo>()->setDstPort(-1);
+    pkt->addTagIfAbsent<FlowControlInfo>()->setSequenceNumber(seqNums_[pair]++);
+    pkt->addTagIfAbsent<FlowControlInfo>()->setHeaderSize(headerSize);
 
-    cPacket* pktToLte = new cPacket(*datagram);
-    pktToLte->encapsulate(datagram);
-    pktToLte->setControlInfo(controlInfo);
+    printControlInfo(pkt);
 
     //** Send datagram to lte stack or LteIp peer **
-    send(pktToLte, stackGateOut_);
+    send(pkt, stackGateOut_);
 
   } else {
     error("Only ipv4 and geo protocols supported");
@@ -70,10 +66,12 @@ void Geo2Lte::toStackEnb(inet::Packet* datagram) {
 void Geo2Lte::toIpUe(Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
-  if (pTag->getProtocol() == &inet::Protocol::ipv4) {
+  auto geoTag = datagram->findTag<rover::GeoNetTag>();
+  if (!geoTag && pTag->getProtocol() == &inet::Protocol::ipv4) {
     IP2lte::toIpUe(datagram);
   } else {
     EV << "Geo2lte::toIpUe - message from stack: send to Geo layer" << endl;
+    datagram->removeTagIfPresent<inet::PacketProtocolTag>();
     prepareForGeo(datagram);
     send(datagram, ipGateOut_);
   }
