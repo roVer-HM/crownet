@@ -133,6 +133,9 @@ class OsgCoordinateConverter {
     return position_cast_artery(output);
   }
 
+  double getBoundaryWidth() const;
+  double getBoundaryHeight() const;
+
  private:
   osgEarth::GeoPoint addZoneOriginOffset(const traci::TraCIPosition& pos) const;
   void removeZoneOriginOffset(osgEarth::GeoPoint& pos) const;

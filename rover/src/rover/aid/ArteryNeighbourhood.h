@@ -17,6 +17,7 @@
 #include "rover/applications/common/AidBaseApp.h"
 #include "rover/common/GridDensityMap.h"
 #include "rover/common/OsgCoordConverter.h"
+#include "rover/common/util/FileWriter.h"
 
 using namespace omnetpp;
 using namespace inet;
@@ -49,6 +50,7 @@ class ArteryNeighbourhood : public AidBaseApp {
   std::shared_ptr<ArteryGridDensityMap> dMap;
   double gridSize;
   std::string id;
+  std::unique_ptr<FileWriter> fileWriter;
 };
 
 } /* namespace rover */

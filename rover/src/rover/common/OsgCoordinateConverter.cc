@@ -39,6 +39,15 @@ OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zBound,
   epgs_code = epgs_code;
 }
 
+double OsgCoordinateConverter::getBoundaryWidth() const {
+  return std::abs(simBound.upperRightPosition().x -
+                  simBound.lowerLeftPosition().x);
+}
+double OsgCoordinateConverter::getBoundaryHeight() const {
+  return std::abs(simBound.upperRightPosition().y -
+                  simBound.lowerLeftPosition().y);
+}
+
 OsgCoordinateConverter::OsgCoordinateConverter(
     traci::TraCIPosition zoneOriginOffset, traci::Boundary simBound,
     std::string epgs_code)

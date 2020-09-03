@@ -24,6 +24,8 @@ class DensityMeasure : public IEntry<omnetpp::simtime_t> {
   DensityMeasure(int, omnetpp::simtime_t& measurement_time,
                  omnetpp::simtime_t& received_time);
 
+  virtual std::string delimWith(std::string delimiter) const override;
+
   friend std::ostream& operator<<(std::ostream& os, const DensityMeasure& obj);
 };
 

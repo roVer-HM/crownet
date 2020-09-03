@@ -1,3 +1,4 @@
+
 /*
  * PositionMap.h
  *
@@ -42,6 +43,8 @@ class IEntry {
 
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
+
+  virtual std::string delimWith(std::string delimiter) const = 0;
 
  protected:
   int count;

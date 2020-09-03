@@ -42,6 +42,19 @@ void ArteryNeighbourhood::initialize(int stage) {
                    .host->getId();
     dMap = std::make_shared<ArteryGridDensityMap>(node_id.str(), gridSize);
     id = dMap->getId();
+
+    if (par("writeDensityLog").boolValue()) {
+      FileWriterBuilder fBuilder{};
+      fBuilder.addMetadata("XSIZE",
+                           converter_m->getConverter()->getBoundaryWidth());
+      fBuilder.addMetadata("YSIZE",
+                           converter_m->getConverter()->getBoundaryHeight());
+      fBuilder.addMetadata("CELLSIZE", gridSize);
+
+      fileWriter.reset(fBuilder.build());
+      fileWriter->writeHeader(
+          {"simtime", "x", "y", "count", "measure_t", "received_t"});
+    }
   }
 }
 
@@ -112,8 +125,6 @@ void ArteryNeighbourhood::updateLocalMap() {
   dMap->resetLocalMap();  // clear local map
   simtime_t measureTime = simTime();
 
-  //  if (dMap->getId() == "13:5:484") simTime();
-
   // add yourself to the map.
   const auto &pos = middleware->getFacilities()
                         .getConst<artery::MovingNodeDataProvider>()
@@ -151,6 +162,7 @@ void ArteryNeighbourhood::updateLocalMap() {
 void ArteryNeighbourhood::sendLocalMap() {
   const auto &payload = createPacket<DensityCount>();
   int numValidCells = dMap->size(ArteryGridDensityMap::MapView::YMF);
+  simtime_t time = simTime();
   payload->setNumCells(numValidCells);
   payload->setNodeId(dMap->getId().c_str());
   payload->setCellCountArraySize(numValidCells);
@@ -160,18 +172,25 @@ void ArteryNeighbourhood::sendLocalMap() {
   int currCell = 0;
   // get Cell count set arrays;
   ArteryGridDensityMap::view_visitor visitor =
-      [&currCell, &payload](const std::pair<int, int> &cell,
-                            const DensityMeasure &measure) {
+      [this, &time, &currCell, &payload](const std::pair<int, int> &cell,
+                                         const DensityMeasure &measure) {
         payload->setCellX(currCell, cell.first);
         payload->setCellY(currCell, cell.second);
         payload->setCellCount(currCell, measure.getCount());
         payload->setMTime(currCell, measure.getMeasureTime());
         currCell++;
+
+        if (par("writeDensityLog").boolValue()) {
+          std::string del = fileWriter->del();
+          fileWriter->write()
+              << time.dbl() << del << cell.first << del << cell.second << del
+              << measure.delimWith(del) << std::endl;
+        }
       };
 
   dMap->visit(visitor, ArteryGridDensityMap::MapView::YMF);
 
-  payload->setChunkLength(B(24 * currCell));  // todo calc?
+  payload->setChunkLength(B(1000));  // todo calc: 24 * currCell Fragmentation!
   sendPayload(payload);
 }
 

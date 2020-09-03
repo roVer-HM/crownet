@@ -34,6 +34,8 @@ simple ArteryNeighbourhood  extends AidBaseApp like INeighbourhood  {
         destPort = 30001;
         localPort = 30001;
         appMainInterval = default(1.0s);
+        
+        bool writeDensityLog = default(true);
             
 }
 
