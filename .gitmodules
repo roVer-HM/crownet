@@ -15,4 +15,4 @@
 	url = ../../rover/roveranalyzer.git
 [submodule "artery"]
 	path = artery
-	url = ssh://git@sam-dev.cs.hm.edu:5022/rover/artery.git
+	url = ../../rover/artery.git
