@@ -81,7 +81,7 @@ void Geo2Lte::toIpEnb(inet::Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2lte::toIpUe(datagram);
+    IP2lte::toIpEnb(datagram);
   } else {
     error("GeoProtocol not supported from backend (Enb->to IP->to core net)");
   }

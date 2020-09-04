@@ -18,6 +18,7 @@
 #include <boost/range/algorithm/min_element.hpp>
 #include <boost/range/iterator_range_core.hpp>
 #include <map>
+#include <memory>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -257,6 +258,11 @@ template <typename CELL_KEY, typename VALUE,
               PositionMapDefaultCtor<VALUE, typename VALUE::key_type>>
 class PositionMap {
  public:
+  class PositionMapView;
+  class LocalView;
+  class YmfView;
+
+ public:
   using key_type = CELL_KEY;  // key for one cell or triangle (bucket)
   using mapped_type = VALUE;  // container in each bucket.
   using value_type = std::pair<const key_type&, mapped_type&>;
@@ -273,19 +279,17 @@ class PositionMap {
   using view_value_type = std::pair<const key_type&, entry_mapped_type&>;
   using view_visitor = std::function<void(const key_type&, entry_mapped_type&)>;
 
-  enum View {
-    LOCAL,
-    YMF,  // youngest measurement first
-  };
-
  private:
   using map_type = std::map<key_type, mapped_type>;
+  using map_views = std::map<std::string, std::shared_ptr<PositionMapView>>;
   map_type _map;
   // identifier that maps to local entry_mapped_type value
-  entry_key_type _localId;
+  entry_key_type _localId;  // NodeId of this node.
+  key_type _currentCell;    // CellId this node  currently ocupies.
   creator_type _cellCtor;
   // range of map_type::value_type items
   using data_range = boost::iterator_range<typename map_type::iterator>;
+  map_views views;
 
  public:
   using data_filter = std::function<bool(const typename map_type::value_type&)>;
@@ -296,17 +300,28 @@ class PositionMap {
   using entry_transform =
       std::function<view_value_type(typename map_type::value_type&)>;
 
-  using entry_map_range = boost::transformed_range<
+  using view_range = boost::transformed_range<
       entry_transform, const boost::filtered_range<data_filter, data_range>>;
 
  public:
   virtual ~PositionMap() = default;
 
-  PositionMap(entry_key_type localId) : _localId(localId), _cellCtor(localId) {}
+  PositionMap(entry_key_type localId) : _localId(localId), _cellCtor(localId) {
+    initViews();
+  }
 
   PositionMap(entry_key_type localId, creator_type&& ctor)
-      : _localId(localId), _cellCtor(ctor) {}
+      : _localId(localId), _cellCtor(ctor) {
+    initViews();
+  }
 
+ private:
+  void initViews() {
+    views["local"] = std::make_shared<LocalView>(this);
+    views["ymf"] = std::make_shared<YmfView>(this);
+  }
+
+ public:
   mapped_type& getCellEntry(const key_type& cell_key) {
     auto cellEntry = _map.find(cell_key);
     if (cellEntry != _map.end()) {
@@ -324,19 +339,22 @@ class PositionMap {
     }
   }
 
+  data_range allCells() {
+    return boost::make_iterator_range(_map.begin(), _map.end());
+  }
+
   void resetLocalMap() {
     for (auto& entry : _map) {
       entry.second.resetLocalMeasure();
     }
   }
 
-  //  void updateLocal(const key_type& cell_key, entry_mapped_type&
-  //  measure_value) {
-  //    getCellEntry(cell_key).local() = measure_value;
-  //  }
-
-  void incrementLocal(const key_type& cell_key, const omnetpp::simtime_t& t) {
+  void incrementLocal(const key_type& cell_key, const omnetpp::simtime_t& t,
+                      bool ownPosition = false) {
     getCellEntry(cell_key).local().incrementCount(t);
+    if (ownPosition) {
+      _currentCell = cell_key;
+    }
   }
 
   void update(const key_type& cell_key, const entry_key_type& node_key,
@@ -344,98 +362,107 @@ class PositionMap {
     getCellEntry(cell_key).get(node_key) = measure_value;
   }
 
-  entry_map_range localMap() {
-    // filter: only valid and local measure
-    data_filter _f = [](const typename map_type::value_type& map_value) {
-      auto& value = map_value.second;
-      return value.hasValidLocalMeasure();
-    };
+  std::shared_ptr<PositionMapView> getView(std::string view_name) {
+    auto iter = views.find(view_name);
+    if (iter == views.end())
+      omnetpp::cRuntimeError("View '%' not found ", view_name.c_str());
 
-    // transform
-    entry_transform _t = [](typename map_type::value_type& map_value) {
-      view_value_type ret =
-          view_value_type{map_value.first, map_value.second.local()};
-      return ret;
-    };
-
-    using namespace boost::adaptors;
-    data_range range_all = boost::make_iterator_range(_map.begin(), _map.end());
-
-    return range_all | filtered(_f) | transformed(_t);
-  }
-  const entry_map_range localMap() const {
-    return const_cast<PositionMap*>(this)->localMap();
+    return iter->second;
   }
 
-  // youngest measure first
-  entry_map_range ymfMap() {
-    // filter: only valid measurements
-    data_filter _f = [](const typename map_type::value_type& map_value) {
-      auto& value = map_value.second;
-      return value.hasValid();
-    };
+  class PositionMapView {
+   public:
+    PositionMapView() : _cell_map(nullptr), _view_name("") {}
+    PositionMapView(PositionMap<key_type, mapped_type, creator_type>* map,
+                    std::string view_name)
+        : _cell_map(map), _view_name(view_name) {}
 
-    // transform
-    entry_transform _t = [](typename map_type::value_type& map_value) {
-      view_value_type ret = view_value_type{
-          map_value.first, map_value.second.youngestMeasureFirst()};
-      return ret;
-    };
+   public:
+    virtual ~PositionMapView() = default;
+    virtual view_range range() { throw omnetpp::cRuntimeError("Err"); }
 
-    using namespace boost::adaptors;
-    data_range range_all = boost::make_iterator_range(_map.begin(), _map.end());
-
-    return range_all | filtered(_f) | transformed(_t);
-  }
-  const entry_map_range ymfMap() const {
-    return const_cast<PositionMap*>(this)->ymfMap();
-  }
-
-  entry_map_range getView(View view = View::LOCAL) {
-    if (view == View::LOCAL) return localMap();
-    if (view == View::YMF) return ymfMap();
-
-    throw omnetpp::cRuntimeError("unkonwn View.");
-  }
-  const entry_map_range getView(View view = View::LOCAL) const {
-    return const_cast<PositionMap*>(this)->getView(view);
-  }
-
-  const int size(View view = View::LOCAL) const {
-    return boost::size(getView(view));
-  }
-
-  std::string strView(View view = View::LOCAL) {
-    std::stringstream s;
-    for (auto entry : getView(view)) {
-      s << "   Cell(" << entry.first.first << ", " << entry.first.second << ") "
-        << entry.second << std::endl;
+    const view_range range() const {
+      return const_cast<PositionMapView*>(this)->range();
     }
-    return s.str();
-  }
 
-  void printView(View view = View::LOCAL) {
-    using namespace omnetpp;
-    EV_DEBUG << strView(view);
-  }
-
-  void printYfmMap() {
-    using namespace omnetpp;
-    for (auto entry : ymfMap()) {
-      EV_DEBUG << "   Cell(" << entry.first.first << ", " << entry.first.second
-               << ") " << entry.second << std::endl;
+    std::string str() {
+      std::stringstream s;
+      s << "Map[ " << _view_name << "] (NodeId: " << _cell_map->_localId
+        << "\n";
+      for (auto entry : range()) {
+        s << "   Cell(" << entry.first.first << ", " << entry.first.second
+          << ") " << entry.second << std::endl;
+      }
+      return s.str();
     }
-  }
 
-  void printLocalMap() {
-    using namespace omnetpp;
-    for (auto entry : localMap()) {
-      EV_DEBUG << "   Cell(" << entry.first.first << ", " << entry.first.second
-               << ") " << entry.second << std::endl;
+    int size() const { return boost::size(range()); }
+
+    entry_key_type getId() { return _cell_map->_localId; }
+
+    void print() {
+      using namespace omnetpp;
+      EV_DEBUG << str();
     }
-  }
 
- private:
-};
+   protected:
+    PositionMap<key_type, mapped_type, creator_type>* _cell_map;  //
+    //    reference
+    std::string _view_name;
+  };
+
+  class LocalView : public PositionMapView {
+   public:
+    LocalView(PositionMap<key_type, mapped_type, creator_type>* map)
+        : PositionMapView(map, "local") {}
+
+    virtual view_range range() override {
+      // filter: only valid and local measure
+      data_filter _f = [](const typename map_type::value_type& map_value) {
+        auto& value = map_value.second;
+        return value.hasValidLocalMeasure();
+      };
+
+      // transform
+      entry_transform _t = [](typename map_type::value_type& map_value) {
+        view_value_type ret =
+            view_value_type{map_value.first, map_value.second.local()};
+        return ret;
+      };
+
+      using namespace boost::adaptors;
+      data_range range_all = this->_cell_map->allCells();
+
+      return range_all | filtered(_f) | transformed(_t);
+    }
+  };
+
+  class YmfView : public PositionMapView {
+   public:
+    YmfView(PositionMap<key_type, mapped_type, creator_type>* map)
+        : PositionMapView(map, "ymf") {}
+
+    virtual view_range range() override {
+      // filter: only valid measurements
+      data_filter _f = [](const typename map_type::value_type& map_value) {
+        auto& value = map_value.second;
+        return value.hasValid();
+      };
+
+      // transform
+      entry_transform _t = [](typename map_type::value_type& map_value) {
+        view_value_type ret = view_value_type{
+            map_value.first, map_value.second.youngestMeasureFirst()};
+        return ret;
+      };
+
+      using namespace boost::adaptors;
+      data_range range_all = this->_cell_map->allCells();
+
+      return range_all | filtered(_f) | transformed(_t);
+    }
+  };
+
+};  // namespace rover
 
 } /* namespace rover */

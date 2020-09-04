@@ -41,7 +41,6 @@ void ArteryNeighbourhood::initialize(int stage) {
                    .getConst<artery::Identity>()
                    .host->getId();
     dMap = std::make_shared<ArteryGridDensityMap>(node_id.str(), gridSize);
-    id = dMap->getId();
 
     if (par("writeDensityLog").boolValue()) {
       FileWriterBuilder fBuilder{};
@@ -70,7 +69,7 @@ void ArteryNeighbourhood::setAppCapabilities() {
 
 void ArteryNeighbourhood::setupTimers() {
   if (destAddresses.empty()) {
-    cRuntimeError("No adderss set.");
+    cRuntimeError("No address set.");
   } else {
     // schedule at startTime or current time, whatever is bigger.
     scheduleNextAppMainEvent(std::max(startTime, simTime()));
@@ -96,7 +95,7 @@ void ArteryNeighbourhood::socketDataArrived(AidSocket *socket, Packet *packet) {
   std::string _nodeId = p->getNodeId();
   simtime_t _received = simTime();
   for (int i = 0; i < numCells; i++) {
-    ArteryGridDensityMap::cellId _cId =
+    ArteryGridDensityMap::CellId _cId =
         std::make_pair(p->getCellX(i), p->getCellY(i));
     simtime_t _measured = p->getMTime(i);
     DensityMeasure _m(p->getCellCount(i), _measured, _received);
@@ -104,17 +103,8 @@ void ArteryNeighbourhood::socketDataArrived(AidSocket *socket, Packet *packet) {
   }
 
   using namespace omnetpp;
-  EV_DEBUG
-      << "[ "
-      << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
-      << "] (YMF) ";
-  dMap->printView(ArteryGridDensityMap::MapView::YMF);
-
-  EV_DEBUG
-      << "[ "
-      << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
-      << "] (LOCAL) ";
-  dMap->printView(ArteryGridDensityMap::MapView::LOCAL);
+  EV_DEBUG << dMap->getView("ymf")->str();
+  EV_DEBUG << dMap->getView("local")->str();
 
   delete packet;
   socketFsmResult =
@@ -130,6 +120,9 @@ void ArteryNeighbourhood::updateLocalMap() {
                         .getConst<artery::MovingNodeDataProvider>()
                         .position();
   const auto &posInet = converter_m->getConverter()->position_cast_inet(pos);
+
+  const auto &table =
+      middleware->getFacilities().getConst<artery::Router>().getLocationTable();
 
   dMap->incrementLocal(posInet, measureTime, true);
 
@@ -147,48 +140,45 @@ void ArteryNeighbourhood::updateLocalMap() {
                  << "|" << geoPos.longitude.value() << "]\n";
         dMap->incrementLocal(cartPos, measureTime);
       };
-
-  const auto &table =
-      middleware->getFacilities().getConst<artery::Router>().getLocationTable();
   table.visit(eVisitor);
+
   using namespace omnetpp;
   EV_DEBUG
       << "[ "
       << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
       << "] ";
-  dMap->printView(ArteryGridDensityMap::MapView::LOCAL);
+  EV_DEBUG << dMap->getView("ymf")->str();
 }
 
 void ArteryNeighbourhood::sendLocalMap() {
   const auto &payload = createPacket<DensityCount>();
-  int numValidCells = dMap->size(ArteryGridDensityMap::MapView::YMF);
+  auto ymfView = dMap->getView("ymf");
+  int numValidCells = ymfView->size();
   simtime_t time = simTime();
   payload->setNumCells(numValidCells);
-  payload->setNodeId(dMap->getId().c_str());
+  payload->setNodeId(ymfView->getId().c_str());
   payload->setCellCountArraySize(numValidCells);
   payload->setCellXArraySize(numValidCells);
   payload->setCellYArraySize(numValidCells);
   payload->setMTimeArraySize(numValidCells);
   int currCell = 0;
-  // get Cell count set arrays;
-  ArteryGridDensityMap::view_visitor visitor =
-      [this, &time, &currCell, &payload](const std::pair<int, int> &cell,
-                                         const DensityMeasure &measure) {
-        payload->setCellX(currCell, cell.first);
-        payload->setCellY(currCell, cell.second);
-        payload->setCellCount(currCell, measure.getCount());
-        payload->setMTime(currCell, measure.getMeasureTime());
-        currCell++;
 
-        if (par("writeDensityLog").boolValue()) {
-          std::string del = fileWriter->del();
-          fileWriter->write()
-              << time.dbl() << del << cell.first << del << cell.second << del
-              << measure.delimWith(del) << std::endl;
-        }
-      };
+  for (const auto &e : ymfView->range()) {
+    const auto &cell = e.first;
+    const auto &measure = e.second;
+    payload->setCellX(currCell, cell.first);
+    payload->setCellY(currCell, cell.second);
+    payload->setCellCount(currCell, measure.getCount());
+    payload->setMTime(currCell, measure.getMeasureTime());
+    currCell++;
 
-  dMap->visit(visitor, ArteryGridDensityMap::MapView::YMF);
+    if (par("writeDensityLog").boolValue()) {
+      std::string del = fileWriter->del();
+      fileWriter->write() << time.dbl() << del << cell.first << del
+                          << cell.second << del << measure.delimWith(del)
+                          << std::endl;
+    }
+  }
 
   payload->setChunkLength(B(1000));  // todo calc: 24 * currCell Fragmentation!
   sendPayload(payload);

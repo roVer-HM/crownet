@@ -27,6 +27,10 @@ namespace rover {
 class ArteryNeighbourhood : public AidBaseApp {
  public:
   using ArteryGridDensityMap = GridDensityMap<std::string>;
+
+  using CellId = std::pair<int, int>;
+  using NodeId = std::string;
+  using TEST = PositionMap<CellId, CellEntry<NodeId, DensityMeasure>>;
   virtual ~ArteryNeighbourhood();
 
  protected:
@@ -49,7 +53,6 @@ class ArteryNeighbourhood : public AidBaseApp {
   OsgCoordConverter *converter_m;
   std::shared_ptr<ArteryGridDensityMap> dMap;
   double gridSize;
-  std::string id;
   std::unique_ptr<FileWriter> fileWriter;
 };
 
