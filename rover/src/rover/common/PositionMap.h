@@ -277,7 +277,6 @@ class PositionMap {
   // used by boost::iterator_ranges to filter/aggregate the correct
   // entry_mapped_type based on given predicate/transformer.
   using view_value_type = std::pair<const key_type&, entry_mapped_type&>;
-  using view_visitor = std::function<void(const key_type&, entry_mapped_type&)>;
 
  private:
   using map_type = std::map<key_type, mapped_type>;
@@ -339,7 +338,7 @@ class PositionMap {
     }
   }
 
-  data_range allCells() {
+  data_range range() {
     return boost::make_iterator_range(_map.begin(), _map.end());
   }
 
@@ -349,8 +348,9 @@ class PositionMap {
     }
   }
 
-  void incrementLocal(const key_type& cell_key, const omnetpp::simtime_t& t,
-                      bool ownPosition = false) {
+  virtual void incrementLocal(const key_type& cell_key,
+                              const omnetpp::simtime_t& t,
+                              bool ownPosition = false) {
     getCellEntry(cell_key).local().incrementCount(t);
     if (ownPosition) {
       _currentCell = cell_key;
@@ -369,6 +369,10 @@ class PositionMap {
 
     return iter->second;
   }
+
+  //  key_type getId(){
+  //      return _localId
+  //  }
 
   class PositionMapView {
    public:
@@ -431,7 +435,7 @@ class PositionMap {
       };
 
       using namespace boost::adaptors;
-      data_range range_all = this->_cell_map->allCells();
+      data_range range_all = this->_cell_map->range();
 
       return range_all | filtered(_f) | transformed(_t);
     }
@@ -457,12 +461,11 @@ class PositionMap {
       };
 
       using namespace boost::adaptors;
-      data_range range_all = this->_cell_map->allCells();
+      data_range range_all = this->_cell_map->range();
 
       return range_all | filtered(_f) | transformed(_t);
     }
   };
-
-};  // namespace rover
+};
 
 } /* namespace rover */

@@ -29,42 +29,22 @@ class DensityMeasure : public IEntry<omnetpp::simtime_t> {
   friend std::ostream& operator<<(std::ostream& os, const DensityMeasure& obj);
 };
 
-template <typename NodeID>
-class GridDensityMap {
- public:
-  using CellId = std::pair<int, int>;
-  using NodeId = NodeID;
-  using map_type = PositionMap<CellId, CellEntry<NodeId, DensityMeasure>>;
+using CellId = std::pair<int, int>;
+using NodeId = std::string;
 
-  using PositionMapView = typename map_type::PositionMapView;
-  using view_visitor =
-      std::function<void(const CellId&, const DensityMeasure&)>;
+class RegularGridMap
+    : public PositionMap<CellId, CellEntry<NodeId, DensityMeasure>> {
+ public:
+  RegularGridMap(NodeId id, double gridSize);
+  virtual ~RegularGridMap() = default;
+
+  using PositionMap::incrementLocal;
+  virtual void incrementLocal(const inet::Coord& coord,
+                              const omnetpp::simtime_t& t,
+                              bool ownPosition = false);
 
  private:
-  map_type _map;
   double gridSize;
-
- public:
-  virtual ~GridDensityMap() = default;
-  GridDensityMap(NodeId id, double gridSize) : _map(id), gridSize(gridSize) {}
-
-  void resetLocalMap() { _map.resetLocalMap(); }
-
-  void incrementLocal(const inet::Coord& coord, const omnetpp::simtime_t& t,
-                      bool ownPosition = false) {
-    CellId id =
-        std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
-    _map.incrementLocal(id, t, ownPosition);
-  }
-
-  void updateMap(const CellId& _cellId, const NodeId& _nodeId,
-                 DensityMeasure& measure) {
-    _map.update(_cellId, _nodeId, measure);
-  }
-
-  std::shared_ptr<PositionMapView> getView(std::string view_name) {
-    return _map.getView(view_name);
-  }
 };
 
 } /* namespace rover */

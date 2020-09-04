@@ -40,7 +40,7 @@ void ArteryNeighbourhood::initialize(int stage) {
             << middleware->getFacilities()
                    .getConst<artery::Identity>()
                    .host->getId();
-    dMap = std::make_shared<ArteryGridDensityMap>(node_id.str(), gridSize);
+    dMap = std::make_shared<RegularGridMap>(node_id.str(), gridSize);
 
     if (par("writeDensityLog").boolValue()) {
       FileWriterBuilder fBuilder{};
@@ -95,11 +95,10 @@ void ArteryNeighbourhood::socketDataArrived(AidSocket *socket, Packet *packet) {
   std::string _nodeId = p->getNodeId();
   simtime_t _received = simTime();
   for (int i = 0; i < numCells; i++) {
-    ArteryGridDensityMap::CellId _cId =
-        std::make_pair(p->getCellX(i), p->getCellY(i));
+    CellId _cId = std::make_pair(p->getCellX(i), p->getCellY(i));
     simtime_t _measured = p->getMTime(i);
     DensityMeasure _m(p->getCellCount(i), _measured, _received);
-    dMap->updateMap(_cId, _nodeId, _m);
+    dMap->update(_cId, _nodeId, _m);
   }
 
   using namespace omnetpp;

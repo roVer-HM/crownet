@@ -29,4 +29,15 @@ std::ostream& operator<<(std::ostream& os, const DensityMeasure& obj) {
   return os;
 }
 
+RegularGridMap::RegularGridMap(NodeId id, double gridSize)
+    : PositionMap(id), gridSize(gridSize) {}
+
+void RegularGridMap::incrementLocal(const inet::Coord& coord,
+                                    const omnetpp::simtime_t& t,
+                                    bool ownPosition) {
+  CellId id =
+      std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
+  PositionMap::incrementLocal(id, t, ownPosition);
+}
+
 } /* namespace rover */
