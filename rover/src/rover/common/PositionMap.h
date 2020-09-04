@@ -244,9 +244,9 @@ class CellEntry {
 };
 
 template <typename VALUE, typename ENTRY_KEY>
-class PositionMapDefaultCtor {
+class CellCtor {
  public:
-  PositionMapDefaultCtor(ENTRY_KEY k) : _k(k) {}
+  CellCtor(ENTRY_KEY k) : _k(k) {}
   VALUE operator()() { return VALUE(_k); }
 
  private:
@@ -254,8 +254,7 @@ class PositionMapDefaultCtor {
 };
 
 template <typename CELL_KEY, typename VALUE,
-          typename CTOR =
-              PositionMapDefaultCtor<VALUE, typename VALUE::key_type>>
+          typename CTOR = CellCtor<VALUE, typename VALUE::key_type>>
 class PositionMap {
  public:
   class PositionMapView;
@@ -263,54 +262,59 @@ class PositionMap {
   class YmfView;
 
  public:
-  using key_type = CELL_KEY;  // key for one cell or triangle (bucket)
-  using mapped_type = VALUE;  // container in each bucket.
-  using value_type = std::pair<const key_type&, mapped_type&>;
-  using creator_type = CTOR;  // creator for container
+  using cell_key_type = CELL_KEY;  // key for one cell or triangle (bucket)
+  using cell_mapped_type = VALUE;  // container in each bucket.
+  using cell_value_type = std::pair<const cell_key_type&, cell_mapped_type&>;
 
   // each bucket contains an entry map
-  using entry_key_type = typename VALUE::key_type;
-  using entry_mapped_type = typename VALUE::mapped_type;
-  using entry_value_type = typename VALUE::value_type;
+  using creator_type = CTOR;  // creator for container
+  using node_key_type = typename VALUE::key_type;
+  using node_mapped_type = typename VALUE::mapped_type;
+  using node_value_type = typename VALUE::value_type;
 
   // map one entry_mapped_type instance  to one key_type instance
   // used by boost::iterator_ranges to filter/aggregate the correct
   // entry_mapped_type based on given predicate/transformer.
-  using view_value_type = std::pair<const key_type&, entry_mapped_type&>;
+  using view_value_type = std::pair<const cell_key_type&, node_mapped_type&>;
 
  private:
-  using map_type = std::map<key_type, mapped_type>;
+  using map_type = std::map<cell_key_type, cell_mapped_type>;
   using map_views = std::map<std::string, std::shared_ptr<PositionMapView>>;
   map_type _map;
-  // identifier that maps to local entry_mapped_type value
-  entry_key_type _localId;  // NodeId of this node.
-  key_type _currentCell;    // CellId this node  currently ocupies.
-  creator_type _cellCtor;
-  // range of map_type::value_type items
-  using data_range = boost::iterator_range<typename map_type::iterator>;
   map_views views;
 
- public:
-  using data_filter = std::function<bool(const typename map_type::value_type&)>;
-  // range of all valid map_type::value_type elements
-  using data_map_range = const boost::filtered_range<data_filter, data_range>;
+  // identifier that maps to local entry_mapped_type value
+  node_key_type _localNodeId;  // NodeId of this node.
+  cell_key_type _currentCell;  // CellId this node  currently ocupies.
+  creator_type _cellCtor;
 
-  using entry_filter = std::function<bool(const entry_mapped_type&)>;
-  using entry_transform =
+ public:
+  // functions
+  using cellContainerFilter_f =
+      std::function<bool(const typename map_type::value_type&)>;
+
+  using cellEntryFilter_f = std::function<bool(const node_mapped_type&)>;
+  using cellEntryTransform_f =
       std::function<view_value_type(typename map_type::value_type&)>;
 
-  using view_range = boost::transformed_range<
-      entry_transform, const boost::filtered_range<data_filter, data_range>>;
+  // ranges
+  using cellContainer_r = boost::iterator_range<typename map_type::iterator>;
+  using cellContainerFiltered_r =
+      const boost::filtered_range<cellContainerFilter_f, cellContainer_r>;
+  using cellEntryFiltered_r = boost::transformed_range<
+      cellEntryTransform_f,
+      const boost::filtered_range<cellContainerFilter_f, cellContainer_r>>;
 
  public:
   virtual ~PositionMap() = default;
 
-  PositionMap(entry_key_type localId) : _localId(localId), _cellCtor(localId) {
+  PositionMap(node_key_type localId)
+      : _localNodeId(localId), _cellCtor(localId) {
     initViews();
   }
 
-  PositionMap(entry_key_type localId, creator_type&& ctor)
-      : _localId(localId), _cellCtor(ctor) {
+  PositionMap(node_key_type localId, creator_type&& ctor)
+      : _localNodeId(localId), _cellCtor(ctor) {
     initViews();
   }
 
@@ -321,7 +325,7 @@ class PositionMap {
   }
 
  public:
-  mapped_type& getCellEntry(const key_type& cell_key) {
+  cell_mapped_type& getCellEntry(const cell_key_type& cell_key) {
     auto cellEntry = _map.find(cell_key);
     if (cellEntry != _map.end()) {
       return cellEntry->second;
@@ -338,7 +342,7 @@ class PositionMap {
     }
   }
 
-  data_range range() {
+  cellContainer_r range() {
     return boost::make_iterator_range(_map.begin(), _map.end());
   }
 
@@ -348,7 +352,7 @@ class PositionMap {
     }
   }
 
-  virtual void incrementLocal(const key_type& cell_key,
+  virtual void incrementLocal(const cell_key_type& cell_key,
                               const omnetpp::simtime_t& t,
                               bool ownPosition = false) {
     getCellEntry(cell_key).local().incrementCount(t);
@@ -357,8 +361,8 @@ class PositionMap {
     }
   }
 
-  void update(const key_type& cell_key, const entry_key_type& node_key,
-              entry_mapped_type& measure_value) {
+  void update(const cell_key_type& cell_key, const node_key_type& node_key,
+              node_mapped_type& measure_value) {
     getCellEntry(cell_key).get(node_key) = measure_value;
   }
 
@@ -370,28 +374,27 @@ class PositionMap {
     return iter->second;
   }
 
-  //  key_type getId(){
-  //      return _localId
-  //  }
+  node_key_type getNodeIde() { return _localNodeId; }
 
   class PositionMapView {
    public:
     PositionMapView() : _cell_map(nullptr), _view_name("") {}
-    PositionMapView(PositionMap<key_type, mapped_type, creator_type>* map,
-                    std::string view_name)
+    PositionMapView(
+        PositionMap<cell_key_type, cell_mapped_type, creator_type>* map,
+        std::string view_name)
         : _cell_map(map), _view_name(view_name) {}
 
    public:
     virtual ~PositionMapView() = default;
-    virtual view_range range() { throw omnetpp::cRuntimeError("Err"); }
+    virtual cellEntryFiltered_r range() { throw omnetpp::cRuntimeError("Err"); }
 
-    const view_range range() const {
+    const cellEntryFiltered_r range() const {
       return const_cast<PositionMapView*>(this)->range();
     }
 
     std::string str() {
       std::stringstream s;
-      s << "Map[ " << _view_name << "] (NodeId: " << _cell_map->_localId
+      s << "Map[ " << _view_name << "] (NodeId: " << _cell_map->_localNodeId
         << "\n";
       for (auto entry : range()) {
         s << "   Cell(" << entry.first.first << ", " << entry.first.second
@@ -402,7 +405,7 @@ class PositionMap {
 
     int size() const { return boost::size(range()); }
 
-    entry_key_type getId() { return _cell_map->_localId; }
+    node_key_type getId() { return _cell_map->_localNodeId; }
 
     void print() {
       using namespace omnetpp;
@@ -410,32 +413,32 @@ class PositionMap {
     }
 
    protected:
-    PositionMap<key_type, mapped_type, creator_type>* _cell_map;  //
-    //    reference
+    PositionMap<cell_key_type, cell_mapped_type, creator_type>* _cell_map;
     std::string _view_name;
   };
 
   class LocalView : public PositionMapView {
    public:
-    LocalView(PositionMap<key_type, mapped_type, creator_type>* map)
+    LocalView(PositionMap<cell_key_type, cell_mapped_type, creator_type>* map)
         : PositionMapView(map, "local") {}
 
-    virtual view_range range() override {
+    virtual cellEntryFiltered_r range() override {
       // filter: only valid and local measure
-      data_filter _f = [](const typename map_type::value_type& map_value) {
-        auto& value = map_value.second;
-        return value.hasValidLocalMeasure();
-      };
+      cellContainerFilter_f _f =
+          [](const typename map_type::value_type& map_value) {
+            auto& value = map_value.second;
+            return value.hasValidLocalMeasure();
+          };
 
       // transform
-      entry_transform _t = [](typename map_type::value_type& map_value) {
+      cellEntryTransform_f _t = [](typename map_type::value_type& map_value) {
         view_value_type ret =
             view_value_type{map_value.first, map_value.second.local()};
         return ret;
       };
 
       using namespace boost::adaptors;
-      data_range range_all = this->_cell_map->range();
+      cellContainer_r range_all = this->_cell_map->range();
 
       return range_all | filtered(_f) | transformed(_t);
     }
@@ -443,25 +446,26 @@ class PositionMap {
 
   class YmfView : public PositionMapView {
    public:
-    YmfView(PositionMap<key_type, mapped_type, creator_type>* map)
+    YmfView(PositionMap<cell_key_type, cell_mapped_type, creator_type>* map)
         : PositionMapView(map, "ymf") {}
 
-    virtual view_range range() override {
+    virtual cellEntryFiltered_r range() override {
       // filter: only valid measurements
-      data_filter _f = [](const typename map_type::value_type& map_value) {
-        auto& value = map_value.second;
-        return value.hasValid();
-      };
+      cellContainerFilter_f _f =
+          [](const typename map_type::value_type& map_value) {
+            auto& value = map_value.second;
+            return value.hasValid();
+          };
 
       // transform
-      entry_transform _t = [](typename map_type::value_type& map_value) {
+      cellEntryTransform_f _t = [](typename map_type::value_type& map_value) {
         view_value_type ret = view_value_type{
             map_value.first, map_value.second.youngestMeasureFirst()};
         return ret;
       };
 
       using namespace boost::adaptors;
-      data_range range_all = this->_cell_map->range();
+      cellContainer_r range_all = this->_cell_map->range();
 
       return range_all | filtered(_f) | transformed(_t);
     }

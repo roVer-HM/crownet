@@ -142,10 +142,7 @@ void ArteryNeighbourhood::updateLocalMap() {
   table.visit(eVisitor);
 
   using namespace omnetpp;
-  EV_DEBUG
-      << "[ "
-      << middleware->getFacilities().getConst<artery::Identity>().geonet.mid()
-      << "] ";
+  EV_DEBUG << "[ " << dMap->getNodeIde() << "] ";
   EV_DEBUG << dMap->getView("ymf")->str();
 }
 
