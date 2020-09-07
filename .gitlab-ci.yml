@@ -19,6 +19,7 @@ build-for-sim:
   tags:
     - rover-sim
   variables:
+    ARTERY_M: '${CI_PROJECT_DIR}/artery'
     INET_M: '${CI_PROJECT_DIR}/inet4'
     LTE_M: '${CI_PROJECT_DIR}/simulte'
     ROVER_M: '${CI_PROJECT_DIR}/rover'
@@ -49,6 +50,13 @@ build-for-sim:
     - "cd ${INET_M}"
     # inet> only delete inet sources for artefacts. We may need the other ones.
     - "find . -name \"*.cc\" -type f -delete"
+    # artery> only use keep libs and h files.
+    - "cd ${ARTERY_M}"
+    - rm -rf scenarios cmake
+    - "find . -name \"*.o\" -type f -delete"
+    - "find . -name \"*.cc\" -type f -delete"
+    - "find build/ -type f -not -path '*.so' -delete"
+    - "find extern/vanetza/build -type f -not -path '*.so' -delete"
   artifacts:
     paths:
     - ${ROVER_MAIN}/scripts
@@ -56,6 +64,7 @@ build-for-sim:
     - ${ROVER_MAIN}/inet4
     - ${ROVER_MAIN}/rover
     - ${ROVER_MAIN}/veins
+    - ${ROVER_MAIN}/artery
     expire_in: 1 weeks
 
 
