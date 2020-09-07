@@ -15,8 +15,10 @@
 
 #pragma once
 
+#include "../../mobility/IPositionHistoryProvider.h"
 #include "inet/mobility/base/MobilityBase.h"
 #include "rover/applications/common/AidBaseApp.h"
+#include "rover/common/ItsPdu_m.h"
 
 namespace rover {
 
@@ -26,14 +28,17 @@ class VruAid : public AidBaseApp {
   virtual ~VruAid();
 
  protected:
-  MobilityBase *mobilityModule = nullptr;
+  IPositionHistoryProvider* mobilityModule = nullptr;
 
  protected:
   virtual void initialize(int stage) override;
-  virtual FsmState fsmSend(cMessage *msg) override;
+  virtual FsmState fsmAppMain(cMessage* msg) override;
+  virtual void socketDataArrived(AidSocket* socket, Packet* packet) override;
   virtual Coord getCurrentLocation();
 
   virtual void setAppRequirements() override;
   virtual void setAppCapabilities() override;
+
+  // VAM
 };
 }  // namespace rover

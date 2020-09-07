@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include "../../common/result/Simsignals.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -34,16 +35,10 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
-#include "rover/common/Simsignals.h"
 
 using namespace inet;
 
 namespace rover {
-
-class IRoverSocket : public ISocket {
- public:
-  virtual ~IRoverSocket() {}
-};
 
 class BaseApp : public ApplicationBase {
  public:
@@ -64,8 +59,8 @@ class BaseApp : public ApplicationBase {
   bool dontFragment = false;
 
   // state
-  cMessage *selfMsgAppTimer = nullptr;
-  cMessage *selfMsgSendTimer = nullptr;
+  cMessage *appLifeTime = nullptr;
+  cMessage *appMainTimer = nullptr;
 
   // statistics
   int numSent = 0;
@@ -78,12 +73,13 @@ class BaseApp : public ApplicationBase {
     WAIT_INACTIVE = FSM_Steady(2),
     ERR = FSM_Steady(3),
     SETUP = FSM_Transient(101),  // socket and stopTime
-    SEND = FSM_Transient(102),   // send data with Interval
+    APP_MAIN = FSM_Transient(
+        102),  // send data with Interval or more elaborate functions
     TEARDOWN = FSM_Transient(110),
     DESTROY = FSM_Transient(120),
     SUBSTATE = 200  // sub states must be outside of +-200
   };
-  typedef int FsmState;  // state for each FSM.
+  using FsmState = int;  // state for each FSM.
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
 
@@ -98,12 +94,18 @@ class BaseApp : public ApplicationBase {
    * base = -1 defaults to the current time.
    * negative par("sendInterval") will cause errors.
    */
-  virtual void scheduleNextSendEvent(simtime_t time = -1);
+  virtual void scheduleNextAppMainEvent(simtime_t time = -1);
+  virtual void cancelAppMainEvent();
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload,
                            L3Address destAddr, int destPort);
-  virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
   virtual L3Address chooseDestAddr();
+
+  template <typename T>
+  IntrusivePtr<T> createPacket();
+
+  template <typename T>
+  IntrusivePtr<const T> checkEmitGetReceived(Packet *pkt);
 
   // fsmRoot actions
 
@@ -111,13 +113,16 @@ class BaseApp : public ApplicationBase {
   virtual FsmState fsmHandleSelfMsg(cMessage *msg) = 0;
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
-  virtual FsmState fsmSend(cMessage *msg) = 0;
+  virtual FsmState fsmAppMain(cMessage *msg) = 0;
   virtual FsmState fsmTeardown(cMessage *msg);
   virtual FsmState fsmDestroy(cMessage *msg);
+
+  virtual void setupTimers();  // called in fsmSetup
 
   // socket actions.
   virtual void initSocket() = 0;
   virtual ISocket &getSocket() = 0;
+  virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
 
   // Lifecycle management
   virtual void handleStartOperation(
@@ -125,4 +130,21 @@ class BaseApp : public ApplicationBase {
   virtual void handleStopOperation(LifecycleOperation *operation) override;
   virtual void handleCrashOperation(LifecycleOperation *operation) override;
 };
+
+template <typename T>
+inline IntrusivePtr<T> BaseApp::createPacket() {
+  auto payload = makeShared<T>();
+  payload->setSequenceNumber(numSent);
+  payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
+  return payload;
+}
+
+template <typename T>
+inline IntrusivePtr<const T> BaseApp::checkEmitGetReceived(Packet *pkt) {
+  emit(packetReceivedSignal, pkt);
+  numReceived++;
+
+  return pkt->popAtFront<T>();
+}
+
 }  // namespace rover

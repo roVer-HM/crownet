@@ -26,16 +26,16 @@ simple BaseApp like IApp
         @display("i=block/app");
         // Application runtime settings
         double startTime @unit(s) = default(0.0s); // start first packet, afterwarts time + sendIntervall. Negative values raises cRuntimeError.
-        double stopTime @unit(s) = default(-1s); // time of finishing sending, -1s means forever
-        volatile double sendInterval @unit(s); // should usually be a random value, e.g. exponential(1).
+        double stopTime @unit(s) = default(0.0s); // time of finishing sending, 0.0s means forever
+        volatile double appMainInterval @unit(s) = default(-1s); // intervall to enter fsmAppMain to process app logic. 
+        										  // if set to -1 fsmAppMain will not be used and user must provide own 
+        										  // handling. fsmAppMain does nothing on default.
         // Base addressing paramters
         string localAddress = default("");
         int localPort = default(-1);  // local port (-1: use ephemeral port)
-        string destAddresses = default(""); // list of IP addresses, separated by spaces ("": don't send)
+        string destAddresses = default("224.0.0.1"); // ALL_HOST_MCAST (automatically joined)
         int destPort; // 
-        string interfaceTableModule; // The path to the InterfaceTable module
         string packetName = default("BasicAppData");
-        volatile int messageLength @unit(B); // length of messages to generate, in bytes
         // IP Setting
         bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing       
         @lifecycleSupport;
@@ -66,6 +66,8 @@ simple UdpBaseApp extends BaseApp {
         @class(rover::UdpBaseApp);
         @display("i=block/app");
         // udp socket options
+        volatile int messageLength @unit(B); // length of messages to generate, in bytes
+        string interfaceTableModule; // The path to the InterfaceTable module
         int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
         int dscp = default(-1); // if not -1, set the DSCP field (on IPv4/IPv6) of sent packets to this value
         int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value

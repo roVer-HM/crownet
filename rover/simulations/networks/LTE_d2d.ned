@@ -30,8 +30,7 @@ import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
 import rover.nodes.IMobileUe;
 import rover.nodes.UnequippedHost;
-import org.car2x.veins.modules.mobility.traci.ITraCIManager;
-import org.car2x.veins.subprojects.veins_inet.mapping.NodeMappingDistribution;
+
 
 network LTE_d2d
 {
@@ -89,13 +88,7 @@ network LTE_d2d
             ipv4.configurator.interfaces = "wlan";
         }
 
-        mappingDistribution[numMappings]: NodeMappingDistribution {
-            @display("p=357,207;is=s;i=block/square");
-        }
-        
-        manager: <default(TraCIScenarioManagerVadere)> like ITraCIManager if typename != "" {
-            @display("p=364,25;is=s;i=block/square");
-        }
+
 
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++;

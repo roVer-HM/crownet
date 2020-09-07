@@ -22,7 +22,12 @@ ADD ide/ide.tar.gz .
 
 # installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
 RUN pip3 install cpplint
-RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group ; PID=`pidof omnetpp`; while [ -e /proc/$PID ]; do sleep 0.1; done
+# check if PID if is empty. If so this will create an infinte loop at while [ -e /proc/ ]
+RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director \
+        -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group; \
+        PID=`pidof omnetpp`; \
+        if [ -z "$PID" ]; then echo "error installing plugin. Is ide installed?" && exit 1; fi; \
+        while [ -e /proc/$PID ]; do sleep 0.1 ; done
 
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp

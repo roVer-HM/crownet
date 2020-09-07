@@ -26,8 +26,8 @@ moduleinterface IVRU extends IApp {
 simple VruAid extends BaseApp like IVRU {
     parameters:
         @class(rover::VruAid);
-	    sendInterval =  default(0.1s);
-	    messageLength = default(1000B);
+	    appMainInterval =  default(0.1s);
+	    volatile int messageLength @unit(B) = default(1000B); // length of messages to generate, in bytes
 	    packetName = default("VRU_AID");
 	    double minRate = default(1); // Hz
 	    double maxRate = default(10); // Hz
@@ -38,7 +38,7 @@ simple VruAid extends BaseApp like IVRU {
 simple VruUdp extends UdpBaseApp {
     parameters:
         @class(rover::VruUdp);
-	    sendInterval =  default(0.1s);
+	    appMainInterval =  default(0.1s);
 	    messageLength = default(1000B);
 	    packetName = default("VRU_AID");
 	    joinLocalMulticastGroups = default(true);

@@ -13,3 +13,6 @@
 [submodule "analysis/roveranalyzer"]
 	path = analysis/roveranalyzer
 	url = ../../rover/roveranalyzer.git
+[submodule "artery"]
+	path = artery
+	url = ../../rover/artery.git

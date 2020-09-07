@@ -30,7 +30,7 @@ class VruUdp : public UdpBaseApp {
 
  protected:
   virtual void initialize(int stage) override;
-  virtual FsmState fsmSend(cMessage *msg) override;
+  virtual FsmState fsmAppMain(cMessage *msg) override;
   virtual Coord getCurrentLocation();
 };
 }  // namespace rover

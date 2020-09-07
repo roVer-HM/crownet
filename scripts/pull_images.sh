@@ -10,3 +10,4 @@ docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp
 docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp-ide
 docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/sumo
 docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/vadere
+docker image pull sam-dev.cs.hm.edu:5023/rover/rover-main/vadere-ide

@@ -38,7 +38,7 @@ WORKDIR /opt/omnetpp/omnetpp
 
 ARG NOCACHE_PULL=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
+            pull ssh://git@sam-dev.cs.hm.edu:5022/rover/omnetpp.git $OMNETRELEASE
 
 # configure and compile
 #  - samples are optional and not needed for compiling - remove for a smaller image
@@ -46,9 +46,9 @@ RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyCheckin
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .
 RUN ./configure && \
-    make -j $(nproc) && \
-    find . -type f -name '*.o' -exec rm {} + && \
-    find . -type f -name '*.o.d' -exec rm {} +
+     make -j $(nproc) && \
+     find . -type f -name '*.o' -exec rm {} + && \
+     find . -type f -name '*.o.d' -exec rm {} +
 
 # now install the Eclipse IDE base
 # ADD ide/ide.tar.gz .

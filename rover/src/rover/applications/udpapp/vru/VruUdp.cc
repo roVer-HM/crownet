@@ -32,14 +32,14 @@ void VruUdp::initialize(int stage) {
   }
 }
 
-BaseApp::FsmState VruUdp::fsmSend(cMessage* msg) {
+BaseApp::FsmState VruUdp::fsmAppMain(cMessage* msg) {
   const auto& payload = makeShared<ApplicationPacket>();
   payload->setSequenceNumber(numSent);
   payload->setChunkLength(B(par("messageLength")));
   payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
   payload->addTag<CurrentLocationTag>()->setLocation(getCurrentLocation());
   sendPayload(payload);
-  scheduleNextSendEvent();
+  scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
 }
 

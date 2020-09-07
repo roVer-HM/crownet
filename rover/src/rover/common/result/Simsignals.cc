@@ -15,9 +15,10 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "rover/common/result/Simsignals.h"
+
 #include <stdio.h>
 
-#include "rover/common/Simsignals.h"
 
 using namespace inet;
 

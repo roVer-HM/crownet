@@ -19,6 +19,6 @@ import inet.node.base.NodeBase;
 module UnequippedHost extends NodeBase
 {
     parameters:
-        @display("i=device/cellphone");
+        @display("i=rover/node/hostUnequipped_vs");
 
 }
