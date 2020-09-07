@@ -47,6 +47,7 @@ makefiles:
 		-L$$\(LTE_PROJ\)/src \
 		-L$$\(VEINS_PROJ\)/src \
 		-L$$\(VEINS_PROJ\)/subprojects/veins_inet/src \
+		-lboost_filesystem \
 		-lartery_core$$\(D\) \
 		-lartery_envmod$$\(D\) \
 		-lartery_police$$\(D\) \
