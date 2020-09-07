@@ -100,9 +100,9 @@ if __name__ == "__main__":
                 "poisson_parameter.txt",
                 "--experiment-label",
                 datetime.now().isoformat().replace(":", "").replace("-", ""),
-                "--run-name",
-                "Sample__0_0",
-                "--create-vadere-container"
+                "--delete-existing-containers",
+                "--create-vadere-container",
+		# docker container tags: both latest
             ],
         )
     else:
@@ -110,4 +110,3 @@ if __name__ == "__main__":
         runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
-
