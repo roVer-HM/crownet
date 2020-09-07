@@ -7,6 +7,7 @@
 
 #include "rover/applications/udpapp/detour/UdpDetourApp.h"
 
+#include "../../../common/result/Simsignals.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/TagBase_m.h"
 #include "inet/common/TimeTag_m.h"
@@ -19,7 +20,6 @@
 #include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
-#include "rover/common/Simsignals.h"
 
 using namespace inet;
 using omnetpp::cStringTokenizer;

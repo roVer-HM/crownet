@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include "../../common/result/Simsignals.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -34,7 +35,6 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
-#include "rover/common/Simsignals.h"
 
 using namespace inet;
 

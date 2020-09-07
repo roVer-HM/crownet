@@ -10,8 +10,9 @@
 #include <omnetpp/csimplemodule.h>
 
 #include <memory>
-#include "OsgCoordinateConverter.h"
+
 #include "inet/common/InitStages.h"
+#include "rover/common/converter/OsgCoordinateConverter.h"
 
 namespace rover {
 

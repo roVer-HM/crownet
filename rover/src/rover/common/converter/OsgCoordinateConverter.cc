@@ -13,7 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "OsgCoordinateConverter.h"
+#include "rover/common/converter/OsgCoordinateConverter.h"
+
 #include <vector>
 
 using namespace omnetpp;

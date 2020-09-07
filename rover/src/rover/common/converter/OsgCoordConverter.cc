@@ -5,7 +5,8 @@
  *      Author: sts
  */
 
-#include "OsgCoordConverter.h"
+#include "rover/common/converter/OsgCoordConverter.h"
+
 #include <omnetpp.h>
 #include <memory>
 #include "inet/common/INETDefs.h"

@@ -13,19 +13,19 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.aid;
+package rover.applications.aid;
 import rover.applications.common.AidBaseApp;
 import inet.applications.contract.IApp;
 
-moduleinterface INeighbourhood extends IApp {
+moduleinterface IDensityMapApp extends IApp {
     parameters:
     	
 }
 
-simple ArteryNeighbourhood  extends AidBaseApp like INeighbourhood  {
+simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
     
     parameters:
-        @class(rover::ArteryNeighbourhood);
+        @class(rover::ArteryDensityMapApp);
         string middelwareModule = default("^.^.middleware"); //node internal
         string traciCoreModule = default("traci.core");
         string coordConverterModule;

@@ -15,7 +15,7 @@
 
 package rover.aid;
 import rover.aid.IAid;
-import rover.aid.INeighbourhood;
+import rover.applications.aid.IDensityMapApp;
 import inet.common.MessageDispatcher;
 
 moduleinterface IAidLayer
@@ -43,7 +43,7 @@ module SimpleAidLayer like IAidLayer
             parameters:
                 @display("p=164,121;is=s");
         }
-        neighbourhood: <default("ArteryNeighbourhood")> like INeighbourhood {
+        densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp {
             @display("p=432,98;i=block/table;is=s");
         }
         // Message Dispatcher 
@@ -68,7 +68,7 @@ module SimpleAidLayer like IAidLayer
         aid.lowerOut --> lower.in++;
         aid.lowerIn <-- lower.out++;
         
-        neighbourhood.socketIn <-- upper.out++;
-        neighbourhood.socketOut --> upper.in++;
+        densityMapApp.socketIn <-- upper.out++;
+        densityMapApp.socketOut --> upper.in++;
 
 }

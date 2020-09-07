@@ -5,21 +5,22 @@
  *      Author: sts
  */
 
-#include "ArteryNeighbourhood.h"
+#include "rover/applications/aid/ArteryDensityMapApp.h"
+
 #include <inet/common/ModuleAccess.h>
 #include <vanetza/geonet/areas.hpp>
-#include "rover/aid/PositionMap_m.h"
+#include "rover/applications/PositionMapPacket_m.h"
 #include "traci/Core.h"
 #include "traci/LiteAPI.h"
 #include "traci/Position.h"
 
 namespace rover {
 
-Define_Module(ArteryNeighbourhood);
+Define_Module(ArteryDensityMapApp);
 
-ArteryNeighbourhood::~ArteryNeighbourhood() {}
+ArteryDensityMapApp::~ArteryDensityMapApp() {}
 
-void ArteryNeighbourhood::initialize(int stage) {
+void ArteryDensityMapApp::initialize(int stage) {
   AidBaseApp::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
     std::string x = par("coordConverterModule").stdstringValue();
@@ -57,17 +58,17 @@ void ArteryNeighbourhood::initialize(int stage) {
   }
 }
 
-void ArteryNeighbourhood::setAppRequirements() {
+void ArteryDensityMapApp::setAppRequirements() {
   L3Address destAddr = chooseDestAddr();
   socket.setAppRequirements(1.0, 2.0, AidRecipientClass::ALL_LOCAL, destAddr,
                             destPort);
 }
 
-void ArteryNeighbourhood::setAppCapabilities() {
+void ArteryDensityMapApp::setAppCapabilities() {
   // todo: no CAP right now.
 }
 
-void ArteryNeighbourhood::setupTimers() {
+void ArteryDensityMapApp::setupTimers() {
   if (destAddresses.empty()) {
     cRuntimeError("No address set.");
   } else {
@@ -76,11 +77,11 @@ void ArteryNeighbourhood::setupTimers() {
   }
 }
 
-void ArteryNeighbourhood::handleMessageWhenUp(cMessage *msg) {
+void ArteryDensityMapApp::handleMessageWhenUp(cMessage *msg) {
   AidBaseApp::handleMessageWhenUp(msg);
 }
 
-BaseApp::FsmState ArteryNeighbourhood::fsmAppMain(cMessage *msg) {
+BaseApp::FsmState ArteryDensityMapApp::fsmAppMain(cMessage *msg) {
   // send Message
   updateLocalMap();
   sendLocalMap();
@@ -88,8 +89,8 @@ BaseApp::FsmState ArteryNeighbourhood::fsmAppMain(cMessage *msg) {
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-void ArteryNeighbourhood::socketDataArrived(AidSocket *socket, Packet *packet) {
-  auto p = checkEmitGetReceived<DensityCount>(packet);
+void ArteryDensityMapApp::socketDataArrived(AidSocket *socket, Packet *packet) {
+  auto p = checkEmitGetReceived<PositionMapPacket>(packet);
 
   int numCells = p->getNumCells();
   std::string _nodeId = p->getNodeId();
@@ -110,7 +111,7 @@ void ArteryNeighbourhood::socketDataArrived(AidSocket *socket, Packet *packet) {
       FsmRootStates::WAIT_ACTIVE;  // GoTo WAIT_ACTIVE steady state
 }
 
-void ArteryNeighbourhood::updateLocalMap() {
+void ArteryDensityMapApp::updateLocalMap() {
   dMap->resetLocalMap();  // clear local map
   simtime_t measureTime = simTime();
 
@@ -146,8 +147,8 @@ void ArteryNeighbourhood::updateLocalMap() {
   EV_DEBUG << dMap->getView("ymf")->str();
 }
 
-void ArteryNeighbourhood::sendLocalMap() {
-  const auto &payload = createPacket<DensityCount>();
+void ArteryDensityMapApp::sendLocalMap() {
+  const auto &payload = createPacket<PositionMapPacket>();
   auto ymfView = dMap->getView("ymf");
   int numValidCells = ymfView->size();
   simtime_t time = simTime();

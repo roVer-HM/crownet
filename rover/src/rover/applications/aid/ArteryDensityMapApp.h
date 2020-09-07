@@ -13,10 +13,11 @@
 #include "artery/application/Middleware.h"
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/networking/Router.h"
+
 #include "inet/common/InitStages.h"
 #include "rover/applications/common/AidBaseApp.h"
 #include "rover/common/GridDensityMap.h"
-#include "rover/common/OsgCoordConverter.h"
+#include "rover/common/converter/OsgCoordConverter.h"
 #include "rover/common/util/FileWriter.h"
 
 using namespace omnetpp;
@@ -24,9 +25,9 @@ using namespace inet;
 
 namespace rover {
 
-class ArteryNeighbourhood : public AidBaseApp {
+class ArteryDensityMapApp : public AidBaseApp {
  public:
-  virtual ~ArteryNeighbourhood();
+  virtual ~ArteryDensityMapApp();
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }

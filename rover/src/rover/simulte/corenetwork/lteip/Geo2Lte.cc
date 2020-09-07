@@ -5,7 +5,8 @@
  *      Author: sts
  */
 
-#include "Geo2Lte.h"
+#include "rover/simulte/corenetwork/lteip/Geo2Lte.h"
+
 #include <inet/networklayer/ipv4/Ipv4Header_m.h>
 #include "rover/artery/lte/GeoNetTag_m.h"
 

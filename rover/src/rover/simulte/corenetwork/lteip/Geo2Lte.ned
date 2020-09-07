@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.artery.lte.corenetwork.lteip;
+package rover.simulte.corenetwork.lteip;
 
 import lte.corenetwork.lteip.INetworkLayer2lte;
 

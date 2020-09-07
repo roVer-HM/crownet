@@ -6,10 +6,11 @@
  */
 
 #include "rover/artery/traci/VadereLauchner.h"
+
+#include "../../common/converter/OsgCoordConverter.h"
 #include "inet/common/ModuleAccess.h"
 #include "rover/artery/traci/VadereApi.h"
 #include "rover/artery/traci/VadereUtils.h"
-#include "rover/common/OsgCoordConverter.h"
 
 using namespace traci;
 using namespace omnetpp;

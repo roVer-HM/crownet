@@ -10,7 +10,7 @@
 #include <traci/API.h>
 #include <traci/sumo/utils/traci/TraCIAPI.h>
 
-#include "../../common/OsgCoordinateConverter.h"
+#include "../../common/converter/OsgCoordinateConverter.h"
 #include "rover/artery/traci/VadereUtils.h"
 
 using namespace traci;

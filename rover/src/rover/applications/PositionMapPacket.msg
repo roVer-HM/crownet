@@ -20,7 +20,7 @@ import inet.common.geometry.Geometry;
 import inet.common.TagBase;
 
 
-class DensityCount extends inet::ApplicationPacket
+class PositionMapPacket extends inet::ApplicationPacket
 {
     string nodeId;
 	int numCells;

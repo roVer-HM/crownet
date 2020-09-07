@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "rover_util.h"
+#include "rover/common/util/rover_util.h"
 
 namespace rover {
 

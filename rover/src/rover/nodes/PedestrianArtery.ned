@@ -1,4 +1,4 @@
-package rover.artery;
+package rover.nodes;
 
 import rover.artery.PedestrianMiddleware;
 import artery.networking.Vanetza;

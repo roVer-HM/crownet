@@ -1,4 +1,4 @@
-package rover.artery;
+package rover.nodes;
 
 import rover.artery.PedestrianMiddleware;
 import rover.artery.IDispatchRadioDriver;
@@ -153,6 +153,7 @@ module PedestrianFull like INetworkNode
         }
         lteNic: <nicType> like ILteNic {
             nodeType = nodeType;
+            ip2lte.typename = "Geo2Lte";
             //d2dCapable = d2dCapable;
             @display("p=549.64,674.06396");
         }
