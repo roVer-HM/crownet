@@ -109,7 +109,7 @@ int IEntry<T>::compareReceivedTime(const IEntry& other) const {
 template <typename VALUE>
 class EntryDefaultCtor {
  public:
-  VALUE operator()() { return VALUE(); }
+  std::shared_ptr<VALUE> operator()() { return std::make_shared<VALUE>(); }
 };
 
 template <
@@ -119,9 +119,9 @@ template <
     typename ENTRY_CTOR = EntryDefaultCtor<VALUE>>
 class CellEntry {
  public:
-  using key_type = KEY;
-  using mapped_type = VALUE;
-  using value_type = std::pair<const key_type&, mapped_type&>;
+  using key_type = KEY;                        // measuring node
+  using mapped_type = std::shared_ptr<VALUE>;  // some type of IEntry
+  using value_type = std::pair<const key_type&, mapped_type>;
   using entry_ctor = ENTRY_CTOR;
 
  private:
@@ -129,7 +129,7 @@ class CellEntry {
   map_type _data;
   key_type _localKey;
   entry_ctor _entryCtor;
-  mapped_type* _localEntry = nullptr;
+  mapped_type _localEntry = nullptr;
 
  public:
   using map_unary_filter =
@@ -154,7 +154,7 @@ class CellEntry {
 
   const bool hasLocalMeasure() const { return _localEntry != nullptr; }
   const bool hasValidLocalMeasure() const {
-    return hasLocalMeasure() && local().valid();
+    return hasLocalMeasure() && local()->valid();
   }
 
   void resetLocalMeasure() {
@@ -163,7 +163,7 @@ class CellEntry {
 
   const key_type localKey() const { return _localKey; }
 
-  mapped_type& local() {
+  mapped_type local() {
     if (!hasLocalMeasure()) {
       auto ret = _data.emplace(std::piecewise_construct,
                                std::forward_as_tuple(_localKey),
@@ -171,16 +171,16 @@ class CellEntry {
       if (!ret.second) {
         throw omnetpp::cRuntimeError("element with key %s already existed.");
       }
-      _localEntry = &(ret.first->second);  // address of mapped_type in map.
+      _localEntry = ret.first->second;  // address of mapped_type in map.
     }
 
-    return *_localEntry;
+    return _localEntry;
   }
-  const mapped_type& local() const {
+  const mapped_type local() const {
     return const_cast<CellEntry*>(this)->local();
   }
 
-  mapped_type& get(const key_type& key) {
+  mapped_type get(const key_type& key) {
     auto measure = _data.find(key);
     if (measure != _data.end()) {
       return measure->second;
@@ -195,29 +195,27 @@ class CellEntry {
       }
     }
   }
-  const mapped_type& get() const { return const_cast<CellEntry*>(this)->get(); }
+  const mapped_type get() const { return const_cast<CellEntry*>(this)->get(); }
 
-  mapped_type& youngestMeasureFirst(bool prefereLocal = true) {
+  mapped_type youngestMeasureFirst(bool prefereLocal = true) {
     map_binary_filter _f = [](const typename map_type::value_type lhs,
                               const typename map_type::value_type rhs) -> bool {
       // Comparator true if lhs lessThan rhs
-      return lhs.second.compareMeasureTime(rhs.second) < 0;
+      return lhs.second->compareMeasureTime(*rhs.second.get()) < 0;
     };
     auto range = validRange();
     //    auto ret = boost::range::min_element(rangge, _f);
     auto ret = boost::range::max_element(range, _f);
 
-    std::string s = str();
-
     if (prefereLocal && hasValidLocalMeasure() &&
-        ret->second.compareMeasureTime(*_localEntry) == 0) {
+        ret->second->compareMeasureTime(*_localEntry.get()) == 0) {
       // return local measure if it has the same age.
-      return *_localEntry;
+      return _localEntry;
     } else {
       return ret->second;
     }
   }
-  const mapped_type& youngestMeasureFirst() const {
+  const mapped_type youngestMeasureFirst() const {
     return const_cast<CellEntry*>(this)->youngestMeasureFirst();
   }
 
@@ -225,7 +223,7 @@ class CellEntry {
 
   map_range_filterd validRange() {
     map_unary_filter _f = [](const typename map_type::value_type val) -> bool {
-      return val.second.valid();
+      return val.second->valid();
     };
     using namespace boost::adaptors;
     map_range rng = boost::make_iterator_range(_data.begin(), _data.end());
@@ -238,7 +236,7 @@ class CellEntry {
   std::string str() const {
     std::ostringstream s;
     for (const auto entry : _data) {
-      s << entry.second << "\n";
+      s << entry.second.str() << "\n";
     }
     return s.str();
   }
@@ -276,7 +274,7 @@ class PositionMap {
   // map one entry_mapped_type instance  to one key_type instance
   // used by boost::iterator_ranges to filter/aggregate the correct
   // entry_mapped_type based on given predicate/transformer.
-  using view_value_type = std::pair<const cell_key_type&, node_mapped_type&>;
+  using view_value_type = std::pair<const cell_key_type&, node_mapped_type>;
 
  private:
   using map_type = std::map<cell_key_type, cell_mapped_type>;
@@ -356,7 +354,7 @@ class PositionMap {
   virtual void incrementLocal(const cell_key_type& cell_key,
                               const omnetpp::simtime_t& t,
                               bool ownPosition = false) {
-    getCellEntry(cell_key).local().incrementCount(t);
+    getCellEntry(cell_key).local()->incrementCount(t);
     if (ownPosition) {
       _currentCell = cell_key;
     }
@@ -399,7 +397,7 @@ class PositionMap {
         << "\n";
       for (auto entry : range()) {
         s << "   Cell(" << entry.first.first << ", " << entry.first.second
-          << ") " << entry.second << std::endl;
+          << ") " << entry.second->str() << std::endl;
       }
       return s.str();
     }

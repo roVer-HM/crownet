@@ -98,7 +98,8 @@ void ArteryDensityMapApp::socketDataArrived(AidSocket *socket, Packet *packet) {
   for (int i = 0; i < numCells; i++) {
     CellId _cId = std::make_pair(p->getCellX(i), p->getCellY(i));
     simtime_t _measured = p->getMTime(i);
-    DensityMeasure _m(p->getCellCount(i), _measured, _received);
+    auto _m = std::make_shared<DensityMeasure>(p->getCellCount(i), _measured,
+                                               _received);
     dMap->update(_cId, _nodeId, _m);
   }
 
@@ -124,6 +125,7 @@ void ArteryDensityMapApp::updateLocalMap() {
   const auto &table =
       middleware->getFacilities().getConst<artery::Router>().getLocationTable();
 
+  // count yourself
   dMap->incrementLocal(posInet, measureTime, true);
 
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
@@ -165,14 +167,14 @@ void ArteryDensityMapApp::sendLocalMap() {
     const auto &measure = e.second;
     payload->setCellX(currCell, cell.first);
     payload->setCellY(currCell, cell.second);
-    payload->setCellCount(currCell, measure.getCount());
-    payload->setMTime(currCell, measure.getMeasureTime());
+    payload->setCellCount(currCell, measure->getCount());
+    payload->setMTime(currCell, measure->getMeasureTime());
     currCell++;
 
     if (par("writeDensityLog").boolValue()) {
       std::string del = fileWriter->del();
       fileWriter->write() << time.dbl() << del << cell.first << del
-                          << cell.second << del << measure.delimWith(del)
+                          << cell.second << del << measure->csv(del)
                           << std::endl;
     }
   }
