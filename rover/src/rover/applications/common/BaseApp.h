@@ -109,6 +109,8 @@ class BaseApp : public ApplicationBase {
 
   // fsmRoot actions
 
+  virtual void setFsmResult(const FsmState &state);
+
   // handle extra self Messages
   virtual FsmState fsmHandleSelfMsg(cMessage *msg) = 0;
   // setup socket, endTime and selfMsgSendTimer

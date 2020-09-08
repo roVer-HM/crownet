@@ -46,6 +46,8 @@ void BaseApp::initialize(int stage) {
   }
 }
 
+void BaseApp::setFsmResult(const FsmState &state) { socketFsmResult = state; }
+
 void BaseApp::finish() {
   recordScalar("packets sent", numSent);
   recordScalar("packets received", numReceived);
