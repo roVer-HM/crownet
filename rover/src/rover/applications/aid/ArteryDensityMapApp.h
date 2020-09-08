@@ -14,9 +14,9 @@
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/networking/Router.h"
 
+#include "../../common/positionMap/GridDensityMap.h"
 #include "inet/common/InitStages.h"
 #include "rover/applications/common/AidBaseApp.h"
-#include "rover/common/GridDensityMap.h"
 #include "rover/common/converter/OsgCoordConverter.h"
 #include "rover/common/util/FileWriter.h"
 

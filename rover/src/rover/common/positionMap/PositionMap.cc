@@ -5,6 +5,6 @@
  *      Author: sts
  */
 
-#include "PositionMap.h"
+#include "rover/common/PositionMap.h"
 
 namespace rover {} /* namespace rover */

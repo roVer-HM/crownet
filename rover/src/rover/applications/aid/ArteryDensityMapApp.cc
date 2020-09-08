@@ -126,7 +126,7 @@ void ArteryDensityMapApp::updateLocalMap() {
       middleware->getFacilities().getConst<artery::Router>().getLocationTable();
 
   // count yourself
-  dMap->incrementLocal(posInet, measureTime, true);
+  dMap->incrementLocal(posInet, dMap->getNodeIde(), measureTime, true);
 
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
       [this, &measureTime](const vanetza::MacAddress &mac,

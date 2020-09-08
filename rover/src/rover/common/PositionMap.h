@@ -25,9 +25,10 @@
 
 namespace rover {
 
-template <typename T>
+template <typename K, typename T>
 class IEntry {
  public:
+  using key_type = K;
   using time_type = T;
   IEntry();
   IEntry(int, time_type&, time_type&);
@@ -55,39 +56,39 @@ class IEntry {
   bool _valid;
 };
 
-template <typename T>
-IEntry<T>::IEntry()
+template <typename K, typename T>
+IEntry<K, T>::IEntry()
     : count(0), measurement_time(), received_time(), _valid(false) {}
 
-template <typename T>
-IEntry<T>::IEntry(int count, time_type& m_t, time_type& r_t)
+template <typename K, typename T>
+IEntry<K, T>::IEntry(int count, time_type& m_t, time_type& r_t)
     : count(count), measurement_time(m_t), received_time(r_t), _valid(true) {}
 
-template <typename T>
-void IEntry<T>::incrementCount(const time_type& t) {
+template <typename K, typename T>
+void IEntry<K, T>::incrementCount(const time_type& t) {
   count++;
   measurement_time = t;
   received_time = t;
   _valid = true;
 }
 
-template <typename T>
-const typename IEntry<T>::time_type& IEntry<T>::getMeasureTime() const {
+template <typename K, typename T>
+const typename IEntry<K, T>::time_type& IEntry<K, T>::getMeasureTime() const {
   return measurement_time;
 }
 
-template <typename T>
-const typename IEntry<T>::time_type& IEntry<T>::getReceivedTime() const {
+template <typename K, typename T>
+const typename IEntry<K, T>::time_type& IEntry<K, T>::getReceivedTime() const {
   return received_time;
 }
 
-template <typename T>
-const int IEntry<T>::getCount() const {
+template <typename K, typename T>
+const int IEntry<K, T>::getCount() const {
   return count;
 }
 
-template <typename T>
-int IEntry<T>::compareMeasureTime(const IEntry& other) const {
+template <typename K, typename T>
+int IEntry<K, T>::compareMeasureTime(const IEntry& other) const {
   if (measurement_time == other.measurement_time) return 0;
   if (measurement_time < other.measurement_time) {
     return -1;
@@ -96,8 +97,8 @@ int IEntry<T>::compareMeasureTime(const IEntry& other) const {
   }
 }
 
-template <typename T>
-int IEntry<T>::compareReceivedTime(const IEntry& other) const {
+template <typename K, typename T>
+int IEntry<K, T>::compareReceivedTime(const IEntry& other) const {
   if (received_time == other.received_time) return 0;
   if (received_time < other.received_time) {
     return -1;
@@ -107,19 +108,31 @@ int IEntry<T>::compareReceivedTime(const IEntry& other) const {
 }
 
 template <typename VALUE>
-class EntryDefaultCtor {
+class EntryCtor {
  public:
-  std::shared_ptr<VALUE> operator()() { return std::make_shared<VALUE>(); }
+  virtual std::shared_ptr<VALUE> entry() = 0;
+  virtual std::shared_ptr<VALUE> localEntry() = 0;
 };
 
-template <
-    typename KEY, typename VALUE,
-    typename std::enable_if<std::is_base_of<IEntry<typename VALUE::time_type>,
-                                            VALUE>::value>::type* = nullptr,
-    typename ENTRY_CTOR = EntryDefaultCtor<VALUE>>
+template <typename VALUE>
+class EntryDefaultCtorImpl : public EntryCtor<VALUE> {
+ public:
+  std::shared_ptr<VALUE> entry() override { return std::make_shared<VALUE>(); }
+
+  std::shared_ptr<VALUE> localEntry() override {
+    return std::make_shared<VALUE>();
+  }
+};
+
+template <typename VALUE, typename ENTRY_CTOR = EntryDefaultCtorImpl<VALUE>,
+          typename std::enable_if<std::is_base_of<
+              IEntry<typename VALUE::key_type, typename VALUE::time_type>,
+              VALUE>::value>::type* = nullptr,
+          typename std::enable_if<std::is_base_of<
+              EntryCtor<VALUE>, ENTRY_CTOR>::value>::type* = nullptr>
 class CellEntry {
  public:
-  using key_type = KEY;                        // measuring node
+  using key_type = typename VALUE::key_type;   // measuring node
   using mapped_type = std::shared_ptr<VALUE>;  // some type of IEntry
   using value_type = std::pair<const key_type&, mapped_type>;
   using entry_ctor = ENTRY_CTOR;
@@ -154,7 +167,7 @@ class CellEntry {
 
   const bool hasLocalMeasure() const { return _localEntry != nullptr; }
   const bool hasValidLocalMeasure() const {
-    return hasLocalMeasure() && local()->valid();
+    return hasLocalMeasure() && getLocal()->valid();
   }
 
   void resetLocalMeasure() {
@@ -163,11 +176,11 @@ class CellEntry {
 
   const key_type localKey() const { return _localKey; }
 
-  mapped_type local() {
+  mapped_type getLocal() {
     if (!hasLocalMeasure()) {
       auto ret = _data.emplace(std::piecewise_construct,
                                std::forward_as_tuple(_localKey),
-                               std::forward_as_tuple(_entryCtor()));
+                               std::forward_as_tuple(_entryCtor.localEntry()));
       if (!ret.second) {
         throw omnetpp::cRuntimeError("element with key %s already existed.");
       }
@@ -176,8 +189,8 @@ class CellEntry {
 
     return _localEntry;
   }
-  const mapped_type local() const {
-    return const_cast<CellEntry*>(this)->local();
+  const mapped_type getLocal() const {
+    return const_cast<CellEntry*>(this)->getLocal();
   }
 
   mapped_type get(const key_type& key) {
@@ -187,7 +200,7 @@ class CellEntry {
     } else {
       auto newMeasure =
           _data.emplace(std::piecewise_construct, std::forward_as_tuple(key),
-                        std::forward_as_tuple(_entryCtor()));
+                        std::forward_as_tuple(_entryCtor.entry()));
       if (!newMeasure.second) {
         throw omnetpp::cRuntimeError("error inserting newMeasure");
       } else {
@@ -276,7 +289,7 @@ class PositionMap {
   // entry_mapped_type based on given predicate/transformer.
   using view_value_type = std::pair<const cell_key_type&, node_mapped_type>;
 
- private:
+ protected:
   using map_type = std::map<cell_key_type, cell_mapped_type>;
   using map_views = std::map<std::string, std::shared_ptr<PositionMapView>>;
   map_type _map;
@@ -354,7 +367,7 @@ class PositionMap {
   virtual void incrementLocal(const cell_key_type& cell_key,
                               const omnetpp::simtime_t& t,
                               bool ownPosition = false) {
-    getCellEntry(cell_key).local()->incrementCount(t);
+    getCellEntry(cell_key).getLocal()->incrementCount(t);
     if (ownPosition) {
       _currentCell = cell_key;
     }
@@ -432,7 +445,7 @@ class PositionMap {
       // transform
       cellEntryTransform_f _t = [](typename map_type::value_type& map_value) {
         view_value_type ret =
-            view_value_type{map_value.first, map_value.second.local()};
+            view_value_type{map_value.first, map_value.second.getLocal()};
         return ret;
       };
 
