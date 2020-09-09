@@ -22,107 +22,9 @@
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
+#include "rover/common/positionMap/Entry.h"
 
 namespace rover {
-
-template <typename K, typename T>
-class IEntry {
- public:
-  using key_type = K;
-  using time_type = T;
-  IEntry();
-  IEntry(int, time_type&, time_type&);
-  virtual void reset() {
-    count = 0;
-    _valid = false;
-  }
-  virtual const bool valid() const { return _valid; }
-  virtual void incrementCount(const time_type& t);
-
-  virtual const time_type& getMeasureTime() const;
-  virtual const time_type& getReceivedTime() const;
-  virtual const int getCount() const;
-
-  virtual int compareMeasureTime(const IEntry& other) const;
-  virtual int compareReceivedTime(const IEntry& other) const;
-
-  virtual std::string csv(std::string delimiter) const = 0;
-  virtual std::string str() const = 0;
-
- protected:
-  int count;
-  time_type measurement_time;
-  time_type received_time;
-  bool _valid;
-};
-
-template <typename K, typename T>
-IEntry<K, T>::IEntry()
-    : count(0), measurement_time(), received_time(), _valid(false) {}
-
-template <typename K, typename T>
-IEntry<K, T>::IEntry(int count, time_type& m_t, time_type& r_t)
-    : count(count), measurement_time(m_t), received_time(r_t), _valid(true) {}
-
-template <typename K, typename T>
-void IEntry<K, T>::incrementCount(const time_type& t) {
-  count++;
-  measurement_time = t;
-  received_time = t;
-  _valid = true;
-}
-
-template <typename K, typename T>
-const typename IEntry<K, T>::time_type& IEntry<K, T>::getMeasureTime() const {
-  return measurement_time;
-}
-
-template <typename K, typename T>
-const typename IEntry<K, T>::time_type& IEntry<K, T>::getReceivedTime() const {
-  return received_time;
-}
-
-template <typename K, typename T>
-const int IEntry<K, T>::getCount() const {
-  return count;
-}
-
-template <typename K, typename T>
-int IEntry<K, T>::compareMeasureTime(const IEntry& other) const {
-  if (measurement_time == other.measurement_time) return 0;
-  if (measurement_time < other.measurement_time) {
-    return -1;
-  } else {
-    return 1;
-  }
-}
-
-template <typename K, typename T>
-int IEntry<K, T>::compareReceivedTime(const IEntry& other) const {
-  if (received_time == other.received_time) return 0;
-  if (received_time < other.received_time) {
-    return -1;
-  } else {
-    return 1;
-  }
-}
-
-template <typename VALUE>
-class EntryCtor {
- public:
-  virtual std::shared_ptr<VALUE> entry() = 0;
-  virtual std::shared_ptr<VALUE> localEntry() = 0;
-};
-
-template <typename VALUE>
-class EntryDefaultCtorImpl : public EntryCtor<VALUE> {
- public:
-  std::shared_ptr<VALUE> entry() override { return std::make_shared<VALUE>(); }
-
-  std::shared_ptr<VALUE> localEntry() override {
-    return std::make_shared<VALUE>();
-  }
-};
 
 template <typename VALUE, typename ENTRY_CTOR = EntryDefaultCtorImpl<VALUE>,
           typename std::enable_if<std::is_base_of<
@@ -176,6 +78,8 @@ class CellEntry {
 
   const key_type localKey() const { return _localKey; }
 
+  const entry_ctor& getCtor() { return _entryCtor; }
+
   mapped_type getLocal() {
     if (!hasLocalMeasure()) {
       auto ret = _data.emplace(std::piecewise_construct,
@@ -191,6 +95,10 @@ class CellEntry {
   }
   const mapped_type getLocal() const {
     return const_cast<CellEntry*>(this)->getLocal();
+  }
+
+  void createOrUpdate(const key_type& key, mapped_type&& val) {
+    _data[key] = std::move(val);
   }
 
   mapped_type get(const key_type& key) {
@@ -277,12 +185,14 @@ class PositionMap {
   using cell_key_type = CELL_KEY;  // key for one cell or triangle (bucket)
   using cell_mapped_type = VALUE;  // container in each bucket.
   using cell_value_type = std::pair<const cell_key_type&, cell_mapped_type&>;
+  using cell_ctor_type = CTOR;  // creator for container
 
   // each bucket contains an entry map
-  using creator_type = CTOR;  // creator for container
+
   using node_key_type = typename VALUE::key_type;
   using node_mapped_type = typename VALUE::mapped_type;
   using node_value_type = typename VALUE::value_type;
+  using node_ctor_type = typename VALUE::entry_ctor;
 
   // map one entry_mapped_type instance  to one key_type instance
   // used by boost::iterator_ranges to filter/aggregate the correct
@@ -298,7 +208,7 @@ class PositionMap {
   // identifier that maps to local entry_mapped_type value
   node_key_type _localNodeId;  // NodeId of this node.
   cell_key_type _currentCell;  // CellId this node  currently ocupies.
-  creator_type _cellCtor;
+  cell_ctor_type _cellCtor;
 
  public:
   // functions
@@ -325,7 +235,7 @@ class PositionMap {
     initViews();
   }
 
-  PositionMap(node_key_type localId, creator_type&& ctor)
+  PositionMap(node_key_type localId, cell_ctor_type&& ctor)
       : _localNodeId(localId), _cellCtor(ctor) {
     initViews();
   }
@@ -354,6 +264,12 @@ class PositionMap {
     }
   }
 
+  node_ctor_type getNodeCtor() const {
+    auto cell = _cellCtor();
+    node_ctor_type nodeCtor = cell.getCtor();
+    return nodeCtor;
+  }
+
   cellContainer_r range() {
     return boost::make_iterator_range(_map.begin(), _map.end());
   }
@@ -374,8 +290,10 @@ class PositionMap {
   }
 
   void update(const cell_key_type& cell_key, const node_key_type& node_key,
-              node_mapped_type& measure_value) {
-    getCellEntry(cell_key).get(node_key) = measure_value;
+              node_mapped_type&& measure_value) {
+    // todo move all the way? (create or update)
+    //    getCellEntry(cell_key).get(node_key) = measure_value;
+    getCellEntry(cell_key).createOrUpdate(node_key, std::move(measure_value));
   }
 
   std::shared_ptr<PositionMapView> getView(std::string view_name) {
@@ -392,7 +310,7 @@ class PositionMap {
    public:
     PositionMapView() : _cell_map(nullptr), _view_name("") {}
     PositionMapView(
-        PositionMap<cell_key_type, cell_mapped_type, creator_type>* map,
+        PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* map,
         std::string view_name)
         : _cell_map(map), _view_name(view_name) {}
 
@@ -425,13 +343,13 @@ class PositionMap {
     }
 
    protected:
-    PositionMap<cell_key_type, cell_mapped_type, creator_type>* _cell_map;
+    PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* _cell_map;
     std::string _view_name;
   };
 
   class LocalView : public PositionMapView {
    public:
-    LocalView(PositionMap<cell_key_type, cell_mapped_type, creator_type>* map)
+    LocalView(PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* map)
         : PositionMapView(map, "local") {}
 
     virtual cellEntryFiltered_r range() override {
@@ -458,7 +376,7 @@ class PositionMap {
 
   class YmfView : public PositionMapView {
    public:
-    YmfView(PositionMap<cell_key_type, cell_mapped_type, creator_type>* map)
+    YmfView(PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* map)
         : PositionMapView(map, "ymf") {}
 
     virtual cellEntryFiltered_r range() override {
