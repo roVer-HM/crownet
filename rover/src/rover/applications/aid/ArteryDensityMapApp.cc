@@ -8,7 +8,9 @@
 #include "rover/applications/aid/ArteryDensityMapApp.h"
 
 #include <inet/common/ModuleAccess.h>
+#include <memory>
 #include <vanetza/geonet/areas.hpp>
+#include "artery/utility/IdentityRegistry.h"
 #include "rover/applications/PositionMapPacket_m.h"
 #include "traci/Core.h"
 #include "traci/LiteAPI.h"
@@ -25,23 +27,17 @@ void ArteryDensityMapApp::initialize(int stage) {
   if (stage == INITSTAGE_LOCAL) {
     std::string x = par("coordConverterModule").stdstringValue();
     gridSize = par("gridSize").doubleValue();
-  } else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+  } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     middleware = inet::findModuleFromPar<artery::Middleware>(
         par("middelwareModule"), this, true);
     converter_m = inet::getModuleFromPar<OsgCoordConverter>(
         par("coordConverterModule"), this, true);
-    std::ostringstream node_id;
 
-    node_id << middleware->getFacilities().getConst<artery::Identity>().traci
-            << ":"
-            << middleware->getFacilities()
-                   .getConst<artery::Identity>()
-                   .host->getIndex()
-            << ":"
-            << middleware->getFacilities()
-                   .getConst<artery::Identity>()
-                   .host->getId();
-    dMap = std::make_shared<RegularGridMap>(node_id.str(), gridSize);
+    // subscribe updateSignal at host module level (pedestrian, vehicle) to
+    // catch identity changes.
+    auto hostModule =
+        middleware->getFacilities().getConst<artery::Identity>().host;
+    hostModule->subscribe(artery::IdentityRegistry::updateSignal, this);
 
     if (par("writeDensityLog").boolValue()) {
       FileWriterBuilder fBuilder{};
@@ -55,6 +51,18 @@ void ArteryDensityMapApp::initialize(int stage) {
       fileWriter->writeHeader(
           {"simtime", "x", "y", "count", "measure_t", "received_t"});
     }
+  }
+}
+
+void ArteryDensityMapApp::receiveSignal(cComponent *source,
+                                        simsignal_t signalID, cObject *obj,
+                                        cObject *details) {
+  if (signalID == artery::IdentityRegistry::updateSignal) {
+    std::ostringstream node_id;
+    node_id << middleware->getFacilities()
+                   .getConst<artery::Identity>()
+                   .geonet.mid();
+    dMap = std::make_shared<Grid>(node_id.str(), gridSize);
   }
 }
 
@@ -77,6 +85,15 @@ void ArteryDensityMapApp::setupTimers() {
   }
 }
 
+BaseApp::FsmState ArteryDensityMapApp::fsmSetup(cMessage *msg) {
+  // ensure Density Grid map was initialized by event
+  if (dMap == nullptr)
+    throw omnetpp::cRuntimeError(
+        "Density Grid map not initialized. Was the "
+        "artery::IdentityRegistry::updateSignal event fired? ");
+  return AidBaseApp::fsmSetup(msg);
+}
+
 void ArteryDensityMapApp::handleMessageWhenUp(cMessage *msg) {
   AidBaseApp::handleMessageWhenUp(msg);
 }
@@ -96,10 +113,11 @@ void ArteryDensityMapApp::socketDataArrived(AidSocket *socket, Packet *packet) {
   std::string _nodeId = p->getNodeId();
   simtime_t _received = simTime();
   for (int i = 0; i < numCells; i++) {
-    CellId _cId = std::make_pair(p->getCellX(i), p->getCellY(i));
+    CellId _cId{p->getCellX(i), p->getCellY(i)};
     simtime_t _measured = p->getMTime(i);
-    DensityMeasure _m(p->getCellCount(i), _measured, _received);
-    dMap->update(_cId, _nodeId, _m);
+    auto _m =
+        std::make_shared<Measurement>(p->getCellCount(i), _measured, _received);
+    dMap->update(_cId, _nodeId, std::move(_m));
   }
 
   using namespace omnetpp;
@@ -124,7 +142,8 @@ void ArteryDensityMapApp::updateLocalMap() {
   const auto &table =
       middleware->getFacilities().getConst<artery::Router>().getLocationTable();
 
-  dMap->incrementLocal(posInet, measureTime, true);
+  // count yourself
+  dMap->incrementLocal(posInet, dMap->getNodeIde(), measureTime, true);
 
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
       [this, &measureTime](const vanetza::MacAddress &mac,
@@ -138,7 +157,9 @@ void ArteryDensityMapApp::updateLocalMap() {
         using namespace omnetpp;
         EV_DEBUG << "process: " << mac << " geo:[" << geoPos.latitude.value()
                  << "|" << geoPos.longitude.value() << "]\n";
-        dMap->incrementLocal(cartPos, measureTime);
+        std::ostringstream _id;
+        _id << mac;
+        dMap->incrementLocal(cartPos, _id.str(), measureTime);
       };
   table.visit(eVisitor);
 
@@ -165,14 +186,14 @@ void ArteryDensityMapApp::sendLocalMap() {
     const auto &measure = e.second;
     payload->setCellX(currCell, cell.first);
     payload->setCellY(currCell, cell.second);
-    payload->setCellCount(currCell, measure.getCount());
-    payload->setMTime(currCell, measure.getMeasureTime());
+    payload->setCellCount(currCell, measure->getCount());
+    payload->setMTime(currCell, measure->getMeasureTime());
     currCell++;
 
     if (par("writeDensityLog").boolValue()) {
       std::string del = fileWriter->del();
       fileWriter->write() << time.dbl() << del << cell.first << del
-                          << cell.second << del << measure.delimWith(del)
+                          << cell.second << del << measure->csv(del)
                           << std::endl;
     }
   }

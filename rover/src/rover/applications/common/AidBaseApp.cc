@@ -58,28 +58,28 @@ void AidBaseApp::socketDataArrived(AidSocket *socket, Packet *packet) {
   emit(packetReceivedSignal, packet);
   numReceived++;
   delete packet;
-  socketFsmResult =
-      FsmRootStates::WAIT_ACTIVE;  // GoTo WAIT_ACTIVE steady state
+  setFsmResult(FsmRootStates::WAIT_ACTIVE);
 }
 
 void AidBaseApp::socketErrorArrived(AidSocket *socket, Indication *indication) {
   EV_WARN << "Ignoring UDP error report " << indication->getName() << endl;
   delete indication;
-  socketFsmResult = FsmRootStates::WAIT_ACTIVE;  // ignore Error
+  setFsmResult(FsmRootStates::WAIT_ACTIVE);  // ignore Error
 }
 
 void AidBaseApp::socketClosed(AidSocket *socket) {
   if (operationalState == State::STOPPING_OPERATION) {
     startActiveOperationExtraTimeOrFinish(par("stopOperationExtraTime"));
   }
-  socketFsmResult = FsmRootStates::TEARDOWN;
+  setFsmResult(FsmRootStates::TEARDOWN);
 }
 
 void AidBaseApp::socketStatusArrived(AidSocket *socket,
                                      Indication *indication) {
   EV_WARN << "Ignoring AID Status" << endl;
   delete indication;
-  socketFsmResult = FsmRootStates::WAIT_ACTIVE;  // just go on for now
+  setFsmResult(socketFsmResult =
+                   FsmRootStates::WAIT_ACTIVE);  // just go on for now
 }
 
 }  // namespace rover
