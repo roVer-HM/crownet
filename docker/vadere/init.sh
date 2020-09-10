@@ -7,10 +7,14 @@ echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI' TRACI_DEBUG='$TRACI_
 echo ""
 echo "To launch vadere-gui call vadere exec vadere-gui"
 
+
 # default jar to be started when container is launched:
 # JAR_PATH=/opt/vadere/vadere/VadereGui/target/vadere-gui.jar
 JAR_PATH=/opt/vadere/vadere/VadereManager/target/vadere-server.jar
 LAUCNER_PATH=/opt/vadere/vadere/Tools/vadere-lauchner/vadere-lauchner.py
+
+# print vadere version
+java -jar $JAR_PATH --version
 
 CMD_ARR=(python3 $LAUCNER_PATH)
 CMD_ARR+=(--bind 0.0.0.0)
@@ -38,6 +42,7 @@ fi
 if [[ ! -z $VADERE_LOG ]];then
     CMD_ARR+=(--vadere-log $VADERE_LOG)
 fi
+
 
 # echo "${CMD_ARR[@]}"
 eval ${CMD_ARR[@]}
