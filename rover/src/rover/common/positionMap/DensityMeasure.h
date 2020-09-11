@@ -15,8 +15,8 @@ class DensityMeasure : public IEntry<NODE_ID, omnetpp::simtime_t> {
  public:
   virtual ~DensityMeasure() = default;
   DensityMeasure() : IEntry<NODE_ID, omnetpp::simtime_t>() {}
-  DensityMeasure(int count, omnetpp::simtime_t& measurement_time,
-                 omnetpp::simtime_t& received_time)
+  DensityMeasure(const int count, const omnetpp::simtime_t& measurement_time,
+                 const omnetpp::simtime_t& received_time)
       : IEntry<NODE_ID, omnetpp::simtime_t>(count, measurement_time,
                                             received_time) {}
 
@@ -28,8 +28,8 @@ template <typename NODE_ID>
 class LocalDensityMeasure : public DensityMeasure<NODE_ID> {
  public:
   LocalDensityMeasure();
-  LocalDensityMeasure(int count, omnetpp::simtime_t& measurement_time,
-                      omnetpp::simtime_t& received_time);
+  LocalDensityMeasure(int count, const omnetpp::simtime_t& measurement_time,
+                      const omnetpp::simtime_t& received_time);
 
   virtual void reset() override;
 
@@ -84,8 +84,8 @@ LocalDensityMeasure<NODE_ID>::LocalDensityMeasure()
 
 template <typename NODE_ID>
 LocalDensityMeasure<NODE_ID>::LocalDensityMeasure(
-    int count, omnetpp::simtime_t& measurement_time,
-    omnetpp::simtime_t& received_time)
+    int count, const omnetpp::simtime_t& measurement_time,
+    const omnetpp::simtime_t& received_time)
     : DensityMeasure<NODE_ID>(count, measurement_time, received_time) {}
 
 template <typename NODE_ID>
