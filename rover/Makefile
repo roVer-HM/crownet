@@ -76,9 +76,9 @@ ifeq ("$(MODE)","debug")
 	D_=dbg
 endif
 
-test: make-test
+test: make-tests
 	cd tests/gtest/src && ./rTests_dbg$(D_)
-	
+
 
 make-test: makefiles-test
 	cd tests/gtest/src && $(MAKE)
@@ -146,7 +146,7 @@ checktestmakefiles:
 	echo; \
 	exit 1; \
 	fi
-		
+
 checkmakefiles:
 	@if [ ! -f src/Makefile ]; then \
 	echo; \
