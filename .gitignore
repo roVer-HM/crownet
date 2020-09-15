@@ -30,9 +30,10 @@ analysis/**/test_data
 
 rover/out
 rover/src/Makefile
+rover/tests/gtest/src/Makefile
 rover/.settings
 rover/**/libROVER*
-rover/**/librTests*
+rover/**/rTests*
 rover/**/results
 rover/**/measurements
 rover/**/output

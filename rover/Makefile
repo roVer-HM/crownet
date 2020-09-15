@@ -77,7 +77,7 @@ ifeq ("$(MODE)","debug")
 endif
 
 test: make-test
-	cd tests/gtest/src && ./rTests_dbg$(D_)
+	cd tests/gtest/src && ./rTests$(D_)
 
 
 make-test: makefiles-test
