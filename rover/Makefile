@@ -76,7 +76,7 @@ ifeq ("$(MODE)","debug")
 	D_=dbg
 endif
 
-test: make-tests
+test: make-test
 	cd tests/gtest/src && ./rTests_dbg$(D_)
 
 

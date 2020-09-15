@@ -76,7 +76,7 @@ gtests:
     OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:
     - "cd ${ROVER_MAIN}/rover"
-    - "${OPP} make tests"
+    - "${OPP} make test"
   artifacts:
     when: always
     paths:
