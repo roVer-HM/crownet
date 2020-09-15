@@ -32,6 +32,7 @@ rover/out
 rover/src/Makefile
 rover/.settings
 rover/**/libROVER*
+rover/**/librTests*
 rover/**/results
 rover/**/measurements
 rover/**/output

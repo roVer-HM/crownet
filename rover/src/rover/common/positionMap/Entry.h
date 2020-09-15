@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <set>
+#include <sstream>
 #include <string>
 
 template <typename VALUE>

@@ -5,10 +5,9 @@
  *      Author: sts
  */
 
+#include "rover/common/positionMap/Entry.h"
 #include <gtest/gtest.h>
 #include <string>
-#include "rover/common/positionMap/DensityMeasure.h"
-#include "rover/common/positionMap/Entry.h"
 
 double TIME1 = 1.34;
 double TIME2 = 4.42;
@@ -84,15 +83,4 @@ TEST_F(IEntryTest, compareMeasureTime) {
 TEST_F(IEntryTest, toCsv) {
   const char *expectVal = "3,1.34,4.42";
   ASSERT_STREQ(expectVal, e2.csv(",").c_str());
-}
-
-TEST(LocalDensityMeasure, rest) {
-  LocalDensityMeasure<int> m{};
-  ASSERT_FALSE(m.valid());
-  m.incrementCount(4.9);
-  m.nodeIds.insert(32);
-  ASSERT_TRUE(m.valid());
-  m.reset();
-  ASSERT_EQ(0, m.nodeIds.size());
-  ASSERT_FALSE(m.valid());
 }
