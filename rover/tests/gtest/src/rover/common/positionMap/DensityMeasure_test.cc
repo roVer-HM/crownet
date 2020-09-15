@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
+// rest must also rest nodeIds set
 TEST(LocalDensityMeasure, rest) {
   LocalDensityMeasure<int> m{};
   ASSERT_FALSE(m.valid());

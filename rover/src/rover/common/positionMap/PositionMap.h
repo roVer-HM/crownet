@@ -14,6 +14,7 @@
 #include <boost/range.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm.hpp>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/algorithm/min_element.hpp>
 #include <boost/range/iterator_range_core.hpp>
@@ -289,6 +290,13 @@ class PositionMap {
     }
   }
 
+  /**
+   * :cell_key:       cellId to which the measurement belongs
+   * :node_key:       nodeId of node which provided the measurement. Does not
+   *                  have to be the original creator of measurement.
+   * :measure_value:  timestamped
+   *                  density count for cellId, provided by nodeId.
+   */
   void update(const cell_key_type& cell_key, const node_key_type& node_key,
               node_mapped_type&& measure_value) {
     // todo move all the way? (create or update)
@@ -304,7 +312,9 @@ class PositionMap {
     return iter->second;
   }
 
-  node_key_type getNodeIde() { return _localNodeId; }
+  node_key_type getNodeId() const { return _localNodeId; }
+
+  cell_key_type getCellId() const { return _currentCell; }
 
   class PositionMapView {
    public:
@@ -340,6 +350,23 @@ class PositionMap {
     void print() {
       using namespace omnetpp;
       EV_DEBUG << str();
+    }
+
+    node_mapped_type get(cell_key_type k) {
+      auto rng = this->range();
+      auto it = boost::range::find_if(
+          rng, [&k](std::pair<const cell_key_type&, node_mapped_type> _item) {
+            return k == _item.first;
+          });
+
+      if (it == rng.end()) {
+        throw omnetpp::cRuntimeError("Item not found in view");
+      }
+      return it->second;
+    }
+
+    node_mapped_type getValue(cell_key_type k) const {
+      return const_cast<PositionMapView*>(this)->get(k);
     }
 
    protected:

@@ -73,12 +73,20 @@ makefiles:
 
 
 ifeq ("$(MODE)","debug")
-	D_=dbg
+	_D=dbg
+else
+	_D=ddd
 endif
 
 test: make-test
-	cd tests/gtest/src && ./rTests$(D_)
+	echo $(MODE)
+	 
+	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg; else cd tests/gtest/src && ./rTests;fi
 
+clean-test:
+	cd tests/gtest/src && $(MAKE) MODE=release clean
+	cd tests/gtest/src && $(MAKE) MODE=debug clean
+	rm -f tests/gtest/src/Makefile
 
 make-test: makefiles-test
 	cd tests/gtest/src && $(MAKE)

@@ -143,7 +143,7 @@ void ArteryDensityMapApp::updateLocalMap() {
       middleware->getFacilities().getConst<artery::Router>().getLocationTable();
 
   // count yourself
-  dMap->incrementLocal(posInet, dMap->getNodeIde(), measureTime, true);
+  dMap->incrementLocalOwnPos(posInet, measureTime);
 
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
       [this, &measureTime](const vanetza::MacAddress &mac,
@@ -164,7 +164,7 @@ void ArteryDensityMapApp::updateLocalMap() {
   table.visit(eVisitor);
 
   using namespace omnetpp;
-  EV_DEBUG << "[ " << dMap->getNodeIde() << "] ";
+  EV_DEBUG << "[ " << dMap->getNodeId() << "] ";
   EV_DEBUG << dMap->getView("ymf")->str();
 }
 
