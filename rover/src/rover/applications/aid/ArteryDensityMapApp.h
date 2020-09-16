@@ -56,7 +56,7 @@ class ArteryDensityMapApp : public AidBaseApp, public omnetpp::cListener {
   virtual FsmState fsmSetup(cMessage *msg) override;
 
   virtual void updateLocalMap();
-  virtual void sendLocalMap();
+  virtual void sendMapMap();
 
  private:
   // application

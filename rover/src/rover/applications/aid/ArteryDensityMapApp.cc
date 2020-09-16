@@ -101,7 +101,7 @@ void ArteryDensityMapApp::handleMessageWhenUp(cMessage *msg) {
 BaseApp::FsmState ArteryDensityMapApp::fsmAppMain(cMessage *msg) {
   // send Message
   updateLocalMap();
-  sendLocalMap();
+  sendMapMap();
   scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
 }
@@ -148,17 +148,20 @@ void ArteryDensityMapApp::updateLocalMap() {
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
       [this, &measureTime](const vanetza::MacAddress &mac,
                            const vanetza::geonet::LocationTableEntry &entry) {
+        // only entries with valid position vector
         if (!entry.has_position_vector()) return;
+
+        // convert Geo to 2D-Cartesian
         const vanetza::geonet::GeodeticPosition geoPos =
             entry.get_position_vector().position();
         auto cartPos =
             converter_m->getConverter()->convertToCartInetPosition(geoPos);
 
-        using namespace omnetpp;
-        EV_DEBUG << "process: " << mac << " geo:[" << geoPos.latitude.value()
-                 << "|" << geoPos.longitude.value() << "]\n";
+        // get string representation of  mac as id
         std::ostringstream _id;
         _id << mac;
+
+        // increment density map
         dMap->incrementLocal(cartPos, _id.str(), measureTime);
       };
   table.visit(eVisitor);
@@ -168,7 +171,7 @@ void ArteryDensityMapApp::updateLocalMap() {
   EV_DEBUG << dMap->getView("ymf")->str();
 }
 
-void ArteryDensityMapApp::sendLocalMap() {
+void ArteryDensityMapApp::sendMapMap() {
   const auto &payload = createPacket<PositionMapPacket>();
   auto ymfView = dMap->getView("ymf");
   int numValidCells = ymfView->size();
