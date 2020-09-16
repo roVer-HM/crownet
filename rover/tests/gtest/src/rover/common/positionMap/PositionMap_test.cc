@@ -17,14 +17,13 @@ using namespace rover;
 class RegularGridMapIncrementLocalTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    g1 = std::make_shared<RegularGridMap<std::pair<int, int>, std::string>>(
-        "Id1", 5.0);
+    g1 = std::make_shared<RegularGridMap<std::string>>("Id1", 5.0);
   }
 
   inet::Coord coord1cell2_5{13.0, 27.0};
   inet::Coord coord2cell2_5{13.5, 27.7};
   inet::Coord coord3cell1_1{5.5, 7.8};
-  std::shared_ptr<RegularGridMap<std::pair<int, int>, std::string>> g1;
+  std::shared_ptr<RegularGridMap<std::string>> g1;
 };
 
 TEST_F(RegularGridMapIncrementLocalTest, getNodeId) {

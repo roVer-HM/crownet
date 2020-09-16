@@ -27,10 +27,9 @@ namespace rover {
 
 class ArteryDensityMapApp : public AidBaseApp, public omnetpp::cListener {
  public:
-  using Grid = RegularGridMap<std::pair<int, int>, std::string>;
+  using Grid = RegularGridMap<std::string>;
   using Measurement =
-      RegularGridMap<std::pair<int, int>,
-                     std::string>::node_mapped_type::element_type;
+      RegularGridMap<std::string>::node_mapped_type::element_type;
   using CellId = Grid::cell_key_type;
 
   virtual ~ArteryDensityMapApp();

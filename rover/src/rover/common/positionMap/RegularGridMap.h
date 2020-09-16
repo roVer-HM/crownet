@@ -19,17 +19,18 @@
 
 namespace rover {
 
-template <typename CELL_ID, typename NODE_ID>
+template <typename NODE_ID>
 class RegularGridMap
-    : public PositionMap<CELL_ID, CellEntry<DensityMeasure<NODE_ID>,
-                                            DensityMeasureCtor<NODE_ID>>> {
+    : public PositionMap<
+          std::pair<int, int>,
+          CellEntry<DensityMeasure<NODE_ID>, DensityMeasureCtor<NODE_ID>>> {
  public:
-  using CellId = CELL_ID;
+  using CellId = std::pair<int, int>;
   using NodeId = NODE_ID;
   RegularGridMap(NodeId id, double gridSize);
   virtual ~RegularGridMap() = default;
 
-  using PositionMap<CELL_ID,
+  using PositionMap<CellId,
                     CellEntry<DensityMeasure<NODE_ID>,
                               DensityMeasureCtor<NODE_ID>>>::incrementLocal;
   virtual CellId incrementLocal(const inet::Coord& coord, const NodeId nodeId,
@@ -44,19 +45,18 @@ class RegularGridMap
   double gridSize;
 };
 
-/// implementation RegularGridMap<CELL_ID, NODE_ID>
-template <typename CELL_ID, typename NODE_ID>
-inline RegularGridMap<CELL_ID, NODE_ID>::RegularGridMap(NodeId id,
-                                                        double gridSize)
-    : PositionMap<CELL_ID, CellEntry<DensityMeasure<NODE_ID>,
-                                     DensityMeasureCtor<NODE_ID>>>(id),
+/// implementation RegularGridMap<NODE_ID>
+template <typename NODE_ID>
+inline RegularGridMap<NODE_ID>::RegularGridMap(NodeId id, double gridSize)
+    : PositionMap<CellId, CellEntry<DensityMeasure<NODE_ID>,
+                                    DensityMeasureCtor<NODE_ID>>>(id),
       gridSize(gridSize) {}
 
-template <typename CELL_ID, typename NODE_ID>
-inline typename RegularGridMap<CELL_ID, NODE_ID>::CellId
-RegularGridMap<CELL_ID, NODE_ID>::incrementLocal(const inet::Coord& coord,
-                                                 const NodeId nodeId,
-                                                 const omnetpp::simtime_t& t) {
+template <typename NODE_ID>
+inline typename RegularGridMap<NODE_ID>::CellId
+RegularGridMap<NODE_ID>::incrementLocal(const inet::Coord& coord,
+                                        const NodeId nodeId,
+                                        const omnetpp::simtime_t& t) {
   CellId cellId =
       std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
 
@@ -72,14 +72,14 @@ RegularGridMap<CELL_ID, NODE_ID>::incrementLocal(const inet::Coord& coord,
   return cellId;
 }
 
-template <typename CELL_ID, typename NODE_ID>
-inline void RegularGridMap<CELL_ID, NODE_ID>::incrementLocalOwnPos(
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::incrementLocalOwnPos(
     const inet::Coord& coord, const omnetpp::simtime_t& t) {
   this->_currentCell = this->incrementLocal(coord, this->getNodeId(), t);
 }
 
-template <typename CELL_ID, typename NODE_ID>
-inline double RegularGridMap<CELL_ID, NODE_ID>::getGridSize() const {
+template <typename NODE_ID>
+inline double RegularGridMap<NODE_ID>::getGridSize() const {
   return this->gridSize;
 }
 
