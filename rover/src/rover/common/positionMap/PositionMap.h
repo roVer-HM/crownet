@@ -73,8 +73,20 @@ class CellEntry {
     return hasLocalMeasure() && getLocal()->valid();
   }
 
+  /**
+   * reset local data in cell
+   */
   void resetLocalMeasure() {
     if (hasLocalMeasure()) _localEntry->reset();
+  }
+
+  /**
+   * reset all data in cell, local and received
+   */
+  void reset() {
+    for (const auto& e : _data) {
+      e.second->reset();
+    }
   }
 
   const key_type localKey() const { return _localKey; }
@@ -154,6 +166,8 @@ class CellEntry {
   const map_range_filterd validRange() const {
     return const_cast<CellEntry*>(this)->validRange();
   }
+
+  const int size() const { return boost::size(validRange()); }
 
   std::string str() const {
     std::ostringstream s;
@@ -326,48 +340,15 @@ class PositionMap {
 
    public:
     virtual ~PositionMapView() = default;
-    virtual cellEntryFiltered_r range() { throw omnetpp::cRuntimeError("Err"); }
+    virtual cellEntryFiltered_r range() = 0;
+    const cellEntryFiltered_r range() const;
 
-    const cellEntryFiltered_r range() const {
-      return const_cast<PositionMapView*>(this)->range();
-    }
+    std::string str() const;
+    int size() const;
+    node_key_type getId() const;
 
-    std::string str() {
-      std::stringstream s;
-      s << "Map[ " << _view_name << "] (NodeId: " << _cell_map->_localNodeId
-        << "\n";
-      for (auto entry : range()) {
-        s << "   Cell(" << entry.first.first << ", " << entry.first.second
-          << ") " << entry.second->str() << std::endl;
-      }
-      return s.str();
-    }
-
-    int size() const { return boost::size(range()); }
-
-    node_key_type getId() { return _cell_map->_localNodeId; }
-
-    void print() {
-      using namespace omnetpp;
-      EV_DEBUG << str();
-    }
-
-    node_mapped_type get(cell_key_type k) {
-      auto rng = this->range();
-      auto it = boost::range::find_if(
-          rng, [&k](std::pair<const cell_key_type&, node_mapped_type> _item) {
-            return k == _item.first;
-          });
-
-      if (it == rng.end()) {
-        throw omnetpp::cRuntimeError("Item not found in view");
-      }
-      return it->second;
-    }
-
-    node_mapped_type getValue(cell_key_type k) const {
-      return const_cast<PositionMapView*>(this)->get(k);
-    }
+    node_mapped_type getValue(cell_key_type k);
+    node_mapped_type getValue(cell_key_type k) const;
 
    protected:
     PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* _cell_map;
@@ -428,5 +409,57 @@ class PositionMap {
     }
   };
 };
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline int PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::size() const {
+  return boost::size(this->range());
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline std::string PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::str()
+    const {
+  std::stringstream s;
+  s << "Map[ " << _view_name << "] (NodeId: " << this->_cell_map->_localNodeId
+    << "\n";
+  for (auto entry : this->range()) {
+    s << "   Cell(" << entry.first.first << ", " << entry.first.second << ") "
+      << entry.second->str() << std::endl;
+  }
+  return s.str();
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline const typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_r
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::range() const {
+  return const_cast<PositionMapView*>(this)->range();
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_key_type
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getId() const {
+  return this->_cell_map->_localNodeId;
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_mapped_type
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getValue(cell_key_type k) {
+  auto rng = this->range();
+  auto it = boost::range::find_if(
+      rng, [&k](std::pair<const cell_key_type&, node_mapped_type> _item) {
+        return k == _item.first;
+      });
+
+  if (it == rng.end()) {
+    throw omnetpp::cRuntimeError("Item not found in view");
+  }
+  return it->second;
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_mapped_type
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getValue(
+    cell_key_type k) const {
+  return const_cast<PositionMapView*>(this)->getValue(k);
+}
 
 } /* namespace rover */
