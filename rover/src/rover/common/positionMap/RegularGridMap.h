@@ -55,9 +55,6 @@ class RegularGridMap
   using range_type = typename RegularGridMap<NODE_ID>::cellEntryFiltered_r;
   class FullIter : public std::iterator<std::output_iterator_tag, iter_value> {
    public:
-    // todo: just give RegularGridMap<NODE_ID> as input?
-    // todo: source
-    // https://lorenzotoso.wordpress.com/2016/01/13/defining-a-custom-iterator-in-c/
     explicit FullIter(RegularGridMap<NODE_ID>& grid, std::string view_str,
                       DensityMeasureCtor<NODE_ID> ctor,
                       bool rowMajorOrder = true);
@@ -81,7 +78,6 @@ class RegularGridMap
     DensityMeasureCtor<NODE_ID> ctor;
     bool rowMajorOrder;
     int index;
-    //    iter_value empty; // todo: set empty value
   };
 };
 

@@ -316,8 +316,6 @@ class PositionMap {
    */
   void update(const cell_key_type& cell_key, const node_key_type& node_key,
               node_mapped_type&& measure_value) {
-    // todo move all the way? (create or update)
-    //    getCellEntry(cell_key).get(node_key) = measure_value;
     getCellEntry(cell_key).createOrUpdate(node_key, std::move(measure_value));
   }
 
