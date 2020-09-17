@@ -16,6 +16,7 @@
 #include "inet/common/geometry/common/Coord.h"
 #include "rover/common/positionMap/DensityMeasure.h"
 #include "rover/common/positionMap/PositionMap.h"
+#include "traci/Position.h"
 
 namespace rover {
 
@@ -34,9 +35,10 @@ class RegularGridMap
   using PositionMap<CellId,
                     CellEntry<DensityMeasure<NODE_ID>,
                               DensityMeasureCtor<NODE_ID>>>::incrementLocal;
-  virtual CellId incrementLocal(const inet::Coord& coord, const NodeId nodeId,
-                                const omnetpp::simtime_t& t);
-  virtual void incrementLocalOwnPos(const inet::Coord& coord,
+  virtual typename RegularGridMap<NODE_ID>::CellId incrementLocal(
+      const traci::TraCIPosition& coord, const NodeId nodeId,
+      const omnetpp::simtime_t& t);
+  virtual void incrementLocalOwnPos(const traci::TraCIPosition& coord,
                                     const omnetpp::simtime_t& t);
 
   double getGridSize() const;
@@ -190,12 +192,11 @@ inline RegularGridMap<NODE_ID>::RegularGridMap(NodeId id, double gridSize,
 
 template <typename NODE_ID>
 inline typename RegularGridMap<NODE_ID>::CellId
-RegularGridMap<NODE_ID>::incrementLocal(const inet::Coord& coord,
+RegularGridMap<NODE_ID>::incrementLocal(const traci::TraCIPosition& coord,
                                         const NodeId nodeId,
                                         const omnetpp::simtime_t& t) {
   CellId cellId =
       std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
-
   std::shared_ptr<LocalDensityMeasure<NODE_ID>> locMeasure =
       std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
           this->getCellEntry(cellId).getLocal());
@@ -204,13 +205,12 @@ RegularGridMap<NODE_ID>::incrementLocal(const inet::Coord& coord,
   if (!ret.second) {
     throw omnetpp::cRuntimeError("duplicate node in DenistyMap found.");
   }
-
   return cellId;
 }
 
 template <typename NODE_ID>
 inline void RegularGridMap<NODE_ID>::incrementLocalOwnPos(
-    const inet::Coord& coord, const omnetpp::simtime_t& t) {
+    const traci::TraCIPosition& coord, const omnetpp::simtime_t& t) {
   this->_currentCell = this->incrementLocal(coord, this->getNodeId(), t);
 }
 

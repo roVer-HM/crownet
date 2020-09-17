@@ -37,9 +37,9 @@ class RegularGridMapFullIterTest : public ::testing::Test {
     return std::make_shared<DensityMeasure<std::string>>(count, time1, time2);
   }
 
-  inet::Coord coord1cell2_1{13.0, 6.0};  // (2,1) rowMajorOrder
-  inet::Coord coord2cell2_1{13.5, 7.7};  // (2,1) rowMajorOrder
-  inet::Coord coord3cell1_1{5.5, 7.8};   // (1,1) rowMajorOrder
+  traci::TraCIPosition coord1cell2_1{13.0, 6.0};  // (2,1) rowMajorOrder
+  traci::TraCIPosition coord2cell2_1{13.5, 7.7};  // (2,1) rowMajorOrder
+  traci::TraCIPosition coord3cell1_1{5.5, 7.8};   // (1,1) rowMajorOrder
   std::shared_ptr<RegularGridMap<std::string>> g1;
 };
 

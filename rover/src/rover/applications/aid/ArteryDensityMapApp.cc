@@ -140,14 +140,10 @@ void ArteryDensityMapApp::updateLocalMap() {
   const auto &pos = middleware->getFacilities()
                         .getConst<artery::MovingNodeDataProvider>()
                         .position();
-  const auto &posInet = converter->position_cast_inet(pos);
-
-  const auto &table =
-      middleware->getFacilities().getConst<artery::Router>().getLocationTable();
-
-  // count yourself
+  const auto &posInet = converter->position_cast_traci(pos);
   dMap->incrementLocalOwnPos(posInet, measureTime);
 
+  // visitor for artery location table
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
       [this, &measureTime](const vanetza::MacAddress &mac,
                            const vanetza::geonet::LocationTableEntry &entry) {
@@ -157,7 +153,7 @@ void ArteryDensityMapApp::updateLocalMap() {
         // convert Geo to 2D-Cartesian
         const vanetza::geonet::GeodeticPosition geoPos =
             entry.get_position_vector().position();
-        auto cartPos = converter->convertToCartInetPosition(geoPos);
+        auto cartPos = converter->convertToCartTraCIPosition(geoPos);
 
         // get string representation of  mac as id
         std::ostringstream _id;
@@ -166,6 +162,10 @@ void ArteryDensityMapApp::updateLocalMap() {
         // increment density map
         dMap->incrementLocal(cartPos, _id.str(), measureTime);
       };
+
+  // visit
+  const auto &table =
+      middleware->getFacilities().getConst<artery::Router>().getLocationTable();
   table.visit(eVisitor);
 
   using namespace omnetpp;

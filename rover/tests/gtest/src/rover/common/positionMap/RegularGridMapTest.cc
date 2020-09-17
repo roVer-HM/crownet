@@ -21,9 +21,9 @@ class RegularGridMapIncrLocalTest : public ::testing::Test {
                                                        std::make_pair(10, 10));
   }
 
-  inet::Coord coord1cell2_5{13.0, 27.0};
-  inet::Coord coord2cell2_5{13.5, 27.7};
-  inet::Coord coord3cell1_1{5.5, 7.8};
+  traci::TraCIPosition coord1cell2_5{13.0, 27.0};
+  traci::TraCIPosition coord2cell2_5{13.5, 27.7};
+  traci::TraCIPosition coord3cell1_1{5.5, 7.8};
   std::shared_ptr<RegularGridMap<std::string>> g1;
 };
 
@@ -122,7 +122,7 @@ TEST_F(RegularGridMapIncrLocalTest, incrementLocal_duplicateNode_sameCell) {
 }
 
 // TODO: Fix
-// TEST_F(RegularGridMapIncrementLocalTest,
+// TEST_F(RegularGridMapIncrLocalTest,
 //       incrementLocal_duplicateNode_differentCell) {
 //  // add node multiple times [err]
 //  g1->incrementLocal(coord1cell2_5, "Node5", 3.3);
@@ -231,7 +231,7 @@ class RegularGridMapRangeTest : public RegularGridMapIncrLocalTest {
     return std::make_shared<DensityMeasure<std::string>>(count, time1, time2);
   }
 
-  inet::Coord coord4cell_2_1{11.0, 7.8};
+  traci::TraCIPosition coord4cell_2_1{11.0, 7.8};
 };
 
 TEST_F(RegularGridMapRangeTest, range_getId) {

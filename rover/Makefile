@@ -79,8 +79,6 @@ else
 endif
 
 test: make-test
-	echo $(MODE)
-	 
 	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg; else cd tests/gtest/src && ./rTests;fi
 
 clean-test:
