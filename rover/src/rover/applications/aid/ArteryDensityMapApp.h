@@ -60,10 +60,10 @@ class ArteryDensityMapApp : public AidBaseApp, public omnetpp::cListener {
  private:
   // application
   artery::Middleware *middleware;
-  OsgCoordConverter *converter_m;
+  std::shared_ptr<OsgCoordinateConverter> converter;
+
   std::shared_ptr<Grid> dMap;
 
-  double gridSize;
   std::unique_ptr<FileWriter> fileWriter;
 };
 

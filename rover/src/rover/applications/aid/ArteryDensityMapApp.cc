@@ -26,12 +26,12 @@ void ArteryDensityMapApp::initialize(int stage) {
   AidBaseApp::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
     std::string x = par("coordConverterModule").stdstringValue();
-    gridSize = par("gridSize").doubleValue();
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     middleware = inet::findModuleFromPar<artery::Middleware>(
         par("middelwareModule"), this, true);
-    converter_m = inet::getModuleFromPar<OsgCoordConverter>(
-        par("coordConverterModule"), this, true);
+    converter = inet::getModuleFromPar<OsgCoordConverter>(
+                    par("coordConverterModule"), this, true)
+                    ->getConverter();
 
     // subscribe updateSignal at host module level (pedestrian, vehicle) to
     // catch identity changes.
@@ -41,11 +41,9 @@ void ArteryDensityMapApp::initialize(int stage) {
 
     if (par("writeDensityLog").boolValue()) {
       FileWriterBuilder fBuilder{};
-      fBuilder.addMetadata("XSIZE",
-                           converter_m->getConverter()->getBoundaryWidth());
-      fBuilder.addMetadata("YSIZE",
-                           converter_m->getConverter()->getBoundaryHeight());
-      fBuilder.addMetadata("CELLSIZE", gridSize);
+      fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
+      fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
+      fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
 
       fileWriter.reset(fBuilder.build());
       fileWriter->writeHeader(
@@ -62,9 +60,12 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
     node_id << middleware->getFacilities()
                    .getConst<artery::Identity>()
                    .geonet.mid();
-    // todo: set gridDim
-    dMap = std::make_shared<Grid>(node_id.str(), gridSize,
-                                  std::make_pair(100, 100));
+
+    std::pair<int, int> gridDim;
+    double gridSize = par("gridSize").doubleValue();
+    gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
+    gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
+    dMap = std::make_shared<Grid>(node_id.str(), gridSize, gridDim);
   }
 }
 
@@ -139,7 +140,7 @@ void ArteryDensityMapApp::updateLocalMap() {
   const auto &pos = middleware->getFacilities()
                         .getConst<artery::MovingNodeDataProvider>()
                         .position();
-  const auto &posInet = converter_m->getConverter()->position_cast_inet(pos);
+  const auto &posInet = converter->position_cast_inet(pos);
 
   const auto &table =
       middleware->getFacilities().getConst<artery::Router>().getLocationTable();
@@ -156,8 +157,7 @@ void ArteryDensityMapApp::updateLocalMap() {
         // convert Geo to 2D-Cartesian
         const vanetza::geonet::GeodeticPosition geoPos =
             entry.get_position_vector().position();
-        auto cartPos =
-            converter_m->getConverter()->convertToCartInetPosition(geoPos);
+        auto cartPos = converter->convertToCartInetPosition(geoPos);
 
         // get string representation of  mac as id
         std::ostringstream _id;
