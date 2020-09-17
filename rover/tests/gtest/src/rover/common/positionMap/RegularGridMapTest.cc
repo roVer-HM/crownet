@@ -14,10 +14,11 @@
 
 using namespace rover;
 
-class RegularGridMapIncrementLocalTest : public ::testing::Test {
+class RegularGridMapIncrLocalTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    g1 = std::make_shared<RegularGridMap<std::string>>("Id1", 5.0);
+    g1 = std::make_shared<RegularGridMap<std::string>>("Id1", 5.0,
+                                                       std::make_pair(10, 10));
   }
 
   inet::Coord coord1cell2_5{13.0, 27.0};
@@ -26,16 +27,16 @@ class RegularGridMapIncrementLocalTest : public ::testing::Test {
   std::shared_ptr<RegularGridMap<std::string>> g1;
 };
 
-TEST_F(RegularGridMapIncrementLocalTest, getNodeId) {
+TEST_F(RegularGridMapIncrLocalTest, getNodeId) {
   std::string intendend("Id1");
   EXPECT_STREQ(intendend.c_str(), g1->getNodeId().c_str());
 }
 
-TEST_F(RegularGridMapIncrementLocalTest, getGridSize) {
+TEST_F(RegularGridMapIncrLocalTest, getGridSize) {
   EXPECT_EQ(5.0, g1->getGridSize());
 }
 
-TEST_F(RegularGridMapIncrementLocalTest, incrementLocal1) {
+TEST_F(RegularGridMapIncrLocalTest, incrementLocal1) {
   // must be in cell(2, 5)
   g1->incrementLocal(coord1cell2_5, "Node5", 3.3);
 
@@ -46,8 +47,7 @@ TEST_F(RegularGridMapIncrementLocalTest, incrementLocal1) {
   EXPECT_EQ(1, entry->getCount());
 }
 
-TEST_F(RegularGridMapIncrementLocalTest,
-       incrementLocal2_addMultipleNodesSameCell) {
+TEST_F(RegularGridMapIncrLocalTest, incrementLocal2_addMultipleNodesSameCell) {
   // must be in cell(2, 5)
   g1->incrementLocal(coord1cell2_5, "Node5", 3.3);
 
@@ -72,7 +72,7 @@ TEST_F(RegularGridMapIncrementLocalTest,
   EXPECT_TRUE(idSet.find("Node4") != idSet.end());
 }
 
-TEST_F(RegularGridMapIncrementLocalTest,
+TEST_F(RegularGridMapIncrLocalTest,
        incrementLocal2_addMultipleNodesDifferentCell) {
   // must be in cell(2, 5)
   g1->incrementLocal(coord1cell2_5, "Id1", 3.3);
@@ -97,7 +97,7 @@ TEST_F(RegularGridMapIncrementLocalTest,
   EXPECT_EQ(1, entry->getCount());
 }
 
-TEST_F(RegularGridMapIncrementLocalTest, incrementLocal3_ownPosition) {
+TEST_F(RegularGridMapIncrLocalTest, incrementLocal3_ownPosition) {
   EXPECT_EQ(std::make_pair(0, 0), g1->getCellId());
 
   // must be in cell(2, 5)
@@ -111,8 +111,7 @@ TEST_F(RegularGridMapIncrementLocalTest, incrementLocal3_ownPosition) {
   EXPECT_EQ(std::make_pair(2, 5), g1->getCellId());
 }
 
-TEST_F(RegularGridMapIncrementLocalTest,
-       incrementLocal_duplicateNode_sameCell) {
+TEST_F(RegularGridMapIncrLocalTest, incrementLocal_duplicateNode_sameCell) {
   // add node multiple times [err]
   g1->incrementLocal(coord1cell2_5, "Node5", 3.3);
   try {
@@ -135,7 +134,7 @@ TEST_F(RegularGridMapIncrementLocalTest,
 //  }
 //}
 
-TEST_F(RegularGridMapIncrementLocalTest, incrementLocal2_resetLocalMap) {
+TEST_F(RegularGridMapIncrLocalTest, incrementLocal2_resetLocalMap) {
   // must be in cell(2, 5)
   g1->incrementLocal(coord1cell2_5, "Id1", 3.3);
   // add second Node to different cell (1,1)
@@ -151,11 +150,11 @@ TEST_F(RegularGridMapIncrementLocalTest, incrementLocal2_resetLocalMap) {
   EXPECT_EQ(0, entry2->getCount());
 }
 
-class RegularGridMapUpdateTest : public RegularGridMapIncrementLocalTest {
+class RegularGridMapUpdateTest : public RegularGridMapIncrLocalTest {
   // Test fixture with 4 Nodes in 1 Cells as measured by the local node.
  protected:
   void SetUp() override {
-    RegularGridMapIncrementLocalTest::SetUp();
+    RegularGridMapIncrLocalTest::SetUp();
     // cell(2,5)
     g1->incrementLocalOwnPos(coord2cell2_5, 3.2);
     g1->incrementLocal(coord1cell2_5, "NodeA", 3.2);
@@ -208,11 +207,11 @@ TEST_F(RegularGridMapUpdateTest, update3_withYoungerLocalMeasure1) {
   EXPECT_EQ(4, measure->getCount());
 }
 
-class RegularGridMapRangeTest : public RegularGridMapIncrementLocalTest {
+class RegularGridMapRangeTest : public RegularGridMapIncrLocalTest {
   // Test fixture with 6 Nodes in 2 Cells as measured by the local node.
  protected:
   void SetUp() override {
-    RegularGridMapIncrementLocalTest::SetUp();
+    RegularGridMapIncrLocalTest::SetUp();
     // cell(2,5) local measure: (4, 3.2, 3.2)
     g1->incrementLocalOwnPos(coord2cell2_5, 3.2);
     g1->incrementLocal(coord1cell2_5, "NodeA", 3.2);
@@ -247,16 +246,28 @@ TEST_F(RegularGridMapRangeTest, range_size) {
   EXPECT_EQ(2, view->size());
 }
 
+TEST_F(RegularGridMapRangeTest, hasValueTrue) {
+  auto view = g1->getView("local");
+
+  EXPECT_TRUE(view->hasValue(std::make_pair(2, 5)));
+}
+
+TEST_F(RegularGridMapRangeTest, hasValueFalse) {
+  auto view = g1->getView("local");
+
+  EXPECT_FALSE(view->hasValue(std::make_pair(33, 32)));
+}
+
 TEST_F(RegularGridMapRangeTest, range_localMap) {
   auto view = g1->getView("local");
 
-  auto e1 = view->getValue(std::make_pair(2, 5));
+  auto e1 = view->find(std::make_pair(2, 5))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(3.2, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(3.2, e1->getReceivedTime().dbl());
   EXPECT_EQ(4, e1->getCount());
 
-  auto e2 = view->getValue(std::make_pair(1, 1));
+  auto e2 = view->find(std::make_pair(1, 1))->second;
   EXPECT_TRUE(e2->valid());
   EXPECT_DOUBLE_EQ(3.1, e2->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(3.1, e2->getReceivedTime().dbl());
@@ -271,7 +282,7 @@ TEST_F(RegularGridMapRangeTest, range_localMapValidOnly) {
   // 2 cells should be found
   EXPECT_EQ(1, view->size());
 
-  auto e2 = view->getValue(std::make_pair(1, 1));
+  auto e2 = view->find(std::make_pair(1, 1))->second;
   EXPECT_TRUE(e2->valid());
   EXPECT_DOUBLE_EQ(3.1, e2->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(3.1, e2->getReceivedTime().dbl());
@@ -284,25 +295,25 @@ TEST_F(RegularGridMapRangeTest, range_youngestMeasureMap) {
   // 2 cells should be found
   EXPECT_EQ(4, view->size());
 
-  auto e1 = view->getValue(std::make_pair(2, 5));
+  auto e1 = view->find(std::make_pair(2, 5))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(3.2, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(3.2, e1->getReceivedTime().dbl());
   EXPECT_EQ(4, e1->getCount());
 
-  e1 = view->getValue(std::make_pair(1, 1));
+  e1 = view->find(std::make_pair(1, 1))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(3.1, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(3.1, e1->getReceivedTime().dbl());
   EXPECT_EQ(2, e1->getCount());
 
-  e1 = view->getValue(std::make_pair(3, 3));
+  e1 = view->find(std::make_pair(3, 3))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(5.3, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(5.27, e1->getReceivedTime().dbl());
   EXPECT_EQ(9, e1->getCount());
 
-  e1 = view->getValue(std::make_pair(5, 5));
+  e1 = view->find(std::make_pair(5, 5))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(5.3, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(5.07, e1->getReceivedTime().dbl());
@@ -314,7 +325,7 @@ TEST_F(RegularGridMapRangeTest, range_youngestMeasureOverrideLocalMap1) {
   g1->update(std::make_pair(1, 1), "NodeE", std::move(this->m(9, 5.3, 5.27)));
 
   auto view = g1->getView("ymf");
-  auto e1 = view->getValue(std::make_pair(1, 1));
+  auto e1 = view->find(std::make_pair(1, 1))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(5.3, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(5.27, e1->getReceivedTime().dbl());
@@ -327,7 +338,7 @@ TEST_F(RegularGridMapRangeTest, range_youngestMeasureOverrideLocalMap2) {
   g1->update(std::make_pair(1, 1), "NodeE", std::move(this->m(9, 1.3, 5.27)));
 
   auto view = g1->getView("ymf");
-  auto e1 = view->getValue(std::make_pair(1, 1));
+  auto e1 = view->find(std::make_pair(1, 1))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(3.1, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(3.1, e1->getReceivedTime().dbl());
@@ -344,7 +355,7 @@ TEST_F(RegularGridMapRangeTest, range_youngestMeasureOverrideLocalMap3) {
   EXPECT_EQ(3, numMeasurements);
 
   auto view = g1->getView("ymf");
-  auto e1 = view->getValue(std::make_pair(1, 1));
+  auto e1 = view->find(std::make_pair(1, 1))->second;
   EXPECT_TRUE(e1->valid());
   EXPECT_DOUBLE_EQ(5.3, e1->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(5.27, e1->getReceivedTime().dbl());

@@ -241,6 +241,9 @@ class PositionMap {
   using cellEntryFiltered_r = boost::transformed_range<
       cellEntryTransform_f,
       const boost::filtered_range<cellContainerFilter_f, cellContainer_r>>;
+  using cellEntryFiltered_iter = typename cellEntryFiltered_r::iterator;
+  using cellEntryFiltered_const_iter =
+      typename cellEntryFiltered_r::const_iterator;
 
  public:
   virtual ~PositionMap() = default;
@@ -342,13 +345,17 @@ class PositionMap {
     virtual ~PositionMapView() = default;
     virtual cellEntryFiltered_r range() = 0;
     const cellEntryFiltered_r range() const;
+    cellEntryFiltered_iter begin();
+    cellEntryFiltered_iter end();
+    cellEntryFiltered_const_iter end() const;
 
     std::string str() const;
     int size() const;
     node_key_type getId() const;
 
-    node_mapped_type getValue(cell_key_type k);
-    node_mapped_type getValue(cell_key_type k) const;
+    cellEntryFiltered_iter find(const cell_key_type& k);
+    cellEntryFiltered_iter find(const cell_key_type& k) const;
+    const bool hasValue(const cell_key_type& k) const;
 
    protected:
     PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* _cell_map;
@@ -435,31 +442,53 @@ PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::range() const {
 }
 
 template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::begin() {
+  return this->range().begin();
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::end() {
+  return this->range().end();
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_const_iter
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::end() const {
+  return this->range().end();
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
 inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_key_type
 PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getId() const {
   return this->_cell_map->_localNodeId;
 }
 
 template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_mapped_type
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getValue(cell_key_type k) {
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::find(
+    const cell_key_type& k) {
   auto rng = this->range();
   auto it = boost::range::find_if(
       rng, [&k](std::pair<const cell_key_type&, node_mapped_type> _item) {
         return k == _item.first;
       });
-
-  if (it == rng.end()) {
-    throw omnetpp::cRuntimeError("Item not found in view");
-  }
-  return it->second;
+  return it;
 }
 
 template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_mapped_type
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getValue(
-    cell_key_type k) const {
-  return const_cast<PositionMapView*>(this)->getValue(k);
+inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
+PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::find(
+    const cell_key_type& k) const {
+  return const_cast<PositionMapView*>(this)->find(k);
+}
+
+template <typename CELL_KEY, typename VALUE, typename CTOR>
+inline const bool PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::hasValue(
+    const cell_key_type& k) const {
+  auto iter = this->find(k);
+  return iter != this->end();
 }
 
 } /* namespace rover */

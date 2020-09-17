@@ -15,6 +15,8 @@ class DensityMeasure : public IEntry<NODE_ID, omnetpp::simtime_t> {
  public:
   virtual ~DensityMeasure() = default;
   DensityMeasure() : IEntry<NODE_ID, omnetpp::simtime_t>() {}
+  DensityMeasure(const int count)
+      : IEntry<NODE_ID, omnetpp::simtime_t>(count) {}
   DensityMeasure(const int count, const omnetpp::simtime_t& measurement_time,
                  const omnetpp::simtime_t& received_time)
       : IEntry<NODE_ID, omnetpp::simtime_t>(count, measurement_time,
@@ -42,6 +44,11 @@ class DensityMeasureCtor : public EntryCtor<DensityMeasure<NODE_ID>> {
  public:
   std::shared_ptr<DensityMeasure<NODE_ID>> entry() override;
   std::shared_ptr<DensityMeasure<NODE_ID>> localEntry() override;
+  std::shared_ptr<DensityMeasure<NODE_ID>> empty() const override;
+
+ private:
+  std::shared_ptr<DensityMeasure<NODE_ID>> _empty =
+      std::make_shared<DensityMeasure<NODE_ID>>(-1);
 };
 
 /// implementation DensityMeasureCtor<NODE_ID>
@@ -55,6 +62,12 @@ template <typename NODE_ID>
 inline std::shared_ptr<DensityMeasure<NODE_ID>>
 DensityMeasureCtor<NODE_ID>::localEntry() {
   return std::make_shared<LocalDensityMeasure<NODE_ID>>();
+}
+
+template <typename NODE_ID>
+inline std::shared_ptr<DensityMeasure<NODE_ID>>
+DensityMeasureCtor<NODE_ID>::empty() const {
+  return _empty;
 }
 
 /// implementation DensityMeasure<NODE_ID>

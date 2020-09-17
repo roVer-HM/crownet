@@ -62,7 +62,9 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
     node_id << middleware->getFacilities()
                    .getConst<artery::Identity>()
                    .geonet.mid();
-    dMap = std::make_shared<Grid>(node_id.str(), gridSize);
+    // todo: set gridDim
+    dMap = std::make_shared<Grid>(node_id.str(), gridSize,
+                                  std::make_pair(100, 100));
   }
 }
 

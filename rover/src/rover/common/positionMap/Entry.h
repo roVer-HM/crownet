@@ -18,6 +18,7 @@ class EntryCtor {
   virtual ~EntryCtor() = default;
   virtual std::shared_ptr<VALUE> entry() = 0;
   virtual std::shared_ptr<VALUE> localEntry() = 0;
+  virtual std::shared_ptr<VALUE> empty() const = 0;
 };
 
 template <typename VALUE>
@@ -28,6 +29,10 @@ class EntryDefaultCtorImpl : public EntryCtor<VALUE> {
   std::shared_ptr<VALUE> localEntry() override {
     return std::make_shared<VALUE>();
   }
+
+  std::shared_ptr<VALUE> empty() override {
+    return std::make_shared<VALUE>(-1);
+  }
 };
 
 template <typename K, typename T>
@@ -37,6 +42,7 @@ class IEntry {
   using time_type = T;
   IEntry();
   IEntry(const int, const time_type&, const time_type&);
+  IEntry(const int);
   virtual ~IEntry() = default;
   virtual void reset() {
     count = 0;
@@ -64,6 +70,10 @@ class IEntry {
 };
 
 /// implementation IEntry<K, T>
+
+template <typename K, typename T>
+inline IEntry<K, T>::IEntry(int count)
+    : count(count), measurement_time(), received_time(), _valid(true) {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry()

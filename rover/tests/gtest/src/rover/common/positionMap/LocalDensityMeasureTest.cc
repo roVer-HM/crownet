@@ -10,7 +10,7 @@
 #include <string>
 
 // rest must also rest nodeIds set
-TEST(LocalDensityMeasure, rest) {
+TEST(LocalDensityMeasureTest, rest) {
   LocalDensityMeasure<int> m{};
   EXPECT_FALSE(m.valid());
   m.incrementCount(4.9);
@@ -21,7 +21,7 @@ TEST(LocalDensityMeasure, rest) {
   EXPECT_FALSE(m.valid());
 }
 
-TEST(LocalDensityMeasure, csv) {
+TEST(LocalDensityMeasureTest, csv) {
   LocalDensityMeasure<int> m{1, 3.5, 3.7};
   std::string csv = "1,3.5,3.7";
   EXPECT_STREQ(csv.c_str(), m.csv(",").c_str());
@@ -29,7 +29,7 @@ TEST(LocalDensityMeasure, csv) {
   EXPECT_STREQ(csv.c_str(), m.csv(";").c_str());
 }
 
-TEST(LocalDensityMeasure, empty) {
+TEST(LocalDensityMeasureTest, empty) {
   LocalDensityMeasure<int> m1{-1, 3.5, 3.7};
   EXPECT_TRUE(m1.empty());
   LocalDensityMeasure<int> m2{0, 3.5, 3.7};
