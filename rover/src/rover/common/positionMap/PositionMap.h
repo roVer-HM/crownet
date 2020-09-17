@@ -44,7 +44,7 @@ class CellEntry {
   using map_type = std::map<key_type, mapped_type>;
   map_type _data;
   key_type _localKey;
-  entry_ctor _entryCtor;
+  std::shared_ptr<entry_ctor> _entryCtor;
   mapped_type _localEntry = nullptr;
 
  public:
@@ -59,14 +59,15 @@ class CellEntry {
 
  public:
   template <typename T = ENTRY_CTOR>
-  CellEntry(
-      key_type localKey,
-      typename std::enable_if<std::is_default_constructible<T>::value>::type* =
-          nullptr)
-      : _localKey(localKey) {}
+  //  CellEntry(
+  //      key_type localKey,
+  //      typename
+  //      std::enable_if<std::is_default_constructible<T>::value>::type* =
+  //          nullptr)
+  //      : _localKey(localKey) {}
 
-  CellEntry(key_type localKey, entry_ctor&& ctor)
-      : _localKey(localKey), _entryCtor(std::move(ctor)) {}
+  CellEntry(key_type localKey, std::shared_ptr<entry_ctor> ctor)
+      : _localKey(localKey), _entryCtor(ctor) {}
 
   const bool hasLocalMeasure() const { return _localEntry != nullptr; }
   const bool hasValidLocalMeasure() const {
@@ -91,13 +92,13 @@ class CellEntry {
 
   const key_type localKey() const { return _localKey; }
 
-  const entry_ctor& getCtor() { return _entryCtor; }
+  //  const entry_ctor& getCtor() { return _entryCtor; }
 
   mapped_type getLocal() {
     if (!hasLocalMeasure()) {
       auto ret = _data.emplace(std::piecewise_construct,
                                std::forward_as_tuple(_localKey),
-                               std::forward_as_tuple(_entryCtor.localEntry()));
+                               std::forward_as_tuple(_entryCtor->localEntry()));
       if (!ret.second) {
         throw omnetpp::cRuntimeError("element with key %s already existed.");
       }
@@ -121,7 +122,7 @@ class CellEntry {
     } else {
       auto newMeasure =
           _data.emplace(std::piecewise_construct, std::forward_as_tuple(key),
-                        std::forward_as_tuple(_entryCtor.entry()));
+                        std::forward_as_tuple(_entryCtor->entry()));
       if (!newMeasure.second) {
         throw omnetpp::cRuntimeError("error inserting newMeasure");
       } else {
@@ -181,11 +182,16 @@ class CellEntry {
 template <typename VALUE, typename ENTRY_KEY>
 class CellCtor {
  public:
-  CellCtor(ENTRY_KEY k) : _k(k) {}
-  VALUE operator()() { return VALUE(_k); }
+  CellCtor(ENTRY_KEY key, std::shared_ptr<typename VALUE::entry_ctor> eCtor)
+      : key(key), entryCtor(eCtor) {}
+  VALUE operator()() { return VALUE(key, entryCtor); }
+  std::shared_ptr<typename VALUE::entry_ctor> getEntryCtor() const {
+    return entryCtor;
+  }
 
  private:
-  ENTRY_KEY _k;
+  ENTRY_KEY key;
+  std::shared_ptr<typename VALUE::entry_ctor> entryCtor;
 };
 
 template <typename CELL_KEY, typename VALUE,
@@ -249,14 +255,15 @@ class PositionMap {
   virtual ~PositionMap() = default;
 
   PositionMap(node_key_type localId)
-      : _localNodeId(localId), _cellCtor(localId) {
+      : _localNodeId(localId),
+        _cellCtor(localId, std::make_shared<node_ctor_type>()) {
     initViews();
   }
 
-  PositionMap(node_key_type localId, cell_ctor_type&& ctor)
-      : _localNodeId(localId), _cellCtor(ctor) {
-    initViews();
-  }
+  //  PositionMap(node_key_type localId, cell_ctor_type&& ctor)
+  //      : _localNodeId(localId), _cellCtor(ctor) {
+  //    initViews();
+  //  }
 
  private:
   void initViews() {
@@ -282,11 +289,11 @@ class PositionMap {
     }
   }
 
-  node_ctor_type getNodeCtor() const {
-    auto cell = _cellCtor();
-    node_ctor_type nodeCtor = cell.getCtor();
-    return nodeCtor;
-  }
+  //  node_ctor_type getNodeCtor() const {
+  //    auto cell = _cellCtor();
+  //    node_ctor_type nodeCtor = cell.getCtor();
+  //    return nodeCtor;
+  //  }
 
   cellContainer_r range() {
     return boost::make_iterator_range(_map.begin(), _map.end());
