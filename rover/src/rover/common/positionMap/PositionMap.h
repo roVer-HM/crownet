@@ -254,11 +254,6 @@ class PositionMap {
     initViews();
   }
 
-  //  PositionMap(node_key_type localId, cell_ctor_type&& ctor)
-  //      : _localNodeId(localId), _cellCtor(ctor) {
-  //    initViews();
-  //  }
-
  private:
   void initViews() {
     views["local"] = std::make_shared<LocalView>(this);
@@ -282,12 +277,6 @@ class PositionMap {
       }
     }
   }
-
-  //  node_ctor_type getNodeCtor() const {
-  //    auto cell = _cellCtor();
-  //    node_ctor_type nodeCtor = cell.getCtor();
-  //    return nodeCtor;
-  //  }
 
   cellContainer_r range() {
     return boost::make_iterator_range(_map.begin(), _map.end());
