@@ -59,12 +59,6 @@ class CellEntry {
 
  public:
   template <typename T = ENTRY_CTOR>
-  //  CellEntry(
-  //      key_type localKey,
-  //      typename
-  //      std::enable_if<std::is_default_constructible<T>::value>::type* =
-  //          nullptr)
-  //      : _localKey(localKey) {}
 
   CellEntry(key_type localKey, std::shared_ptr<entry_ctor> ctor)
       : _localKey(localKey), _entryCtor(ctor) {}

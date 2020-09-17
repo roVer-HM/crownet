@@ -56,7 +56,6 @@ class RegularGridMap
   class FullIter : public std::iterator<std::output_iterator_tag, iter_value> {
    public:
     explicit FullIter(RegularGridMap<NODE_ID>& grid, std::string view_str,
-                      DensityMeasureCtor<NODE_ID> ctor,
                       bool rowMajorOrder = true);
     iter_value operator*() const;
     FullIter& operator++();
@@ -75,7 +74,7 @@ class RegularGridMap
     explicit FullIter(FullIter& other, int index);
     std::shared_ptr<view_type> view;
     std::pair<int, int> gridDim;
-    DensityMeasureCtor<NODE_ID> ctor;
+    std::shared_ptr<typename RegularGridMap<NODE_ID>::node_ctor_type> ctor;
     bool rowMajorOrder;
     int index;
   };
@@ -83,11 +82,10 @@ class RegularGridMap
 
 template <typename NODE_ID>
 inline RegularGridMap<NODE_ID>::FullIter::FullIter(
-    RegularGridMap<NODE_ID>& grid, std::string view_str,
-    DensityMeasureCtor<NODE_ID> ctor, bool rowMajorOrder)
+    RegularGridMap<NODE_ID>& grid, std::string view_str, bool rowMajorOrder)
     : view(grid.getView(view_str)),
       gridDim(grid.getGridDim()),
-      ctor(ctor),
+      ctor(grid._cellCtor.getEntryCtor()),
       rowMajorOrder(rowMajorOrder),
       index(0) {}
 
@@ -173,7 +171,7 @@ inline typename RegularGridMap<NODE_ID>::iter_value
   } else {
     // 2b if missing return empty value given on ctor
     // return empty
-    return ctor.empty();
+    return ctor->empty();
   }
 }
 
@@ -223,8 +221,7 @@ inline const std::pair<int, int> RegularGridMap<NODE_ID>::getGridDim() const {
 template <typename NODE_ID>
 inline typename RegularGridMap<NODE_ID>::FullIter RegularGridMap<NODE_ID>::iter(
     const std::string view, bool rowMajorOrder) {
-  return RegularGridMap<NODE_ID>::FullIter(
-      *this, view, DensityMeasureCtor<NODE_ID>(), rowMajorOrder);
+  return RegularGridMap<NODE_ID>::FullIter(*this, view, rowMajorOrder);
 }
 
 } /* namespace rover */
