@@ -56,7 +56,8 @@ TODO: diagram of classic stack and system structure
 
 ## Overview of roVer Protocol Stack
 
-TODO: explanation and figure with roVer protocol stack, highlighting the modifications (e.g. AID-layer)
+TODO: explanation and figure with roVer protocol stack, highlighting the
+modifications (e.g. AID-layer)
 
 ## References
 
