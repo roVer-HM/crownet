@@ -38,17 +38,6 @@ void ArteryDensityMapApp::initialize(int stage) {
     auto hostModule =
         middleware->getFacilities().getConst<artery::Identity>().host;
     hostModule->subscribe(artery::IdentityRegistry::updateSignal, this);
-
-    if (par("writeDensityLog").boolValue()) {
-      FileWriterBuilder fBuilder{};
-      fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
-      fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
-      fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
-
-      fileWriter.reset(fBuilder.build());
-      fileWriter->writeHeader(
-          {"simtime", "x", "y", "count", "measure_t", "received_t"});
-    }
   }
 }
 
@@ -66,6 +55,19 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
     gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
     dMap = std::make_shared<Grid>(node_id.str(), gridSize, gridDim);
+
+    if (par("writeDensityLog").boolValue()) {
+      FileWriterBuilder fBuilder{};
+      fBuilder.addMetadata("IDXCOL", 3);
+      fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
+      fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
+      fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
+      fBuilder.addPath(node_id.str());
+
+      fileWriter.reset(fBuilder.build());
+      fileWriter->writeHeader(
+          {"simtime", "x", "y", "count", "measured_t", "received_t"});
+    }
   }
 }
 

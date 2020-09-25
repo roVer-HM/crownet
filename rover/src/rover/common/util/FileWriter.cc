@@ -29,7 +29,9 @@ FileWriterBuilder &FileWriterBuilder::addPath(std::string path) {
 FileWriter *FileWriterBuilder::build() {
   FileWriter *obj = new FileWriter();
   obj->initialize(path, metadata["SEP"]);
+  // write metadata
   int n = metadata.size();
+  obj->write() << "#";
   for (const auto &e : metadata) {
     obj->write() << e.first << "=" << e.second;
     if (n > 1) {
@@ -61,7 +63,7 @@ void FileWriter::initialize(std::string fileName, std::string _delim) {
                                        ->getAsFilename(scaObj);
 
     boost::filesystem::path p{outputScalarFile};
-    std::string _path = p.parent_path().string() + "/" + fileName;
+    std::string _path = p.parent_path().string() + "/" + fileName + ".csv";
     s = std::ofstream(_path);
     delim = _delim;
   } else {
