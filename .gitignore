@@ -1,6 +1,7 @@
 log.out
 VadereTestingSuite.preferences.xml
 **/__cache__
+**/scenarios/meshes
 **/vadere-server-output
 **/.directory
 **/*.legacy
