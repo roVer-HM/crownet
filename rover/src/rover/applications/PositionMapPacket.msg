@@ -23,6 +23,7 @@ import inet.common.TagBase;
 class PositionMapPacket extends inet::ApplicationPacket
 {
     string nodeId;
+    int cellId[2];
 	int numCells;
 	int cellX[];
 	int cellY[];

@@ -51,6 +51,7 @@ class IEntry {
   const bool empty() const;
   virtual const bool valid() const { return _valid; }
   virtual void incrementCount(const time_type& t);
+  virtual void decrementCount(const time_type& t);
 
   virtual const time_type& getMeasureTime() const;
   virtual const time_type& getReceivedTime() const;
@@ -72,12 +73,12 @@ class IEntry {
 /// implementation IEntry<K, T>
 
 template <typename K, typename T>
-inline IEntry<K, T>::IEntry(int count)
-    : count(count), measurement_time(), received_time(), _valid(true) {}
-
-template <typename K, typename T>
 inline IEntry<K, T>::IEntry()
     : count(0), measurement_time(), received_time(), _valid(false) {}
+
+template <typename K, typename T>
+inline IEntry<K, T>::IEntry(int count)
+    : count(count), measurement_time(), received_time(), _valid(true) {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
@@ -95,6 +96,20 @@ inline void IEntry<K, T>::incrementCount(const time_type& t) {
   measurement_time = t;
   received_time = t;
   _valid = true;
+}
+
+template <typename K, typename T>
+inline void IEntry<K, T>::decrementCount(const time_type& t) {
+  if (count > 0) {
+    count--;
+    _valid = true;
+  } else {
+    // todo: should this be an error?
+    count = 0;
+    _valid = false;
+  }
+  measurement_time = t;
+  received_time = t;
 }
 
 template <typename K, typename T>

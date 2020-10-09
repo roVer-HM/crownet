@@ -112,11 +112,26 @@ BaseApp::FsmState ArteryDensityMapApp::fsmAppMain(cMessage *msg) {
 }
 
 void ArteryDensityMapApp::socketDataArrived(AidSocket *socket, Packet *packet) {
-  auto p = checkEmitGetReceived<PositionMapPacket>(packet);
+  bool ret = mergeReceivedMap(packet);
 
+  delete packet;
+  socketFsmResult =
+      (ret) ? FsmRootStates::WAIT_ACTIVE  // GoTo WAIT_ACTIVE steady state
+            : FsmRootStates::ERR;         // GoTo ERR steady state
+}
+
+bool ArteryDensityMapApp::mergeReceivedMap(Packet *packet) {
+  auto p = checkEmitGetReceived<PositionMapPacket>(packet);
   int numCells = p->getNumCells();
+
   std::string _nodeId = p->getNodeId();
+  CellId _cellId = std::make_pair(p->getCellId(0), p->getCellId(1));
+
   simtime_t _received = simTime();
+  // 1) reset previously received measurements for this source
+  dMap->restMap(_nodeId);
+
+  // 2) update new measurements
   for (int i = 0; i < numCells; i++) {
     CellId _cId{p->getCellX(i), p->getCellY(i)};
     simtime_t _measured = p->getMTime(i);
@@ -125,17 +140,19 @@ void ArteryDensityMapApp::socketDataArrived(AidSocket *socket, Packet *packet) {
     dMap->update(_cId, _nodeId, std::move(_m));
   }
 
+  // 3) check local map for _nodeId and compare if the local and packet
+  //    place the _nodeId in the same cell.
+  dMap->moveNodeInLocalMap(_cellId, _nodeId);
+
   using namespace omnetpp;
   EV_DEBUG << dMap->getView("ymf")->str();
   EV_DEBUG << dMap->getView("local")->str();
 
-  delete packet;
-  socketFsmResult =
-      FsmRootStates::WAIT_ACTIVE;  // GoTo WAIT_ACTIVE steady state
+  return true;
 }
 
 void ArteryDensityMapApp::updateLocalMap() {
-  dMap->resetLocalMap();  // clear local map
+  dMap->restMap();  // clear local map
   simtime_t measureTime = simTime();
 
   // add yourself to the map.
@@ -180,8 +197,11 @@ void ArteryDensityMapApp::sendMapMap() {
   auto ymfView = dMap->getView("ymf");
   int numValidCells = ymfView->size();
   simtime_t time = simTime();
-  payload->setNumCells(numValidCells);
   payload->setNodeId(ymfView->getId().c_str());
+  payload->setCellId(0, dMap->getCellId().first);
+  payload->setCellId(1, dMap->getCellId().second);
+
+  payload->setNumCells(numValidCells);
   payload->setCellCountArraySize(numValidCells);
   payload->setCellXArraySize(numValidCells);
   payload->setCellYArraySize(numValidCells);

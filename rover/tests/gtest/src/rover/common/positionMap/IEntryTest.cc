@@ -5,9 +5,9 @@
  *      Author: sts
  */
 
-#include "rover/common/positionMap/Entry.h"
 #include <gtest/gtest.h>
 #include <string>
+#include "rover/common/positionMap/Entry.h"
 
 double TIME1 = 1.34;
 double TIME2 = 4.42;
@@ -66,6 +66,25 @@ TEST_F(IEntryTest, incrementCount) {
   ASSERT_EQ(2, e2.getMeasureTime());
   ASSERT_EQ(2, e2.getReceivedTime());
   ASSERT_TRUE(e2.valid());
+}
+
+TEST_F(IEntryTest, decrementCount) {
+  e1.incrementCount(2);
+  ASSERT_EQ(1, e1.getCount());
+  ASSERT_EQ(2, e1.getMeasureTime());
+  ASSERT_EQ(2, e1.getReceivedTime());
+  ASSERT_TRUE(e1.valid());
+  e1.decrementCount(3);
+  ASSERT_EQ(0, e1.getCount());
+  ASSERT_EQ(3, e1.getMeasureTime());
+  ASSERT_EQ(3, e1.getReceivedTime());
+  ASSERT_TRUE(e1.valid());
+  // decrement below 0 will invalidate cell but count stays at 0
+  e1.decrementCount(4);
+  ASSERT_EQ(0, e1.getCount());
+  ASSERT_EQ(4, e1.getMeasureTime());
+  ASSERT_EQ(4, e1.getReceivedTime());
+  ASSERT_FALSE(e1.valid());
 }
 
 TEST_F(IEntryTest, compareMeasureTime) {

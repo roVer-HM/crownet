@@ -32,14 +32,16 @@ class RegularGridMap
   RegularGridMap(NodeId id, double gridSize, std::pair<int, int> gridDim);
   virtual ~RegularGridMap() = default;
 
-  using PositionMap<CellId,
-                    CellEntry<DensityMeasure<NODE_ID>,
-                              DensityMeasureCtor<NODE_ID>>>::incrementLocal;
   virtual typename RegularGridMap<NODE_ID>::CellId incrementLocal(
       const traci::TraCIPosition& coord, const NodeId nodeId,
       const omnetpp::simtime_t& t);
+  virtual typename RegularGridMap<NODE_ID>::CellId incrementLocal(
+      const CellId& cellId, const NodeId nodeId, const omnetpp::simtime_t& t);
+
   virtual void incrementLocalOwnPos(const traci::TraCIPosition& coord,
                                     const omnetpp::simtime_t& t);
+
+  virtual void moveNodeInLocalMap(const CellId& cellId, const NodeId& nodeId);
 
   double getGridSize() const;
   const std::pair<int, int> getGridDim() const;
@@ -53,6 +55,11 @@ class RegularGridMap
   using iter_value = typename RegularGridMap<NODE_ID>::node_mapped_type;
   using view_type = typename RegularGridMap<NODE_ID>::PositionMapView;
   using range_type = typename RegularGridMap<NODE_ID>::cellEntryFiltered_r;
+  /**
+   * Iterator for regular grid in row major or column major order based on
+   * given view.
+   *
+   */
   class FullIter : public std::iterator<std::output_iterator_tag, iter_value> {
    public:
     explicit FullIter(RegularGridMap<NODE_ID>& grid, std::string view_str,
@@ -191,14 +198,35 @@ RegularGridMap<NODE_ID>::incrementLocal(const traci::TraCIPosition& coord,
                                         const omnetpp::simtime_t& t) {
   CellId cellId =
       std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
+  return this->incrementLocal(cellId, nodeId, t);
+}
+
+/**
+ * Increment local count in cellId.
+ * The node with :nodeId: is added to the count. Check that this node is added
+ * only once.
+ */
+template <typename NODE_ID>
+inline typename RegularGridMap<NODE_ID>::CellId
+RegularGridMap<NODE_ID>::incrementLocal(const CellId& cellId,
+                                        const NodeId nodeId,
+                                        const omnetpp::simtime_t& t) {
+  // 0) each node must be added only once to the local map
+  if (this->hasNeighbour(nodeId)) {
+    throw omnetpp::cRuntimeError("duplicate node in DenistyMap found.");
+  }
+
+  // 1) increment local count in cell
   std::shared_ptr<LocalDensityMeasure<NODE_ID>> locMeasure =
       std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
           this->getCellEntry(cellId).getLocal());
   locMeasure->incrementCount(t);
-  auto ret = locMeasure->nodeIds.insert(nodeId);
-  if (!ret.second) {
-    throw omnetpp::cRuntimeError("duplicate node in DenistyMap found.");
-  }
+
+  // 2) add nodeId into nodeId set
+  locMeasure->nodeIds.insert(nodeId);
+
+  // 3) add mapping nodeId->cellId into updateNeighbourCell
+  this->updateNeighbourCell(nodeId, cellId);
   return cellId;
 }
 
@@ -206,6 +234,38 @@ template <typename NODE_ID>
 inline void RegularGridMap<NODE_ID>::incrementLocalOwnPos(
     const traci::TraCIPosition& coord, const omnetpp::simtime_t& t) {
   this->_currentCell = this->incrementLocal(coord, this->getNodeId(), t);
+}
+
+/**
+ * Move :nodeId: to cell given by :cellId:.
+ * - If :nodeId: already exist in some other
+ *   cell remove it form there.
+ * - If :nodeId: already exists in :cellId: do nothing.
+ * - If :nodeId: does not exist anywhere add it to :cellId: in the local map.
+ */
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::moveNodeInLocalMap(const CellId& cellId,
+                                                        const NodeId& nodeId) {
+  auto iter = this->_localNodeToCellMap.find(nodeId);
+  if (iter == this->_localNodeToCellMap.end()) {
+    // nodeId does not exist. add :cellId: to local map
+    this->incrementLocal(cellId, nodeId, omnetpp::SimTime());
+
+  } else if (iter->second != cellId) {
+    // nodeId present but in wrong cell. Move :nodeId: to :cellId:
+
+    // remove from old cell
+    auto oldMeasure = std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
+        this->getCellEntry(iter->second).getLocal());
+    oldMeasure->decrementCount(omnetpp::SimTime());
+    oldMeasure->nodeIds.erase(nodeId);
+    this->removeNeighbour(nodeId);
+
+    // add to new cell
+    this->incrementLocal(cellId, nodeId, omnetpp::SimTime());
+  } else {
+    // :nodeId: is already in :cellId:. Do nothing.
+  }
 }
 
 template <typename NODE_ID>

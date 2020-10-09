@@ -25,11 +25,11 @@ class RegularGridMapFullIterTest : public ::testing::Test {
     g1->incrementLocal(coord2cell2_1, "NodeC", 3.2);
     // cell(1,1): local measure: (2, 3.1, 3.1)
     g1->incrementLocal(coord3cell1_1, "NodeD", 3.1);
-    g1->incrementLocal(coord3cell1_1, "NodeC", 3.1);
+    g1->incrementLocal(coord3cell1_1, "NodeF", 3.1);
 
     // data received from NodeE with.
-    g1->update(std::make_pair(3, 2), "NodeE", std::move(this->m(9, 5.3, 5.27)));
-    g1->update(std::make_pair(0, 0), "NodeE", std::move(this->m(7, 5.3, 5.07)));
+    g1->update(std::make_pair(3, 2), "NodeE", this->m(9, 5.3, 5.27));
+    g1->update(std::make_pair(0, 0), "NodeE", this->m(7, 5.3, 5.07));
   }
 
   std::shared_ptr<DensityMeasure<std::string>> m(int count, double time1,

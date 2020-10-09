@@ -68,6 +68,14 @@ class CellEntry {
     return hasLocalMeasure() && getLocal()->valid();
   }
 
+  const bool hasMeasure(const key_type& node_id) const {
+    return _data.find(node_id) != _data.end();
+  }
+
+  const bool hasValidMeasure(const key_type& node_id) const {
+    return hasMeasure(node_id) && get(node_id)->valid();
+  }
+
   /**
    * reset local data in cell
    */
@@ -81,6 +89,12 @@ class CellEntry {
   void reset() {
     for (const auto& e : _data) {
       e.second->reset();
+    }
+  }
+
+  void reset(const key_type& node_id) {
+    if (hasMeasure(node_id)) {
+      get(node_id)->reset();
     }
   }
 
@@ -124,7 +138,9 @@ class CellEntry {
       }
     }
   }
-  const mapped_type get() const { return const_cast<CellEntry*>(this)->get(); }
+  const mapped_type get(const key_type& key) const {
+    return const_cast<CellEntry*>(this)->get(key);
+  }
 
   mapped_type youngestMeasureFirst(bool prefereLocal = true) {
     map_binary_filter _f = [](const typename map_type::value_type lhs,
@@ -217,7 +233,9 @@ class PositionMap {
  protected:
   using map_type = std::map<cell_key_type, cell_mapped_type>;
   using map_views = std::map<std::string, std::shared_ptr<PositionMapView>>;
-  map_type _map;
+  map_type _map;  // map of cells. cell -> node -> measure
+  std::map<node_key_type, cell_key_type>
+      _localNodeToCellMap;  // node -> cell (local map)
   map_views views;
 
   // identifier that maps to local entry_mapped_type value
@@ -282,18 +300,14 @@ class PositionMap {
     return boost::make_iterator_range(_map.begin(), _map.end());
   }
 
-  void resetLocalMap() {
-    for (auto& entry : _map) {
-      entry.second.resetLocalMeasure();
-    }
+  void restMap() {
+    restMap(_localNodeId);
+    clearLocalNodetoCellMap();
   }
 
-  virtual void incrementLocal(const cell_key_type& cell_key,
-                              const omnetpp::simtime_t& t,
-                              bool ownPosition = false) {
-    getCellEntry(cell_key).getLocal()->incrementCount(t);
-    if (ownPosition) {
-      _currentCell = cell_key;
+  void restMap(const node_key_type& node_key) {
+    for (auto& entry : _map) {
+      entry.second.reset(node_key);
     }
   }
 
@@ -309,12 +323,43 @@ class PositionMap {
     getCellEntry(cell_key).createOrUpdate(node_key, std::move(measure_value));
   }
 
+  void removeNeighbour(const node_key_type& neigbourId) {
+    _localNodeToCellMap.erase(neigbourId);
+  }
+
+  bool hasNeighbour(const node_key_type& neigbourId) const {
+    return _localNodeToCellMap.find(neigbourId) != _localNodeToCellMap.end();
+  }
+
+  bool hasNeighbour(const node_key_type& neigbourId,
+                    const cell_key_type& cellID) const {
+    auto iter = _localNodeToCellMap.find(neigbourId);
+
+    // neigbourId exists and  neighbour is in cellID
+    return iter != _localNodeToCellMap.end() && iter->second == cellID;
+  }
+
+  const int neighbourCount() const { return _localNodeToCellMap.size(); }
+
+  void updateNeighbourCell(const node_key_type& neigbourId,
+                           const cell_key_type& cellId) {
+    _localNodeToCellMap[neigbourId] = cellId;
+  }
+
+  void clearLocalNodetoCellMap() { _localNodeToCellMap.clear(); }
+
   std::shared_ptr<PositionMapView> getView(std::string view_name) {
     auto iter = views.find(view_name);
     if (iter == views.end())
       omnetpp::cRuntimeError("View '%' not found ", view_name.c_str());
 
     return iter->second;
+  }
+
+  std::shared_ptr<PositionMapView> getViewBySource(
+      const node_key_type& nodeId) {
+    auto view = std::make_shared<SourceNodeView>(this, nodeId);
+    return std::move(view);
   }
 
   node_key_type getNodeId() const { return _localNodeId; }
@@ -402,6 +447,39 @@ class PositionMap {
 
       return range_all | filtered(_f) | transformed(_t);
     }
+  };
+
+  class SourceNodeView : public PositionMapView {
+   public:
+    SourceNodeView(
+        PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* map,
+        node_key_type sourceNodeId)
+        : PositionMapView(map, ""), sourceNodeId(sourceNodeId) {}
+
+    virtual cellEntryFiltered_r range() override {
+      // filter: only valid measurements
+      cellContainerFilter_f _f =
+          [this](const typename map_type::value_type& map_value) {
+            auto& value = map_value.second;
+            return value.hasValidMeasure(this->sourceNodeId);
+          };
+
+      // transform
+      cellEntryTransform_f _t =
+          [this](typename map_type::value_type& map_value) {
+            view_value_type ret = view_value_type{
+                map_value.first, map_value.second.get(this->sourceNodeId)};
+            return ret;
+          };
+
+      using namespace boost::adaptors;
+      cellContainer_r range_all = this->_cell_map->range();
+
+      return range_all | filtered(_f) | transformed(_t);
+    }
+
+   protected:
+    node_key_type sourceNodeId;
   };
 };
 

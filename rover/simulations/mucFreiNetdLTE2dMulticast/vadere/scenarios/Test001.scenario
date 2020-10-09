@@ -120,7 +120,9 @@
     },
     "attributesStrategy" : {
       "useStrategyModel" : false,
-      "strategyModel" : null
+      "strategyModel" : null,
+      "arguments" : [ ],
+      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {
@@ -162,6 +164,15 @@
           } ]
         },
         "id" : 3
+      }, {
+        "shape" : {
+          "x" : 1.1,
+          "y" : 5.5,
+          "width" : 1.5,
+          "height" : 1.4,
+          "type" : "RECTANGLE"
+        },
+        "id" : 4
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
