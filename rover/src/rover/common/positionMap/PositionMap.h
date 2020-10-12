@@ -300,12 +300,12 @@ class PositionMap {
     return boost::make_iterator_range(_map.begin(), _map.end());
   }
 
-  void restMap() {
-    restMap(_localNodeId);
+  void resetMap() {
+    resetMap(_localNodeId);
     clearLocalNodetoCellMap();
   }
 
-  void restMap(const node_key_type& node_key) {
+  void resetMap(const node_key_type& node_key) {
     for (auto& entry : _map) {
       entry.second.reset(node_key);
     }
