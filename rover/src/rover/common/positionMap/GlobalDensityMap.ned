@@ -13,35 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.applications.aid;
-import rover.applications.common.AidBaseApp;
-import inet.applications.contract.IApp;
+package rover.common.positionMap;
 
-moduleinterface IDensityMapApp extends IApp {
+//
+// TODO auto-generated type
+//
+simple GlobalDensityMap
+{
     parameters:
-    	
-}
-
-simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
-    
-    parameters:
-        @class(rover::ArteryDensityMapApp);
-        @signal[RegisterDensityMap];
-        @signal[RemoveDensityMap];
-        string middelwareModule = default("^.^.middleware"); //node internal
-        string coordConverterModule;
+        @class(rover::GlobalDensityMap);
+        string traciNodeManager = default("traci.nodes");
+        string middelwareModule = default(".middleware"); // relative to moving object module
+        string coordConverterModule = default("coordConverter");
         double gridSize = default(3.0) @units(m);
         
-        destPort = 30001;
-        localPort = 30001;
-        appMainInterval = default(1.0s);
+        double updateInterval = default(2.0s) @unit(s);
         
-        bool writeDensityLog = default(true);
-            
 }
-
-
-
-//simple SimpleNeighbourhood like INeighbourhood {
-//    
-//}

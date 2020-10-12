@@ -12,6 +12,7 @@
 #include <vanetza/geonet/areas.hpp>
 #include "artery/utility/IdentityRegistry.h"
 #include "rover/applications/PositionMapPacket_m.h"
+#include "rover/common/positionMap/GlobalDensityMap.h"
 #include "traci/Core.h"
 #include "traci/LiteAPI.h"
 #include "traci/Position.h"
@@ -41,6 +42,11 @@ void ArteryDensityMapApp::initialize(int stage) {
   }
 }
 
+void ArteryDensityMapApp::finish() {
+  // remove density map for use in GlobalDensityMap context.
+  emit(GlobalDensityMap::removeMap, this);
+}
+
 void ArteryDensityMapApp::receiveSignal(cComponent *source,
                                         simsignal_t signalID, cObject *obj,
                                         cObject *details) {
@@ -56,6 +62,7 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
     gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
     dMap = std::make_shared<Grid>(node_id.str(), gridSize, gridDim);
 
+    // FIXME: handle local/global write
     if (par("writeDensityLog").boolValue()) {
       FileWriterBuilder fBuilder{};
       fBuilder.addMetadata("IDXCOL", 3);
@@ -68,6 +75,9 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
       fileWriter->writeHeader(
           {"simtime", "x", "y", "count", "measured_t", "received_t"});
     }
+
+    // register density map for use in GlobalDensityMap context.
+    emit(GlobalDensityMap::registerMap, this);
   }
 }
 
@@ -129,7 +139,7 @@ bool ArteryDensityMapApp::mergeReceivedMap(Packet *packet) {
 
   simtime_t _received = simTime();
   // 1) reset previously received measurements for this source
-  dMap->restMap(_nodeId);
+  dMap->resetMap(_nodeId);
 
   // 2) update new measurements
   for (int i = 0; i < numCells; i++) {
@@ -152,8 +162,13 @@ bool ArteryDensityMapApp::mergeReceivedMap(Packet *packet) {
 }
 
 void ArteryDensityMapApp::updateLocalMap() {
-  dMap->restMap();  // clear local map
   simtime_t measureTime = simTime();
+  if (lastUpdate >= simTime()) {
+    return;
+  }
+  lastUpdate = measureTime;
+
+  dMap->resetMap();  // clear local map
 
   // add yourself to the map.
   const auto &pos = middleware->getFacilities()
@@ -192,11 +207,27 @@ void ArteryDensityMapApp::updateLocalMap() {
   EV_DEBUG << dMap->getView("ymf")->str();
 }
 
+void ArteryDensityMapApp::writeMap() {
+  auto ymfView = dMap->getView("ymf");
+  simtime_t time = simTime();
+  for (const auto &e : ymfView->range()) {
+    const auto &cell = e.first;
+    const auto &measure = e.second;
+
+    std::string del = fileWriter->del();
+    fileWriter->write() << time.dbl() << del << cell.first << del << cell.second
+                        << del << measure->csv(del) << std::endl;
+  }
+}
+
+std::shared_ptr<ArteryDensityMapApp::Grid> ArteryDensityMapApp::getMap() {
+  return dMap;
+}
+
 void ArteryDensityMapApp::sendMapMap() {
   const auto &payload = createPacket<PositionMapPacket>();
   auto ymfView = dMap->getView("ymf");
   int numValidCells = ymfView->size();
-  simtime_t time = simTime();
   payload->setNodeId(ymfView->getId().c_str());
   payload->setCellId(0, dMap->getCellId().first);
   payload->setCellId(1, dMap->getCellId().second);
@@ -216,14 +247,12 @@ void ArteryDensityMapApp::sendMapMap() {
     payload->setCellCount(currCell, measure->getCount());
     payload->setMTime(currCell, measure->getMeasureTime());
     currCell++;
-
-    if (par("writeDensityLog").boolValue()) {
-      std::string del = fileWriter->del();
-      fileWriter->write() << time.dbl() << del << cell.first << del
-                          << cell.second << del << measure->csv(del)
-                          << std::endl;
-    }
   }
+
+  // FIXME: handle local/global write
+  //  if (par("writeDensityLog").boolValue()) {
+  //    writeMap();
+  //  }
 
   payload->setChunkLength(B(1000));  // todo calc: 24 * currCell Fragmentation!
   sendPayload(payload);

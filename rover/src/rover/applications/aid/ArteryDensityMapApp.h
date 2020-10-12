@@ -17,6 +17,7 @@
 #include "inet/common/InitStages.h"
 #include "rover/applications/common/AidBaseApp.h"
 #include "rover/common/converter/OsgCoordConverter.h"
+#include "rover/common/positionMap/IDensityMapHandler.h"
 #include "rover/common/positionMap/RegularGridMap.h"
 #include "rover/common/util/FileWriter.h"
 
@@ -25,7 +26,10 @@ using namespace inet;
 
 namespace rover {
 
-class ArteryDensityMapApp : public AidBaseApp, public omnetpp::cListener {
+class ArteryDensityMapApp
+    : public AidBaseApp,
+      public IDensityMapHandler<RegularGridMap<std::string>>,
+      public omnetpp::cListener {
  public:
   using Grid = RegularGridMap<std::string>;
   using Measurement =
@@ -38,6 +42,8 @@ class ArteryDensityMapApp : public AidBaseApp, public omnetpp::cListener {
   // cSimpleModule
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
   virtual void initialize(int stage) override;
+  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
+  virtual void finish() override;
   // cListener
 
   void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj,
@@ -54,18 +60,21 @@ class ArteryDensityMapApp : public AidBaseApp, public omnetpp::cListener {
   virtual FsmState fsmAppMain(cMessage *msg) override;
   virtual FsmState fsmSetup(cMessage *msg) override;
 
-  virtual bool mergeReceivedMap(Packet *packet);
-  virtual void updateLocalMap();
   virtual void sendMapMap();
+  virtual bool mergeReceivedMap(Packet *packet);
+  //
+  virtual void updateLocalMap() override;
+  virtual void writeMap() override;
+  virtual std::shared_ptr<Grid> getMap() override;
 
  private:
   // application
-  artery::Middleware *middleware;
+  artery::Middleware *middleware = nullptr;
+
   std::shared_ptr<OsgCoordinateConverter> converter;
-
   std::shared_ptr<Grid> dMap;
-
   std::unique_ptr<FileWriter> fileWriter;
+  simtime_t lastUpdate = -1.0;
 };
 
 } /* namespace rover */
