@@ -69,11 +69,12 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
       fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
       fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
       fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
+      fBuilder.addMetadata("NODE_ID", dMap->getNodeId());
       fBuilder.addPath(node_id.str());
 
       fileWriter.reset(fBuilder.build());
-      fileWriter->writeHeader(
-          {"simtime", "x", "y", "count", "measured_t", "received_t"});
+      fileWriter->writeHeader({"simtime", "x", "y", "count", "measured_t",
+                               "received_t", "source", "own_cell"});
     }
 
     // register density map for use in GlobalDensityMap context.
@@ -208,16 +209,7 @@ void ArteryDensityMapApp::updateLocalMap() {
 }
 
 void ArteryDensityMapApp::writeMap() {
-  auto ymfView = dMap->getView("ymf");
-  simtime_t time = simTime();
-  for (const auto &e : ymfView->range()) {
-    const auto &cell = e.first;
-    const auto &measure = e.second;
-
-    std::string del = fileWriter->del();
-    fileWriter->write() << time.dbl() << del << cell.first << del << cell.second
-                        << del << measure->csv(del) << std::endl;
-  }
+  dMap->writeYmf(simTime(), fileWriter.get());
 }
 
 std::shared_ptr<ArteryDensityMapApp::Grid> ArteryDensityMapApp::getMap() {

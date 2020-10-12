@@ -9,13 +9,17 @@
 
 #include <math.h>
 #include <omnetpp/simtime_t.h>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/map.hpp>
+#include <boost/tokenizer.hpp>
 #include <map>
 #include <unordered_map>
 #include "inet/common/geometry/common/Coord.h"
 #include "rover/common/positionMap/DensityMeasure.h"
 #include "rover/common/positionMap/PositionMap.h"
+#include "rover/common/util/FileWriter.h"
 #include "traci/Position.h"
 
 namespace rover {
@@ -29,6 +33,12 @@ class RegularGridMap
   class FullIter;
   using CellId = std::pair<int, int>;
   using NodeId = NODE_ID;
+  using time_type = typename DensityMeasure<NODE_ID>::time_type;
+
+  using iter_value = typename RegularGridMap<NODE_ID>::node_mapped_type;
+  using view_type = typename RegularGridMap<NODE_ID>::PositionMapView;
+  using range_type = typename RegularGridMap<NODE_ID>::cellEntryFiltered_r;
+
   RegularGridMap(NodeId id, double gridSize, std::pair<int, int> gridDim);
   virtual ~RegularGridMap() = default;
 
@@ -47,14 +57,18 @@ class RegularGridMap
   const std::pair<int, int> getGridDim() const;
   FullIter iter(const std::string view, bool rowMajorOrder = true);
 
+  // writer
+  virtual void write(time_type& time, std::shared_ptr<view_type>,
+                     FileWriter* writer);
+  virtual void writeLocal(time_type& time, FileWriter* writer);
+  virtual void writeYmf(time_type& time, FileWriter* writer);
+  virtual void writeLocalWithIds(time_type& time, FileWriter* writer);
+
  private:
   double gridSize;
   std::pair<int, int> gridDim;
 
  public:
-  using iter_value = typename RegularGridMap<NODE_ID>::node_mapped_type;
-  using view_type = typename RegularGridMap<NODE_ID>::PositionMapView;
-  using range_type = typename RegularGridMap<NODE_ID>::cellEntryFiltered_r;
   /**
    * Iterator for regular grid in row major or column major order based on
    * given view.
@@ -221,6 +235,7 @@ RegularGridMap<NODE_ID>::incrementLocal(const CellId& cellId,
       std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
           this->getCellEntry(cellId).getLocal());
   locMeasure->incrementCount(t);
+  locMeasure->setSource(this->getNodeId());
 
   // 2) add nodeId into nodeId set
   locMeasure->nodeIds.insert(nodeId);
@@ -282,6 +297,58 @@ template <typename NODE_ID>
 inline typename RegularGridMap<NODE_ID>::FullIter RegularGridMap<NODE_ID>::iter(
     const std::string view, bool rowMajorOrder) {
   return RegularGridMap<NODE_ID>::FullIter(*this, view, rowMajorOrder);
+}
+
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::write(time_type& time,
+                                           std::shared_ptr<view_type> view,
+                                           FileWriter* writer) {
+  auto currCell = this->getCellId();
+  for (const auto& e : view->range()) {
+    const auto& cell = e.first;
+    const auto& measure = e.second;
+    int ownCell = (currCell == cell) ? 1 : 0;
+
+    std::string del = writer->del();
+    writer->write() << time.dbl() << del << cell.first << del << cell.second
+                    << del << measure->csv(del) << del << ownCell << std::endl;
+  }
+}
+
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::writeLocal(time_type& time,
+                                                FileWriter* writer) {
+  write(time, this->getView("local"), writer);
+}
+
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::writeYmf(time_type& time,
+                                              FileWriter* writer) {
+  write(time, this->getView("ymf"), writer);
+}
+
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::writeLocalWithIds(time_type& time,
+                                                       FileWriter* writer) {
+  auto map = this->getView("local");
+  auto currCell = this->getCellId();
+  for (const auto& e : map->range()) {
+    const auto& cell = e.first;
+    const auto& measure =
+        std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(e.second);
+    int ownCell = (currCell == cell) ? 1 : 0;
+
+    using nodeIdSet_t =
+        std::set<typename LocalDensityMeasure<NODE_ID>::key_type>;
+    std::string del = writer->del();
+    boost::iterator_range<typename nodeIdSet_t::const_iterator> rng(
+        measure->nodeIds.begin(), measure->nodeIds.end());
+    std::string nodIds_str = boost::algorithm::join(rng, ",");
+
+    writer->write() << time.dbl() << del << cell.first << del << cell.second
+                    << del << measure->csv(del) << del << ownCell << del
+                    << nodIds_str << std::endl;
+  }
 }
 
 } /* namespace rover */

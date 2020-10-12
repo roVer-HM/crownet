@@ -95,8 +95,8 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     fBuilder.addPath("global");
 
     fileWriter.reset(fBuilder.build());
-    fileWriter->writeHeader(
-        {"simtime", "x", "y", "count", "measured_t", "received_t"});
+    fileWriter->writeHeader({"simtime", "x", "y", "count", "measured_t",
+                             "received_t", "source", "NodeIds"});
   }
 }
 
@@ -174,17 +174,8 @@ void GlobalDensityMap::updateMaps() {
 }  // namespace rover
 
 void GlobalDensityMap::writeMaps() {
-  // write global map
-  auto ymfView = gMap->getView("ymf");
   simtime_t time = simTime();
-  for (const auto &e : ymfView->range()) {
-    const auto &cell = e.first;
-    const auto &measure = e.second;
-
-    std::string del = fileWriter->del();
-    fileWriter->write() << time.dbl() << del << cell.first << del << cell.second
-                        << del << measure->csv(del) << std::endl;
-  }
+  gMap->writeLocalWithIds(time, fileWriter.get());
 
   // write decentralized maps
   for (auto &handler : dezentralMaps) {

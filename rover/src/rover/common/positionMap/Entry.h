@@ -60,11 +60,15 @@ class IEntry {
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
 
+  virtual void setSource(const key_type& source);
+  virtual const key_type& getSource() const;
+
   virtual std::string csv(std::string delimiter) const;
   virtual std::string str() const;
 
  protected:
   int count;
+  key_type source;
   time_type measurement_time;
   time_type received_time;
   bool _valid;
@@ -150,10 +154,20 @@ inline int IEntry<K, T>::compareReceivedTime(const IEntry& other) const {
 }
 
 template <typename K, typename T>
+inline void IEntry<K, T>::setSource(const key_type& source) {
+  this->source = source;
+}
+
+template <typename K, typename T>
+inline const K& IEntry<K, T>::getSource() const {
+  return this->source;
+}
+
+template <typename K, typename T>
 inline std::string IEntry<K, T>::csv(std::string delimiter) const {
   std::stringstream out;
   out << this->count << delimiter << this->measurement_time << delimiter
-      << this->received_time;
+      << this->received_time << this->source << delimiter;
   return out.str();
 }
 

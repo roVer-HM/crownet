@@ -120,6 +120,7 @@ class CellEntry {
   }
 
   void createOrUpdate(const key_type& key, mapped_type&& val) {
+    val->setSource(key);
     _data[key] = std::move(val);
   }
 

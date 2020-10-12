@@ -75,7 +75,7 @@ template <typename NODE_ID>
 inline std::string DensityMeasure<NODE_ID>::csv(std::string delimiter) const {
   std::stringstream out;
   out << this->count << delimiter << this->measurement_time.dbl() << delimiter
-      << this->received_time.dbl();
+      << this->received_time.dbl() << delimiter << this->source;
   return out.str();
 }
 
