@@ -1,4 +1,4 @@
-# roVer Protocol Stack
+# roVer Protocol Stack and Services
 
 ## Requirements
 Provide *robust information dissemination* for location-dependent information
@@ -57,7 +57,7 @@ TODO: diagram of classic stack and system structure
 ## Overview of roVer Protocol Stack
 
 TODO: explanation and figure with roVer protocol stack, highlighting the
-modifications (e.g. AID-layer)
+modifications (e.g. AID-service)
 
 ## References
 

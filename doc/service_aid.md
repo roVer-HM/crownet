@@ -1,8 +1,8 @@
-# roVer AID Layer
+# roVer AID Service
 
-Description of AID layer (Stefan) and its usage
+Description of AID service (Stefan) and its usage
 
-![Aid Layer](aid.png)
+![Aid Service](aid.png)
 
 ## Common Service Register
 
@@ -39,8 +39,8 @@ to aid the decentral information dissemination.
 
 ## Application Register
 
-Each application must register itself to the AID layer and share its
-requirements and intent with the AID layer.
+Each application must register itself to the AID service and share its
+requirements and intent with the AID service.
 
 *Requirements* are for instance minimal message rates needed for the application
 logic to function properly.
@@ -52,8 +52,8 @@ registration?
 
 ## Connection
 
-The aid layer creates *one* connection for each application. The connection is
-the entry point for an application to communicate with the AID layer as well as
+The aid service creates *one* connection for each application. The connection is
+the entry point for an application to communicate with the AID service as well as
 to send and receive data. Each connection contains one or more sockets which
 connect to one specific communication channel. A mode in this sense is a
 technology (i.e. wireless LAN 802.11 or cellular LTE) as well as mode such as
@@ -64,6 +64,3 @@ and type of network interfaces)
 Each connection has a handler to access common services as well as the
 context manager to use these information to decide who to handle request and
 indication primitives.
-
-
-
