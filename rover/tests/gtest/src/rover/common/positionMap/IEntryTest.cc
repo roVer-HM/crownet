@@ -100,6 +100,6 @@ TEST_F(IEntryTest, compareMeasureTime) {
 }
 
 TEST_F(IEntryTest, toCsv) {
-  const char *expectVal = "3,1.34,4.42";
+  const char *expectVal = "3,1.34,4.42,0";
   ASSERT_STREQ(expectVal, e2.csv(",").c_str());
 }

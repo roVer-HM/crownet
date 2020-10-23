@@ -5,9 +5,9 @@
  *      Author: sts
  */
 
-#include "rover/common/positionMap/DensityMeasure.h"
 #include <gtest/gtest.h>
 #include <string>
+#include "rover/common/positionMap/DensityMeasure.h"
 
 // rest must also rest nodeIds set
 TEST(LocalDensityMeasureTest, rest) {
@@ -23,9 +23,9 @@ TEST(LocalDensityMeasureTest, rest) {
 
 TEST(LocalDensityMeasureTest, csv) {
   LocalDensityMeasure<int> m{1, 3.5, 3.7};
-  std::string csv = "1,3.5,3.7";
+  std::string csv = "1,3.5,3.7,0";
   EXPECT_STREQ(csv.c_str(), m.csv(",").c_str());
-  csv = "1;3.5;3.7";
+  csv = "1;3.5;3.7;0";
   EXPECT_STREQ(csv.c_str(), m.csv(";").c_str());
 }
 

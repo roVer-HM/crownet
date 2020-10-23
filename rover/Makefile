@@ -51,6 +51,7 @@ makefiles:
 		-L$$\(VEINS_PROJ\)/src \
 		-L$$\(VEINS_PROJ\)/subprojects/veins_inet/src \
 		-lboost_filesystem \
+		-lboost_system \
 		-lartery_core$$\(D\) \
 		-lartery_envmod$$\(D\) \
 		-lartery_police$$\(D\) \
@@ -120,6 +121,7 @@ makefiles-test:
 		-L$$\(VEINS_PROJ\)/subprojects/veins_inet/src \
 		-L/usr/local/lib \
 		-lboost_filesystem \
+		-lboost_system \
 		-lartery_core$$\(D\) \
 		-lartery_envmod$$\(D\) \
 		-lartery_police$$\(D\) \

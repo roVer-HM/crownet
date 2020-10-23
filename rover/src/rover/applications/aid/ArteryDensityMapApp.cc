@@ -209,7 +209,8 @@ void ArteryDensityMapApp::updateLocalMap() {
 }
 
 void ArteryDensityMapApp::writeMap() {
-  dMap->writeYmf(simTime(), fileWriter.get());
+  simtime_t time = simTime();
+  dMap->writeYmf(time, fileWriter.get());
 }
 
 std::shared_ptr<ArteryDensityMapApp::Grid> ArteryDensityMapApp::getMap() {

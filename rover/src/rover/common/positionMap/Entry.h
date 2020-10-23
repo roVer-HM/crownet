@@ -78,16 +78,24 @@ class IEntry {
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry()
-    : count(0), measurement_time(), received_time(), _valid(false) {}
+    : count(0), measurement_time(), received_time(), _valid(false), source() {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(int count)
-    : count(count), measurement_time(), received_time(), _valid(true) {}
+    : count(count),
+      measurement_time(),
+      received_time(),
+      _valid(true),
+      source() {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
                             const time_type& r_t)
-    : count(count), measurement_time(m_t), received_time(r_t), _valid(true) {}
+    : count(count),
+      measurement_time(m_t),
+      received_time(r_t),
+      _valid(true),
+      source() {}
 
 template <typename K, typename T>
 inline const bool IEntry<K, T>::empty() const {
@@ -167,7 +175,7 @@ template <typename K, typename T>
 inline std::string IEntry<K, T>::csv(std::string delimiter) const {
   std::stringstream out;
   out << this->count << delimiter << this->measurement_time << delimiter
-      << this->received_time << this->source << delimiter;
+      << this->received_time << delimiter << this->source;
   return out.str();
 }
 
