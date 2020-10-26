@@ -42,7 +42,7 @@ TEST_F(CellEntryLocalTest, hasLocalValidMeasure_1) {
   EXPECT_FALSE(cell->hasValidLocalMeasure());
   // has local measure but invalid
   cell->getLocal()->incrementCount(2.2);
-  cell->resetLocalMeasure();
+  cell->reset();
   EXPECT_FALSE(cell->hasValidLocalMeasure());
 }
 
@@ -66,7 +66,7 @@ TEST_F(CellEntryLocalTest, local_increment_and_rest_2) {
   cell->getLocal()->incrementCount(2.2);
   EXPECT_EQ(3, cell->getLocal()->getCount());
   // reset must start count form beginning.
-  cell->resetLocalMeasure();
+  cell->reset();
   cell->getLocal()->incrementCount(2.2);
   EXPECT_EQ(1, cell->getLocal()->getCount());
 }
@@ -100,7 +100,7 @@ class CellEntryTest : public ::testing::Test {
 TEST_F(CellEntryTest, size_1) { EXPECT_EQ(2, cell->size()); }
 
 TEST_F(CellEntryTest, size_2) {
-  cell->resetLocalMeasure();
+  cell->reset();
   EXPECT_EQ(1, cell->size());
 }
 
@@ -110,7 +110,7 @@ TEST_F(CellEntryTest, size_3) {
 }
 
 TEST_F(CellEntryTest, size_4) {
-  cell->reset();
+  cell->resetAll();
   EXPECT_EQ(0, cell->size());
 }
 
@@ -153,7 +153,7 @@ TEST_F(CellEntryTest, hasValidMeasure_2) {
 }
 
 TEST_F(CellEntryTest, hasValidMeasure_3) {
-  cell->reset();
+  cell->resetAll();
   EXPECT_FALSE(cell->hasValidMeasure(node_id_3));
   EXPECT_FALSE(cell->hasValidMeasure(node_id_4));
   EXPECT_FALSE(cell->hasValidLocalMeasure());

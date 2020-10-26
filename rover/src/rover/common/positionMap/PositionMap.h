@@ -83,24 +83,40 @@ class CellEntry {
   }
 
   /**
-   * reset local data in cell
-   */
-  void resetLocalMeasure() {
-    if (hasLocalMeasure()) _localEntry->reset();
-  }
-
-  /**
    * reset all data in cell, local and received
    */
-  void reset() {
+  void resetAll() {
     for (const auto& e : _data) {
       e.second->reset();
     }
   }
 
+  /**
+   * reset local data in cell
+   */
+  void reset() {
+    if (hasLocalMeasure()) _localEntry->reset();
+  }
+
   void reset(const key_type& node_id) {
     if (hasMeasure(node_id)) {
       get(node_id)->reset();
+    }
+  }
+
+  void clearAll() {
+    for (const auto& e : _data) {
+      e.second->clear();
+    }
+  }
+
+  void clear() {
+    if (hasLocalMeasure()) _localEntry->clear();
+  }
+
+  void clear(const key_type& node_id) {
+    if (hasMeasure(node_id)) {
+      get(node_id)->clear();
     }
   }
 
@@ -305,6 +321,18 @@ class PositionMap {
 
   cellContainer_r range() {
     return boost::make_iterator_range(_map.begin(), _map.end());
+  }
+
+  void clearMap() {
+    clearMap(_localNodeId);
+    clearLocalNodetoCellMap();
+  }
+
+  void clearMap(const node_key_type& node_key) {
+    for (auto& entry : _map) {
+      entry.second.clear(node_key);
+    }
+    clearLocalNodetoCellMap();
   }
 
   void resetMap() {

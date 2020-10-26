@@ -90,7 +90,7 @@ TEST_F(RegularGridMapViewTest, range_localMap) {
 
 TEST_F(RegularGridMapViewTest, range_localMapValidOnly) {
   // reset cell (2,5) this cell must not be in the view
-  g1->getCellEntry(std::make_pair(2, 5)).reset();
+  g1->getCellEntry(std::make_pair(2, 5)).resetAll();
   auto view = g1->getView("local");
 
   // 2 cells should be found

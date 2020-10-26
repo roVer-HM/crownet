@@ -169,9 +169,9 @@ void ArteryDensityMapApp::updateLocalMap() {
   }
   lastUpdate = measureTime;
 
-  // FIXME: clearing leads to removing 0 count cells. Build up of phantom
-  // counts.
-  dMap->resetMap();
+  // set count of all cells in local map to zero.
+  // do not change the valid state.
+  dMap->clearMap();
 
   // add yourself to the map.
   const auto &pos = middleware->getFacilities()
