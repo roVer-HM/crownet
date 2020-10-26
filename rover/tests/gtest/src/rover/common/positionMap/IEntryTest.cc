@@ -32,6 +32,10 @@ class IEntryTest : public ::testing::Test {
   IEntry<int, double> e2_dbl_with_count;
   ILocalEntry<int, int> e3_int_empty_loc;
   ILocalEntry<int, double> e4_dbl_with_count_loc;
+
+  int t1{1};
+  int t2{2};
+  int t3{3};
 };
 
 TEST_F(IEntryTest, Ctor1) {
@@ -51,17 +55,21 @@ TEST_F(IEntryTest, isValid) {
   ASSERT_TRUE(e2_dbl_with_count.valid());
 }
 
-TEST_F(IEntryTest, rest) {
-  e1_int_empty.reset();
-  ASSERT_EQ(0, e1_int_empty.getCount());
+TEST_F(IEntryTest, reset2) {
   ASSERT_EQ(0, e1_int_empty.getMeasureTime());
   ASSERT_EQ(0, e1_int_empty.getReceivedTime());
+  e1_int_empty.reset(t1);
+  ASSERT_EQ(0, e1_int_empty.getCount());
+  ASSERT_EQ(1, e1_int_empty.getMeasureTime());
+  ASSERT_EQ(1, e1_int_empty.getReceivedTime());
   ASSERT_FALSE(e1_int_empty.valid());
 
-  e2_dbl_with_count.reset();
-  ASSERT_EQ(0, e2_dbl_with_count.getCount());
   ASSERT_EQ(TIME1, e2_dbl_with_count.getMeasureTime());
   ASSERT_EQ(TIME2, e2_dbl_with_count.getReceivedTime());
+  e2_dbl_with_count.reset(t2);
+  ASSERT_EQ(0, e2_dbl_with_count.getCount());
+  ASSERT_EQ(2, e2_dbl_with_count.getMeasureTime());
+  ASSERT_EQ(2, e2_dbl_with_count.getReceivedTime());
   ASSERT_FALSE(e2_dbl_with_count.valid());
 }
 
@@ -140,13 +148,13 @@ TEST_F(IEntryTest, XXXX) {
 
   IEntry<std::string, omnetpp::simtime_t> other1{1, 1.1, 2.2};
   std::cout << "start";
-  other1.reset();
-  e1->reset();
+  other1.reset(t1);
+  e1->reset(t1);
   std::cout << "end" << std::endl;
-  e2->reset();  // print
+  e2->reset(t1);  // print
   std::shared_ptr<OppLocEntry> e2Cast =
       std::static_pointer_cast<OppLocEntry>(e2);
-  e2Cast->reset();  // print
+  e2Cast->reset(t1);  // print
 }
 
 TEST_F(IEntryTest, toCsv) {
@@ -158,12 +166,12 @@ TEST_F(IEntryTest, clear) {
   EXPECT_TRUE(e2_dbl_with_count.valid());
   EXPECT_GT(e2_dbl_with_count.getCount(), 0);
 
-  e2_dbl_with_count.clear();
+  e2_dbl_with_count.clear(t1);
   EXPECT_TRUE(e2_dbl_with_count.valid());
   EXPECT_EQ(e2_dbl_with_count.getCount(), 0);
 
   EXPECT_FALSE(e1_int_empty.valid());
-  e1_int_empty.clear();
+  e1_int_empty.clear(t1);
   EXPECT_FALSE(e1_int_empty.valid());
 }
 
@@ -172,13 +180,13 @@ TEST_F(IEntryTest, clearLocal) {
   EXPECT_GT(e4_dbl_with_count_loc.getCount(), 0);
   EXPECT_GT(e4_dbl_with_count_loc.nodeIds.size(), 0);
 
-  e4_dbl_with_count_loc.clear();
+  e4_dbl_with_count_loc.clear(t1);
   EXPECT_TRUE(e4_dbl_with_count_loc.valid());
   EXPECT_EQ(e4_dbl_with_count_loc.getCount(), 0);
   EXPECT_EQ(e4_dbl_with_count_loc.nodeIds.size(), 0);
 
   EXPECT_FALSE(e3_int_empty_loc.valid());
-  e3_int_empty_loc.clear();
+  e3_int_empty_loc.clear(t1);
   EXPECT_FALSE(e3_int_empty_loc.valid());
 }
 
@@ -186,12 +194,12 @@ TEST_F(IEntryTest, reset) {
   EXPECT_TRUE(e2_dbl_with_count.valid());
   EXPECT_GT(e2_dbl_with_count.getCount(), 0);
 
-  e2_dbl_with_count.reset();
+  e2_dbl_with_count.reset(t1);
   EXPECT_FALSE(e2_dbl_with_count.valid());
   EXPECT_EQ(e2_dbl_with_count.getCount(), 0);
 
   EXPECT_FALSE(e1_int_empty.valid());
-  e1_int_empty.reset();
+  e1_int_empty.reset(t1);
   EXPECT_FALSE(e1_int_empty.valid());
 }
 
@@ -200,12 +208,12 @@ TEST_F(IEntryTest, resetLocal) {
   EXPECT_GT(e4_dbl_with_count_loc.getCount(), 0);
   EXPECT_GT(e4_dbl_with_count_loc.nodeIds.size(), 0);
 
-  e4_dbl_with_count_loc.reset();
+  e4_dbl_with_count_loc.reset(t1);
   EXPECT_FALSE(e4_dbl_with_count_loc.valid());
   EXPECT_EQ(e4_dbl_with_count_loc.getCount(), 0);
   EXPECT_EQ(e4_dbl_with_count_loc.nodeIds.size(), 0);
 
   EXPECT_FALSE(e3_int_empty_loc.valid());
-  e3_int_empty_loc.reset();
+  e3_int_empty_loc.reset(t1);
   EXPECT_FALSE(e3_int_empty_loc.valid());
 }

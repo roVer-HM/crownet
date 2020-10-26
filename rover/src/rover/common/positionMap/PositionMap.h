@@ -38,7 +38,8 @@ template <typename VALUE,
               ENTRY_CTOR>::value>::type* = nullptr>
 class CellEntry {
  public:
-  using key_type = typename VALUE::key_type;   // measuring node
+  using key_type = typename VALUE::key_type;  // measuring node
+  using time_type = typename VALUE::time_type;
   using mapped_type = std::shared_ptr<VALUE>;  // some type of IEntry
   using value_type = std::pair<const key_type&, mapped_type>;
   using entry_ctor = ENTRY_CTOR;
@@ -85,38 +86,38 @@ class CellEntry {
   /**
    * reset all data in cell, local and received
    */
-  void resetAll() {
+  void resetAll(const time_type& t) {
     for (const auto& e : _data) {
-      e.second->reset();
+      e.second->reset(t);
     }
   }
 
   /**
    * reset local data in cell
    */
-  void reset() {
-    if (hasLocalMeasure()) _localEntry->reset();
+  void reset(const time_type& t) {
+    if (hasLocalMeasure()) _localEntry->reset(t);
   }
 
-  void reset(const key_type& node_id) {
+  void reset(const key_type& node_id, const time_type& t) {
     if (hasMeasure(node_id)) {
-      get(node_id)->reset();
+      get(node_id)->reset(t);
     }
   }
 
-  void clearAll() {
+  void clearAll(const time_type& t) {
     for (const auto& e : _data) {
-      e.second->clear();
+      e.second->clear(t);
     }
   }
 
-  void clear() {
-    if (hasLocalMeasure()) _localEntry->clear();
+  void clear(const time_type& t) {
+    if (hasLocalMeasure()) _localEntry->clear(t);
   }
 
-  void clear(const key_type& node_id) {
+  void clear(const key_type& node_id, const time_type& t) {
     if (hasMeasure(node_id)) {
-      get(node_id)->clear();
+      get(node_id)->clear(t);
     }
   }
 
@@ -244,6 +245,7 @@ class PositionMap {
   // each bucket contains an entry map
 
   using node_key_type = typename VALUE::key_type;
+  using node_time_type = typename VALUE::time_type;
   using node_mapped_type = typename VALUE::mapped_type;
   using node_value_type = typename VALUE::value_type;
   using node_ctor_type = typename VALUE::entry_ctor;
@@ -323,26 +325,26 @@ class PositionMap {
     return boost::make_iterator_range(_map.begin(), _map.end());
   }
 
-  void clearMap() {
-    clearMap(_localNodeId);
+  void clearMap(const node_time_type& t) {
+    clearMap(_localNodeId, t);
     clearLocalNodetoCellMap();
   }
 
-  void clearMap(const node_key_type& node_key) {
+  void clearMap(const node_key_type& node_key, const node_time_type& t) {
     for (auto& entry : _map) {
-      entry.second.clear(node_key);
+      entry.second.clear(node_key, t);
     }
     clearLocalNodetoCellMap();
   }
 
-  void resetMap() {
-    resetMap(_localNodeId);
+  void resetMap(const node_time_type& t) {
+    resetMap(_localNodeId, t);
     clearLocalNodetoCellMap();
   }
 
-  void resetMap(const node_key_type& node_key) {
+  void resetMap(const node_key_type& node_key, const node_time_type& t) {
     for (auto& entry : _map) {
-      entry.second.reset(node_key);
+      entry.second.reset(node_key, t);
     }
   }
 

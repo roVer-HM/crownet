@@ -19,7 +19,7 @@ TEST(LocalDensityMeasureTest, rest) {
   m.incrementCount(4.9);
   m.nodeIds.insert(32);
   EXPECT_TRUE(m.valid());
-  m.reset();
+  m.reset(1.0);
   EXPECT_EQ(0, m.nodeIds.size());
   EXPECT_FALSE(m.valid());
 }

@@ -46,6 +46,8 @@ class RegularGridMapViewTest : public ::testing::Test {
   traci::TraCIPosition coord3cell1_1{5.5, 7.8};
   traci::TraCIPosition coord4cell_2_1{11.0, 7.8};
   std::shared_ptr<RegularGridMap<std::string>> g1;
+
+  omnetpp::simtime_t t1{1.0};
 };
 
 TEST_F(RegularGridMapViewTest, range_getId) {
@@ -90,7 +92,7 @@ TEST_F(RegularGridMapViewTest, range_localMap) {
 
 TEST_F(RegularGridMapViewTest, range_localMapValidOnly) {
   // reset cell (2,5) this cell must not be in the view
-  g1->getCellEntry(std::make_pair(2, 5)).resetAll();
+  g1->getCellEntry(std::make_pair(2, 5)).resetAll(t1);
   auto view = g1->getView("local");
 
   // 2 cells should be found

@@ -139,8 +139,9 @@ bool ArteryDensityMapApp::mergeReceivedMap(Packet *packet) {
   CellId _cellId = std::make_pair(p->getCellId(0), p->getCellId(1));
 
   simtime_t _received = simTime();
-  // 1) reset previously received measurements for this source
-  dMap->resetMap(_nodeId);
+  // 1) set count of all cells in local map to zero.
+  // do not change the valid state.
+  dMap->clearMap(_nodeId, simTime());
 
   // 2) update new measurements
   for (int i = 0; i < numCells; i++) {
@@ -171,7 +172,7 @@ void ArteryDensityMapApp::updateLocalMap() {
 
   // set count of all cells in local map to zero.
   // do not change the valid state.
-  dMap->clearMap();
+  dMap->clearMap(simTime());
 
   // add yourself to the map.
   const auto &pos = middleware->getFacilities()

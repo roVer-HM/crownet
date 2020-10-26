@@ -22,11 +22,17 @@ class IEntry {
   IEntry(const int, const time_type&, const time_type&);
   IEntry(const int);
   virtual ~IEntry() = default;
-  virtual void reset() {
+  virtual void reset(const time_type& t) {
     count = 0;
     _valid = false;
+    measurement_time = t;
+    received_time = t;
   }
-  virtual void clear() { count = 0; }
+  virtual void clear(const time_type& t) {
+    count = 0;
+    measurement_time = t;
+    received_time = t;
+  }
   const bool empty() const;
   virtual const bool valid() const { return _valid; }
   virtual void incrementCount(const time_type& t);
@@ -60,8 +66,8 @@ class ILocalEntry : public IEntry<K, T> {
   ILocalEntry();
   ILocalEntry(const int, const T&, const T&);
 
-  virtual void reset() override;
-  virtual void clear() override;
+  virtual void reset(const T& t) override;
+  virtual void clear(const T& t) override;
 
   // STS: make protected.
   std::set<typename IEntry<K, T>::key_type> nodeIds;
@@ -215,14 +221,13 @@ inline ILocalEntry<K, T>::ILocalEntry(const int count, const T& m_t,
     : IEntry<K, T>(count, m_t, r_t) {}
 
 template <typename K, typename T>
-inline void ILocalEntry<K, T>::reset() {
-  this->count = 0;
-  this->_valid = false;
+inline void ILocalEntry<K, T>::reset(const T& t) {
+  IEntry<K, T>::reset(t);
   this->nodeIds.clear();
 }
 
 template <typename K, typename T>
-inline void ILocalEntry<K, T>::clear() {
-  this->count = 0;
+inline void ILocalEntry<K, T>::clear(const T& t) {
+  IEntry<K, T>::clear(t);
   this->nodeIds.clear();
 }

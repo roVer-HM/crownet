@@ -92,11 +92,12 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
     fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
     fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
+    fBuilder.addMetadata<std::string>("NODE_ID", "global");
     fBuilder.addPath("global");
 
     fileWriter.reset(fBuilder.build());
     fileWriter->writeHeader({"simtime", "x", "y", "count", "measured_t",
-                             "received_t", "source", "NodeIds"});
+                             "received_t", "source", "own_cell", "node_id"});
   }
 }
 
@@ -164,7 +165,8 @@ void GlobalDensityMap::updateMaps() {
   }
   lastUpdate = simTime();
 
-  gMap->resetMap();
+  // global map needs reset (not clear)
+  gMap->resetMap(lastUpdate);
   nodeManager->visit(this);
 
   // update each decentralized map

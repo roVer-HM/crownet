@@ -35,6 +35,9 @@ class RegularGridMapIncrLocalTest : public ::testing::Test {
   traci::TraCIPosition coord2cell2_5{13.5, 27.7};
   traci::TraCIPosition coord3cell1_1{5.5, 7.8};
   std::shared_ptr<RegularGridMap<std::string>> g1;
+  omnetpp::simtime_t t1{1.0};
+  omnetpp::simtime_t t2{2.0};
+  omnetpp::simtime_t t3{3.0};
 };
 
 TEST_F(RegularGridMapIncrLocalTest, getNodeId) {
@@ -161,7 +164,7 @@ TEST_F(RegularGridMapIncrLocalTest, incrementLocal2_resetMap) {
   EXPECT_TRUE(g1->hasNeighbour("Node4", this->cellKey(1, 1)));
   EXPECT_EQ(2, g1->neighbourCount());
 
-  g1->resetMap();
+  g1->resetMap(t1);
   EXPECT_FALSE(entry1->valid());
   EXPECT_FALSE(entry2->valid());
   EXPECT_EQ(0, entry1->getCount());
@@ -177,7 +180,7 @@ TEST_F(RegularGridMapIncrLocalTest, incrementLocal2_resetMap2) {
   auto entry1 = g1->getCellEntry(this->cellKey(2, 5)).getLocal();
   auto entry2 = g1->getCellEntry(this->cellKey(1, 1)).getLocal();
   EXPECT_TRUE(entry1->valid());
-  g1->resetMap();
+  g1->resetMap(t1);
   EXPECT_FALSE(entry1->valid());
   EXPECT_FALSE(entry2->valid());
   EXPECT_EQ(0, entry1->getCount());
@@ -196,7 +199,7 @@ TEST_F(RegularGridMapIncrLocalTest, incrementLocal2_resetMapForNodeId) {
 
   auto viewN = g1->getViewBySource("Node_N");
   EXPECT_EQ(2, viewN->size());
-  g1->resetMap("Node_N");
+  g1->resetMap("Node_N", t1);
   EXPECT_EQ(0, viewN->size());
 
   // check locak count not effected by resetMap(...)
@@ -212,7 +215,7 @@ TEST_F(RegularGridMapIncrLocalTest, incrementLocal3_reset) {
   auto entry2 = g1->getCellEntry(this->cellKey(1, 1)).getLocal();
   EXPECT_TRUE(entry1->valid());
   EXPECT_TRUE(entry2->valid());
-  g1->resetMap();
+  g1->resetMap(t1);
   EXPECT_FALSE(entry1->valid());
   EXPECT_FALSE(entry2->valid());
   EXPECT_EQ(0, entry1->getCount());
@@ -278,8 +281,8 @@ TEST_F(RegularGridMapUpdateTest, update3_withYoungerLocalMeasure1) {
 
 TEST_F(RegularGridMapUpdateTest, moveNodeInLocalMap1_nodeExists) {
   // clear state
-  g1->resetMap();
-  g1->resetMap("NodeE");
+  g1->resetMap(t1);
+  g1->resetMap("NodeE", t1);
 
   // NodeE is in cell (1,1)
   EXPECT_EQ(0, g1->getCellEntry(this->cellKey(1, 1)).getLocal()->getCount());
@@ -298,8 +301,8 @@ TEST_F(RegularGridMapUpdateTest, moveNodeInLocalMap1_nodeExists) {
 
 TEST_F(RegularGridMapUpdateTest, moveNodeInLocalMap2_nodeNotExists) {
   // clear state
-  g1->resetMap();
-  g1->resetMap("NodeE");
+  g1->resetMap(t1);
+  g1->resetMap("NodeE", t1);
 
   // no Node in cell(2,5)
   EXPECT_EQ(0, g1->getCellEntry(this->cellKey(2, 5)).getLocal()->getCount());
