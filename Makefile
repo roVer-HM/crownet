@@ -31,6 +31,8 @@ ifeq (, $(shell which opp_configfilepath))
  $(error opp_configfilepath not found. In order to run the command within the roVer docker container, try "omnetpp exec make")
 endif
 
+# In case the user did not specify a MODE, use the default mode which is "debug".
+MODE ?= debug
 
 target clean : TARGET = clean
 target cleanall : TARGET = cleanall
@@ -64,8 +66,8 @@ configure_veins_inet:
 	cd $(mod_veins_inet); ./configure --with-inet=../../../$(mod_inet)
 
 $(models_l3) $(models_l2) $(models_l1):
-	$(MAKE) -j$$(($(NUM_CPUS)*2)) --directory=$@ $(TARGET)
+	$(MAKE) -j$$(($(NUM_CPUS)*2)) --directory=$@ $(TARGET) MODE=$(MODE)
 
 $(mod_artery): $(models_l2) $(models_l1)
-	$(MAKE) -j$$(($(NUM_CPUS)*2)) --directory=$@ $(TARGET)
+	$(MAKE) -j$$(($(NUM_CPUS)*2)) --directory=$@ $(TARGET) MODE=$(MODE)
 
