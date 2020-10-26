@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <omnetpp/cexception.h>
 #include <memory>
 #include <set>
 #include <sstream>
@@ -127,14 +128,11 @@ inline void IEntry<K, T>::incrementCount(const time_type& t) {
 
 template <typename K, typename T>
 inline void IEntry<K, T>::decrementCount(const time_type& t) {
-  if (count > 0) {
-    count--;
-    _valid = true;
-  } else {
-    // todo: should this be an error?
-    count = 0;
-    _valid = false;
+  if (count <= 0) {
+    throw omnetpp::cRuntimeError("Cell count decrement below 0.");
   }
+  count--;
+  _valid = true;
   measurement_time = t;
   received_time = t;
 }

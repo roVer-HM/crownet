@@ -57,37 +57,54 @@ TEST_F(IEntryTest, rest) {
   ASSERT_FALSE(e2.valid());
 }
 
+/**
+ * incrementing count will increase count and validate cell
+ */
 TEST_F(IEntryTest, incrementCount) {
+  EXPECT_FALSE(e1.valid());  // no count given on construction
   e1.incrementCount(2);
-  ASSERT_EQ(1, e1.getCount());
-  ASSERT_EQ(2, e1.getMeasureTime());
-  ASSERT_EQ(2, e1.getReceivedTime());
-  ASSERT_TRUE(e1.valid());
+  EXPECT_EQ(1, e1.getCount());
+  EXPECT_EQ(2, e1.getMeasureTime());
+  EXPECT_EQ(2, e1.getReceivedTime());
+  EXPECT_TRUE(e1.valid());
 
+  EXPECT_TRUE(e2.valid());  // has already valid count
   e2.incrementCount(2);
-  ASSERT_EQ(4, e2.getCount());
-  ASSERT_EQ(2, e2.getMeasureTime());
-  ASSERT_EQ(2, e2.getReceivedTime());
-  ASSERT_TRUE(e2.valid());
+  EXPECT_EQ(4, e2.getCount());
+  EXPECT_EQ(2, e2.getMeasureTime());
+  EXPECT_EQ(2, e2.getReceivedTime());
+  EXPECT_TRUE(e2.valid());
 }
 
+/*
+ * A decrement must never invalidate the count
+ */
 TEST_F(IEntryTest, decrementCount) {
   e1.incrementCount(2);
   ASSERT_EQ(1, e1.getCount());
   ASSERT_EQ(2, e1.getMeasureTime());
   ASSERT_EQ(2, e1.getReceivedTime());
   ASSERT_TRUE(e1.valid());
+
+  // count = 0 is valid
   e1.decrementCount(3);
   ASSERT_EQ(0, e1.getCount());
   ASSERT_EQ(3, e1.getMeasureTime());
   ASSERT_EQ(3, e1.getReceivedTime());
   ASSERT_TRUE(e1.valid());
-  // decrement below 0 will invalidate cell but count stays at 0
-  e1.decrementCount(4);
-  ASSERT_EQ(0, e1.getCount());
-  ASSERT_EQ(4, e1.getMeasureTime());
-  ASSERT_EQ(4, e1.getReceivedTime());
-  ASSERT_FALSE(e1.valid());
+}
+
+TEST_F(IEntryTest, decrementCountErr) {
+  e1.incrementCount(2);  // count=1
+  e1.decrementCount(3);  // count=0 (ok)
+  try {
+    e1.decrementCount(4);  // count=-1 (err)
+    FAIL() << "negative count must be an error\n";
+  } catch (omnetpp::cRuntimeError& e) {
+  } catch (...) {
+    FAIL() << " Unexpected exception thrown " << std::current_exception
+           << std::endl;
+  }
 }
 
 TEST_F(IEntryTest, compareMeasureTime) {
@@ -125,6 +142,6 @@ TEST_F(IEntryTest, XXXX) {
 }
 
 TEST_F(IEntryTest, toCsv) {
-  const char *expectVal = "3,1.34,4.42,0";
+  const char* expectVal = "3,1.34,4.42,0";
   ASSERT_STREQ(expectVal, e2.csv(",").c_str());
 }
