@@ -9,10 +9,14 @@
 #include <boost/range/algorithm.hpp>
 #include <memory>
 #include <string>
-#include "rover/common/positionMap/DensityMeasure.h"
+#include "rover/common/positionMap/Entry.h"
 #include "rover/common/positionMap/RegularGridMap.h"
 
 using namespace rover;
+
+using Entry = IEntry<std::string, omnetpp::simtime_t>;
+using LocalEntry = ILocalEntry<std::string, omnetpp::simtime_t>;
+using CellStrEntry = CellEntry<Entry>;
 
 class RegularGridMapIncrLocalTest : public ::testing::Test {
  protected:
@@ -21,9 +25,8 @@ class RegularGridMapIncrLocalTest : public ::testing::Test {
                                                        this->cellKey(10, 10));
   }
 
-  std::shared_ptr<DensityMeasure<std::string>> m(int count, double time1,
-                                                 double time2) {
-    return std::make_shared<DensityMeasure<std::string>>(count, time1, time2);
+  std::shared_ptr<Entry> m(int count, double time1, double time2) {
+    return std::make_shared<Entry>(count, time1, time2);
   }
 
   std::pair<int, int> cellKey(int x, int y) { return std::make_pair(x, y); }
@@ -72,8 +75,7 @@ TEST_F(RegularGridMapIncrLocalTest, incrementLocal2_addMultipleNodesSameCell) {
   EXPECT_DOUBLE_EQ(3.7, entry->getReceivedTime().dbl());
   EXPECT_EQ(2, entry->getCount());
 
-  auto locMeasure =
-      std::static_pointer_cast<LocalDensityMeasure<std::string>>(entry);
+  auto locMeasure = std::static_pointer_cast<LocalEntry>(entry);
   auto idSet = locMeasure->nodeIds;
   EXPECT_TRUE(idSet.find("Node5") != idSet.end());
   EXPECT_TRUE(idSet.find("Node4") != idSet.end());
@@ -253,7 +255,7 @@ TEST_F(RegularGridMapUpdateTest, update1_newCell) {
 }
 
 TEST_F(RegularGridMapUpdateTest, update2_withOlderLocalMeasure1) {
-  auto _m1 = std::make_shared<DensityMeasure<std::string>>(5, 3.54, 3.50);
+  auto _m1 = std::make_shared<Entry>(5, 3.54, 3.50);
   g1->update(this->cellKey(2, 5), "NodeE", std::move(_m1));
   auto measure = g1->getCellEntry(this->cellKey(2, 5)).youngestMeasureFirst();
   // expect value from NodeE (5, 3.54, 3.50)

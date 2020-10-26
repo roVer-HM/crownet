@@ -12,29 +12,6 @@
 #include <sstream>
 #include <string>
 
-template <typename VALUE>
-class EntryCtor {
- public:
-  virtual ~EntryCtor() = default;
-  virtual std::shared_ptr<VALUE> entry() = 0;
-  virtual std::shared_ptr<VALUE> localEntry() = 0;
-  virtual std::shared_ptr<VALUE> empty() const = 0;
-};
-
-template <typename VALUE>
-class EntryDefaultCtorImpl : public EntryCtor<VALUE> {
- public:
-  std::shared_ptr<VALUE> entry() override { return std::make_shared<VALUE>(); }
-
-  std::shared_ptr<VALUE> localEntry() override {
-    return std::make_shared<VALUE>();
-  }
-
-  std::shared_ptr<VALUE> empty() override {
-    return std::make_shared<VALUE>(-1);
-  }
-};
-
 template <typename K, typename T>
 class IEntry {
  public:
@@ -68,10 +45,48 @@ class IEntry {
 
  protected:
   int count;
-  key_type source;
   time_type measurement_time;
   time_type received_time;
   bool _valid;
+  key_type source;
+};
+
+template <typename K, typename T>
+class ILocalEntry : public IEntry<K, T> {
+ public:
+  virtual ~ILocalEntry() = default;
+  ILocalEntry();
+  ILocalEntry(const int, const T&, const T&);
+
+  virtual void reset() override;
+
+  // STS: make protected.
+  std::set<typename IEntry<K, T>::key_type> nodeIds;
+};
+
+template <typename K, typename T>
+class EntryCtor {
+ public:
+  virtual ~EntryCtor() = default;
+  virtual std::shared_ptr<IEntry<K, T>> entry() = 0;
+  virtual std::shared_ptr<ILocalEntry<K, T>> localEntry() = 0;
+  virtual std::shared_ptr<IEntry<K, T>> empty() = 0;
+};
+
+template <typename K, typename T>
+class EntryDefaultCtorImpl : public EntryCtor<K, T> {
+ public:
+  std::shared_ptr<IEntry<K, T>> entry() override {
+    return std::make_shared<IEntry<K, T>>();
+  }
+
+  std::shared_ptr<ILocalEntry<K, T>> localEntry() override {
+    return std::make_shared<ILocalEntry<K, T>>();
+  }
+
+  std::shared_ptr<IEntry<K, T>> empty() override {
+    return std::make_shared<IEntry<K, T>>(-1);
+  }
 };
 
 /// implementation IEntry<K, T>
@@ -187,4 +202,21 @@ inline std::string IEntry<K, T>::str() const {
      << "| received_time: " << this->received_time
      << "| valid: " << this->valid();
   return os.str();
+}
+
+///////////////////////////////////////////////////
+
+template <typename K, typename T>
+inline ILocalEntry<K, T>::ILocalEntry() : IEntry<K, T>() {}
+
+template <typename K, typename T>
+inline ILocalEntry<K, T>::ILocalEntry(const int count, const T& m_t,
+                                      const T& r_t)
+    : IEntry<K, T>(count, m_t, r_t) {}
+
+template <typename K, typename T>
+inline void ILocalEntry<K, T>::reset() {
+  this->count = 0;
+  this->_valid = false;
+  this->nodeIds.clear();
 }

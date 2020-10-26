@@ -9,10 +9,13 @@
 #include <boost/range/algorithm.hpp>
 #include <memory>
 #include <string>
-#include "rover/common/positionMap/DensityMeasure.h"
 #include "rover/common/positionMap/RegularGridMap.h"
 
 using namespace rover;
+
+using StrEntry = IEntry<std::string, omnetpp::simtime_t>;
+using StrLocalEntry = IEntry<std::string, omnetpp::simtime_t>;
+using CellStrEntry = CellEntry<StrEntry>;
 
 class RegularGridMapViewTest : public ::testing::Test {
   // Test fixture with 6 Nodes in 2 Cells as measured by the local node.
@@ -34,9 +37,8 @@ class RegularGridMapViewTest : public ::testing::Test {
     g1->update(std::make_pair(5, 5), "NodeE", this->m(7, 5.3, 5.07));
   }
 
-  std::shared_ptr<DensityMeasure<std::string>> m(int count, double time1,
-                                                 double time2) {
-    return std::make_shared<DensityMeasure<std::string>>(count, time1, time2);
+  std::shared_ptr<StrEntry> m(int count, double time1, double time2) {
+    return std::make_shared<StrEntry>(count, time1, time2);
   }
 
   traci::TraCIPosition coord1cell2_5{13.0, 27.0};
@@ -203,9 +205,8 @@ class RegularGridMapSourceNodeViewTest : public ::testing::Test {
     g1->incrementLocal(coord3cell1_1, "NodeF", 3.1);
   }
 
-  std::shared_ptr<DensityMeasure<std::string>> m(int count, double time1,
-                                                 double time2) {
-    return std::make_shared<DensityMeasure<std::string>>(count, time1, time2);
+  std::shared_ptr<StrEntry> m(int count, double time1, double time2) {
+    return std::make_shared<StrEntry>(count, time1, time2);
   }
 
   traci::TraCIPosition coord1cell2_5{13.0, 27.0};

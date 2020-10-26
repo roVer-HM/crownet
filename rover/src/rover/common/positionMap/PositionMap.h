@@ -27,12 +27,15 @@
 
 namespace rover {
 
-template <typename VALUE, typename ENTRY_CTOR = EntryDefaultCtorImpl<VALUE>,
+template <typename VALUE,
+          typename ENTRY_CTOR = EntryDefaultCtorImpl<typename VALUE::key_type,
+                                                     typename VALUE::time_type>,
           typename std::enable_if<std::is_base_of<
               IEntry<typename VALUE::key_type, typename VALUE::time_type>,
               VALUE>::value>::type* = nullptr,
           typename std::enable_if<std::is_base_of<
-              EntryCtor<VALUE>, ENTRY_CTOR>::value>::type* = nullptr>
+              EntryCtor<typename VALUE::key_type, typename VALUE::time_type>,
+              ENTRY_CTOR>::value>::type* = nullptr>
 class CellEntry {
  public:
   using key_type = typename VALUE::key_type;   // measuring node
@@ -59,6 +62,9 @@ class CellEntry {
 
  public:
   template <typename T = ENTRY_CTOR>
+
+  CellEntry(key_type localKey)
+      : CellEntry(localKey, std::make_shared<entry_ctor>()) {}
 
   CellEntry(key_type localKey, std::shared_ptr<entry_ctor> ctor)
       : _localKey(localKey), _entryCtor(ctor) {}

@@ -6,12 +6,15 @@
  */
 
 #include <gtest/gtest.h>
+#include <omnetpp.h>
 #include <string>
-#include "rover/common/positionMap/DensityMeasure.h"
+#include "rover/common/positionMap/Entry.h"
+
+using LocalEntry = ILocalEntry<int, omnetpp::simtime_t>;
 
 // rest must also rest nodeIds set
 TEST(LocalDensityMeasureTest, rest) {
-  LocalDensityMeasure<int> m{};
+  LocalEntry m{};
   EXPECT_FALSE(m.valid());
   m.incrementCount(4.9);
   m.nodeIds.insert(32);
@@ -22,7 +25,7 @@ TEST(LocalDensityMeasureTest, rest) {
 }
 
 TEST(LocalDensityMeasureTest, csv) {
-  LocalDensityMeasure<int> m{1, 3.5, 3.7};
+  LocalEntry m{1, 3.5, 3.7};
   std::string csv = "1,3.5,3.7,0";
   EXPECT_STREQ(csv.c_str(), m.csv(",").c_str());
   csv = "1;3.5;3.7;0";
@@ -30,10 +33,10 @@ TEST(LocalDensityMeasureTest, csv) {
 }
 
 TEST(LocalDensityMeasureTest, empty) {
-  LocalDensityMeasure<int> m1{-1, 3.5, 3.7};
+  LocalEntry m1{-1, 3.5, 3.7};
   EXPECT_TRUE(m1.empty());
-  LocalDensityMeasure<int> m2{0, 3.5, 3.7};
+  LocalEntry m2{0, 3.5, 3.7};
   EXPECT_FALSE(m2.empty());
-  LocalDensityMeasure<int> m3{1, 3.5, 3.7};
+  LocalEntry m3{1, 3.5, 3.7};
   EXPECT_FALSE(m3.empty());
 }

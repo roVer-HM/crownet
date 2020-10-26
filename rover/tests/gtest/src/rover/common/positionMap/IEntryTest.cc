@@ -6,7 +6,10 @@
  */
 
 #include <gtest/gtest.h>
+#include <omnetpp.h>
+#include <memory>
 #include <string>
+
 #include "rover/common/positionMap/Entry.h"
 
 double TIME1 = 1.34;
@@ -97,6 +100,28 @@ TEST_F(IEntryTest, compareMeasureTime) {
   IEntry<double, double> other4{1, TIME1, 1};
   ASSERT_GT(e2.compareMeasureTime(other3), 0);
   ASSERT_EQ(e2.compareMeasureTime(other4), 0);
+}
+
+TEST_F(IEntryTest, XXXX) {
+  //   std::shared_ptr<LocalDensityMeasure<NODE_ID>> locMeasure =
+  //        std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
+  //            this->getCellEntry(cellId).getLocal());
+
+  using OppEntry = IEntry<std::string, omnetpp::simtime_t>;
+  using OppLocEntry = ILocalEntry<std::string, omnetpp::simtime_t>;
+
+  std::shared_ptr<OppEntry> e1 = std::make_shared<OppEntry>(1, 1.1, 2.2);
+  std::shared_ptr<OppEntry> e2 = std::make_shared<OppLocEntry>(1, 1.1, 2.2);
+
+  IEntry<std::string, omnetpp::simtime_t> other1{1, 1.1, 2.2};
+  std::cout << "start";
+  other1.reset();
+  e1->reset();
+  std::cout << "end" << std::endl;
+  e2->reset();  // print
+  std::shared_ptr<OppLocEntry> e2Cast =
+      std::static_pointer_cast<OppLocEntry>(e2);
+  e2Cast->reset();  // print
 }
 
 TEST_F(IEntryTest, toCsv) {

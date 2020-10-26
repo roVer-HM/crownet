@@ -17,7 +17,7 @@
 #include <map>
 #include <unordered_map>
 #include "inet/common/geometry/common/Coord.h"
-#include "rover/common/positionMap/DensityMeasure.h"
+#include "rover/common/positionMap/Entry.h"
 #include "rover/common/positionMap/PositionMap.h"
 #include "rover/common/util/FileWriter.h"
 #include "traci/Position.h"
@@ -26,14 +26,15 @@ namespace rover {
 
 template <typename NODE_ID>
 class RegularGridMap
-    : public PositionMap<
-          std::pair<int, int>,
-          CellEntry<DensityMeasure<NODE_ID>, DensityMeasureCtor<NODE_ID>>> {
+    : public PositionMap<std::pair<int, int>,
+                         CellEntry<IEntry<NODE_ID, omnetpp::simtime_t>>> {
  public:
   class FullIter;
   using CellId = std::pair<int, int>;
   using NodeId = NODE_ID;
-  using time_type = typename DensityMeasure<NODE_ID>::time_type;
+  using Entry = IEntry<NODE_ID, omnetpp::simtime_t>;
+  using LocalEntry = ILocalEntry<NODE_ID, omnetpp::simtime_t>;
+  using time_type = typename Entry::time_type;
 
   using iter_value = typename RegularGridMap<NODE_ID>::node_mapped_type;
   using view_type = typename RegularGridMap<NODE_ID>::PositionMapView;
@@ -200,8 +201,7 @@ inline typename RegularGridMap<NODE_ID>::iter_value
 template <typename NODE_ID>
 inline RegularGridMap<NODE_ID>::RegularGridMap(NodeId id, double gridSize,
                                                std::pair<int, int> gridDim)
-    : PositionMap<CellId, CellEntry<DensityMeasure<NODE_ID>,
-                                    DensityMeasureCtor<NODE_ID>>>(id),
+    : PositionMap<CellId, CellEntry<Entry>>(id),
       gridSize(gridSize),
       gridDim(gridDim) {}
 
@@ -231,9 +231,8 @@ RegularGridMap<NODE_ID>::incrementLocal(const CellId& cellId,
   }
 
   // 1) increment local count in cell
-  std::shared_ptr<LocalDensityMeasure<NODE_ID>> locMeasure =
-      std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
-          this->getCellEntry(cellId).getLocal());
+  std::shared_ptr<LocalEntry> locMeasure = std::static_pointer_cast<LocalEntry>(
+      this->getCellEntry(cellId).getLocal());
   locMeasure->incrementCount(t);
   locMeasure->setSource(this->getNodeId());
 
@@ -270,7 +269,7 @@ inline void RegularGridMap<NODE_ID>::moveNodeInLocalMap(const CellId& cellId,
     // nodeId present but in wrong cell. Move :nodeId: to :cellId:
 
     // remove from old cell
-    auto oldMeasure = std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
+    auto oldMeasure = std::static_pointer_cast<LocalEntry>(
         this->getCellEntry(iter->second).getLocal());
     oldMeasure->decrementCount(omnetpp::SimTime());
     oldMeasure->nodeIds.erase(nodeId);
@@ -334,12 +333,10 @@ inline void RegularGridMap<NODE_ID>::writeLocalWithIds(time_type& time,
   auto currCell = this->getCellId();
   for (const auto& e : map->range()) {
     const auto& cell = e.first;
-    const auto& measure =
-        std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(e.second);
+    const auto& measure = std::static_pointer_cast<LocalEntry>(e.second);
     int ownCell = (currCell == cell) ? 1 : 0;
 
-    using nodeIdSet_t =
-        std::set<typename LocalDensityMeasure<NODE_ID>::key_type>;
+    using nodeIdSet_t = std::set<typename LocalEntry::key_type>;
     std::string del = writer->del();
     boost::iterator_range<typename nodeIdSet_t::const_iterator> rng(
         measure->nodeIds.begin(), measure->nodeIds.end());

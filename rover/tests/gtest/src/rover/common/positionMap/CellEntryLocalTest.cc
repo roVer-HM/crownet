@@ -7,20 +7,19 @@
 
 #include <gtest/gtest.h>
 #include <string>
-#include "rover/common/positionMap/DensityMeasure.h"
+#include "rover/common/positionMap/Entry.h"
 #include "rover/common/positionMap/PositionMap.h"
 
 using namespace rover;
 
+using IntEntry = IEntry<int, omnetpp::simtime_t>;
+using CellIntEntry = CellEntry<IntEntry>;
+
 class CellEntryLocalTest : public ::testing::Test {
  protected:
-  void SetUp() override {
-    cell = std::make_shared<
-        CellEntry<DensityMeasure<int>, DensityMeasureCtor<int>>>(
-        1, std::make_shared<DensityMeasureCtor<int>>());
-  }
+  void SetUp() override { cell = std::make_shared<CellIntEntry>(1); }
 
-  std::shared_ptr<CellEntry<DensityMeasure<int>, DensityMeasureCtor<int>>> cell;
+  std::shared_ptr<CellIntEntry> cell;
 };
 
 TEST_F(CellEntryLocalTest, localKey) { EXPECT_EQ(1, cell->localKey()); }
@@ -75,9 +74,7 @@ TEST_F(CellEntryLocalTest, local_increment_and_rest_2) {
 class CellEntryTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    cell = std::make_shared<
-        CellEntry<DensityMeasure<int>, DensityMeasureCtor<int>>>(
-        1, std::make_shared<DensityMeasureCtor<int>>());
+    cell = std::make_shared<CellIntEntry>(1);
 
     // local count 3
     cell->getLocal()->incrementCount(1.1);
@@ -97,7 +94,7 @@ class CellEntryTest : public ::testing::Test {
 
   int node_id_3 = 3;
   int node_id_4 = 4;
-  std::shared_ptr<CellEntry<DensityMeasure<int>, DensityMeasureCtor<int>>> cell;
+  std::shared_ptr<CellIntEntry> cell;
 };
 
 TEST_F(CellEntryTest, size_1) { EXPECT_EQ(2, cell->size()); }
