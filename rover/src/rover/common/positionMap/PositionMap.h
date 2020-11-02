@@ -235,6 +235,7 @@ class PositionMap {
   class PositionMapView;
   class LocalView;
   class YmfView;
+  class AllView;
 
  public:
   using cell_key_type = CELL_KEY;  // key for one cell or triangle (bucket)
@@ -277,6 +278,10 @@ class PositionMap {
   using cellEntryTransform_f =
       std::function<view_value_type(typename map_type::value_type&)>;
 
+  // entry_visitor (CellId, [NodeId, Entry])
+  using entry_visitor_f =
+      std::function<void(const cell_key_type&, const node_value_type&)>;
+
   // ranges
   using cellContainer_r = boost::iterator_range<typename map_type::iterator>;
   using cellContainerFiltered_r =
@@ -298,55 +303,16 @@ class PositionMap {
   }
 
  private:
-  void initViews() {
-    views["local"] = std::make_shared<LocalView>(this);
-    views["ymf"] = std::make_shared<YmfView>(this);
-  }
+  void initViews();
 
  public:
-  cell_mapped_type& getCellEntry(const cell_key_type& cell_key) {
-    auto cellEntry = _map.find(cell_key);
-    if (cellEntry != _map.end()) {
-      return cellEntry->second;
-    } else {
-      // create new cell entry
-      auto newCellEntry = _map.emplace(std::piecewise_construct,
-                                       std::forward_as_tuple(cell_key),
-                                       std::forward_as_tuple(_cellCtor()));
-      if (!newCellEntry.second) {
-        throw omnetpp::cRuntimeError("error inserting cellEntry");
-      } else {
-        return newCellEntry.first->second;
-      }
-    }
-  }
+  cell_mapped_type& getCellEntry(const cell_key_type& cell_key);
 
-  cellContainer_r range() {
-    return boost::make_iterator_range(_map.begin(), _map.end());
-  }
-
-  void clearMap(const node_time_type& t) {
-    clearMap(_localNodeId, t);
-    clearLocalNodetoCellMap();
-  }
-
-  void clearMap(const node_key_type& node_key, const node_time_type& t) {
-    for (auto& entry : _map) {
-      entry.second.clear(node_key, t);
-    }
-    clearLocalNodetoCellMap();
-  }
-
-  void resetMap(const node_time_type& t) {
-    resetMap(_localNodeId, t);
-    clearLocalNodetoCellMap();
-  }
-
-  void resetMap(const node_key_type& node_key, const node_time_type& t) {
-    for (auto& entry : _map) {
-      entry.second.reset(node_key, t);
-    }
-  }
+  cellContainer_r range();
+  void clearMap(const node_time_type& t);
+  void clearMap(const node_key_type& node_key, const node_time_type& t);
+  void resetMap(const node_time_type& t);
+  void resetMap(const node_key_type& node_key, const node_time_type& t);
 
   /**
    * :cell_key:       cellId to which the measurement belongs
@@ -356,52 +322,26 @@ class PositionMap {
    *                  density count for cellId, provided by nodeId.
    */
   void update(const cell_key_type& cell_key, const node_key_type& node_key,
-              node_mapped_type&& measure_value) {
-    getCellEntry(cell_key).createOrUpdate(node_key, std::move(measure_value));
-  }
+              node_mapped_type&& measure_value);
 
-  void removeNeighbour(const node_key_type& neigbourId) {
-    _localNodeToCellMap.erase(neigbourId);
-  }
-
-  bool hasNeighbour(const node_key_type& neigbourId) const {
-    return _localNodeToCellMap.find(neigbourId) != _localNodeToCellMap.end();
-  }
-
+  void removeNeighbour(const node_key_type& neigbourId);
+  bool hasNeighbour(const node_key_type& neigbourId) const;
   bool hasNeighbour(const node_key_type& neigbourId,
-                    const cell_key_type& cellID) const {
-    auto iter = _localNodeToCellMap.find(neigbourId);
-
-    // neigbourId exists and  neighbour is in cellID
-    return iter != _localNodeToCellMap.end() && iter->second == cellID;
-  }
-
-  const int neighbourCount() const { return _localNodeToCellMap.size(); }
-
+                    const cell_key_type& cellID) const;
+  const int neighbourCount() const;
   void updateNeighbourCell(const node_key_type& neigbourId,
-                           const cell_key_type& cellId) {
-    _localNodeToCellMap[neigbourId] = cellId;
-  }
+                           const cell_key_type& cellId);
+  void clearLocalNodetoCellMap();
 
-  void clearLocalNodetoCellMap() { _localNodeToCellMap.clear(); }
-
-  std::shared_ptr<PositionMapView> getView(std::string view_name) {
-    auto iter = views.find(view_name);
-    if (iter == views.end())
-      omnetpp::cRuntimeError("View '%' not found ", view_name.c_str());
-
-    return iter->second;
-  }
-
-  std::shared_ptr<PositionMapView> getViewBySource(
-      const node_key_type& nodeId) {
-    auto view = std::make_shared<SourceNodeView>(this, nodeId);
-    return std::move(view);
-  }
+  std::shared_ptr<PositionMapView> getView(std::string view_name);
+  std::shared_ptr<PositionMapView> getViewBySource(const node_key_type& nodeId);
 
   node_key_type getNodeId() const { return _localNodeId; }
-
   cell_key_type getCellId() const { return _currentCell; }
+
+  void visit_entry(const entry_visitor_f& visitor) const;
+  // remove selection string from all entries
+  void clearEntrySelection();
 
   class PositionMapView {
    public:
@@ -437,26 +377,7 @@ class PositionMap {
     LocalView(PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* map)
         : PositionMapView(map, "local") {}
 
-    virtual cellEntryFiltered_r range() override {
-      // filter: only valid and local measure
-      cellContainerFilter_f _f =
-          [](const typename map_type::value_type& map_value) {
-            auto& value = map_value.second;
-            return value.hasValidLocalMeasure();
-          };
-
-      // transform
-      cellEntryTransform_f _t = [](typename map_type::value_type& map_value) {
-        view_value_type ret =
-            view_value_type{map_value.first, map_value.second.getLocal()};
-        return ret;
-      };
-
-      using namespace boost::adaptors;
-      cellContainer_r range_all = this->_cell_map->range();
-
-      return range_all | filtered(_f) | transformed(_t);
-    }
+    virtual cellEntryFiltered_r range() override;
   };
 
   class YmfView : public PositionMapView {
@@ -464,26 +385,7 @@ class PositionMap {
     YmfView(PositionMap<cell_key_type, cell_mapped_type, cell_ctor_type>* map)
         : PositionMapView(map, "ymf") {}
 
-    virtual cellEntryFiltered_r range() override {
-      // filter: only valid measurements
-      cellContainerFilter_f _f =
-          [](const typename map_type::value_type& map_value) {
-            auto& value = map_value.second;
-            return value.hasValid();
-          };
-
-      // transform
-      cellEntryTransform_f _t = [](typename map_type::value_type& map_value) {
-        view_value_type ret = view_value_type{
-            map_value.first, map_value.second.youngestMeasureFirst()};
-        return ret;
-      };
-
-      using namespace boost::adaptors;
-      cellContainer_r range_all = this->_cell_map->range();
-
-      return range_all | filtered(_f) | transformed(_t);
-    }
+    virtual cellEntryFiltered_r range() override;
   };
 
   class SourceNodeView : public PositionMapView {
@@ -493,105 +395,17 @@ class PositionMap {
         node_key_type sourceNodeId)
         : PositionMapView(map, ""), sourceNodeId(sourceNodeId) {}
 
-    virtual cellEntryFiltered_r range() override {
-      // filter: only valid measurements
-      cellContainerFilter_f _f =
-          [this](const typename map_type::value_type& map_value) {
-            auto& value = map_value.second;
-            return value.hasValidMeasure(this->sourceNodeId);
-          };
-
-      // transform
-      cellEntryTransform_f _t =
-          [this](typename map_type::value_type& map_value) {
-            view_value_type ret = view_value_type{
-                map_value.first, map_value.second.get(this->sourceNodeId)};
-            return ret;
-          };
-
-      using namespace boost::adaptors;
-      cellContainer_r range_all = this->_cell_map->range();
-
-      return range_all | filtered(_f) | transformed(_t);
-    }
+    virtual cellEntryFiltered_r range() override;
 
    protected:
     node_key_type sourceNodeId;
   };
 };
 
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline int PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::size() const {
-  return boost::size(this->range());
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline std::string PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::str()
-    const {
-  std::stringstream s;
-  s << "Map[ " << _view_name << "] (NodeId: " << this->_cell_map->_localNodeId
-    << "\n";
-  for (auto entry : this->range()) {
-    s << "   Cell(" << entry.first.first << ", " << entry.first.second << ") "
-      << entry.second->str() << std::endl;
-  }
-  return s.str();
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline const typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_r
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::range() const {
-  return const_cast<PositionMapView*>(this)->range();
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::begin() {
-  return this->range().begin();
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::end() {
-  return this->range().end();
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_const_iter
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::end() const {
-  return this->range().end();
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::node_key_type
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::getId() const {
-  return this->_cell_map->_localNodeId;
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::find(
-    const cell_key_type& k) {
-  auto rng = this->range();
-  auto it = boost::range::find_if(
-      rng, [&k](std::pair<const cell_key_type&, node_mapped_type> _item) {
-        return k == _item.first;
-      });
-  return it;
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline typename PositionMap<CELL_KEY, VALUE, CTOR>::cellEntryFiltered_iter
-PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::find(
-    const cell_key_type& k) const {
-  return const_cast<PositionMapView*>(this)->find(k);
-}
-
-template <typename CELL_KEY, typename VALUE, typename CTOR>
-inline const bool PositionMap<CELL_KEY, VALUE, CTOR>::PositionMapView::hasValue(
-    const cell_key_type& k) const {
-  auto iter = this->find(k);
-  return iter != this->end();
-}
-
 } /* namespace rover */
+
+// template implementations
+
+#include "rover/common/positionMap/CellEntry.tcc"
+#include "rover/common/positionMap/PositionMap.tcc"
+#include "rover/common/positionMap/PositionMapView.tcc"

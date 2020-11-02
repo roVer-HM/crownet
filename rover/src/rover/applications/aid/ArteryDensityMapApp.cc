@@ -34,6 +34,9 @@ void ArteryDensityMapApp::initialize(int stage) {
                     par("coordConverterModule"), this, true)
                     ->getConverter();
 
+    mapType = par("mapType").stdstringValue();
+    mapTypeLog = par("mapTypeLog").stdstringValue();
+
     // subscribe updateSignal at host module level (pedestrian, vehicle) to
     // catch identity changes.
     auto hostModule =
@@ -69,12 +72,22 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
       fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
       fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
       fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
+      fBuilder.addMetadata("MAP_TYPE", mapTypeLog);
       fBuilder.addMetadata("NODE_ID", dMap->getNodeId());
       fBuilder.addPath(node_id.str());
 
       fileWriter.reset(fBuilder.build());
-      fileWriter->writeHeader({"simtime", "x", "y", "count", "measured_t",
-                               "received_t", "source", "own_cell"});
+      fileWriter->writeHeader({
+          "simtime",
+          "x",
+          "y",
+          "count",
+          "measured_t",
+          "received_t",
+          "source",
+          "selection",
+          "own_cell",
+      });
     }
 
     // register density map for use in GlobalDensityMap context.
@@ -156,9 +169,9 @@ bool ArteryDensityMapApp::mergeReceivedMap(Packet *packet) {
   //    place the _nodeId in the same cell.
   dMap->moveNodeInLocalMap(_cellId, _nodeId);
 
-  using namespace omnetpp;
-  EV_DEBUG << dMap->getView("ymf")->str();
-  EV_DEBUG << dMap->getView("local")->str();
+  //  using namespace omnetpp;
+  //  EV_DEBUG << dMap->getView(mapType)->str();
+  //  EV_DEBUG << dMap->getView("local")->str();
 
   return true;
 }
@@ -180,6 +193,7 @@ void ArteryDensityMapApp::updateLocalMap() {
                         .position();
   const auto &posInet = converter->position_cast_traci(pos);
   dMap->incrementLocalOwnPos(posInet, measureTime);
+  if (dMap->getNodeId() == "0a:aa:00:00:00:02") EV_DEBUG << "trap";
 
   // visitor for artery location table
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
@@ -197,6 +211,20 @@ void ArteryDensityMapApp::updateLocalMap() {
         std::ostringstream _id;
         _id << mac;
 
+        if (_id.str() == "0a:aa:00:00:00:08") {
+          std::stringstream out;
+          out << "Time: " << simTime() << std::endl;
+          out << "Owner: " << dMap->getNodeId() << std::endl;
+          out << "Id: " << _id.str() << std::endl;
+          out << "Geo: " << geoPos.latitude.value() << ", "
+              << geoPos.longitude.value() << std::endl;
+          out << "Cart: " << cartPos.x << ", " << cartPos.y << std::endl;
+          out << "Cart: " << floor(cartPos.x / 3) << ", "
+              << floor(cartPos.y / 3) << std::endl;
+          out << "trap" << std::endl;
+          EV_DEBUG << out.str();
+        }
+
         // increment density map
         dMap->incrementLocal(cartPos, _id.str(), measureTime);
       };
@@ -208,12 +236,21 @@ void ArteryDensityMapApp::updateLocalMap() {
 
   using namespace omnetpp;
   EV_DEBUG << "[ " << dMap->getNodeId() << "] ";
-  EV_DEBUG << dMap->getView("ymf")->str();
+  EV_DEBUG << dMap->getView(mapType)->str();
 }
 
 void ArteryDensityMapApp::writeMap() {
   simtime_t time = simTime();
-  dMap->writeYmf(time, fileWriter.get());
+
+  if (mapType != mapTypeLog) {
+    // annotate entries used in current view to discriminate them from other
+    // values logged.
+    dMap->clearEntrySelection();
+    for (const auto &e : dMap->getView(mapType)->range()) {
+      e.second->setSelectedIn(mapType);
+    }
+  }
+  dMap->write(time, mapTypeLog, fileWriter.get());
 }
 
 std::shared_ptr<ArteryDensityMapApp::Grid> ArteryDensityMapApp::getMap() {
@@ -222,7 +259,7 @@ std::shared_ptr<ArteryDensityMapApp::Grid> ArteryDensityMapApp::getMap() {
 
 void ArteryDensityMapApp::sendMapMap() {
   const auto &payload = createPacket<PositionMapPacket>();
-  auto ymfView = dMap->getView("ymf");
+  auto ymfView = dMap->getView(mapType);
   int numValidCells = ymfView->size();
   payload->setNodeId(ymfView->getId().c_str());
   payload->setCellId(0, dMap->getCellId().first);

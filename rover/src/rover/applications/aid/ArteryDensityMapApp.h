@@ -75,6 +75,9 @@ class ArteryDensityMapApp
   std::shared_ptr<Grid> dMap;
   std::unique_ptr<FileWriter> fileWriter;
   simtime_t lastUpdate = -1.0;
+
+  std::string mapType;
+  std::string mapTypeLog;
 };
 
 } /* namespace rover */

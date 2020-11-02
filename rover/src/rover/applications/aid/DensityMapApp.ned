@@ -37,6 +37,10 @@ simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
         appMainInterval = default(1.0s);
         
         bool writeDensityLog = default(true);
+        string mapType = default("ymf"); // select map algorithm to calculate cell values
+        string mapTypeLog = default("ymf"); // if writeDensityLog is true log this map algorithm. If "all" just 
+        									// dump raw data currently present. 
+        
             
 }
 

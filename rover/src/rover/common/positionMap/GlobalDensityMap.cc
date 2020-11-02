@@ -92,12 +92,26 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
     fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
     fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
+    fBuilder.addMetadata<std::string>(
+        "MAP_TYPE",
+        "global");  // The global density map is the ground
+                    // truth. No algorihm needed.
     fBuilder.addMetadata<std::string>("NODE_ID", "global");
     fBuilder.addPath("global");
 
     fileWriter.reset(fBuilder.build());
-    fileWriter->writeHeader({"simtime", "x", "y", "count", "measured_t",
-                             "received_t", "source", "own_cell", "node_id"});
+    fileWriter->writeHeader({
+        "simtime",
+        "x",
+        "y",
+        "count",
+        "measured_t",
+        "received_t",
+        "source",
+        "selection",
+        "own_cell",
+        "node_id",
+    });
   }
 }
 
@@ -148,6 +162,21 @@ void GlobalDensityMap::visitNode(const std::string &traciNodeId,
   std::ostringstream node_id;
   node_id
       << middleware->getFacilities().getConst<artery::Identity>().geonet.mid();
+
+  if (node_id.str() == "0a:aa:00:00:00:08") {
+    std::stringstream out;
+    out << "Time: " << simTime() << std::endl;
+    out << "Owner: "
+        << "global" << std::endl;
+    out << "Id: " << node_id.str() << std::endl;
+    //    out << "Geo: " << pos.latitude.val_ << ", " << pos.longitude.val_
+    //        << std::endl;
+    out << "Cart: " << posInet.x << ", " << posInet.y << std::endl;
+    out << "Cart: " << floor(posInet.x / 3) << ", " << floor(posInet.y / 3)
+        << std::endl;
+    out << "trap" << std::endl;
+    EV_DEBUG << out.str();
+  }
 
   // visitNode is called for *all* nodes thus this 'local' map of the global
   // module represents the global (ground truth) of the simulation.

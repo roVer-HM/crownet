@@ -27,11 +27,13 @@ class IEntry {
     _valid = false;
     measurement_time = t;
     received_time = t;
+    selected_in = "";
   }
   virtual void clear(const time_type& t) {
     count = 0;
     measurement_time = t;
     received_time = t;
+    selected_in = "";
   }
   const bool empty() const;
   virtual const bool valid() const { return _valid; }
@@ -48,6 +50,9 @@ class IEntry {
   virtual void setSource(const key_type& source);
   virtual const key_type& getSource() const;
 
+  virtual void setSelectedIn(std::string viewName);
+  virtual std::string getSelectedIn() const;
+
   virtual std::string csv(std::string delimiter) const;
   virtual std::string str() const;
 
@@ -57,6 +62,7 @@ class IEntry {
   time_type received_time;
   bool _valid;
   key_type source;
+  std::string selected_in;
 };
 
 template <typename K, typename T>
@@ -193,10 +199,21 @@ inline const K& IEntry<K, T>::getSource() const {
 }
 
 template <typename K, typename T>
+void IEntry<K, T>::setSelectedIn(std::string viewName) {
+  this->selected_in = viewName;
+}
+
+template <typename K, typename T>
+std::string IEntry<K, T>::getSelectedIn() const {
+  return this->selected_in;
+}
+
+template <typename K, typename T>
 inline std::string IEntry<K, T>::csv(std::string delimiter) const {
   std::stringstream out;
   out << this->count << delimiter << this->measurement_time << delimiter
-      << this->received_time << delimiter << this->source;
+      << this->received_time << delimiter << this->source << delimiter
+      << this->selected_in;
   return out.str();
 }
 

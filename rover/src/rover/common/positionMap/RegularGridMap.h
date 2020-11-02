@@ -61,6 +61,8 @@ class RegularGridMap
   // writer
   virtual void write(time_type& time, std::shared_ptr<view_type>,
                      FileWriter* writer);
+  virtual void write(time_type& time, std::string viewStr, FileWriter* writer);
+  virtual void writeAll(time_type& time, FileWriter* writer);
   virtual void writeLocal(time_type& time, FileWriter* writer);
   virtual void writeYmf(time_type& time, FileWriter* writer);
   virtual void writeLocalWithIds(time_type& time, FileWriter* writer);
@@ -212,6 +214,9 @@ RegularGridMap<NODE_ID>::incrementLocal(const traci::TraCIPosition& coord,
                                         const omnetpp::simtime_t& t) {
   CellId cellId =
       std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
+  if (cellId == std::make_pair(5, 46)) {
+    int x = 3;
+  }
   return this->incrementLocal(cellId, nodeId, t);
 }
 
@@ -312,6 +317,35 @@ inline void RegularGridMap<NODE_ID>::write(time_type& time,
     writer->write() << time.dbl() << del << cell.first << del << cell.second
                     << del << measure->csv(del) << del << ownCell << std::endl;
   }
+}
+
+template <typename NODE_ID>
+inline void RegularGridMap<NODE_ID>::write(time_type& time, std::string viewStr,
+                                           FileWriter* writer) {
+  if (viewStr == "all") {
+    this->writeAll(time, writer);
+  } else {
+    write(time, this->getView(viewStr), writer);
+  }
+}
+
+template <typename NODE_ID>
+void RegularGridMap<NODE_ID>::writeAll(time_type& time, FileWriter* writer) {
+  using visitor_f = typename RegularGridMap<NODE_ID>::entry_visitor_f;
+  using cell_key_type = typename RegularGridMap<NODE_ID>::cell_key_type;
+  using node_value_type = typename RegularGridMap<NODE_ID>::node_value_type;
+
+  auto currCell = this->getCellId();
+  visitor_f v = [&time, &writer, &currCell](const cell_key_type& cell,
+                                            const node_value_type& value) {
+    int ownCell = (currCell == cell) ? 1 : 0;
+    const auto& measure = value.second;
+
+    std::string del = writer->del();
+    writer->write() << time.dbl() << del << cell.first << del << cell.second
+                    << del << measure->csv(del) << del << ownCell << std::endl;
+  };
+  this->visit_entry(v);
 }
 
 template <typename NODE_ID>
