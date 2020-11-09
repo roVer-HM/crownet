@@ -26,6 +26,8 @@ class IEntryTest : public ::testing::Test {
     e4_dbl_with_count_loc.nodeIds.insert(11);
     e4_dbl_with_count_loc.nodeIds.insert(22);
     e4_dbl_with_count_loc.nodeIds.insert(33);
+
+    e2_dbl_with_count.setSelectedIn("someViewName");
   }
 
   IEntry<int, int> e1_int_empty;
@@ -158,7 +160,7 @@ TEST_F(IEntryTest, XXXX) {
 }
 
 TEST_F(IEntryTest, toCsv) {
-  const char* expectVal = "3,1.34,4.42,0";
+  const char* expectVal = "3,1.34,4.42,0,someViewName";
   ASSERT_STREQ(expectVal, e2_dbl_with_count.csv(",").c_str());
 }
 

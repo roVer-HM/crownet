@@ -26,9 +26,9 @@ TEST(LocalDensityMeasureTest, rest) {
 
 TEST(LocalDensityMeasureTest, csv) {
   LocalEntry m{1, 3.5, 3.7};
-  std::string csv = "1,3.5,3.7,0";
+  std::string csv = "1,3.5,3.7,0,";  // empty selected in
   EXPECT_STREQ(csv.c_str(), m.csv(",").c_str());
-  csv = "1;3.5;3.7;0";
+  csv = "1;3.5;3.7;0;";  // empty selected in
   EXPECT_STREQ(csv.c_str(), m.csv(";").c_str());
 }
 
