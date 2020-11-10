@@ -7,6 +7,7 @@
 
 #include "VadereNodeManager.h"
 #include <inet/common/ModuleAccess.h>
+#include "inet/common/scenario/ScenarioManager.h"
 #include "rover/artery/traci/VadereCore.h"
 
 using namespace rover::constants;
@@ -174,7 +175,15 @@ cModule* VadereNodeManager::addNodeModule(const std::string& id,
   m_nodes[id] = module;
   init(module);
   module->scheduleStart(simTime());
+
+  inet::cPreModuleInitNotification pre;
+  pre.module = module;
+  emit(POST_MODEL_CHANGE, &pre);
   module->callInitialize();
+  inet::cPostModuleInitNotification post;
+  post.module = module;
+  emit(POST_MODEL_CHANGE, &post);
+
   emit(addNodeSignal, id.c_str(), module);
 
   return module;
