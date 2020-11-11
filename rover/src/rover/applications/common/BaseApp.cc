@@ -20,6 +20,7 @@ using namespace inet;
 namespace rover {
 BaseApp::~BaseApp() {
   if (appLifeTime) cancelAndDelete(appLifeTime);
+  if (appMainTimer) cancelAndDelete(appMainTimer);
 }
 
 void BaseApp::initialize(int stage) {

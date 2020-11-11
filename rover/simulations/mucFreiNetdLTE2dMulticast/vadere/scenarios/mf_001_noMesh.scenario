@@ -1,0 +1,868 @@
+{
+  "name" : "mf_001_noMesh",
+  "description" : "",
+  "release" : "1.14",
+  "processWriters" : {
+    "files" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 6, 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "pedestrianPosition.csv",
+      "processors" : [ 9 ]
+    } ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
+    } ],
+    "isTimestamped" : true,
+    "isWriteMetaData" : true
+  },
+  "scenario" : {
+    "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
+    "attributesModel" : {
+      "org.vadere.state.attributes.models.AttributesOSM" : {
+        "stepCircleResolution" : 4,
+        "numberOfCircles" : 1,
+        "optimizationType" : "DISCRETE",
+        "varyStepDirection" : true,
+        "movementType" : "ARBITRARY",
+        "stepLengthIntercept" : 0.4625,
+        "stepLengthSlopeSpeed" : 0.2345,
+        "stepLengthSD" : 0.036,
+        "movementThreshold" : 0.0,
+        "minStepLength" : 0.1,
+        "minimumStepLength" : true,
+        "maxStepDuration" : 1.7976931348623157E308,
+        "dynamicStepLength" : true,
+        "updateType" : "EVENT_DRIVEN",
+        "seeSmallWalls" : false,
+        "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
+        "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
+        "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
+        "submodels" : [ ]
+      },
+      "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
+        "pedPotentialIntimateSpaceWidth" : 0.45,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialHeight" : 50.0,
+        "obstPotentialWidth" : 0.8,
+        "obstPotentialHeight" : 6.0,
+        "intimateSpaceFactor" : 1.2,
+        "personalSpacePower" : 1,
+        "intimateSpacePower" : 1
+      },
+      "org.vadere.state.attributes.models.AttributesFloorField" : {
+        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "potentialFieldResolution" : 0.3,
+        "obstacleGridPenalty" : 0.1,
+        "targetAttractionStrength" : 1.0,
+        "cacheType" : "BIN_CACHE",
+        "cacheDir" : "",
+        "timeCostAttributes" : {
+          "standardDeviation" : 0.7,
+          "type" : "UNIT",
+          "obstacleDensityWeight" : 3.5,
+          "pedestrianSameTargetDensityWeight" : 3.5,
+          "pedestrianOtherTargetDensityWeight" : 3.5,
+          "pedestrianWeight" : 3.5,
+          "queueWidthLoading" : 1.0,
+          "pedestrianDynamicWeight" : 6.0,
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
+        }
+      }
+    },
+    "attributesSimulation" : {
+      "finishTime" : 400.0,
+      "simTimeStepLength" : 0.4,
+      "realTimeSimTimeRatio" : 0.1,
+      "writeSimulationData" : true,
+      "visualizationEnabled" : true,
+      "printFPS" : false,
+      "digitsPerCoordinate" : 2,
+      "useFixedSeed" : false,
+      "fixedSeed" : -7492697142818052001,
+      "simulationSeed" : 0
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null,
+      "arguments" : [ ],
+      "requiredDataProcessorIds" : [ ]
+    },
+    "topography" : {
+      "attributes" : {
+        "bounds" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 281.135,
+          "height" : 233.492
+        },
+        "boundingBoxWidth" : 0.5,
+        "bounded" : true,
+        "referenceCoordinateSystem" : {
+          "epsgCode" : "EPSG:32632",
+          "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
+          "translation" : {
+            "x" : 692298.893546436,
+            "y" : 5337359.5927164
+          }
+        }
+      },
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 34.184528031619266,
+            "y" : 103.45165914203972
+          }, {
+            "x" : 35.143472886877134,
+            "y" : 104.59655814245343
+          }, {
+            "x" : 36.5662145196693,
+            "y" : 104.78908331599087
+          }, {
+            "x" : 37.68349146726541,
+            "y" : 104.32600555103272
+          }, {
+            "x" : 38.41683508839924,
+            "y" : 103.3270724080503
+          }, {
+            "x" : 39.12917688721791,
+            "y" : 101.40395382326096
+          }, {
+            "x" : 36.21081361558754,
+            "y" : 90.13497867714614
+          }, {
+            "x" : 33.662605388090014,
+            "y" : 90.42750915884972
+          }, {
+            "x" : 31.56104696553666,
+            "y" : 91.82544513046741
+          }, {
+            "x" : 31.38560078665614,
+            "y" : 93.49960389640182
+          } ]
+        },
+        "id" : -2146909508
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 44.95580209430773,
+            "y" : 145.69339104369283
+          }, {
+            "x" : 44.545680914772674,
+            "y" : 144.16641706041992
+          }, {
+            "x" : 45.2247751490213,
+            "y" : 143.00989151280373
+          }, {
+            "x" : 47.498271818156354,
+            "y" : 142.47446985542774
+          }, {
+            "x" : 48.598571354406886,
+            "y" : 143.17907950095832
+          }, {
+            "x" : 49.05699854623526,
+            "y" : 144.8189422674477
+          }, {
+            "x" : 48.3173444410786,
+            "y" : 145.7842827634886
+          }, {
+            "x" : 46.22454259626102,
+            "y" : 146.25902840774506
+          } ]
+        },
+        "id" : 315892727
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 36.15401877113618,
+            "y" : 124.24897328391671
+          }, {
+            "x" : 38.53970266249962,
+            "y" : 133.36109044402838
+          }, {
+            "x" : 44.9521799973445,
+            "y" : 131.614958406426
+          }, {
+            "x" : 42.43446780578233,
+            "y" : 122.39011141005903
+          }, {
+            "x" : 41.95210967049934,
+            "y" : 122.52175992634147
+          }, {
+            "x" : 44.33812262152787,
+            "y" : 131.26394434645772
+          }, {
+            "x" : 38.89552052039653,
+            "y" : 132.7459762757644
+          }, {
+            "x" : 36.63771611719858,
+            "y" : 124.12233390193433
+          } ]
+        },
+        "id" : -2146909574
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 70.03598873973824,
+            "y" : 154.44162870440633
+          }, {
+            "x" : 63.9051997439703,
+            "y" : 155.57291137482972
+          }, {
+            "x" : 63.68937568860129,
+            "y" : 154.4609250543639
+          }, {
+            "x" : 69.75846854113043,
+            "y" : 153.30733322594315
+          }, {
+            "x" : 69.66510152635165,
+            "y" : 152.81612817440183
+          }, {
+            "x" : 63.10307629434392,
+            "y" : 154.06348395403475
+          }, {
+            "x" : 63.50892190965824,
+            "y" : 156.15451824627817
+          }, {
+            "x" : 70.12671957321,
+            "y" : 154.93332803864033
+          } ]
+        },
+        "id" : -2146909575
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 41.495958384592086,
+            "y" : 183.76441889908165
+          }, {
+            "x" : 39.12477841426153,
+            "y" : 173.14604601170868
+          }, {
+            "x" : 42.04149968351703,
+            "y" : 172.50078107323498
+          }, {
+            "x" : 44.46519816911314,
+            "y" : 183.33340229000896
+          }, {
+            "x" : 44.95313465455547,
+            "y" : 183.2242323672399
+          }, {
+            "x" : 42.42051705112681,
+            "y" : 171.90467507205904
+          }, {
+            "x" : 38.52760422276333,
+            "y" : 172.76590347103775
+          }, {
+            "x" : 41.00797741964925,
+            "y" : 183.8733884524554
+          } ]
+        },
+        "id" : -2146909576
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 32.51053092163056,
+            "y" : 164.91235029604286
+          }, {
+            "x" : 34.48099246842321,
+            "y" : 164.53361880686134
+          }, {
+            "x" : 34.861655729822814,
+            "y" : 166.49352435022593
+          }, {
+            "x" : 32.890820767497644,
+            "y" : 166.88336935266852
+          } ]
+        },
+        "id" : 258747568
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 190.7618675532285,
+            "y" : 124.80099873896688
+          }, {
+            "x" : 74.83682320057414,
+            "y" : 156.92423631995916
+          }, {
+            "x" : 57.20784526085481,
+            "y" : 164.73688931483775
+          }, {
+            "x" : 60.16722558485344,
+            "y" : 177.64818987809122
+          }, {
+            "x" : 63.4801616508048,
+            "y" : 191.3448637779802
+          }, {
+            "x" : 67.41563127504196,
+            "y" : 207.55477807018906
+          }, {
+            "x" : 173.0324382625986,
+            "y" : 216.90788922645152
+          }, {
+            "x" : 176.72245256369933,
+            "y" : 203.0464565390721
+          }, {
+            "x" : 180.61082071368583,
+            "y" : 188.37948899995536
+          }, {
+            "x" : 184.5933474684134,
+            "y" : 173.34852800425142
+          }, {
+            "x" : 194.20352301141247,
+            "y" : 133.7845619544387
+          } ]
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 226.3263244627742,
+            "y" : 125.53173826355487
+          }, {
+            "x" : 204.37542883609422,
+            "y" : 134.56112706288695
+          }, {
+            "x" : 201.7971219897736,
+            "y" : 144.365528203547
+          }, {
+            "x" : 192.50285635958426,
+            "y" : 180.95828558783978
+          }, {
+            "x" : 183.35417968663387,
+            "y" : 216.9885176429525
+          }, {
+            "x" : 201.89338803174905,
+            "y" : 220.6170987067744
+          }, {
+            "x" : 227.66909021360334,
+            "y" : 222.4423063788563
+          }, {
+            "x" : 243.31888462847564,
+            "y" : 221.4675362892449
+          }, {
+            "x" : 266.8641395017039,
+            "y" : 216.58650793414563
+          }, {
+            "x" : 267.9708851422183,
+            "y" : 215.11062895320356
+          } ]
+        },
+        "id" : 2
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 260.8812735421816,
+            "y" : 93.26152925658971
+          }, {
+            "x" : 244.05070658866316,
+            "y" : 100.54959123954177
+          }, {
+            "x" : 238.87414659676142,
+            "y" : 114.33865467552096
+          }, {
+            "x" : 243.4401964941062,
+            "y" : 123.97207950428128
+          }, {
+            "x" : 250.98321901855525,
+            "y" : 138.9240373559296
+          }, {
+            "x" : 265.8513249706011,
+            "y" : 132.21519688982517
+          }, {
+            "x" : 266.52393763524015,
+            "y" : 106.06886018998921
+          } ]
+        },
+        "id" : 4
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 236.60935701429844,
+            "y" : 36.178175740875304
+          }, {
+            "x" : 190.7335660138633,
+            "y" : 41.219531727954745
+          }, {
+            "x" : 176.23753470624797,
+            "y" : 47.70745483879
+          }, {
+            "x" : 201.7161203790456,
+            "y" : 104.34161129593849
+          }, {
+            "x" : 250.7174344616942,
+            "y" : 83.40610039141029
+          } ]
+        },
+        "id" : 5
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 163.97155458736233,
+            "y" : 43.90083914715797
+          }, {
+            "x" : 100.8645743234083,
+            "y" : 67.03247937373817
+          }, {
+            "x" : 91.400879368186,
+            "y" : 95.75552458222955
+          }, {
+            "x" : 94.81280079181306,
+            "y" : 113.3875450687483
+          }, {
+            "x" : 105.83364458288997,
+            "y" : 134.56926098559052
+          }, {
+            "x" : 126.49755827151239,
+            "y" : 131.03704586345702
+          }, {
+            "x" : 144.40523256990127,
+            "y" : 125.57625259272754
+          }, {
+            "x" : 186.24831376958173,
+            "y" : 109.62850864138454
+          }, {
+            "x" : 179.02355446084403,
+            "y" : 79.03271373733878
+          } ]
+        },
+        "id" : 6
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 73.391655680025,
+            "y" : 70.93640628363937
+          }, {
+            "x" : 35.18955889437348,
+            "y" : 74.0835119811818
+          }, {
+            "x" : 53.421859462046996,
+            "y" : 143.9884978728369
+          }, {
+            "x" : 93.88797833118588,
+            "y" : 137.39369323011488
+          }, {
+            "x" : 86.69231894193217,
+            "y" : 112.99634445086122
+          }, {
+            "x" : 82.6933010640787,
+            "y" : 99.99976863898337
+          } ]
+        },
+        "id" : 7
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 38.657446734257974,
+            "y" : 30.04657330363989
+          }, {
+            "x" : 22.48113794787787,
+            "y" : 34.70925254561007
+          }, {
+            "x" : 25.282931765075773,
+            "y" : 45.46248584240675
+          }, {
+            "x" : 34.28020040481351,
+            "y" : 60.79684395994991
+          }, {
+            "x" : 97.54455124400556,
+            "y" : 56.86257029697299
+          }, {
+            "x" : 124.76689721515868,
+            "y" : 48.243910011835396
+          }, {
+            "x" : 144.6164098768495,
+            "y" : 40.38958319462836
+          }, {
+            "x" : 141.06120428279974,
+            "y" : 31.457867121323943
+          } ]
+        },
+        "id" : 8
+      } ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 2.3,
+          "y" : 5.8,
+          "width" : 224.3,
+          "height" : 225.7,
+          "type" : "RECTANGLE"
+        },
+        "id" : 33
+      } ],
+      "stairs" : [ ],
+      "targets" : [ {
+        "id" : 2004,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 38.38017114950344,
+            "y" : 129.2482413193211
+          }, {
+            "x" : 42.99653236696031,
+            "y" : 127.93883320968598
+          }, {
+            "x" : 42.32688660803251,
+            "y" : 125.39741617254913
+          }, {
+            "x" : 37.671219136798754,
+            "y" : 126.65074417833239
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2005,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 65.84538135528564,
+            "y" : 155.1516011144966
+          }, {
+            "x" : 66.49283912477549,
+            "y" : 155.06165613811464
+          }, {
+            "x" : 66.28855706485919,
+            "y" : 154.1385136369616
+          }, {
+            "x" : 65.73046959496568,
+            "y" : 154.23705464340748
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2006,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 39.743836659239605,
+            "y" : 175.1885706447065
+          }, {
+            "x" : 40.03878624760546,
+            "y" : 176.57178546953946
+          }, {
+            "x" : 42.64186042826623,
+            "y" : 176.0068034948781
+          }, {
+            "x" : 42.31035781640094,
+            "y" : 174.5258869305253
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2010,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 212.77475542388856,
+            "y" : 112.58420109096915
+          }, {
+            "x" : 210.7502333279699,
+            "y" : 108.70256907306612
+          }, {
+            "x" : 216.1148088691989,
+            "y" : 106.25020141806453
+          }, {
+            "x" : 218.09373033512384,
+            "y" : 110.58428115211427
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2012,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 14.498689020564779,
+            "y" : 15.489219468832015
+          }, {
+            "x" : 19.633464544359594,
+            "y" : 15.445768344961106
+          }, {
+            "x" : 19.25427063407842,
+            "y" : 13.823129471205174
+          }, {
+            "x" : 13.932564650010317,
+            "y" : 13.69209489300847
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      } ],
+      "targetChangers" : [ ],
+      "absorbingAreas" : [ ],
+      "sources" : [ {
+        "id" : 1004,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 39.09952326992061,
+            "y" : 132.3526000296697
+          }, {
+            "x" : 43.89463899855036,
+            "y" : 131.035520484671
+          }, {
+            "x" : 43.1331309544621,
+            "y" : 128.36780711077154
+          }, {
+            "x" : 38.44773379713297,
+            "y" : 129.68858129810542
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 30,
+        "maxSpawnNumberTotal" : 30,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2010 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1005,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 64.56561238614377,
+            "y" : 155.3175312589854
+          }, {
+            "x" : 64.36467318043579,
+            "y" : 154.46154481936247
+          }, {
+            "x" : 64.90690780738369,
+            "y" : 154.33453650977464
+          }, {
+            "x" : 65.10653123892844,
+            "y" : 155.22958635091783
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 30,
+        "maxSpawnNumberTotal" : 30,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2012 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1006,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 39.28489002282731,
+            "y" : 173.26640917919576
+          }, {
+            "x" : 39.68267181888223,
+            "y" : 174.97654628567398
+          }, {
+            "x" : 42.32100326218642,
+            "y" : 174.37870224472135
+          }, {
+            "x" : 41.96378227695823,
+            "y" : 172.64723144005984
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 30,
+        "maxSpawnNumberTotal" : 30,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2010 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1010,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 205.57176774577238,
+            "y" : 114.64172127656639
+          }, {
+            "x" : 203.81481660716236,
+            "y" : 111.82839394640177
+          }, {
+            "x" : 208.84381105948705,
+            "y" : 109.4252469651401
+          }, {
+            "x" : 210.92693999549374,
+            "y" : 113.36938277352601
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 30,
+        "maxSpawnNumberTotal" : 30,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2006 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1012,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 6.688078890321776,
+            "y" : 15.884285255149006
+          }, {
+            "x" : 5.830813595792279,
+            "y" : 13.428607236407696
+          }, {
+            "x" : 11.057035847450607,
+            "y" : 13.532395476289093
+          }, {
+            "x" : 11.733023814624175,
+            "y" : 15.645580861531197
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 30,
+        "maxSpawnNumberTotal" : 30,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2005 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1014,
+        "shape" : {
+          "x" : 20.9,
+          "y" : 95.7,
+          "width" : 7.0,
+          "height" : 3.6,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 5.0 ],
+        "spawnNumber" : 30,
+        "maxSpawnNumberTotal" : 30,
+        "startTime" : 0.0,
+        "endTime" : 50.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2004 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      } ],
+      "dynamicElements" : [ ],
+      "attributesPedestrian" : {
+        "radius" : 0.195,
+        "densityDependentSpeed" : false,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.26,
+        "minimumSpeed" : 0.5,
+        "maximumSpeed" : 2.2,
+        "acceleration" : 2.0,
+        "footstepHistorySize" : 4,
+        "searchRadius" : 1.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+      },
+      "teleporter" : null,
+      "attributesCar" : null
+    },
+    "stimulusInfos" : [ {
+      "timeframe" : {
+        "startTime" : 0.0,
+        "endTime" : 10.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "stimuli" : [ {
+        "type" : "Wait"
+      } ]
+    } ]
+  }
+}

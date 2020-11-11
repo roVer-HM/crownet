@@ -83,7 +83,7 @@ module PedestrianFull like INetworkNode
         bool hasIpv6 = default(false);
 
         **.interfaceTableModule = default(absPath(".interfaceTable"));
-        *.routingTableModule = default("^.ipv4.routingTable");
+        *.routingTableModule = default("^.^.ipv4.routingTable");
 
         //# Ext Interface
         bool enableExtInterface = default(false);
