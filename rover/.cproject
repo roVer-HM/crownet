@@ -13,7 +13,11 @@
                     				
                 </macros>
                 				
-                <externalSettings/>
+                <externalSettings>
+                    					
+                    <externalSetting/>
+                    				
+                </externalSettings>
                 				
                 <extensions>
                     					
@@ -191,6 +195,18 @@
                             							
                             <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.186963895" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
                                 								
+                                <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.1527259147" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/src}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/src/traci/sumo}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/extern/vanetza/vanetza/asn1/support}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/extern/vanetza}&quot;"/>
+                                    								
+                                </option>
+                                								
                                 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1873979592" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                                 							
                             </tool>
@@ -220,6 +236,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/build/Release/lib}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/extern/vanetza/build/Debug/lib}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/artery/extern/vanetza/build/Release/lib}&quot;"/>
                                     								
                                 </option>
                                 								
