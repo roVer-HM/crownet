@@ -11,6 +11,7 @@
 #include <memory>
 #include <vanetza/geonet/areas.hpp>
 #include "artery/utility/IdentityRegistry.h"
+#include "omnetpp/cwatch.h"
 #include "rover/applications/PositionMapPacket_m.h"
 #include "rover/common/positionMap/GlobalDensityMap.h"
 #include "traci/Core.h"
@@ -27,6 +28,14 @@ void ArteryDensityMapApp::initialize(int stage) {
   AidBaseApp::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
     std::string x = par("coordConverterModule").stdstringValue();
+    WATCH(mapType);
+    new omnetpp::cGenericReadonlyWatch<std::string>("mapTypeLog", mapTypeLog);
+    new omnetpp::cGenericReadonlyWatch<std::string>("FooBar", mapTypeLog);
+    m[1] = "Hello";
+    m[2] = "World";
+    WATCH_MAP(_map);
+    WATCH_MAP(m);
+
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     middleware = inet::findModuleFromPar<artery::Middleware>(
         par("middelwareModule"), this, true);
@@ -92,6 +101,7 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
 
     // register density map for use in GlobalDensityMap context.
     emit(GlobalDensityMap::registerMap, this);
+    _map = dMap->getMap();
   }
 }
 
@@ -132,6 +142,7 @@ BaseApp::FsmState ArteryDensityMapApp::fsmAppMain(cMessage *msg) {
   updateLocalMap();
   sendMapMap();
   scheduleNextAppMainEvent();
+  _map = dMap->getMap();
   return FsmRootStates::WAIT_ACTIVE;
 }
 

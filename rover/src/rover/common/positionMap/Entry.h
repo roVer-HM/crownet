@@ -13,13 +13,16 @@
 #include <sstream>
 #include <string>
 
+#include "../util/FilePrinter.h"
+
 template <typename K, typename T>
-class IEntry {
+class IEntry : public rover::FilePrinter {
  public:
   using key_type = K;
   using time_type = T;
   IEntry();
   IEntry(const int, const time_type&, const time_type&);
+  IEntry(const int, const time_type&, const time_type&, const key_type& source);
   IEntry(const int);
   virtual ~IEntry() = default;
   virtual void reset(const time_type& t) {
@@ -27,6 +30,11 @@ class IEntry {
     _valid = false;
     measurement_time = t;
     received_time = t;
+    selected_in = "";
+  }
+  virtual void reset() {
+    count = 0;
+    _valid = false;
     selected_in = "";
   }
   virtual void clear(const time_type& t) {
@@ -39,6 +47,7 @@ class IEntry {
   virtual const bool valid() const { return _valid; }
   virtual void incrementCount(const time_type& t);
   virtual void decrementCount(const time_type& t);
+  virtual void touch(const time_type& t);  // update time only
 
   virtual const time_type& getMeasureTime() const;
   virtual const time_type& getReceivedTime() const;
@@ -56,6 +65,16 @@ class IEntry {
   virtual std::string csv(std::string delimiter) const;
   virtual std::string str() const;
 
+  virtual int columns() const override;
+  virtual void writeTo(std::ostream& out,
+                       const std::string& sep) const override;
+  virtual void writeHeaderTo(std::ostream& out,
+                             const std::string& sep) const override;
+
+  //  bool operator<(const Cell<C, N, T>& rhs) const;
+  //  bool operator>(const Cell<C, N, T>& rhs) const;
+  bool operator==(const IEntry<K, T>& rhs) const;
+
  protected:
   int count;
   time_type measurement_time;
@@ -71,9 +90,12 @@ class ILocalEntry : public IEntry<K, T> {
   virtual ~ILocalEntry() = default;
   ILocalEntry();
   ILocalEntry(const int, const T&, const T&);
+  ILocalEntry(const int);
 
   virtual void reset(const T& t) override;
   virtual void clear(const T& t) override;
+  virtual std::string str() const override;
+  virtual std::string nodeString(const std::string& sep) const;
 
   // STS: make protected.
   std::set<typename IEntry<K, T>::key_type> nodeIds;
@@ -108,14 +130,14 @@ class EntryDefaultCtorImpl : public EntryCtor<K, T> {
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry()
-    : count(0), measurement_time(), received_time(), _valid(false), source() {}
+    : count(0), measurement_time(), received_time(), _valid(true), source() {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(int count)
     : count(count),
       measurement_time(),
       received_time(),
-      _valid(true),
+      _valid(count >= 0),
       source() {}
 
 template <typename K, typename T>
@@ -126,6 +148,14 @@ inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
       received_time(r_t),
       _valid(true),
       source() {}
+template <typename K, typename T>
+inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
+                            const time_type& r_t, const key_type& source)
+    : count(count),
+      measurement_time(m_t),
+      received_time(r_t),
+      _valid(true),
+      source(source) {}
 
 template <typename K, typename T>
 inline const bool IEntry<K, T>::empty() const {
@@ -147,6 +177,12 @@ inline void IEntry<K, T>::decrementCount(const time_type& t) {
   }
   count--;
   _valid = true;
+  measurement_time = t;
+  received_time = t;
+}
+
+template <typename K, typename T>
+void IEntry<K, T>::touch(const time_type& t) {
   measurement_time = t;
   received_time = t;
 }
@@ -220,11 +256,36 @@ inline std::string IEntry<K, T>::csv(std::string delimiter) const {
 template <typename K, typename T>
 inline std::string IEntry<K, T>::str() const {
   std::stringstream os;
-  os << "Count: " << this->count
-     << "| measurement_time:" << this->measurement_time
-     << "| received_time: " << this->received_time
-     << "| valid: " << this->valid();
+  os << "Count: " << this->count << "| meas_t: " << this->measurement_time
+     << "| recv_t: " << this->received_time << "| valid: " << this->valid();
   return os.str();
+}
+
+template <typename K, typename T>
+int IEntry<K, T>::columns() const {
+  return 5;
+}
+
+template <typename K, typename T>
+void IEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
+  out << this->count << sep << this->measurement_time << sep
+      << this->received_time << sep << this->source << sep << this->selected_in;
+}
+
+template <typename K, typename T>
+void IEntry<K, T>::writeHeaderTo(std::ostream& out,
+                                 const std::string& sep) const {
+  out << "count" << sep << "measured_t" << sep << "received_t" << sep
+      << "source" << sep << "selection";
+}
+
+template <typename K, typename T>
+bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
+  if (this == &rhs) return true;
+  return (this->count == rhs.count) && (this->source == rhs.source) &&
+         (this->measurement_time == rhs.measurement_time) &&
+         (this->received_time == rhs.received_time) &&
+         (this->_valid == rhs._valid);
 }
 
 ///////////////////////////////////////////////////
@@ -238,6 +299,9 @@ inline ILocalEntry<K, T>::ILocalEntry(const int count, const T& m_t,
     : IEntry<K, T>(count, m_t, r_t) {}
 
 template <typename K, typename T>
+inline ILocalEntry<K, T>::ILocalEntry(const int count) : IEntry<K, T>(count) {}
+
+template <typename K, typename T>
 inline void ILocalEntry<K, T>::reset(const T& t) {
   IEntry<K, T>::reset(t);
   this->nodeIds.clear();
@@ -247,4 +311,33 @@ template <typename K, typename T>
 inline void ILocalEntry<K, T>::clear(const T& t) {
   IEntry<K, T>::clear(t);
   this->nodeIds.clear();
+}
+
+template <typename K, typename T>
+inline std::string ILocalEntry<K, T>::str() const {
+  std::stringstream os;
+  os << IEntry<K, T>::str() << "| node_ids: {";
+  int nCount = this->nodeIds.size() - 1;
+  for (const auto& e : this->nodeIds) {
+    os << e;
+    if (nCount > 0) {
+      os << ", ";
+      --nCount;
+    }
+  }
+  os << "}";
+  return os.str();
+}
+
+template <typename K, typename T>
+std::string ILocalEntry<K, T>::nodeString(const std::string& sep) const {
+  std::stringstream os;
+  int nCount = this->nodeIds.size() - 1;
+  for (const auto& e : this->nodeIds) {
+    os << e;
+    if (nCount-- > 0) {
+      os << ", ";
+    }
+  }
+  return os.str();
 }

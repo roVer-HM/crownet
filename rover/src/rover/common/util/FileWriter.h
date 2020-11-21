@@ -12,6 +12,8 @@
 #include <memory>
 #include <vector>
 
+#include "FilePrinter.h"
+
 namespace rover {
 
 class FileWriter {

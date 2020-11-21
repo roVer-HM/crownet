@@ -8,6 +8,7 @@
 #pragma once
 
 #include <math.h>
+#include <omnetpp/cwatch.h>
 #include <omnetpp/simtime_t.h>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/filesystem.hpp>
@@ -39,6 +40,7 @@ class RegularGridMap
   using iter_value = typename RegularGridMap<NODE_ID>::node_mapped_type;
   using view_type = typename RegularGridMap<NODE_ID>::PositionMapView;
   using range_type = typename RegularGridMap<NODE_ID>::cellEntryFiltered_r;
+  using map_type = typename RegularGridMap<NODE_ID>::map_type;
 
   RegularGridMap(NodeId id, double gridSize, std::pair<int, int> gridDim);
   virtual ~RegularGridMap() = default;
@@ -103,6 +105,15 @@ class RegularGridMap
     int index;
   };
 };
+
+//
+// template <typename NODE_ID>
+// class RegularGridMapWatcher
+//    : public omnetpp::cStdVectorWatcherBase<
+//          std::pair<int, int>, CellEntry<IEntry<NODE_ID, omnetpp::simtime_t>>>
+//          {
+//  // todo
+//};
 
 template <typename NODE_ID>
 inline RegularGridMap<NODE_ID>::FullIter::FullIter(
@@ -214,9 +225,6 @@ RegularGridMap<NODE_ID>::incrementLocal(const traci::TraCIPosition& coord,
                                         const omnetpp::simtime_t& t) {
   CellId cellId =
       std::make_pair(floor(coord.x / gridSize), floor(coord.y / gridSize));
-  if (cellId == std::make_pair(5, 46)) {
-    int x = 3;
-  }
   return this->incrementLocal(cellId, nodeId, t);
 }
 

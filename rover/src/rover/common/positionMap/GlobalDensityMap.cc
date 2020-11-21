@@ -101,16 +101,9 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
 
     fileWriter.reset(fBuilder.build());
     fileWriter->writeHeader({
-        "simtime",
-        "x",
-        "y",
-        "count",
-        "measured_t",
-        "received_t",
-        "source",
-        "selection",
-        "own_cell",
-        "node_id",
+        "simtime", "x", "y", "count", "measured_t", "received_t", "source",
+        "selection", "own_cell",
+        "node_id",  // new
     });
   }
 }

@@ -10,6 +10,7 @@
 
 #include <omnetpp/cexception.h>
 #include <omnetpp/clog.h>
+#include <omnetpp/cobject.h>
 #include <boost/heap/binomial_heap.hpp>
 #include <boost/range.hpp>
 #include <boost/range/adaptor/filtered.hpp>
@@ -25,6 +26,8 @@
 #include <utility>
 #include "rover/common/positionMap/Entry.h"
 
+namespace foobar {}
+
 namespace rover {
 
 template <typename VALUE,
@@ -36,6 +39,21 @@ template <typename VALUE,
           typename std::enable_if<std::is_base_of<
               EntryCtor<typename VALUE::key_type, typename VALUE::time_type>,
               ENTRY_CTOR>::value>::type* = nullptr>
+class CellEntry;
+
+template <typename VALUE, typename ENTRY_CTOR>
+inline std::ostream& operator<<(std::ostream& os,
+                                CellEntry<VALUE, ENTRY_CTOR>& e) {
+  return os << "Foo";
+}
+
+template <typename VALUE, typename ENTRY_CTOR,
+          typename std::enable_if<std::is_base_of<
+              IEntry<typename VALUE::key_type, typename VALUE::time_type>,
+              VALUE>::value>::type*,
+          typename std::enable_if<std::is_base_of<
+              EntryCtor<typename VALUE::key_type, typename VALUE::time_type>,
+              ENTRY_CTOR>::value>::type*>
 class CellEntry {
  public:
   using key_type = typename VALUE::key_type;  // measuring node
@@ -82,6 +100,9 @@ class CellEntry {
   const bool hasValidMeasure(const key_type& node_id) const {
     return hasMeasure(node_id) && get(node_id)->valid();
   }
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const CellEntry<VALUE, ENTRY_CTOR>& e);
 
   /**
    * reset all data in cell, local and received
@@ -134,6 +155,7 @@ class CellEntry {
         throw omnetpp::cRuntimeError("element with key %s already existed.");
       }
       _localEntry = ret.first->second;  // address of mapped_type in map.
+      _localEntry->reset();
     }
 
     return _localEntry;
@@ -230,7 +252,7 @@ class CellCtor {
 
 template <typename CELL_KEY, typename VALUE,
           typename CTOR = CellCtor<VALUE, typename VALUE::key_type>>
-class PositionMap {
+class PositionMap : public omnetpp::cObject {
  public:
   class PositionMapView;
   class LocalView;
@@ -255,9 +277,9 @@ class PositionMap {
   // used by boost::iterator_ranges to filter/aggregate the correct
   // entry_mapped_type based on given predicate/transformer.
   using view_value_type = std::pair<const cell_key_type&, node_mapped_type>;
+  using map_type = std::map<cell_key_type, cell_mapped_type>;
 
  protected:
-  using map_type = std::map<cell_key_type, cell_mapped_type>;
   using map_views = std::map<std::string, std::shared_ptr<PositionMapView>>;
   map_type _map;  // map of cells. cell -> node -> measure
   std::map<node_key_type, cell_key_type>
@@ -306,6 +328,8 @@ class PositionMap {
   void initViews();
 
  public:
+  map_type getMap() const { return this->_map; }
+
   cell_mapped_type& getCellEntry(const cell_key_type& cell_key);
 
   cellContainer_r range();

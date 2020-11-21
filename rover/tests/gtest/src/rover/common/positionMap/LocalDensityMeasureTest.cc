@@ -15,7 +15,7 @@ using LocalEntry = ILocalEntry<int, omnetpp::simtime_t>;
 // rest must also rest nodeIds set
 TEST(LocalDensityMeasureTest, rest) {
   LocalEntry m{};
-  EXPECT_FALSE(m.valid());
+  EXPECT_TRUE(m.valid());
   m.incrementCount(4.9);
   m.nodeIds.insert(32);
   EXPECT_TRUE(m.valid());

@@ -8,11 +8,13 @@
 #pragma once
 
 #include <omnetpp.h>
+#include <omnetpp/cwatch.h>
 #include <memory>
 #include <vanetza/net/mac_address.hpp>
 #include "artery/application/Middleware.h"
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/networking/Router.h"
+#include "rover/rover.h"
 
 #include "inet/common/InitStages.h"
 #include "rover/applications/common/AidBaseApp.h"
@@ -26,12 +28,26 @@ using namespace inet;
 
 namespace rover {
 
+// class FooBar {
+// public:
+//  FooBar(std::string a) : a(a){};
+//  std::string a;
+//
+//};
+//
+// class FooBarWatcher : public omnetpp::cGenericReadonlyWatch<FooBar> {
+// public:
+//  FooBarWatcher(const char *name, const FooBar &x)
+//      : omnetpp::cGenericReadonlyWatch<FooBar>(name, x) {}
+//};
+
 class ArteryDensityMapApp
     : public AidBaseApp,
       public IDensityMapHandler<RegularGridMap<std::string>>,
       public omnetpp::cListener {
  public:
   using Grid = RegularGridMap<std::string>;
+  using GridMap = RegularGridMap<std::string>::map_type;
   using Measurement =
       RegularGridMap<std::string>::node_mapped_type::element_type;
   using CellId = Grid::cell_key_type;
@@ -73,11 +89,13 @@ class ArteryDensityMapApp
 
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<Grid> dMap;
+  GridMap _map;
   std::unique_ptr<FileWriter> fileWriter;
   simtime_t lastUpdate = -1.0;
 
   std::string mapType;
   std::string mapTypeLog;
+  std::map<int, std::string> m;
 };
 
 } /* namespace rover */
