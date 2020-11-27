@@ -31,6 +31,7 @@ simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
         string middelwareModule = default("^.^.middleware"); //node internal
         string coordConverterModule;
         double gridSize = default(3.0) @units(m);
+        packetName = default("DcDMap");
         
         destPort = 30001;
         localPort = 30001;
