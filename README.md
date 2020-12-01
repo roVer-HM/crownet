@@ -31,7 +31,7 @@ The roVer environment requires a Linux System. We are currently using Ubuntu 18.
 Clone the roVer repository including all submodules within your home directory:
 ```
 cd ~
-git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:5022/rover/rover-main.git
+git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/rover-main.git
 ```
 
 Install Docker (if not already available on your system):
