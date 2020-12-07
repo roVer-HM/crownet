@@ -141,6 +141,28 @@ TEST_F(DcDMapFileWriterTest, print_all_valid) {
   EXPECT_STREQ(out.str().c_str(), ret.c_str());
 }
 
+TEST_F(DcDMapFileWriterTest, computeValues_idenpotent) {
+  YmfVisitor ymf_v;
+  mapFull.setOwnerCell(GridCellID(3, 3));
+
+  setSimTime(1.4);
+  mapFull.computeValues(ymf_v);
+  auto sourceOfSelected = mapFull.getCell(GridCellID(6, 3)).val()->getSource();
+  EXPECT_EQ(sourceOfSelected.value(), 803);
+
+  setSimTime(10.4);
+  mapFull.getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
+  mapFull.computeValues(ymf_v);
+  sourceOfSelected = mapFull.getCell(GridCellID(6, 3)).val()->getSource();
+  EXPECT_EQ(sourceOfSelected.value(), 805);
+
+  // resetting 805 but no time increment must not change the selected value
+  mapFull.getCell(GridCellID(6, 3)).get(805)->reset(omnetpp::simTime());
+  mapFull.computeValues(ymf_v);
+  sourceOfSelected = mapFull.getCell(GridCellID(6, 3)).val()->getSource();
+  EXPECT_EQ(sourceOfSelected.value(), 805);
+}
+
 TEST_F(DcDMapFileWriterTest, printall_all_valid) {
   YmfVisitor ymf_v;
   std::stringstream out;

@@ -69,6 +69,11 @@ const typename DcDMap<C, N, T>::map_t* DcDMap<C, N, T>::getCells() const {
 }
 
 template <typename C, typename N, typename T>
+void DcDMap<C, N, T>::setOwnerCell(const traci::TraCIPosition& pos) {
+  this->setOwnerCell(this->cellKeyProvider->getCellKey(pos));
+}
+
+template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::setCellKeyProvider(
     std::shared_ptr<CellKeyProvider<C>> provider) {
   this->cellKeyProvider = provider;
@@ -85,8 +90,11 @@ void DcDMap<C, N, T>::visitCells(Fn visitor) {
 template <typename C, typename N, typename T>
 template <typename Fn>
 void DcDMap<C, N, T>::computeValues(Fn visitor) {
-  for (auto& entry : this->cells) {
-    entry.second.computeValue(visitor);
+  if (lastComputedAt < this->timeProvider->now()) {
+    for (auto& entry : this->cells) {
+      entry.second.computeValue(visitor);
+    }
+    lastComputedAt = this->timeProvider->now();
   }
 }
 

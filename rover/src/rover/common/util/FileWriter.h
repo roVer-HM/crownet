@@ -19,21 +19,23 @@ namespace rover {
 class FileWriter {
  public:
   virtual ~FileWriter();
-  FileWriter();
+  FileWriter(std::shared_ptr<FilePrinter> printer);
   FileWriter(FileWriter &&other);
 
   void initialize(std::string absPath, std::string delim = ";");
-  void writeHeader(std::initializer_list<std::string> header);
   std::string del() const;
 
   std::ostream &write();
+  void writeHeader();
+  void writeData();
 
   template <typename T>
   friend std::ostream &operator<<(FileWriter &output, const T &_t);
 
  private:
   std::ofstream s;
-  std::string delim;
+  std::string sep;
+  std::shared_ptr<FilePrinter> printer;
 };
 
 template <typename T>
@@ -53,13 +55,12 @@ class FileWriterBuilder {
     return *this;
   }
   FileWriterBuilder &addPath(std::string path);
-  FileWriter *build();
+  FileWriter *build(std::shared_ptr<FilePrinter> printer);
 
  private:
   using metadata_t = std::map<std::string, std::string>;
   metadata_t metadata;
   std::string path;
-  std::initializer_list<std::string> header;
 };
 
 template <>

@@ -132,6 +132,23 @@ class SimTimePrinter2:
         s = s.normalize()
         return eng_string(s, si_str='s', si=True)
 
+class NodeIdentifierInt:
+
+    def __init__(self, val):
+        self.val = val
+
+    def to_string(self):
+        return f"{self.val['id']}"
+
+
+class GridCellID:
+
+    def __init__(self, val):
+        self.val = val
+
+    def to_string(self):
+        return f"id: [{self.val['id.first']}, {self.val['id.second']}]"
+
 ##############################################
 
 class cObjectPrinter(cPrinterBase):
@@ -302,6 +319,8 @@ def build_rover_dictionary():
 
     rover_printer.add('omnetpp::SimTime', SimTimePrinter)
     rover_printer.add('omnetpp::simtime_t', SimTimePrinter2)
+    rover_printer.add('rover::NodeIdentifiere<int>', NodeIdentifierInt)
+    #rover_printer.add('rover::GridCellID',GridCellID)
 # As of GDB 7.5 and CDT 3.8.1, GDB often crashes during pretty printing
 # a cObject pointer so the cObject pretty printer routines are disabled for now.
 #    rover_printer.add('cObject', cObjectPrinter)

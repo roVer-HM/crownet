@@ -35,6 +35,7 @@ class GridCellID : public CellIdentifiere {
                        const std::string& sep) const override;
   virtual void writeHeaderTo(std::ostream& out,
                              const std::string& sep) const override;
+  virtual std::pair<int, int> val() const { return id; }
 
  private:
   std::pair<int, int> id;

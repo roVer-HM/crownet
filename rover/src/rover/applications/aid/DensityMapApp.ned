@@ -29,6 +29,7 @@ simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
         @signal[RegisterDensityMap];
         @signal[RemoveDensityMap];
         string middelwareModule = default("^.^.middleware"); //node internal
+        string identiyRegistryModule = default("identiyRegistry");
         string coordConverterModule;
         double gridSize = default(3.0) @units(m);
         

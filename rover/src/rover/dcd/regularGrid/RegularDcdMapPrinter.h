@@ -30,7 +30,7 @@ class RegularDcdMapValuePrinter : public FilePrinter {
 };
 
 // todo print all cell values  not only the 'selected' one
-class RegularDcdMapAllPrinter : RegularDcdMapValuePrinter {
+class RegularDcdMapAllPrinter : public RegularDcdMapValuePrinter {
  public:
   RegularDcdMapAllPrinter(RegularDcdMap* map)
       : RegularDcdMapValuePrinter(map){};
@@ -39,7 +39,7 @@ class RegularDcdMapAllPrinter : RegularDcdMapValuePrinter {
 };
 
 // todo print global map
-class RegularDcdMapGlobalPrinter : RegularDcdMapValuePrinter {
+class RegularDcdMapGlobalPrinter : public RegularDcdMapValuePrinter {
  public:
   RegularDcdMapGlobalPrinter(RegularDcdMap* map)
       : RegularDcdMapValuePrinter(map){};

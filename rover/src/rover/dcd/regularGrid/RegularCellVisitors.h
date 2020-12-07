@@ -51,6 +51,41 @@ class ClearVisitor : public TimestampedVisitor<RegularCell> {
   }
 };
 
+class ClearSelection : public VoidCellVisitor<RegularCell> {
+ public:
+  ClearSelection() {}
+  virtual void applyTo(RegularCell& cell) override {
+    for (auto e : cell) {
+      e.second->setSelectedIn("");
+    }
+  }
+};
+
+class ClearLocalVisitor : public TimestampedVisitor<RegularCell> {
+ public:
+  ClearLocalVisitor(RegularCell::time_t time)
+      : TimestampedVisitor<RegularCell>(time) {}
+  virtual void applyTo(RegularCell& cell) override {
+    if (cell.hasLocal()) {
+      cell.getLocal()->clear(time);
+    }
+  }
+};
+
+class ClearCellIdVisitor : public TimestampedVisitor<RegularCell> {
+ public:
+  ClearCellIdVisitor(RegularCell::node_key_t id, RegularCell::time_t time)
+      : TimestampedVisitor<RegularCell>(time), id(id) {}
+  virtual void applyTo(RegularCell& cell) override {
+    if (cell.hasData(id)) {
+      cell.get(id)->clear(time);
+    }
+  }
+
+ private:
+  RegularCell::node_key_t id;
+};
+
 /**
  * Return Youngest Measurement from a RegularCell
  *

@@ -87,3 +87,14 @@ FilterIterator<T, Iter, IterVal, Pred>
 FilterIterator<T, Iter, IterVal, Pred>::end() {
   return FilterIterator<T, Iter, IterVal, Pred>(*this, this->data->end());
 }
+
+template <typename T, typename Iter, typename IterVal, typename Pred>
+int FilterIterator<T, Iter, IterVal, Pred>::distance() {
+  // new iterator
+  FilterIterator<T, Iter, IterVal, Pred> tmp(this->data, this->predicate);
+  int i = 0;
+  for (; tmp != tmp.end(); ++tmp) {
+    ++i;
+  }
+  return i;
+}

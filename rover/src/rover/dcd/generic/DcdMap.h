@@ -11,6 +11,7 @@
 #include "rover/dcd/generic/CellVisitors.h"  // *.tcc
 #include "rover/dcd/generic/iterator/DcDMapIterator.h"
 #include "rover/dcd/identifier/CellKeyProvider.h"
+#include "rover/dcd/identifier/TimeProvider.h"
 
 namespace rover {
 
@@ -30,8 +31,11 @@ class DcDMap {
   virtual ~DcDMap() = default;
   DcDMap() {}
   DcDMap(node_key_t owner_id,
-         std::shared_ptr<CellKeyProvider<C>> cellKeyProvider)
-      : owner_id(owner_id), cellKeyProvider(cellKeyProvider) {}
+         std::shared_ptr<CellKeyProvider<C>> cellKeyProvider,
+         std::shared_ptr<TimeProvider<T>> timeProvider)
+      : owner_id(owner_id),
+        cellKeyProvider(cellKeyProvider),
+        timeProvider(timeProvider) {}
 
   // getter
   const node_key_t& getOwnerId() const { return owner_id; }
@@ -42,6 +46,7 @@ class DcDMap {
   bool hasDataFrom(const cell_key_t& cell_id, const node_key_t& owner_id) const;
   std::string str() const;
   std::string strFull() const;
+  std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() const;
 
   // getter/setter (create if missing)
   cell_t& getCell(const cell_key_t& cell_id);
@@ -50,6 +55,7 @@ class DcDMap {
   // setter
   void setOwnerId(node_key_t _owner_id) { owner_id = _owner_id; }
   void setOwnerCell(cell_key_t _owner_cell) { owner_cell = _owner_cell; }
+  void setOwnerCell(const traci::TraCIPosition& pos);
   void setCellKeyProvider(std::shared_ptr<CellKeyProvider<C>> provider);
 
   // map update methods
@@ -84,7 +90,6 @@ class DcDMap {
   void visitCells(Fn visitor);
   template <typename Fn>
   void computeValues(Fn visitor);
-
   template <typename Fn>
   void applyVisitorTo(const cell_key_t& cell_id, Fn visitor);
 
@@ -92,7 +97,9 @@ class DcDMap {
   map_t cells;
   node_key_t owner_id;
   cell_key_t owner_cell;
+  time_t lastComputedAt;
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
+  std::shared_ptr<TimeProvider<T>> timeProvider;
   std::map<node_key_t, cell_key_t> neighborhood;
 };
 #include "DcdMap.tcc"

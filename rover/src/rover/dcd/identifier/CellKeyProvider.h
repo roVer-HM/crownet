@@ -28,6 +28,9 @@ class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
 
   virtual GridCellID getCellKey(const traci::TraCIPosition& pos) override;
 
+  std::pair<double, double> getGridSize() const { return gridSize; }
+  std::pair<int, int> getGridDim() const { return gridDim; }
+
  private:
   std::pair<double, double> gridSize;
   std::pair<int, int> gridDim;
