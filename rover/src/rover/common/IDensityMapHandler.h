@@ -17,6 +17,7 @@ class IDensityMapHandler {
  public:
   virtual ~IDensityMapHandler() = default;
   virtual void updateLocalMap() = 0;
+  virtual void computeValues() = 0;
   // FIXME: allow global fileWriter object to pass in.
   virtual void writeMap() = 0;
   virtual std::shared_ptr<GRID> getMap() = 0;

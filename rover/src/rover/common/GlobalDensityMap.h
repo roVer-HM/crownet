@@ -21,10 +21,10 @@
 #include <memory>
 
 #include "inet/common/InitStages.h"
+#include "rover/common/IDensityMapHandler.h"
 #include "rover/common/converter/OsgCoordConverter.h"
-#include "rover/common/positionMap/IDensityMapHandler.h"
-#include "rover/common/positionMap/RegularGridMap.h"
 #include "rover/common/util/FileWriter.h"
+#include "rover/dcd/regularGrid/RegularDcdMap.h"
 #include "traci/NodeManager.h"
 
 using namespace omnetpp;
@@ -36,9 +36,9 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
                          public traci::ITraciNodeVisitor {
  public:
-  using Grid = RegularGridMap<std::string>;
-  using GridHandler = IDensityMapHandler<RegularGridMap<std::string>>;
-  using gridMap_t = std::map<typename Grid::NodeId, GridHandler *>;
+  //  using Grid = RegularGridMap<std::string>;
+  using GridHandler = IDensityMapHandler<RegularDcdMap>;
+  using gridMap_t = std::map<RegularDcdMap::node_key_t, GridHandler *>;
 
   static const omnetpp::simsignal_t registerMap;
   static const omnetpp::simsignal_t removeMap;
@@ -75,7 +75,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
 
   traci::NodeManager *nodeManager = nullptr;
   std::shared_ptr<OsgCoordinateConverter> converter;
-  std::shared_ptr<Grid> gMap;
+  std::shared_ptr<RegularDcdMap> dcdMapGlobal;
   gridMap_t dezentralMaps;
   std::string m_middelwareModule;
   std::unique_ptr<FileWriter> fileWriter;

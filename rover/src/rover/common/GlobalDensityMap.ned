@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.common.positionMap;
+package rover.common;
 
 //
 // TODO auto-generated type

@@ -36,9 +36,10 @@ import lte.epc.PgwStandardSimplified;
 import rover.nodes.IMobileUe;
 import rover.nodes.UnequippedHost;
 import rover.common.ICoordConverter;
-import rover.common.positionMap.GlobalDensityMap;
+import rover.common.GlobalDensityMap;
 
 import artery.storyboard.Storyboard;
+import artery.utility.IdentityRegistry;
 import traci.Manager;
 
 
@@ -114,11 +115,16 @@ network LTE_World
             parameters:
                 @display("p=523.74,148.995");
         }
-        
+
         gloablDensityMap: GlobalDensityMap {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
-        
+
+        identiyRegistry: IdentityRegistry {
+            @display("p=523.74,259.6125;i=block/table2;is=s");
+        }
+
+
 
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++;

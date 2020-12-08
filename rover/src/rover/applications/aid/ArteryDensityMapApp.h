@@ -8,33 +8,49 @@
 #pragma once
 
 #include <omnetpp.h>
+#include <omnetpp/cwatch.h>
 #include <memory>
 #include <vanetza/net/mac_address.hpp>
 #include "artery/application/Middleware.h"
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/networking/Router.h"
+#include "artery/utility/IdentityRegistry.h"
+#include "rover/rover.h"
 
 #include "inet/common/InitStages.h"
 #include "rover/applications/common/AidBaseApp.h"
+#include "rover/common/IDensityMapHandler.h"
 #include "rover/common/converter/OsgCoordConverter.h"
-#include "rover/common/positionMap/IDensityMapHandler.h"
-#include "rover/common/positionMap/RegularGridMap.h"
 #include "rover/common/util/FileWriter.h"
+#include "rover/dcd/regularGrid/RegularDcdMap.h"
 
 using namespace omnetpp;
 using namespace inet;
 
 namespace rover {
 
-class ArteryDensityMapApp
-    : public AidBaseApp,
-      public IDensityMapHandler<RegularGridMap<std::string>>,
-      public omnetpp::cListener {
+// class FooBar {
+// public:
+//  FooBar(std::string a) : a(a){};
+//  std::string a;
+//
+//};
+//
+// class FooBarWatcher : public omnetpp::cGenericReadonlyWatch<FooBar> {
+// public:
+//  FooBarWatcher(const char *name, const FooBar &x)
+//      : omnetpp::cGenericReadonlyWatch<FooBar>(name, x) {}
+//};
+
+class ArteryDensityMapApp : public AidBaseApp,
+                            public IDensityMapHandler<RegularDcdMap>,
+                            public omnetpp::cListener {
  public:
-  using Grid = RegularGridMap<std::string>;
-  using Measurement =
-      RegularGridMap<std::string>::node_mapped_type::element_type;
-  using CellId = Grid::cell_key_type;
+  //  using Grid = RegularGridMap<std::string>;
+  //  using GridMap = RegularGridMap<std::string>::map_type;
+  //  using Measurement =
+  //      RegularGridMap<std::string>::node_mapped_type::element_type;
+  //  using CellId = Grid::cell_key_type;
 
   virtual ~ArteryDensityMapApp();
 
@@ -65,14 +81,18 @@ class ArteryDensityMapApp
   //
   virtual void updateLocalMap() override;
   virtual void writeMap() override;
-  virtual std::shared_ptr<Grid> getMap() override;
+  virtual std::shared_ptr<RegularDcdMap> getMap() override;
+  virtual void computeValues() override;
 
  private:
   // application
   artery::Middleware *middleware = nullptr;
+  artery::IdentityRegistry *identiyRegistry = nullptr;
+  int hostId;
 
   std::shared_ptr<OsgCoordinateConverter> converter;
-  std::shared_ptr<Grid> dMap;
+  //  std::shared_ptr<Grid> dMap;
+  std::shared_ptr<RegularDcdMap> dcdMap;
   std::unique_ptr<FileWriter> fileWriter;
   simtime_t lastUpdate = -1.0;
 

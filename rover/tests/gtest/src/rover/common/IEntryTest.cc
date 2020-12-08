@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-#include "rover/common/positionMap/Entry.h"
+#include "rover/common/Entry.h"
 
 double TIME1 = 1.34;
 double TIME2 = 4.42;
@@ -53,7 +53,7 @@ TEST_F(IEntryTest, Ctor2) {
 }
 
 TEST_F(IEntryTest, isValid) {
-  ASSERT_FALSE(e1_int_empty.valid());
+  ASSERT_TRUE(e1_int_empty.valid());
   ASSERT_TRUE(e2_dbl_with_count.valid());
 }
 
@@ -79,7 +79,7 @@ TEST_F(IEntryTest, reset2) {
  * incrementing count will increase count and validate cell
  */
 TEST_F(IEntryTest, incrementCount) {
-  EXPECT_FALSE(e1_int_empty.valid());  // no count given on construction
+  ASSERT_TRUE(e1_int_empty.valid());  // no count given on construction
   e1_int_empty.incrementCount(2);
   EXPECT_EQ(1, e1_int_empty.getCount());
   EXPECT_EQ(2, e1_int_empty.getMeasureTime());
@@ -149,10 +149,8 @@ TEST_F(IEntryTest, XXXX) {
   std::shared_ptr<OppEntry> e2 = std::make_shared<OppLocEntry>(1, 1.1, 2.2);
 
   IEntry<std::string, omnetpp::simtime_t> other1{1, 1.1, 2.2};
-  std::cout << "start";
   other1.reset(t1);
   e1->reset(t1);
-  std::cout << "end" << std::endl;
   e2->reset(t1);  // print
   std::shared_ptr<OppLocEntry> e2Cast =
       std::static_pointer_cast<OppLocEntry>(e2);
@@ -172,9 +170,9 @@ TEST_F(IEntryTest, clear) {
   EXPECT_TRUE(e2_dbl_with_count.valid());
   EXPECT_EQ(e2_dbl_with_count.getCount(), 0);
 
-  EXPECT_FALSE(e1_int_empty.valid());
+  EXPECT_TRUE(e1_int_empty.valid());
   e1_int_empty.clear(t1);
-  EXPECT_FALSE(e1_int_empty.valid());
+  EXPECT_TRUE(e1_int_empty.valid());
 }
 
 TEST_F(IEntryTest, clearLocal) {
@@ -187,9 +185,9 @@ TEST_F(IEntryTest, clearLocal) {
   EXPECT_EQ(e4_dbl_with_count_loc.getCount(), 0);
   EXPECT_EQ(e4_dbl_with_count_loc.nodeIds.size(), 0);
 
-  EXPECT_FALSE(e3_int_empty_loc.valid());
+  EXPECT_TRUE(e3_int_empty_loc.valid());
   e3_int_empty_loc.clear(t1);
-  EXPECT_FALSE(e3_int_empty_loc.valid());
+  EXPECT_TRUE(e3_int_empty_loc.valid());
 }
 
 TEST_F(IEntryTest, reset) {
@@ -200,7 +198,7 @@ TEST_F(IEntryTest, reset) {
   EXPECT_FALSE(e2_dbl_with_count.valid());
   EXPECT_EQ(e2_dbl_with_count.getCount(), 0);
 
-  EXPECT_FALSE(e1_int_empty.valid());
+  EXPECT_TRUE(e1_int_empty.valid());
   e1_int_empty.reset(t1);
   EXPECT_FALSE(e1_int_empty.valid());
 }
@@ -215,7 +213,7 @@ TEST_F(IEntryTest, resetLocal) {
   EXPECT_EQ(e4_dbl_with_count_loc.getCount(), 0);
   EXPECT_EQ(e4_dbl_with_count_loc.nodeIds.size(), 0);
 
-  EXPECT_FALSE(e3_int_empty_loc.valid());
+  EXPECT_TRUE(e3_int_empty_loc.valid());
   e3_int_empty_loc.reset(t1);
   EXPECT_FALSE(e3_int_empty_loc.valid());
 }

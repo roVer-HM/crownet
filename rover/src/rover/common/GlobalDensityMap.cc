@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "rover/common/positionMap/GlobalDensityMap.h"
+#include "rover/common/GlobalDensityMap.h"
 
 #include <inet/common/ModuleAccess.h>
 #include <inet/mobility/contract/IMobility.h>
@@ -22,6 +22,8 @@
 #include "artery/application/Middleware.h"
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/utility/Identity.h"
+#include "rover/dcd/regularGrid/RegularCellVisitors.h"
+#include "rover/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 namespace {
 const simsignal_t traciInit = cComponent::registerSignal("traci.init");
@@ -58,15 +60,15 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
                                      omnetpp::cObject *details) {
   if (signalId == registerMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
-    dezentralMaps[mapHandler->getMap()->getNodeId()] = mapHandler;
+    dezentralMaps[mapHandler->getMap()->getOwnerId()] = mapHandler;
     EV_DEBUG << "register DensityMap for node: "
-             << mapHandler->getMap()->getNodeId();
+             << mapHandler->getMap()->getOwnerId();
 
   } else if (signalId == removeMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
-    dezentralMaps.erase(mapHandler->getMap()->getNodeId());
+    dezentralMaps.erase(mapHandler->getMap()->getOwnerId());
     EV_DEBUG << "remove DensityMap for node: "
-             << mapHandler->getMap()->getNodeId();
+             << mapHandler->getMap()->getOwnerId();
   }
 }
 void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
@@ -83,10 +85,11 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
     gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
-    gMap = std::make_shared<RegularGridMap<std::string>>("global", gridSize,
-                                                         gridDim);
+    RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
-    // 2) setup writer. todo: duplicated see ArteryDensityMapApp.cc
+    dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
+
+    // 2) setup writer.
     FileWriterBuilder fBuilder{};
     fBuilder.addMetadata("IDXCOL", 3);
     fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
@@ -96,22 +99,12 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
         "MAP_TYPE",
         "global");  // The global density map is the ground
                     // truth. No algorihm needed.
-    fBuilder.addMetadata<std::string>("NODE_ID", "global");
+    fBuilder.addMetadata("NODE_ID", dcdMapGlobal->getOwnerId().value());
     fBuilder.addPath("global");
 
-    fileWriter.reset(fBuilder.build());
-    fileWriter->writeHeader({
-        "simtime",
-        "x",
-        "y",
-        "count",
-        "measured_t",
-        "received_t",
-        "source",
-        "selection",
-        "own_cell",
-        "node_id",
-    });
+    fileWriter.reset(fBuilder.build(
+        std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal.get())));
+    fileWriter->writeHeader();
   }
 }
 
@@ -158,29 +151,9 @@ void GlobalDensityMap::visitNode(const std::string &traciNodeId,
                         .position();
   const auto &posInet = converter->position_cast_traci(pos);
 
-  // access mac address as identifier
-  std::ostringstream node_id;
-  node_id
-      << middleware->getFacilities().getConst<artery::Identity>().geonet.mid();
-
-  if (node_id.str() == "0a:aa:00:00:00:08") {
-    std::stringstream out;
-    out << "Time: " << simTime() << std::endl;
-    out << "Owner: "
-        << "global" << std::endl;
-    out << "Id: " << node_id.str() << std::endl;
-    //    out << "Geo: " << pos.latitude.val_ << ", " << pos.longitude.val_
-    //        << std::endl;
-    out << "Cart: " << posInet.x << ", " << posInet.y << std::endl;
-    out << "Cart: " << floor(posInet.x / 3) << ", " << floor(posInet.y / 3)
-        << std::endl;
-    out << "trap" << std::endl;
-    EV_DEBUG << out.str();
-  }
-
   // visitNode is called for *all* nodes thus this 'local' map of the global
   // module represents the global (ground truth) of the simulation.
-  gMap->incrementLocal(posInet, node_id.str(), simTime());
+  dcdMapGlobal->incrementLocal(posInet, mod->getId(), simTime());
 }
 
 /**
@@ -195,18 +168,19 @@ void GlobalDensityMap::updateMaps() {
   lastUpdate = simTime();
 
   // global map needs reset (not clear)
-  gMap->resetMap(lastUpdate);
+  dcdMapGlobal->visitCells(ResetVisitor{lastUpdate});
+  dcdMapGlobal->clearNeighborhood();
   nodeManager->visit(this);
 
   // update each decentralized map
   for (auto &handler : dezentralMaps) {
     handler.second->updateLocalMap();
+    handler.second->computeValues();
   }
-}  // namespace rover
+}
 
 void GlobalDensityMap::writeMaps() {
-  simtime_t time = simTime();
-  gMap->writeLocalWithIds(time, fileWriter.get());
+  fileWriter->writeData();
 
   // write decentralized maps
   for (auto &handler : dezentralMaps) {
