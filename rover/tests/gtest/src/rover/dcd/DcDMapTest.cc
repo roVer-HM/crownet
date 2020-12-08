@@ -10,7 +10,7 @@
 #include <string>
 
 #include "main_test.h"
-#include "rover/common/positionMap/Entry.h"
+#include "rover/common/Entry.h"
 #include "rover/dcd/regularGrid/RegularCell.h"
 #include "rover/dcd/regularGrid/RegularCellVisitors.h"
 #include "rover/dcd/regularGrid/RegularDcdMap.h"

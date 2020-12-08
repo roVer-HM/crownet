@@ -13,7 +13,7 @@
 #include "artery/utility/IdentityRegistry.h"
 #include "omnetpp/cwatch.h"
 #include "rover/applications/PositionMapPacket_m.h"
-#include "rover/common/positionMap/GlobalDensityMap.h"
+#include "rover/common/GlobalDensityMap.h"
 #include "rover/dcd/regularGrid/RegularCellVisitors.h"
 #include "rover/dcd/regularGrid/RegularDcdMapPrinter.h"
 #include "traci/Core.h"

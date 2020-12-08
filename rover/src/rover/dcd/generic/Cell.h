@@ -13,7 +13,7 @@
 #include <omnetpp/cexception.h>
 #include <memory>
 
-#include "rover/common/positionMap/Entry.h"
+#include "rover/common/Entry.h"
 #include "rover/dcd/generic/iterator/CellDataIterator.h"
 #include "rover/dcd/identifier/Identifiers.h"
 

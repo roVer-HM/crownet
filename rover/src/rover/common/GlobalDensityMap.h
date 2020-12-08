@@ -21,9 +21,8 @@
 #include <memory>
 
 #include "inet/common/InitStages.h"
+#include "rover/common/IDensityMapHandler.h"
 #include "rover/common/converter/OsgCoordConverter.h"
-#include "rover/common/positionMap/IDensityMapHandler.h"
-#include "rover/common/positionMap/RegularGridMap.h"
 #include "rover/common/util/FileWriter.h"
 #include "rover/dcd/regularGrid/RegularDcdMap.h"
 #include "traci/NodeManager.h"

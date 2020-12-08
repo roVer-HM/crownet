@@ -36,7 +36,7 @@ import lte.epc.PgwStandardSimplified;
 import rover.nodes.IMobileUe;
 import rover.nodes.UnequippedHost;
 import rover.common.ICoordConverter;
-import rover.common.positionMap.GlobalDensityMap;
+import rover.common.GlobalDensityMap;
 
 import artery.storyboard.Storyboard;
 import artery.utility.IdentityRegistry;

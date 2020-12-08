@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-#include "rover/common/positionMap/Entry.h"
+#include "rover/common/Entry.h"
 
 double TIME1 = 1.34;
 double TIME2 = 4.42;
