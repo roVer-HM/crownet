@@ -26,10 +26,12 @@ FileWriterBuilder &FileWriterBuilder::addPath(std::string path) {
   return *this;
 }
 
-FileWriter *FileWriterBuilder::build() {
-  FileWriter *obj = new FileWriter();
+FileWriter *FileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
+  FileWriter *obj = new FileWriter(std::move(printer));
   obj->initialize(path, metadata["SEP"]);
+  // write metadata
   int n = metadata.size();
+  obj->write() << "#";
   for (const auto &e : metadata) {
     obj->write() << e.first << "=" << e.second;
     if (n > 1) {
@@ -38,6 +40,7 @@ FileWriter *FileWriterBuilder::build() {
     n--;
   }
   obj->write() << "\n";
+
   return obj;
 }
 
@@ -47,9 +50,14 @@ FileWriter::~FileWriter() {
 }
 
 FileWriter::FileWriter(FileWriter &&other)
-    : s(std::move(other.s)), delim(std::move(other.delim)) {}
+    : s(std::move(other.s)), sep(other.sep), printer(other.printer) {}
 
-FileWriter::FileWriter() : s(), delim(";") {}
+FileWriter::FileWriter(std::shared_ptr<FilePrinter> printer)
+    : s(), sep(";"), printer(std::move(printer)) {}
+
+void FileWriter::writeHeader() { printer->writeHeaderTo(s, sep); }
+
+void FileWriter::writeData() { printer->writeTo(s, sep); }
 
 void FileWriter::initialize(std::string fileName, std::string _delim) {
   using namespace omnetpp;
@@ -61,22 +69,15 @@ void FileWriter::initialize(std::string fileName, std::string _delim) {
                                        ->getAsFilename(scaObj);
 
     boost::filesystem::path p{outputScalarFile};
-    std::string _path = p.parent_path().string() + "/" + fileName;
+    std::string _path = p.parent_path().string() + "/" + fileName + ".csv";
     s = std::ofstream(_path);
-    delim = _delim;
+    sep = _delim;
   } else {
     throw cRuntimeError("output-scalar-file not found");
   }
 }
 
-void FileWriter::writeHeader(std::initializer_list<std::string> header) {
-  boost::iterator_range<std::initializer_list<std::string>::const_iterator> rng(
-      header.begin(), header.end());
-  std::string joined = boost::algorithm::join(rng, delim);
-  s << joined << std::endl;
-}
-
-std::string FileWriter::del() const { return delim; }
+std::string FileWriter::del() const { return sep; }
 
 std::ostream &FileWriter::write() { return s; }
 

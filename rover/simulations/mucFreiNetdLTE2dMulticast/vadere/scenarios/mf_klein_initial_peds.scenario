@@ -125,7 +125,9 @@
     },
     "attributesStrategy" : {
       "useStrategyModel" : false,
-      "strategyModel" : null
+      "strategyModel" : null,
+      "arguments" : [ ],
+      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {

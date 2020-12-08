@@ -43,6 +43,7 @@ class VadereSubscriptionManager : public traci::Listener,
 
  protected:
   void initialize() override;
+  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
   void finish() override;
 
   void subscribePerson(const std::string& id);

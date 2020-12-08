@@ -46,6 +46,7 @@ class VadereNodeManager : public traci::NodeManager,
   using NodeInitializer = std::function<void(omnetpp::cModule*)>;
 
   void initialize() override;
+  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
   void finish() override;
 
   virtual void addMovingObject(const std::string&);
@@ -71,7 +72,6 @@ class VadereNodeManager : public traci::NodeManager,
   Boundary m_boundary;
   VadereSubscriptionManager* m_subscriptions;
   unsigned m_nodeIndex;
-  std::map<std::string, omnetpp::cModule*> m_nodes;
   std::map<std::string, MovingObjectSink*> m_persons;
   std::string m_objectSinkModule;
 };

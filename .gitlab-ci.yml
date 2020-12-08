@@ -67,6 +67,21 @@ build-for-sim:
     - ${ROVER_MAIN}/artery
     expire_in: 1 weeks
 
+# run the unit tests
+gtests:
+  stage: test
+  tags:
+    - rover-sim
+  variables:
+    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
+  script:
+    - "cd ${ROVER_MAIN}/rover"
+    - "${OPP} make test"
+  artifacts:
+    when: always
+    paths:
+    - ${ROVER_MAIN}/rover/tests/fingerprint
+    expire_in: 8 weeks
 
 # run the fingerprint tests
 fingerprints:
