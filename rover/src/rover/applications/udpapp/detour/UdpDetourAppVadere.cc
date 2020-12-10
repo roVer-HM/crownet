@@ -6,6 +6,7 @@
  */
 
 #include "rover/applications/udpapp/detour/UdpDetourAppVadere.h"
+#include <artery/traci/ControllableObject.h>
 
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/TagBase_m.h"
@@ -26,7 +27,7 @@ using omnetpp::cStringTokenizer;
 namespace rover {
 Define_Module(UdpDetourAppVadere);
 
-UdpDetourAppVadere::UdpDetourAppVadere() : mobility(nullptr), traci(nullptr) {}
+UdpDetourAppVadere::UdpDetourAppVadere() : mobility(nullptr) {}
 
 UdpDetourAppVadere::~UdpDetourAppVadere() {}
 
@@ -36,13 +37,18 @@ void UdpDetourAppVadere::initialize(int stage) {
     // nothing here
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     // traci
-    mobility =
-        veins::VeinsInetMobilityAccess().get<veins::VaderePersonMobility *>(
-            getParentModule());
-    traci = mobility->getCommandInterface();
+    // todo get artery TraCI !!!!
+    //    mobility =
+    //        veins::VeinsInetMobilityAccess().get<veins::VaderePersonMobility
+    //        *>(
+    //            getParentModule());
+    auto mobility = inet::getModuleFromPar<ControllableObject>(
+        par("mobilityModule"), inet::getContainingNode(this));
+    ctrl = mobility->getController<VaderePersonController>();
 
     // record internal identifier for node.
-    std::string exId = mobility->getExternalId();
+    //    std::string exId = mobility->getExternalId();
+    std::string exId = ctrl->getNodeId();
     try {
       recordScalar("externalId", std::stod(exId));
     } catch (std::invalid_argument const &e) {
@@ -55,15 +61,19 @@ void UdpDetourAppVadere::initialize(int stage) {
 
 void UdpDetourAppVadere::actOnIncident(
     IntrusivePtr<const DetourAppPacket> pkt) {
-  veins::VaderePersonItfc *traciPerson = mobility->getPersonCommandInterface();
+  //  veins::VaderePersonItfc *traciPerson =
+  //  mobility->getPersonCommandInterface();
 
   // inform mobility provider about received information
-  traciPerson->setInformation(simTime().dbl(), -1.0,
-                              std::string(pkt->getIncidentReason()));
+  //  traciPerson->setInformation(simTime().dbl(), -1.0,
+  //                              std::string(pkt->getIncidentReason()));
+  ctrl->setInformed(simTime().dbl(), -1.0,
+                    std::string(pkt->getIncidentReason()));
 
   // check and act if needed.
   std::string blocked = std::string(pkt->getClosedTarget());
-  std::vector<std::string> targetLists = traciPerson->getTargetList();
+  //  std::vector<std::string> targetLists = traciPerson->getTargetList();
+  std::vector<std::string> targetLists = ctrl->getTargetList();
   if (std::find(targetLists.begin(), targetLists.end(), blocked) !=
       targetLists.end()) {
     // blocked target found on traget list.
@@ -71,7 +81,8 @@ void UdpDetourAppVadere::actOnIncident(
     for (int i = 0; i < pkt->getAlternativeRouteArraySize(); i++) {
       newTargetlist.push_back(pkt->getAlternativeRoute(i));
     }
-    traciPerson->setTargetList(newTargetlist);
+    //    traciPerson->setTargetList(newTargetlist);
+    ctrl->setTargetList(newTargetlist);
   }
 }
 

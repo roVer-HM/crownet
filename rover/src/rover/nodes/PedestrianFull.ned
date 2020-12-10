@@ -52,6 +52,10 @@ module PedestrianFull like INetworkNode
         bool withAntennaMobility = default(false);
         *.mobility.visualRepresentation = "^";
 
+		//# Artery
+		bool useArtery = default(true);
+		string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddelwareEmpyt");
+		
 
         //# AID layer
         string aidType = default("SimpleAidLayer");
@@ -67,11 +71,10 @@ module PedestrianFull like INetworkNode
         bool hasUdp = default(firstAvailableOrEmpty("Udp") != "");
         bool hasTcp = default(firstAvailableOrEmpty("Tcp", "TcpLwip", "TcpNsc") != "");
         bool hasSctp = default(false);
-        bool hasGeoNet = default(true);
 
         //# Node specs
         string nodeType = "UE";  // DO NOT CHANGE
-        int masterId;
+        int masterId = default(0);
         int macNodeId = default(0); // TODO: this is not a real parameter
         int macCellId = default(0); // TODO: this is not a real parameter
 
@@ -82,16 +85,22 @@ module PedestrianFull like INetworkNode
         bool hasIpv4 = default(true);
         bool hasIpv6 = default(false);
 
+        //# Link Layer specs
+        bool hasWlan = default(false);
+        int  numWlanNic = default(0);
+        bool hasLte = default(true);
+
         **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.^.ipv4.routingTable");
 
         //# Ext Interface
         bool enableExtInterface = default(false);
         string extHostAddress = default("");
-        
+
         int numPcapRecorders = default(0); // no of PcapRecorders
     gates:
-        input radioIn @directIn;     // connection to master
+        input lteRadioIn @directIn;
+        input radioIn[numWlanNic] @directIn;     // connection to master
 
     submodules:
         interfaceTable: InterfaceTable {
@@ -101,13 +110,11 @@ module PedestrianFull like INetworkNode
             parameters:
                 @display("p=48.608,101.92");
         }
-        middleware: <default("PedestrianMiddleware")> like IMiddleware if hasGeoNet {
+        middleware: <default(middlewareType)> like IMiddleware {
             parameters:
                 @display("p=109.76,296.352");
-                routerModule = ".vanetza.router";
-                mobilityModule = ".mobility";
         }
-        vanetza: <default("Vanetza")> like IVanetza if hasGeoNet {
+        vanetza: <default("Vanetza")> like IVanetza if useArtery {
             parameters:
                 @display("p=109.76,393.568");
                 *.middlewareModule = absPath("^.middleware");
@@ -116,7 +123,7 @@ module PedestrianFull like INetworkNode
                 runtime.datetime = middleware.datetime;
                 *.position.typename = "PedestrianPositionProvider";
         }
-        radioDriver: <default("LteRadioDriver")> like IDispatchRadioDriver if hasGeoNet {
+        radioDriver: <default("LteRadioDriver")> like IDispatchRadioDriver if useArtery {
             parameters:
                 @display("p=109.76,553.504,row,100");
         }
@@ -144,19 +151,24 @@ module PedestrianFull like INetworkNode
                 //set HostAutoConfigurator (deactivated)
                 //use standalone configurator
                 configurator.typename = "HostAutoConfigurator";
-                *.configurator.interfaces = "wlan";
-                *.limitedBroadcast = true;
+                configurator.interfaces = default("cellular");
         }
         ipv6: <default("Ipv6NetworkLayer")> like INetworkLayer if hasIpv6 {
             parameters:
                 @display("p=681.312,526.688;q=queue");
         }
-        lteNic: <nicType> like ILteNic {
+        lteNic: <nicType> like ILteNic if hasLte {
             nodeType = nodeType;
             ip2lte.typename = "Geo2Lte";
             //d2dCapable = d2dCapable;
-            @display("p=549.64,674.06396");
+            @display("p=710.304,672.672");
         }
+
+        wlanNic[numWlanNic]: <default("Ieee80211Interface")> like IWirelessInterface if hasWlan {
+            parameters:
+                @display("p=407.68,672.672,row,150;q=queue");
+        }
+
         // message dispatcher for SAP between application and transport layer
         aa: MessageDispatcher {
             parameters:
@@ -183,13 +195,21 @@ module PedestrianFull like INetworkNode
 
     connections allowunconnected:
         //# LTE Nic 
-        lteNic.radioIn <-- radioIn;
+        lteNic.radioIn <-- lteRadioIn if exists(lteNic);
 
-        lteNic.upperLayerOut --> nl.in++;
-        lteNic.upperLayerIn <-- nl.out++;
-
-        radioDriver.upperLayer <--> vanetza.radioDriverData;
-        radioDriver.properties --> vanetza.radioDriverProperties;
+        lteNic.upperLayerOut --> nl.in++ if exists(lteNic);
+        lteNic.upperLayerIn <-- nl.out++ if exists(lteNic);
+        
+        //# Wlan Nic
+        for i=0..sizeof(radioIn)-1 {
+            wlanNic[i].upperLayerOut --> nl.in++  if exists(wlanNic);
+	        wlanNic[i].upperLayerIn <-- nl.out++ if exists(wlanNic);
+    	    wlanNic[i].radioIn <-- radioIn[i] if exists(wlanNic);
+        }
+        
+        //# Artery 
+        radioDriver.upperLayer <--> vanetza.radioDriverData if useArtery;
+        radioDriver.properties --> vanetza.radioDriverProperties if useArtery;
 
         //# 
         //# Internal Tcp/Udp applications connections with transport layer
@@ -231,8 +251,8 @@ module PedestrianFull like INetworkNode
         ipv4.ifIn <-- nl.out++ if hasIpv4;
         ipv4.ifOut --> nl.in++ if hasIpv4;
 
-        radioDriver.lowerLayerIn <-- nl.out++ if hasGeoNet;
-        radioDriver.lowerLayerOut --> nl.in++ if hasGeoNet;
+        radioDriver.lowerLayerIn <-- nl.out++ if useArtery;
+        radioDriver.lowerLayerOut --> nl.in++ if useArtery;
 
         ipv4.transportIn <-- tn.out++ if hasIpv4;
         ipv4.transportOut --> tn.in++ if hasIpv4;

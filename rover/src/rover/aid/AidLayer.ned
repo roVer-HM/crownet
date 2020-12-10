@@ -31,6 +31,7 @@ module SimpleAidLayer like IAidLayer
 {
     parameters:
         @display("i=block/app");
+        bool hasDensityMap = default(false);
 
     gates:
         input upperIn;
@@ -43,7 +44,7 @@ module SimpleAidLayer like IAidLayer
             parameters:
                 @display("p=164,121;is=s");
         }
-        densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp {
+        densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp if hasDensityMap {
             @display("p=432,98;i=block/table;is=s");
         }
         // Message Dispatcher 
@@ -68,7 +69,7 @@ module SimpleAidLayer like IAidLayer
         aid.lowerOut --> lower.in++;
         aid.lowerIn <-- lower.out++;
         
-        densityMapApp.socketIn <-- upper.out++;
-        densityMapApp.socketOut --> upper.in++;
+        densityMapApp.socketIn <-- upper.out++ if hasDensityMap;
+        densityMapApp.socketOut --> upper.in++ if hasDensityMap;
 
 }
