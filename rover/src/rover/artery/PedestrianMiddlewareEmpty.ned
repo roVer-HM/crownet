@@ -14,18 +14,13 @@
 // 
 
 package rover.artery;
+import artery.application.MiddlewareBase;
 
-import artery.application.Middleware;
 
-simple PedestrianMiddleware extends Middleware
+simple PedestrianMiddelwareEmpyt extends MiddlewareBase
 {
     	parameters:
-		@class(rover::PedestrianMiddleware);
+		@class(rover::PedestrianMiddelwareEmpyt);
 		@signal[IdentityChanged](type=long);
-		
-		string localEnvironmentModule = default("");
-		string globalEnvironmentModule = default("");
 		string mobilityModule = default(".mobility");
-    	routerModule = default(".vanetza.router");
-
 }
