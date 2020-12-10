@@ -8,28 +8,43 @@
 #pragma once
 
 #include <traci/API.h>
+#include <traci/VariableTraits.h>
 #include <traci/sumo/utils/traci/TraCIAPI.h>
 
-#include "../../common/converter/OsgCoordinateConverter.h"
 #include "rover/artery/traci/VadereUtils.h"
+#include "rover/common/converter/OsgCoordinateConverter.h"
+
+namespace rover {
+namespace constants {
+
+// command: set connection priority (execution order)
+constexpr traci::ubyte VAR_TARGET_LIST = 0xfe;
+constexpr traci::ubyte VAR_CACHE_HASH = 0x7d;
+constexpr traci::ubyte VAR_SIM_CONFIG = 0x7e;
+constexpr traci::ubyte VAR_PERSON_STIMULUS = 0xfd;
+constexpr traci::ubyte CMD_FILE_SEND = 0x75;
+constexpr traci::ubyte VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
+constexpr traci::ubyte VAR_DEPARTED_PEDESTRIANS_IDS = 0x74;
+constexpr traci::ubyte VAR_COORD_REF = 0x90;
+
+}  // namespace constants
+}  // namespace rover
+
+namespace traci {
+#define VAR_TRAIT(var_, type_)                                     \
+  template <>                                                      \
+  struct VariableTrait<var_> {                                     \
+    using value_type = type_;                                      \
+    using result_type = TraCIResultTrait<value_type>::result_type; \
+  };
+
+VAR_TRAIT(rover::constants::VAR_TARGET_LIST, std::vector<std::string>)
+#undef VAR_TRAIT
+}  // namespace traci
 
 using namespace traci;
 
 namespace rover {
-
-namespace constants {
-
-// command: set connection priority (execution order)
-constexpr ubyte VAR_TARGET_LIST = 0xfe;
-constexpr ubyte VAR_CACHE_HASH = 0x7d;
-constexpr ubyte VAR_SIM_CONFIG = 0x7e;
-constexpr ubyte VAR_PERSON_STIMULUS = 0xfd;
-constexpr ubyte CMD_FILE_SEND = 0x75;
-constexpr ubyte VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
-constexpr ubyte VAR_DEPARTED_PEDESTRIANS_IDS = 0x74;
-constexpr ubyte VAR_COORD_REF = 0x90;
-
-}  // namespace constants
 
 struct CoordRef {
   std::string epsg_code;
@@ -68,7 +83,7 @@ class VadereApi : public API {
     std::string getTypeID(const std::string& personID) const;
     double getAngle(const std::string& personID) const;
     libsumo::TraCIColor getColor(const std::string& personID) const;
-    std::vector<std::string> getTargetList() const;
+    std::vector<std::string> getTargetList(const std::string& personID) const;
 
     // add?
 
@@ -79,8 +94,10 @@ class VadereApi : public API {
     void setHeight(const std::string& personID, double height) const;
     void setColor(const std::string& personID,
                   const libsumo::TraCIColor& c) const;
-    void setTargetList(const std::string& personId,
+    void setTargetList(const std::string& personID,
                        std::vector<std::string> targets) const;
+    void setInformation(const std::string& personID, double start_at,
+                        double obsolete_at, std::string information) const;
 
    private:
     /// @brief invalidated copy constructor

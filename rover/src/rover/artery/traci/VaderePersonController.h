@@ -35,6 +35,12 @@ class VaderePersonController : public traci::MovingNodeController {
   virtual Length getLength() const override;
   virtual Length getWidth() const override;
 
+  virtual std::vector<std::string> getTargetList() const;
+  virtual void setTargetList(std::vector<std::string> targetId);
+  virtual void appendTarget(const std::string& targetId, bool back = true);
+  virtual void setInformed(const simtime_t& start, const simtime_t& obsolte_at,
+                           const std::string& data);
+
  private:
   VaderePersonController(const std::string& id,
                          std::shared_ptr<VaderePersonCache> cache,
