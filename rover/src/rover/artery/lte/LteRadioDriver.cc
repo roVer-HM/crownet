@@ -60,10 +60,6 @@ void LteRadioDriver::initialize(int stage) {
           0x8947, &artery::InetRadioDriver::geonet);
     });
 
-    cModule* m = getParentModule()->getModuleByPath(
-        par("lteNicModule").stdstringValue().c_str());
-    interfaceEntry = getContainingNicModule(m);
-
     numSent = 0;
     numPassedUp = 0;
 
@@ -71,6 +67,11 @@ void LteRadioDriver::initialize(int stage) {
     WATCH(numPassedUp);
 
   } else if (stage == inet::INITSTAGE_NETWORK_LAYER) {
+    inet::IInterfaceTable* interfaceTable =
+        getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
+    interfaceEntry = interfaceTable->findInterfaceByName(
+        par("dispatchInterfaceName").stdstringValue().c_str());
+
     registerService(artery::InetRadioDriver::geonet, gate("upperLayer$i"),
                     gate("lowerLayerIn"));
     registerProtocol(artery::InetRadioDriver::geonet, gate("lowerLayerOut"),
