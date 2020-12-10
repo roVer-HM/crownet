@@ -19,7 +19,7 @@
 #include <inet/mobility/contract/IMobility.h>
 #include <omnetpp/checkandcast.h>
 #include <memory>
-#include "artery/application/Middleware.h"
+#include "artery/application/MiddlewareBase.h"
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/utility/Identity.h"
 #include "rover/dcd/regularGrid/RegularCellVisitors.h"
@@ -142,7 +142,7 @@ void GlobalDensityMap::visitNode(const std::string &traciNodeId,
                                  omnetpp::cModule *mod) {
   // access middelware for position
 
-  auto middleware = check_and_cast<artery::Middleware *>(
+  auto middleware = check_and_cast<artery::MiddlewareBase *>(
       mod->getModuleByPath(m_middelwareModule.c_str()));
 
   // convert to traci 2D position
