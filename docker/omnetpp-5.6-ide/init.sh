@@ -10,7 +10,7 @@
 
 export PATH=/opt/omnetpp/omnetpp/bin:~/.local/bin:$PATH
 
-echo "Command: $1"
+# echo "Command: $1"
 
 if [ -z "$1" ]; then
      CMD="omnetpp"

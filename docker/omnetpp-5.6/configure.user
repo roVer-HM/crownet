@@ -18,7 +18,7 @@
 # Set to "yes" if you want to use clang/clang++ instead of gcc/g++ when both
 # compiler is installed.
 #
-PREFER_CLANG=no
+PREFER_CLANG=yes
 
 #
 # Compiler optimization switches. There are two sets of switches,
@@ -58,12 +58,12 @@ PREFER_QTENV=yes
 #
 # Set to "yes" to enable OpenSceneGraph and support in Qtenv
 #
-WITH_OSG=no
+WITH_OSG=yes
 
 #
 # Set to "yes" to enable osgEarth support in Qtenv (requires OpenScreenGraph enabled)
 #
-WITH_OSGEARTH=no
+WITH_OSGEARTH=yes
 
 #
 # Set to "yes" to enable simulation executables to load NED files dynamically.

@@ -10,7 +10,7 @@ if [[ -z "$1" || "$1" == "exec" ]]; then
 else
       VERSION=omnetpp-$1
       SHORTNAME=$SHORTNAME-$1
-      CONTNAME=$CONTNAME
+      CONTNAME=$CONTNAME:$1
 fi
 
 if [[ "$1" == "exec" ]]; then
@@ -28,5 +28,5 @@ IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$CONTNAME
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
 # Variant 2: Start an individual container for each run
-#echo $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
+echo $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
 run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
