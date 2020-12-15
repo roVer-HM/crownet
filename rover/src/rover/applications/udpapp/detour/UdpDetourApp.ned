@@ -76,4 +76,6 @@ simple UdpDetourAppVadere extends UdpDetourApp
 	    @class(rover::UdpDetourAppVadere);
 	    // sender parameters
 	    notifyMobilityProvider = default(true);
+	    string mobilityModule = default(".mobility");
 }
+

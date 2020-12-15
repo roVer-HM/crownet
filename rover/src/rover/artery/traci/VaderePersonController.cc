@@ -14,6 +14,8 @@
 
 namespace si = boost::units::si;
 
+using namespace rover::constants;
+
 namespace rover {
 
 VaderePersonController::VaderePersonController(const std::string& id,
@@ -81,6 +83,33 @@ auto VaderePersonController::getLength() const -> Length {
 
 auto VaderePersonController::getWidth() const -> Length {
   return m_cache->get<VAR_WIDTH>() * si::meter;
+}
+
+std::vector<std::string> VaderePersonController::getTargetList() const {
+  return m_cache->get<VAR_TARGET_LIST>();
+}
+
+void VaderePersonController::setTargetList(std::vector<std::string> targetId) {
+  m_api.vPerson().setTargetList(m_id, targetId);
+
+  m_cache->invalidate(VAR_TARGET_LIST);
+}
+
+void VaderePersonController::appendTarget(const std::string& targetId,
+                                          bool back) {
+  auto target = m_api.vPerson().getTargetList(m_id);
+  if (back) {
+    target.push_back(targetId);
+  } else {
+    target.insert(target.begin(), targetId);
+  }
+  m_cache->invalidate(VAR_TARGET_LIST);
+}
+
+void VaderePersonController::setInformed(const simtime_t& start,
+                                         const simtime_t& obsolte_at,
+                                         const std::string& data) {
+  m_api.vPerson().setInformation(m_id, start.dbl(), obsolte_at.dbl(), data);
 }
 
 } /* namespace rover */

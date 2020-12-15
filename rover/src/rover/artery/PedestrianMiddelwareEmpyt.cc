@@ -1,11 +1,19 @@
-/*
- * PedestrianMiddleware.cc
- *
- *  Created on: Aug 11, 2020
- *      Author: sts
- */
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see http://www.gnu.org/licenses/.
+//
 
-#include "PedestrianMiddleware.h"
+#include "PedestrianMiddelwareEmpyt.h"
 #include <artery/application/MovingNodeDataProvider.h>
 #include <artery/traci/MobilityBase.h>
 #include <artery/utility/InitStages.h>
@@ -16,37 +24,33 @@ using namespace artery;
 
 namespace rover {
 
-Define_Module(PedestrianMiddleware);
+Define_Module(PedestrianMiddelwareEmpyt);
 
-PedestrianMiddleware::~PedestrianMiddleware() {}
-
-void PedestrianMiddleware::initialize(int stage) {
+void PedestrianMiddelwareEmpyt::initialize(int stage) {
   using vanetza::geonet::StationType;
+  MiddlewareBase::initialize(stage);
 
   if (stage == InitStages::Self) {
     findHost()->subscribe(MobilityBase::stateChangedSignal, this);
     initializeController(par("mobilityModule"));
     mDataProvider.setStationType(StationType::Pedestrian);
-    setStationType(StationType::Pedestrian);
     getFacilities().register_const(&mDataProvider);
     mDataProvider.update(mPersonController);
 
-    // emit will update mIdenity of Middelware base
     Identity identity;
     identity.traci = mPersonController->getNodeId();
     identity.application = mDataProvider.station_id();
     emit(Identity::changeSignal,
          Identity::ChangeTraCI | Identity::ChangeStationId, &identity);
   }
-  Middleware::initialize(stage);
 }
 
-void PedestrianMiddleware::finish() {
-  Middleware::finish();
+void PedestrianMiddelwareEmpyt::finish() {
+  MiddlewareBase::finish();
   findHost()->unsubscribe(MobilityBase::stateChangedSignal, this);
 }
 
-void PedestrianMiddleware::initializeController(cPar& mobilityPar) {
+void PedestrianMiddelwareEmpyt::initializeController(cPar& mobilityPar) {
   auto mobility =
       inet::getModuleFromPar<ControllableObject>(mobilityPar, findHost());
   mPersonController = mobility->getController<VaderePersonController>();
@@ -54,12 +58,12 @@ void PedestrianMiddleware::initializeController(cPar& mobilityPar) {
   getFacilities().register_mutable(mPersonController);
 }
 
-void PedestrianMiddleware::receiveSignal(cComponent* component,
-                                         simsignal_t signal, cObject* obj,
-                                         cObject* details) {
+void PedestrianMiddelwareEmpyt::receiveSignal(cComponent* component,
+                                              simsignal_t signal, cObject* obj,
+                                              cObject* details) {
   if (signal == MobilityBase::stateChangedSignal) {
     mDataProvider.update(mPersonController);
   }
 }
 
-} /* namespace rover */
+}  // namespace rover

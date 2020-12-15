@@ -17,12 +17,12 @@ class PedestrianMiddleware : public artery::Middleware {
  public:
   virtual ~PedestrianMiddleware();
   void initialize(int stage) override;
-  void finish() override;
 
  protected:
+  void finish() override;
   void initializeController(omnetpp::cPar&);
-  void receiveSignal(omnetpp::cComponent*, omnetpp::simsignal_t,
-                     omnetpp::cObject*, omnetpp::cObject*) override;
+  virtual void receiveSignal(omnetpp::cComponent*, omnetpp::simsignal_t,
+                             omnetpp::cObject*, omnetpp::cObject*) override;
 
  private:
   VaderePersonController* mPersonController = nullptr;

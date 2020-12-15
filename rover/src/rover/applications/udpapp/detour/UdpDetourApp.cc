@@ -243,7 +243,7 @@ void UdpDetourApp::socketClosed(UdpSocket *socket) {
 
 Coord UdpDetourApp::getCurrentLocation() {
   if (!mobilityModule) {
-    mobilityModule = check_and_cast<MobilityBase *>(
+    mobilityModule = check_and_cast<inet::IMobility *>(
         getParentModule()->getSubmodule("mobility"));
   }
   return mobilityModule->getCurrentPosition();

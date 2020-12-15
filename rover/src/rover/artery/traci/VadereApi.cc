@@ -7,6 +7,8 @@
 
 #include "rover/artery/traci/VadereApi.h"
 
+using namespace rover::constants;
+
 namespace rover {
 
 TraCIGeoPosition VadereApi::convertGeo(const TraCIPosition& pos) const {
@@ -51,7 +53,7 @@ void VadereApi::sendFile(const vadere::VadereScenario& scenario) const {
       0);  // first byte of extended length field must be zero
   outMsg.writeInt(length);
 
-  outMsg.writeByte(rover::constants::CMD_FILE_SEND);
+  outMsg.writeByte(CMD_FILE_SEND);
   //  outMsg.writeByte(TYPE_STRING);
   outMsg.writeString(scenario.first);
   //  outMsg.writeByte(TYPE_STRING);
@@ -99,11 +101,11 @@ libsumo::TraCIColor VadereApi::VaderePersonScope::getColor(
   return myParent.getColor(CMD_GET_PERSON_VARIABLE, VAR_COLOR, personID);
 }
 
-/*
-std::vector<std::string> VadereApi::VaderePersonScope::getTargetList() const {
-  return myParent.getStringVector(CMD_GET_PERSON_VARIABLE, XXX_TARGET_LIST, "");
+std::vector<std::string> VadereApi::VaderePersonScope::getTargetList(
+    const std::string& personID) const {
+  return myParent.getStringVector(CMD_GET_PERSON_VARIABLE, VAR_TARGET_LIST,
+                                  personID);
 }
-*/
 
 void VadereApi::VaderePersonScope::setSpeed(const std::string& personID,
                                             double speed) const {
@@ -164,6 +166,35 @@ void VadereApi::VaderePersonScope::setColor(
   content.writeUnsignedByte(c.b);
   content.writeUnsignedByte(c.a);
   send_commandSetValue(CMD_SET_PERSON_VARIABLE, VAR_COLOR, personID, content);
+  tcpip::Storage inMsg;
+  check_resultState(inMsg, CMD_SET_PERSON_VARIABLE);
+}
+
+void VadereApi::VaderePersonScope::setTargetList(
+    const std::string& personID, std::vector<std::string> targets) const {
+  tcpip::Storage content;
+  content.writeUnsignedByte(TYPE_STRINGLIST);
+  content.writeStringList(targets);
+  send_commandSetValue(CMD_SET_PERSON_VARIABLE, VAR_TARGET_LIST, personID,
+                       content);
+  tcpip::Storage inMsg;
+  check_resultState(inMsg, CMD_SET_PERSON_VARIABLE);
+}
+
+void VadereApi::VaderePersonScope::setInformation(
+    const std::string& personID, double start_at, double obsolete_at,
+    std::string information) const {
+  tcpip::Storage content;
+  content.writeByte(TYPE_COMPOUND);
+  content.writeInt(3);
+  content.writeByte(TYPE_DOUBLE);
+  content.writeDouble(start_at);
+  content.writeByte(TYPE_DOUBLE);
+  content.writeDouble(obsolete_at);
+  content.writeByte(TYPE_STRING);
+  content.writeString(information);
+  send_commandSetValue(CMD_SET_PERSON_VARIABLE, VAR_PERSON_STIMULUS, personID,
+                       content);
   tcpip::Storage inMsg;
   check_resultState(inMsg, CMD_SET_PERSON_VARIABLE);
 }

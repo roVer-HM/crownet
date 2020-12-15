@@ -144,6 +144,7 @@ void MobilityRoverArtery::initialize(const Position& pos, Angle heading,
 
 void MobilityRoverArtery::update(const Position& pos, Angle heading,
                                  double speed) {
+  if (lastUpdate == simTime()) return;  // do not update twice
   using boost::units::si::meter;
   const double heading_rad = heading.radian();
   const inet::Coord direction{cos(heading_rad), -sin(heading_rad)};

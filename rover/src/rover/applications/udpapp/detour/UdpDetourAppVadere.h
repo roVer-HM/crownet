@@ -21,6 +21,8 @@
 #include "veins_inet/VeinsInetApplicationBase.h"
 #include "veins_inet/vadere/VaderePersonMobility.h"
 #include "veins_inet/veins_inet.h"
+
+#include "rover/artery/traci/VaderePersonController.h"
 using namespace inet;
 
 namespace rover {
@@ -35,7 +37,7 @@ class UdpDetourAppVadere : public UdpDetourApp {
   virtual void actOnIncident(IntrusivePtr<const DetourAppPacket> pkt) override;
 
   veins::VaderePersonMobility* mobility;
-  veins::TraCICommandInterface* traci;
+  VaderePersonController* ctrl;
 
 };  // namespace rover
 

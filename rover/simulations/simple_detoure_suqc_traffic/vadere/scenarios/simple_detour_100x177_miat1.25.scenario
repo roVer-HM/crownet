@@ -161,7 +161,14 @@
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
-        "referenceCoordinateSystem" : null
+        "referenceCoordinateSystem" : {
+          "epsgCode" : "EPSG:32632",
+          "description" : "UTM Zone 32U dummy",
+          "translation" : {
+            "x" : 692298.893546436,
+            "y" : 5337359.5927164
+          }
+        }
       },
       "obstacles" : [ {
         "shape" : {

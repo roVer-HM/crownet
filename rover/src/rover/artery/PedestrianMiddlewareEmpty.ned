@@ -13,23 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package rover.artery.lte;
+package rover.artery;
+import artery.application.MiddlewareBase;
 
-import rover.artery.IDispatchRadioDriver;
-import artery.nic.IRadioDriver;
 
-simple LteRadioDriver like IDispatchRadioDriver
+simple PedestrianMiddelwareEmpyt extends MiddlewareBase
 {
- 	parameters:
- 	    @class(rover::LteRadioDriver);
- 	    @signal[ChannelLoad](type=double);
- 	    string dispatchInterfaceName = default("cellular"); //todo make this configuratabel
- 	    string interfaceTableModule;
- 	    
-    gates:
-   		inout upperLayer;
-		input lowerLayerIn @labels(Ieee802Ctrl/up);
-		output lowerLayerOut @labels(Ieee802Ctrl/down);
-		output properties;
-		
+    	parameters:
+		@class(rover::PedestrianMiddelwareEmpyt);
+		@signal[IdentityChanged](type=long);
+		string mobilityModule = default(".mobility");
 }
