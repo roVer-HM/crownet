@@ -86,9 +86,9 @@ module PedestrianFull like INetworkNode
         bool hasIpv6 = default(false);
 
         //# Link Layer specs
+        bool hasLte = default(true);
         bool hasWlan = default(false);
         int  numWlanNic = default(0);
-        bool hasLte = default(true);
 
         **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.^.ipv4.routingTable");

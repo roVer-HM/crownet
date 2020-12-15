@@ -28,15 +28,16 @@ network World_Wlan extends World
         int numStationary = default(0);
         bool hasStationary = default(numStationary != 0);
 
-    submodules:
+        hasLte = false;
+        hasLteCoreNetwork = false;
+        hasWlan = true;
+        hasStoryboard = false;
+		hasGlobalMap = false;
 
-        radioMedium: <default(Ieee80211ScalarRadioMedium)> like IRadioMedium {
-            parameters:
-                @display("p=261.87,281.05875;is=s");
-        }
+    submodules:
 
         station[numStationary]: AdhocHost if hasStationary {
             parameters:
-                @display("r=,,#707070;p=411.99374,279.93;i=device/accesspoint_s;t1=t");
+                @display("r=,,#707070;p=94.814995,266.385;i=device/accesspoint_s;t1=t");
         }
 }
