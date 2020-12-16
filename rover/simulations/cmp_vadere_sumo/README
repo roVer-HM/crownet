@@ -1,0 +1,60 @@
+= Sumo =
+
+
+~~~
+sumo-server some-sumo.cfg
+~~~
+
+
+access docker container
+
+~~~
+local> sumo exec /bin/bash
+sumoContainer> ls /opt/sumo/sumo/bin
+Makefile.am      duarouter              marouter     od2trips                sumo-gui
+TraCITestClient  emissionsDrivingCycle  netconvert   polyconvert             testlibsumo
+activitygen      emissionsMap           netedit      start-command-line.bat
+dfrouter         jtrrouter              netgenerate  sumo
+
+
+sumoContainer> ls /opt/sumo/sumo/tools
+README_Contributing.md        generateStationEdges.py  route2trips.py
+addStops2Routes.py            import                   shapes
+assign                        launcher.py              showDepartsAndArrivalsPerEdge.py
+averageRuns.py                lib                      simpla
+build                         libsumo                  sumolib
+contributed                   net                      tls
+createVehTypeDistribution.py  osmBuild.py              tlsCoordinator.py
+detector                      osmGet.py                tlsCycleAdaptation.py
+district                      osmWebWizard.py          traceExporter.py
+districts2poly.py             output                   traci
+edgesInDistricts.py           pedestrianFlow.py        trigger
+emissions                     plot_trajectories.py     turn-defs
+extractTest.py                ptlines2flows.py         visualization
+game                          randomTrips.py           webWizard
+generateBidiDistricts.py      route                    xml
+generateParkingLots.py        route2sel.py
+~~~
+
+== Sumo tools/apps ==
+
+=== netedit ===
+
+* Zweck: Erstellen von Netzwerk Files (***.net.xml)
+* Aufruf: sumo exec netedit
+* Tutorial: https://sumo.dlr.de/docs/Tutorials/quick_start.html
+* Doku: https://sumo.dlr.de/docs/netedit.html
+
+
+=== duarouter ===
+
+* Zweck: Erstellen von routen für personen/autos
+
+
+=== randomTrips.py ===
+
+* https://sumo.dlr.de/docs/Tools/Trip.html
+
+~~~
+/opt/sumo/sumo/tools/randomTrips.py -n mf_base.net.xml -e 10
+~~~
