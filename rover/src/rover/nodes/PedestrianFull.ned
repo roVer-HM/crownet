@@ -148,6 +148,7 @@ module PedestrianFull like INetworkNode
         ipv4: <default("Ipv4NetworkLayer")> like INetworkLayer if hasIpv4 {
             parameters:
                 @display("p=425,507;q=queue");
+                //todo: hostAutoConfigurator with wlan and cellular
                 //set HostAutoConfigurator (deactivated)
                 //use standalone configurator
                 configurator.typename = "HostAutoConfigurator";

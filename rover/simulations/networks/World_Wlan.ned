@@ -18,8 +18,7 @@ package rover.simulations.networks;
 
 import rover.simulations.networks.World;
 import inet.node.inet.AdhocHost;
-import inet.physicallayer.contract.packetlevel.IRadioMedium;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+
 
 
 network World_Wlan extends World

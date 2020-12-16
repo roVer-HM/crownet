@@ -18,10 +18,6 @@
 #include "rover/applications/udpapp/detour/DetourAppPacket_m.h"
 #include "rover/applications/udpapp/detour/UdpDetourApp.h"
 
-#include "veins_inet/VeinsInetApplicationBase.h"
-#include "veins_inet/vadere/VaderePersonMobility.h"
-#include "veins_inet/veins_inet.h"
-
 #include "rover/artery/traci/VaderePersonController.h"
 using namespace inet;
 
@@ -36,7 +32,6 @@ class UdpDetourAppVadere : public UdpDetourApp {
   virtual void initialize(int stage) override;
   virtual void actOnIncident(IntrusivePtr<const DetourAppPacket> pkt) override;
 
-  veins::VaderePersonMobility* mobility;
   VaderePersonController* ctrl;
 
 };  // namespace rover
