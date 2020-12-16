@@ -60,9 +60,6 @@ module PedestrianFull like INetworkNode
         //# AID layer
         string aidType = default("SimpleAidLayer");
 
-        //# Mobility
-        string mobilityType = default("rover.artery.traci.MobilityRoverArtery");
-
         //# Apps
         int numApps = default(0);   // no of apps.
                                     // Specify the app types in INI file with app[0..1].typename="UdpVideoStreamClient" syntax 

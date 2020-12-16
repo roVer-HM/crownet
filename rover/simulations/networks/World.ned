@@ -63,10 +63,9 @@ network World
         traci.subscriptions.typename = default("VadereSubscriptionManager");
         traci.mapper.objectType = default("rover.nodes.PedestrianFull");
         
-        traci.core.typename = default("VadereCore");
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);
-		traci.core.typename = default("VadereCore");
+        traci.core.typename = default("VadereCore");
         
         traci.launcher.typename = default("VadereLauchner");
         traci.launcher.hostname = default("vadere");
