@@ -114,7 +114,7 @@ network World
             @display("p=307.02,42.892498;is=l");
         }
         // WLAN
-        radioMedium: <default(Ieee80211ScalarRadioMedium)> like IRadioMedium if hasWlan {
+        radioMedium: <default("Ieee80211ScalarRadioMedium")> like IRadioMedium if hasWlan {
             parameters:
                 @display("p=423.28125,267.51373;is=s");
         }

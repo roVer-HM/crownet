@@ -112,7 +112,7 @@ inet::Coord MobilityRoverArtery::getConstraintAreaMin() const {
 void MobilityRoverArtery::initialize(const Position& pos, Angle heading,
                                      double speed) {
   // setup coordBuffer. Must be done here and not in initialize due to dynamic
-  // creation with TraCI/veins.
+  // creation with TraCI.
   coordBuffer.set(par("ringBufferSize").intValue());
   recordThreshold = par("recordThreshold").doubleValue();
   lastRecordedTime = SIMTIME_ZERO;

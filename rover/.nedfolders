@@ -1,4 +1,4 @@
 simulations
 src
-../artery/src/artery
-../artery/src/traci
+src/artery
+src/traci
