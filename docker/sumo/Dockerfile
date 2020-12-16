@@ -18,7 +18,7 @@ LABEL maintainer  "wischhof@ieee.org"
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo net-tools \
-       git git-lfs \ 
+       git git-lfs \
        cmake python libxerces-c-dev libfox-1.6-dev \
        libgl1-mesa-dev libglu1-mesa-dev libgdal-dev libproj-dev libgl2ps-dev && \
     apt-get clean && \
@@ -33,10 +33,10 @@ WORKDIR /opt/sumo
 # enable lfs (must be done before cloning!) and clone the project
 RUN git lfs install
 
-# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value] 
+# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --recursive --branch $RELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/sumo.git $RELEASE
+        clone --recursive --branch $RELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/sumo.git $RELEASE
 
 # add a symbolic link so sumo is found in the path
 RUN ln -s /opt/sumo/$RELEASE /opt/sumo/sumo
@@ -45,7 +45,7 @@ WORKDIR /opt/sumo/sumo
 
 ARG NOCACHE_PULL=0
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/sumo.git $RELEASE
+        pull ssh://git@sam-dev.cs.hm.edu:6000/rover/sumo.git $RELEASE
 
 # configure and compile
 ENV PATH /opt/sumo/sumo/bin:$PATH
@@ -60,7 +60,7 @@ RUN rm -rf build/cmake-build
 # Next, we need to aquire the python script to lauch sumo for TraCI from the VEINS project
 WORKDIR /opt
 RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone -n ssh://git@sam-dev.cs.hm.edu:5022/rover/veins.git --depth 1 && \
+        clone -n ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git --depth 1 && \
     cd veins && \
     git checkout $VEINS_RELEASE sumo-launchd.py && \
     chmod 555 sumo-launchd.py && \
