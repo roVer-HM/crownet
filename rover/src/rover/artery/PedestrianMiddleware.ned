@@ -22,9 +22,10 @@ simple PedestrianMiddleware extends Middleware
     	parameters:
 		@class(rover::PedestrianMiddleware);
 		@signal[IdentityChanged](type=long);
-
+		
 		string localEnvironmentModule = default("");
 		string globalEnvironmentModule = default("");
-		string mobilityModule;
-    
+		string mobilityModule = default(".mobility");
+    	routerModule = default(".vanetza.router");
+
 }

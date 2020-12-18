@@ -23,7 +23,8 @@ simple LteRadioDriver like IDispatchRadioDriver
  	parameters:
  	    @class(rover::LteRadioDriver);
  	    @signal[ChannelLoad](type=double);
- 	    string lteNicModule = default("");
+ 	    string dispatchInterfaceName = default("cellular"); //todo make this configuratabel
+ 	    string interfaceTableModule;
  	    
     gates:
    		inout upperLayer;

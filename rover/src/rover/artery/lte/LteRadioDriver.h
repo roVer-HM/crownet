@@ -29,7 +29,7 @@ class LteRadioDriver : public artery::RadioDriverBase,
   void refreshDisplay() const override;
 
  private:
-  inet::InterfaceEntry* interfaceEntry;
+  inet::InterfaceEntry* interfaceEntry = nullptr;
   int numPassedUp, numSent;
 };
 

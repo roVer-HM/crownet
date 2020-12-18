@@ -1,7 +1,7 @@
 {
   "name" : "separation_slow_fast",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -111,10 +111,6 @@
         "cognition" : "CooperativeCognitionModel"
       }
     },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
-    },
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -125,7 +121,14 @@
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
-        "referenceCoordinateSystem" : null
+        "referenceCoordinateSystem" : {
+          "epsgCode" : "EPSG:32632",
+          "description" : "UTM Zone 32U dummy",
+          "translation" : {
+            "x" : 692298.893546436,
+            "y" : 5337359.5927164
+          }
+        }
       },
       "obstacles" : [ {
         "shape" : {

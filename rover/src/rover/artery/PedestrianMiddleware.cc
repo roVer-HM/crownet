@@ -31,6 +31,7 @@ void PedestrianMiddleware::initialize(int stage) {
     getFacilities().register_const(&mDataProvider);
     mDataProvider.update(mPersonController);
 
+    // emit will update mIdenity of Middelware base
     Identity identity;
     identity.traci = mPersonController->getNodeId();
     identity.application = mDataProvider.station_id();

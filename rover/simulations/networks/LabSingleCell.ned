@@ -20,6 +20,7 @@ import lte.corenetwork.nodes.Ue;
 import lte.corenetwork.nodes.eNodeB;
 import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
+import lte.common.LteNetworkConfigurator;
 
 
 network LabSingleCellBase
@@ -36,7 +37,7 @@ network LabSingleCellBase
         routingRecorder: RoutingTableRecorder {
             @display("p=8,2;is=s");
         }
-        configurator: Ipv4NetworkConfigurator {
+        configurator: LteNetworkConfigurator {
             @display("p=8,3");
             config = xmldoc("demo.xml");
         }

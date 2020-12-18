@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DATE_TAG="$(date "+%y%m%d-%H%M")"
+CONF="$1"
+
+sumo exec sumo -v --remote-port 9999 \
+  --configuration-file "${CONF}" \
+  --message-log "${CONF}${DATE_TAG}.log" --no-step-log --quit-on-end
+

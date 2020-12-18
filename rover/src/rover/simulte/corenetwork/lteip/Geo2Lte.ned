@@ -23,6 +23,7 @@ simple Geo2Lte like INetworkLayer2lte
         string nodeType;    
         string interfaceTableModule;
         string routingTableModule;
+        string interfaceName = default("cellular");
         @display("i=block/layer");
         @class(rover::Geo2Lte);
     gates:

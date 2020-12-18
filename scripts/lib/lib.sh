@@ -133,6 +133,9 @@ function run_container_X11() {
 	CMD_ARR+=(--volume="/etc/shadow:/etc/shadow:ro")
 	CMD_ARR+=(--volume="/etc/sudoers.d:/etc/sudoers.d:ro")
 	CMD_ARR+=(--volume="/tmp/.X11-unix:/tmp/.X11-unix")
+    if [[ ! -z ${OPP_EXTERN_DATA_MNT} ]];then
+	    CMD_ARR+=(--volume="$OPP_EXTERN_DATA_MNT")
+    fi
 	if [[ ! -z ${DOCKER_VADERE_CACHE_LOCATION} && ($2 == *"vadere"* || $3 == *"vadere"* ) ]];then
 		# (default not set.) only used for vadere containers.
 		# set DOCKER_VADERE_CACHE_LOCATION to new location of vadere cache.

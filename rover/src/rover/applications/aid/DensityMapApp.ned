@@ -26,18 +26,26 @@ simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
     
     parameters:
         @class(rover::ArteryDensityMapApp);
+        @signal[RegisterDensityMap];
+        @signal[RemoveDensityMap];
         string middelwareModule = default("^.^.middleware"); //node internal
-        string traciCoreModule = default("traci.core");
+        string identiyRegistryModule = default("identiyRegistry");
         string coordConverterModule;
         double gridSize = default(3.0) @units(m);
+        packetName = default("DcDMap");
         
         destPort = 30001;
         localPort = 30001;
         appMainInterval = default(1.0s);
         
         bool writeDensityLog = default(true);
+        string mapType = default("ymf"); // select map algorithm to calculate cell values
+        string mapTypeLog = default("all"); // if writeDensityLog is true log this map algorithm. If "all" just 
+        									// dump raw data currently present. 
+        
             
 }
+
 
 
 //simple SimpleNeighbourhood like INeighbourhood {
