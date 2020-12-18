@@ -35,13 +35,15 @@ if [ -z "$SILENT" ]; then
 fi
 
 # execute command
-CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
+CMD="$CMD ${@:2:${#@}+1-2}"
+
+echo "executing \"$CMD\""
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
 if [[ "$CMD" == "omnetpp" ]]; then
-     sleep 3
-     PID=`pidof omnetpp`
+     sleep 3000
+     PID=`pidof opp_ide`
 
      # omnetpp is special since the start script in its bin directory returns immediately
      # Therefore, we wait until the omnetpp process terminates. (cannot use wait since it is not a child process)

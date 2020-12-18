@@ -7,7 +7,16 @@
 
 $@
 sleep 3
-PID=`pidof $1`
+
+# Handle special case: Since version 6, the omnetpp IDE has the process name opp_ide
+if [ "$1" == "omnetpp" ]
+then
+  PROCESSNAME="opp_ide"
+else
+  PROCESSNAME="$1"
+fi
+
+PID=`pidof $PROCESSNAME`
 
 # The first parameter $1 can for example be the omnetpp launcher.
 # omnetpp is special since the start script in its bin directory returns immediately
