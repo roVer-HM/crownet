@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1.0-experimental
+#
 # OMNeT++ Simulator (as used within the roVer project)
 #
 # Within roVer, we use two different containers:
@@ -13,7 +15,6 @@ FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
 # Specify the version/tag of omnetpp to be put in the container:
 ENV OMNETRELEASE omnetpp-6.0pre9
 # Note: Remember to update the description below when changing OMNETRELEASE
-
 
 LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-6.0pre9)"
 LABEL maintainer  "wischhof@ieee.org"
@@ -34,7 +35,7 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
         clone --depth 1 --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/omnetpp.git $OMNETRELEASE
 
 # add a symbolic link so omnetpp is found in the path
@@ -44,7 +45,7 @@ RUN ln -s /opt/omnetpp/$OMNETRELEASE /opt/omnetpp/omnetpp
 WORKDIR /opt/omnetpp/omnetpp
 
 ARG NOCACHE_PULL=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
             pull ssh://git@sam-dev.cs.hm.edu:6000/rover/omnetpp.git $OMNETRELEASE
 
 # configure and compile

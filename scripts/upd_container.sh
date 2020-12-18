@@ -7,6 +7,7 @@ REGISTRY='sam-dev.cs.hm.edu:5023'
 IMAGE_LONG="$REGISTRY/rover/rover-main/$IMAGE_SHORT"
 VERSION_TAG="$2"
 DATE_TAG="$(date "+%y%m%d-%H%M")"
+SSH_KEY_LOCATION="$HOME/.ssh/id_rsa"
 
 if [ -z "$IMAGE_SHORT" ]; then
     echo "Illegal number of command line arguments."
@@ -21,7 +22,7 @@ fi
 
 
 echo "Building $IMAGE_SHORT ..."
-docker build -t "$IMAGE_LONG:$VERSION_TAG" -t "$IMAGE_LONG:$DATE_TAG" --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
+DOCKER_BUILDKIT=1 docker build -t "$IMAGE_LONG:$VERSION_TAG" -t "$IMAGE_LONG:$DATE_TAG" --secret id=sshkey,src=$SSH_KEY_LOCATION --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
 
 if [ $? -eq 0 ]; then
    docker login "$REGISTRY"
