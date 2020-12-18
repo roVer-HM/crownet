@@ -24,10 +24,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# for read access to the (non-public) roVer repos, we need to copy the key of the rover-readonly user:
-COPY id_rsa /root/.ssh/id_rsa
-RUN chmod 400 /root/.ssh/id_rsa
-
 # clone the sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/sumo
 # enable lfs (must be done before cloning!) and clone the project
