@@ -21,7 +21,7 @@ CONTNAME=omnetpp
 
 if [[ -z "$1" || "$1" == "exec" ]]; then
       VERSION=latest
-      CONTNAME=$SHORTNAME-$VERSION
+      CONTNAME=$SHORTNAME:$VERSION
 else
       VERSION=omnetpp-$1
       SHORTNAME=$SHORTNAME-$1
