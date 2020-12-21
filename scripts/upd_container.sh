@@ -1,6 +1,11 @@
 #!/bin/bash
 # Update a container within the rover container registry.
 #
+# $1 is the image short name
+# $2 is the version tag
+#
+# All further arguments are passed to the docker build command, e.g. in order to set additional build arguments.
+#
 IMAGE_SHORT="$1"
 RANDOM=$(date +%s)
 REGISTRY='sam-dev.cs.hm.edu:5023'
@@ -20,9 +25,10 @@ if [ -z "$VERSION_TAG" ]; then
     VERSION_TAG="latest"
 fi
 
+TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG"
 
 echo "Building $IMAGE_SHORT ..."
-DOCKER_BUILDKIT=1 docker build -t "$IMAGE_LONG:$VERSION_TAG" -t "$IMAGE_LONG:$DATE_TAG" --secret id=sshkey,src=$SSH_KEY_LOCATION --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
+DOCKER_BUILDKIT=1 docker build $TAG_OPTIONS --secret id=sshkey,src=$SSH_KEY_LOCATION --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
 
 if [ $? -eq 0 ]; then
    docker login "$REGISTRY"
