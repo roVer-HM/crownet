@@ -55,7 +55,7 @@ echo "executing \"$CMD\""
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
 if [[ "$CMD" == "omnetpp" ]]; then
-     sleep 3000
+     sleep 3
      PID=`pidof opp_ide`
 
      # omnetpp is special since the start script in its bin directory returns immediately

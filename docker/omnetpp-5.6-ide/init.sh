@@ -10,7 +10,11 @@
 
 export PATH=/opt/omnetpp/omnetpp/bin:~/.local/bin:$PATH
 
-# echo "Command: $1"
+# location where the IDE stores its preference file
+PREFS_CONT='/opt/omnetpp/omnetpp/ide/configuration/.settings'
+PREFS_HOME="$HOME/.opp_container_settings"
+
+echo "Command: $1"
 
 if [ -z "$1" ]; then
      CMD="omnetpp"
@@ -34,8 +38,19 @@ if [ -z "$SILENT" ]; then
      fi
 fi
 
+# OMNeT++ IDE stores infos on most recently used workspace at $PREFS_CONT
+# We redirect it to a file within our home directory, so that the settings can be 
+# located outside the container and will be available even it the container is removed.
+mv $PREFS_CONT $PREFS_CONT.backup
+if [ ! -d "$PREFS_HOME" ]; then
+    mkdir $PREFS_HOME
+fi
+ln -s $PREFS_HOME $PREFS_CONT
+
 # execute command
-CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
+CMD="$CMD ${@:2:${#@}+1-2}"
+
+echo "executing \"$CMD\""
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
