@@ -58,7 +58,7 @@ RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o 
 WORKDIR /models/simulte
 
 ARG NOCACHE_PULL=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
        pull ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git $SIMULTERELEASE
 
 # configure and compile
