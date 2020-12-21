@@ -41,7 +41,9 @@ fi
 # OMNeT++ IDE stores infos on most recently used workspace at $PREFS_CONT
 # We redirect it to a file within our home directory, so that the settings can be 
 # located outside the container and will be available even it the container is removed.
-mv $PREFS_CONT $PREFS_CONT.backup
+if [ -d "$PREFS_CONT" ]; then
+    mv $PREFS_CONT $PREFS_CONT.backup
+fi
 if [ ! -d "$PREFS_HOME" ]; then
     mkdir $PREFS_HOME
 fi

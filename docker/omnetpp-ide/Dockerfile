@@ -10,7 +10,7 @@
 
 
 #FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:latest
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:6.0pre9
+FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:6.0pre10
 
 WORKDIR /opt/omnetpp/omnetpp
 

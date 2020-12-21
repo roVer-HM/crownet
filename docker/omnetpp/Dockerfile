@@ -13,10 +13,10 @@
 FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-6.0pre9
+ENV OMNETRELEASE omnetpp-6.0pre10
 # Note: Remember to update the description below when changing OMNETRELEASE
 
-LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-6.0pre9)"
+LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-6.0pre10)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all packages required to compile omnet
