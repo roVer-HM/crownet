@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1.0-experimental
+#
 # OMNeT++ Simulator with the following extensions:
 # - INET Framework    (in /models/inet4)
 # - simuLTE           (in /models/simulte)
@@ -8,7 +10,7 @@
 FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:latest
 
 # Specify the version/tag of inet to be put in the container:
-ENV INETRELEASE v4.1.1
+ENV INETRELEASE v4.2.1
 ENV SIMULTERELEASE hm_master
 ENV VEINSRELEASE hm_master
 # Note: Remember to update the description below when changing versions/tags
@@ -16,10 +18,6 @@ ENV VEINSRELEASE hm_master
 
 LABEL description "OMNeT++ Simulation Framework including inet, simulte and veins models (roVer project)"
 LABEL maintainer  "wischhof@ieee.org"
-
-# for read access to the (non-public) roVer repos, we need to copy the key of the rover-readonly user:
-COPY id_rsa /root/.ssh/id_rsa
-RUN chmod 400 /root/.ssh/id_rsa
 
 #################### INET #############################################################################
 
@@ -30,15 +28,15 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --branch $INETRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git inet4
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        clone --branch $INETRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/inet.git inet4
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /models/inet4
 
 ARG NOCACHE_PULL=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/inet.git $INETRELEASE
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        pull ssh://git@sam-dev.cs.hm.edu:6000/rover/inet.git $INETRELEASE
 
 # configure and compile
 RUN make makefiles && \
@@ -53,15 +51,15 @@ WORKDIR /models
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-       clone --branch $SIMULTERELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/simulte.git
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+       clone --branch $SIMULTERELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /models/simulte
 
 ARG NOCACHE_PULL=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-       pull ssh://git@sam-dev.cs.hm.edu:5022/rover/simulte.git $SIMULTERELEASE
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+       pull ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git $SIMULTERELEASE
 
 # configure and compile
 RUN make makefiles && \
@@ -76,15 +74,15 @@ WORKDIR /models
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-       clone --branch $VEINSRELEASE ssh://git@sam-dev.cs.hm.edu:5022/rover/veins.git
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+       clone --branch $VEINSRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /models/veins
 
 ARG NOCACHE_PULL=0
-RUN GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        pull ssh://git@sam-dev.cs.hm.edu:5022/rover/veins.git $VEINSRELEASE
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        pull ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git $VEINSRELEASE
 
 # configure and compile
 RUN ./configure && \

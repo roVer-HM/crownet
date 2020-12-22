@@ -5,8 +5,11 @@
  *      Author: sts
  */
 
-#include <omnetpp/cnedvalue.h>
 #include "inet/common/INETDefs.h"
+
+#if OMNETPP_VERSION < 0x600
+  #include <omnetpp/cnedvalue.h>
+#endif
 
 using namespace omnetpp;
 

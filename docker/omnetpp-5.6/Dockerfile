@@ -1,22 +1,19 @@
 # syntax = docker/dockerfile:1.0-experimental
 #
 # OMNeT++ Simulator (as used within the roVer project)
-#
-# Within roVer, we use two different containers:
-#   1) omnetpp (command line, no GUI, for simulation campaigns)
+# To be discussed: Split this in two containers:
+#   1) omnetpp-base (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
-#
-# This Dockerfile is used to build the omnetpp base container, 
-# which is also the base container for omnetpp-ide
 
 
 FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-6.0pre10
+ENV OMNETRELEASE omnetpp-5.6.2
 # Note: Remember to update the description below when changing OMNETRELEASE
 
-LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-6.0pre10)"
+
+LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-5.6.2)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all packages required to compile omnet
@@ -24,9 +21,6 @@ LABEL maintainer  "wischhof@ieee.org"
 #       we must include debug info for the installed libraries (versions must match!)
 #       by manually installing the libstdc++6-8-dbg package
 # see rover-base-cpp and rover-base-min
-
-# install additionally needed Python modules
-RUN pip3 install numpy pandas matplotlib posix_ipc
 
 # clone the OMNeT++ sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/omnetpp
@@ -49,12 +43,22 @@ RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o 
             pull ssh://git@sam-dev.cs.hm.edu:6000/rover/omnetpp.git $OMNETRELEASE
 
 # configure and compile
+#  - samples are optional and not needed for compiling - remove for a smaller image
+# RUN rm -rf samples
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .
 RUN ./configure && \
      make -j $(nproc) && \
      find . -type f -name '*.o' -exec rm {} + && \
      find . -type f -name '*.o.d' -exec rm {} +
+
+# now install the Eclipse IDE base
+# ADD ide/ide.tar.gz .
+
+
+# installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
+# RUN pip3 install cpplint
+# RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group ; PID=`pidof omnetpp`; while [ -e /proc/$PID ]; do sleep 0.1; done
 
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
