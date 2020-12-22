@@ -32,8 +32,8 @@ DOCKER_BUILDKIT=1 docker build $TAG_OPTIONS --secret id=sshkey,src=$SSH_KEY_LOCA
 
 if [ $? -eq 0 ]; then
    docker login "$REGISTRY"
-#   docker push "$IMAGE_LONG:$VERSION_TAG"
-#   docker push "$IMAGE_LONG:$DATE_TAG"
+   docker push "$IMAGE_LONG:$VERSION_TAG"
+   docker push "$IMAGE_LONG:$DATE_TAG"
 else
    echo "Container build did not succeed - $IMAGE_SHORT not uploaded to registry."
 fi
