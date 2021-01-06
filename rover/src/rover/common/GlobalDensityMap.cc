@@ -76,10 +76,10 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
   if (signalID == traciInit) {
     // 1) setup map
     converter = inet::getModuleFromPar<OsgCoordConverter>(
-                    par("coordConverterModule"), this, true)
+                    par("coordConverterModule"), this)
                     ->getConverter();
     nodeManager = inet::getModuleFromPar<traci::NodeManager>(
-        par("traciNodeManager"), this, true);
+        par("traciNodeManager"), this);
 
     std::pair<int, int> gridDim;
     double gridSize = par("gridSize").doubleValue();

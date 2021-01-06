@@ -14,7 +14,7 @@
 //
 
 #include "AidConnection.h"
-#include "inet/applications/common/SocketTag_m.h"
+#include "inet/common/socket/SocketTag_m.h"
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/Simsignals.h"
 #include "inet/common/Simsignals_m.h"
@@ -113,7 +113,7 @@ bool AidConnection::processLower(Packet* packet, int receivingSocketId) {
   if (aidHeader) {
     // emit rcv...
     packet->setKind(AID_I_DATA);
-    delete packet->removeTagIfPresent<SocketInd>();
+    packet->removeTagIfPresent<SocketInd>();
     packet->addTag<SocketInd>()->setSocketId(appSocketId);
     sendToApp(packet);
 

@@ -37,15 +37,16 @@ class MobilityRoverArtery : public artery::MobilityBase,
                       std::shared_ptr<traci::VariableCache> cache) override;
 
   // inet::IMobility interface
-  double getMaxSpeed() const override;
-  inet::Coord getCurrentPosition() override;
-  inet::Coord getCurrentVelocity() override;
-  inet::Coord getCurrentAcceleration() override;
-  inet::Quaternion getCurrentAngularPosition() override;
-  inet::Quaternion getCurrentAngularVelocity() override;
-  inet::Quaternion getCurrentAngularAcceleration() override;
-  inet::Coord getConstraintAreaMax() const override;
-  inet::Coord getConstraintAreaMin() const override;
+  virtual int getId() const override { return cSimpleModule::getId(); }
+  virtual double getMaxSpeed() const override;
+  virtual const inet::Coord& getCurrentPosition() override;
+  virtual const inet::Coord& getCurrentVelocity() override;
+  virtual const inet::Coord& getCurrentAcceleration() override;
+  virtual const inet::Quaternion& getCurrentAngularPosition() override;
+  virtual const inet::Quaternion& getCurrentAngularVelocity() override;
+  virtual const inet::Quaternion& getCurrentAngularAcceleration() override;
+  virtual const inet::Coord& getConstraintAreaMax() const override;
+  virtual const inet::Coord& getConstraintAreaMin() const override;
 
   // omnetpp::cSimpleModule
   void initialize(int stage) override;
@@ -71,6 +72,8 @@ class MobilityRoverArtery : public artery::MobilityBase,
   inet::Coord lastPosition;
   inet::Coord lastVelocity;
   inet::Quaternion lastOrientation;
+  inet::Coord constrainedAreaMin;
+  inet::Coord constrainedAreaMax;
 
   simtime_t nextPosTime;
   inet::Coord nextPosition;

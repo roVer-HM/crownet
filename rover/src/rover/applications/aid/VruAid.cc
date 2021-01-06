@@ -61,7 +61,7 @@ BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   basicContainer.setVruProfile(ItsVruProfile::PEDESTRIAN);
   basicContainer.setVruType(ItsVruType::ADULT);
   ReferencePosition ref{};
-  ref.setHeadingValue(mobilityModule->getCurrentVelocity().normalize());
+  ref.setHeadingValue(mobilityModule->getCurrentVelocity().getNormalized());
   ref.setReferencePosition(mobilityModule->getCurrentPosition());
   ref.setSemiMajorConf(0.3);
   ref.setSemiMajorConf(0.3);

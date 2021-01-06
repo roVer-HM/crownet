@@ -32,12 +32,12 @@ void ArteryDensityMapApp::initialize(int stage) {
     std::string x = par("coordConverterModule").stdstringValue();
 
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-    middleware = inet::findModuleFromPar<artery::Middleware>(
-        par("middelwareModule"), this, true);
-    identiyRegistry = inet::findModuleFromPar<artery::IdentityRegistry>(
-        par("identiyRegistryModule"), this, true);
+    middleware = inet::getModuleFromPar<artery::Middleware>(
+        par("middelwareModule"), this);
+    identiyRegistry = inet::getModuleFromPar<artery::IdentityRegistry>(
+        par("identiyRegistryModule"), this);
     converter = inet::getModuleFromPar<OsgCoordConverter>(
-                    par("coordConverterModule"), this, true)
+                    par("coordConverterModule"), this)
                     ->getConverter();
 
     mapType = par("mapType").stdstringValue();
