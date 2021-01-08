@@ -1,9 +1,9 @@
 variables:
  GIT_SUBMODULE_STRATEGY: recursive    # clone submodules
- GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vader submodule)
+ GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vadere submodule)
  ROVER_MAIN: '${CI_PROJECT_DIR}'      # all files relative to this.
  OPP_CONT_TAG: '6.0pre10'             # tag of OMNeT++ container to be used
-
+ OPP: '${CI_PROJECT_DIR}/scripts/omnetpp ${OPP_CONT_TAG} exec'
 
 
 stages:
@@ -27,7 +27,6 @@ build-for-sim:
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
     MODE: 'release'
-    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp ${OPP_CONT_TAG} exec'
   script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
@@ -73,8 +72,6 @@ gtests:
   stage: test
   tags:
     - rover-sim
-  variables:
-    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:
     - "cd ${ROVER_MAIN}/rover"
     - "${OPP} make test"
@@ -89,8 +86,6 @@ fingerprints:
   stage: test
   tags:
     - rover-sim
-  variables:
-    OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:
     - "cd ${ROVER_MAIN}/rover/tests/fingerprint"
     - "${OPP} ./fingerprints"
