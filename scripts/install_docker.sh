@@ -14,6 +14,9 @@ sudo apt update && sudo apt -y install docker-ce
 
 echo "When queried, please enter login credentials for accessing the Docker registry at sam-dev.cs.hm.edu."
 echo ""
+if [[ ! -d "$HOME/.docker" ]];then
+    mkdir "$HOME/.docker"
+fi
 sudo docker login sam-dev.cs.hm.edu:5023
 sudo chown -R $USER ~/.docker
 
