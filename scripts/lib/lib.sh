@@ -125,7 +125,7 @@ function run_container_X11() {
         echo "container> set var VADERE_LOG=$VADERE_LOG"
         CMD_ARR+=(--env VADERE_LOG=${VADERE_LOG})
 	fi
-    CMD_ARR+=(--env ROVER_MAIN=${ROVER_MAIN})
+    CMD_ARR+=(--env CROWNET_HOME=${CROWNET_HOME})
 	CMD_ARR+=(--workdir=$(pwd))
 	CMD_ARR+=(--volume="/home/$USER:/home/$USER")
 	CMD_ARR+=(--volume="/etc/group:/etc/group:ro")

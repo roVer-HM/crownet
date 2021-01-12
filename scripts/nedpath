@@ -1,21 +1,21 @@
 #!/bin/bash
-# set NEDPATH variable to all nedfolders found in $ROVER_MAIN.
+# set NEDPATH variable to all nedfolders found in $CROWNET_HOME.
 # Ignore directories containing any of the following strings.
 
-if [[ -z $ROVER_MAIN ]];then
-  echo "Variable ROVER_MAIN not set. Did you source roverenv?"
+if [[ -z $CROWNET_HOME ]];then
+  echo "Variable CROWNET_HOME not set. Did you source roverenv?"
   exit -1
 fi
 
-IGNORE_PATH='veins_inet3|veins_catch|veins_testsims|rover-main/builds'
+IGNORE_PATH='veins_inet3|veins_catch|veins_testsims|crownet/builds'
 
-if [ -z $ROVER_MAIN ]; then
-  echo "ROVER_MAIN not set"
+if [ -z $CROWNET_HOME ]; then
+  echo "CROWNET_HOME not set"
   exit -1
 fi
 
 NEDPATH='.'
-ned_folders=$(find $ROVER_MAIN  -name ".nedfolders" | grep -Ev -- $IGNORE_PATH)
+ned_folders=$(find $CROWNET_HOME  -name ".nedfolders" | grep -Ev -- $IGNORE_PATH)
 for folder in $ned_folders; do
   NEDPATH="$NEDPATH:$(sed -e "s~^~${folder%%.nedfolders}~g" "$folder" | paste -sd ':')"
 done

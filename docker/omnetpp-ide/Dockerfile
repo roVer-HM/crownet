@@ -4,13 +4,13 @@
 #   1) omnetpp (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 #
-# This Dockerfile is used to build the omnetpp-ide container, 
+# This Dockerfile is used to build the omnetpp-ide container,
 # which extends the omnetpp container with a GUI
 
 
 
-#FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:latest
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:6.0pre10
+#FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0pre10
 
 WORKDIR /opt/omnetpp/omnetpp
 

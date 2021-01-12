@@ -64,14 +64,14 @@ def main():
     ## 2. Run simulations
     # 2.1. check system variables
 
-    if print(os.getenv('ROVER_MAIN')) is None:
+    if print(os.getenv('CROWNET_HOME')) is None:
         # print(os.environ)
-        print("Please add variable ROVER_MAIN to your e.g. /etc/environment")
+        print("Please add variable CROWNET_HOME to your e.g. /etc/environment")
 
-        print("Alternative: add ROVER_MAIN with python")
-        os.environ['ROVER_MAIN'] = '/home/christina/repos/rover-main'
+        print("Alternative: add CROWNET_HOME with python")
+        os.environ['CROWNET_HOME'] = '/home/christina/repos/crownet'
 
-    print(os.getenv('ROVER_MAIN'))
+    print(os.getenv('CROWNET_HOME'))
 
     # 2.2. start simulations, each run produces an output folder in the sample folder
 

@@ -43,7 +43,7 @@ class Cfg:
         "stderr": True,
         "cap_add": ["SYS_PTRACE"],
         "working_dir": os.path.abspath(os.curdir),
-        "environment": {"ROVER_MAIN": os.environ["ROVER_MAIN"], },
+        "environment": {"CROWNET_HOME": os.environ["CROWNET_HOME"], },
         "volumes": {
             f"{os.environ['HOME']}": {"bind": f"{os.environ['HOME']}", "mode": "rw"},
             "/etc/group": {"bind": "/etc/group", "mode": "ro"},

@@ -28,7 +28,7 @@ else
       CONTNAME=$CONTNAME:$1
 fi
 
-# if the script was started with an "exec" argument, 
+# if the script was started with an "exec" argument,
 # forward all parameters following the "exec"
 if [[ "$1" == "exec" ]]; then
       COMMAND="${@:2:${#@}+1-2}"
@@ -38,7 +38,7 @@ if [[ "$2" == "exec" ]]; then
       COMMAND="${@:3:${#@}+1-3}"
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$CONTNAME
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$CONTNAME
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 

@@ -123,7 +123,7 @@ def add_default_args(container_name, parser):
         "--registry",
         required=False,
         dest="registry",
-        default="sam-dev.cs.hm.edu:5023/rover/rover-main/",
+        default="sam-dev.cs.hm.edu:5023/rover/crownet/",
         help="Docker Registry path",
     )
     parser.add_argument(

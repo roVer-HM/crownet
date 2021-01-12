@@ -13,7 +13,7 @@ else
       CONTNAME=$SHORTNAME
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$SHORTNAME$TAG_DIGEST
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$SHORTNAME$TAG_DIGEST
 
 echo "container> used image: $IMAGENAME"
 
