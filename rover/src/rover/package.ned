@@ -1,3 +1,0 @@
-package rover;
-
-@license(LGPL);

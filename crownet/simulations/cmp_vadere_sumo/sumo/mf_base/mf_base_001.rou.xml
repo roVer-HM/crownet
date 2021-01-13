@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Tue Nov 26 16:11:13 2019 by Eclipse SUMO duarouter Version v1_3_1+0207-e5522cc340
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="mf_base_new2.net.xml"/>
+        <route-files value="trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="mf_base_new2.rou.xml"/>
+        <alternatives-output value="mf_base_new2.rou.alt.xml"/>
+    </output>
+
+    <time>
+        <begin value="0.0"/>
+        <end value="500.0"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <person id="6" depart="6.00">
+        <walk edges="-41726075 -33487028#4 -31344484 -5785422"/>
+    </person>
+    <person id="8" depart="8.00">
+        <walk edges="332176204 5785422 -31344484 -33487028#4 -33487028#3 -33487028#2 -33487028#1 24039836#1 24039836#4 gneE21 258139178 258747556 105469274#0 gneE22 -155548874"/>
+    </person>
+    <person id="14" depart="14.00">
+        <walk edges="-4662541#2 -254945243 -33487028#1 24039836#1 155546685"/>
+    </person>
+</routes>

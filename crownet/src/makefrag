@@ -1,0 +1,12 @@
+#
+# Use the new message compiler introduced in OMNeT++ 5.3
+#
+MSGC:=$(MSGC) --msg6
+
+#
+# compiler warning for c-style cast
+#
+#CFLAGS += -Wold-style-cast
+#CFLAGS += -save-temps
+
+
