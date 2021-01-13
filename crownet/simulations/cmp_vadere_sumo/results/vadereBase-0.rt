@@ -1,0 +1,58 @@
++R 0  0  9  10.10.1.1  10.10.0.0  24  <unspec>
++R 0  0  9  10.10.1.1  10.10.1.0  24  <unspec>
++R 0  0  10  10.10.2.1  127.0.0.0  8  <unspec>
++R 0  0  10  10.10.2.1  10.10.2.0  24  <unspec>
++R 0  0  11  10.10.3.1  127.0.0.0  8  <unspec>
++R 0  0  11  10.10.3.1  10.10.2.0  24  <unspec>
++R 0  0  11  10.10.3.1  10.10.3.0  24  <unspec>
++R 0  0  12  10.10.3.2  127.0.0.0  8  <unspec>
++R 0  0  12  10.10.3.2  10.10.1.0  24  <unspec>
++R 0  0  12  10.10.3.2  10.10.3.0  24  <unspec>
+*I  2  0  215  lteNic <unspec>
++I  2  0  215  lteNic <unspec>
+*I  2  0  215  lteNic <unspec>
+*I  2  0  215  cellular <unspec>
+*I  2  0  215  cellular <unspec>
+*I  2  0  215  cellular <unspec>
+*I  2  0  215  cellular <unspec>
+*I  2  0  215  cellular <unspec>
+*I  2  0  215  cellular 10.0.0.215
+*I  2  0  215  cellular 10.0.0.215
+*I  2  0  215  cellular 10.0.0.215
+*I  2  0  215  cellular 10.0.0.215
+*I  2  0  215  cellular 10.0.0.215
+*I  2  0  215  cellular 20.0.0.215
+*I  2  0  215  cellular 20.0.0.215
++R 2  0  215  20.0.0.215  20.0.0.0  8  <unspec>
+*I  2  0  265  lteNic <unspec>
++I  2  0  265  lteNic <unspec>
+*I  2  0  265  lteNic <unspec>
+*I  2  0  265  cellular <unspec>
+*I  2  0  265  cellular <unspec>
+*I  2  0  265  cellular <unspec>
+*I  2  0  265  cellular <unspec>
+*I  2  0  265  cellular <unspec>
+*I  2  0  265  cellular 10.0.1.9
+*I  2  0  265  cellular 10.0.1.9
+*I  2  0  265  cellular 10.0.1.9
+*I  2  0  265  cellular 10.0.1.9
+*I  2  0  265  cellular 10.0.1.9
+*I  2  0  265  cellular 20.0.1.9
+*I  2  0  265  cellular 20.0.1.9
++R 2  0  265  20.0.1.9  20.0.0.0  8  <unspec>
+*I  2  0  315  lteNic <unspec>
++I  2  0  315  lteNic <unspec>
+*I  2  0  315  lteNic <unspec>
+*I  2  0  315  cellular <unspec>
+*I  2  0  315  cellular <unspec>
+*I  2  0  315  cellular <unspec>
+*I  2  0  315  cellular <unspec>
+*I  2  0  315  cellular <unspec>
+*I  2  0  315  cellular 10.0.1.59
+*I  2  0  315  cellular 10.0.1.59
+*I  2  0  315  cellular 10.0.1.59
+*I  2  0  315  cellular 10.0.1.59
+*I  2  0  315  cellular 10.0.1.59
+*I  2  0  315  cellular 20.0.1.59
+*I  2  0  315  cellular 20.0.1.59
++R 2  0  315  20.0.1.59  20.0.0.0  8  <unspec>

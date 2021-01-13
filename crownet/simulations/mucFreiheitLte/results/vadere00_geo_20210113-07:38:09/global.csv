@@ -1,0 +1,4 @@
+#CELLSIZE=3.000000,DATACOL=-1,IDXCOL=3,MAP_TYPE=global,NODE_ID=-1,SEP=;,XSIZE=281.135000,YSIZE=233.492000
+simtime;x;y;count;measured_t;received_t;source;selection;own_cellnode_id2;12;49;1;2;2;-1;;0;270
+2;12;52;1;2;2;-1;;0;324
+2;12;53;1;2;2;-1;;0;216

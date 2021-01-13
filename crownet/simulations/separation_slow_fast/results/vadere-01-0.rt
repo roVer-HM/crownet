@@ -1,0 +1,86 @@
++R 0  0  10  10.10.0.1  127.0.0.0  8  <unspec>
++R 0  0  10  10.10.0.1  10.10.0.0  24  <unspec>
+*I  1  0  105  wlanNic0 <unspec>
++I  1  0  105  wlanNic0 <unspec>
+*I  1  0  105  wlanNic0 <unspec>
+*I  1  0  105  wlanNic0 <unspec>
+*I  1  0  105  wlanNic0 <unspec>
+*I  1  0  105  wlanNic0 <unspec>
+*I  1  0  105  wlanNic0 10.0.0.105
+*I  1  0  105  wlanNic0 10.0.0.105
+*I  1  0  105  wlanNic0 10.0.0.105
+*I  1  0  105  wlanNic0 10.0.0.105
+*I  1  0  105  wlanNic0 20.0.5.105
+*I  1  0  105  wlanNic0 20.0.5.105
+*I  1  0  105  wlanNic0 20.0.5.105
++R 1  0  105  20.0.5.105  20.0.0.0  8  <unspec>
+*I  1  0  169  wlanNic0 <unspec>
++I  1  0  169  wlanNic0 <unspec>
+*I  1  0  169  wlanNic0 <unspec>
+*I  1  0  169  wlanNic0 <unspec>
+*I  1  0  169  wlanNic0 <unspec>
+*I  1  0  169  wlanNic0 <unspec>
+*I  1  0  169  wlanNic0 10.0.0.169
+*I  1  0  169  wlanNic0 10.0.0.169
+*I  1  0  169  wlanNic0 10.0.0.169
+*I  1  0  169  wlanNic0 10.0.0.169
+*I  1  0  169  wlanNic0 20.0.5.169
+*I  1  0  169  wlanNic0 20.0.5.169
+*I  1  0  169  wlanNic0 20.0.5.169
++R 1  0  169  20.0.5.169  20.0.0.0  8  <unspec>
+*I  1  0  233  wlanNic0 <unspec>
++I  1  0  233  wlanNic0 <unspec>
+*I  1  0  233  wlanNic0 <unspec>
+*I  1  0  233  wlanNic0 <unspec>
+*I  1  0  233  wlanNic0 <unspec>
+*I  1  0  233  wlanNic0 <unspec>
+*I  1  0  233  wlanNic0 10.0.0.233
+*I  1  0  233  wlanNic0 10.0.0.233
+*I  1  0  233  wlanNic0 10.0.0.233
+*I  1  0  233  wlanNic0 10.0.0.233
+*I  1  0  233  wlanNic0 20.0.5.233
+*I  1  0  233  wlanNic0 20.0.5.233
+*I  1  0  233  wlanNic0 20.0.5.233
++R 1  0  233  20.0.5.233  20.0.0.0  8  <unspec>
+*I  1  0  297  wlanNic0 <unspec>
++I  1  0  297  wlanNic0 <unspec>
+*I  1  0  297  wlanNic0 <unspec>
+*I  1  0  297  wlanNic0 <unspec>
+*I  1  0  297  wlanNic0 <unspec>
+*I  1  0  297  wlanNic0 <unspec>
+*I  1  0  297  wlanNic0 10.0.1.41
+*I  1  0  297  wlanNic0 10.0.1.41
+*I  1  0  297  wlanNic0 10.0.1.41
+*I  1  0  297  wlanNic0 10.0.1.41
+*I  1  0  297  wlanNic0 20.0.6.41
+*I  1  0  297  wlanNic0 20.0.6.41
+*I  1  0  297  wlanNic0 20.0.6.41
++R 1  0  297  20.0.6.41  20.0.0.0  8  <unspec>
+*I  1  0  361  wlanNic0 <unspec>
++I  1  0  361  wlanNic0 <unspec>
+*I  1  0  361  wlanNic0 <unspec>
+*I  1  0  361  wlanNic0 <unspec>
+*I  1  0  361  wlanNic0 <unspec>
+*I  1  0  361  wlanNic0 <unspec>
+*I  1  0  361  wlanNic0 10.0.1.105
+*I  1  0  361  wlanNic0 10.0.1.105
+*I  1  0  361  wlanNic0 10.0.1.105
+*I  1  0  361  wlanNic0 10.0.1.105
+*I  1  0  361  wlanNic0 20.0.6.105
+*I  1  0  361  wlanNic0 20.0.6.105
+*I  1  0  361  wlanNic0 20.0.6.105
++R 1  0  361  20.0.6.105  20.0.0.0  8  <unspec>
+*I  1  0  425  wlanNic0 <unspec>
++I  1  0  425  wlanNic0 <unspec>
+*I  1  0  425  wlanNic0 <unspec>
+*I  1  0  425  wlanNic0 <unspec>
+*I  1  0  425  wlanNic0 <unspec>
+*I  1  0  425  wlanNic0 <unspec>
+*I  1  0  425  wlanNic0 10.0.1.169
+*I  1  0  425  wlanNic0 10.0.1.169
+*I  1  0  425  wlanNic0 10.0.1.169
+*I  1  0  425  wlanNic0 10.0.1.169
+*I  1  0  425  wlanNic0 20.0.6.169
+*I  1  0  425  wlanNic0 20.0.6.169
+*I  1  0  425  wlanNic0 20.0.6.169
++R 1  0  425  20.0.6.169  20.0.0.0  8  <unspec>
