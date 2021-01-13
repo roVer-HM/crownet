@@ -14,9 +14,9 @@
 //
 
 
-package rover.simulations.networks;
+package crownet.simulations.networks;
 
-import rover.simulations.networks.LTE_d2d;
+import crownet.simulations.networks.LTE_d2d;
 import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import inet.visualizer.contract.IIntegratedVisualizer;
 import inet.environment.common.PhysicalEnvironment;
@@ -36,10 +36,10 @@ import lte.corenetwork.nodes.eNodeB;
 import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
 import lte.common.LteNetworkConfigurator;
-import rover.nodes.IMobileUe;
-import rover.nodes.UnequippedHost;
-import rover.common.ICoordConverter;
-import rover.common.GlobalDensityMap;
+import crownet.nodes.IMobileUe;
+import crownet.nodes.UnequippedHost;
+import crownet.common.ICoordConverter;
+import crownet.common.GlobalDensityMap;
 
 import artery.storyboard.Storyboard;
 import artery.utility.IdentityRegistry;
@@ -61,16 +61,16 @@ network World
         traci.nodes.typename = default("VadereNodeManager");
         traci.nodes.objectSinkModule = default(".mobility");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
-        traci.mapper.objectType = default("rover.nodes.PedestrianFull");
-        
+        traci.mapper.objectType = default("crownet.nodes.PedestrianFull");
+
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);
         traci.core.typename = default("VadereCore");
-        
+
         traci.launcher.typename = default("VadereLauchner");
         traci.launcher.hostname = default("vadere");
 		traci.launcher.port = default(9998);
-        
+
 
         storyboard.middlewareModule = default(".middleware");
 
@@ -124,7 +124,7 @@ network World
         }
         identiyRegistry: IdentityRegistry {
             @display("p=523.74,259.6125;i=block/table2;is=s");
-        }       
+        }
         // Misc
         storyboard: Storyboard if hasStoryboard {
             parameters:

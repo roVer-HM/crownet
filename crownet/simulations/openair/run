@@ -1,7 +1,7 @@
 #!/bin/sh
 cd `dirname $0`
-../../src/run_rover -n .:../src $*
-# for shared lib, use: opp_run -l ../../src/ROVER -n .:../src $*
+../../src/run_crownet -n .:../src $*
+# for shared lib, use: opp_run -l ../../src/CROWNET -n .:../src $*
 
 # in order to execute a single configuration (in the case "S1") in GUI mode use:
 # omnetpp exec ./run -c S1

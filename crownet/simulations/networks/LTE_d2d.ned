@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package rover.simulations.networks;
+package crownet.simulations.networks;
 
 import inet.node.inet.StandardHost;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
@@ -28,8 +28,8 @@ import lte.corenetwork.nodes.Ue;
 import lte.corenetwork.nodes.eNodeB;
 import lte.world.radio.LteChannelControl;
 import lte.epc.PgwStandardSimplified;
-import rover.nodes.IMobileUe;
-import rover.nodes.UnequippedHost;
+import crownet.nodes.IMobileUe;
+import crownet.nodes.UnequippedHost;
 
 
 network LTE_d2d
@@ -76,13 +76,13 @@ network LTE_d2d
             @display("p=357,312;is=vs");
         }
 
-        ueD2D_a[numUeD2D_a]: <ueType> like IMobileUe { 
+        ueD2D_a[numUeD2D_a]: <ueType> like IMobileUe {
             @display("p=356,277;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";
         }
 
-        ueD2D_b[numUeD2D_b]: <ueType> like IMobileUe { 
+        ueD2D_b[numUeD2D_b]: <ueType> like IMobileUe {
             @display("p=356,245;is=vs");
             ipv4.configurator.typename = "HostAutoConfigurator";
             ipv4.configurator.interfaces = "wlan";

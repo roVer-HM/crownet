@@ -1,3 +1,3 @@
-package rover.simulations.muenchnerFreiheit;
+package crownet.simulations.muenchnerFreiheit;
 
 @license(LGPL);

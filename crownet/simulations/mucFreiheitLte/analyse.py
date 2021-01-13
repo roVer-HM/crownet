@@ -4,7 +4,7 @@ from typing import List, Dict
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from roveranalyzer.oppanalyzer.utils import Config, ScaveTool, StatsTool, Simulation, PlotAttrs
+from crownetanalyzer.oppanalyzer.utils import Config, ScaveTool, StatsTool, Simulation, PlotAttrs
 
 # Type definitions
 SimList = List[Simulation]
@@ -17,7 +17,7 @@ SET_TITLE = False
 
 cnf = Config()
 att = PlotAttrs()
-SIM_RESULT_BASE = f"{cnf.rover_main}/rover/simulations/mucFreiNetdLTE2dMulticast/results"
+SIM_RESULT_BASE = f"{cnf.crownet_main}/crownet/simulations/mucFreiNetdLTE2dMulticast/results"
 
 """
 Process a specific simulation scenario

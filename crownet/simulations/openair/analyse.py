@@ -3,8 +3,8 @@ import errno
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from roveranalyzer.oppanalyzer.utils import Config, ScaveTool, StatsTool
-from roveranalyzer.oppanalyzer.rover_measurements import OaiMeasurement
+from crownetanalyzer.oppanalyzer.utils import Config, ScaveTool, StatsTool
+from crownetanalyzer.oppanalyzer.crownet_measurements import OaiMeasurement
 from typing import List, Dict
 
 plt.rcParams['pdf.fonttype'] = 42    # required by EDAS publishing system but leads to larger PDF files
@@ -122,9 +122,9 @@ def process_scenario(name: str, id: str, measurements: CsvList, sims: SimList,
     alertdelay_ue = {}  # dictionary for storing the delays for alerts (application layer)
     df_sims: Dict[str, pd.DataFrame] = {}  # dictionary for storing the dataframes of simulations
     for sim in sims:
-        input_sca = f"{cnf.rover_main}/rover/simulations/openair/results/{sim.path}/*.sca"
-        input_vec = f"{cnf.rover_main}/rover/simulations/openair/results/{sim.path}/*.vec"
-        output_csv = f"{cnf.rover_main}/rover/simulations/openair/results/results_{sim.id}.csv"
+        input_sca = f"{cnf.crownet_main}/crownet/simulations/openair/results/{sim.path}/*.sca"
+        input_vec = f"{cnf.crownet_main}/crownet/simulations/openair/results/{sim.path}/*.vec"
+        output_csv = f"{cnf.crownet_main}/crownet/simulations/openair/results/results_{sim.id}.csv"
         print(f"Converting {input_sca} and {input_vec} to {output_csv}")
         csv = scave.create_or_get_csv_file(
             csv_path=output_csv,
@@ -152,7 +152,7 @@ def process_scenario(name: str, id: str, measurements: CsvList, sims: SimList,
     # %% Read measurement data
     camdelay_ue_measure = {}  # dictionary for storing the delays for alerts (application layer)
     for m in measurements:
-        input_trace = f"{cnf.rover_main}/rover/simulations/openair/measurements/{m.path}"
+        input_trace = f"{cnf.crownet_main}/crownet/simulations/openair/measurements/{m.path}"
         print(f"Reading measurement data: {input_trace}")
         camdelay_ue_measure[m.id] = OaiMeasurement.read_packet_trace(input_trace)
 

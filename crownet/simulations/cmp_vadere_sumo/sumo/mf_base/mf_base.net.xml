@@ -4,11 +4,11 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="/home/stsc/repos/crownet/rover/simulations/mucFreiNetdLTE2dMulticast/mf_base.net.xml"/>
+        <sumo-net-file value="/home/stsc/repos/crownet/crownet/simulations/mucFreiNetdLTE2dMulticast/mf_base.net.xml"/>
     </input>
 
     <output>
-        <output-file value="/home/stsc/repos/crownet/rover/simulations/mucFreiNetdLTE2dMulticast/mf_base.net.xml"/>
+        <output-file value="/home/stsc/repos/crownet/crownet/simulations/mucFreiNetdLTE2dMulticast/mf_base.net.xml"/>
     </output>
 
     <processing>

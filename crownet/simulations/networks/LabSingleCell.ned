@@ -1,12 +1,12 @@
-// 
+//
 //                           SimuLTE
-// 
+//
 // This file is part of a software released under the license included in file
 // "license.pdf". This license can be also found at http://www.ltesimulator.com/
-// The above file and the present reference are part of the software itself, 
+// The above file and the present reference are part of the software itself,
 // and cannot be removed from it.
-// 
-package rover.simulations.networks;
+//
+package crownet.simulations.networks;
 
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.networklayer.ipv4.RoutingTableRecorder;
@@ -28,8 +28,8 @@ network LabSingleCellBase
     parameters:
         int numUe = default(1);
         int numENB = default(1);
-        @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");       
-          
+        @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");
+
     submodules:
         channelControl: LteChannelControl {
             @display("p=8,1;is=s");
@@ -70,11 +70,11 @@ network LabSingleCell extends LabSingleCellBase
                 datarate = 1024Mbps;
                 thruputDisplayFormat = "u";
             }
-    
+
         connections:
         server.pppg++ <--> Eth1GMetered <--> router.pppg++;
         router.pppg++ <--> Eth1GMetered <--> pgw.filterGate;
         for i=0..numENB-1 {
-            pgw.pppg++ <--> Eth1GMetered <--> eNB[i].ppp; 
+            pgw.pppg++ <--> Eth1GMetered <--> eNB[i].ppp;
         }
 }

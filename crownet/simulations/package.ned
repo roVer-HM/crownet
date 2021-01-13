@@ -1,3 +1,3 @@
-package rover.simulations;
+package crownet.simulations;
 
 @license(LGPL);

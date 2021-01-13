@@ -150,664 +150,664 @@
   <node id='-999066511' action='modify' visible='true' lat='48.16251362025' lon='11.58562377472' />
   <node id='-999066514' action='modify' visible='true' lat='48.16257520789' lon='11.58563050093' />
   <node id='-2146744925' action='modify' visible='true' lat='48.16257198239' lon='11.58682557188'>
-    <tag k='rover:id' v='2083277806' />
+    <tag k='crownet:id' v='2083277806' />
   </node>
   <node id='-2146744927' action='modify' visible='true' lat='48.16256673134' lon='11.58685896441'>
-    <tag k='rover:id' v='1987314021' />
+    <tag k='crownet:id' v='1987314021' />
   </node>
   <node id='-2146744929' action='modify' visible='true' lat='48.16255655271' lon='11.58692369246'>
-    <tag k='rover:id' v='1037635155' />
+    <tag k='crownet:id' v='1037635155' />
   </node>
   <node id='-2146744931' action='modify' visible='true' lat='48.16254754325' lon='11.5869809855'>
-    <tag k='rover:id' v='506032858' />
+    <tag k='crownet:id' v='506032858' />
   </node>
   <node id='-2146744933' action='modify' visible='true' lat='48.16254316612' lon='11.58697944767'>
-    <tag k='rover:id' v='449621491' />
+    <tag k='crownet:id' v='449621491' />
   </node>
   <node id='-2146744935' action='modify' visible='true' lat='48.16255217558' lon='11.58692215463'>
-    <tag k='rover:id' v='1758099341' />
+    <tag k='crownet:id' v='1758099341' />
   </node>
   <node id='-2146744937' action='modify' visible='true' lat='48.16256235421' lon='11.58685742657'>
-    <tag k='rover:id' v='1084729800' />
+    <tag k='crownet:id' v='1084729800' />
   </node>
   <node id='-2146744939' action='modify' visible='true' lat='48.16256760526' lon='11.58682403405'>
-    <tag k='rover:id' v='1610275297' />
+    <tag k='crownet:id' v='1610275297' />
   </node>
   <node id='-2146744942' action='modify' visible='true' lat='48.1625547634' lon='11.5869196165'>
-    <tag k='rover:id' v='363011967' />
+    <tag k='crownet:id' v='363011967' />
   </node>
   <node id='-2146744944' action='modify' visible='true' lat='48.16259177344' lon='11.58692959991'>
-    <tag k='rover:id' v='1992536407' />
+    <tag k='crownet:id' v='1992536407' />
   </node>
   <node id='-2146744946' action='modify' visible='true' lat='48.16261511621' lon='11.58693811714'>
-    <tag k='rover:id' v='1515896986' />
+    <tag k='crownet:id' v='1515896986' />
   </node>
   <node id='-2146744948' action='modify' visible='true' lat='48.16263690173' lon='11.58694606527'>
-    <tag k='rover:id' v='1006734856' />
+    <tag k='crownet:id' v='1006734856' />
   </node>
   <node id='-2146744950' action='modify' visible='true' lat='48.16266193716' lon='11.58695512281'>
-    <tag k='rover:id' v='1681785890' />
+    <tag k='crownet:id' v='1681785890' />
   </node>
   <node id='-2146744952' action='modify' visible='true' lat='48.16268306384' lon='11.58696289584'>
-    <tag k='rover:id' v='190804883' />
+    <tag k='crownet:id' v='190804883' />
   </node>
   <node id='-2146744954' action='modify' visible='true' lat='48.16270882047' lon='11.58696961061'>
-    <tag k='rover:id' v='830580479' />
+    <tag k='crownet:id' v='830580479' />
   </node>
   <node id='-2146744956' action='modify' visible='true' lat='48.16274090881' lon='11.58698500503'>
-    <tag k='rover:id' v='1334450068' />
+    <tag k='crownet:id' v='1334450068' />
   </node>
   <node id='-2146744958' action='modify' visible='true' lat='48.16277607977' lon='11.5869936592'>
-    <tag k='rover:id' v='2067306643' />
+    <tag k='crownet:id' v='2067306643' />
   </node>
   <node id='-2146744960' action='modify' visible='true' lat='48.16277534944' lon='11.5870002909'>
-    <tag k='rover:id' v='1838098144' />
+    <tag k='crownet:id' v='1838098144' />
   </node>
   <node id='-2146744962' action='modify' visible='true' lat='48.16273984754' lon='11.58699155483'>
-    <tag k='rover:id' v='1530388820' />
+    <tag k='crownet:id' v='1530388820' />
   </node>
   <node id='-2146744964' action='modify' visible='true' lat='48.16270774484' lon='11.58697615352'>
-    <tag k='rover:id' v='1690512807' />
+    <tag k='crownet:id' v='1690512807' />
   </node>
   <node id='-2146744966' action='modify' visible='true' lat='48.16268212352' lon='11.58696947403'>
-    <tag k='rover:id' v='1871364456' />
+    <tag k='crownet:id' v='1871364456' />
   </node>
   <node id='-2146744968' action='modify' visible='true' lat='48.16266081938' lon='11.5869616357'>
-    <tag k='rover:id' v='1468992402' />
+    <tag k='crownet:id' v='1468992402' />
   </node>
   <node id='-2146744970' action='modify' visible='true' lat='48.1626366698' lon='11.58695289865'>
-    <tag k='rover:id' v='1690109529' />
+    <tag k='crownet:id' v='1690109529' />
   </node>
   <node id='-2146744972' action='modify' visible='true' lat='48.16261405009' lon='11.58694464642'>
-    <tag k='rover:id' v='1267420449' />
+    <tag k='crownet:id' v='1267420449' />
   </node>
   <node id='-2146744974' action='modify' visible='true' lat='48.16259082693' lon='11.58693617279'>
-    <tag k='rover:id' v='1789798' />
+    <tag k='crownet:id' v='1789798' />
   </node>
   <node id='-2146744976' action='modify' visible='true' lat='48.16255396489' lon='11.58692623059'>
-    <tag k='rover:id' v='1909648880' />
+    <tag k='crownet:id' v='1909648880' />
   </node>
   <node id='-2146744979' action='modify' visible='true' lat='48.16274280998' lon='11.58695646699'>
-    <tag k='rover:id' v='1418923251' />
+    <tag k='crownet:id' v='1418923251' />
   </node>
   <node id='-2146744981' action='modify' visible='true' lat='48.1626647669' lon='11.58693135261'>
-    <tag k='rover:id' v='2123330921' />
+    <tag k='crownet:id' v='2123330921' />
   </node>
   <node id='-2146744983' action='modify' visible='true' lat='48.16264124321' lon='11.58692310926'>
-    <tag k='rover:id' v='565186657' />
+    <tag k='crownet:id' v='565186657' />
   </node>
   <node id='-2146744985' action='modify' visible='true' lat='48.16261577787' lon='11.58691412729'>
-    <tag k='rover:id' v='2086481056' />
+    <tag k='crownet:id' v='2086481056' />
   </node>
   <node id='-2146744987' action='modify' visible='true' lat='48.16259715556' lon='11.58690765428'>
-    <tag k='rover:id' v='1569066431' />
+    <tag k='crownet:id' v='1569066431' />
   </node>
   <node id='-2146744989' action='modify' visible='true' lat='48.16257316444' lon='11.58689915153'>
-    <tag k='rover:id' v='1198252510' />
+    <tag k='crownet:id' v='1198252510' />
   </node>
   <node id='-2146744991' action='modify' visible='true' lat='48.16257420187' lon='11.58689261194'>
-    <tag k='rover:id' v='1473940899' />
+    <tag k='crownet:id' v='1473940899' />
   </node>
   <node id='-2146744993' action='modify' visible='true' lat='48.1625976075' lon='11.58690090845'>
-    <tag k='rover:id' v='142302067' />
+    <tag k='crownet:id' v='142302067' />
   </node>
   <node id='-2146744995' action='modify' visible='true' lat='48.16261651148' lon='11.58690747936'>
-    <tag k='rover:id' v='945804805' />
+    <tag k='crownet:id' v='945804805' />
   </node>
   <node id='-2146744997' action='modify' visible='true' lat='48.16264252624' lon='11.58691665511'>
-    <tag k='rover:id' v='150704809' />
+    <tag k='crownet:id' v='150704809' />
   </node>
   <node id='-2146744999' action='modify' visible='true' lat='48.16266580641' lon='11.58692481313'>
-    <tag k='rover:id' v='2046371316' />
+    <tag k='crownet:id' v='2046371316' />
   </node>
   <node id='-2146745001' action='modify' visible='true' lat='48.16274375632' lon='11.58694989658'>
-    <tag k='rover:id' v='1248546143' />
+    <tag k='crownet:id' v='1248546143' />
   </node>
   <node id='-2146745004' action='modify' visible='true' lat='48.16256506718' lon='11.58685492773'>
-    <tag k='rover:id' v='1262557649' />
+    <tag k='crownet:id' v='1262557649' />
   </node>
   <node id='-2146900928' action='modify' visible='true' lat='48.1626010127' lon='11.58686781626'>
-    <tag k='rover:id' v='2146900928' />
+    <tag k='crownet:id' v='2146900928' />
   </node>
   <node id='-2146900930' action='modify' visible='true' lat='48.16262608158' lon='11.58687644321'>
-    <tag k='rover:id' v='1740280321' />
+    <tag k='crownet:id' v='1740280321' />
   </node>
   <node id='-2146900932' action='modify' visible='true' lat='48.16264856026' lon='11.58688426619'>
-    <tag k='rover:id' v='427529730' />
+    <tag k='crownet:id' v='427529730' />
   </node>
   <node id='-2146900934' action='modify' visible='true' lat='48.16267208064' lon='11.58689238385'>
-    <tag k='rover:id' v='930484035' />
+    <tag k='crownet:id' v='930484035' />
   </node>
   <node id='-2146900936' action='modify' visible='true' lat='48.16269426376' lon='11.58690000038'>
-    <tag k='rover:id' v='734861481' />
+    <tag k='crownet:id' v='734861481' />
   </node>
   <node id='-2146900938' action='modify' visible='true' lat='48.16272922326' lon='11.58691121085'>
-    <tag k='rover:id' v='557125471' />
+    <tag k='crownet:id' v='557125471' />
   </node>
   <node id='-2146900940' action='modify' visible='true' lat='48.16272827997' lon='11.58691778222'>
-    <tag k='rover:id' v='784199631' />
+    <tag k='crownet:id' v='784199631' />
   </node>
   <node id='-2146900942' action='modify' visible='true' lat='48.16269320815' lon='11.58690653332'>
-    <tag k='rover:id' v='240592895' />
+    <tag k='crownet:id' v='240592895' />
   </node>
   <node id='-2146900944' action='modify' visible='true' lat='48.16267094421' lon='11.58689888904'>
-    <tag k='rover:id' v='24731153' />
+    <tag k='crownet:id' v='24731153' />
   </node>
   <node id='-2146900946' action='modify' visible='true' lat='48.16264737586' lon='11.58689075483'>
-    <tag k='rover:id' v='1814351457' />
+    <tag k='crownet:id' v='1814351457' />
   </node>
   <node id='-2146900948' action='modify' visible='true' lat='48.16262495522' lon='11.58688295204'>
-    <tag k='rover:id' v='813959604' />
+    <tag k='crownet:id' v='813959604' />
   </node>
   <node id='-2146900950' action='modify' visible='true' lat='48.16260002716' lon='11.58687437355'>
-    <tag k='rover:id' v='2017353700' />
+    <tag k='crownet:id' v='2017353700' />
   </node>
   <node id='-2146900952' action='modify' visible='true' lat='48.16256401836' lon='11.58686146325'>
-    <tag k='rover:id' v='1696831335' />
+    <tag k='crownet:id' v='1696831335' />
   </node>
   <node id='-2146900955' action='modify' visible='true' lat='48.16331917754' lon='11.58699966161'>
-    <tag k='rover:id' v='1087440184' />
+    <tag k='crownet:id' v='1087440184' />
   </node>
   <node id='-2146900957' action='modify' visible='true' lat='48.16336339707' lon='11.58667224383'>
-    <tag k='rover:id' v='168891087' />
+    <tag k='crownet:id' v='168891087' />
   </node>
   <node id='-2146900959' action='modify' visible='true' lat='48.16383092849' lon='11.58671554515'>
-    <tag k='rover:id' v='146680726' />
+    <tag k='crownet:id' v='146680726' />
   </node>
   <node id='-2146900961' action='modify' visible='true' lat='48.16382008843' lon='11.58705413145'>
-    <tag k='rover:id' v='814571614' />
+    <tag k='crownet:id' v='814571614' />
   </node>
   <node id='-2146900963' action='modify' visible='true' lat='48.16381559715' lon='11.58705381016'>
-    <tag k='rover:id' v='968564587' />
+    <tag k='crownet:id' v='968564587' />
   </node>
   <node id='-2146900965' action='modify' visible='true' lat='48.16382622528' lon='11.58672184344'>
-    <tag k='rover:id' v='1465457515' />
+    <tag k='crownet:id' v='1465457515' />
   </node>
   <node id='-2146900967' action='modify' visible='true' lat='48.16336702943' lon='11.58667931407'>
-    <tag k='rover:id' v='1551341820' />
+    <tag k='crownet:id' v='1551341820' />
   </node>
   <node id='-2146900969' action='modify' visible='true' lat='48.16332358505' lon='11.58700099159'>
-    <tag k='rover:id' v='1427917910' />
+    <tag k='crownet:id' v='1427917910' />
   </node>
   <node id='-2146900972' action='modify' visible='true' lat='48.16382008593' lon='11.58711320483'>
-    <tag k='rover:id' v='1907685201' />
+    <tag k='crownet:id' v='1907685201' />
   </node>
   <node id='-2146900974' action='modify' visible='true' lat='48.16380935168' lon='11.58735192168'>
-    <tag k='rover:id' v='1052364922' />
+    <tag k='crownet:id' v='1052364922' />
   </node>
   <node id='-2146900976' action='modify' visible='true' lat='48.16380486539' lon='11.58735147094'>
-    <tag k='rover:id' v='1981032572' />
+    <tag k='crownet:id' v='1981032572' />
   </node>
   <node id='-2146900978' action='modify' visible='true' lat='48.16381559964' lon='11.5871127541'>
-    <tag k='rover:id' v='1819206068' />
+    <tag k='crownet:id' v='1819206068' />
   </node>
   <node id='-2146900981' action='modify' visible='true' lat='48.16380488129' lon='11.58739746292'>
-    <tag k='rover:id' v='780011488' />
+    <tag k='crownet:id' v='780011488' />
   </node>
   <node id='-2146900983' action='modify' visible='true' lat='48.1638003348' lon='11.58753243243'>
-    <tag k='rover:id' v='262962662' />
+    <tag k='crownet:id' v='262962662' />
   </node>
   <node id='-2146900985' action='modify' visible='true' lat='48.16378464245' lon='11.58754125544'>
-    <tag k='rover:id' v='1344477826' />
+    <tag k='crownet:id' v='1344477826' />
   </node>
   <node id='-2146900987' action='modify' visible='true' lat='48.1637830595' lon='11.58753496463'>
-    <tag k='rover:id' v='735468142' />
+    <tag k='crownet:id' v='735468142' />
   </node>
   <node id='-2146900989' action='modify' visible='true' lat='48.16379599244' lon='11.58752768967'>
-    <tag k='rover:id' v='1534572548' />
+    <tag k='crownet:id' v='1534572548' />
   </node>
   <node id='-2146900991' action='modify' visible='true' lat='48.16380039056' lon='11.58739712492'>
-    <tag k='rover:id' v='1607065749' />
+    <tag k='crownet:id' v='1607065749' />
   </node>
   <node id='-2146900994' action='modify' visible='true' lat='48.16374855457' lon='11.58755080194'>
-    <tag k='rover:id' v='1027181867' />
+    <tag k='crownet:id' v='1027181867' />
   </node>
   <node id='-2146900996' action='modify' visible='true' lat='48.16346303089' lon='11.58747162955'>
-    <tag k='rover:id' v='548098859' />
+    <tag k='crownet:id' v='548098859' />
   </node>
   <node id='-2146900998' action='modify' visible='true' lat='48.1632586908' lon='11.58736454152'>
-    <tag k='rover:id' v='839250823' />
+    <tag k='crownet:id' v='839250823' />
   </node>
   <node id='-2146901000' action='modify' visible='true' lat='48.16328344236' lon='11.58723809973'>
-    <tag k='rover:id' v='1963368954' />
+    <tag k='crownet:id' v='1963368954' />
   </node>
   <node id='-2146901002' action='modify' visible='true' lat='48.16328775784' lon='11.58723998717'>
-    <tag k='rover:id' v='1544943103' />
+    <tag k='crownet:id' v='1544943103' />
   </node>
   <node id='-2146901004' action='modify' visible='true' lat='48.16326420467' lon='11.58736030899'>
-    <tag k='rover:id' v='1452092210' />
+    <tag k='crownet:id' v='1452092210' />
   </node>
   <node id='-2146901006' action='modify' visible='true' lat='48.163464191' lon='11.58746511534'>
-    <tag k='rover:id' v='2090186570' />
+    <tag k='crownet:id' v='2090186570' />
   </node>
   <node id='-2146901008' action='modify' visible='true' lat='48.1637493747' lon='11.58754419361'>
-    <tag k='rover:id' v='1969739969' />
+    <tag k='crownet:id' v='1969739969' />
   </node>
   <node id='-2146901011' action='modify' visible='true' lat='48.16331553999' lon='11.58704118105'>
-    <tag k='rover:id' v='1799931475' />
+    <tag k='crownet:id' v='1799931475' />
   </node>
   <node id='-2146901013' action='modify' visible='true' lat='48.16329764939' lon='11.58718333828'>
-    <tag k='rover:id' v='2030626468' />
+    <tag k='crownet:id' v='2030626468' />
   </node>
   <node id='-2146901015' action='modify' visible='true' lat='48.16329323048' lon='11.58718209574'>
-    <tag k='rover:id' v='911163275' />
+    <tag k='crownet:id' v='911163275' />
   </node>
   <node id='-2146901017' action='modify' visible='true' lat='48.16331112108' lon='11.58703993852'>
-    <tag k='rover:id' v='842679587' />
+    <tag k='crownet:id' v='842679587' />
   </node>
   <node id='-2146903787' action='modify' visible='true' lat='48.1625383212' lon='11.58675250687'>
-    <tag k='rover:id' v='1733963405' />
+    <tag k='crownet:id' v='1733963405' />
   </node>
   <node id='-2146903789' action='modify' visible='true' lat='48.16249976665' lon='11.58698748228'>
-    <tag k='rover:id' v='2110425623' />
+    <tag k='crownet:id' v='2110425623' />
   </node>
   <node id='-2146903791' action='modify' visible='true' lat='48.16249539965' lon='11.58698588139'>
-    <tag k='rover:id' v='869519264' />
+    <tag k='crownet:id' v='869519264' />
   </node>
   <node id='-2146903793' action='modify' visible='true' lat='48.16253504497' lon='11.58674425767'>
-    <tag k='rover:id' v='1707800774' />
+    <tag k='crownet:id' v='1707800774' />
   </node>
   <node id='-2146903795' action='modify' visible='true' lat='48.16254652489' lon='11.58674879918'>
-    <tag k='rover:id' v='248545164' />
+    <tag k='crownet:id' v='248545164' />
   </node>
   <node id='-2146903797' action='modify' visible='true' lat='48.16258998637' lon='11.58676616481'>
-    <tag k='rover:id' v='1305506333' />
+    <tag k='crownet:id' v='1305506333' />
   </node>
   <node id='-2146903799' action='modify' visible='true' lat='48.16260133636' lon='11.58670206'>
-    <tag k='rover:id' v='987627906' />
+    <tag k='crownet:id' v='987627906' />
   </node>
   <node id='-2146903801' action='modify' visible='true' lat='48.1625555905' lon='11.58668374162'>
-    <tag k='rover:id' v='122591271' />
+    <tag k='crownet:id' v='122591271' />
   </node>
   <node id='-2146903803' action='modify' visible='true' lat='48.1625751031' lon='11.58658214878'>
-    <tag k='rover:id' v='313873266' />
+    <tag k='crownet:id' v='313873266' />
   </node>
   <node id='-2146903805' action='modify' visible='true' lat='48.16280573416' lon='11.5865918854'>
-    <tag k='rover:id' v='1914487217' />
+    <tag k='crownet:id' v='1914487217' />
   </node>
   <node id='-2146903807' action='modify' visible='true' lat='48.16325241086' lon='11.58661074317'>
-    <tag k='rover:id' v='49977343' />
+    <tag k='crownet:id' v='49977343' />
   </node>
   <node id='-2146903809' action='modify' visible='true' lat='48.16323475079' lon='11.58670667309'>
-    <tag k='rover:id' v='646210429' />
+    <tag k='crownet:id' v='646210429' />
   </node>
   <node id='-2146906539' action='modify' visible='true' lat='48.16175599047' lon='11.58531174469'>
-    <tag k='rover:id' v='967926336' />
+    <tag k='crownet:id' v='967926336' />
   </node>
   <node id='-2146906541' action='modify' visible='true' lat='48.16178482432' lon='11.58532383559'>
-    <tag k='rover:id' v='1300968086' />
+    <tag k='crownet:id' v='1300968086' />
   </node>
   <node id='-2146906543' action='modify' visible='true' lat='48.16190678895' lon='11.5853748441'>
-    <tag k='rover:id' v='1451093718' />
+    <tag k='crownet:id' v='1451093718' />
   </node>
   <node id='-2146906545' action='modify' visible='true' lat='48.16190557736' lon='11.58538131635'>
-    <tag k='rover:id' v='605562578' />
+    <tag k='crownet:id' v='605562578' />
   </node>
   <node id='-2146906547' action='modify' visible='true' lat='48.16178288574' lon='11.58533000382'>
-    <tag k='rover:id' v='500670882' />
+    <tag k='crownet:id' v='500670882' />
   </node>
   <node id='-2146906549' action='modify' visible='true' lat='48.16175477585' lon='11.58531821565'>
-    <tag k='rover:id' v='861238173' />
+    <tag k='crownet:id' v='861238173' />
   </node>
   <node id='-2146906552' action='modify' visible='true' lat='48.16165571955' lon='11.58473871623'>
-    <tag k='rover:id' v='1439240570' />
+    <tag k='crownet:id' v='1439240570' />
   </node>
   <node id='-2146906554' action='modify' visible='true' lat='48.16198821955' lon='11.58486081632'>
-    <tag k='rover:id' v='87014862' />
+    <tag k='crownet:id' v='87014862' />
   </node>
   <node id='-2146906556' action='modify' visible='true' lat='48.16198714677' lon='11.58486734308'>
-    <tag k='rover:id' v='1062035648' />
+    <tag k='crownet:id' v='1062035648' />
   </node>
   <node id='-2146906558' action='modify' visible='true' lat='48.16165464677' lon='11.58474524295'>
-    <tag k='rover:id' v='597043015' />
+    <tag k='crownet:id' v='597043015' />
   </node>
   <node id='-2146906561' action='modify' visible='true' lat='48.16074943774' lon='11.58506406523'>
-    <tag k='rover:id' v='373218958' />
+    <tag k='crownet:id' v='373218958' />
   </node>
   <node id='-2146906563' action='modify' visible='true' lat='48.16105784847' lon='11.58520436037'>
-    <tag k='rover:id' v='468938141' />
+    <tag k='crownet:id' v='468938141' />
   </node>
   <node id='-2146906565' action='modify' visible='true' lat='48.16120663245' lon='11.58463672083'>
-    <tag k='rover:id' v='766501834' />
+    <tag k='crownet:id' v='766501834' />
   </node>
   <node id='-2146906567' action='modify' visible='true' lat='48.16129729204' lon='11.58467484476'>
-    <tag k='rover:id' v='871186449' />
+    <tag k='crownet:id' v='871186449' />
   </node>
   <node id='-2146906569' action='modify' visible='true' lat='48.16129607428' lon='11.58468131435'>
-    <tag k='rover:id' v='84099325' />
+    <tag k='crownet:id' v='84099325' />
   </node>
   <node id='-2146906571' action='modify' visible='true' lat='48.16120933394' lon='11.58464483836'>
-    <tag k='rover:id' v='942498171' />
+    <tag k='crownet:id' v='942498171' />
   </node>
   <node id='-2146906573' action='modify' visible='true' lat='48.16106051793' lon='11.58521259992'>
-    <tag k='rover:id' v='457920734' />
+    <tag k='crownet:id' v='457920734' />
   </node>
   <node id='-2146906575' action='modify' visible='true' lat='48.16074812857' lon='11.58507049474'>
-    <tag k='rover:id' v='1157395275' />
+    <tag k='crownet:id' v='1157395275' />
   </node>
   <node id='-2146906578' action='modify' visible='true' lat='48.16144165027' lon='11.58474837058'>
-    <tag k='rover:id' v='645609054' />
+    <tag k='crownet:id' v='645609054' />
   </node>
   <node id='-2146906580' action='modify' visible='true' lat='48.16153725027' lon='11.58479277061'>
-    <tag k='rover:id' v='1800045075' />
+    <tag k='crownet:id' v='1800045075' />
   </node>
   <node id='-2146906582' action='modify' visible='true' lat='48.16153591605' lon='11.58479918871'>
-    <tag k='rover:id' v='170112231' />
+    <tag k='crownet:id' v='170112231' />
   </node>
   <node id='-2146906584' action='modify' visible='true' lat='48.16144031605' lon='11.58475478866'>
-    <tag k='rover:id' v='1561363550' />
+    <tag k='crownet:id' v='1561363550' />
   </node>
   <node id='-2146906587' action='modify' visible='true' lat='48.1608662392' lon='11.58468386549'>
-    <tag k='rover:id' v='560183338' />
+    <tag k='crownet:id' v='560183338' />
   </node>
   <node id='-2146906589' action='modify' visible='true' lat='48.16093914825' lon='11.58471711159'>
-    <tag k='rover:id' v='698094967' />
+    <tag k='crownet:id' v='698094967' />
   </node>
   <node id='-2146906591' action='modify' visible='true' lat='48.16098043254' lon='11.58453341082'>
-    <tag k='rover:id' v='1761533358' />
+    <tag k='crownet:id' v='1761533358' />
   </node>
   <node id='-2146906593' action='modify' visible='true' lat='48.16073207789' lon='11.58441077003'>
-    <tag k='rover:id' v='701814644' />
+    <tag k='crownet:id' v='701814644' />
   </node>
   <node id='-2146906595' action='modify' visible='true' lat='48.16073348843' lon='11.5844043886'>
-    <tag k='rover:id' v='138998398' />
+    <tag k='crownet:id' v='138998398' />
   </node>
   <node id='-2146906597' action='modify' visible='true' lat='48.16098613372' lon='11.584529148'>
-    <tag k='rover:id' v='721210710' />
+    <tag k='crownet:id' v='721210710' />
   </node>
   <node id='-2146906599' action='modify' visible='true' lat='48.16094201815' lon='11.58472544701'>
-    <tag k='rover:id' v='1266524754' />
+    <tag k='crownet:id' v='1266524754' />
   </node>
   <node id='-2146906601' action='modify' visible='true' lat='48.16086492712' lon='11.58469029369'>
-    <tag k='rover:id' v='614651667' />
+    <tag k='crownet:id' v='614651667' />
   </node>
   <node id='-2146906604' action='modify' visible='true' lat='48.16146084887' lon='11.58521058205'>
-    <tag k='rover:id' v='716169690' />
+    <tag k='crownet:id' v='716169690' />
   </node>
   <node id='-2146906606' action='modify' visible='true' lat='48.1614486179' lon='11.58527619526'>
-    <tag k='rover:id' v='1181135329' />
+    <tag k='crownet:id' v='1181135329' />
   </node>
   <node id='-2146906608' action='modify' visible='true' lat='48.16148806178' lon='11.58528626777'>
-    <tag k='rover:id' v='1656625548' />
+    <tag k='crownet:id' v='1656625548' />
   </node>
   <node id='-2146906610' action='modify' visible='true' lat='48.16148730453' lon='11.58529289256'>
-    <tag k='rover:id' v='26573506' />
+    <tag k='crownet:id' v='26573506' />
   </node>
   <node id='-2146906612' action='modify' visible='true' lat='48.16144294876' lon='11.5852815654'>
-    <tag k='rover:id' v='927830591' />
+    <tag k='crownet:id' v='927830591' />
   </node>
   <node id='-2146906614' action='modify' visible='true' lat='48.16145651744' lon='11.58520877813'>
-    <tag k='rover:id' v='1626237063' />
+    <tag k='crownet:id' v='1626237063' />
   </node>
   <node id='-2146906617' action='modify' visible='true' lat='48.16148252509' lon='11.5853295977'>
-    <tag k='rover:id' v='1636840456' />
+    <tag k='crownet:id' v='1636840456' />
   </node>
   <node id='-2146906619' action='modify' visible='true' lat='48.16144229162' lon='11.58531989649'>
-    <tag k='rover:id' v='470792545' />
+    <tag k='crownet:id' v='470792545' />
   </node>
   <node id='-2146906621' action='modify' visible='true' lat='48.16137771356' lon='11.58572978399'>
-    <tag k='rover:id' v='12564620' />
+    <tag k='crownet:id' v='12564620' />
   </node>
   <node id='-2146906623' action='modify' visible='true' lat='48.16136882622' lon='11.58592580803'>
-    <tag k='rover:id' v='1635069730' />
+    <tag k='crownet:id' v='1635069730' />
   </node>
   <node id='-2146906625' action='modify' visible='true' lat='48.16136434009' lon='11.58592535362'>
-    <tag k='rover:id' v='29499970' />
+    <tag k='crownet:id' v='29499970' />
   </node>
   <node id='-2146906627' action='modify' visible='true' lat='48.16137325267' lon='11.58572877814'>
-    <tag k='rover:id' v='653390601' />
+    <tag k='crownet:id' v='653390601' />
   </node>
   <node id='-2146906629' action='modify' visible='true' lat='48.16143887463' lon='11.58531226473'>
-    <tag k='rover:id' v='1843676403' />
+    <tag k='crownet:id' v='1843676403' />
   </node>
   <node id='-2146906631' action='modify' visible='true' lat='48.16148324123' lon='11.58532296271'>
-    <tag k='rover:id' v='2141355260' />
+    <tag k='crownet:id' v='2141355260' />
   </node>
   <node id='-2146906634' action='modify' visible='true' lat='48.16148042541' lon='11.58655096111'>
-    <tag k='rover:id' v='437494856' />
+    <tag k='crownet:id' v='437494856' />
   </node>
   <node id='-2146906636' action='modify' visible='true' lat='48.16156160122' lon='11.58658713022'>
-    <tag k='rover:id' v='1342606271' />
+    <tag k='crownet:id' v='1342606271' />
   </node>
   <node id='-2146906638' action='modify' visible='true' lat='48.16154396761' lon='11.58667248562'>
-    <tag k='rover:id' v='1957374298' />
+    <tag k='crownet:id' v='1957374298' />
   </node>
   <node id='-2146906640' action='modify' visible='true' lat='48.16146181858' lon='11.58663449176'>
-    <tag k='rover:id' v='235724286' />
+    <tag k='crownet:id' v='235724286' />
   </node>
   <node id='-2146906642' action='modify' visible='true' lat='48.16146314772' lon='11.58662807132'>
-    <tag k='rover:id' v='1357043163' />
+    <tag k='crownet:id' v='1357043163' />
   </node>
   <node id='-2146906644' action='modify' visible='true' lat='48.16154099854' lon='11.58666407769'>
-    <tag k='rover:id' v='358220819' />
+    <tag k='crownet:id' v='358220819' />
   </node>
   <node id='-2146906646' action='modify' visible='true' lat='48.16155596509' lon='11.58659163214'>
-    <tag k='rover:id' v='761783109' />
+    <tag k='crownet:id' v='761783109' />
   </node>
   <node id='-2146906648' action='modify' visible='true' lat='48.16147914089' lon='11.58655740181'>
-    <tag k='rover:id' v='1653289882' />
+    <tag k='crownet:id' v='1653289882' />
   </node>
   <node id='-2146906651' action='modify' visible='true' lat='48.16178218724' lon='11.58705276133'>
-    <tag k='rover:id' v='1960391725' />
+    <tag k='crownet:id' v='1960391725' />
   </node>
   <node id='-2146906653' action='modify' visible='true' lat='48.1617942098' lon='11.58697091184'>
-    <tag k='rover:id' v='1455293046' />
+    <tag k='crownet:id' v='1455293046' />
   </node>
   <node id='-2146906655' action='modify' visible='true' lat='48.16178428084' lon='11.5869675096'>
-    <tag k='rover:id' v='1313361617' />
+    <tag k='crownet:id' v='1313361617' />
   </node>
   <node id='-2146906657' action='modify' visible='true' lat='48.16177207644' lon='11.58704852016'>
-    <tag k='rover:id' v='1613183354' />
+    <tag k='crownet:id' v='1613183354' />
   </node>
   <node id='-2146906659' action='modify' visible='true' lat='48.16176768986' lon='11.58704704373'>
-    <tag k='rover:id' v='309234263' />
+    <tag k='crownet:id' v='309234263' />
   </node>
   <node id='-2146906661' action='modify' visible='true' lat='48.16178088612' lon='11.58695945352'>
-    <tag k='rover:id' v='1823745820' />
+    <tag k='crownet:id' v='1823745820' />
   </node>
   <node id='-2146906663' action='modify' visible='true' lat='48.16179955703' lon='11.58696585125'>
-    <tag k='rover:id' v='300935079' />
+    <tag k='crownet:id' v='300935079' />
   </node>
   <node id='-2146906665' action='modify' visible='true' lat='48.16178657906' lon='11.58705420257'>
-    <tag k='rover:id' v='1162977640' />
+    <tag k='crownet:id' v='1162977640' />
   </node>
   <node id='-2146906668' action='modify' visible='true' lat='48.16201371965' lon='11.58664963467'>
-    <tag k='rover:id' v='687581462' />
+    <tag k='crownet:id' v='687581462' />
   </node>
   <node id='-2146906670' action='modify' visible='true' lat='48.16191900163' lon='11.5866129789'>
-    <tag k='rover:id' v='1240821250' />
+    <tag k='crownet:id' v='1240821250' />
   </node>
   <node id='-2146906672' action='modify' visible='true' lat='48.16191231982' lon='11.58665187051'>
-    <tag k='rover:id' v='675582759' />
+    <tag k='crownet:id' v='675582759' />
   </node>
   <node id='-2146906674' action='modify' visible='true' lat='48.16200894755' lon='11.58668932876'>
-    <tag k='rover:id' v='207288339' />
+    <tag k='crownet:id' v='207288339' />
   </node>
   <node id='-2146906676' action='modify' visible='true' lat='48.16200781875' lon='11.58669583437'>
-    <tag k='rover:id' v='1167557414' />
+    <tag k='crownet:id' v='1167557414' />
   </node>
   <node id='-2146906678' action='modify' visible='true' lat='48.16190684751' lon='11.58665669271'>
-    <tag k='rover:id' v='2123625240' />
+    <tag k='crownet:id' v='2123625240' />
   </node>
   <node id='-2146906680' action='modify' visible='true' lat='48.16191576565' lon='11.58660478455'>
-    <tag k='rover:id' v='1111292697' />
+    <tag k='crownet:id' v='1111292697' />
   </node>
   <node id='-2146906682' action='modify' visible='true' lat='48.16201484666' lon='11.58664312837'>
-    <tag k='rover:id' v='2076001542' />
+    <tag k='crownet:id' v='2076001542' />
   </node>
   <node id='-2146906685' action='modify' visible='true' lat='48.16165180528' lon='11.58599832545'>
-    <tag k='rover:id' v='1779261078' />
+    <tag k='crownet:id' v='1779261078' />
   </node>
   <node id='-2146906687' action='modify' visible='true' lat='48.16175735022' lon='11.58600690763'>
-    <tag k='rover:id' v='501266396' />
+    <tag k='crownet:id' v='501266396' />
   </node>
   <node id='-2146906689' action='modify' visible='true' lat='48.16175500459' lon='11.5860710216'>
-    <tag k='rover:id' v='734337133' />
+    <tag k='crownet:id' v='734337133' />
   </node>
   <node id='-2146906691' action='modify' visible='true' lat='48.16164975922' lon='11.58606233623'>
-    <tag k='rover:id' v='1123848451' />
+    <tag k='crownet:id' v='1123848451' />
   </node>
   <node id='-2146906693' action='modify' visible='true' lat='48.16165000709' lon='11.58605562565'>
-    <tag k='rover:id' v='784281497' />
+    <tag k='crownet:id' v='784281497' />
   </node>
   <node id='-2146906695' action='modify' visible='true' lat='48.16175076086' lon='11.58606394051'>
-    <tag k='rover:id' v='1840901697' />
+    <tag k='crownet:id' v='1840901697' />
   </node>
   <node id='-2146906697' action='modify' visible='true' lat='48.16175261525' lon='11.58601325393'>
-    <tag k='rover:id' v='619450277' />
+    <tag k='crownet:id' v='619450277' />
   </node>
   <node id='-2146906699' action='modify' visible='true' lat='48.16165156103' lon='11.58600503632'>
-    <tag k='rover:id' v='2001981378' />
+    <tag k='crownet:id' v='2001981378' />
   </node>
   <node id='-2146906702' action='modify' visible='true' lat='48.16211718744' lon='11.58605253828'>
-    <tag k='rover:id' v='277831821' />
+    <tag k='crownet:id' v='277831821' />
   </node>
   <node id='-2146906704' action='modify' visible='true' lat='48.16202524774' lon='11.58604668213'>
-    <tag k='rover:id' v='1663371068' />
+    <tag k='crownet:id' v='1663371068' />
   </node>
   <node id='-2146906706' action='modify' visible='true' lat='48.16202391001' lon='11.58610206422'>
-    <tag k='rover:id' v='1825757975' />
+    <tag k='crownet:id' v='1825757975' />
   </node>
   <node id='-2146906708' action='modify' visible='true' lat='48.16211487829' lon='11.58610782354'>
-    <tag k='rover:id' v='1036961562' />
+    <tag k='crownet:id' v='1036961562' />
   </node>
   <node id='-2146906710' action='modify' visible='true' lat='48.16211468802' lon='11.58611453839'>
-    <tag k='rover:id' v='1795748354' />
+    <tag k='crownet:id' v='1795748354' />
   </node>
   <node id='-2146906712' action='modify' visible='true' lat='48.16201925614' lon='11.58610849709'>
-    <tag k='rover:id' v='1895551304' />
+    <tag k='crownet:id' v='1895551304' />
   </node>
   <node id='-2146906714' action='modify' visible='true' lat='48.1620209184' lon='11.58603967951'>
-    <tag k='rover:id' v='1247798347' />
+    <tag k='crownet:id' v='1247798347' />
   </node>
   <node id='-2146906716' action='modify' visible='true' lat='48.16211737887' lon='11.58604582352'>
-    <tag k='rover:id' v='515858675' />
+    <tag k='crownet:id' v='515858675' />
   </node>
   <node id='-2146906719' action='modify' visible='true' lat='48.16269487159' lon='11.58613323727'>
-    <tag k='rover:id' v='448444458' />
+    <tag k='crownet:id' v='448444458' />
   </node>
   <node id='-2146906721' action='modify' visible='true' lat='48.1626217489' lon='11.58612780643'>
-    <tag k='rover:id' v='1253745301' />
+    <tag k='crownet:id' v='1253745301' />
   </node>
   <node id='-2146906723' action='modify' visible='true' lat='48.16262091017' lon='11.58616286516'>
-    <tag k='rover:id' v='98937575' />
+    <tag k='crownet:id' v='98937575' />
   </node>
   <node id='-2146906725' action='modify' visible='true' lat='48.16269407882' lon='11.58616752356'>
-    <tag k='rover:id' v='697220006' />
+    <tag k='crownet:id' v='697220006' />
   </node>
   <node id='-2146906727' action='modify' visible='true' lat='48.16269388749' lon='11.58617423841'>
-    <tag k='rover:id' v='1538336406' />
+    <tag k='crownet:id' v='1538336406' />
   </node>
   <node id='-2146906729' action='modify' visible='true' lat='48.16261625753' lon='11.58616929641'>
-    <tag k='rover:id' v='1452665982' />
+    <tag k='crownet:id' v='1452665982' />
   </node>
   <node id='-2146906731' action='modify' visible='true' lat='48.16261741878' lon='11.58612075582'>
-    <tag k='rover:id' v='1856268229' />
+    <tag k='crownet:id' v='1856268229' />
   </node>
   <node id='-2146906733' action='modify' visible='true' lat='48.16269509473' lon='11.58612652462'>
-    <tag k='rover:id' v='467918287' />
+    <tag k='crownet:id' v='467918287' />
   </node>
   <node id='-2146906777' action='modify' visible='true' lat='48.16270383948' lon='11.5871540692'>
-    <tag k='rover:id' v='1467832844' />
+    <tag k='crownet:id' v='1467832844' />
   </node>
   <node id='-2146906779' action='modify' visible='true' lat='48.16273168718' lon='11.58702237803'>
-    <tag k='rover:id' v='1208857109' />
+    <tag k='crownet:id' v='1208857109' />
   </node>
   <node id='-2146906781' action='modify' visible='true' lat='48.16279791094' lon='11.58703183857'>
-    <tag k='rover:id' v='1426723136' />
+    <tag k='crownet:id' v='1426723136' />
   </node>
   <node id='-2146906783' action='modify' visible='true' lat='48.16280314317' lon='11.58698510313'>
-    <tag k='rover:id' v='2089057534' />
+    <tag k='crownet:id' v='2089057534' />
   </node>
   <node id='-2146906785' action='modify' visible='true' lat='48.16274061959' lon='11.58695544448'>
-    <tag k='rover:id' v='867381954' />
+    <tag k='crownet:id' v='867381954' />
   </node>
   <node id='-2146906787' action='modify' visible='true' lat='48.16275314822' lon='11.58687541239'>
-    <tag k='rover:id' v='2138635260' />
+    <tag k='crownet:id' v='2138635260' />
   </node>
   <node id='-2146906789' action='modify' visible='true' lat='48.16292736673' lon='11.58690434764'>
-    <tag k='rover:id' v='376094309' />
+    <tag k='crownet:id' v='376094309' />
   </node>
   <node id='-2146906791' action='modify' visible='true' lat='48.16304279044' lon='11.58692815279'>
-    <tag k='rover:id' v='228559443' />
+    <tag k='crownet:id' v='228559443' />
   </node>
   <node id='-2146906793' action='modify' visible='true' lat='48.16304217586' lon='11.58693481069'>
-    <tag k='rover:id' v='2755628' />
+    <tag k='crownet:id' v='2755628' />
   </node>
   <node id='-2146906795' action='modify' visible='true' lat='48.16292679019' lon='11.58691101394'>
-    <tag k='rover:id' v='1055937191' />
+    <tag k='crownet:id' v='1055937191' />
   </node>
   <node id='-2146906797' action='modify' visible='true' lat='48.1627566178' lon='11.58688275066'>
-    <tag k='rover:id' v='1613450090' />
+    <tag k='crownet:id' v='1613450090' />
   </node>
   <node id='-2146906799' action='modify' visible='true' lat='48.16274594629' lon='11.58695091961'>
-    <tag k='rover:id' v='1694852662' />
+    <tag k='crownet:id' v='1694852662' />
   </node>
   <node id='-2146906801' action='modify' visible='true' lat='48.1628082224' lon='11.58698046086'>
-    <tag k='rover:id' v='1196670048' />
+    <tag k='crownet:id' v='1196670048' />
   </node>
   <node id='-2146906803' action='modify' visible='true' lat='48.16280165467' lon='11.58703912519'>
-    <tag k='rover:id' v='1636740395' />
+    <tag k='crownet:id' v='1636740395' />
   </node>
   <node id='-2146906805' action='modify' visible='true' lat='48.16273487896' lon='11.58702958579'>
-    <tag k='rover:id' v='1986837897' />
+    <tag k='crownet:id' v='1986837897' />
   </node>
   <node id='-2146906807' action='modify' visible='true' lat='48.16270812683' lon='11.58715609479'>
-    <tag k='rover:id' v='1485662136' />
+    <tag k='crownet:id' v='1485662136' />
   </node>
   <node id='-2146906810' action='modify' visible='true' lat='48.16256644045' lon='11.58602764597'>
-    <tag k='rover:id' v='259479931' />
+    <tag k='crownet:id' v='259479931' />
   </node>
   <node id='-2146906812' action='modify' visible='true' lat='48.16257425093' lon='11.58586102078'>
-    <tag k='rover:id' v='92976290' />
+    <tag k='crownet:id' v='92976290' />
   </node>
   <node id='-2146906814' action='modify' visible='true' lat='48.16262186561' lon='11.58551752161'>
-    <tag k='rover:id' v='1449614531' />
+    <tag k='crownet:id' v='1449614531' />
   </node>
   <node id='-2146906816' action='modify' visible='true' lat='48.16245330091' lon='11.5854970297'>
-    <tag k='rover:id' v='1484953526' />
+    <tag k='crownet:id' v='1484953526' />
   </node>
   <node id='-2146906818' action='modify' visible='true' lat='48.16245366541' lon='11.58549033091'>
-    <tag k='rover:id' v='1017933197' />
+    <tag k='crownet:id' v='1017933197' />
   </node>
   <node id='-2146906820' action='modify' visible='true' lat='48.16262730065' lon='11.58551143927'>
-    <tag k='rover:id' v='962173050' />
+    <tag k='crownet:id' v='962173050' />
   </node>
   <node id='-2146906822' action='modify' visible='true' lat='48.1625787155' lon='11.5858619396'>
-    <tag k='rover:id' v='734711225' />
+    <tag k='crownet:id' v='734711225' />
   </node>
   <node id='-2146906824' action='modify' visible='true' lat='48.16257092587' lon='11.58602811573'>
-    <tag k='rover:id' v='981340531' />
+    <tag k='crownet:id' v='981340531' />
   </node>
   <node id='-2146906827' action='modify' visible='true' lat='48.1637269352' lon='11.58493633057'>
-    <tag k='rover:id' v='1394227452' />
+    <tag k='crownet:id' v='1394227452' />
   </node>
   <node id='-2146906829' action='modify' visible='true' lat='48.16373066911' lon='11.58455414704'>
-    <tag k='rover:id' v='1899716610' />
+    <tag k='crownet:id' v='1899716610' />
   </node>
   <node id='-2146906831' action='modify' visible='true' lat='48.16395789672' lon='11.584571323'>
-    <tag k='rover:id' v='1704945193' />
+    <tag k='crownet:id' v='1704945193' />
   </node>
   <node id='-2146906833' action='modify' visible='true' lat='48.16395766962' lon='11.58457803553'>
-    <tag k='rover:id' v='475152024' />
+    <tag k='crownet:id' v='475152024' />
   </node>
   <node id='-2146906835' action='modify' visible='true' lat='48.16373509703' lon='11.58456121149'>
-    <tag k='rover:id' v='807339982' />
+    <tag k='crownet:id' v='807339982' />
   </node>
   <node id='-2146906837' action='modify' visible='true' lat='48.16373143114' lon='11.58493642873'>
-    <tag k='rover:id' v='1606737582' />
+    <tag k='crownet:id' v='1606737582' />
   </node>
   <node id='-2146906840' action='modify' visible='true' lat='48.16319736216' lon='11.5867822506'>
-    <tag k='rover:id' v='208161974' />
+    <tag k='crownet:id' v='208161974' />
   </node>
   <node id='-2146906842' action='modify' visible='true' lat='48.16311676216' lon='11.58675355057'>
-    <tag k='rover:id' v='1198141383' />
+    <tag k='crownet:id' v='1198141383' />
   </node>
   <node id='-2146906844' action='modify' visible='true' lat='48.16311780415' lon='11.58674701253'>
-    <tag k='rover:id' v='91233989' />
+    <tag k='crownet:id' v='91233989' />
   </node>
   <node id='-2146906846' action='modify' visible='true' lat='48.16319840415' lon='11.58677571255'>
-    <tag k='rover:id' v='183894832' />
+    <tag k='crownet:id' v='183894832' />
   </node>
   <node id='-2146909873' action='modify' visible='true' lat='48.16238811748' lon='11.58989147319' />
   <node id='-2146909874' action='modify' visible='true' lat='48.16037464093' lon='11.58985061298' />
@@ -6304,10 +6304,10 @@
     <nd ref='-127490' />
     <nd ref='-127425' />
     <nd ref='-127407' />
-    <tag k='rover:id' v='-133507' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1039484356' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133507' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1039484356' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909500' action='modify' visible='true'>
     <nd ref='-127425' />
@@ -6319,10 +6319,10 @@
     <nd ref='3816982418' />
     <nd ref='3816982423' />
     <nd ref='-127436' />
-    <tag k='rover:id' v='-133508' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1921812497' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133508' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1921812497' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909501' action='modify' visible='true'>
     <nd ref='3816982425' />
@@ -6331,10 +6331,10 @@
     <nd ref='2640786693' />
     <nd ref='2640786685' />
     <nd ref='2640786667' />
-    <tag k='rover:id' v='-133509' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1666871289' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133509' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1666871289' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909502' action='modify' visible='true'>
     <nd ref='-127490' />
@@ -6344,55 +6344,55 @@
     <nd ref='2640786719' />
     <nd ref='2640786736' />
     <nd ref='-127497' />
-    <tag k='rover:id' v='-133510' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1949387562' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133510' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1949387562' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909503' action='modify' visible='true'>
     <nd ref='-127654' />
     <nd ref='-127623' />
     <nd ref='-127625' />
     <nd ref='-127627' />
-    <tag k='rover:id' v='-133513' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-241020769' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133513' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-241020769' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909504' action='modify' visible='true'>
     <nd ref='-127629' />
     <nd ref='-127631' />
-    <tag k='rover:id' v='-133514' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-23833588' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133514' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-23833588' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909505' action='modify' visible='true'>
     <nd ref='-127633' />
     <nd ref='-127635' />
     <nd ref='-127637' />
-    <tag k='rover:id' v='-133515' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-572271458' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133515' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-572271458' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909506' action='modify' visible='true'>
     <nd ref='-127639' />
     <nd ref='-127641' />
     <nd ref='-127666' />
     <nd ref='-127668' />
-    <tag k='rover:id' v='-133516' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1963995184' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133516' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1963995184' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909507' action='modify' visible='true'>
     <nd ref='-127656' />
     <nd ref='-127658' />
-    <tag k='rover:id' v='-133517' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-2012674510' />
-    <tag k='rover:obstacle:type' v='line' />
+    <tag k='crownet:id' v='-133517' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-2012674510' />
+    <tag k='crownet:obstacle:type' v='line' />
   </way>
   <way id='-2146909508' action='modify' visible='true'>
     <nd ref='1836950716' />
@@ -6407,8 +6407,8 @@
     <nd ref='1836950662' />
     <nd ref='1836950716' />
     <tag k='building' v='yes' />
-    <tag k='rover:id' v='-133518' />
-    <tag k='rover:obstacle' v='yes' />
+    <tag k='crownet:id' v='-133518' />
+    <tag k='crownet:obstacle' v='yes' />
   </way>
   <way id='-2146909509' action='modify' visible='true'>
     <nd ref='-130849' />
@@ -6419,8 +6419,8 @@
     <nd ref='-130854' />
     <nd ref='-130849' />
     <tag k='building' v='yes' />
-    <tag k='rover:id' v='-133519' />
-    <tag k='rover:obstacle' v='yes' />
+    <tag k='crownet:id' v='-133519' />
+    <tag k='crownet:obstacle' v='yes' />
   </way>
   <way id='-2146909510' action='modify' visible='true'>
     <nd ref='1042333350' />
@@ -6437,9 +6437,9 @@
     <nd ref='1042333251' />
     <nd ref='1042333399' />
     <nd ref='1042333350' />
-    <tag k='rover:id' v='-576119517' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-576119517' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909511' action='modify' visible='true'>
     <nd ref='1324415590' />
@@ -6453,9 +6453,9 @@
     <nd ref='1324414637' />
     <nd ref='1324415345' />
     <nd ref='1324415590' />
-    <tag k='rover:id' v='-404960259' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-404960259' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909512' action='modify' visible='true'>
     <nd ref='2587365890' />
@@ -6469,9 +6469,9 @@
     <nd ref='429834399' />
     <nd ref='2587365893' />
     <nd ref='2587365890' />
-    <tag k='rover:id' v='-999046037' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-999046037' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909513' action='modify' visible='true'>
     <nd ref='1143085752' />
@@ -6490,9 +6490,9 @@
     <nd ref='1143085809' />
     <nd ref='1143085871' />
     <nd ref='1143085752' />
-    <tag k='rover:id' v='-724056993' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-724056993' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909514' action='modify' visible='true'>
     <nd ref='1042311736' />
@@ -6502,9 +6502,9 @@
     <nd ref='1042311745' />
     <nd ref='1042311727' />
     <nd ref='1042311736' />
-    <tag k='rover:id' v='-171551051' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-171551051' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909515' action='modify' visible='true'>
     <nd ref='1282567480' />
@@ -6515,9 +6515,9 @@
     <nd ref='1213408584' />
     <nd ref='1282567303' />
     <nd ref='1282567480' />
-    <tag k='rover:id' v='-17330038' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-17330038' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909516' action='modify' visible='true'>
     <nd ref='1213358965' />
@@ -6530,9 +6530,9 @@
     <nd ref='1213358953' />
     <nd ref='1213358795' />
     <nd ref='1213358965' />
-    <tag k='rover:id' v='-515777654' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-515777654' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909517' action='modify' visible='true'>
     <nd ref='-999053443' />
@@ -6540,8 +6540,8 @@
     <nd ref='-999053447' />
     <nd ref='-999053449' />
     <nd ref='-999053443' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1001' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1001' />
   </way>
   <way id='-2146909518' action='modify' visible='true'>
     <nd ref='-999053452' />
@@ -6549,8 +6549,8 @@
     <nd ref='-999053456' />
     <nd ref='-999053458' />
     <nd ref='-999053452' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2001' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2001' />
   </way>
   <way id='-2146909519' action='modify' visible='true'>
     <nd ref='-999053510' />
@@ -6558,8 +6558,8 @@
     <nd ref='-999053514' />
     <nd ref='-999053516' />
     <nd ref='-999053510' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1002' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1002' />
   </way>
   <way id='-2146909520' action='modify' visible='true'>
     <nd ref='-999053531' />
@@ -6567,8 +6567,8 @@
     <nd ref='-999053535' />
     <nd ref='-999053537' />
     <nd ref='-999053531' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2002' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2002' />
   </way>
   <way id='-2146909521' action='modify' visible='true'>
     <nd ref='-999053552' />
@@ -6576,8 +6576,8 @@
     <nd ref='-999053556' />
     <nd ref='-999053558' />
     <nd ref='-999053552' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1003' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1003' />
   </way>
   <way id='-2146909522' action='modify' visible='true'>
     <nd ref='-999053573' />
@@ -6585,8 +6585,8 @@
     <nd ref='-999053577' />
     <nd ref='-999053579' />
     <nd ref='-999053573' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2003' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2003' />
   </way>
   <way id='-2146909523' action='modify' visible='true'>
     <nd ref='-999053595' />
@@ -6594,8 +6594,8 @@
     <nd ref='-999053599' />
     <nd ref='-999053601' />
     <nd ref='-999053595' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1004' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1004' />
   </way>
   <way id='-2146909524' action='modify' visible='true'>
     <nd ref='-999053616' />
@@ -6603,8 +6603,8 @@
     <nd ref='-999053620' />
     <nd ref='-999053622' />
     <nd ref='-999053616' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2004' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2004' />
   </way>
   <way id='-2146909525' action='modify' visible='true'>
     <nd ref='-999053637' />
@@ -6612,8 +6612,8 @@
     <nd ref='-999053641' />
     <nd ref='-999053643' />
     <nd ref='-999053637' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1005' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1005' />
   </way>
   <way id='-2146909526' action='modify' visible='true'>
     <nd ref='-999053658' />
@@ -6621,8 +6621,8 @@
     <nd ref='-999053662' />
     <nd ref='-999053664' />
     <nd ref='-999053658' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2005' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2005' />
   </way>
   <way id='-2146909527' action='modify' visible='true'>
     <nd ref='-999053679' />
@@ -6630,8 +6630,8 @@
     <nd ref='-999053683' />
     <nd ref='-999053685' />
     <nd ref='-999053679' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1006' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1006' />
   </way>
   <way id='-2146909528' action='modify' visible='true'>
     <nd ref='-999053700' />
@@ -6639,8 +6639,8 @@
     <nd ref='-999053704' />
     <nd ref='-999053706' />
     <nd ref='-999053700' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2006' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2006' />
   </way>
   <way id='-2146909529' action='modify' visible='true'>
     <nd ref='-999053748' />
@@ -6648,8 +6648,8 @@
     <nd ref='-999053752' />
     <nd ref='-999053754' />
     <nd ref='-999053748' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1007' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1007' />
   </way>
   <way id='-2146909530' action='modify' visible='true'>
     <nd ref='-999053783' />
@@ -6657,8 +6657,8 @@
     <nd ref='-999053787' />
     <nd ref='-999053789' />
     <nd ref='-999053783' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2007' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2007' />
   </way>
   <way id='-2146909531' action='modify' visible='true'>
     <nd ref='-999053872' />
@@ -6666,8 +6666,8 @@
     <nd ref='-999053876' />
     <nd ref='-999053878' />
     <nd ref='-999053872' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1008' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1008' />
   </way>
   <way id='-2146909532' action='modify' visible='true'>
     <nd ref='-999053893' />
@@ -6675,8 +6675,8 @@
     <nd ref='-999053897' />
     <nd ref='-999053899' />
     <nd ref='-999053893' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2008' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2008' />
   </way>
   <way id='-2146909533' action='modify' visible='true'>
     <nd ref='-999053928' />
@@ -6684,8 +6684,8 @@
     <nd ref='-999053932' />
     <nd ref='-999053934' />
     <nd ref='-999053928' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1009' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1009' />
   </way>
   <way id='-2146909534' action='modify' visible='true'>
     <nd ref='-999053949' />
@@ -6693,8 +6693,8 @@
     <nd ref='-999053953' />
     <nd ref='-999053955' />
     <nd ref='-999053949' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2009' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2009' />
   </way>
   <way id='-2146909535' action='modify' visible='true'>
     <nd ref='-999054001' />
@@ -6702,8 +6702,8 @@
     <nd ref='-999054005' />
     <nd ref='-999054007' />
     <nd ref='-999054001' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1010' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1010' />
   </way>
   <way id='-2146909536' action='modify' visible='true'>
     <nd ref='-999054022' />
@@ -6711,8 +6711,8 @@
     <nd ref='-999054026' />
     <nd ref='-999054028' />
     <nd ref='-999054022' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2010' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2010' />
   </way>
   <way id='-2146909537' action='modify' visible='true'>
     <nd ref='-999054045' />
@@ -6720,8 +6720,8 @@
     <nd ref='-999054049' />
     <nd ref='-999054051' />
     <nd ref='-999054045' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1011' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1011' />
   </way>
   <way id='-2146909538' action='modify' visible='true'>
     <nd ref='-999054066' />
@@ -6729,8 +6729,8 @@
     <nd ref='-999054070' />
     <nd ref='-999054072' />
     <nd ref='-999054066' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2011' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2011' />
   </way>
   <way id='-2146909539' action='modify' visible='true'>
     <nd ref='-999054087' />
@@ -6738,8 +6738,8 @@
     <nd ref='-999054091' />
     <nd ref='-999054093' />
     <nd ref='-999054087' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1012' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1012' />
   </way>
   <way id='-2146909540' action='modify' visible='true'>
     <nd ref='-999054108' />
@@ -6747,8 +6747,8 @@
     <nd ref='-999054112' />
     <nd ref='-999054114' />
     <nd ref='-999054108' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2012' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2012' />
   </way>
   <way id='-2146909541' action='modify' visible='true'>
     <nd ref='349333339' />
@@ -6761,9 +6761,9 @@
     <nd ref='1318875181' />
     <nd ref='349333346' />
     <nd ref='349333339' />
-    <tag k='rover:id' v='-517482034' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-517482034' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909542' action='modify' visible='true'>
     <nd ref='349333124' />
@@ -6776,9 +6776,9 @@
     <nd ref='1081999573' />
     <nd ref='349333125' />
     <nd ref='349333124' />
-    <tag k='rover:id' v='-750225121' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-750225121' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909543' action='modify' visible='true'>
     <nd ref='1279152803' />
@@ -6790,9 +6790,9 @@
     <nd ref='1279152645' />
     <nd ref='1279152806' />
     <nd ref='1279152803' />
-    <tag k='rover:id' v='-515579840' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-515579840' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909544' action='modify' visible='true'>
     <nd ref='-999057362' />
@@ -6805,9 +6805,9 @@
     <nd ref='1836950739' />
     <nd ref='-999057359' />
     <nd ref='-999057362' />
-    <tag k='rover:id' v='-806531120' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-806531120' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909545' action='modify' visible='true'>
     <nd ref='429834427' />
@@ -6816,9 +6816,9 @@
     <nd ref='1143086086' />
     <nd ref='1143085929' />
     <nd ref='429834427' />
-    <tag k='rover:id' v='-714113567' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-714113567' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909546' action='modify' visible='true'>
     <nd ref='1030655617' />
@@ -6828,9 +6828,9 @@
     <nd ref='1030655572' />
     <nd ref='1030655593' />
     <nd ref='1030655617' />
-    <tag k='rover:id' v='-4434885' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-4434885' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909547' action='modify' visible='true'>
     <nd ref='1282567236' />
@@ -6844,9 +6844,9 @@
     <nd ref='1282567419' />
     <nd ref='1282567551' />
     <nd ref='1282567236' />
-    <tag k='rover:id' v='-284411240' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-284411240' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909548' action='modify' visible='true'>
     <nd ref='1282567150' />
@@ -6856,9 +6856,9 @@
     <nd ref='1282567454' />
     <nd ref='1282567265' />
     <nd ref='1282567150' />
-    <tag k='rover:id' v='-968235699' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-968235699' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909549' action='modify' visible='true'>
     <nd ref='429834367' />
@@ -6875,9 +6875,9 @@
     <nd ref='429834374' />
     <nd ref='1390620965' />
     <nd ref='429834367' />
-    <tag k='rover:id' v='-789121110' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-789121110' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909550' action='modify' visible='true'>
     <nd ref='429637658' />
@@ -6890,9 +6890,9 @@
     <nd ref='-999060349' />
     <nd ref='1404411556' />
     <nd ref='429637658' />
-    <tag k='rover:id' v='-661958669' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-661958669' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909551' action='modify' visible='true'>
     <nd ref='1279152659' />
@@ -6907,9 +6907,9 @@
     <nd ref='1279152648' />
     <nd ref='1279152770' />
     <nd ref='1279152659' />
-    <tag k='rover:id' v='-889536535' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-889536535' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909552' action='modify' visible='true'>
     <nd ref='1313466321' />
@@ -6921,9 +6921,9 @@
     <nd ref='1318876502' />
     <nd ref='1318876199' />
     <nd ref='1313466321' />
-    <tag k='rover:id' v='-681874651' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-681874651' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909553' action='modify' visible='true'>
     <nd ref='-999063365' />
@@ -6931,8 +6931,8 @@
     <nd ref='-999063369' />
     <nd ref='-999063371' />
     <nd ref='-999063365' />
-    <tag k='rover:source' v='yes' />
-    <tag k='rover:source:id' v='1013' />
+    <tag k='crownet:source' v='yes' />
+    <tag k='crownet:source:id' v='1013' />
   </way>
   <way id='-2146909554' action='modify' visible='true'>
     <nd ref='-999063386' />
@@ -6940,8 +6940,8 @@
     <nd ref='-999063390' />
     <nd ref='-999063392' />
     <nd ref='-999063386' />
-    <tag k='rover:target' v='yes' />
-    <tag k='rover:target:id' v='2013' />
+    <tag k='crownet:target' v='yes' />
+    <tag k='crownet:target:id' v='2013' />
   </way>
   <way id='-2146909555' action='modify' visible='true'>
     <nd ref='1143085891' />
@@ -6965,9 +6965,9 @@
     <nd ref='1282567540' />
     <nd ref='1279152505' />
     <nd ref='1143085891' />
-    <tag k='rover:id' v='-538062546' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-538062546' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909556' action='modify' visible='true'>
     <nd ref='429583851' />
@@ -6978,9 +6978,9 @@
     <nd ref='429583853' />
     <nd ref='429583852' />
     <nd ref='429583851' />
-    <tag k='rover:id' v='-844178812' />
-    <tag k='rover:obstacle' v='convex-hull' />
-    <tag k='rover:obstacle:hull' v='-1' />
+    <tag k='crownet:id' v='-844178812' />
+    <tag k='crownet:obstacle' v='convex-hull' />
+    <tag k='crownet:obstacle:hull' v='-1' />
   </way>
   <way id='-2146909557' action='modify' visible='true'>
     <nd ref='-2146744925' />
@@ -6992,10 +6992,10 @@
     <nd ref='-2146744937' />
     <nd ref='-2146744939' />
     <nd ref='-2146744925' />
-    <tag k='rover:id' v='1039484356' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069167' />
+    <tag k='crownet:id' v='1039484356' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069167' />
   </way>
   <way id='-2146909558' action='modify' visible='true'>
     <nd ref='-2146744942' />
@@ -7017,10 +7017,10 @@
     <nd ref='-2146744974' />
     <nd ref='-2146744976' />
     <nd ref='-2146744942' />
-    <tag k='rover:id' v='1921812497' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069168' />
+    <tag k='crownet:id' v='1921812497' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069168' />
   </way>
   <way id='-2146909559' action='modify' visible='true'>
     <nd ref='-2146744979' />
@@ -7036,10 +7036,10 @@
     <nd ref='-2146744999' />
     <nd ref='-2146745001' />
     <nd ref='-2146744979' />
-    <tag k='rover:id' v='1666871289' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069169' />
+    <tag k='crownet:id' v='1666871289' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069169' />
   </way>
   <way id='-2146909560' action='modify' visible='true'>
     <nd ref='-2146745004' />
@@ -7057,10 +7057,10 @@
     <nd ref='-2146900950' />
     <nd ref='-2146900952' />
     <nd ref='-2146745004' />
-    <tag k='rover:id' v='1949387562' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069170' />
+    <tag k='crownet:id' v='1949387562' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069170' />
   </way>
   <way id='-2146909561' action='modify' visible='true'>
     <nd ref='-2146900955' />
@@ -7072,10 +7072,10 @@
     <nd ref='-2146900967' />
     <nd ref='-2146900969' />
     <nd ref='-2146900955' />
-    <tag k='rover:id' v='241020769' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069173' />
+    <tag k='crownet:id' v='241020769' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069173' />
   </way>
   <way id='-2146909562' action='modify' visible='true'>
     <nd ref='-2146900972' />
@@ -7083,10 +7083,10 @@
     <nd ref='-2146900976' />
     <nd ref='-2146900978' />
     <nd ref='-2146900972' />
-    <tag k='rover:id' v='23833588' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069174' />
+    <tag k='crownet:id' v='23833588' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069174' />
   </way>
   <way id='-2146909563' action='modify' visible='true'>
     <nd ref='-2146900981' />
@@ -7096,10 +7096,10 @@
     <nd ref='-2146900989' />
     <nd ref='-2146900991' />
     <nd ref='-2146900981' />
-    <tag k='rover:id' v='572271458' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069175' />
+    <tag k='crownet:id' v='572271458' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069175' />
   </way>
   <way id='-2146909564' action='modify' visible='true'>
     <nd ref='-2146900994' />
@@ -7111,10 +7111,10 @@
     <nd ref='-2146901006' />
     <nd ref='-2146901008' />
     <nd ref='-2146900994' />
-    <tag k='rover:id' v='1963995184' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069176' />
+    <tag k='crownet:id' v='1963995184' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069176' />
   </way>
   <way id='-2146909565' action='modify' visible='true'>
     <nd ref='-2146901011' />
@@ -7122,10 +7122,10 @@
     <nd ref='-2146901015' />
     <nd ref='-2146901017' />
     <nd ref='-2146901011' />
-    <tag k='rover:id' v='2012674510' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='-999069177' />
+    <tag k='crownet:id' v='2012674510' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='-999069177' />
   </way>
   <way id='-2146909566' action='modify' visible='true'>
     <nd ref='-2146903787' />
@@ -7163,10 +7163,10 @@
     <nd ref='3816982406' />
     <nd ref='3816982399' />
     <nd ref='-2146903787' />
-    <tag k='rover:id' v='1693919892' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258747571' />
+    <tag k='crownet:id' v='1693919892' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258747571' />
   </way>
   <way id='-2146909567' action='modify' visible='true'>
     <nd ref='-2146906539' />
@@ -7176,10 +7176,10 @@
     <nd ref='-2146906547' />
     <nd ref='-2146906549' />
     <nd ref='-2146906539' />
-    <tag k='rover:id' v='119459530' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243544423' />
+    <tag k='crownet:id' v='119459530' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243544423' />
   </way>
   <way id='-2146909568' action='modify' visible='true'>
     <nd ref='-2146906552' />
@@ -7187,10 +7187,10 @@
     <nd ref='-2146906556' />
     <nd ref='-2146906558' />
     <nd ref='-2146906552' />
-    <tag k='rover:id' v='1029594990' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243544425' />
+    <tag k='crownet:id' v='1029594990' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243544425' />
   </way>
   <way id='-2146909569' action='modify' visible='true'>
     <nd ref='-2146906561' />
@@ -7202,10 +7202,10 @@
     <nd ref='-2146906573' />
     <nd ref='-2146906575' />
     <nd ref='-2146906561' />
-    <tag k='rover:id' v='1581792262' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243544430' />
+    <tag k='crownet:id' v='1581792262' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243544430' />
   </way>
   <way id='-2146909570' action='modify' visible='true'>
     <nd ref='-2146906578' />
@@ -7213,10 +7213,10 @@
     <nd ref='-2146906582' />
     <nd ref='-2146906584' />
     <nd ref='-2146906578' />
-    <tag k='rover:id' v='98176535' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243544431' />
+    <tag k='crownet:id' v='98176535' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243544431' />
   </way>
   <way id='-2146909571' action='modify' visible='true'>
     <nd ref='-2146906587' />
@@ -7228,10 +7228,10 @@
     <nd ref='-2146906599' />
     <nd ref='-2146906601' />
     <nd ref='-2146906587' />
-    <tag k='rover:id' v='383748304' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243544437' />
+    <tag k='crownet:id' v='383748304' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243544437' />
   </way>
   <way id='-2146909572' action='modify' visible='true'>
     <nd ref='-2146906604' />
@@ -7241,10 +7241,10 @@
     <nd ref='-2146906612' />
     <nd ref='-2146906614' />
     <nd ref='-2146906604' />
-    <tag k='rover:id' v='1993084596' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243683731' />
+    <tag k='crownet:id' v='1993084596' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243683731' />
   </way>
   <way id='-2146909573' action='modify' visible='true'>
     <nd ref='-2146906617' />
@@ -7256,10 +7256,10 @@
     <nd ref='-2146906629' />
     <nd ref='-2146906631' />
     <nd ref='-2146906617' />
-    <tag k='rover:id' v='1367035602' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='243683732' />
+    <tag k='crownet:id' v='1367035602' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='243683732' />
   </way>
   <way id='-2146909574' action='modify' visible='true'>
     <nd ref='-2146906634' />
@@ -7271,10 +7271,10 @@
     <nd ref='-2146906646' />
     <nd ref='-2146906648' />
     <nd ref='-2146906634' />
-    <tag k='rover:id' v='1653715658' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258139205' />
+    <tag k='crownet:id' v='1653715658' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258139205' />
   </way>
   <way id='-2146909575' action='modify' visible='true'>
     <nd ref='-2146906651' />
@@ -7286,10 +7286,10 @@
     <nd ref='-2146906663' />
     <nd ref='-2146906665' />
     <nd ref='-2146906651' />
-    <tag k='rover:id' v='1621435047' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258139206' />
+    <tag k='crownet:id' v='1621435047' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258139206' />
   </way>
   <way id='-2146909576' action='modify' visible='true'>
     <nd ref='-2146906668' />
@@ -7301,10 +7301,10 @@
     <nd ref='-2146906680' />
     <nd ref='-2146906682' />
     <nd ref='-2146906668' />
-    <tag k='rover:id' v='773156381' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258139207' />
+    <tag k='crownet:id' v='773156381' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258139207' />
   </way>
   <way id='-2146909577' action='modify' visible='true'>
     <nd ref='-2146906685' />
@@ -7316,10 +7316,10 @@
     <nd ref='-2146906697' />
     <nd ref='-2146906699' />
     <nd ref='-2146906685' />
-    <tag k='rover:id' v='710460683' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258139208' />
+    <tag k='crownet:id' v='710460683' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258139208' />
   </way>
   <way id='-2146909578' action='modify' visible='true'>
     <nd ref='-2146906702' />
@@ -7331,10 +7331,10 @@
     <nd ref='-2146906714' />
     <nd ref='-2146906716' />
     <nd ref='-2146906702' />
-    <tag k='rover:id' v='1232221280' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258139209' />
+    <tag k='crownet:id' v='1232221280' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258139209' />
   </way>
   <way id='-2146909579' action='modify' visible='true'>
     <nd ref='-2146906719' />
@@ -7346,10 +7346,10 @@
     <nd ref='-2146906731' />
     <nd ref='-2146906733' />
     <nd ref='-2146906719' />
-    <tag k='rover:id' v='1234236507' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258139211' />
+    <tag k='crownet:id' v='1234236507' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258139211' />
   </way>
   <way id='-2146909580' action='modify' visible='true'>
     <nd ref='-2146906777' />
@@ -7369,10 +7369,10 @@
     <nd ref='-2146906805' />
     <nd ref='-2146906807' />
     <nd ref='-2146906777' />
-    <tag k='rover:id' v='570203452' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='258747573' />
+    <tag k='crownet:id' v='570203452' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='258747573' />
   </way>
   <way id='-2146909581' action='modify' visible='true'>
     <nd ref='-2146906810' />
@@ -7384,10 +7384,10 @@
     <nd ref='-2146906822' />
     <nd ref='-2146906824' />
     <nd ref='-2146906810' />
-    <tag k='rover:id' v='1407531131' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='300326717' />
+    <tag k='crownet:id' v='1407531131' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='300326717' />
   </way>
   <way id='-2146909582' action='modify' visible='true'>
     <nd ref='-2146906827' />
@@ -7397,10 +7397,10 @@
     <nd ref='-2146906835' />
     <nd ref='-2146906837' />
     <nd ref='-2146906827' />
-    <tag k='rover:id' v='787837296' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='305457064' />
+    <tag k='crownet:id' v='787837296' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='305457064' />
   </way>
   <way id='-2146909583' action='modify' visible='true'>
     <nd ref='-2146906840' />
@@ -7408,10 +7408,10 @@
     <nd ref='-2146906844' />
     <nd ref='-2146906846' />
     <nd ref='-2146906840' />
-    <tag k='rover:id' v='1724255043' />
-    <tag k='rover:obstacle' v='wall' />
-    <tag k='rover:obstacle:line:hull' v='-1' />
-    <tag k='rover:obstacle:line:ref' v='378298787' />
+    <tag k='crownet:id' v='1724255043' />
+    <tag k='crownet:obstacle' v='wall' />
+    <tag k='crownet:obstacle:line:hull' v='-1' />
+    <tag k='crownet:obstacle:line:ref' v='378298787' />
   </way>
   <way id='-2146909875' action='modify' visible='true'>
     <nd ref='-2146909873' />
@@ -7651,8 +7651,8 @@
     <tag k='building' v='yes' />
     <tag k='building:levels' v='4' />
     <tag k='roof:colour' v='grey' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='33487023' timestamp='2019-01-24T22:27:38Z' uid='155331' user='benhurxt' visible='true' version='24' changeset='66613465'>
     <nd ref='371663701' />
@@ -7776,8 +7776,8 @@
     <tag k='addr:street' v='Occamstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-844178812' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-844178812' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36948856' timestamp='2014-08-18T19:19:47Z' uid='91790' user='morray' visible='true' version='7' changeset='24841801'>
     <nd ref='429636733' />
@@ -7794,8 +7794,8 @@
     <nd ref='429636733' />
     <tag k='building' v='residential' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='late 19C' />
   </way>
   <way id='36948857' timestamp='2014-12-12T19:36:55Z' uid='78613' user='heilbron' visible='true' version='5' changeset='27428817'>
@@ -7807,8 +7807,8 @@
     <nd ref='429636807' />
     <tag k='building' v='residential' />
     <tag k='roof:colour' v='#EEEEEE' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36948869' timestamp='2014-08-18T19:19:51Z' uid='91790' user='morray' visible='true' version='7' changeset='24841801'>
     <nd ref='429636928' />
@@ -7823,8 +7823,8 @@
     <tag k='architect' v='Josef Knerr' />
     <tag k='building' v='residential' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='1904' />
   </way>
   <way id='36948878' timestamp='2014-08-18T19:19:52Z' uid='91790' user='morray' visible='true' version='7' changeset='24841801'>
@@ -7839,8 +7839,8 @@
     <nd ref='429636950' />
     <nd ref='429636941' />
     <tag k='building' v='residential' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='~1900' />
   </way>
   <way id='36948926' timestamp='2014-08-24T14:11:52Z' uid='91790' user='morray' visible='true' version='7' changeset='24979970'>
@@ -7858,8 +7858,8 @@
     <tag k='addr:street' v='Herzogstraße' />
     <tag k='building' v='apartments' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-661958669' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-661958669' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='early 20C' />
   </way>
   <way id='36959857' timestamp='2013-10-20T13:56:40Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
@@ -7872,8 +7872,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36959858' timestamp='2015-07-21T22:47:12Z' uid='8703' user='rolandg' visible='true' version='5' changeset='32790663'>
     <nd ref='429756937' />
@@ -7890,8 +7890,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36959859' timestamp='2013-10-20T13:56:45Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='429756948' />
@@ -7903,8 +7903,8 @@
     <nd ref='429756948' />
     <tag k='addr:postcode' v='80802' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36959860' timestamp='2013-10-20T13:20:56Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
     <nd ref='429756956' />
@@ -7921,8 +7921,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36959861' timestamp='2013-10-20T13:20:59Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451256'>
     <nd ref='429756957' />
@@ -7938,8 +7938,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36959862' timestamp='2013-08-28T12:21:05Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17553630'>
     <nd ref='429756961' />
@@ -7953,8 +7953,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36959863' timestamp='2013-08-28T12:21:05Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17553630'>
     <nd ref='429756963' />
@@ -7969,8 +7969,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965583' timestamp='2013-08-28T12:21:05Z' uid='56526' user='JJ Rammerl' visible='true' version='3' changeset='17553630'>
     <nd ref='429834369' />
@@ -7985,8 +7985,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965584' timestamp='2013-08-28T12:21:05Z' uid='56526' user='JJ Rammerl' visible='true' version='3' changeset='17553630'>
     <nd ref='429834368' />
@@ -8003,8 +8003,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965585' timestamp='2015-08-14T21:27:54Z' uid='78613' user='heilbron' visible='true' version='4' changeset='33343235'>
     <nd ref='429834372' />
@@ -8017,8 +8017,8 @@
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965588' timestamp='2013-10-20T13:20:58Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
     <nd ref='429834386' />
@@ -8034,8 +8034,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965589' timestamp='2013-12-19T23:38:37Z' uid='834127' user='kartler175' visible='true' version='4' changeset='19542502'>
     <nd ref='429834392' />
@@ -8051,8 +8051,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Occamstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965590' timestamp='2013-12-19T23:38:37Z' uid='834127' user='kartler175' visible='true' version='4' changeset='19542502'>
     <nd ref='429834396' />
@@ -8067,8 +8067,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965591' timestamp='2013-10-20T13:56:40Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='429834403' />
@@ -8084,8 +8084,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965592' timestamp='2014-11-02T20:05:02Z' uid='78613' user='heilbron' visible='true' version='5' changeset='26511966'>
     <nd ref='429834409' />
@@ -8101,8 +8101,8 @@
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965593' timestamp='2014-11-02T20:05:01Z' uid='78613' user='heilbron' visible='true' version='4' changeset='26511966'>
     <nd ref='429834418' />
@@ -8118,8 +8118,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965594' timestamp='2014-11-02T20:04:59Z' uid='78613' user='heilbron' visible='true' version='4' changeset='26511966'>
     <nd ref='429834419' />
@@ -8134,8 +8134,8 @@
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965595' timestamp='2013-10-20T13:56:45Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451928'>
     <nd ref='429834419' />
@@ -8145,8 +8145,8 @@
     <nd ref='429834419' />
     <tag k='addr:postcode' v='80802' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='36965596' timestamp='2014-01-03T09:14:37Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='19782512'>
     <nd ref='429834421' />
@@ -8163,8 +8163,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-714113567' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-714113567' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='37229096' timestamp='2014-08-24T14:11:29Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='433580559' />
@@ -8174,8 +8174,8 @@
     <nd ref='1214825499' />
     <nd ref='433580559' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='37229097' timestamp='2014-08-24T14:11:29Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='433580563' />
@@ -8185,8 +8185,8 @@
     <nd ref='433580566' />
     <nd ref='433580563' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='39057410' timestamp='2017-07-07T11:40:46Z' uid='367380' user='Mloni' visible='true' version='7' changeset='50106355'>
     <nd ref='466194487' />
@@ -8203,8 +8203,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-844178812' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-844178812' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='41726075' timestamp='2014-01-02T23:29:43Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='19778078'>
     <nd ref='312385385' />
@@ -8262,8 +8262,8 @@
     <tag k='architect' v='Paul Puschner' />
     <tag k='building' v='apartments' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-661958669' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-661958669' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='1907' />
   </way>
   <way id='80736709' timestamp='2014-08-24T14:11:51Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
@@ -8275,8 +8275,8 @@
     <tag k='addr:housenumber' v='6' />
     <tag k='addr:street' v='Herzogstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-661958669' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-661958669' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='80736721' timestamp='2014-08-24T14:11:43Z' uid='91790' user='morray' visible='true' version='5' changeset='24979970'>
     <nd ref='941558004' />
@@ -8290,8 +8290,8 @@
     <tag k='addr:housenumber' v='2' />
     <tag k='addr:street' v='Herzogstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-661958669' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-661958669' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='80737020' timestamp='2017-07-07T11:40:46Z' uid='367380' user='Mloni' visible='true' version='13' changeset='50106355'>
     <nd ref='4956635667' />
@@ -8376,8 +8376,8 @@
     <nd ref='1030655677' />
     <nd ref='1030655659' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815439' timestamp='2018-04-25T06:38:59Z' uid='7352749' user='Arikp' visible='true' version='6' changeset='58397913'>
     <nd ref='1030655576' />
@@ -8394,8 +8394,8 @@
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
     <tag k='building:levels' v='6' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815442' timestamp='2015-08-14T21:27:53Z' uid='78613' user='heilbron' visible='true' version='5' changeset='33343235'>
     <nd ref='1030655611' />
@@ -8410,8 +8410,8 @@
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815443' timestamp='2013-10-20T14:17:42Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='18452307'>
     <nd ref='1030655658' />
@@ -8426,8 +8426,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815444' timestamp='2013-10-20T14:17:41Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18452307'>
     <nd ref='1030655579' />
@@ -8443,8 +8443,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815446' timestamp='2015-08-14T21:27:55Z' uid='78613' user='heilbron' visible='true' version='5' changeset='33343235'>
     <nd ref='1030655600' />
@@ -8460,8 +8460,8 @@
     <tag k='building' v='yes' />
     <tag k='roof:orientation' v='across' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815449' timestamp='2015-08-14T21:27:55Z' uid='78613' user='heilbron' visible='true' version='5' changeset='33343235'>
     <nd ref='1030655590' />
@@ -8478,8 +8478,8 @@
     <tag k='building' v='yes' />
     <tag k='roof:orientation' v='across' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='88815452' timestamp='2015-08-14T21:27:54Z' uid='78613' user='heilbron' visible='true' version='5' changeset='33343235'>
     <nd ref='1030655630' />
@@ -8495,8 +8495,8 @@
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-4434885' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-4434885' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='89922513' timestamp='2013-08-28T12:21:06Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17553630'>
     <nd ref='1042311736' />
@@ -8512,8 +8512,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-171551051' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-171551051' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922515' timestamp='2015-08-14T21:27:51Z' uid='78613' user='heilbron' visible='true' version='2' changeset='33343235'>
@@ -8524,8 +8524,8 @@
     <nd ref='1042311788' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-171551051' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-171551051' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922516' timestamp='2013-08-28T12:21:06Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17553630'>
@@ -8542,8 +8542,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-171551051' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-171551051' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922517' timestamp='2013-10-20T13:56:42Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
@@ -8561,8 +8561,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-171551051' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-171551051' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922804' timestamp='2013-10-20T14:17:40Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='18452307'>
@@ -8580,8 +8580,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922805' timestamp='2013-10-20T13:56:45Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
@@ -8596,8 +8596,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922807' timestamp='2013-10-20T14:17:41Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='18452307'>
@@ -8615,8 +8615,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922808' timestamp='2013-10-20T13:56:43Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='18451928'>
@@ -8633,8 +8633,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922810' timestamp='2015-08-14T21:27:55Z' uid='78613' user='heilbron' visible='true' version='4' changeset='33343235'>
@@ -8650,8 +8650,8 @@
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922812' timestamp='2014-07-15T22:57:39Z' uid='2188863' user='piroripo' visible='true' version='5' changeset='24171810'>
@@ -8669,8 +8669,8 @@
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
     <tag k='name' v='Baltenzentrum' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922813' timestamp='2010-12-17T07:48:05Z' uid='77464' user='Daniel27' visible='true' version='1' changeset='6684137'>
@@ -8680,8 +8680,8 @@
     <nd ref='1042333394' />
     <nd ref='1042333340' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922814' timestamp='2015-08-14T21:27:52Z' uid='78613' user='heilbron' visible='true' version='5' changeset='33343235'>
@@ -8698,8 +8698,8 @@
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922815' timestamp='2015-08-14T21:27:50Z' uid='78613' user='heilbron' visible='true' version='4' changeset='33343235'>
@@ -8713,8 +8713,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922816' timestamp='2013-10-20T14:17:40Z' uid='13219' user='Pyrokrat' visible='true' version='5' changeset='18452307'>
@@ -8734,8 +8734,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922817' timestamp='2015-08-14T21:27:56Z' uid='78613' user='heilbron' visible='true' version='5' changeset='33343235'>
@@ -8751,8 +8751,8 @@
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922819' timestamp='2015-08-14T21:27:51Z' uid='78613' user='heilbron' visible='true' version='4' changeset='33343235'>
@@ -8768,8 +8768,8 @@
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922820' timestamp='2013-10-20T14:17:41Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18452307'>
@@ -8783,8 +8783,8 @@
     <tag k='addr:housenumber' v='4' />
     <tag k='addr:street' v='Marschallstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='89922822' timestamp='2013-10-20T13:56:44Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
@@ -8801,8 +8801,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='Bing' />
   </way>
   <way id='93072400' timestamp='2014-01-24T17:17:04Z' uid='360562' user='haytigran' visible='true' version='3' changeset='20180611'>
@@ -8832,8 +8832,8 @@
     <tag k='addr:street' v='Leopoldstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-750225121' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-750225121' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='93607081' timestamp='2015-09-21T14:50:12Z' uid='2290263' user='soemisch' visible='true' version='11' changeset='34163945'>
     <nd ref='6578727' />
@@ -8864,8 +8864,8 @@
     <tag k='addr:street' v='Occamstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822682' timestamp='2013-10-20T13:20:59Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
     <nd ref='429834405' />
@@ -8879,8 +8879,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822684' timestamp='2014-11-02T20:05:00Z' uid='78613' user='heilbron' visible='true' version='3' changeset='26511966'>
     <nd ref='1143085770' />
@@ -8895,8 +8895,8 @@
     <tag k='addr:street' v='Occamstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822685' timestamp='2011-03-07T11:06:37Z' uid='301486' user='occam11' visible='true' version='2' changeset='7483012'>
     <nd ref='1143085975' />
@@ -8912,8 +8912,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Occamstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822686' timestamp='2014-08-24T14:11:28Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1143085881' />
@@ -8923,8 +8923,8 @@
     <nd ref='1143085967' />
     <nd ref='1143085881' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822687' timestamp='2011-02-08T23:34:09Z' uid='342705' user='KonB' visible='true' version='1' changeset='7232063'>
     <nd ref='1143086050' />
@@ -8937,8 +8937,8 @@
     <nd ref='1143085819' />
     <nd ref='1143086050' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822692' timestamp='2014-08-24T14:11:32Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1143085846' />
@@ -8950,8 +8950,8 @@
     <nd ref='1143085992' />
     <nd ref='1143085846' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822693' timestamp='2014-01-02T23:29:40Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='19778078'>
     <nd ref='1143085925' />
@@ -8968,8 +8968,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='survey 2 January 2014' />
   </way>
   <way id='98822695' timestamp='2013-10-20T13:20:58Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
@@ -8986,8 +8986,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822699' timestamp='2019-04-16T15:37:37Z' uid='14390' user='BeKri' visible='true' version='3' changeset='69276432'>
     <nd ref='1143085797' />
@@ -8998,8 +8998,8 @@
     <nd ref='1143085843' />
     <nd ref='1143085797' />
     <tag k='building' v='garage' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822700' timestamp='2013-10-20T13:20:58Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
     <nd ref='1143086100' />
@@ -9018,8 +9018,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822702' timestamp='2014-11-02T20:05:02Z' uid='78613' user='heilbron' visible='true' version='2' changeset='26511966'>
     <nd ref='1143085955' />
@@ -9035,8 +9035,8 @@
     <tag k='addr:street' v='Occamstraße' />
     <tag k='building' v='yes' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822703' timestamp='2014-01-02T23:29:41Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='19778078'>
     <nd ref='1143085786' />
@@ -9054,8 +9054,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='survey 2 January 2014' />
   </way>
   <way id='98822704' timestamp='2013-10-20T13:56:43Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
@@ -9070,8 +9070,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822706' timestamp='2013-10-20T13:56:44Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1143085871' />
@@ -9088,8 +9088,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822713' timestamp='2014-08-24T14:11:35Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='1143085881' />
@@ -9102,8 +9102,8 @@
     <nd ref='1214825364' />
     <nd ref='1143085881' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822714' timestamp='2011-02-08T23:34:13Z' uid='342705' user='KonB' visible='true' version='1' changeset='7232063'>
     <nd ref='1143086051' />
@@ -9114,8 +9114,8 @@
     <nd ref='1143085777' />
     <nd ref='1143086051' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822716' timestamp='2014-06-07T21:18:04Z' uid='8703' user='rolandg' visible='true' version='3' changeset='22799928'>
     <nd ref='2904937021' />
@@ -9127,8 +9127,8 @@
     <nd ref='1143086005' />
     <nd ref='2904937021' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822718' timestamp='2013-10-20T13:20:57Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
     <nd ref='1143085920' />
@@ -9146,8 +9146,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822719' timestamp='2014-08-24T14:11:36Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1143086056' />
@@ -9161,8 +9161,8 @@
     <nd ref='1143085823' />
     <nd ref='1143086056' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822720' timestamp='2013-08-28T12:21:06Z' uid='56526' user='JJ Rammerl' visible='true' version='3' changeset='17553630'>
     <nd ref='1143085742' />
@@ -9178,8 +9178,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822721' timestamp='2014-11-02T20:04:45Z' uid='78613' user='heilbron' visible='true' version='3' changeset='26511966'>
     <nd ref='429834424' />
@@ -9192,8 +9192,8 @@
     <nd ref='429834424' />
     <tag k='building' v='yes' />
     <tag k='roof:colour' v='#666666' />
-    <tag k='rover:obstacle:hull' v='-714113567' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-714113567' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822722' action='modify' timestamp='2013-08-28T12:21:06Z' uid='56526' user='JJ Rammerl' visible='true' version='3' changeset='17553630'>
     <nd ref='1143085782' />
@@ -9210,8 +9210,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822724' action='modify' timestamp='2014-08-24T14:11:49Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1143086040' />
@@ -9224,8 +9224,8 @@
     <tag k='addr:housenumber' v='4' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='source' v='survey' />
   </way>
   <way id='98822725' timestamp='2013-08-28T12:21:06Z' uid='56526' user='JJ Rammerl' visible='true' version='3' changeset='17553630'>
@@ -9240,8 +9240,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822728' timestamp='2011-02-08T23:34:16Z' uid='342705' user='KonB' visible='true' version='1' changeset='7232063'>
     <nd ref='429834416' />
@@ -9250,8 +9250,8 @@
     <nd ref='429834415' />
     <nd ref='429834416' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822731' timestamp='2014-01-03T09:14:36Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='19782512'>
     <nd ref='1143086045' />
@@ -9265,8 +9265,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822732' timestamp='2014-12-12T19:37:02Z' uid='78613' user='heilbron' visible='true' version='4' changeset='27428817'>
     <nd ref='1003901535' />
@@ -9284,8 +9284,8 @@
     <tag k='building' v='yes' />
     <tag k='building:levels' v='4' />
     <tag k='roof:colour' v='grey' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822734' action='modify' timestamp='2014-10-18T12:31:50Z' uid='91790' user='morray' visible='true' version='5' changeset='26169302'>
     <nd ref='1143085829' />
@@ -9302,8 +9302,8 @@
     <tag k='building' v='apartments' />
     <tag k='roof:colour' v='ce8674' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822737' timestamp='2013-10-20T13:56:39Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1143085878' />
@@ -9319,8 +9319,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='98822738' timestamp='2013-10-20T13:20:56Z' uid='13219' user='Pyrokrat' visible='true' version='2' changeset='18451256'>
     <nd ref='1143085865' />
@@ -9335,8 +9335,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='100024661' timestamp='2014-01-24T17:17:04Z' uid='360562' user='haytigran' visible='true' version='2' changeset='20180611'>
     <nd ref='2635396986' />
@@ -9386,8 +9386,8 @@
     <nd ref='1213329171' />
     <tag k='building' v='yes' />
     <tag k='building:levels' v='4' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='105283013' timestamp='2018-07-18T17:17:43Z' uid='8499206' user='SeisenB' visible='true' version='5' changeset='60843349'>
     <nd ref='1213358905' />
@@ -9402,8 +9402,8 @@
     <tag k='building' v='apartments' />
     <tag k='building:levels' v='4' />
     <tag k='roof:levels' v='1' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='105283014' timestamp='2014-08-24T14:11:49Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='1213358841' />
@@ -9419,8 +9419,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='105283015' timestamp='2014-08-24T14:11:51Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1213358795' />
@@ -9442,8 +9442,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='105283017' timestamp='2014-08-24T14:11:43Z' uid='91790' user='morray' visible='true' version='5' changeset='24979970'>
     <nd ref='1213358999' />
@@ -9461,8 +9461,8 @@
     <tag k='architect' v='R. Böhm' />
     <tag k='building' v='apartments' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='1903' />
   </way>
   <way id='105283018' timestamp='2012-01-15T10:28:17Z' uid='361746' user='raupach' visible='true' version='2' changeset='10396197'>
@@ -9479,8 +9479,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Morawitzkystraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-515777654' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515777654' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='105289322' timestamp='2014-01-24T17:17:03Z' uid='360562' user='haytigran' visible='true' version='3' changeset='20180611'>
     <nd ref='871975368' />
@@ -9558,8 +9558,8 @@
     <nd ref='1282567713' />
     <nd ref='1213408584' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-17330038' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-17330038' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='105289331' timestamp='2017-02-21T09:25:33Z' uid='4642374' user='x_zhao_MENTZ' visible='true' version='8' changeset='46268490'>
     <nd ref='1213408443' />
@@ -9613,8 +9613,8 @@
     <tag k='building' v='apartments' />
     <tag k='roof:colour' v='7b5d4b' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568607' timestamp='2014-08-24T14:11:47Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1279152659' />
@@ -9629,8 +9629,8 @@
     <tag k='addr:housenumber' v='3' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-889536535' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-889536535' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568611' timestamp='2016-09-30T12:56:47Z' uid='14390' user='BeKri' visible='true' version='5' changeset='42541803'>
     <nd ref='1279152768' />
@@ -9645,8 +9645,8 @@
     <nd ref='2509522510' />
     <nd ref='1279152768' />
     <tag k='building' v='residential' />
-    <tag k='rover:obstacle:hull' v='-515579840' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515579840' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568618' timestamp='2014-12-12T19:36:59Z' uid='78613' user='heilbron' visible='true' version='4' changeset='27428817'>
     <nd ref='1279152765' />
@@ -9661,8 +9661,8 @@
     <tag k='building' v='yes' />
     <tag k='roof:colour' v='#666666' />
     <tag k='roof:shape' v='flat' />
-    <tag k='rover:obstacle:hull' v='-750225121' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-750225121' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568626' action='modify' timestamp='2014-08-24T14:11:39Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='1279152707' />
@@ -9677,8 +9677,8 @@
     <tag k='addr:housenumber' v='10' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568627' timestamp='2016-09-30T12:56:51Z' uid='14390' user='BeKri' visible='true' version='5' changeset='42541803'>
     <nd ref='1279152841' />
@@ -9689,8 +9689,8 @@
     <nd ref='1279152645' />
     <nd ref='1279152841' />
     <tag k='building' v='residential' />
-    <tag k='rover:obstacle:hull' v='-515579840' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515579840' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568630' timestamp='2016-09-30T12:56:49Z' uid='14390' user='BeKri' visible='true' version='4' changeset='42541803'>
     <nd ref='1279152795' />
@@ -9700,8 +9700,8 @@
     <nd ref='1279152806' />
     <nd ref='1279152795' />
     <tag k='building' v='residential' />
-    <tag k='rover:obstacle:hull' v='-515579840' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515579840' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112568632' action='modify' timestamp='2014-08-24T14:11:52Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1279152707' />
@@ -9712,8 +9712,8 @@
     <tag k='addr:housenumber' v='8a' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112953982' timestamp='2014-08-24T14:11:50Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1279152464' />
@@ -9725,8 +9725,8 @@
     <tag k='addr:housenumber' v='5' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-889536535' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-889536535' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112953985' timestamp='2014-10-18T12:27:24Z' uid='91790' user='morray' visible='true' version='4' changeset='26169227'>
     <nd ref='1282567155' />
@@ -9747,8 +9747,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-17330038' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-17330038' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954005' timestamp='2014-08-24T14:11:51Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='1282567637' />
@@ -9765,8 +9765,8 @@
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-284411240' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-284411240' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='early 20C' />
   </way>
   <way id='112954012' action='modify' timestamp='2014-08-24T14:11:40Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
@@ -9780,8 +9780,8 @@
     <tag k='addr:housenumber' v='12' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-538062546' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-538062546' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954016' timestamp='2014-08-24T14:11:41Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='352533601' />
@@ -9797,8 +9797,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-284411240' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-284411240' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954027' timestamp='2015-07-31T13:01:05Z' uid='78234' user='The_Mappet_Show' visible='true' version='4' changeset='33006128'>
     <nd ref='1282567141' />
@@ -9825,8 +9825,8 @@
     <tag k='addr:housenumber' v='9' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-889536535' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-889536535' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954043' timestamp='2019-04-10T21:31:02Z' uid='14390' user='BeKri' visible='true' version='5' changeset='69097808'>
     <nd ref='1282567215' />
@@ -9858,8 +9858,8 @@
     <tag k='addr:housenumber' v='14' />
     <tag k='addr:street' v='Siegfriedstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-968235699' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-968235699' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954052' timestamp='2014-08-24T14:11:51Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1282567409' />
@@ -9875,8 +9875,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-17330038' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-17330038' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954056' timestamp='2014-08-24T14:11:39Z' uid='91790' user='morray' visible='true' version='4' changeset='24979970'>
     <nd ref='1282567736' />
@@ -9893,8 +9893,8 @@
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-284411240' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-284411240' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='early 20C' />
   </way>
   <way id='112954080' timestamp='2014-08-24T14:11:52Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
@@ -9911,8 +9911,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-968235699' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-968235699' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='112954092' timestamp='2014-08-24T14:11:38Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1282567878' />
@@ -9931,8 +9931,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Morawitzkystraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-284411240' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-284411240' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='116531458' timestamp='2011-06-05T20:36:08Z' uid='342705' user='KonB' visible='true' version='1' changeset='8354107'>
     <nd ref='1313466429' />
@@ -9941,8 +9941,8 @@
     <nd ref='1313466321' />
     <nd ref='1313466429' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='116531469' timestamp='2011-06-05T20:36:10Z' uid='342705' user='KonB' visible='true' version='1' changeset='8354107'>
     <nd ref='1313466707' />
@@ -9951,8 +9951,8 @@
     <nd ref='1313466429' />
     <nd ref='1313466707' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='116531487' timestamp='2013-08-14T23:43:42Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17353192'>
     <nd ref='1313466151' />
@@ -9966,8 +9966,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Franzstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075070' timestamp='2013-12-14T00:47:15Z' uid='78613' user='heilbron' visible='true' version='4' changeset='19442478'>
     <nd ref='1318875508' />
@@ -9982,8 +9982,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Herzogstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075078' timestamp='2011-06-10T13:33:47Z' uid='342705' user='KonB' visible='true' version='1' changeset='8397338'>
     <nd ref='1318876611' />
@@ -9995,8 +9995,8 @@
     <nd ref='1318875094' />
     <nd ref='1318876611' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-714113567' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-714113567' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075100' timestamp='2012-11-30T16:28:52Z' uid='338611' user='marek kleciak' visible='true' version='2' changeset='14100891'>
     <nd ref='1318875661' />
@@ -10007,8 +10007,8 @@
     <nd ref='1318876284' />
     <nd ref='1318875661' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075105' timestamp='2016-09-30T12:57:01Z' uid='14390' user='BeKri' visible='true' version='4' changeset='42541803'>
     <nd ref='1318876502' />
@@ -10026,8 +10026,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Leopoldstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075111' timestamp='2013-08-14T23:43:36Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17353192'>
     <nd ref='1318875474' />
@@ -10041,8 +10041,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Franzstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075135' timestamp='2014-01-02T23:29:41Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='19778078'>
     <nd ref='1318876620' />
@@ -10057,8 +10057,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Siegesstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-714113567' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-714113567' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075193' timestamp='2014-01-02T23:29:41Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='19778078'>
     <nd ref='1318875683' />
@@ -10072,8 +10072,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Siegesstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-714113567' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-714113567' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075197' timestamp='2014-08-27T09:10:42Z' uid='2290918' user='ap-KF' visible='true' version='3' changeset='25046803'>
     <nd ref='1318876410' />
@@ -10090,8 +10090,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Franzstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075228' timestamp='2016-09-30T12:56:54Z' uid='14390' user='BeKri' visible='true' version='2' changeset='42541803'>
     <nd ref='429636745' />
@@ -10104,8 +10104,8 @@
     <nd ref='1318875447' />
     <nd ref='429636745' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075261' timestamp='2014-08-27T09:10:42Z' uid='2290918' user='ap-KF' visible='true' version='4' changeset='25046803'>
     <nd ref='1318875079' />
@@ -10120,8 +10120,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Leopoldstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-681874651' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-681874651' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117075266' timestamp='2014-01-02T23:29:41Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='19778078'>
     <nd ref='429834422' />
@@ -10135,8 +10135,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Siegesstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-714113567' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-714113567' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589806' timestamp='2013-10-20T13:56:44Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1324414833' />
@@ -10150,8 +10150,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589810' timestamp='2013-10-20T13:56:40Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1324415974' />
@@ -10165,8 +10165,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589836' timestamp='2014-11-02T20:04:51Z' uid='78613' user='heilbron' visible='true' version='3' changeset='26511966'>
     <nd ref='2502842327' />
@@ -10182,8 +10182,8 @@
     <tag k='building' v='yes' />
     <tag k='roof:colour' v='grey' />
     <tag k='roof:shape' v='flat' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589838' timestamp='2016-06-14T20:21:19Z' uid='4117905' user='Kinderstadtplan' visible='true' version='5' changeset='40025965'>
     <nd ref='429834390' />
@@ -10202,8 +10202,8 @@
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
     <tag k='operator' v='Nilpferde e.V.' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589841' timestamp='2011-06-13T23:04:06Z' uid='342705' user='KonB' visible='true' version='1' changeset='8432586'>
     <nd ref='1324415761' />
@@ -10212,8 +10212,8 @@
     <nd ref='1324415540' />
     <nd ref='1324415761' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-576119517' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-576119517' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589878' timestamp='2013-10-20T13:56:43Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1324415636' />
@@ -10229,8 +10229,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589888' timestamp='2011-06-13T23:04:11Z' uid='342705' user='KonB' visible='true' version='1' changeset='8432586'>
     <nd ref='1324415827' />
@@ -10239,8 +10239,8 @@
     <nd ref='1324416050' />
     <nd ref='1324415827' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-806531120' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-806531120' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589909' timestamp='2013-10-20T13:20:56Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451256'>
     <nd ref='1324414637' />
@@ -10257,8 +10257,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Haimhauserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589961' timestamp='2013-10-20T13:56:42Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1324415310' />
@@ -10275,8 +10275,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117589970' timestamp='2013-10-20T13:56:44Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1324415548' />
@@ -10290,8 +10290,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117590051' timestamp='2013-10-20T13:56:41Z' uid='13219' user='Pyrokrat' visible='true' version='4' changeset='18451928'>
     <nd ref='1324416086' />
@@ -10307,8 +10307,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117590089' timestamp='2013-10-20T13:56:40Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1324415929' />
@@ -10322,8 +10322,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Hesseloherstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='117590119' timestamp='2019-04-10T21:31:03Z' uid='14390' user='BeKri' visible='true' version='5' changeset='69097808'>
     <nd ref='1324415977' />
@@ -10353,8 +10353,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-404960259' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-404960259' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='127977585' timestamp='2017-11-07T15:11:04Z' uid='8748' user='ToniE' visible='true' version='8' changeset='53583763'>
     <nd ref='1955585' />
@@ -10413,8 +10413,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='145673016' timestamp='2014-08-24T14:11:38Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1590426461' />
@@ -10435,8 +10435,8 @@
     <tag k='addr:postcode' v='80803' />
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
-    <tag k='rover:obstacle:hull' v='-17330038' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-17330038' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='145673023' timestamp='2014-08-24T14:11:50Z' uid='91790' user='morray' visible='true' version='3' changeset='24979970'>
     <nd ref='1590426474' />
@@ -10455,8 +10455,8 @@
     <tag k='addr:street' v='Clemensstraße' />
     <tag k='building' v='apartments' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-17330038' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-17330038' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='1890' />
   </way>
   <way id='151542344' action='modify' timestamp='2016-01-18T12:28:21Z' uid='360562' user='haytigran' visible='true' version='13' changeset='36655940'>
@@ -10788,8 +10788,8 @@
     <tag k='name' v='Karstadt' />
     <tag k='opening_hours' v='Mo-Sa 10:00-20:00' />
     <tag k='roof:shape' v='flat' />
-    <tag k='rover:id' v='172846488' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:id' v='172846488' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='shop' v='department_store' />
     <tag k='wheelchair' v='yes' />
     <tag k='wheelchair:description' v='Eingänge schwellenlos, Lift für die Stockwerke, Behinderten-WC; Im UG sehr großer Lebensmittel- und Imbissbereich' />
@@ -10820,8 +10820,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-806531120' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-806531120' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='173168560' timestamp='2014-12-12T19:37:01Z' uid='78613' user='heilbron' visible='true' version='4' changeset='27428817'>
     <nd ref='349333125' />
@@ -10840,8 +10840,8 @@
     <tag k='roof:colour' v='#DDDDDD' />
     <tag k='roof:levels' v='1' />
     <tag k='roof:shape' v='gabled' />
-    <tag k='rover:obstacle:hull' v='-750225121' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-750225121' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='173168628' timestamp='2014-06-30T12:12:19Z' uid='8703' user='rolandg' visible='true' version='4' changeset='23344904'>
     <nd ref='1081999560' />
@@ -10874,8 +10874,8 @@
     <nd ref='349333340' />
     <tag k='building' v='residential' />
     <tag k='protect_class' v='22' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='start_date' v='~1900' />
   </way>
   <way id='174847919' timestamp='2013-08-28T12:21:05Z' uid='56526' user='JJ Rammerl' visible='true' version='2' changeset='17553630'>
@@ -10890,8 +10890,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Münchner Freiheit' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='174847922' timestamp='2013-10-20T13:56:41Z' uid='13219' user='Pyrokrat' visible='true' version='3' changeset='18451928'>
     <nd ref='1542628732' />
@@ -10903,8 +10903,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Marktstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-789121110' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-789121110' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='193703018' action='modify' timestamp='2015-11-04T12:08:37Z' uid='2455020' user='EJ_' visible='true' version='5' changeset='35077358'>
     <nd ref='2042190228' />
@@ -11061,8 +11061,8 @@
     <tag k='addr:housenumber' v='14b' />
     <tag k='addr:street' v='Kaiserstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-515579840' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-515579840' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='237111686' action='modify' timestamp='2014-10-10T16:46:02Z' uid='91790' user='morray' visible='true' version='2' changeset='25986687'>
     <nd ref='2450607666' />
@@ -11076,7 +11076,7 @@
     <nd ref='2450607670' />
     <nd ref='2450607666' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='243544422' timestamp='2016-09-30T12:56:49Z' uid='14390' user='BeKri' visible='true' version='5' changeset='42541803'>
     <nd ref='2509348051' />
@@ -11097,25 +11097,25 @@
     <nd ref='2509348051' />
     <tag k='building' v='yes' />
     <tag k='roof:colour' v='grey' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='243544423' action='modify' timestamp='2014-08-30T16:31:45Z' uid='91790' user='morray' visible='true' version='2' changeset='25121610'>
     <nd ref='2509348051' />
     <nd ref='3050661411' />
     <nd ref='2509348071' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243544423' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-119459530' />
+    <tag k='crownet:id' v='243544423' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-119459530' />
   </way>
   <way id='243544425' action='modify' timestamp='2013-10-26T12:50:13Z' uid='1753028' user='cüper' visible='true' version='1' changeset='18551026'>
     <nd ref='2042190226' />
     <nd ref='2509348083' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243544425' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1029594990' />
+    <tag k='crownet:id' v='243544425' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1029594990' />
   </way>
   <way id='243544430' action='modify' timestamp='2013-10-26T12:50:14Z' uid='1753028' user='cüper' visible='true' version='1' changeset='18551026'>
     <nd ref='1279152595' />
@@ -11123,17 +11123,17 @@
     <nd ref='2509348136' />
     <nd ref='1279152831' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243544430' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1581792262' />
+    <tag k='crownet:id' v='243544430' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1581792262' />
   </way>
   <way id='243544431' action='modify' timestamp='2013-10-26T12:50:14Z' uid='1753028' user='cüper' visible='true' version='1' changeset='18551026'>
     <nd ref='1279152765' />
     <nd ref='1318876093' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243544431' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-98176535' />
+    <tag k='crownet:id' v='243544431' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-98176535' />
   </way>
   <way id='243544432' timestamp='2014-01-02T23:29:42Z' uid='13219' user='Pyrokrat' visible='true' version='6' changeset='19778078'>
     <nd ref='2509348138' />
@@ -11149,18 +11149,18 @@
     <nd ref='2509348178' />
     <nd ref='2509348180' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243544437' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-383748304' />
+    <tag k='crownet:id' v='243544437' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-383748304' />
   </way>
   <way id='243683731' action='modify' timestamp='2013-10-27T17:35:09Z' uid='1753028' user='cüper' visible='true' version='1' changeset='18570441'>
     <nd ref='1318875181' />
     <nd ref='2510589872' />
     <nd ref='2510589873' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243683731' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1993084596' />
+    <tag k='crownet:id' v='243683731' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1993084596' />
   </way>
   <way id='243683732' action='modify' timestamp='2013-10-27T17:35:09Z' uid='1753028' user='cüper' visible='true' version='1' changeset='18570441'>
     <nd ref='2510589874' />
@@ -11168,9 +11168,9 @@
     <nd ref='2510589876' />
     <nd ref='2510589877' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='243683732' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1367035602' />
+    <tag k='crownet:id' v='243683732' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1367035602' />
   </way>
   <way id='243816718' timestamp='2014-01-24T17:17:04Z' uid='360562' user='haytigran' visible='true' version='2' changeset='20180611'>
     <nd ref='2635396927' />
@@ -11274,8 +11274,8 @@
     <nd ref='1318875508' />
     <nd ref='2578884669' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-517482034' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-517482034' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='251709416' timestamp='2014-08-27T09:10:42Z' uid='2290918' user='ap-KF' visible='true' version='2' changeset='25046803'>
     <nd ref='1836950713' />
@@ -11288,8 +11288,8 @@
     <tag k='addr:postcode' v='80802' />
     <tag k='addr:street' v='Feilitzschstraße' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-806531120' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-806531120' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='251805202' timestamp='2018-08-20T17:14:20Z' uid='8748' user='ToniE' visible='true' version='3' changeset='61830369'>
     <nd ref='259839368' />
@@ -11377,10 +11377,10 @@
     <nd ref='2635396996' />
     <tag k='building' v='roof' />
     <tag k='layer' v='1' />
-    <tag k='rover:id' v='258139171' />
-    <tag k='rover:measurementArea' v='yes' />
-    <tag k='rover:measurementArea:id' v='3001' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:id' v='258139171' />
+    <tag k='crownet:measurementArea' v='yes' />
+    <tag k='crownet:measurementArea:id' v='3001' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='258139172' timestamp='2014-01-24T17:16:58Z' uid='360562' user='haytigran' visible='true' version='1' changeset='20180611'>
     <nd ref='2635396926' />
@@ -11588,7 +11588,7 @@
     <tag k='highway' v='elevator' />
     <tag k='level' v='0;-1' />
     <tag k='levelpart' v='elevator_platform' />
-    <tag k='rover:obstacle' v='yes' />
+    <tag k='crownet:obstacle' v='yes' />
   </way>
   <way id='258139205' action='modify' timestamp='2015-03-08T08:37:48Z' uid='2480006' user='Qantor' visible='true' version='2' changeset='29324752'>
     <nd ref='2635396914' />
@@ -11597,9 +11597,9 @@
     <nd ref='2635396911' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1' />
-    <tag k='rover:id' v='258139205' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1653715658' />
+    <tag k='crownet:id' v='258139205' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1653715658' />
   </way>
   <way id='258139206' action='modify' timestamp='2015-03-08T08:37:48Z' uid='2480006' user='Qantor' visible='true' version='2' changeset='29324752'>
     <nd ref='2635396951' />
@@ -11608,9 +11608,9 @@
     <nd ref='2635396946' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1' />
-    <tag k='rover:id' v='258139206' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1621435047' />
+    <tag k='crownet:id' v='258139206' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1621435047' />
   </way>
   <way id='258139207' action='modify' timestamp='2015-03-08T08:37:48Z' uid='2480006' user='Qantor' visible='true' version='2' changeset='29324752'>
     <nd ref='2635396978' />
@@ -11619,9 +11619,9 @@
     <nd ref='2635396975' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1' />
-    <tag k='rover:id' v='258139207' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-773156381' />
+    <tag k='crownet:id' v='258139207' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-773156381' />
   </way>
   <way id='258139208' action='modify' timestamp='2015-03-08T08:37:48Z' uid='2480006' user='Qantor' visible='true' version='2' changeset='29324752'>
     <nd ref='2635396924' />
@@ -11630,9 +11630,9 @@
     <nd ref='2635396923' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1' />
-    <tag k='rover:id' v='258139208' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-710460683' />
+    <tag k='crownet:id' v='258139208' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-710460683' />
   </way>
   <way id='258139209' action='modify' timestamp='2015-04-03T08:52:43Z' uid='2480006' user='Qantor' visible='true' version='2' changeset='29946433'>
     <nd ref='2635396989' />
@@ -11641,9 +11641,9 @@
     <nd ref='2635396988' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1' />
-    <tag k='rover:id' v='258139209' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1232221280' />
+    <tag k='crownet:id' v='258139209' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1232221280' />
   </way>
   <way id='258139211' action='modify' timestamp='2015-03-08T08:37:48Z' uid='2480006' user='Qantor' visible='true' version='2' changeset='29324752'>
     <nd ref='2635397013' />
@@ -11652,9 +11652,9 @@
     <nd ref='2635397012' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1' />
-    <tag k='rover:id' v='258139211' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1234236507' />
+    <tag k='crownet:id' v='258139211' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1234236507' />
   </way>
   <way id='258139212' timestamp='2015-08-07T10:26:20Z' uid='2144605' user='Gavaasuren' visible='true' version='8' changeset='33176204'>
     <nd ref='2635396908' />
@@ -12054,8 +12054,8 @@
     <tag k='indoor' v='yes' />
     <tag k='level' v='-2;-1' />
     <tag k='levelpart' v='elevator_platform' />
-    <tag k='rover:id' v='258747568' />
-    <tag k='rover:obstacle' v='yes' />
+    <tag k='crownet:id' v='258747568' />
+    <tag k='crownet:obstacle' v='yes' />
   </way>
   <way id='258747569' timestamp='2017-05-05T10:23:50Z' uid='4258249' user='ekutscharski' visible='true' version='4' changeset='48422305'>
     <nd ref='2640786564' />
@@ -12102,9 +12102,9 @@
     <nd ref='2640786639' />
     <tag k='barrier' v='wall' />
     <tag k='height' v='1.3' />
-    <tag k='rover:id' v='258747571' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-463443493' />
+    <tag k='crownet:id' v='258747571' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-463443493' />
   </way>
   <way id='258747572' timestamp='2018-03-26T11:59:57Z' uid='1787357' user='letihu' visible='true' version='15' changeset='57532595'>
     <nd ref='2640786691' />
@@ -12193,9 +12193,9 @@
     <nd ref='2640786747' />
     <nd ref='2640786759' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='258747573' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-570203452' />
+    <tag k='crownet:id' v='258747573' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-570203452' />
   </way>
   <way id='259773586' action='modify' timestamp='2017-07-20T21:04:50Z' uid='371369' user='mucx' visible='true' version='9' changeset='50442550'>
     <nd ref='2652306682' />
@@ -12411,8 +12411,8 @@
     <nd ref='1143085968' />
     <nd ref='2904937026' />
     <tag k='building' v='residential' />
-    <tag k='rover:obstacle:hull' v='-724056993' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-724056993' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='286817442' timestamp='2016-09-30T12:57:06Z' uid='14390' user='BeKri' visible='true' version='2' changeset='42541803'>
     <nd ref='4424957537' />
@@ -12454,9 +12454,9 @@
     <nd ref='3044120583' />
     <nd ref='3044120580' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='300326717' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1407531131' />
+    <tag k='crownet:id' v='300326717' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1407531131' />
   </way>
   <way id='300442410' timestamp='2014-08-27T09:10:40Z' uid='2290918' user='ap-KF' visible='true' version='1' changeset='25046803'>
     <nd ref='3045309360' />
@@ -12469,8 +12469,8 @@
     <nd ref='3045309365' />
     <nd ref='3045309360' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-806531120' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-806531120' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='300442411' timestamp='2014-08-27T09:10:40Z' uid='2290918' user='ap-KF' visible='true' version='1' changeset='25046803'>
     <nd ref='3045309366' />
@@ -12485,8 +12485,8 @@
     <nd ref='3045309373' />
     <nd ref='3045309366' />
     <tag k='building' v='yes' />
-    <tag k='rover:obstacle:hull' v='-806531120' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-806531120' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='300559220' timestamp='2015-07-31T11:56:57Z' uid='78234' user='The_Mappet_Show' visible='true' version='2' changeset='33004633'>
     <nd ref='3046332213' />
@@ -12539,9 +12539,9 @@
     <nd ref='3100813934' />
     <nd ref='3100775535' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='305457064' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-787837296' />
+    <tag k='crownet:id' v='305457064' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-787837296' />
   </way>
   <way id='305457071' timestamp='2017-03-16T21:39:51Z' uid='8748' user='ToniE' visible='true' version='2' changeset='46911358'>
     <nd ref='4738777392' />
@@ -12737,8 +12737,8 @@
     <nd ref='429834418' />
     <nd ref='429834413' />
     <tag k='building' v='garage' />
-    <tag k='rover:obstacle:hull' v='-999046037' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:hull' v='-999046037' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
   </way>
   <way id='315892725' timestamp='2018-03-26T12:00:00Z' uid='1787357' user='letihu' visible='true' version='5' changeset='57532595'>
     <nd ref='2640786556' />
@@ -12791,7 +12791,7 @@
     <tag k='building:levels' v='1' />
     <tag k='name' v='23-Stunden-Kiosk' />
     <tag k='opening_hours' v='Mo-Su 04:00-03:00' />
-    <tag k='rover:obstacle:ignore' v='yes' />
+    <tag k='crownet:obstacle:ignore' v='yes' />
     <tag k='shop' v='kiosk' />
     <tag k='wheelchair' v='yes' />
   </way>
@@ -13541,9 +13541,9 @@
     <nd ref='3816989681' />
     <nd ref='3816989544' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='378298787' />
-    <tag k='rover:obstacle.ignore' v='yes' />
-    <tag k='rover:obstacle:line:hull' v='-1724255043' />
+    <tag k='crownet:id' v='378298787' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
+    <tag k='crownet:obstacle:line:hull' v='-1724255043' />
   </way>
   <way id='378298789' action='modify' timestamp='2015-11-04T12:08:31Z' uid='2455020' user='EJ_' visible='true' version='1' changeset='35077358'>
     <nd ref='3816982447' />
@@ -13613,8 +13613,8 @@
     <nd ref='3816989494' />
     <nd ref='3816989458' />
     <tag k='barrier' v='wall' />
-    <tag k='rover:id' v='378298799' />
-    <tag k='rover:obstacle.ignore' v='yes' />
+    <tag k='crownet:id' v='378298799' />
+    <tag k='crownet:obstacle.ignore' v='yes' />
   </way>
   <way id='378298801' timestamp='2015-11-04T12:08:31Z' uid='2455020' user='EJ_' visible='true' version='1' changeset='35077358'>
     <nd ref='2640786763' />

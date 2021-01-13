@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for rTests
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep -o rTests -O out -KCROWNET_PORJ=../../../../crownet -KARTERY_PROJ=../../../../artery -KINET_PROJ=../../../../inet4 -KLTE_PROJ=../../../../simulte -I. -I$(CROWNET_PORJ)/src -I$(ARTERY_PROJ)/src -I$(ARTERY_PROJ)/src/traci/sumo -I$(ARTERY_PROJ)/extern/vanetza -I$(ARTERY_PROJ)/extern/vanetza/vanetza/asn1/support -I$(INET_PROJ)/src -I$(LTE_PROJ)/src -I/usr/local/include -L$(ARTERY_PROJ)/build/Debug/lib -L$(ARTERY_PROJ)/build/Release/lib -L$(ARTERY_PROJ)/extern/vanetza/build/Debug/lib -L$(ARTERY_PROJ)/extern/vanetza/build/Release/lib -L$(CROWNET_PORJ)/src -L$(INET_PROJ)/src -L$(LTE_PROJ)/src -L/usr/local/lib -lboost_filesystem -lboost_system -lartery_core$(D) -lartery_envmod$(D) -lartery_police$(D) -lartery_storyboard$(D) -ltraci$(D) -lvanetza_access$(D) -lvanetza_asn1$(D) -lvanetza_btp$(D) -lvanetza_common$(D) -lvanetza_dcc$(D) -lvanetza_facilities$(D) -lvanetza_geonet$(D) -lvanetza_gnss$(D) -lvanetza_net$(D) -lvanetza_security$(D) -lCROWNET$(D) -lINET$(D) -llte$(D) -lgtest -lpthread
+#  opp_makemake -f --deep -o rTests -O out -KCROWNET_PORJ=../../../../crownet -KARTERY_PROJ=../../../../artery -KINET_PROJ=../../../../inet4 -KLTE_PROJ=../../../../simulte -KVEINS_PROJ=../../../../veins -KVEINS_INET_PROJ=../../../../veins/subprojects/veins_inet -DINET_IMPORT -DVEINS_IMPORT -DVEINS_INET_IMPORT -I. -I$(CROWNET_PORJ)/src -I$(ARTERY_PROJ)/src -I$(ARTERY_PROJ)/src/traci/sumo -I$(ARTERY_PROJ)/extern/vanetza -I$(ARTERY_PROJ)/extern/vanetza/vanetza/asn1/support -I$(INET_PROJ)/src -I$(LTE_PROJ)/src -I$(VEINS_PROJ)/src -I$(VEINS_PROJ)/subprojects/veins_inet/src -I/usr/local/include -L$(ARTERY_PROJ)/build/Debug/lib -L$(ARTERY_PROJ)/build/Release/lib -L$(ARTERY_PROJ)/extern/vanetza/build/Debug/lib -L$(ARTERY_PROJ)/extern/vanetza/build/Release/lib -L$(CROWNET_PORJ)/src -L$(INET_PROJ)/src -L$(LTE_PROJ)/src -L$(VEINS_PROJ)/src -L$(VEINS_PROJ)/subprojects/veins_inet/src -L/usr/local/lib -lboost_filesystem -lboost_system -lartery_core$(D) -lartery_envmod$(D) -lartery_police$(D) -lartery_storyboard$(D) -ltraci$(D) -lvanetza_access$(D) -lvanetza_asn1$(D) -lvanetza_btp$(D) -lvanetza_common$(D) -lvanetza_dcc$(D) -lvanetza_facilities$(D) -lvanetza_geonet$(D) -lvanetza_gnss$(D) -lvanetza_net$(D) -lvanetza_security$(D) -lCROWNET$(D) -lINET$(D) -llte$(D) -lveins$(D) -lveins_inet$(D) -lgtest -lpthread
 #
 
 # Name of target to be created (-o option)
@@ -25,13 +25,15 @@ INCLUDE_PATH = \
     -I$(ARTERY_PROJ)/extern/vanetza/vanetza/asn1/support \
     -I$(INET_PROJ)/src \
     -I$(LTE_PROJ)/src \
+    -I$(VEINS_PROJ)/src \
+    -I$(VEINS_PROJ)/subprojects/veins_inet/src \
     -I/usr/local/include
 
 # Additional object and library files to link with
 EXTRA_OBJS =
 
 # Additional libraries (-L, -l options)
-LIBS = $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/build/Debug/lib $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/build/Release/lib $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/extern/vanetza/build/Debug/lib $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/extern/vanetza/build/Release/lib $(LDFLAG_LIBPATH)$(CROWNET_PORJ)/src $(LDFLAG_LIBPATH)$(INET_PROJ)/src $(LDFLAG_LIBPATH)$(LTE_PROJ)/src $(LDFLAG_LIBPATH)/usr/local/lib  -lboost_filesystem -lboost_system -lartery_core$(D) -lartery_envmod$(D) -lartery_police$(D) -lartery_storyboard$(D) -ltraci$(D) -lvanetza_access$(D) -lvanetza_asn1$(D) -lvanetza_btp$(D) -lvanetza_common$(D) -lvanetza_dcc$(D) -lvanetza_facilities$(D) -lvanetza_geonet$(D) -lvanetza_gnss$(D) -lvanetza_net$(D) -lvanetza_security$(D) -lCROWNET$(D) -lINET$(D) -llte$(D) -lgtest -lpthread
+LIBS = $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/build/Debug/lib $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/build/Release/lib $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/extern/vanetza/build/Debug/lib $(LDFLAG_LIBPATH)$(ARTERY_PROJ)/extern/vanetza/build/Release/lib $(LDFLAG_LIBPATH)$(CROWNET_PORJ)/src $(LDFLAG_LIBPATH)$(INET_PROJ)/src $(LDFLAG_LIBPATH)$(LTE_PROJ)/src $(LDFLAG_LIBPATH)$(VEINS_PROJ)/src $(LDFLAG_LIBPATH)$(VEINS_PROJ)/subprojects/veins_inet/src $(LDFLAG_LIBPATH)/usr/local/lib  -lboost_filesystem -lboost_system -lartery_core$(D) -lartery_envmod$(D) -lartery_police$(D) -lartery_storyboard$(D) -ltraci$(D) -lvanetza_access$(D) -lvanetza_asn1$(D) -lvanetza_btp$(D) -lvanetza_common$(D) -lvanetza_dcc$(D) -lvanetza_facilities$(D) -lvanetza_geonet$(D) -lvanetza_gnss$(D) -lvanetza_net$(D) -lvanetza_security$(D) -lCROWNET$(D) -lINET$(D) -llte$(D) -lveins$(D) -lveins_inet$(D) -lgtest -lpthread
 
 # Output directory
 PROJECT_OUTPUT_DIR = ../../../out
@@ -59,6 +61,8 @@ CROWNET_PORJ=../../../../crownet
 ARTERY_PROJ=../../../../artery
 INET_PROJ=../../../../inet4
 LTE_PROJ=../../../../simulte
+VEINS_PROJ=../../../../veins
+VEINS_INET_PROJ=../../../../veins/subprojects/veins_inet
 
 #------------------------------------------------------------------------------
 
@@ -83,10 +87,10 @@ include $(CONFIGFILE)
 # Simulation kernel and user interface libraries
 OMNETPP_LIBS = $(OPPMAIN_LIB) $(USERIF_LIBS) $(KERNEL_LIBS) $(SYS_LIBS)
 ifneq ($(TOOLCHAIN_NAME),clangc2)
-LIBS += -Wl,-rpath,$(abspath $(ARTERY_PROJ)/build/Debug/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/build/Release/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/extern/vanetza/build/Debug/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/extern/vanetza/build/Release/lib) -Wl,-rpath,$(abspath $(CROWNET_PORJ)/src) -Wl,-rpath,$(abspath $(INET_PROJ)/src) -Wl,-rpath,$(abspath $(LTE_PROJ)/src) -Wl,-rpath,$(abspath /usr/local/lib)
+LIBS += -Wl,-rpath,$(abspath $(ARTERY_PROJ)/build/Debug/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/build/Release/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/extern/vanetza/build/Debug/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/extern/vanetza/build/Release/lib) -Wl,-rpath,$(abspath $(CROWNET_PORJ)/src) -Wl,-rpath,$(abspath $(INET_PROJ)/src) -Wl,-rpath,$(abspath $(LTE_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_PROJ)/subprojects/veins_inet/src) -Wl,-rpath,$(abspath /usr/local/lib)
 endif
 
-COPTS = $(CFLAGS) $(IMPORT_DEFINES)  $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)
+COPTS = $(CFLAGS) $(IMPORT_DEFINES) -DINET_IMPORT -DVEINS_IMPORT -DVEINS_INET_IMPORT $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)
 MSGCOPTS = $(INCLUDE_PATH)
 SMCOPTS =
 

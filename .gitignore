@@ -27,32 +27,32 @@ analysis/**/dist
 analysis/**/test_data
 *.egg-info
 
-# rover project
+# crownet project
 
-rover/out
-rover/src/Makefile
-rover/tests/gtest/src/Makefile
-rover/.settings
-rover/**/libROVER*
-rover/**/rTests*
-rover/**/results
-rover/**/measurements
-rover/**/output
-rover/**/legacy
-rover/**/.qtenvrc
-rover/**/.cmdenv-log
-rover/**/*.log
-rover/**/simulations/*/plots/*.png
-rover/**/simulations/*/plots/*.pdf
-rover/**/simulations/*/plots/*.svg
-rover/**/simulations/*/plots/*.eps
-rover/**/venv
-rover/**/*_m.cc
-rover/**/*_m.h
+crownet/out
+crownet/src/Makefile
+crownet/tests/gtest/src/Makefile
+crownet/.settings
+crownet/**/libCROWNET*
+crownet/**/rTests*
+crownet/**/results
+crownet/**/measurements
+crownet/**/output
+crownet/**/legacy
+crownet/**/.qtenvrc
+crownet/**/.cmdenv-log
+crownet/**/*.log
+crownet/**/simulations/*/plots/*.png
+crownet/**/simulations/*/plots/*.pdf
+crownet/**/simulations/*/plots/*.svg
+crownet/**/simulations/*/plots/*.eps
+crownet/**/venv
+crownet/**/*_m.cc
+crownet/**/*_m.h
 
 
 # Python
-rover/**/test.out
+crownet/**/test.out
 **/*.pcy
 __pycache__
 

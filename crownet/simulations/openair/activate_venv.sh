@@ -6,9 +6,9 @@ BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 VENV="$BASEDIR/venv"
 
 # check if virtual environment needs to be created
-if [ ! -d "$BASEDIR/venv" ] 
+if [ ! -d "$BASEDIR/venv" ]
 then
-    echo "venv does not exists - creating new virtual environment" 
+    echo "venv does not exists - creating new virtual environment"
     python3.8 -m venv "$BASEDIR/venv"
 fi
 
@@ -19,13 +19,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# install roveranalyzer if not available
-python3 -c "import roveranalyzer"
+# install crownetanalyzer if not available
+python3 -c "import crownetanalyzer"
 if [ $? -ne 0 ]; then
-    echo "roveranalyzer is not available - installing module..." 
-    # currently, we use editable mode - remove -e if you do not need to edit the roveranalyzer
+    echo "crownetanalyzer is not available - installing module..."
+    # currently, we use editable mode - remove -e if you do not need to edit the crownetanalyzer
     pip3 install --upgrade pip
-    pip3 install -e "$BASEDIR/../../../analysis/roveranalyzer"
+    pip3 install -e "$BASEDIR/../../../analysis/crownetanalyzer"
 fi
 
 
