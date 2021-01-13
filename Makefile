@@ -7,7 +7,7 @@
 # make               builds all models  (optionally specify MODE=debug or MODE=release)
 # make clean         cleans all models  (optionally specify MODE=debug or MODE=release)
 
-mod_rover      := rover
+mod_crownet      := crownet
 mod_inet       := inet4
 mod_simulte    := simulte
 mod_veins      := veins
@@ -21,7 +21,7 @@ mod_artery     := artery
 # Level 3: These models depend on Level 2 models, e.g. simuLTE.
 models_l1 := $(mod_inet) $(mod_veins)
 models_l2 := $(mod_simulte) $(mod_veins_inet)
-models_l3 := $(mod_rover)
+models_l3 := $(mod_crownet)
 models := $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
@@ -57,7 +57,7 @@ makefiles: makefiles_std configure_veins configure_veins_inet
 makefiles_std:
 	$(MAKE) --directory=$(mod_inet) makefiles
 	$(MAKE) --directory=$(mod_simulte) makefiles
-	$(MAKE) --directory=$(mod_rover) makefiles
+	$(MAKE) --directory=$(mod_crownet) makefiles
 
 configure_veins:
 	cd $(mod_veins); ./configure

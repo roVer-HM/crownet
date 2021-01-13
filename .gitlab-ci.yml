@@ -1,7 +1,7 @@
 variables:
  GIT_SUBMODULE_STRATEGY: recursive    # clone submodules
  GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vader submodule)
- ROVER_MAIN: '${CI_PROJECT_DIR}'      # all files relative to this.
+ CROWNET_HOME: '${CI_PROJECT_DIR}'      # all files relative to this.
 
 
 
@@ -11,18 +11,18 @@ stages:
   - simulation-campaign
 
 
-# Build all dependencies of the rover project (default: release mode)
+# Build all dependencies of the crownet project (default: release mode)
 # This is the base for running simulation campaings on a dedicated
 # gitlab runner with more cores and memmory. Use latest version of containers
 build-for-sim:
   stage: build
   tags:
-    - rover-sim
+    - crownet-sim
   variables:
     ARTERY_M: '${CI_PROJECT_DIR}/artery'
     INET_M: '${CI_PROJECT_DIR}/inet4'
     LTE_M: '${CI_PROJECT_DIR}/simulte'
-    ROVER_M: '${CI_PROJECT_DIR}/rover'
+    CROWNET_M: '${CI_PROJECT_DIR}/crownet'
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
     MODE: 'release'
@@ -45,7 +45,7 @@ build-for-sim:
     - "cd ${VEINS_M}"
     - rm -rf doc examples subprojects/veins_catch subprojects/veins_inet3 subprojects/veins_testsims
     # ## global cleanup
-    - "cd ${ROVER_MAIN}"
+    - "cd ${CROWNET_HOME}"
     - "find . -name \"*.o\" -type f -delete"
     - "cd ${INET_M}"
     # inet> only delete inet sources for artefacts. We may need the other ones.
@@ -59,44 +59,44 @@ build-for-sim:
     - "find extern/vanetza/build -type f -not -path '*.so' -delete"
   artifacts:
     paths:
-    - ${ROVER_MAIN}/scripts
-    - ${ROVER_MAIN}/simulte
-    - ${ROVER_MAIN}/inet4
-    - ${ROVER_MAIN}/rover
-    - ${ROVER_MAIN}/veins
-    - ${ROVER_MAIN}/artery
+    - ${CROWNET_HOME}/scripts
+    - ${CROWNET_HOME}/simulte
+    - ${CROWNET_HOME}/inet4
+    - ${CROWNET_HOME}/crownet
+    - ${CROWNET_HOME}/veins
+    - ${CROWNET_HOME}/artery
     expire_in: 1 weeks
 
 # run the unit tests
 gtests:
   stage: test
   tags:
-    - rover-sim
+    - crownet-sim
   variables:
     OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:
-    - "cd ${ROVER_MAIN}/rover"
+    - "cd ${CROWNET_HOME}/crownet"
     - "${OPP} make test"
   artifacts:
     when: always
     paths:
-    - ${ROVER_MAIN}/rover/tests/fingerprint
+    - ${CROWNET_HOME}/crownet/tests/fingerprint
     expire_in: 8 weeks
 
 # run the fingerprint tests
 fingerprints:
   stage: test
   tags:
-    - rover-sim
+    - crownet-sim
   variables:
     OPP: '${CI_PROJECT_DIR}/scripts/omnetpp exec'
   script:
-    - "cd ${ROVER_MAIN}/rover/tests/fingerprint"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
     - "${OPP} ./fingerprints"
   artifacts:
     when: always
     paths:
-    - ${ROVER_MAIN}/rover/tests/fingerprint
+    - ${CROWNET_HOME}/crownet/tests/fingerprint
     expire_in: 8 weeks
 
 
@@ -104,22 +104,22 @@ fingerprints:
 simulation-campaign:
   stage: simulation-campaign
   tags:
-    - rover-sim
+    - crownet-sim
   rules:
     - if: '$SIM_TRIGGER'
   script:
-    - "/bin/bash ${ROVER_MAIN}/$SIM_SCRIPT"
-    - "echo ${CI_COMMIT_SHA} > ${ROVER_MAIN}/$SIM_SCRIPT-results/commit-hash"
-    - "echo ${CI_PIPELINE_IID} > ${ROVER_MAIN}/$SIM_SCRIPT-results/pipeline-id"
-    - "cat /proc/cpuinfo > > ${ROVER_MAIN}/$SIM_SCRIPT-results/cpuinfo"
+    - "/bin/bash ${CROWNET_HOME}/$SIM_SCRIPT"
+    - "echo ${CI_COMMIT_SHA} > ${CROWNET_HOME}/$SIM_SCRIPT-results/commit-hash"
+    - "echo ${CI_PIPELINE_IID} > ${CROWNET_HOME}/$SIM_SCRIPT-results/pipeline-id"
+    - "cat /proc/cpuinfo > > ${CROWNET_HOME}/$SIM_SCRIPT-results/cpuinfo"
   artifacts:
     paths:
-      - ${ROVER_MAIN}/$SIM_SCRIPT
-      - ${ROVER_MAIN}/$SIM_SCRIPT-results
-      - ${ROVER_MAIN}/scripts
-      - ${ROVER_MAIN}/simulte/src
-      - ${ROVER_MAIN}/inet4/src
-      - ${ROVER_MAIN}/rover
-      - ${ROVER_MAIN}/veins/src
-      - ${ROVER_MAIN}/veins/subprojects/veins_inet/src
+      - ${CROWNET_HOME}/$SIM_SCRIPT
+      - ${CROWNET_HOME}/$SIM_SCRIPT-results
+      - ${CROWNET_HOME}/scripts
+      - ${CROWNET_HOME}/simulte/src
+      - ${CROWNET_HOME}/inet4/src
+      - ${CROWNET_HOME}/crownet
+      - ${CROWNET_HOME}/veins/src
+      - ${CROWNET_HOME}/veins/subprojects/veins_inet/src
     expire_in: 4 weeks
