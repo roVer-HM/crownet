@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ -z $ROVER_MAIN ]];then
-  echo "Variable ROVER_MAIN not set."
+if [[ -z $CROWNET_HOME ]];then
+  echo "Variable CROWNET_HOME not set."
   exit -1
 fi
 
@@ -22,21 +22,21 @@ CONFIG="$2"
 
 echo "$EXPERIMENT"
 
-source $ROVER_MAIN/scripts/nedpath > /dev/null
+source $CROWNET_HOME/scripts/nedpath > /dev/null
 
 CMD_ARR=(exec opp_run)
 CMD_ARR+=(-u Cmdenv)
 CMD_ARR+=(-c "$CONFIG")
 CMD_ARR+=("--experiment-label=$EXPERIMENT")
 CMD_ARR+=("--cmdenv-stop-batch-on-error=true")
-CMD_ARR+=(-l "$ROVER_MAIN/inet4/src/INET")
-CMD_ARR+=(-l "$ROVER_MAIN/rover/src/ROVER")
-CMD_ARR+=(-l "$ROVER_MAIN/simulte/src/lte")
-CMD_ARR+=(-l "$ROVER_MAIN/veins/src/veins")
-CMD_ARR+=(-l "$ROVER_MAIN/veins/subprojects/veins_inet/src/veins_inet")
+CMD_ARR+=(-l "$CROWNET_HOME/inet4/src/INET")
+CMD_ARR+=(-l "$CROWNET_HOME/rover/src/ROVER")
+CMD_ARR+=(-l "$CROWNET_HOME/simulte/src/lte")
+CMD_ARR+=(-l "$CROWNET_HOME/veins/src/veins")
+CMD_ARR+=(-l "$CROWNET_HOME/veins/subprojects/veins_inet/src/veins_inet")
 CMD_ARR+=("$OPP_INI")
 echo "workingdir: $PWD"
 echo "running command:"
-echo "$ROVER_MAIN/scripts/omnetpp ${CMD_ARR[@]}"
+echo "$CROWNET_HOME/scripts/omnetpp ${CMD_ARR[@]}"
 echo ""
-$ROVER_MAIN/scripts/omnetpp "${CMD_ARR[@]}"
+$CROWNET_HOME/scripts/omnetpp "${CMD_ARR[@]}"

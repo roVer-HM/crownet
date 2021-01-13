@@ -22,7 +22,7 @@ if [[ "$2" == "exec" ]]; then
       # COMMAND="$3 $4 $5 $6 $7 $8 $9"
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/rover-main/$CONTNAME
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$CONTNAME
 
 echo "container> used image: $IMAGENAME"
 

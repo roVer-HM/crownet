@@ -30,9 +30,9 @@ build-for-sim:
   script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker pull $CI_REGISTRY/rover/rover-main/omnetpp
-    - docker pull $CI_REGISTRY/rover/rover-main/sumo
-    - docker pull $CI_REGISTRY/rover/rover-main/vadere
+    - docker pull $CI_REGISTRY/rover/crownet/omnetpp
+    - docker pull $CI_REGISTRY/rover/crownet/sumo
+    - docker pull $CI_REGISTRY/rover/crownet/vadere
     # ## build all models
     - "${OPP} make makefiles"
     - "${OPP} make MODE=${MODE}"

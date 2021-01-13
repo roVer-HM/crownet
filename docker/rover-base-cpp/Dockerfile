@@ -1,7 +1,7 @@
 # roVer base container
 #
 
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-min:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
 
 LABEL description "roVer base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"

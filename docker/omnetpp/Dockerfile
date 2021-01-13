@@ -6,11 +6,11 @@
 #   1) omnetpp (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 #
-# This Dockerfile is used to build the omnetpp base container, 
+# This Dockerfile is used to build the omnetpp base container,
 # which is also the base container for omnetpp-ide
 
 
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
 ENV OMNETRELEASE omnetpp-6.0pre10
