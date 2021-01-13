@@ -24,10 +24,10 @@ omnetpp_pp_enabled = True
 
 ##############################################
 
-rover_printer_debug = False #or True
+crownet_printer_debug = False #or True
 def debug(s):
-    global rover_printer_debug
-    if rover_printer_debug:
+    global crownet_printer_debug
+    if crownet_printer_debug:
         print(s)
 
 
@@ -295,36 +295,36 @@ class OppPrinter(object):
         return None
 
 
-rover_printer = None
+crownet_printer = None
 
 
-def register_rover_printers(obj):
-    "Register rover pretty-printers with objfile Obj."
+def register_crownet_printers(obj):
+    "Register crownet pretty-printers with objfile Obj."
 
     global _use_gdb_pp
-    global rover_printer
+    global crownet_printer
 
     if _use_gdb_pp:
-        gdb.printing.register_pretty_printer(obj, rover_printer)
+        gdb.printing.register_pretty_printer(obj, crownet_printer)
     else:
         if obj is None:
             obj = gdb
-        obj.pretty_printers.append(rover_printer)
+        obj.pretty_printers.append(crownet_printer)
 
 
-def build_rover_dictionary():
-    global rover_printer
+def build_crownet_dictionary():
+    global crownet_printer
 
-    rover_printer = OppPrinter("rover")
+    crownet_printer = OppPrinter("crownet")
 
-    rover_printer.add('omnetpp::SimTime', SimTimePrinter)
-    rover_printer.add('omnetpp::simtime_t', SimTimePrinter2)
-    rover_printer.add('rover::NodeIdentifiere<int>', NodeIdentifierInt)
-    #rover_printer.add('rover::GridCellID',GridCellID)
+    crownet_printer.add('omnetpp::SimTime', SimTimePrinter)
+    crownet_printer.add('omnetpp::simtime_t', SimTimePrinter2)
+    crownet_printer.add('crownet::NodeIdentifiere<int>', NodeIdentifierInt)
+    #crownet_printer.add('crownet::GridCellID',GridCellID)
 # As of GDB 7.5 and CDT 3.8.1, GDB often crashes during pretty printing
 # a cObject pointer so the cObject pretty printer routines are disabled for now.
-#    rover_printer.add('cObject', cObjectPrinter)
+#    crownet_printer.add('cObject', cObjectPrinter)
 
-build_rover_dictionary()
+build_crownet_dictionary()
 
 # end
