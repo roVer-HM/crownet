@@ -91,12 +91,12 @@ Start the omnetpp container:
 omnetpp
 ```
 ## Step 3: Import project with submodules
-Choose General>Exising files> and import following folders:
-*crownet/inet4
-*roVer
-*simulte
+Choose File>Import>General>Exising projects> and import following folders:
+* inet4
+* crownet
+* simulte
 When importing the folder veins only import the modules 1 (veins) and 3 (inet).
-*veins
+* veins
 
 ## Step 4: Close and restart the Environment
 Choose the folder omnetpp-ws to see the project which was just created.
