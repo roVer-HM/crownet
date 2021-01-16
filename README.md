@@ -1,34 +1,40 @@
-# roVer Main
+# CrowNet
 
-Project collecting general documentation and tooling for the roVer project.
+CrowNet (for crowd network) is an open-source simulation environment which
+couples state-of-the art pedestrian locomotion models with wireless
+communication models. It can be used to evaluate pedestrian communication
+in urban and rural environments.
 
-The roVer simulation environment is composed of three simulation frameworks:
+
+Within the CrowNet simulation environment, three open-source
+simulation frameworks are coupled:
 * [OMNeT++](https://omnetpp.org/) - The simulation framework used
   for modelling communication and information dissemination
 * [VADERE](http://www.vadere.org/) - VADERE Crowd Simulation
 * [SUMO](https://dlr.de/ts/en/sumo/) - Simulation of Urban MObility
 
-The roVer project provides easy to install docker containers for these three. The containers can either be installed by the roVer setup script or by pulling them from the [roVer docker registry](https://sam-dev.cs.hm.edu/rover/crownet/container_registry).
+The CrowNet project provides easy to install docker containers for these three. The containers can either be installed by the CrowNet setup script or by pulling them from the [CrowNet docker registry](https://sam-dev.cs.hm.edu/rover/crownet/container_registry).
 
-## roVer Communication and Information Dissemination Simulation
-The OMNeT++ simulation of communication and networking for disseminating mobility information is based on three open source simulation projects:
+## CrowNet Communication and Information Dissemination Simulation
+The OMNeT++ simulation of communication and networking for disseminating mobility information is based on four open source simulation projects:
 * [INET](https://inet.omnetpp.org/) - The INET Framework is a widely-used open-source model suite for wireless and wired networks. It includes models for all major Internet protocols.
-* [VEINS](https://veins.car2x.org/) - Vehicles in Network Simulation (VEINS) is an open-source vehicular network simulation framework.
 * [SimuLTE](http://simulte.com/) - SimuLTE provides a LTE/LTE-A user plane simulation model for INET and OMNeT++.
+* [Artery](http://artery.v2x-research.eu/) - Artery V2X Simulation Framework
+* [VEINS](https://veins.car2x.org/) - Vehicles in Network Simulation (VEINS) is an open-source vehicular network simulation framework.
 
-Since the roVer projects requires several modifications in each of these three open-source projects, they are included as submodules and changes are tracked on separete branches.
+Since CrowNet requires several modifications in each of these open-source projects, they are included as submodules and changes are tracked on separete branches.
 
 ## Getting Started
 
-Setting up a simulation machine with the roVer environment is quite simple. You simply clone this roVer main repository, install [Docker](https://www.docker.com/) and start the three containers.
+Setting up a simulation machine with the CrowNet environment is quite simple. You simply clone this CrowNet repository, install [Docker](https://www.docker.com/) and start the three containers.
 
 ### Required Hard- and Software
 
-The roVer environment requires a Linux System. We are currently using Ubuntu 18.04.2 LTS but any major distribution should do, since the required dependencies are all part of the respective Docker containers. A system with 8 GB of RAM is recommended.
+The CrowNet environment requires a Linux System. We are currently using Ubuntu 18.04.2 LTS but any major distribution should do, since the required dependencies are all part of the respective Docker containers. A system with 8 GB of RAM is recommended.
 
 ### Step-by-Step Installation Instructions
 
-Clone the roVer repository including all submodules within your home directory:
+Clone the CrowNet repository including all submodules within your home directory:
 ```
 cd ~
 git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.git
@@ -48,7 +54,7 @@ pull_images.sh
 
 It is also recommended to include the script 'crownet/scripts/crownetenv' in the startup file
 of your shell, e.g. by adding 'source $HOME/crownet/scripts/crownetenv' at the end of ~/.bashrc. This will
-include the rover scripts in the search path, allowing you to start the containers easily
+include the CrowNet scripts in the search path, allowing you to start the containers easily
 by simply typing their name.
 
 If you use a Linux distribution which enables SELinux (Fedoara, RedHat, ...) the X11 Forwarding is blocked.
@@ -88,7 +94,7 @@ mkdir omnetpp-ws
 ## Step 2: Start the omnetpp container and import the subprojects
 Start the omnetpp container:
 ```
-omnetpp
+omnetpp-ide
 ```
 ## Step 3: Import project with submodules
 Choose File>Import>General>Exising projects> and import following folders:
@@ -105,7 +111,7 @@ Choose the folder omnetpp-ws to see the project which was just created.
 # Running Your First Coupled Simulation
 
 *Note: As a first test for testing coupled mobility and mobile node simulation, we are simply running the
-VEINS example simulation in the roVer containers. This example will be updated to an example illustrating pedistrian mobility as soon as the required TraCI interfaces have been implemented.*
+VEINS example simulation in the CrowNet containers. This example will be updated to an example illustrating pedistrian mobility as soon as the required TraCI interfaces have been implemented.*
 
 In this example, we will use the sumo container for simulating the mobility and the omnetpp container for simulating mobile communication (as within the VEINS Erlangen example).
 
@@ -119,7 +125,7 @@ The container will now be listening for incomming TraCi commands and start sumo 
 ## Step 2: Start the omnetpp container and import the subprojects
 Start the omnetpp container:
 ```
-omnetpp
+omnetpp-ide
 ```
 
 Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'crownet' folder that have been created when cloning the 'crownet' repository. (Import of these projects is done via File->Import->General->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
@@ -134,9 +140,9 @@ the first time the simulation is started. Workaround: Simply close the dialog an
 ## Step 4: Create and Run Own Coupled Simulations
 Now you are ready to create and run your own coupled simulations. Good starting points are the [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [INET User's Guide](https://inet.omnetpp.org/docs/users-guide/), [INET Developer's Guide](https://inet.omnetpp.org/docs/developers-guide/), and the [VEINS tutorial](https://veins.car2x.org/tutorial/).
 
-*TODO: Create roVer Tutorial and it as primary reference here*
+*TODO: Create CrowNet Tutorial and name it as primary reference here*
 
-_Important note:_ Since within the roVer project we run the mobility simulation and the network simulation in separate containers, remember to update the respective ``omnetpp.ini`` to refer to the container running the mobility simulation - ``localhost`` *will not work*. This can easily be done by adapting the ``*.manager.host`` parameter.
+_Important note:_ Since within the CrowNet project we run the mobility simulation and the network simulation in separate containers, remember to update the respective ``omnetpp.ini`` to refer to the container running the mobility simulation - ``localhost`` *will not work*. This can easily be done by adapting the ``*.manager.host`` parameter.
 
 Example: Connect to sumo within the sumo container
 ```
@@ -154,7 +160,7 @@ Example: Connect to sumo within the sumo container
 If you prefer to work on the command line instead of using the graphical IDE of OMNeT++, you can use the "exec" option
 of the omnetpp Docker container. It allows to execute an arbitrary command within the container.
 
-## Building all roVer Components using the Top-Level Makefile
+## Building all CrowNet Components using the Top-Level Makefile
 The simplest way to build the system is to use the top-level Makefile. Preserving the required build-order,
 it builds all the required models. Note that it also auto-detects the number of available processor cores and
 starts a sufficient number of threads.
@@ -180,7 +186,7 @@ first switch to the model subdirectory and than execute make locally.
 
 *Example: Building the INET and SimuLTE Frameworks*
 
-Assuming that you have added the "omnetpp" script to your search path for executibles and cloned the roVer with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
+Assuming that you have added the "omnetpp" script to your search path for executibles and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
 ```
 cd inet
 omnetpp exec make makefiles
@@ -205,7 +211,7 @@ omnetpp exec ./configure
 omnetpp exec make -j4
 ```
 
-Veins includes of several subprojects - for roVer the veins_inet project is required. It needs to have access to the folder where INET 4 is located. The location is specified by the option `--with-inet=../../../inet4` of the *configure* script:
+Veins includes of several subprojects - for CrowNet the veins_inet project is required. It needs to have access to the folder where INET 4 is located. The location is specified by the option `--with-inet=../../../inet4` of the *configure* script:
 
 ```
 cd subprojects/veins_inet
