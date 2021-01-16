@@ -7,7 +7,7 @@
 
 
 # based on the latest omnet container of the rover project
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/omnetpp:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
 
 # Specify the version/tag of inet to be put in the container:
 ENV INETRELEASE v4.2.1

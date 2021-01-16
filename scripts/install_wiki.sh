@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LOCALDIR=`pwd`
-WIKINAME=rover-main.wiki.git
+WIKINAME=crownet.wiki.git
 
 echo "This script installs all dependencies for locally editing the project wiki."
 echo "Afterwards, the wiki will be cloned to $LOCALDIR/$WIKINAME and gollum will be started."
@@ -15,7 +15,7 @@ sudo apt install ruby ruby-dev
 sudo gem install gollum
 sudo gem install github-markdown
 
-git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/rover-main.wiki.git
-cd rover-main.wiki
+git clone ssh://git@sam-dev.cs.hm.edu:5022/rover/crownet.wiki.git
+cd crownet.wiki
 gollum
 

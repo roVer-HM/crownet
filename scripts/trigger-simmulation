@@ -1,8 +1,8 @@
 #!/bin/bash
 # send POST request to gitlab-ci API to execut a simulation campaign.
 
-if [[ -z $ROVER_MAIN ]];then
-  echo "Variable ROVER_MAIN not set. Did you source roverenv?"
+if [[ -z $CROWNET_HOME ]];then
+  echo "Variable CROWNET_HOME not set. Did you source roverenv?"
   exit -1
 fi
 
@@ -11,21 +11,21 @@ if [[ -z $1 ]];then
   exit -1
 fi
 
-if [[ ! -f "$ROVER_MAIN/${1}" ]];then
-  echo "Given simulation script does not exist or is not relative to rover-main: '$ROVER_MAIN/${1}'"
+if [[ ! -f "$CROWNET_HOME/${1}" ]];then
+  echo "Given simulation script does not exist or is not relative to crownet: '$CROWNET_HOME/${1}'"
   exit -1
 fi
 SIM_CMD="${1}"
 
-if [[ ! -f "$ROVER_MAIN/.tokens/sim-trigger" ]];then
+if [[ ! -f "$CROWNET_HOME/.tokens/sim-trigger" ]];then
   echo "No gitlab-ci pipeline trigger token found"
   exit -1
 fi
-PIPLINE_TRIGGER_TOKEN=$(cat "$ROVER_MAIN/.tokens/sim-trigger" | tr -d '\r' )
+PIPLINE_TRIGGER_TOKEN=$(cat "$CROWNET_HOME/.tokens/sim-trigger" | tr -d '\r' )
 URL='https://sam-dev.cs.hm.edu/api/v4/projects/45/trigger/pipeline'
 
 
-pushd $ROVER_MAIN > /dev/null
+pushd $CROWNET_HOME > /dev/null
 
 if [[ ! -d .git ]];then
   echo "no git repo found."

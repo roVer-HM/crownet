@@ -7,7 +7,7 @@
 # - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
 
 
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-min:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
 
 # Specify the version/tag of vadere to be put in the container:
 ENV RELEASE master

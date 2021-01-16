@@ -1,0 +1,3 @@
+#!/bin/sh
+
+./crownet_fingerprinttest -C ../.. -e ../../src/run_crownet $*

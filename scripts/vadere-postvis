@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if [[ -z $ROVER_MAIN ]];then
-    echo "ROVER_MAIN not set"
+if [[ -z $CROWNET_HOME ]];then
+    echo "CROWNET_HOME not set"
     exit -1
 fi
 
 if [[ -z "$1" ]]; then
-    $ROVER_MAIN/scripts/vadere exec java -jar /opt/vadere/vadere/VadereGui/target/vadere-postvis.jar
+    $CROWNET_HOME/scripts/vadere exec java -jar /opt/vadere/vadere/VadereGui/target/vadere-postvis.jar
 else
-    $ROVER_MAIN/scripts/vadere $1 exec java -jar /opt/vadere/vadere/VadereGui/target/vadere-postvis.jar
+    $CROWNET_HOME/scripts/vadere $1 exec java -jar /opt/vadere/vadere/VadereGui/target/vadere-postvis.jar
 fi
 

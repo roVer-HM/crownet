@@ -8,7 +8,7 @@ The roVer simulation environment is composed of three simulation frameworks:
 * [VADERE](http://www.vadere.org/) - VADERE Crowd Simulation
 * [SUMO](https://dlr.de/ts/en/sumo/) - Simulation of Urban MObility
 
-The roVer project provides easy to install docker containers for these three. The containers can either be installed by the roVer setup script or by pulling them from the [roVer docker registry](https://sam-dev.cs.hm.edu/rover/rover-main/container_registry).
+The roVer project provides easy to install docker containers for these three. The containers can either be installed by the roVer setup script or by pulling them from the [roVer docker registry](https://sam-dev.cs.hm.edu/rover/crownet/container_registry).
 
 ## roVer Communication and Information Dissemination Simulation
 The OMNeT++ simulation of communication and networking for disseminating mobility information is based on three open source simulation projects:
@@ -31,13 +31,13 @@ The roVer environment requires a Linux System. We are currently using Ubuntu 18.
 Clone the roVer repository including all submodules within your home directory:
 ```
 cd ~
-git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/rover-main.git
+git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.git
 ```
 
 Install Docker (if not already available on your system):
 ```
-cd rover-main/scripts
-source roverenv
+cd crownet/scripts
+source crownetenv
 install_docker.sh
 ```
 
@@ -46,8 +46,8 @@ Pull the required Docker images (due to the large size of some of them, this wil
 pull_images.sh
 ```
 
-It is also recommended to include the script 'rover-main/scripts/roverenv' in the startup file
-of your shell, e.g. by adding 'source $HOME/rover-main/scripts/roverenv' at the end of ~/.bashrc. This will
+It is also recommended to include the script 'crownet/scripts/crownetenv' in the startup file
+of your shell, e.g. by adding 'source $HOME/crownet/scripts/crownetenv' at the end of ~/.bashrc. This will
 include the rover scripts in the search path, allowing you to start the containers easily
 by simply typing their name.
 
@@ -91,12 +91,12 @@ Start the omnetpp container:
 omnetpp
 ```
 ## Step 3: Import project with submodules
-Choose General>Exising files> and import following folders:
-*rover-main/inet4
-*roVer
-*simulte
+Choose File>Import>General>Exising projects> and import following folders:
+* inet4
+* crownet
+* simulte
 When importing the folder veins only import the modules 1 (veins) and 3 (inet).
-*veins
+* veins
 
 ## Step 4: Close and restart the Environment
 Choose the folder omnetpp-ws to see the project which was just created.
@@ -122,7 +122,7 @@ Start the omnetpp container:
 omnetpp
 ```
 
-Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'rover-main' folder that have been created when cloning the 'rover-main' repository. (Import of these projects is done via File->Import->General->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
+Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'crownet' folder that have been created when cloning the 'crownet' repository. (Import of these projects is done via File->Import->General->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
 
 
 ## Step 3: Run the simulation
@@ -228,7 +228,7 @@ If you additionally want to guarantee that only correctly formatted code is comm
 which checks the files you are about to commit. A suitable script is available within the `scripts` subdirectory. Execute:
 
 ```
-user@host:~/rover-main$ scripts/git-format/git-pre-commit-format install
+user@host:~/crownet$ scripts/git-format/git-pre-commit-format install
 ```
 
 If your are using the (recommended) execution of the simulation based on the provided Docker containers, you are done now. In order to disable the style check for individual projects (for example containing legacy code or code of other projects not conforming to the style guide), go to
@@ -291,7 +291,7 @@ pip install black
 ```
 For IDE support see Black [Editor integration](https://black.readthedocs.io/en/stable/editor_integration.html).
 
-ToDo: add git hook to check formatting of python files.  
+ToDo: add git hook to check formatting of python files.
 
 
 # Start SSH agent automtically

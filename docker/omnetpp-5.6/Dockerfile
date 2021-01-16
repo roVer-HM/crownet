@@ -6,7 +6,7 @@
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 
 
-FROM sam-dev.cs.hm.edu:5023/rover/rover-main/rover-base-cpp:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
 ENV OMNETRELEASE omnetpp-5.6.2

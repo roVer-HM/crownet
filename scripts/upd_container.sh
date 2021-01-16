@@ -9,7 +9,7 @@
 IMAGE_SHORT="$1"
 RANDOM=$(date +%s)
 REGISTRY='sam-dev.cs.hm.edu:5023'
-IMAGE_LONG="$REGISTRY/rover/rover-main/$IMAGE_SHORT"
+IMAGE_LONG="$REGISTRY/rover/crownet/$IMAGE_SHORT"
 VERSION_TAG="$2"
 DATE_TAG="$(date "+%y%m%d-%H%M")"
 SSH_KEY_LOCATION="$HOME/.ssh/id_rsa"
