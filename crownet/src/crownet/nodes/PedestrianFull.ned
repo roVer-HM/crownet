@@ -52,9 +52,9 @@ module PedestrianFull like INetworkNode
         bool withAntennaMobility = default(false);
         *.mobility.visualRepresentation = "^";
 
-		//# Artery
-		bool useArtery = default(true);
-		string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddelwareEmpyt");
+        //# Artery
+        bool useArtery = default(true);
+        string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddelwareEmpyt");
 
 
         //# AID layer
@@ -85,7 +85,7 @@ module PedestrianFull like INetworkNode
         //# Link Layer specs
         bool hasLte = default(true);
         bool hasWlan = default(false);
-        int  numWlanNic = default(0);
+        int numWlanNic = default(0);
 
         **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.^.ipv4.routingTable");
@@ -128,7 +128,7 @@ module PedestrianFull like INetworkNode
             @display("p=346.69598,74.895996,row,140");
         }
         aid: <aidType> like IAidLayer {
-            @display("p=407.68,205.408");
+            @display("p=396.704,216.384");
         }
         udp: <default(firstAvailableOrEmpty("Udp"))> like IUdp if hasUdp {
             parameters:
@@ -200,9 +200,9 @@ module PedestrianFull like INetworkNode
 
         //# Wlan Nic
         for i=0..sizeof(radioIn)-1 {
-            wlanNic[i].upperLayerOut --> nl.in++  if exists(wlanNic);
-	        wlanNic[i].upperLayerIn <-- nl.out++ if exists(wlanNic);
-    	    wlanNic[i].radioIn <-- radioIn[i] if exists(wlanNic);
+            wlanNic[i].upperLayerOut --> nl.in++ if exists(wlanNic);
+            wlanNic[i].upperLayerIn <-- nl.out++ if exists(wlanNic);
+            wlanNic[i].radioIn <-- radioIn[i] if exists(wlanNic);
         }
 
         //# Artery

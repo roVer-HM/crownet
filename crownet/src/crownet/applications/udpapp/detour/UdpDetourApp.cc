@@ -7,7 +7,7 @@
 
 #include "crownet/applications/udpapp/detour/UdpDetourApp.h"
 
-#include "../../../common/result/Simsignals.h"
+#include "crownet/common/result/Simsignals.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/TagBase_m.h"
 #include "inet/common/TimeTag_m.h"

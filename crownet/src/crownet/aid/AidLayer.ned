@@ -45,7 +45,7 @@ module SimpleAidLayer like IAidLayer
                 @display("p=164,121;is=s");
         }
         densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp if hasDensityMap {
-            @display("p=432,98;i=block/table;is=s");
+            @display("p=413,98;i=block/table;is=s");
         }
         // Message Dispatcher
         upper: MessageDispatcher {
