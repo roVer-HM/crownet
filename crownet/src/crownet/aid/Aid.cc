@@ -15,12 +15,15 @@
 
 #include "Aid.h"
 
-#include "inet/applications/common/SocketTag_m.h"
+#include "inet/common/socket/SocketTag_m.h"
 #include "inet/common/IProtocolRegistrationListener.h"
 #include "inet/common/InitStages.h"
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/packet/Message.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
 #include "crownet/aid/AidConnection.h"
 #include "crownet/common/SocketHandler.h"
+
 
 using namespace inet;
 
@@ -105,7 +108,8 @@ void Aid::handleSelfMessage(cMessage *msg) {
 }
 
 void Aid::handleUpperCommand(cMessage *msg) {
-  int socketId = getTags(msg).getTag<SocketReq>()->getSocketId();
+  Message *message = check_and_cast<Message *>(msg);
+  int socketId = message->getTags().getTag<SocketReq>()->getSocketId();
   AidConnection *conn = findConnForApp(socketId);
 
   if (!conn) {
@@ -172,7 +176,7 @@ SocketHandler *Aid::createSocketHandler(AidConnection *conn,
       if (multicastInterface[0]) {
         IInterfaceTable *ift = getModuleFromPar<IInterfaceTable>(
             par("interfaceTableModule"), this);
-        InterfaceEntry *ie = ift->findInterfaceByName(multicastInterface);
+        NetworkInterface *ie = ift->findInterfaceByName(multicastInterface);
         if (!ie)
           throw cRuntimeError(
               "Wrong multicastInterface setting: no interface named \"%s\"",

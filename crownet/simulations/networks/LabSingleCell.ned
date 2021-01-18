@@ -39,7 +39,6 @@ network LabSingleCellBase
         }
         configurator: LteNetworkConfigurator {
             @display("p=8,3");
-            config = xmldoc("demo.xml");
         }
         binder: LteBinder {
             @display("p=8,4;is=s");

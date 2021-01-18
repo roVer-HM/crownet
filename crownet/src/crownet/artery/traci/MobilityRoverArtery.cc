@@ -32,8 +32,8 @@ Define_Module(MobilityRoverArtery)
 void MobilityRoverArtery::initialize(int stage) {
   //  inet::MobilityBase::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
-    mVisualRepresentation = inet::getModuleFromPar<cModule>(
-        par("visualRepresentation"), this, false);
+    mVisualRepresentation = inet::findModuleFromPar<cModule>(
+        par("visualRepresentation"), this);
     WATCH(mObjectId);
     WATCH(lastPosition);
     WATCH(lastVelocity);
@@ -59,8 +59,16 @@ void MobilityRoverArtery::initializeSink(
   mObjectId = id;
   mNetBoundary = boundary;
 
+
+  const auto& max = mNetBoundary.upperRightPosition();
+  constrainedAreaMax = inet::Coord { max.x, max.y, max.z };
+
+  const auto& min = mNetBoundary.lowerLeftPosition();
+  constrainedAreaMin = inet::Coord { min.x, min.y, min.z };
+
   std::shared_ptr<crownet::VaderePersonCache> vehicleCache =
       std::dynamic_pointer_cast<crownet::VaderePersonCache>(cache);
+
   if (!vehicleCache) {
     // todo
   }
@@ -69,44 +77,42 @@ void MobilityRoverArtery::initializeSink(
 
 double MobilityRoverArtery::getMaxSpeed() const { return NaN; }
 
-inet::Coord MobilityRoverArtery::getCurrentPosition() {
+const inet::Coord& MobilityRoverArtery::getCurrentPosition() {
   moveAndUpdate();
   return lastPosition;
 }
 
-inet::Coord MobilityRoverArtery::getCurrentVelocity() {
+const inet::Coord& MobilityRoverArtery::getCurrentVelocity() {
   moveAndUpdate();
   return lastVelocity;
 }
 
-inet::Coord MobilityRoverArtery::getCurrentAcceleration() {
+const inet::Coord& MobilityRoverArtery::getCurrentAcceleration() {
   //  return inet::Coord::NIL;
   throw cRuntimeError("Invalid operation");
 }
 
-inet::Quaternion MobilityRoverArtery::getCurrentAngularPosition() {
+const inet::Quaternion& MobilityRoverArtery::getCurrentAngularPosition() {
   moveAndUpdate();
   return lastOrientation;
 }
 
-inet::Quaternion MobilityRoverArtery::getCurrentAngularVelocity() {
+const inet::Quaternion& MobilityRoverArtery::getCurrentAngularVelocity() {
   //  return inet::Quaternion::NIL;
   throw cRuntimeError("Invalid operation");
 }
 
-inet::Quaternion MobilityRoverArtery::getCurrentAngularAcceleration() {
+const inet::Quaternion& MobilityRoverArtery::getCurrentAngularAcceleration() {
   //  return inet::Quaternion::NIL;
   throw cRuntimeError("Invalid operation");
 }
 
-inet::Coord MobilityRoverArtery::getConstraintAreaMax() const {
-  const auto& max = mNetBoundary.upperRightPosition();
-  return inet::Coord{max.x, max.y, max.z};
+const inet::Coord& MobilityRoverArtery::getConstraintAreaMax() const {
+    return constrainedAreaMax;
 }
 
-inet::Coord MobilityRoverArtery::getConstraintAreaMin() const {
-  const auto& min = mNetBoundary.lowerLeftPosition();
-  return inet::Coord{min.x, min.y, min.z};
+const inet::Coord& MobilityRoverArtery::getConstraintAreaMin() const {
+    return constrainedAreaMin;
 }
 
 void MobilityRoverArtery::initialize(const Position& pos, Angle heading,

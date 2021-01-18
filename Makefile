@@ -50,11 +50,14 @@ clean: all
 
 cleanall: all
 
+oppfeatures:
+	cd $(mod_inet); opp_featuretool enable VisualizationOsg
+
 # - for all standard models we recursively call make with the makefiles target
 # - for veins, we need to call ./configure
 makefiles: makefiles_std configure_veins configure_veins_inet
 
-makefiles_std:
+makefiles_std: oppfeatures
 	$(MAKE) --directory=$(mod_inet) makefiles
 	$(MAKE) --directory=$(mod_simulte) makefiles
 	$(MAKE) --directory=$(mod_crownet) makefiles

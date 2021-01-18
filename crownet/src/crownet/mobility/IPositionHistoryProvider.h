@@ -23,8 +23,8 @@ class IPositionHistoryProvider {
   virtual std::vector<PathPoint> getDeltaPositionHistory() = 0;
   virtual int historySize() = 0;
 
-  virtual inet::Coord getCurrentVelocity() = 0;
-  virtual inet::Coord getCurrentPosition() = 0;
+  virtual const inet::Coord& getCurrentVelocity() = 0;
+  virtual const inet::Coord& getCurrentPosition() = 0;
 };
 
 } /* namespace crownet */

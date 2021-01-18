@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "inet/applications/common/SocketTag_m.h"
+#include "inet/common/socket/SocketTag_m.h"
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/packet/Message.h"
 #include "inet/common/packet/Packet.h"
@@ -79,7 +79,7 @@ class AidSocket : public ISocket {
   void destroy() override;
   bool isOpen() const override { return socketState != CLOSED; }
 
-  void send(Packet *pk);
+  void send(Packet *pk) override;
   void sendTo(Packet *pk, L3Address destAddr, int destPort);
   void setOutputGate(cGate *toAid) { gateToAid = toAid; }
 

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <artery/inet/InetRadioDriver.h>
-#include <inet/networklayer/common/InterfaceEntry.h>
+#include <inet/networklayer/common/NetworkInterface.h>
 #include <omnetpp/clistener.h>
 
 namespace crownet {
@@ -29,7 +29,7 @@ class LteRadioDriver : public artery::RadioDriverBase,
   void refreshDisplay() const override;
 
  private:
-  inet::InterfaceEntry* interfaceEntry = nullptr;
+  inet::NetworkInterface* interfaceEntry = nullptr;
   int numPassedUp, numSent;
 };
 

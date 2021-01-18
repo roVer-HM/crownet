@@ -104,8 +104,8 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
 
   m_api->sendFile(scenario);
 
-  auto converter_m = inet::getModuleFromPar<OsgCoordConverter>(
-      par("coordConverterModule"), this, false);
+  auto converter_m = inet::findModuleFromPar<OsgCoordConverter>(
+      par("coordConverterModule"), this);
 
   if (!converter_m || !converter_m->isInitialized()) {
     // no OsgCoordConverter module found --> not set create

@@ -17,7 +17,6 @@
 package crownet.simulations.networks;
 
 import crownet.simulations.networks.LTE_d2d;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import inet.visualizer.contract.IIntegratedVisualizer;
 import inet.environment.common.PhysicalEnvironment;
 import inet.node.inet.StandardHost;
@@ -27,8 +26,8 @@ import inet.node.ethernet.Eth10G;
 import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
-import inet.physicallayer.contract.packetlevel.IRadioMedium;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
+import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;
 import lte.corenetwork.nodes.Ue;
