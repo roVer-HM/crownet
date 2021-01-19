@@ -1,18 +1,18 @@
 [submodule "inet"]
 	path = inet4
-	url = ../../rover/inet.git
+	url = ../inet.git
 [submodule "simulte"]
 	path = simulte
-	url = ../../rover/simulte.git
+	url = ../simulte.git
 [submodule "veins"]
 	path = veins
-	url = ../../rover/veins.git
+	url = ../veins.git
 [submodule "vadere"]
 	path = vadere
 	url = https://gitlab.lrz.de/vadere/vadere.git
 [submodule "analysis/roveranalyzer"]
 	path = analysis/roveranalyzer
-	url = ../../rover/roveranalyzer.git
+	url = ../roveranalyzer.git
 [submodule "artery"]
 	path = artery
-	url = ../../rover/artery.git
+	url = ../artery.git
