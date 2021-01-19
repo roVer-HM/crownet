@@ -101,6 +101,8 @@ Choose File>Import>General>Exising projects> and import following folders:
 * inet4
 * crownet
 * simulte
+* artery
+
 When importing the folder veins only import the modules 1 (veins) and 3 (inet).
 * veins
 
