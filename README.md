@@ -62,16 +62,18 @@ For now disable SELinux with `sudo setenforce 0` which will switch SELinux in Pe
 reboot SELinx will be enabled again.
 
 Now you have a completely installed simulation system. Simply start the container which you want to use, e.g. by:
-OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
+
 ```
-omnetpp
+omnetpp-ide
 ```
 or
 ```
 vadere
 ```
 
-Note: The start script will mount your home directory so that it is visible inside the Docker container.
+Note: 
+* The start script will mount your home directory so that it is visible inside the Docker container.
+* The OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
 
 # Information about omnet and omnet container
 
