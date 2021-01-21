@@ -9,6 +9,8 @@
 
 #include <inet/networklayer/ipv4/Ipv4Header_m.h>
 #include "crownet/artery/lte/GeoNetTag_m.h"
+#include <inet/linklayer/common/InterfaceTag_m.h>
+#include "inet/common/IProtocolRegistrationListener.h"
 
 using namespace std;
 using namespace inet;
@@ -17,6 +19,15 @@ using namespace omnetpp;
 namespace crownet {
 
 Define_Module(Geo2Lte);
+
+void Geo2Lte::initialize(int stage) {
+    IP2lte::initialize(stage);
+    if (stage == inet::INITSTAGE_APPLICATION_LAYER){
+        // register geonet protocol
+        registerService(artery::InetRadioDriver::geonet, gate("upperLayerIn"),
+                        gate("upperLayerOut"));
+    }
+}
 
 void Geo2Lte::toStackUe(inet::Packet* pkt) {
   // if IP let parent handle it.
@@ -91,7 +102,13 @@ void Geo2Lte::toIpEnb(inet::Packet* datagram) {
 void Geo2Lte::prepareForGeo(inet::Packet* datagram,
                             const inet::Protocol* protocol) {
   // set geonet tag instead of ip4
-  IP2lte::prepareForIpv4(datagram, protocol);
+  // add DispatchProtocolRequest so that the packet is handled by the specified protocol
+  auto pDispatch_tag = datagram->addTagIfAbsent<DispatchProtocolReq>();
+  pDispatch_tag->setProtocol(protocol);
+  pDispatch_tag->setServicePrimitive(inet::ServicePrimitive::SP_INDICATION);
+  datagram->addTagIfAbsent<PacketProtocolTag>()->setProtocol(protocol);
+  // add Interface-Indication to indicate which interface this packet was received from
+  datagram->addTagIfAbsent<InterfaceInd>()->setInterfaceId(interfaceEntry->getInterfaceId());
 }
 
 } /* namespace crownet */
