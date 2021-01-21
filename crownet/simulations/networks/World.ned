@@ -78,7 +78,7 @@ network World
         coordConverter: <default("OsgCoordConverterRemote")> like ICoordConverter if typename != "" {
             @display("p=308.14874,207.69;i=block/table2;is=s");
         }
-        visualization: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
+        visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=523.74,89.17125;is=s");
         }
         physicalEnvironment: PhysicalEnvironment {
@@ -89,7 +89,6 @@ network World
         }
         configurator: Ipv4NetworkConfigurator {
             @display("p=523.74,198.66;is=s");
-            config = xmldoc("ip4Config.xml");
         }
         // LTE
         channelControl: LteChannelControl if hasLte {
