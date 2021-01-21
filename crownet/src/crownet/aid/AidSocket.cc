@@ -29,8 +29,8 @@ AidSocket::~AidSocket() {}
 
 // ISocket Interface
 bool AidSocket::belongsToSocket(cMessage *msg) const {
-  Message *message = check_and_cast<Message *>(msg);
-  auto &tags = message->getTags();
+
+  auto &tags = check_and_cast<ITaggedObject *>(msg)->getTags();
   auto socketInd = tags.findTag<SocketInd>();
   return socketInd != nullptr && socketInd->getSocketId() == socketId;
 }
@@ -166,9 +166,10 @@ void AidSocket::sendToAid(cMessage *msg) {
              << ctrl->getFullName();
   EV_TRACE << endl;
 
-  Message *message = check_and_cast<Message *>(msg);
 
-  auto &tags = message->getTags();
+  ITaggedObject *tObj = check_and_cast<ITaggedObject *>(msg);
+
+  auto &tags = tObj->getTags();
   tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Aid::aid);
   tags.addTagIfAbsent<SocketReq>()->setSocketId(socketId);
   check_and_cast<cSimpleModule *>(gateToAid->getOwnerModule())
