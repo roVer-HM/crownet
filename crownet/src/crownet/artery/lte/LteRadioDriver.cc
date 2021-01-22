@@ -72,10 +72,8 @@ void LteRadioDriver::initialize(int stage) {
     interfaceEntry = interfaceTable->findInterfaceByName(
         par("dispatchInterfaceName").stdstringValue().c_str());
 
-    registerService(artery::InetRadioDriver::geonet, gate("upperLayer$i"),
-                    gate("lowerLayerIn"));
     registerProtocol(artery::InetRadioDriver::geonet, gate("lowerLayerOut"),
-                     gate("upperLayer$o"));
+                     gate("lowerLayerIn"));
     auto properties = new artery::RadioDriverProperties();
     properties->LinkLayerAddress = convert(interfaceEntry->getMacAddress());
     numPassedUp++;
@@ -104,18 +102,27 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
       "INET GeoNet over LTE",
       inet::makeShared<inet::cPacketChunk>(check_and_cast<cPacket*>(msg)));
 
+  // tag: MacAddressReq
   auto addr_tag = packet->addTag<inet::MacAddressReq>();
   addr_tag->setDestAddress(convert(request->destination_addr));
   addr_tag->setSrcAddress(convert(request->source_addr));
-  //
-  auto proto_tag = packet->addTagIfAbsent<inet::PacketProtocolTag>();
-  proto_tag->setProtocol(&artery::InetRadioDriver::geonet);
+
+  // tag: DispatchProtocolReq
+  auto pDispatch_tag = packet->addTagIfAbsent<inet::DispatchProtocolReq>();
+  pDispatch_tag->setProtocol(&artery::InetRadioDriver::geonet);
+  pDispatch_tag->setServicePrimitive(inet::ServicePrimitive::SP_REQUEST);
+
+  //tag: PacketProtocolTag
+  packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(&artery::InetRadioDriver::geonet);
   assert(request->ether_type.host() ==
          inet::ProtocolGroup::ethertype.findProtocolNumber(
              &artery::InetRadioDriver::geonet));
+
+  // tag: InterfaceReq
   packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(
       interfaceEntry->getInterfaceId());
 
+  // tag: GeoNetTag
   auto geo_tag = packet->addTagIfAbsent<crownet::GeoNetTag>();
   geo_tag->setSrcAddrMac(convert(request->source_addr));
   geo_tag->setDstAddrMac(convert(request->destination_addr));

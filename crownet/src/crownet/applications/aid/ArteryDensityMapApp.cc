@@ -242,7 +242,10 @@ void ArteryDensityMapApp::writeMap() { fileWriter->writeData(); }
 std::shared_ptr<RegularDcdMap> ArteryDensityMapApp::getMap() { return dcdMap; }
 
 void ArteryDensityMapApp::sendMapMap() {
-  const auto &payload = createPacket<PositionMapPacket>();
+
+  // todo calc: 24 * currCell Fragmentation!
+  // FIXME: real size!!!
+  const auto &payload = createPacket<PositionMapPacket>(B(1000));
 
   computeValues();
   int numValidCells = dcdMap->valid().distance();
@@ -268,8 +271,7 @@ void ArteryDensityMapApp::sendMapMap() {
     currCell++;
   }
 
-  // FIXME: real size!!!
-  payload->setChunkLength(B(1000));  // todo calc: 24 * currCell Fragmentation!
+//  payload->setChunkLength(B(1000));
   sendPayload(payload);
 }
 

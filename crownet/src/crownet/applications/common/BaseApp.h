@@ -102,7 +102,7 @@ class BaseApp : public ApplicationBase {
   virtual L3Address chooseDestAddr();
 
   template <typename T>
-  IntrusivePtr<T> createPacket();
+  IntrusivePtr<T> createPacket(b length = b(-1));
 
   template <typename T>
   IntrusivePtr<const T> checkEmitGetReceived(Packet *pkt);
@@ -134,8 +134,9 @@ class BaseApp : public ApplicationBase {
 };
 
 template <typename T>
-inline IntrusivePtr<T> BaseApp::createPacket() {
+inline IntrusivePtr<T> BaseApp::createPacket(b length) {
   auto payload = makeShared<T>();
+  payload->setChunkLength(length);
   payload->setSequenceNumber(numSent);
   payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
   return payload;

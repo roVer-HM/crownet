@@ -108,8 +108,8 @@ void Aid::handleSelfMessage(cMessage *msg) {
 }
 
 void Aid::handleUpperCommand(cMessage *msg) {
-  Message *message = check_and_cast<Message *>(msg);
-  int socketId = message->getTags().getTag<SocketReq>()->getSocketId();
+  ITaggedObject *tObj = check_and_cast<ITaggedObject *>(msg);
+  int socketId = tObj->getTags().getTag<SocketReq>()->getSocketId();
   AidConnection *conn = findConnForApp(socketId);
 
   if (!conn) {

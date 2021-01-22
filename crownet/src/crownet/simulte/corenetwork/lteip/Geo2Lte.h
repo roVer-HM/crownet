@@ -23,6 +23,8 @@ class Geo2Lte : public ::IP2lte {
   void toStackEnb(inet::Packet* datagram) override;
   void toIpEnb(inet::Packet* datagram) override;
 
+  virtual void initialize(int stage) override;
+
   void prepareForGeo(
       inet::Packet* datagram,
       const inet::Protocol* protocol = &artery::InetRadioDriver::geonet);
