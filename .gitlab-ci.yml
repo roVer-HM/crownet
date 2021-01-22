@@ -12,6 +12,11 @@ stages:
   - simulation-campaign
 
 
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - ./venv
+
 # Build all dependencies of the crownet project (default: release mode)
 # This is the base for running simulation campaings on a dedicated
 # gitlab runner with more cores and memmory. Use latest version of containers
@@ -26,6 +31,7 @@ build-for-sim:
     CROWNET_M: '${CI_PROJECT_DIR}/crownet'
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
     MODE: 'release'
   script:
     # ## update required docker images
@@ -57,6 +63,9 @@ build-for-sim:
     - "find . -name \"*.cc\" -type f -delete"
     - "find build/ -type f -not -path '*.so' -delete"
     - "find extern/vanetza/build -type f -not -path '*.so' -delete"
+    # build analyzer
+    - "cd ${ANALYZER_M}"
+    - python3 setup.py sdist
   artifacts:
     paths:
     - ${CROWNET_HOME}/scripts
@@ -65,6 +74,7 @@ build-for-sim:
     - ${CROWNET_HOME}/crownet
     - ${CROWNET_HOME}/veins
     - ${CROWNET_HOME}/artery
+    - ${ANALYZER_M}/dist
     expire_in: 1 weeks
 
 # run the unit tests
@@ -86,9 +96,14 @@ fingerprints:
   stage: test
   tags:
     - crownet-sim
+  variables:
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
   script:
+    - virtualenv --system-site-packages --python py38 ./venv
+    - source ./venv/bin/activate
+    - "pip3 install -I ${ANALYZER_M}/dist/*.tar.gz"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
-    - "${OPP} ./fingerprints"
+    - ./fingerprints
   artifacts:
     when: always
     paths:

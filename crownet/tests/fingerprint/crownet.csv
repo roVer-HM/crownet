@@ -1,0 +1,5 @@
+# Fingerprint tests for the "Mobile Communications Lab (R1.009a@MUAS)" scenario
+
+# cellular scenarios
+# workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
+/simulations/mucFreiheitLte/,           -f omnetpp.ini -c fTest01 -r 0,   80s,              02f5-bbe8/tplx, PASS, vadere:latest;omnetpp:latest

@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
-./crownet_fingerprinttest -C ../.. -e ../../src/run_crownet $*
+./crownet_fingerprinttest --use-docker -C ../.. -e ../../src/run_crownet $*
+
