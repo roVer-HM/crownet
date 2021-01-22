@@ -58,10 +58,16 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
                            ->getEnvir()
                            ->getConfigEx()
                            ->getVariable(CFGVAR_DATETIME);
-  simCfg.oppResultRootDir = basedir + cSimulation::getActiveSimulation()
-                                          ->getEnvir()
-                                          ->getConfigEx()
-                                          ->getVariable(CFGVAR_RESULTDIR);
+  std::string resultDir = cSimulation::getActiveSimulation()
+                                                  ->getEnvir()
+                                                  ->getConfigEx()
+                                                  ->getVariable(CFGVAR_RESULTDIR);
+  if (resultDir.find("/", 0) == 0 || resultDir.find("\\", 0)){
+      simCfg.oppResultRootDir = resultDir;
+  } else {
+      simCfg.oppResultRootDir = basedir + resultDir;
+  }
+
   simCfg.oppIterationVariables = cSimulation::getActiveSimulation()
                                      ->getEnvir()
                                      ->getConfigEx()
