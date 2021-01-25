@@ -57,6 +57,7 @@ class NodeIdentifiere : public FilePrinter {
 
   bool operator<(const NodeIdentifiere<T>& rhs) const { return id < rhs.id; }
   bool operator==(const NodeIdentifiere<T>& rhs) const { return id == rhs.id; }
+  bool operator!=(const NodeIdentifiere<T>& rhs) const { return id != rhs.id; }
 
   T value() const { return id; }
 

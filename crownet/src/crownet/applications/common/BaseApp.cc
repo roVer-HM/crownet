@@ -69,7 +69,7 @@ void BaseApp::scheduleNextAppMainEvent(simtime_t time) {
     return;
   }
   simtime_t base = time < 0.0 ? omnetpp::simTime() : time;
-  simtime_t nextSend = base + par("appMainInterval");
+  simtime_t nextSend = base + par("appMainInterval") + par ("appMainIntervalJitter");
 
   if ((stopTime == SIMTIME_ZERO) || (nextSend < stopTime)) {
     if (appMainTimer->isScheduled()) {
@@ -170,7 +170,8 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
       }
       break;
     case FSM_Exit(FsmRootStates::WAIT_INACTIVE):
-      throw cRuntimeError("Application stop time reached! WAIT_INACTIVE");
+      EV_INFO << "Application stop time reached! WAIT_INACTIVE" << std::endl;
+//      throw cRuntimeError("Application stop time reached! WAIT_INACTIVE");
       break;
     case FSM_Enter(FsmRootStates::ERR):  // error! if state is entered
       throw cRuntimeError("Reached Error state");
@@ -237,7 +238,12 @@ BaseApp::FsmState BaseApp::fsmAppMain(cMessage *msg) {
 
 BaseApp::FsmState BaseApp::fsmTeardown(cMessage *msg) {
   getSocket().close();
-  delayActiveOperationFinish(par("stopOperationTimeout"));
+//  delayActiveOperationFinish(par("stopOperationTimeout"));    // todo: correctly  implement ILifecycle ...
+  cancelAndDelete(appLifeTime);
+  appLifeTime = nullptr;
+  cancelAndDelete(appMainTimer);
+  appMainTimer = nullptr;
+
   return FsmRootStates::WAIT_INACTIVE;
 }
 
@@ -245,6 +251,11 @@ BaseApp::FsmState BaseApp::fsmDestroy(cMessage *msg) {
   getSocket().destroy();
   // TODO  in real operating systems, program crash detected
   // by OS and OS closes sockets of crashed programs.
+  cancelAndDelete(appLifeTime);
+  appLifeTime = nullptr;
+  cancelAndDelete(appMainTimer);
+  appMainTimer = nullptr;
+
   return FsmRootStates::WAIT_INACTIVE;
 }
 

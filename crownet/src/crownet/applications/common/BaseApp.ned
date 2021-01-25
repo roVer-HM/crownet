@@ -30,6 +30,7 @@ simple BaseApp like IApp
         volatile double appMainInterval @unit(s) = default(-1s); // intervall to enter fsmAppMain to process app logic.
         										  // if set to -1 fsmAppMain will not be used and user must provide own
         										  // handling. fsmAppMain does nothing on default.
+        volatile double appMainIntervalJitter @unit(s) = default(0s); // 
         // Base addressing paramters
         string localAddress = default("");
         int localPort = default(-1);  // local port (-1: use ephemeral port)

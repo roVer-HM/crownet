@@ -22,31 +22,48 @@ moduleinterface IDensityMapApp extends IApp {
 
 }
 
-simple ArteryDensityMapApp  extends AidBaseApp like IDensityMapApp  {
-
-    parameters:
-        @class(crownet::ArteryDensityMapApp);
+simple BaseDensityMapApp  extends AidBaseApp like IDensityMapApp {
+	parameters:
+	    @class(crownet::ArteryDensityMapBase);
         @signal[RegisterDensityMap];
         @signal[RemoveDensityMap];
-        string middelwareModule = default("^.^.middleware"); //node internal
-        string identiyRegistryModule = default("identiyRegistry");
-        string coordConverterModule;
-        double gridSize = default(3.0) @units(m);
+        
+        // Aid app override defaults
         packetName = default("DcDMap");
-
-        destPort = 30001;
-        localPort = 30001;
         appMainInterval = default(1.0s);
 
+	    // Aid app fix defaults
+        destPort = 30001;
+        localPort = 30001;         
+        
+        // App logic
+        string coordConverterModule;
+        
+        double gridSize = default(3.0) @units(m);
+        
         bool writeDensityLog = default(true);
         string mapType = default("ymf"); // select map algorithm to calculate cell values
         string mapTypeLog = default("all"); // if writeDensityLog is true log this map algorithm. If "all" just
         									// dump raw data currently present.
-
-
 }
 
+simple ArteryDensityMapApp  extends BaseDensityMapApp  {
 
+    parameters:
+        @class(crownet::ArteryDensityMapApp);
+        string middelwareModule = default("^.^.middleware"); //node internal
+        string identiyRegistryModule = default("identiyRegistry");
+        
+}
+
+simple DensityMapAppSimple  extends BaseDensityMapApp  {
+
+    parameters:
+        @class(crownet::DensityMapAppSimple);
+
+         string mobilityModule;
+         string neighborhoodTableMobdule;
+}
 
 //simple SimpleNeighbourhood like INeighbourhood {
 //

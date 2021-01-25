@@ -38,13 +38,7 @@ void VruAid::initialize(int stage) {
 }
 
 BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
-  //  vanetza::asn1::Cam message;
-
-  //  const auto& vam = makeShared<ItsVam>();
-  //  vam->setSequenceNumber(numSent);
-  //  vam->addTag<CreationTimeTag>()->setCreationTime(simTime());
-
-  const auto& vam = createPacket<ItsVam>();
+  const auto& vam = createPacket<ItsVam>(B(par("messageLength")));  // todo calc?
   vam->setGenerationDeltaTime(simTime());
   // VAM Header
   ItsPduHeader itsHeader{};
@@ -72,7 +66,6 @@ BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   }
   vam->setBasicContainer(basicContainer);
 
-  vam->setChunkLength(B(par("messageLength")));  // todo calc?
   sendPayload(vam);
   scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
