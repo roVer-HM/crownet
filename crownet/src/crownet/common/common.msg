@@ -34,7 +34,7 @@ class NeighborhoodTableEntry
     @existingClass;
     int nodeId;
     simtime_t timeSend;
-    simtime_t timeRecived;
+    simtime_t timeReceived;
     inet::Coord pos;
     inet::Coord epsilon;   
 }
