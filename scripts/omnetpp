@@ -19,7 +19,7 @@ SHORTNAME=omnetpp
 COMMAND=omnetpp
 CONTNAME=omnetpp
 
-if [[ -z "$1" || "$1" == "exec" ]]; then
+if [[ -z "$1" || "$1" == "exec" || "$1" == "execs" ]]; then
       VERSION=latest
       CONTNAME=$SHORTNAME:$VERSION
 else
@@ -36,6 +36,16 @@ fi
 
 if [[ "$2" == "exec" ]]; then
       COMMAND="${@:3:${#@}+1-3}"
+fi
+
+if [[ "$1" == "execs" ]]; then
+      COMMAND="${@:2:${#@}+1-2}"
+      SILENT=y
+fi
+
+if [[ "$2" == "execs" ]]; then
+      COMMAND="${@:3:${#@}+1-3}"
+      SILENT=y
 fi
 
 IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$CONTNAME
