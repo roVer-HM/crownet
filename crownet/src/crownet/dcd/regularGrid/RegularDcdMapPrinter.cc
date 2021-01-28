@@ -31,7 +31,7 @@ void RegularDcdMapValuePrinter::writeHeaderTo(std::ostream& out,
                                               const std::string& sep) const {
   out << "simtime" << sep << "x" << sep << "y" << sep << "count" << sep
       << "measured_t" << sep << "received_t" << sep << "source" << sep
-      << "selection" << sep << "own_cell";
+      << "selection" << sep << "own_cell" << std::endl;
 }
 
 void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
@@ -75,8 +75,7 @@ void RegularDcdMapGlobalPrinter::writeHeaderTo(std::ostream& out,
                                                const std::string& sep) const {
   out << "simtime" << sep << "x" << sep << "y" << sep << "count" << sep
       << "measured_t" << sep << "received_t" << sep << "source" << sep
-      << "selection" << sep << "own_cell"
-      << "node_id";
+      << "selection" << sep << "own_cell" << sep << "node_id" << std::endl;
 }
 
 }  // namespace crownet

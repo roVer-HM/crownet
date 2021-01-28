@@ -99,7 +99,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
         "MAP_TYPE",
         "global");  // The global density map is the ground
                     // truth. No algorihm needed.
-    fBuilder.addMetadata("NODE_ID", dcdMapGlobal->getOwnerId().value());
+    fBuilder.addMetadata<std::string>("NODE_ID", "global");
     fBuilder.addPath("global");
 
     fileWriter.reset(fBuilder.build(

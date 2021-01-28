@@ -71,14 +71,10 @@ BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-void VruAid::socketDataArrived(AidSocket* socket, Packet* packet) {
-  auto payload = checkEmitGetReceived<ItsVam>(packet);
-  //  emit(packetReceivedSignal, packet);
-  //  numReceived++;
-  // todo log received coordiantes.
-  delete packet;
-  socketFsmResult =
-      FsmRootStates::WAIT_ACTIVE;  // GoTo WAIT_ACTIVE steady state
+BaseApp::FsmState VruAid::handleSocketDataArrived(Packet *packet){
+    // todo: implement handle packet
+    // ...
+    return FsmRootStates::WAIT_ACTIVE;
 }
 
 Coord VruAid::getCurrentLocation() {

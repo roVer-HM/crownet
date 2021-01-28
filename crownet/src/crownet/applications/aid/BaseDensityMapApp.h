@@ -53,7 +53,7 @@ protected:
  // Aid Socket
  virtual void setAppRequirements() override;
  virtual void setAppCapabilities() override;
- virtual void socketDataArrived(AidSocket *socket, Packet *packet) override;
+ virtual FsmState handleSocketDataArrived(Packet *packet) override;
 
  // FSM
  virtual void setupTimers() override;
@@ -83,6 +83,7 @@ protected:
  std::string mapTypeLog;
 
  RegularDcdMapWatcher* watcher;
+
 };
 
 } // namesapce crownet

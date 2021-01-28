@@ -33,11 +33,12 @@ class VruAid : public AidBaseApp {
  protected:
   virtual void initialize(int stage) override;
   virtual FsmState fsmAppMain(cMessage* msg) override;
-  virtual void socketDataArrived(AidSocket* socket, Packet* packet) override;
   virtual Coord getCurrentLocation();
 
+  // Aid Socket
   virtual void setAppRequirements() override;
   virtual void setAppCapabilities() override;
+  virtual FsmState handleSocketDataArrived(Packet *packet) override;
 
   // VAM
 };

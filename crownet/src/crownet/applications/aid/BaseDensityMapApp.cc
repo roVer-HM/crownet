@@ -76,13 +76,8 @@ void BaseDensityMapApp::setAppCapabilities() {
   // todo: no CAP right now.
 }
 
-void BaseDensityMapApp::socketDataArrived(AidSocket *socket, Packet *packet) {
-  bool ret = mergeReceivedMap(packet);
-
-  delete packet;
-  socketFsmResult =
-      (ret) ? FsmRootStates::WAIT_ACTIVE  // GoTo WAIT_ACTIVE steady state
-            : FsmRootStates::ERR;         // GoTo ERR steady state
+BaseApp::FsmState BaseDensityMapApp::handleSocketDataArrived(Packet *packet){
+    return mergeReceivedMap(packet) ? FsmRootStates::WAIT_ACTIVE  : FsmRootStates::ERR;
 }
 
 // FSM

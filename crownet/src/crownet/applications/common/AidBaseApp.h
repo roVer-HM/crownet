@@ -49,5 +49,7 @@ class AidBaseApp : public BaseApp, public AidSocket::ICallback {
   virtual void socketClosed(AidSocket *socket) override;
   virtual void socketStatusArrived(AidSocket *socket,
                                    Indication *indication) override;
+  virtual FsmState handleSocketDataArrived(Packet *packet) = 0;
+
 };
 }  // namespace crownet

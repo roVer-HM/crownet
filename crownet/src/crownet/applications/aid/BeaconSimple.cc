@@ -58,14 +58,12 @@ void BeaconSimple::setAppCapabilities(){
     // todo: no CAP right now.
 }
 
-void BeaconSimple::socketDataArrived(AidSocket *socket, Packet *packet){
+BaseApp::FsmState BeaconSimple::handleSocketDataArrived(Packet *packet){
     auto p = checkEmitGetReceived<BeaconPacket>(packet);
 
     NeighborhoodTableEntry b{p->getNodeId(), p->getTime(), simTime(), p->getPos(), p->getEpsilon()};
     nTable->handleBeacon(std::move(b));
-
-    delete packet;
-    socketFsmResult = FsmRootStates::WAIT_ACTIVE;
+    return FsmRootStates::WAIT_ACTIVE;
 }
 
 

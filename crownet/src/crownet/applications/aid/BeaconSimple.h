@@ -32,7 +32,7 @@ public:
     // Aid Socket
     virtual void setAppRequirements() override;
     virtual void setAppCapabilities() override;
-    virtual void socketDataArrived(AidSocket *socket, Packet *packet) override;
+    virtual FsmState handleSocketDataArrived(Packet *packet) override;
 
 
 private:
