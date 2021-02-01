@@ -9,6 +9,9 @@ tags
 tags*
 compile_commands.json
 *.h5
+**/*.csv.ERROR
+**/*.csv.FAILED
+
 
 # ignore gitlab-runner local test directory
 /builds

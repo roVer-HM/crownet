@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "../../common/result/Simsignals.h"
+#include "crownet/common/result/Simsignals.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"

@@ -10,11 +10,17 @@ INTNET="rovernet"
 #
 function check_create_network() {
 	if [ ! "$(docker network ls | grep $INTNET)" ]; then
-	  echo "Creating $INTNET network ..."
+	  log_ "Creating $INTNET network ..."
 	  docker network create $INTNET
 	# else
-	  # echo "Network $INTNET for communication between the roVer containers exists."
+	  # log_ "Network $INTNET for communication between the roVer containers exists."
 	fi
+}
+
+function log_() {
+    if [[ "$SILENT" != "y" ]]; then
+        echo  $*
+    fi
 }
 
 # Wrap a command so that is executed within a shell
@@ -30,8 +36,9 @@ function wrap_command() {
 	else
            WRAPPER="/bin/bash -c \"cd $(pwd);"
            WRAPPER_END="\""
-        fi
-        echo "$WRAPPER $@ $WRAPPER_END"
+    fi
+    # not printet to shell
+    echo "$WRAPPER $@ $WRAPPER_END"
 }
 
 # Create name for container by adding incrementing numbers to the base name.
@@ -43,15 +50,15 @@ function create_name(){
 	i=0
 
     #{
-        #flock --verbose -w 10 200 || { echo "lock timeout on $lock"; exit -1; }
-        #echo "$$: Lock recieved $lock"
-        #echo "$$: received fd"
-        #echo "$$: $1"
-        #echo "$$: $1" > "$nfile"
+        #flock --verbose -w 10 200 || { log_ "lock timeout on $lock"; exit -1; }
+        #log_ "$$: Lock recieved $lock"
+        #log_ "$$: received fd"
+        #log_ "$$: $1"
+        #log_ "$$: $1" > "$nfile"
         #sleep 1
         #prev=$(cat $nfile)
-        #echo "$$: prev $prev"
-        #echo "$$: Lock released"
+        #log_ "$$: prev $prev"
+        #log_ "$$: Lock released"
         #flock -u 200
     #} 200>"$lock"
 
@@ -92,7 +99,7 @@ function run_container_X11() {
 	  *) # Running in background - do not add the --interactive flag ;;
 	esac
 
-	# echo "Running docker container with access to X11 and your home directory..."
+	# log_ "Running docker container with access to X11 and your home directory..."
 
 	CMD_ARR=(docker run $MODE)
 	CMD_ARR+=(--cap-add=SYS_PTRACE)
@@ -104,26 +111,30 @@ function run_container_X11() {
 		CMD_ARR+=(--env NEDPATH=$NEDPATH)
 	fi
 	if [[ ! -z ${TRACI_PORT} ]];then
-		echo "container> set var TRACI_PORT=$TRACI_PORT"
+		log_ "container> set var TRACI_PORT=$TRACI_PORT"
 		CMD_ARR+=(--env TRACI_PORT=$TRACI_PORT)
 	fi
 	if [[ -z ${TRACI_GUI} ]];then
 		CMD_ARR+=(--env TRACI_GUI="false")
 	else
-		echo "container> set var TRACI_GUI=$TRACI_GUI"
+		log_ "container> set var TRACI_GUI=$TRACI_GUI"
 		CMD_ARR+=(--env TRACI_GUI=${TRACI_GUI})
 	fi
 	if [[ ! -z ${TRACI_DEBUG} ]];then
-  	    echo "container> set var TRACI_DEBUG=$TRACI_DEBUG"
+  	    log_ "container> set var TRACI_DEBUG=$TRACI_DEBUG"
 		CMD_ARR+=(--env TRACI_DEBUG=${TRACI_DEBUG})
 	fi
     if [[ ! -z ${VADERE_LOG_LEVEL} ]];then
-        echo "container> set var VADERE_LOG_LEVEL=$VADERE_LOG_LEVEL"
+        log_ "container> set var VADERE_LOG_LEVEL=$VADERE_LOG_LEVEL"
         CMD_ARR+=(--env VADERE_LOG_LEVEL=${VADERE_LOG_LEVEL})
 	fi
     if [[ ! -z ${VADERE_LOG} ]];then
-        echo "container> set var VADERE_LOG=$VADERE_LOG"
+        log_ "container> set var VADERE_LOG=$VADERE_LOG"
         CMD_ARR+=(--env VADERE_LOG=${VADERE_LOG})
+	fi
+    if [[ ! -z ${SILENT} ]];then
+        log_ "container> set var SILENT=$SILENT"
+        CMD_ARR+=(--env SILENT=${SILENT})
 	fi
     CMD_ARR+=(--env CROWNET_HOME=${CROWNET_HOME})
 	CMD_ARR+=(--workdir=$(pwd))
@@ -144,11 +155,11 @@ function run_container_X11() {
 		# location outside of /home/$USER/ the container cannot follow the link.
 		# Adding a volume at the location of the symlink will allow access to the
 		# new cache location. (e.g. DOCKER_VADERE_CACHE_LOCATION=/opt/vadere-cache)
-		echo "container> mount cache location '${DOCKER_VADERE_CACHE_LOCATION}' to '/home/$USER/.cache/vadere'"
+		log_ "container> mount cache location '${DOCKER_VADERE_CACHE_LOCATION}' to '/home/$USER/.cache/vadere'"
 		CMD_ARR+=(--volume="/home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
 	fi
 	CMD_ARR+=($@)
-	# echo "${CMD_ARR[@]}"
+	#log_ "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
 
 }
@@ -162,7 +173,7 @@ function run_container_X11() {
 # function run_start_container() {
 # 	COMMAND="${@:4:${#@}+1-4}"
 # 	CMD4="$(wrap_command $COMMAND)"
-# 	echo "$1"
+# 	log_ "$1"
 # 	if [ ! "$(docker ps -q -f name=^/$1$)" ]; then
 # 	    if [ "$(docker ps -aq -f status=exited -f name=^/$1$)" ]; then
 # 		# cleanup
@@ -173,7 +184,7 @@ function run_container_X11() {
 #  	else
 # 	    # container already exists - execute command within container
 # 						COMMAND="${@:4:${#@}+1-4}"
-# 						echo "CMD4=\"$CMD4\""
+# 						log_ "CMD4=\"$CMD4\""
 #        	    docker exec -i $1 bash -c "cd $(pwd); $COMMAND"
 # 	fi
 # }
@@ -186,12 +197,13 @@ function run_container_X11() {
 function run_individual_container() {
 	COMMAND="${@:4:${#@}+1-4}"
 	CMD4="$(wrap_command $COMMAND)"
+    log_ $CMD4
     if [[ "$1" == *_rnd ]];then
         # let docker create random names.
         run_container_X11 --rm $3 $CMD4
     else
         NAME=$(create_name $1)
-        # echo "Container name: $NAME"
+        # log_ "Container name: $NAME"
         run_container_X11 --rm --name $NAME --hostname $NAME $3 $CMD4
     fi
 }
@@ -200,7 +212,7 @@ function run_individual_container() {
 function check_ptrace() {
 	read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)
         if [[ $value = 1 ]]; then
-           echo "Warning: It seems that your system does not allow ptrace - debugging will not work."
-           echo "         Edit /etc/sysctl.d/10-ptrace.conf and set ptrace_scope = 0."
+           log_ "Warning: It seems that your system does not allow ptrace - debugging will not work."
+           log_ "         Edit /etc/sysctl.d/10-ptrace.conf and set ptrace_scope = 0."
         fi
 }

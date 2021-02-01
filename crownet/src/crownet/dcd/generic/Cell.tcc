@@ -163,6 +163,32 @@ std::string Cell<C, N, T>::str() const {
 }
 
 template <typename C, typename N, typename T>
+std::string Cell<C, N, T>::infoCompact() const{
+    std::stringstream os;
+    os << "[#" << this->data.size();
+    int validCount = 0;
+    for (const auto e : this->validIter()) {
+        ++validCount;
+    }
+    os << "V" << validCount;
+    if (this->hasLocal()){
+        const auto l = this->getLocal();
+        std::string valid = l->valid() ? "" : "-";
+        os << "] -> [L" << l->getSource() << ":" << valid << l->getCount() << "|" << l->getMeasureTime() << "]";
+    } else {
+        os << "] -> ";
+    }
+    for(auto const& e : this->data){
+        if(e.first != this->owner_id){
+            std::string valid2 = e.second->valid() ? "" : "-";
+            os << "[" << e.second->getSource() << ":" << valid2 << e.second->getCount() << "|" << e.second->getMeasureTime() << "]";
+        }
+    }
+
+    return os.str();
+}
+
+template <typename C, typename N, typename T>
 void Cell<C, N, T>::incrementLocal(const node_key_t& countedNodeId,
                                    const time_t& time) {
   if (!hasData(this->owner_id)) {

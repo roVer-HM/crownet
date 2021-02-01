@@ -374,11 +374,12 @@ void AidConnection::process_AID_CLOSE(AidEventCode& event,
                                       AidCommand* aidCommand, cMessage* msg) {
   AidCloseCommand* cmd = check_and_cast<AidCloseCommand*>(aidCommand);
 
-  switch (fsm.getState()) {
-    // todo: action or error for each steady state
-    default:
-      throw cRuntimeError(aidMain, "Err");
-  }
+//  switch (fsm.getState()) {
+//    // todo: action or error for each steady state
+//    default:
+//      throw cRuntimeError(aidMain, "Err");
+//  }
+  // cleanup?
 
   delete cmd;
   delete msg;

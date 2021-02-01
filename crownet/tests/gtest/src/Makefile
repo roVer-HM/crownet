@@ -6,13 +6,16 @@
 #
 
 # Name of target to be created (-o option)
-TARGET = rTests$(D)$(EXE_SUFFIX)
 TARGET_DIR = .
+TARGET_NAME = rTests$(D)
+TARGET = $(TARGET_NAME)$(EXE_SUFFIX)
+TARGET_IMPLIB = $(TARGET_NAME)$(IMPLIB_SUFFIX)
+TARGET_IMPDEF = $(TARGET_NAME)$(IMPDEF_SUFFIX)
+TARGET_FILES = $(TARGET_DIR)/$(TARGET)
 
 # User interface (uncomment one) (-u option)
-USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(QTENV_LIBS) $(CMDENV_LIBS)
+USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(QTENV_LIBS) $(CMDENV_LIBS)
 #USERIF_LIBS = $(CMDENV_LIBS)
-#USERIF_LIBS = $(TKENV_LIBS)
 #USERIF_LIBS = $(QTENV_LIBS)
 
 # C++ include paths (with -I)
@@ -86,7 +89,7 @@ include $(CONFIGFILE)
 
 # Simulation kernel and user interface libraries
 OMNETPP_LIBS = $(OPPMAIN_LIB) $(USERIF_LIBS) $(KERNEL_LIBS) $(SYS_LIBS)
-ifneq ($(TOOLCHAIN_NAME),clangc2)
+ifneq ($(PLATFORM),win32.x86_64)
 LIBS += -Wl,-rpath,$(abspath $(ARTERY_PROJ)/build/Debug/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/build/Release/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/extern/vanetza/build/Debug/lib) -Wl,-rpath,$(abspath $(ARTERY_PROJ)/extern/vanetza/build/Release/lib) -Wl,-rpath,$(abspath $(CROWNET_PORJ)/src) -Wl,-rpath,$(abspath $(INET_PROJ)/src) -Wl,-rpath,$(abspath $(LTE_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_PROJ)/src) -Wl,-rpath,$(abspath $(VEINS_PROJ)/subprojects/veins_inet/src) -Wl,-rpath,$(abspath /usr/local/lib)
 endif
 
@@ -95,27 +98,26 @@ MSGCOPTS = $(INCLUDE_PATH)
 SMCOPTS =
 
 # we want to recompile everything if COPTS changes,
-# so we store COPTS into $COPTS_FILE and have object
-# files depend on it (except when "make depend" was called)
+# so we store COPTS into $COPTS_FILE (if COPTS has changed since last build)
+# and make the object files depend on it
 COPTS_FILE = $O/.last-copts
 ifneq ("$(COPTS)","$(shell cat $(COPTS_FILE) 2>/dev/null || echo '')")
-$(shell $(MKPATH) "$O" && echo "$(COPTS)" >$(COPTS_FILE))
+  $(shell $(MKPATH) "$O")
+  $(file >$(COPTS_FILE),$(COPTS))
 endif
 
 #------------------------------------------------------------------------------
 # User-supplied makefile fragment(s)
-# >>>
-# <<<
 #------------------------------------------------------------------------------
 
 # Main target
-all: $(TARGET_DIR)/$(TARGET)
+all: $(TARGET_FILES)
 
 $(TARGET_DIR)/% :: $O/%
 	@mkdir -p $(TARGET_DIR)
 	$(Q)$(LN) $< $@
-ifeq ($(TOOLCHAIN_NAME),clangc2)
-	$(Q)-$(LN) $(<:%.dll=%.lib) $(@:%.dll=%.lib)
+ifeq ($(TOOLCHAIN_NAME),clang-msabi)
+	-$(Q)-$(LN) $(<:%.dll=%.lib) $(@:%.dll=%.lib) 2>/dev/null
 endif
 
 $O/$(TARGET): $(OBJS)  $(wildcard $(EXTRA_OBJS)) Makefile $(CONFIGFILE)
@@ -147,14 +149,18 @@ smheaders: $(SMFILES:.sm=_sm.h)
 clean:
 	$(qecho) Cleaning $(TARGET)
 	$(Q)-rm -rf $O
-	$(Q)-rm -f $(TARGET_DIR)/$(TARGET)
-	$(Q)-rm -f $(TARGET_DIR)/$(TARGET:%.dll=%.lib)
+	$(Q)-rm -f $(TARGET_FILES)
 	$(Q)-rm -f $(call opp_rwildcard, . , *_m.cc *_m.h *_sm.cc *_sm.h)
 
 cleanall:
-	$(Q)$(MAKE) -s clean MODE=release
-	$(Q)$(MAKE) -s clean MODE=debug
+	$(Q)$(CLEANALL_COMMAND)
 	$(Q)-rm -rf $(PROJECT_OUTPUT_DIR)
+
+help:
+	@echo "$$HELP_SYNOPSYS"
+	@echo "$$HELP_TARGETS"
+	@echo "$$HELP_VARIABLES"
+	@echo "$$HELP_EXAMPLES"
 
 # include all dependencies
 -include $(OBJS:%=%.d) $(MSGFILES:%.msg=$O/%_m.h.d)

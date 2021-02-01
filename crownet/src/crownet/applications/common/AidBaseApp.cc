@@ -57,8 +57,9 @@ void AidBaseApp::sendToSocket(Packet *msg, L3Address destAddr, int destPort) {
 void AidBaseApp::socketDataArrived(AidSocket *socket, Packet *packet) {
   emit(packetReceivedSignal, packet);
   numReceived++;
+  FsmState state = handleSocketDataArrived(packet);
   delete packet;
-  setFsmResult(FsmRootStates::WAIT_ACTIVE);
+  setFsmResult(state);
 }
 
 void AidBaseApp::socketErrorArrived(AidSocket *socket, Indication *indication) {

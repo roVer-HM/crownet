@@ -9,10 +9,12 @@
 
 #include "crownet/dcd/generic/Cell.h"
 #include "crownet/dcd/generic/DcdMap.h"
+#include "crownet/dcd/generic/DcdMapWatcher.h"
 
 namespace crownet {
 
 using RegularDcdMap = DcDMap<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+using RegularDcdMapWatcher = DcdMapWatcher<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 
 class RegularDcdMapFactory {
  public:

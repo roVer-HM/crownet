@@ -47,6 +47,7 @@ class DcDMap {
   std::string str() const;
   std::string strFull() const;
   std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() const;
+  std::map<node_key_t, cell_key_t>& getNeighborhood();
 
   // getter/setter (create if missing)
   cell_t& getCell(const cell_key_t& cell_id);

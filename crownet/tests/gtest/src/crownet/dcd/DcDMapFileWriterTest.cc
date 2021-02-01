@@ -79,7 +79,7 @@ TEST_F(DcDMapFileWriterTest, print_header) {
   p.writeHeaderTo(out, "; ");
   std::string header =
       "simtime; x; y; count; measured_t; received_t; source; selection; "
-      "own_cell";
+      "own_cell\n";
   EXPECT_STREQ(out.str().c_str(), header.c_str());
 }
 

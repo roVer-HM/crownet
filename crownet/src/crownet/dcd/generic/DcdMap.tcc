@@ -8,21 +8,6 @@
 #pragma once
 #include "crownet/dcd/generic/DcdMap.h"
 
-// template <typename C, typename N, typename T>
-// bool DcDMap<C, N, T>::operator<(const DcDMap<C, N, T>& rhs) const {
-//  return this->owner_id < rhs.owner_id;
-//}
-//
-// template <typename C, typename N, typename T>
-// bool DcDMap<C, N, T>::operator>(const DcDMap<C, N, T>& rhs) const {
-//  return this->owner_id > rhs.owner_id;
-//}
-//
-// template <typename C, typename N, typename T>
-// bool DcDMap<C, N, T>::operator==(const DcDMap<C, N, T>& rhs) const {
-//  return this->owner_id == rhs.owner_id;
-//}
-
 template <typename C, typename N, typename T>
 const typename DcDMap<C, N, T>::map_t::iterator DcDMap<C, N, T>::begin() const {
   return const_cast<DcDMap<C, N, T>*>(this)->cells.begin();
@@ -66,6 +51,11 @@ DcDMapIterator<DcDMap<C, N, T>> DcDMap<C, N, T>::valid() const {
 template <typename C, typename N, typename T>
 const typename DcDMap<C, N, T>::map_t* DcDMap<C, N, T>::getCells() const {
   return const_cast<DcDMap<C, N, T>*>(this)->getCells();
+}
+
+template <typename C, typename N, typename T>
+std::map< typename DcDMap<C, N, T>::node_key_t,  typename DcDMap<C, N, T>::cell_key_t>&  DcDMap<C, N, T>::getNeighborhood(){
+    return this->neighborhood;
 }
 
 template <typename C, typename N, typename T>

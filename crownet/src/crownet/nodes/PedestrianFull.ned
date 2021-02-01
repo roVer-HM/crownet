@@ -2,6 +2,8 @@ package crownet.nodes;
 
 import crownet.artery.PedestrianMiddleware;
 import crownet.artery.IDispatchRadioDriver;
+import crownet.aid.IAidLayer;
+import crownet.common.INeighborhoodTable;
 import artery.networking.Vanetza;
 import artery.networking.IVanetza;
 import artery.inet.PlainVehicle;
@@ -11,7 +13,6 @@ import inet.node.inet.INetworkNode;
 import inet.linklayer.contract.IWirelessInterface;
 import inet.mobility.contract.IMobility;
 import inet.networklayer.common.InterfaceTable;
-import crownet.aid.IAidLayer;
 import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 import inet.applications.contract.IApp;
 import inet.mobility.contract.IMobility;
@@ -89,6 +90,9 @@ module PedestrianFull like INetworkNode
 
         **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.^.ipv4.routingTable");
+        **.mobilityModule = default(absPath(".mobility"));
+        **.neighborhoodTableMobdule = default(absPath(".nTable"));
+        **.multicastInterface = "cellular";
 
         //# Ext Interface
         bool enableExtInterface = default(false);
@@ -101,11 +105,14 @@ module PedestrianFull like INetworkNode
 
     submodules:
         interfaceTable: InterfaceTable {
-            @display("p=103,194;is=s");
+            @display("p=84.672,147.392;is=s");
         }
         mobility: <default("crownet.artery.traci.MobilityRoverArtery")> like IMobility {
             parameters:
-                @display("p=48.608,101.92");
+                @display("p=83.104004,54.88;is=s");
+        }
+        nTable: <default("NeighborhoodTable")> like INeighborhoodTable if typename!="" {
+            @display("p=216.384,147.392;i=block/table2;is=s");
         }
         middleware: <default(middlewareType)> like IMiddleware {
             parameters:
@@ -125,7 +132,7 @@ module PedestrianFull like INetworkNode
                 @display("p=109.76,553.504,row,100");
         }
         app[numApps]: <> like IApp {
-            @display("p=346.69598,74.895996,row,140");
+            @display("p=346.528,54.88,row,140");
         }
         aid: <aidType> like IAidLayer {
             @display("p=396.704,216.384");
@@ -188,7 +195,7 @@ module PedestrianFull like INetworkNode
                 @display("p=550,596;b=600,5,,,,1");
         }
         configurator: HostAutoConfigurator {
-            @display("p=170.912,101.92");
+            @display("p=216.384,54.88;is=s");
         }
 
     connections allowunconnected:

@@ -2,4 +2,5 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
-/simulations/mucFreiheitLte/,           -f omnetpp.ini -c fTest01 -r 0,   80s,              02f5-bbe8/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/mucFreiheitLte/,           -f omnetpp.ini -c fTestDcD -r 0,   80s,              ccbb-53fa/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/mucFreiheitLte/,           -f omnetpp.ini -c fTestDcDwArtery -r 0,   80s,              a236-79a4/tplx, PASS, vadere:latest;omnetpp:latest

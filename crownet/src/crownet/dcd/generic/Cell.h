@@ -130,6 +130,7 @@ class Cell {
 
   // display
   std::string str() const;
+  std::string infoCompact() const;
 
   // operators
   // Sort order cell_key_t --> node_key_t

@@ -16,6 +16,7 @@
 package crownet.aid;
 import crownet.aid.IAid;
 import crownet.applications.aid.IDensityMapApp;
+import crownet.applications.aid.IBeaconApp;
 import inet.common.MessageDispatcher;
 
 moduleinterface IAidLayer
@@ -31,7 +32,6 @@ module SimpleAidLayer like IAidLayer
 {
     parameters:
         @display("i=block/app");
-        bool hasDensityMap = default(false);
 
     gates:
         input upperIn;
@@ -42,11 +42,16 @@ module SimpleAidLayer like IAidLayer
     submodules:
         aid: <default("Aid")> like IAid {
             parameters:
-                @display("p=164,121;is=s");
+                @display("p=218,121;is=s");
         }
-        densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp if hasDensityMap {
-            @display("p=413,98;i=block/table;is=s");
+        densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp if typename!="" {
+            @display("p=413,121;i=block/users;is=s");
         }
+
+        beaconApp: <default("BeaconSimple")> like IBeaconApp if typename!="" {
+            @display("p=532,121;i=block/broadcast;is=s");
+        }
+
         // Message Dispatcher
         upper: MessageDispatcher {
             parameters:
@@ -69,7 +74,10 @@ module SimpleAidLayer like IAidLayer
         aid.lowerOut --> lower.in++;
         aid.lowerIn <-- lower.out++;
 
-        densityMapApp.socketIn <-- upper.out++ if hasDensityMap;
-        densityMapApp.socketOut --> upper.in++ if hasDensityMap;
+        densityMapApp.socketIn <-- upper.out++ if  exists(densityMapApp);
+        densityMapApp.socketOut --> upper.in++ if exists(densityMapApp);
+
+        beaconApp.socketIn <-- upper.out++ if exists(beaconApp);
+        beaconApp.socketOut --> upper.in++ if exists(beaconApp);
 
 }

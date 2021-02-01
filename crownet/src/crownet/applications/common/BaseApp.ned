@@ -30,6 +30,7 @@ simple BaseApp like IApp
         volatile double appMainInterval @unit(s) = default(-1s); // intervall to enter fsmAppMain to process app logic.
         										  // if set to -1 fsmAppMain will not be used and user must provide own
         										  // handling. fsmAppMain does nothing on default.
+        volatile double appMainIntervalJitter @unit(s) = default(0s); // 
         // Base addressing paramters
         string localAddress = default("");
         int localPort = default(-1);  // local port (-1: use ephemeral port)
@@ -44,9 +45,9 @@ simple BaseApp like IApp
         // signals
         @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=inet::Packet);
+        @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
-        @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
         @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="appPkSeqNo(packetReceived)"; record=vector; interpolationmode=none);
 
