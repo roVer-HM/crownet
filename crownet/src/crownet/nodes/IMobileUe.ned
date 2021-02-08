@@ -20,6 +20,4 @@ moduleinterface IMobileUe
 {
     parameters:
         @display("i=block/app");
-        //# Mobility
-        string mobilityType;
 }

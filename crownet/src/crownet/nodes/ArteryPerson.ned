@@ -36,7 +36,7 @@ module ArteryPerson like IMobileUe
 
         bool withAntennaMobility = default(false);
         *.interfaceTableModule = default(absPath(".interfaceTable"));
-        string mobilityType = default("VaderePersonTracedMobility");
+        mobility.typename = default("VaderePersonTracedMobility");
         int numRadios = default(1);
         vanetza.position.typename = "RoVerPositionProvider";
 
@@ -46,7 +46,7 @@ module ArteryPerson like IMobileUe
         inout ethg[] @labels(EtherFrame-conn);
 
     submodules:
-        mobility: <mobilityType> like IMobility {
+        mobility: <default("")> like IMobility if typename != "" {
             parameters:
                 @display("p=50,200");
         }
