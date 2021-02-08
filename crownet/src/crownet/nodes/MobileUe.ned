@@ -25,7 +25,7 @@ module MobileUe extends Ue like IMobileUe{
 	parameters:
 	    @display("i=misc/smartphone;is=vs");
 
-	    mobilityType = default("VaderePersonTracedMobility");
+	    mobility.typename = default("VaderePersonTracedMobility");
 
 	    // Network Layer specs
         *.routingTableModule = default(absPath(".ipv4.routingTable"));
