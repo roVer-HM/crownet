@@ -41,7 +41,16 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
       scheduleAt(simTime() + m_updateInterval, m_updateEvent);
     }
   } else if (msg == m_connectEvent) {
-    m_traci->connect(m_launcher->launch());
+      ServerEndpoint endpoint = m_launcher->launch();
+      try{
+          m_traci->connect(endpoint);
+      } catch (tcpip::SocketException e) {
+          throw omnetpp::cRuntimeError("Cannot connect to Vadere server using <<%s:%s>>. "
+                  "Is server or container started or check hostname and port configuration?",
+                  endpoint.hostname.c_str(), std::to_string(endpoint.port).c_str());
+    }
+
+
     auto traciLauchner = omnetpp::check_and_cast<VadereLauchner*>(m_launcher);
     {  // scope of raw pointer
       auto tmp_vadereLiteApi =
