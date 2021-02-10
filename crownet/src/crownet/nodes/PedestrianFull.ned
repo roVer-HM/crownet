@@ -57,10 +57,6 @@ module PedestrianFull like INetworkNode
         bool useArtery = default(true);
         string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddelwareEmpyt");
 
-
-        //# AID layer
-        string aidType = default("SimpleAidLayer");
-
         //# Apps
         int numApps = default(0);   // no of apps.
                                     // Specify the app types in INI file with app[0..1].typename="UdpVideoStreamClient" syntax
@@ -92,7 +88,7 @@ module PedestrianFull like INetworkNode
         *.routingTableModule = default("^.^.ipv4.routingTable");
         **.mobilityModule = default(absPath(".mobility"));
         **.neighborhoodTableMobdule = default(absPath(".nTable"));
-        **.multicastInterface = "cellular";
+        **.multicastInterface = default("cellular");
 
         //# Ext Interface
         bool enableExtInterface = default(false);
@@ -134,7 +130,7 @@ module PedestrianFull like INetworkNode
         app[numApps]: <> like IApp {
             @display("p=346.528,54.88,row,140");
         }
-        aid: <aidType> like IAidLayer {
+        aid: <default("SimpleAidLayer")> like IAidLayer if typename !="" {
             @display("p=396.704,216.384");
         }
         udp: <default(firstAvailableOrEmpty("Udp"))> like IUdp if hasUdp {
@@ -225,11 +221,11 @@ module PedestrianFull like INetworkNode
             app[i].socketIn <-- aa.out++;
         }
 
-        aa.out++ --> aid.upperIn;
-        aa.in++ <-- aid.upperOut;
+        aa.out++ --> aid.upperIn if exists(aid);
+        aa.in++ <-- aid.upperOut if exists(aid);
 
-        at.out++ --> aid.lowerIn;
-        at.in++ <-- aid.lowerOut;
+        at.out++ --> aid.lowerIn if exists(aid);
+        at.in++ <-- aid.lowerOut if exists(aid);
 
         at.out++ --> udp.appIn if hasUdp;
         at.in++ <-- udp.appOut if hasUdp;

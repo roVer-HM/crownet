@@ -8,7 +8,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from roveranalyzer.runner.roverrunner import BaseRunner, process_as
+from roveranalyzer.simulators.rover.runner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):
