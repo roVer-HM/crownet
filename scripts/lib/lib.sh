@@ -80,8 +80,12 @@ function create_name(){
 function run_container_X11() {
 	check_create_network
 	# allow X11 access for the docker user
-	xhost +"local:docker@" >/dev/null
-	# xhost +"local:root"
+	if [[ "$OSTYPE" == "darwin"* ]];then
+ 		xhost +"localhost"
+	else
+		xhost +"local:docker@" >/dev/null
+		# xhost +"local:root"
+	fi
 
 	# Detect if a tty is connected as standard input
 	# https://gist.github.com/davejamesmiller/1966557
@@ -105,7 +109,11 @@ function run_container_X11() {
 	CMD_ARR+=(--cap-add=SYS_PTRACE)
 	CMD_ARR+=(--user $(id -u))
 	CMD_ARR+=(--network $INTNET)
-	CMD_ARR+=(--env DISPLAY=$DISPLAY)
+	if [[ "$OSTYPE" == "darwin"* ]];then
+		CMD_ARR+=(--env DISPLAY="host.docker.internal:0")
+	else
+		CMD_ARR+=(--env DISPLAY=$DISPLAY)
+	fi
 	if [[ ! -z ${NEDPATH} ]];then
 	  # set NEDPATH in container to simplify opp_run commands.
 		CMD_ARR+=(--env NEDPATH=$NEDPATH)
@@ -138,7 +146,11 @@ function run_container_X11() {
 	fi
     CMD_ARR+=(--env CROWNET_HOME=${CROWNET_HOME})
 	CMD_ARR+=(--workdir=$(pwd))
-	CMD_ARR+=(--volume="/home/$USER:/home/$USER")
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+		CMD_ARR+=(--volume="/Users/$USER:/Users/$USER")
+	else
+		CMD_ARR+=(--volume="/home/$USER:/home/$USER")
+	fi
 	CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
 	CMD_ARR+=(--volume="/etc/passwd:/etc/passwd:ro")
 	CMD_ARR+=(--volume="/etc/shadow:/etc/shadow:ro")
