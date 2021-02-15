@@ -24,7 +24,7 @@ omnetpp_pp_enabled = True
 
 ##############################################
 
-crownet_printer_debug = False #or True
+crownet_printer_debug = True #or True
 def debug(s):
     global crownet_printer_debug
     if crownet_printer_debug:
@@ -66,45 +66,6 @@ class cPrinterBase:
 
 ##############################################
 
-# https://stackoverflow.com/a/19270863/12079469
-def eng_string( x, format='%.3f',si_str='s', si=False):
-    '''
-    Returns float/int value <x> formatted in a simplified engineering format -
-    using an exponent that is a multiple of 3.
-
-    format: printf-style string used to format the value before the exponent.
-
-    si: if true, use SI suffix for exponent, e.g. k instead of e3, n instead of
-    e-9 etc.
-
-    E.g. with format='%.2f':
-        1.23e-08 => 12.30e-9
-             123 => 123.00
-          1230.0 => 1.23e3
-      -1230000.0 => -1.23e6
-
-    and with si=True:
-          1230.0 => 1.23k
-      -1230000.0 => -1.23M
-    '''
-    if x.is_signed():
-        sign = '-'
-    else:
-        sign = ''
-    exp = int( math.floor( math.log10( x)))
-    exp3 = exp - ( exp % 3)
-    x3 = getcontext().divide(x, Decimal(( 10 ** exp3)))
-
-    if si and exp3 >= -24 and exp3 <= 24 and exp3 != 0:
-        exp3_text = f"{'yzafpnum kMGTPEZY'[ int(( exp3 - (-24)) / 3)]}{si_str}"
-    elif exp3 == 0:
-        exp3_text = f"{si_str}"
-    else:
-        exp3_text = f"e{exp3}{si_str}"
-
-    return ( '%s'+format+'%s') % ( sign, x3, exp3_text)
-
-
 class SimTimePrinter:
     "Print a SimTime"
 
@@ -116,21 +77,8 @@ class SimTimePrinter:
             return "0s"
         s = Decimal(str(self.val['t']) + 'E' + str(self.val['scaleexp']))
         s = s.normalize()
-        return eng_string(s, si_str='s', si=True)
+        return f"{s.to_eng_string()} s"
 
-
-class SimTimePrinter2:
-    "Print a SimTime"
-
-    def __init__(self, val):
-        self.val = val
-
-    def to_string(self):
-        if (self.val['t'] == 0):
-            return "0s"
-        s = Decimal(str(self.val['t']) + 'E' + str(self.val['scaleexp']))
-        s = s.normalize()
-        return eng_string(s, si_str='s', si=True)
 
 class NodeIdentifierInt:
 
@@ -147,7 +95,7 @@ class GridCellID:
         self.val = val
 
     def to_string(self):
-        return f"id: [{self.val['id.first']}, {self.val['id.second']}]"
+        return f"[{self.val['id']['first']}, {self.val['id']['second']}]"
 
 ##############################################
 
@@ -318,9 +266,9 @@ def build_crownet_dictionary():
     crownet_printer = OppPrinter("crownet")
 
     crownet_printer.add('omnetpp::SimTime', SimTimePrinter)
-    crownet_printer.add('omnetpp::simtime_t', SimTimePrinter2)
-    crownet_printer.add('crownet::NodeIdentifiere<int>', NodeIdentifierInt)
-    #crownet_printer.add('crownet::GridCellID',GridCellID)
+    crownet_printer.add('omnetpp::simtime_t', SimTimePrinter)
+    crownet_printer.add('crownet::IntIdentifer', NodeIdentifierInt)
+    crownet_printer.add('crownet::GridCellID',GridCellID)
 # As of GDB 7.5 and CDT 3.8.1, GDB often crashes during pretty printing
 # a cObject pointer so the cObject pretty printer routines are disabled for now.
 #    crownet_printer.add('cObject', cObjectPrinter)
