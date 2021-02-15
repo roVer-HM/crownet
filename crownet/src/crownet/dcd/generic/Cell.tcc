@@ -133,8 +133,16 @@ typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::acceptGetEntry(
 template <typename C, typename N, typename T>
 template <typename Fn>
 void Cell<C, N, T>::computeValue(const Fn computeAlg) {
+  // 1 clear selection flag on all entries
+  for(auto & e : this->data){
+      e.second->setSelectedIn("");
+  }
+  // 2 apply computeAlg to select or compute value which represents this cell.
   this->cell_value = computeAlg(*this);  // may set empty shared_ptr
+  // 3 set selection flag
   if (this->cell_value) this->cell_value->setSelectedIn(computeAlg.getName());
+  // todo: if computeAlg creates a new entry (i.e compute not select) this->data
+  // does not contain the selected value!
 }
 
 template <typename C, typename N, typename T>

@@ -129,8 +129,8 @@ void BaseDensityMapApp::initWriter(){
       s << "dcdMap_" << hostId;
       fBuilder.addPath(s.str());
 
-      fileWriter.reset(fBuilder.build(
-          std::make_shared<RegularDcdMapValuePrinter>(dcdMap.get())));
+      fileWriter.reset(fBuilder.build<RegularDcdMap>(
+              dcdMap.get(), par("mapTypeLog").stdstringValue()));
       fileWriter->writeHeader();
     }
 
@@ -195,7 +195,6 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
   // 3) check local map for _nodeId and compare if the local and packet
   //    place the _nodeId in the same cell.
   dcdMap->addToNeighborhood(sourceNodeId, _cellId);
-
   //  using namespace omnetpp;
   //  EV_DEBUG << dMap->getView(mapType)->str();
   //  EV_DEBUG << dMap->getView("local")->str();
@@ -209,7 +208,9 @@ void BaseDensityMapApp::updateLocalMap() {
     throw omnetpp::cRuntimeError("Not Implemented in Base* class. Use child class");
 }
 
-void BaseDensityMapApp::writeMap() { fileWriter->writeData(); }
+void BaseDensityMapApp::writeMap() {
+    fileWriter->writeData();
+}
 
 std::shared_ptr<RegularDcdMap> BaseDensityMapApp::getMap() { return dcdMap; }
 
