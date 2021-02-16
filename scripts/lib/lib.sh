@@ -151,10 +151,12 @@ function run_container_X11() {
 	else
 		CMD_ARR+=(--volume="/home/$USER:/home/$USER")
 	fi
-	CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
-	CMD_ARR+=(--volume="/etc/passwd:/etc/passwd:ro")
-	CMD_ARR+=(--volume="/etc/shadow:/etc/shadow:ro")
-	CMD_ARR+=(--volume="/etc/sudoers.d:/etc/sudoers.d:ro")
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
+		CMD_ARR+=(--volume="/etc/passwd:/etc/passwd:ro")
+		CMD_ARR+=(--volume="/etc/shadow:/etc/shadow:ro")
+		CMD_ARR+=(--volume="/etc/sudoers.d:/etc/sudoers.d:ro")
+	fi
 	CMD_ARR+=(--volume="/tmp/.X11-unix:/tmp/.X11-unix")
     if [[ ! -z ${OPP_EXTERN_DATA_MNT} ]];then
 	    CMD_ARR+=(--volume="$OPP_EXTERN_DATA_MNT")
