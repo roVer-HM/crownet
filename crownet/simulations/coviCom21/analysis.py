@@ -113,7 +113,8 @@ def make_delay_plot(dcd, para, delay, save_path):
     f1, ax = dcd.plot_count_diff()
     font_dict = dcd.font_dict
 
-    ax.set_title("Node count and packet delay (beacon and map) over time", **font_dict["title"])
+    # ax.set_title("Node count and packet delay (beacon and map) over time", **font_dict["title"])
+    ax.set_title("")
     ax.set_ylabel("Pedestrian count", **font_dict["ylabel"])
 
     df_all = delay.opp.filter().vector().normalize_vectors(axis=0)
@@ -200,11 +201,11 @@ def delay_distance():
     time = 66
     delay_t = "measurement_age"
     fig, ax = check_ax()
-    fig, ax = dcd_120.plot_delay_over_distance(time, -1, delay_t, remove_null=True, label="DCD_Map_120", ax=ax)
+    fig, ax = dcd_120.plot_delay_over_distance(time, -1, delay_t, remove_null=True, label="S2 (overload situation)", ax=ax)
     fig, ax = dcd_60.plot_delay_over_distance(time, -1, delay_t, remove_null=True,
-                                              label="DCD_Map_60", ax=ax,
+                                              label="S1", ax=ax,
                                               ax_prop=dict(title="Measurement Age over Distance for $t=66\,s$"))
-    fig.legend(prop=dcd_60.font_dict["legend"], bbox_to_anchor=(.33, 0.87))
+    fig.legend(prop=dcd_60.font_dict["legend"], bbox_to_anchor=(.41, 0.87))
     ax.tick_params(axis="x", labelsize=dcd_60.font_dict["tick_size"])
     ax.tick_params(axis="y", labelsize=dcd_60.font_dict["tick_size"])
     ax.lines[0].set_linestyle("None")
@@ -213,17 +214,19 @@ def delay_distance():
     ax.lines[1].set_marker("v")
     ax.set_xlim(right=200)
     ax.set_ylabel(f"Age in [s] ", **dcd_120.font_dict["ylabel"])
+    ax.set_title("")
 
     fig2, ax2 = check_ax(figsize=(4, 9))
-    ax2.set_title("Distance distribution of \n NT entries to owner", fontsize=14)
+    # ax2.set_title("Distance distribution of \n NT entries to owner", fontsize=14)
+    ax2.set_title("")
     local_ = dcd_120.map.index.get_level_values("ID") == dcd_120.map["source"]
     df_hist_120 = dcd_120.map.loc[(dcd_120.map["count"] != 0) & local_]
-    ax2.hist(df_hist_120["owner_dist"], density=True, histtype="step", label="dcd_map_120")
+    ax2.hist(df_hist_120["owner_dist"], density=True, histtype="step", label="S2 (overload situation)")
     ax2.set_xlabel(f"Cell distance (euklid) to owners location [m]", **dcd_120.font_dict["xlabel"])
 
     local_ = dcd_60.map.index.get_level_values("ID") == dcd_60.map["source"]
     df_hist_60 = dcd_60.map.loc[(dcd_60.map["count"] != 0) & local_]
-    ax2.hist(df_hist_60["owner_dist"], density=True, histtype="step", label="dcd_map_60")
+    ax2.hist(df_hist_60["owner_dist"], density=True, histtype="step", label="S2")
     ax2.set_xlabel(f"distance [m]", **dcd_60.font_dict["ylabel"])
 
     ax2.legend(prop={"size": 14})
@@ -233,8 +236,8 @@ def delay_distance():
 
 
 def main():
-    make_figures()
-    make_sample_map()
+    # make_figures()
+    # make_sample_map()
     delay_distance()
     # interactive: select section
     # make_grid_map()
