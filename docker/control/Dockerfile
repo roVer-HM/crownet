@@ -9,13 +9,13 @@
 
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
 
-# Specify the version/tag of vadere to be put in the container. defaut master
+# Specify the version/tag of the flow controller to be put in the container. defaut master
 ARG BRANCH
 
 LABEL description "flow controller (as used in roVer)"
 LABEL maintainer  "mayr9@hm.edu"
 
-# clone the vadere sources (version/tag is specified in the git command at the end)
+# clone the flow control sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/flowcontrol
 # enable lfs (must be done before cloning!) and clone the project
 RUN git lfs install
