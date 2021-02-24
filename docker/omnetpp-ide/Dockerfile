@@ -17,6 +17,12 @@ WORKDIR /opt/omnetpp/omnetpp
 # now install the Eclipse IDE base
 ADD ide/ide.tar.gz .
 
+# install embeded browser components
+RUN apt-get update -y
+RUN export SWT_GTK3=1
+RUN apt-get install -y gtk3.0
+RUN apt-get install -y libwebkitgtk-3.0-0
+
 # installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
 RUN pip3 install cpplint
 # check if PID if is empty. If so this will create an infinte loop at while [ -e /proc/ ]
