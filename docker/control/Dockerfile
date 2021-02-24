@@ -6,8 +6,10 @@
 # - include drivers for HW-accelerated OpenCL/nvidia
 # - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
 
-
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
+
+#run mkdir ~/.ssh
+#run COPY ~/.ssh/ /root/.ssh/known_host
 
 # Specify the version/tag of the flow controller to be put in the container. defaut master
 ARG BRANCH
@@ -22,7 +24,10 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN git clone --depth 1 --branch $BRANCH git@gitlab.lrz.de:hm-mayr9/vadere-control.git $BRANCH
+#RUN git clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
+
+RUN --mount=type=secret,id=sshkey,dst=~/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+        clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
 
 # add a symbolic link so flowcontrol is found in the path
 RUN ln -f -s /opt/flowcontrol/$BRANCH /opt/flowcontrol/flowcontrol

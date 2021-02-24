@@ -107,7 +107,7 @@ if __name__ == "__main__":
     is_controlled = True
     is_vadere_only = True
 
-    settings = [
+    settings =  [
                     "--qoi",
                     "degree_informed_extract.txt",
                     "poisson_parameter.txt",
