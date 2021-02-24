@@ -26,6 +26,9 @@ RUN apt-get update && \
        libopenmpi-dev libxml2-dev libwebkitgtk-3.0-0  && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+    
+# download public key for sam-dev.cs.hm.edu
+RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -p 6000 sam-dev.cs.hm.edu >> ~/.ssh/known_hosts
 
 RUN cd /usr/src/googletest/googletest && cmake CMakeLists.txt && make install
 RUN cd /usr/src/googletest/googlemock && cmake CMakeLists.txt && make install
