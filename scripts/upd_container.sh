@@ -28,7 +28,7 @@ fi
 TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG"
 
 echo "Building $IMAGE_SHORT ..."
-DOCKER_BUILDKIT=1 docker build $TAG_OPTIONS --secret id=sshkey,src=$SSH_KEY_LOCATION --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
+DOCKER_BUILDKIT=1 docker build $TAG_OPTIONS --no-cache --secret id=sshkey,src=$SSH_KEY_LOCATION --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
 
 if [ $? -eq 0 ]; then
    docker login "$REGISTRY"

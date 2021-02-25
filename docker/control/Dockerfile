@@ -26,11 +26,12 @@ RUN git lfs install
 ARG NOCACHE_CLONE=0
 #RUN git clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
 
-RUN export DOCKER_BUILDKIT=1
+#RUN export DOCKER_BUILDKIT=1
 
+RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa cat /root/.ssh/id_rsa
 
 RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
+        clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git $BRANCH
 
 
 #RUN --mount=type=ssh git clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
