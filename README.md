@@ -22,7 +22,7 @@ The OMNeT++ simulation of communication and networking for disseminating mobilit
 * [Artery](http://artery.v2x-research.eu/) - Artery V2X Simulation Framework
 * [VEINS](https://veins.car2x.org/) - Vehicles in Network Simulation (VEINS) is an open-source vehicular network simulation framework.
 
-Since CrowNet requires several modifications in each of these open-source projects, they are included as submodules and changes are tracked on separete branches.
+Since CrowNet requires several modifications in each of these open-source projects, they are included as submodules and changes are tracked on separate branches.
 
 ## Getting Started
 
@@ -223,6 +223,16 @@ omnetpp exec ./configure --with-inet=../../../inet4
 omnetpp exec make -j4
 cd ../../..
 ```
+# Additional Installation Steps (optional)
+## Start SSH agent automatically
+ When logging in into your profile, you are asked for your passphrase for your key:
+ ```
+eval `ssh-agent`
+SSH_ASKPASS='ssh-askpass'
+ssh-add ~/.ssh/id_rsa
+```
+with id_rsa as your private key.
+
 # Coding Style
 
 To ensure a standardized code style, we use the Google C++ Style Guide.
@@ -302,13 +312,3 @@ pip install black
 For IDE support see Black [Editor integration](https://black.readthedocs.io/en/stable/editor_integration.html).
 
 ToDo: add git hook to check formatting of python files.
-
-
-# Start SSH agent automtically
- When logging in into your profile, you are asked for your passphrase for your key:
- ```
-eval `ssh-agent`
-SSH_ASKPASS='ssh-askpass'
-ssh-add ~/.ssh/id_rsa
-```
-with id_rsa as your private key.
