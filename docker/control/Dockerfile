@@ -1,15 +1,9 @@
-# vadere Crowd Simulator
+# flowcontrol traci handler
 #
-# see https://gitlab.lrz.de/vadere/vadere
+# see https://sam-dev.cs.hm.edu/rover/flowcontrol
 #
-# TODO:
-# - include drivers for HW-accelerated OpenCL/nvidia
-# - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
 
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
-
-#run mkdir ~/.ssh
-#run COPY ~/.ssh/ /root/.ssh/known_host
 
 # Specify the version/tag of the flow controller to be put in the container. defaut master
 ARG BRANCH
@@ -24,21 +18,8 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-#RUN git clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
-
-#RUN export DOCKER_BUILDKIT=1
-
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa cat /root/.ssh/id_rsa
-
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-        clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git $BRANCH
-
-
-#RUN --mount=type=ssh git clone --depth 1 --branch $BRANCH ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
-
-#RUN --mount=type=secret,id=sshkey,dst=~/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
-#        clone --depth 1 --branch $BRANCH https://sam-dev.cs.hm.edu/rover/flowcontrol.git $BRANCH
-
+RUN --mount=type=ssh git clone --depth 1 --branch $BRANCH \
+    ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
 
 # add a symbolic link so flowcontrol is found in the path
 RUN ln -f -s /opt/flowcontrol/$BRANCH /opt/flowcontrol/flowcontrol
@@ -50,15 +31,15 @@ RUN ln -f -s /usr/bin/python3.7 /usr/bin/python3
 WORKDIR /opt/flowcontrol/flowcontrol
 
 ARG NOCACHE_PULL=0
-RUN git pull
+RUN --mount=type=ssh git \
+            pull ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
 
 # configure and install
-RUN python3 setup.py install
+#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python-pkg-resources
+#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-setuptools python3-pip
 
-
-# create script to start vadere gui and add it to the path.
-#COPY vadere-gui /usr/local/bin/vadere-gui
-# RUN chmod 555 /usr/local/bin/vadere-gui
+RUN python3.7 setup.py install
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
