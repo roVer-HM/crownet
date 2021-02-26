@@ -13,7 +13,6 @@ from flowcontrol.crownetcontrol.traci.subsciption_listners import VaderePersonLi
 # TikTokController ->
 #	pass
 
-
 def server_test():
 	sub = VaderePersonListener.with_vars("persons", {"pos": tc.VAR_POSITION, "target_list": tc.VAR_TARGET_LIST})
 	controller = TikTokController()
