@@ -115,6 +115,8 @@ if __name__ == "__main__":
                     datetime.now().isoformat().replace(":", "").replace("-", ""),
                     "--delete-existing-containers",
                     "--create-vadere-container",
+		    "--with-control",
+		    "control.py"
             # docker container tags: both latest
                 ]
 
