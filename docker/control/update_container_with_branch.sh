@@ -8,6 +8,6 @@ then
       echo "\$1 is empty - branch not specified."
       exit -1
 else
-      $DIR/../../scripts/upd_container.sh $CONTAINER $VERSION_TAG -t "$IMAGE:branch_$1" --build-arg BRANCH=$1
+      $DIR/../../scripts/upd_container.sh $CONTAINER $VERSION_TAG --build-arg BRANCH=$1
 fi
 
