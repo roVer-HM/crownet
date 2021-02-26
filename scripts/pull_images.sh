@@ -11,3 +11,6 @@ docker image pull sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp-ide
 docker image pull sam-dev.cs.hm.edu:5023/rover/crownet/sumo
 docker image pull sam-dev.cs.hm.edu:5023/rover/crownet/vadere
 docker image pull sam-dev.cs.hm.edu:5023/rover/crownet/vadere-ide
+docker image pull sam-dev.cs.hm.edu:5023/rover/crownet/flowcontrol
+docker image pull sam-dev.cs.hm.edu:5023/rover/crownet/flowcontrol-ide
+
