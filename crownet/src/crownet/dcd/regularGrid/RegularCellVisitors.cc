@@ -10,8 +10,6 @@
 namespace crownet {
 
 RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
-  //  auto iter = cell.validIter();
-  //  RegularCell::value_type ret = *iter;  // first item of iter
   RegularCell::entry_t_ptr ret = nullptr;
   for (const auto& e : cell.validIter()) {
     if (ret == nullptr) {
@@ -19,10 +17,9 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
       continue;
     }
     if (e.second->getMeasureTime() > ret->getMeasureTime()) {
-      ret = e.second;  // std::make_pair(e.first, e.second);
+      ret = e.second;
     }
   }
-  //  return ret.second;
   return ret;
 }
 

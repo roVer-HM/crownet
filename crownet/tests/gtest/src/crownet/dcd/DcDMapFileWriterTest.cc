@@ -163,6 +163,58 @@ TEST_F(DcDMapFileWriterTest, computeValues_idenpotent) {
   EXPECT_EQ(sourceOfSelected.value(), 805);
 }
 
+TEST_F(DcDMapFileWriterTest, print_duplicate_selections) {
+    /*
+     *  For each cell only one entry can be the 'selected'
+     *  The selection entry in the Entry object must be reset between
+     *  calls to MAP.computeValues() to ensure only on 'selected' value
+     *  to be set if the hole map is printed. with RegularDcdMapAllPrinter
+     */
+    YmfVisitor ymf_v;
+    std::stringstream out;
+    RegularDcdMapAllPrinter p(&mapFull);
+    mapFull.setOwnerCell(GridCellID(3, 3));
+
+    setSimTime(1.4);
+    mapFull.computeValues(ymf_v);
+    //source of Cell[3,3] must be id=3
+    auto sourceOfSelected = mapFull.getCell(GridCellID(3,3)).val()->getSource();
+    EXPECT_EQ(sourceOfSelected.value(), 3);
+    p.writeTo(out, "; ");
+
+
+    setSimTime(10.4);
+    // set time to t=33 previous time for [3,3] was 32
+    // this should now be the selected value
+    update(mapFull, 3, 3, 555, 10, 33.3); // x,y,id,count,time
+    mapFull.computeValues(ymf_v);
+    sourceOfSelected = mapFull.getCell(GridCellID(3,3)).val()->getSource();
+    EXPECT_EQ(sourceOfSelected.value(), 555);
+    p.writeTo(out, "; ");
+
+    std::string ret =
+            "1.4; 1; 1; 2; 30; 30; 3; ; 0\n"
+            "1.4; 1; 1; 4; 31; 31; 800; ymf; 0\n"
+            "1.4; 3; 3; 3; 32; 32; 3; ymf; 1\n"
+            "1.4; 4; 4; 2; 34; 34; 3; ymf; 0\n"
+            "1.4; 4; 4; 3; 32; 32; 801; ; 0\n"
+            "1.4; 6; 3; 5; 33; 33; 803; ymf; 0\n"
+            "1.4; 6; 3; 7; 31; 31; 805; ; 0\n"
+            "1.4; 6; 3; 9; 12; 12; 808; ; 0\n"
+            "10.4; 1; 1; 2; 30; 30; 3; ; 0\n"
+            "10.4; 1; 1; 4; 31; 31; 800; ymf; 0\n"
+            "10.4; 3; 3; 3; 32; 32; 3; ; 1\n" // << no 'ymf' here!
+            "10.4; 3; 3; 10; 33.3; 33.3; 555; ymf; 1\n"
+            "10.4; 4; 4; 2; 34; 34; 3; ymf; 0\n"
+            "10.4; 4; 4; 3; 32; 32; 801; ; 0\n"
+            "10.4; 6; 3; 5; 33; 33; 803; ymf; 0\n"
+            "10.4; 6; 3; 7; 31; 31; 805; ; 0\n"
+            "10.4; 6; 3; 9; 12; 12; 808; ; 0\n";
+
+    EXPECT_STREQ(out.str().c_str(), ret.c_str());
+//    std::cout << out.str() << std::endl;
+}
+
 TEST_F(DcDMapFileWriterTest, printall_all_valid) {
   YmfVisitor ymf_v;
   std::stringstream out;

@@ -6,6 +6,8 @@
  */
 
 #include "crownet/common/util/FileWriter.h"
+#include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 #include <omnetpp.h>
 #include <boost/algorithm/string/join.hpp>
@@ -21,9 +23,35 @@ FileWriterBuilder::FileWriterBuilder(std::string sep) {
   metadata["SEP"] = sep;
 }
 
-FileWriterBuilder &FileWriterBuilder::addPath(std::string path) {
+FileWriterBuilder &FileWriterBuilder::addPath(const std::string &path) {
   this->path = path;
   return *this;
+}
+
+
+template <>
+FileWriter *FileWriterBuilder::build(RegularDcdMap* map, const std::string &mapType){
+    FileWriter *obj = nullptr;
+    if (mapType == "all"){
+        obj = new FileWriter(std::make_shared<RegularDcdMapAllPrinter>(map));
+    } else {
+        obj = new FileWriter(std::make_shared<RegularDcdMapValuePrinter>(map));
+    }
+    obj->initialize(path, metadata["SEP"]);
+    // write metadata
+    int n = metadata.size();
+    obj->write() << "#";
+    for (const auto &e : metadata) {
+      obj->write() << e.first << "=" << e.second;
+      if (n > 1) {
+        obj->write() << ",";
+      }
+      n--;
+    }
+    obj->write() << "\n";
+
+
+    return obj;
 }
 
 FileWriter *FileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {

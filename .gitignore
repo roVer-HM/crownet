@@ -11,7 +11,7 @@ compile_commands.json
 *.h5
 **/*.csv.ERROR
 **/*.csv.FAILED
-
+**/results
 
 # ignore gitlab-runner local test directory
 /builds

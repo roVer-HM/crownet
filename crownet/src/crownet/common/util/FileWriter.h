@@ -54,8 +54,11 @@ class FileWriterBuilder {
     metadata[key] = std::to_string(value);
     return *this;
   }
-  FileWriterBuilder &addPath(std::string path);
+  FileWriterBuilder &addPath(const std::string &path);
+
   FileWriter *build(std::shared_ptr<FilePrinter> printer);
+  template <typename M>
+  FileWriter *build(M* map, const std::string &mapType);
 
  private:
   using metadata_t = std::map<std::string, std::string>;
