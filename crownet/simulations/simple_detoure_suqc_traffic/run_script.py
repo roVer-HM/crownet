@@ -26,7 +26,7 @@ class SimulationRun(BaseRunner):
         df_r.index = df_r.index - 249
         return df_r
 
-    @process_as({"prio": 20, "type": "post"})
+    @process_as({"prio": 20, "type": "postx"})
     def degree_informed_extract(self):
         filename = "DegreeInformed.txt"
         # wait for file
@@ -48,7 +48,7 @@ class SimulationRun(BaseRunner):
         plt.title("Information degree")
         plt.savefig(os.path.join(os.path.dirname(filepath), "InformationDegree.png"))
 
-    @process_as({"prio": 10, "type": "post"})
+    @process_as({"prio": 10, "type": "postx"})
     def time_95_informed(self):
         filename = "DegreeInformed.txt"
         # wait for file
@@ -70,7 +70,7 @@ class SimulationRun(BaseRunner):
         f.write(f" timeToInform95PercentAgents\n0 {time95}")
         f.close()
 
-    @process_as({"prio": 30, "type": "post"})
+    @process_as({"prio": 30, "type": "postx"})
     def poisson_parameter(self):
         filename = "numberPedsGen.txt"
         # wait for file
@@ -90,6 +90,8 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
+    scenario_file = os.path.join(os.getcwd(), "scenario002.scenario")
+
     settings = [
                     "--qoi",
                     "degree_informed_extract.txt",
@@ -100,7 +102,10 @@ if __name__ == "__main__":
                     "--create-vadere-container",
                     "--with-control",
                     "control.py",
-                    "--control-vadere-only"
+                    "--control-vadere-only",
+                    "--scenario",
+                    scenario_file,
+
                     # docker container tags: both latest
                 ]
 

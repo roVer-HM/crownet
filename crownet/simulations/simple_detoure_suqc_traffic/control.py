@@ -14,24 +14,27 @@ if __name__ == "__main__":
 	)
 	controller = TikTokController()
 
+	scenario_file = os.path.join(os.getcwd(), "scenario002.scenario")
+
 	if len(sys.argv) == 1:
 		settings = [
 			"--port",
 			"9999",
 			"--host-name",
 			"vadere",
-			"--client-mode"
+			"--client-mode",
+			"--scenario",
+			scenario_file
 		]
-
 		traci_manager = ControlTraciWrapper.get_controller_from_args(
 			working_dir=os.getcwd(), args=settings, controller=controller)
 	else:
+		print(sys.argv)
 		traci_manager = ControlTraciWrapper.get_controller_from_args(
 			working_dir=os.path.dirname(os.path.abspath(__file__)),
 			controller=controller)
 
 	controller.initialize_connection(traci_manager)
 	controller.start_controller()
-
 
 	print()
