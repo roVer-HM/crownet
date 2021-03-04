@@ -1,14 +1,17 @@
 #!/usr/bin/python3
-import os
-import sys
+import sys, os
+sys.path.append(os.path.abspath(".."))
+from import_PYTHON_PATHS import *
 
-import numpy
 from datetime import datetime
 
+from roveranalyzer.simulators.rover.runner import BaseRunner, process_as # add
+
+
+# scenario-specific python packages
+import numpy
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from roveranalyzer.simulators.rover.runner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):

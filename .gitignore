@@ -29,6 +29,7 @@ analysis/**/venv
 analysis/**/dist
 analysis/**/test_data
 *.egg-info
+.venv
 
 # crownet project
 
