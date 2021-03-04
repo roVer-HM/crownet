@@ -10,7 +10,7 @@ from flowcontrol.crownetcontrol.traci.connection_manager import ControlTraciWrap
 from flowcontrol.crownetcontrol.traci.subsciption_listners import VaderePersonListener
 
 
-class TikTokController(Controller):
+class TikTokController2(Controller):
     def __init__(self):
         super().__init__()
         self.sub = VaderePersonListener.with_vars(
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     sub = VaderePersonListener.with_vars(
         "persons", {"pos": tc.VAR_POSITION, "target_list": tc.VAR_TARGET_LIST}
     )
-    controller = TikTokController()
+    controller = TikTokController2()
 
     scenario_file = os.path.join(os.getcwd(), "scenario002.scenario")
 
@@ -67,9 +67,9 @@ if __name__ == "__main__":
             "--port",
             "9999",
             "--host-name",
-            "vadere",
+            "localhost",
             "--client-mode",
-            # "--start-server", start server manually if not set
+            "--start-server", # start server manually if not set
             "--scenario",
             scenario_file,
         ]
