@@ -71,7 +71,6 @@ network World
         traci.launcher.hostname = default("vadere");
         traci.launcher.port = default(9998);
 
-
         storyboard.middlewareModule = default(".middleware");
 
     submodules:
@@ -133,7 +132,7 @@ network World
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
 
-        flowController: <default("ControlManager")> like IControlManager if typename != "" {
+        flowController: <default("")> like IControlManager if typename != "" {
             @display("p=308.14874,319.43625;i=block/table2;is=s");
         }
 
