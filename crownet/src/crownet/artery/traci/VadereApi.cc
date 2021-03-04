@@ -33,6 +33,11 @@ TraCIPosition VadereApi::convert2D(const TraCIGeoPosition& pos) const {
   }
 }
 
+void VadereApi::forward(tcpip::Storage& msgIn,  tcpip::Storage& msgResponse){
+    mySocket->sendExact(msgIn);
+    mySocket->receiveExact(msgResponse);
+}
+
 VadereApi::VadereApi() : API(), v_simulation(*this), v_person(*this) {
   // override domain response
   myDomains[RESPONSE_SUBSCRIBE_SIM_VARIABLE] = &v_simulation;

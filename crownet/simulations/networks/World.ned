@@ -39,8 +39,9 @@ import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
 import crownet.common.GlobalDensityMap;
+import crownet.control.IControlManager;
 
-import artery.storyboard.Storyboard;
+import artery.storyboard.IStoryboard;
 import artery.utility.IdentityRegistry;
 import traci.Manager;
 
@@ -53,8 +54,8 @@ network World
 
         bool hasLte = default(true);
         bool hasLteCoreNetwork = default(hasLte);
-        bool hasWlan = default(false);
         bool hasStoryboard = default(false);
+        bool hasWlan = default(false);
         bool hasGlobalMap = default(true);
 
         traci.nodes.typename = default("VadereNodeManager");
@@ -68,7 +69,7 @@ network World
 
         traci.launcher.typename = default("VadereLauchner");
         traci.launcher.hostname = default("vadere");
-		traci.launcher.port = default(9998);
+        traci.launcher.port = default(9998);
 
 
         storyboard.middlewareModule = default(".middleware");
@@ -88,14 +89,14 @@ network World
             @display("p=411.99374,89.17125;is=s");
         }
         configurator: Ipv4NetworkConfigurator {
-            @display("p=523.74,198.66;is=s");
+            @display("p=523.74,207.69;is=s");
         }
         // LTE
         channelControl: LteChannelControl if hasLte {
             @display("p=410.865,148.995;is=s");
         }
         binder: LteBinder if hasLte {
-            @display("p=411.99374,198.66;is=s");
+            @display("p=411.99374,207.69;is=s");
         }
         eNB: eNodeB if hasLte {
             @display("p=37,51;is=vl");
@@ -113,7 +114,7 @@ network World
         // WLAN
         radioMedium: <default("Ieee80211ScalarRadioMedium")> like IRadioMedium if hasWlan {
             parameters:
-                @display("p=423.28125,267.51373;is=s");
+                @display("p=410.865,267.51373;is=s");
         }
         // TraCI
         traci: Manager {
@@ -124,12 +125,16 @@ network World
             @display("p=523.74,259.6125;i=block/table2;is=s");
         }
         // Misc
-        storyboard: Storyboard if hasStoryboard {
+        storyboard: <default("Storyboard")> like IStoryboard if hasStoryboard {
             parameters:
                 @display("p=523.74,148.995");
         }
         gloablDensityMap: GlobalDensityMap if hasGlobalMap {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
+        }
+
+        flowController: <default("ControlManager")> like IControlManager if typename != "" {
+            @display("p=308.14874,319.43625;i=block/table2;is=s");
         }
 
 
