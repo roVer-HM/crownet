@@ -10,6 +10,8 @@ import pandas as pd
 
 from roveranalyzer.simulators.rover.runner import BaseRunner, process_as
 
+from pythontraciwrapper.py4j_client import Py4jClient
+
 
 class SimulationRun(BaseRunner):
     def __init__(self, working_dir, args=None):
@@ -87,26 +89,53 @@ class SimulationRun(BaseRunner):
         f.write(f" PoissonParameter\n0 {poisson_parameter}")
         f.close()
 
+class VadereControl(BaseRunner):
+
+    def run_simulation(self):
+
+        self.build_and_start_vadere_runner()
+        self.build_control_runner()
+        print()
+
+
+    def build_control_runner(self):
+        pass
+
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 1:
-        # default behavior of script
-        runner = SimulationRun(
-            os.getcwd(),
-            [
-                "--qoi",
-                "degree_informed_extract.txt",
-                "poisson_parameter.txt",
-                "--experiment-label",
-                datetime.now().isoformat().replace(":", "").replace("-", ""),
-                "--delete-existing-containers",
-                "--create-vadere-container",
-		# docker container tags: both latest
-            ],
-        )
+    is_controlled = True
+    is_vadere_only = True
+
+    settings = [
+                    "--qoi",
+                    "degree_informed_extract.txt",
+                    "poisson_parameter.txt",
+                    "--experiment-label",
+                    datetime.now().isoformat().replace(":", "").replace("-", ""),
+                    "--delete-existing-containers",
+                    "--create-vadere-container",
+		    "--with-control",
+		    "control.py"
+            # docker container tags: both latest
+                ]
+
+    if is_controlled is False:
+        if len(sys.argv) == 1:
+            # default behavior of script
+            runner = SimulationRun(
+                os.getcwd(),
+                settings
+            )
+        else:
+            # use arguments from command line
+            runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
+
     else:
-        # use arguments from command line
-        runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
+        if is_vadere_only:
+            runner = VadereControl(os.getcwd(),
+                settings)
 
     runner.run()
+
+    print()

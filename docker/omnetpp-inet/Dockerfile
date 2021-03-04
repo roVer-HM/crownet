@@ -1,4 +1,4 @@
-# syntax = docker/dockerfile:1.0-experimental
+# syntax = docker/dockerfile:experimental
 #
 # OMNeT++ Simulator with the following extensions:
 # - INET Framework    (in /models/inet4)
@@ -10,7 +10,7 @@
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
 
 # Specify the version/tag of inet to be put in the container:
-ENV INETRELEASE v4.2.1
+ENV INETRELEASE v4.3.0
 ENV SIMULTERELEASE hm_master
 ENV VEINSRELEASE hm_master
 # Note: Remember to update the description below when changing versions/tags
@@ -28,14 +28,14 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=ssh git \
         clone --branch $INETRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/inet.git inet4
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /models/inet4
 
 ARG NOCACHE_PULL=0
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=ssh git \
         pull ssh://git@sam-dev.cs.hm.edu:6000/rover/inet.git $INETRELEASE
 
 # configure and compile
@@ -51,14 +51,14 @@ WORKDIR /models
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=ssh git \
        clone --branch $SIMULTERELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /models/simulte
 
 ARG NOCACHE_PULL=0
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=ssh git \
        pull ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git $SIMULTERELEASE
 
 # configure and compile
@@ -74,14 +74,14 @@ WORKDIR /models
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=ssh git \
        clone --branch $VEINSRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /models/veins
 
 ARG NOCACHE_PULL=0
-RUN --mount=type=secret,id=sshkey,dst=/root/.ssh/id_rsa GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git \
+RUN --mount=type=ssh git \
         pull ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git $VEINSRELEASE
 
 # configure and compile
