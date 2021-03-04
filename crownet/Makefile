@@ -8,6 +8,7 @@ VEINS_PROJ=../veins
 VEINS_INET_PROJ=../veins/subprojects/veins_inet
 
 GOOGLE_TEST_LIB = gtest
+GOOGLE_MOCK_LIB = gmock
 GOOGLE_TEST_INCLUDE = /usr/local/include
 
 
@@ -143,6 +144,7 @@ makefiles-test:
 		-lveins$$\(D\) \
 		-lveins_inet$$\(D\) \
 		-l$(GOOGLE_TEST_LIB) \
+		-l$(GOOGLE_MOCK_LIB) \
 		-lpthread
 
 checktestmakefiles:
