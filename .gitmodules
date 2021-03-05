@@ -18,4 +18,4 @@
 	url = ../artery.git
 [submodule "flowcontrol"]
 	path = flowcontrol
-	url = ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git
+	url = ../flowcontrol.git
