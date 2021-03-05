@@ -4,7 +4,7 @@ import os, sys
 def import_local_package_if_not_installed(package_name, local_path):
 
     spec = find_spec(package_name)
-    if spec is None:
+    if True:
         print(f"INFO Package {package_name} is not installed.")
         rover_analyzer_path = os.path.abspath(local_path)
         if os.path.isdir(rover_analyzer_path):
