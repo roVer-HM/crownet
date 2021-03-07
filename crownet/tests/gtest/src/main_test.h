@@ -8,7 +8,6 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <omnetpp.h>
 
 using namespace omnetpp;

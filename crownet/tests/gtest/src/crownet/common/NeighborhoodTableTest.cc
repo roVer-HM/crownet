@@ -1,7 +1,7 @@
 #include "main_test.h"
 #include "crownet/common/NeighborhoodTable.h"
 
-#include <gmock/gmock.h>
+#include "gmock/gmock.h"
 
 using namespace crownet;
 
@@ -10,7 +10,20 @@ class MockNeighborhoodTable : public NeighborhoodTable{
   public:
 //    MOCK_METHOD(checkTimeToLive,void());
     // (New) MOCK_METHOD(double, Bar, (std::string s), (override));
-    MOCK_METHOD(void, checkTimeToLive,(),(override));
+//    MOCK_METHOD(void, checkTimeToLive,(),(override));
+//    MOCK_METHOD(void, scheduleAt, (simetime_t t, cMessage *msg), (override));
+    MOCK_METHOD2(scheduleAt,void(simtime_t t, cMessage* msg));
+    MOCK_METHOD0(checkTimeToLive, void());
+//    virtual void scheduleAt(simtime_t t, cMessage *msg);
+
+    //    old MOCK_METHOD EXAMPLES
+    //    MOCK_METHOD0(PenUp, void());
+    //    MOCK_METHOD0(PenDown, void());
+    //    MOCK_METHOD1(Forward, void(int distance));
+    //    MOCK_METHOD1(Turn, void(int degrees));
+    //    MOCK_METHOD2(GoTo, void(int x, int y));
+    //    MOCK_CONST_METHOD0(GetX, int());
+    //    MOCK_CONST_METHOD0(GetY, int());
 };
 
 TEST(NeighborhoodTableBase, Test_constructor) {
@@ -84,37 +97,32 @@ TEST_F(NeighborhoodTableTest, handleBeacon) {
 
 TEST_F(NeighborhoodTableTest, handleMessage) {
   MockNeighborhoodTable mock;
-  NeighborhoodTable nTable;
-//  mock.handleMessage(msg);
-//  cMessage* msg = new cMessage("TitleMessage");
-//  nTable.setTitleMessage(msg);
-//  nTable.handleMessage(msg);
-//  EXPECT_CALL(mock,checkTimeToLive()).Times(1);
-  EXPECT_TRUE(1==1);
+  cMessage* ttl_msg = new cMessage("TitleMessage");
+  cMessage* invalid_msg = new cMessage("InvalidMessage");
+  simtime_t time = simTime().dbl();
+  double maxAge = 1.0;
+  // important to define mock spies before invoking the function to test
+  EXPECT_CALL(mock, checkTimeToLive()).Times(1);
+  EXPECT_CALL(mock, scheduleAt(time + maxAge, ttl_msg)).Times(1);
+  mock.setTitleMessage(ttl_msg);
+  mock.setMaxAge(maxAge);
+  mock.handleMessage(ttl_msg);
+  // this tests _that_ the expected exception is thrown
+  EXPECT_THROW(mock.handleMessage(invalid_msg), cRuntimeError);
+  delete invalid_msg; // suppress weird warning
 }
 
-//NeighborhoodTable::~NeighborhoodTable(){
-//    if (ttl_msg != nullptr)
-//        cancelAndDelete(ttl_msg);
-//}
+//TEST_F(NeighborhoodTableTest, initialize) {
+//  MockNeighborhoodTable mock;
+//  cMessage* ttl_msg = new cMessage("NeighborhoodTable_ttl");
+//  simtime_t time = simTime().dbl();
+//  double maxAge = 1.0;
+//  EXPECT_CALL(mock, scheduleAt(time + maxAge, ttl_msg)).Times(1); // triggers on call with arg 0
+//  mock.setTitleMessage(ttl_msg);
+//  mock.setMaxAge(maxAge);
 //
-//// cSimpleModule
-//void NeighborhoodTable::initialize(int stage){
-//    cSimpleModule::initialize(stage);
-//    if (stage == INITSTAGE_LOCAL){
-//        maxAge = par("maxAge");
-//        ttl_msg = new cMessage("NeighborhoodTable_ttl");
-//        scheduleAt(simTime() + maxAge, ttl_msg);
-//        WATCH_MAP(_table);
-//        WATCH(maxAge);
-//    }
-//}
-//
-//void NeighborhoodTable::handleMessage(cMessage *msg){
-//    if (msg == ttl_msg){
-//        checkTimeToLive();
-//        scheduleAt(simTime() + maxAge, ttl_msg);
-//    } else {
-//        throw cRuntimeError("Unknown Message received");
-//    }
+//  mock.initialize(0); // failes on par("maxAge") -> function of cComponent
+//  mock.initialize(1);
+//  mock.initialize(2);
+//  mock.initialize(42);
 //}
