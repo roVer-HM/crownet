@@ -6,16 +6,13 @@ echo ""
 echo "Using TRACI_PORT='$TRACI_PORT' TRACI_DEBUG='$TRACI_DEBUG' CONTROL_LOG_LEVEL='$CONTROL_LOG_LEVEL'  CONTROL_LOG='$CONTROL_LOG'"
 echo ""
 
-
-
-# print control version
-crownetctl --version
+'' TODO
 
 CMD_ARR=(crownetctl)
 CMD_ARR+=(--bind 0.0.0.0)
-# default to traci port 9997 to allow simultanous use of vadere and sumo and control
+# default to traci port 9999 to allow simultanous use of vadere and sumo and control
 if [[ -z $TRACI_PORT ]];then
-  CMD_ARR+=(--port 9997)
+  CMD_ARR+=(--port 9999)
 else
   CMD_ARR+=(--port $TRACI_PORT)
 fi

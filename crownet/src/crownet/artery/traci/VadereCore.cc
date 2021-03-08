@@ -66,6 +66,10 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
   }
 }
 
+std::shared_ptr<TraCiForwarder> VadereCore::getTraCiForwarder(){
+    return  std::dynamic_pointer_cast<VadereApi>(this->m_traci);
+}
+
 VadereLiteApi* VadereCore::getVadereLiteAPI() {
   return omnetpp::check_and_cast<VadereLiteApi*>(m_lite.get());
 }

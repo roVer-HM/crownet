@@ -1,16 +1,17 @@
 #!/usr/bin/python3
-import os
-import sys
+import sys, os
+sys.path.append(os.path.abspath(".."))
+from import_PYTHON_PATHS import *
 
-import numpy
 from datetime import datetime
 
+from roveranalyzer.simulators.rover.runner import BaseRunner, process_as # add
+
+
+# scenario-specific python packages
+import numpy
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from roveranalyzer.simulators.rover.runner import BaseRunner, process_as
-
-from pythontraciwrapper.py4j_client import Py4jClient
 
 
 class SimulationRun(BaseRunner):
@@ -28,7 +29,7 @@ class SimulationRun(BaseRunner):
         df_r.index = df_r.index - 249
         return df_r
 
-    @process_as({"prio": 20, "type": "post"})
+    @process_as({"prio": 20, "type": "postx"})
     def degree_informed_extract(self):
         filename = "DegreeInformed.txt"
         # wait for file
@@ -50,7 +51,7 @@ class SimulationRun(BaseRunner):
         plt.title("Information degree")
         plt.savefig(os.path.join(os.path.dirname(filepath), "InformationDegree.png"))
 
-    @process_as({"prio": 10, "type": "post"})
+    @process_as({"prio": 10, "type": "postx"})
     def time_95_informed(self):
         filename = "DegreeInformed.txt"
         # wait for file
@@ -72,7 +73,7 @@ class SimulationRun(BaseRunner):
         f.write(f" timeToInform95PercentAgents\n0 {time95}")
         f.close()
 
-    @process_as({"prio": 30, "type": "post"})
+    @process_as({"prio": 30, "type": "postx"})
     def poisson_parameter(self):
         filename = "numberPedsGen.txt"
         # wait for file
@@ -89,23 +90,10 @@ class SimulationRun(BaseRunner):
         f.write(f" PoissonParameter\n0 {poisson_parameter}")
         f.close()
 
-class VadereControl(BaseRunner):
-
-    def run_simulation(self):
-
-        self.build_and_start_vadere_runner()
-        self.build_control_runner()
-        print()
-
-
-    def build_control_runner(self):
-        pass
-
 
 if __name__ == "__main__":
 
-    is_controlled = True
-    is_vadere_only = True
+    scenario_file = os.path.join(os.getcwd(), "scenario002.scenario")
 
     settings = [
                     "--qoi",
@@ -115,27 +103,24 @@ if __name__ == "__main__":
                     datetime.now().isoformat().replace(":", "").replace("-", ""),
                     "--delete-existing-containers",
                     "--create-vadere-container",
-		    "--with-control",
-		    "control.py"
-            # docker container tags: both latest
+                    "--with-control",
+                    "control.py",
+                    "--control-vadere-only",
+                    "--scenario",
+                    scenario_file,
+
+                    # docker container tags: both latest
                 ]
 
-    if is_controlled is False:
-        if len(sys.argv) == 1:
-            # default behavior of script
-            runner = SimulationRun(
-                os.getcwd(),
-                settings
-            )
-        else:
-            # use arguments from command line
-            runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
-
+    if len(sys.argv) == 1:
+        # default behavior of script
+        runner = SimulationRun(
+            os.getcwd(),
+            settings
+        )
     else:
-        if is_vadere_only:
-            runner = VadereControl(os.getcwd(),
-                settings)
+        # use arguments from command line
+        runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
 
-    print()
