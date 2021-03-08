@@ -101,11 +101,11 @@ const vadereVersion cacheVersion{
     20, 0, 1};  // version from which onwards cache data can be send with
                 // initial SEND_FILE command
 
-std::pair<std::string,
-          std::string> typedef VadereCache;  // (cacheId / cachePath) map for
-                                             // transferal
-std::pair<std::string, std::string> typedef VadereScenario;  // (scenarioPath /
-                                                             // scenarioContent)
+// (cacheId / cachePath) map for transferal
+using VadereCache = std::pair<std::string, std::string>;
+//(scenarioPath /scenarioContent)
+using VadereScenario = std::pair<std::string, std::string>;
+
 // read list of cachId->cachePath pairs from configuration xml.
 std::vector<VadereCache> getCachePaths(const std::string basedir,
                                        const std::string vadereCachePath,
@@ -113,5 +113,11 @@ std::vector<VadereCache> getCachePaths(const std::string basedir,
 // read scenarioPath->scenarioContent from configuration xml.
 VadereScenario getScenarioContent(const std::string basedir,
                                   const std::string vadereScenarioPath);
+
+
+using OppInit = std::pair<std::string, std::string>;
+OppInit getOppInitFile(const std::string basedir,
+                       const std::string initFile);
+
 
 }  // namespace vadere
