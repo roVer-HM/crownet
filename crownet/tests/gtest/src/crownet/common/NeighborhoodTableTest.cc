@@ -4,26 +4,25 @@
 #include "gmock/gmock.h"
 
 using namespace crownet;
+using ::testing::Return;
 
 class MockNeighborhoodTable : public NeighborhoodTable{
 
   public:
-//    MOCK_METHOD(checkTimeToLive,void());
-    // (New) MOCK_METHOD(double, Bar, (std::string s), (override));
 //    MOCK_METHOD(void, checkTimeToLive,(),(override));
 //    MOCK_METHOD(void, scheduleAt, (simetime_t t, cMessage *msg), (override));
     MOCK_METHOD2(scheduleAt,void(simtime_t t, cMessage* msg));
     MOCK_METHOD0(checkTimeToLive, void());
-//    virtual void scheduleAt(simtime_t t, cMessage *msg);
+//    MOCK_METHOD1(par, cPar&(const char *parname));
 
-    //    old MOCK_METHOD EXAMPLES
-    //    MOCK_METHOD0(PenUp, void());
-    //    MOCK_METHOD0(PenDown, void());
-    //    MOCK_METHOD1(Forward, void(int distance));
-    //    MOCK_METHOD1(Turn, void(int degrees));
-    //    MOCK_METHOD2(GoTo, void(int x, int y));
-    //    MOCK_CONST_METHOD0(GetX, int());
-    //    MOCK_CONST_METHOD0(GetY, int());
+//    old MOCK_METHOD EXAMPLES
+//    MOCK_METHOD0(PenUp, void());
+//    MOCK_METHOD0(PenDown, void());
+//    MOCK_METHOD1(Forward, void(int distance));
+//    MOCK_METHOD1(Turn, void(int degrees));
+//    MOCK_METHOD2(GoTo, void(int x, int y));
+//    MOCK_CONST_METHOD0(GetX, int());
+//    MOCK_CONST_METHOD0(GetY, int());
 };
 
 TEST(NeighborhoodTableBase, Test_constructor) {
@@ -102,8 +101,10 @@ TEST_F(NeighborhoodTableTest, handleMessage) {
   simtime_t time = simTime().dbl();
   double maxAge = 1.0;
   // important to define mock spies before invoking the function to test
-  EXPECT_CALL(mock, checkTimeToLive()).Times(1);
-  EXPECT_CALL(mock, scheduleAt(time + maxAge, ttl_msg)).Times(1);
+  EXPECT_CALL(mock, checkTimeToLive())
+    .Times(1);
+  EXPECT_CALL(mock, scheduleAt(time + maxAge, ttl_msg))
+    .Times(1);
   mock.setTitleMessage(ttl_msg);
   mock.setMaxAge(maxAge);
   mock.handleMessage(ttl_msg);
@@ -112,17 +113,29 @@ TEST_F(NeighborhoodTableTest, handleMessage) {
   delete invalid_msg; // suppress weird warning
 }
 
-//TEST_F(NeighborhoodTableTest, initialize) {
-//  MockNeighborhoodTable mock;
-//  cMessage* ttl_msg = new cMessage("NeighborhoodTable_ttl");
-//  simtime_t time = simTime().dbl();
-//  double maxAge = 1.0;
+TEST_F(NeighborhoodTableTest, initialize) {
+  MockNeighborhoodTable mock;
+  simtime_t time = simTime().dbl();
+  double maxAge = 1.0;
+  mock.setMaxAge(1.0);
+//  cParImpl* cp = new cParImpl();
+//  cp->setName("maxAge");
+//  cp->setDoubleValue(1.0);
+          //explicit cNamedObject(const char *name, bool namepooling=true);
+//  mock.addPar(value);
+  cMessage* ttl_msg = new cMessage("NeighborhoodTable_ttl");
+//  EXPECT_CALL(mock, par("maxAge"))
+//    .Times(1);
+//  EXPECT_CALL(mock, par("maxAge"))
+//    .WillOnce(::testing::ReturnRef(1.0));
+
 //  EXPECT_CALL(mock, scheduleAt(time + maxAge, ttl_msg)).Times(1); // triggers on call with arg 0
-//  mock.setTitleMessage(ttl_msg);
-//  mock.setMaxAge(maxAge);
-//
-//  mock.initialize(0); // failes on par("maxAge") -> function of cComponent
-//  mock.initialize(1);
-//  mock.initialize(2);
-//  mock.initialize(42);
-//}
+  EXPECT_CALL(mock, scheduleAt(testing::_, testing::_)).Times(1); // triggers on call with arg 0
+  mock.setTitleMessage(ttl_msg);
+  mock.setMaxAge(maxAge);
+
+  mock.initialize(0); // failes on par("maxAge") -> function of cComponent
+  mock.initialize(1);
+  mock.initialize(2);
+  mock.initialize(42);
+}
