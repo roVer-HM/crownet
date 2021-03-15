@@ -20,8 +20,6 @@ int main(int argc, char **argv) {
   // create a simulation manager and an environment for the simulation
 //  cEnvir *env = new GtestEnv(argc, argv, new EmptyConfig());
   cEnvir *env = new GtestEnv(argc, argv, new EmptyConfig());
-  cConfiguration* test = env->getConfig();
-  const char* value = test->getConfigValue("maxAge");
   cSimulation *sim = new cSimulation("simulation", env);
   cSimulation::setActiveSimulation(sim);
 
