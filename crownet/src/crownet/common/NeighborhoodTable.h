@@ -1,5 +1,5 @@
 /*
- * NeighborhoodTable.cc
+ * NeighborhoodTable.h
  *
  *  Created on: Jan 23, 2021
  *      Author: sts
