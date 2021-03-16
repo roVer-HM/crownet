@@ -1,0 +1,14 @@
+%description:
+Test the name and length properties of cPacket.
+
+%activity:
+cPacket *pk = new cPacket();
+pk->setName("ACK");
+pk->setByteLength(64);
+EV << "name: " << pk->getName() << endl;
+EV << "length: " << pk->getByteLength() << endl;
+delete pk;
+
+%contains: stdout
+name: ACK
+length: 64

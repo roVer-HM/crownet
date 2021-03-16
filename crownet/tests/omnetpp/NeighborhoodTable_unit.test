@@ -1,0 +1,53 @@
+%description:
+Test the NeighborhoodTable
+
+%includes:
+#include <stdio.h>
+#include "crownet/common/NeighborhoodTable.h"
+
+%inifile: omnetpp.ini
+
+# [General]
+# NeighborhoodTable 
+# *.node[*].nTable.typename = "crownet.common.NeighborhoodTable"
+# *.node[*].nTable.maxAge = 7s
+# *.maxAge = 7s
+# *.typename = "crownet.common.NeighborhoodTable"
+# NeighborhoodTable_unit.maxAge = 7s
+# *.Test.maxAge = 7s
+# NeighborhoodTable_unit.Test.maxAge = 7s
+# *.node[*].*.maxAge = 7s
+# *.node[*].maxAge = 7s
+# *.node[*].nTable.maxAge = 7s
+*.Test.maxAge = 7s
+*.node[*].nTable.typename = "crownet.common.NeighborhoodTable"
+*.node[*].nTable.maxAge = 7s
+*.node[*].NeighborhoodTable.Test.nTable.maxAge = 7s
+Test.maxAge = 7s
+Test.nTable.maxAge = 7s
+
+
+%global:
+
+// using namespace omnetpp;
+using namespace crownet;
+// using namespace inet;
+// using namespace inet::physicallayer;
+
+void test()
+{
+	std::string nTableString = "NeighborhoodTable";
+	std::cout << nTableString << endl;
+	NeighborhoodTable* nTable = new NeighborhoodTable();
+	std::cout << "a: " << nTable->getParentModule()->getFullName() << endl;
+	std::cout << "b: " << nTable->getFullName();
+	nTable->initialize(0);
+}
+
+%activity:
+
+test();
+
+%contains: stdout
+NeighborhoodTable
+a: Test
