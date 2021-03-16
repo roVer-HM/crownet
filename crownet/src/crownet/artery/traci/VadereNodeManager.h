@@ -46,7 +46,7 @@ class VadereNodeManager : public traci::NodeManager,
   using NodeInitializer = std::function<void(omnetpp::cModule*)>;
 
   void initialize() override;
-  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
+//  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
   void finish() override;
 
   virtual void addMovingObject(const std::string&);

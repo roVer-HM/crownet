@@ -16,3 +16,6 @@
 [submodule "artery"]
 	path = artery
 	url = ../artery.git
+[submodule "flowcontrol"]
+	path = flowcontrol
+	url = ../flowcontrol.git

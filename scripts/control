@@ -1,0 +1,36 @@
+#!/bin/bash
+
+SHORTNAME=flowcontrol
+CONTNAME=$SHORTNAME
+
+if [[ -z "$1" || "$1" == "exec" ]]; then
+      TAG_DIGEST=:latest
+      CONTNAME=$SHORTNAME
+      echo "xxx"
+else
+      TAG_DIGEST=:$1
+      SHORTNAME=$SHORTNAME
+      CONTNAME=$SHORTNAME
+fi
+
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$SHORTNAME$TAG_DIGEST
+
+echo "container> used image: $IMAGENAME"
+
+source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
+
+# run new individual container execute (and wrap) command after exec
+# argument.
+if [[ "$1" == "exec" ]]; then
+      COMMAND="${@:2:${#@}+1-2}"
+      run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
+      exit $?
+fi
+
+if [[ "$2" == "exec" ]]; then
+      COMMAND="${@:3:${#@}+1-3}"
+      run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
+      exit $?
+fi
+
+run_individual_container $SHORTNAME $CONTNAME $IMAGENAME /init.sh $@
