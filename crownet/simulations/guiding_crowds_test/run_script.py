@@ -23,7 +23,7 @@ if __name__ == "__main__":
         "--create-vadere-container",
         "--with-control",
         "control.py",
-        "--control-vadere-only",
+        #"--control-vadere-only",
     ]
 
     if len(sys.argv) == 1:

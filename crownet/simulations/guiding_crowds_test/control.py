@@ -3,6 +3,7 @@ import sys, os
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.setup.vadere import get_scenario_content
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
+from flowcontrol.crownetcontrol.traci.connection_manager import ClientModeConnection
 
 sys.path.append(os.path.abspath(".."))
 from import_PYTHON_PATHS import *
@@ -64,14 +65,23 @@ if __name__ == "__main__":
     scenario_file = get_scenario_file("vadere/scenarios/test001.scenario")
 
     if len(sys.argv) == 1:
+        # settings = [
+        #     "--port",
+        #     "9999",
+        #     "--host-name",
+        #     "localhost",
+        #     "--client-mode",
+        #     "--start-server",
+        # ]
+
         settings = [
             "--port",
-            "9999",
+            "9997",
             "--host-name",
             "localhost",
-            "--client-mode",
-            "--start-server", # start server manually if not set
         ]
+
+
         traci_manager = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
     else:
         traci_manager = get_controller_from_args(
