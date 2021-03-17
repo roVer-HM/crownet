@@ -17,16 +17,13 @@ class SimulationRun(BaseRunner):
 if __name__ == "__main__":
 
     settings = [
-        "--qoi",
-        "degree_informed_extract.txt",
-        "poisson_parameter.txt",
         "--experiment-label",
         datetime.now().isoformat().replace(":", "").replace("-", ""),
         "--delete-existing-containers",
         "--create-vadere-container",
-        #"--with-control",
-        #"control.py",
-        #"--control-vadere-only",
+        "--with-control",
+        "control.py",
+        "--control-vadere-only",
     ]
 
     if len(sys.argv) == 1:

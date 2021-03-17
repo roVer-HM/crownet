@@ -11,7 +11,7 @@ from flowcontrol.crownetcontrol.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 from flowcontrol.utils.opp.scenario import get_scenario_file
 
-class TikTokController2(Controller):
+class PingPong(Controller):
     def __init__(self):
         super().__init__()
         self.sub = VadereDefaultStateListener.with_vars(
@@ -59,10 +59,9 @@ if __name__ == "__main__":
     sub = VadereDefaultStateListener.with_vars(
         "persons", {"pos": tc.VAR_POSITION, "target_list": tc.VAR_TARGET_LIST}
     )
-    controller = TikTokController2()
+    controller = PingPong()
 
-    scenario_file = get_scenario_file("scenario002.scenario")
-
+    scenario_file = get_scenario_file("vadere/scenarios/test001.scenario")
 
     if len(sys.argv) == 1:
         settings = [

@@ -1,7 +1,7 @@
 {
-  "name" : "scenario004",
+  "name" : "test001",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -121,7 +121,14 @@
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
-        "referenceCoordinateSystem" : null
+        "referenceCoordinateSystem" : {
+          "epsgCode" : "EPSG:32632",
+          "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
+          "translation" : {
+            "x" : 692152.0894735109,
+            "y" : 5337384.6661008
+          }
+        }
       },
       "obstacles" : [ {
         "shape" : {
