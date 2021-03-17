@@ -9,8 +9,7 @@ from import_PYTHON_PATHS import *
 
 from flowcontrol.crownetcontrol.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
-
-
+from flowcontrol.utils.opp.scenario import get_scenario_file
 
 class TikTokController2(Controller):
     def __init__(self):
@@ -62,7 +61,8 @@ if __name__ == "__main__":
     )
     controller = TikTokController2()
 
-    scenario_file = os.path.join(os.getcwd(), "scenario004.scenario")
+    scenario_file = get_scenario_file("scenario002.scenario")
+
 
     if len(sys.argv) == 1:
         settings = [
@@ -72,21 +72,15 @@ if __name__ == "__main__":
             "localhost",
             "--client-mode",
             "--start-server", # start server manually if not set
-            "--scenario",
-            scenario_file,
         ]
         traci_manager = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
     else:
-        print(sys.argv)
         traci_manager = get_controller_from_args(
             working_dir=os.path.dirname(os.path.abspath(__file__)),
             controller=controller,
         )
 
     controller.initialize_connection(traci_manager)
-
     kwargs = {"file_name": scenario_file, "file_content": get_scenario_content(scenario_file)}
-
     controller.start_controller(**kwargs)
 
-    print()

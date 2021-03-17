@@ -93,7 +93,7 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
-    scenario_file = os.path.join(os.getcwd(), "scenario002.scenario")
+    scenario_file = os.path.join(os.getcwd(), "scenario004.scenario")
 
     settings = [
                     "--qoi",

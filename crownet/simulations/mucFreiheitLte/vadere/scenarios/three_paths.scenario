@@ -77,7 +77,7 @@
     "attributesSimulation" : {
       "finishTime" : 400.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.9,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -1390,15 +1390,6 @@
           } ]
         },
         "id" : 19
-      }, {
-        "shape" : {
-          "x" : 204.1,
-          "y" : 214.8,
-          "width" : 1.4,
-          "height" : 5.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 2
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -1452,7 +1443,30 @@
         },
         "id" : 3001
       } ],
-      "stairs" : [ ],
+      "stairs" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 199.3,
+            "y" : 220.6
+          }, {
+            "x" : 210.3,
+            "y" : 218.4
+          }, {
+            "x" : 209.6,
+            "y" : 214.0
+          }, {
+            "x" : 198.45,
+            "y" : 216.3
+          } ]
+        },
+        "id" : 2,
+        "treadCount" : 30,
+        "upwardDirection" : {
+          "x" : 1.0,
+          "y" : -0.2
+        }
+      } ],
       "targets" : [ {
         "id" : 2008,
         "absorbing" : true,
