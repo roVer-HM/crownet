@@ -23,6 +23,8 @@ if __name__ == "__main__":
         "--create-vadere-container",
         "--with-control",
         "control.py",
+        "--config",
+        "final"
         #"--control-vadere-only",
     ]
 
