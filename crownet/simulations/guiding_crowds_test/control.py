@@ -3,7 +3,6 @@ import sys, os
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.setup.vadere import get_scenario_content
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
-from flowcontrol.crownetcontrol.traci.connection_manager import ClientModeConnection
 
 sys.path.append(os.path.abspath(".."))
 from import_PYTHON_PATHS import *
