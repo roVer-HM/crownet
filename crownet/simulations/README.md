@@ -52,11 +52,11 @@ The  `run_script.py` serves as entry-point. It starts the each simulator in a se
 Run the simulation
 |  			   			 		 |  			 Scope 		                                  | Command	              | Comment|
 |-------|-------------------------------------------|----------------------|------------|
-|  			 1 		  |  			 Pedestrian movement in mobile networks 		 | python3 run_script.py --delete-existing-containers --create-vadere-container --config final  | Config final in omnetpp.ini must not contain flowController application.
-|  			 2 		  |  			 Guiding crowds using navigation apps 		   | python3 run_script.py --delete-existing-containers --create-vadere-container --with-control control.py --config final_control	                 | Config final-control in omnetpp.ini must contain flowController application. |
-|  			 3 		  |  			 Normal crowd behavior 		                  | python3 run_script.py 		                 | |
-|  			 4 		  |  			 Rerouting crowds	                        |  			 x 		                 | |
-|  			 5 		  |  			 Guiding crowds using signs 		             |  			 x 		                 | |
+|  			 1 		  |  			 Pedestrian movement in mobile networks 		 | `python3 run_script.py --experiment-label crownet_simulation --delete-existing-containers --create-vadere-container --config final`  | Config final in omnetpp.ini must not contain flowController application.
+|  			 2 		  |  			 Guiding crowds using navigation apps 		   | `python3 run_script.py --experiment-label crownet_with-control --delete-existing-containers --create-vadere-container --with-control path/to/python-file-that-contains-control --config final_control`	                 | Config final-control in omnetpp.ini must contain flowController application. |
+|  			 3 		  |  			 Normal crowd behavior 		                  | `python3 run_script.py --experiment-label normal_crowd --vadere-only --scenario-file /path/to/vadere-scenario-file` 		                 | |
+|  			 4 		  |  			 Rerouting crowds	                        | `python3 run_script.py --experiment-label ideal_crowd_guiding --control-vadere-only --delete-existing-containers --create-vadere-container --with-control path/to/python-file-that-contains-control`		                 | |
+|  			 5 		  |  			 Guiding crowds using signs 		        |`python3 run_script.py --experiment-label sign_management --vadere-only --scenario-file /path/to/vadere-scenario-file-with-target-changer-as-signs`		                 | |
 
 
 ### Run simulations in an IDE
