@@ -1,4 +1,4 @@
-# How to run simulations
+# How to run simulations with Python
 
 ## System setup
 Python >= 3.7 is required. We strongly recommend to use a virtual environment:
@@ -50,13 +50,13 @@ cd $CROWNET_HOME/crownet/simulations/guiding_crowds_test
 The  `run_script.py` serves as entry-point. It starts the each simulator in a separate Docker container. Debugging is not available in this mode. If you need to debug through the code, move on to section *Run simulations in an IDE*.
 
 Run the simulation
-|  			   			 		 |  			 Scope 		                                  | Command	              |
-|-------|-------------------------------------------|----------------------|
-|  			 1 		  |  			 Pedestrian movement in mobile networks 		 |  			 python3 run_script |
-|  			 2 		  |  			 Guiding crowds using navigation apps 		   |  			 x 		                 |
-|  			 3 		  |  			 Normal crowd behavior 		                  |  			 x 		                 |
-|  			 4 		  |  			 Rerouting crowds	                        |  			 x 		                 |
-|  			 5 		  |  			 Guiding crowds using signs 		             |  			 x 		                 |
+|  			   			 		 |  			 Scope 		                                  | Command	              | Comment|
+|-------|-------------------------------------------|----------------------|------------|
+|  			 1 		  |  			 Pedestrian movement in mobile networks 		 | python3 run_script.py --delete-existing-containers --create-vadere-container --config final  | Config final in omnetpp.ini must not contain flowController application.
+|  			 2 		  |  			 Guiding crowds using navigation apps 		   | python3 run_script.py --delete-existing-containers --create-vadere-container --with-control control.py --config final_control	                 | Config final-control in omnetpp.ini must contain flowController application. |
+|  			 3 		  |  			 Normal crowd behavior 		                  | python3 run_script.py 		                 | |
+|  			 4 		  |  			 Rerouting crowds	                        |  			 x 		                 | |
+|  			 5 		  |  			 Guiding crowds using signs 		             |  			 x 		                 | |
 
 
 ### Run simulations in an IDE
@@ -139,5 +139,6 @@ Start the simulation without containers.
 ```
 python3 control.py --port 9999 --host-name vadere --client-mode --scenario $PWD/scenario002.scenario
 ```
+
 
 
