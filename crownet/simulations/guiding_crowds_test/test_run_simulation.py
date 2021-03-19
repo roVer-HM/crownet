@@ -1,11 +1,9 @@
 import subprocess
 import os
 import filecmp
-import shutil
 
 timeout_sec = 60
 
-shutil.rmtree(os.path.abspath("results"))
 
 def test_1():
 
@@ -26,7 +24,6 @@ def test_1():
 	)
 
 	output_dir = os.path.abspath("results/vadere_only_test_1/vadere.d")
-
 	test_dir = os.path.abspath("tests/vadere_only_test_1/vadere.d")
 
 	assert len(filecmp.dircmp(output_dir, test_dir).diff_files) == 0
@@ -102,7 +99,7 @@ def test_4():
 		subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
 	)
 
-	output_dir = os.path.abspath("results/vadere_controlled_test_4_control_test_3/vadere.d")
+	output_dir = os.path.abspath("results/vadere_controlled_test_4/vadere.d")
 	test_dir = os.path.abspath("tests/vadere_controlled_test_4/vadere.d")
 
 	assert len(filecmp.dircmp(output_dir, test_dir).diff_files) == 0
@@ -128,8 +125,13 @@ def test_5():
 	)
 
 	output_dir = os.path.abspath("results/vadere_only_signs_test_5/vadere.d")
-
 	test_dir = os.path.abspath("tests/vadere_only_signs_test_5/vadere.d")
 
 	assert len(filecmp.dircmp(output_dir, test_dir).diff_files) == 0
 
+if __name__=="__main__":
+	test_1()
+	test_2()
+	test_3()
+	test_4()
+	test_5()
