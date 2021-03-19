@@ -1,7 +1,8 @@
 {
-  "name" : "test001",
+  "name" : "test001_with_signs",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "f9cbb1b6f4ba8f5051f92cfb250d37f98ce70155",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,7 +103,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 183115877309837713,
-      "simulationSeed" : 0
+      "simulationSeed" : 183115877309837713
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
@@ -237,7 +238,20 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 7,
+        "shape" : {
+          "x" : 5.3,
+          "y" : 3.6,
+          "width" : 2.5,
+          "height" : 2.8,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 3 ],
+        "probabilityToChangeTarget" : [ 0.75 ]
+      } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 1,

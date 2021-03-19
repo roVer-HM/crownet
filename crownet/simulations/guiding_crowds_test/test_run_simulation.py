@@ -105,3 +105,28 @@ def test_4():
 	assert len(filecmp.dircmp(output_dir, test_dir).diff_files) == 0
 
 
+def test_5():
+
+	# run vadere (use signs as control element)
+	# no control necessary; signs are modeled with target changers in vadere
+
+	subprocess_cmd = ["python3", "run_script.py"]
+	settings = [
+		"--experiment-label",
+		"signs_test_5",
+		"--vadere-only",
+		"--scenario-file",
+		os.path.join(os.getcwd(), "vadere/scenarios/test001_with_signs.scenario")
+	]
+	subprocess_cmd += settings
+
+	subprocess.check_output(
+		subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
+	)
+
+	output_dir = os.path.abspath("results/vadere_only_signs_test_5/vadere.d")
+
+	test_dir = os.path.abspath("tests/vadere_only_signs_test_5/vadere.d")
+
+	assert len(filecmp.dircmp(output_dir, test_dir).diff_files) == 0
+
