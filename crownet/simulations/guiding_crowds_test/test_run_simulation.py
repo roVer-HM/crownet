@@ -1,8 +1,11 @@
 import subprocess
 import os
 import filecmp
+import shutil
 
 timeout_sec = 60
+
+shutil.rmtree(os.path.abspath("results"))
 
 def test_1():
 
