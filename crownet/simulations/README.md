@@ -1,7 +1,7 @@
 # How to run simulations with Python
 
 ## System setup
-Python >= 3.7 is required. We strongly recommend to use a virtual environment:
+Python >= 3.8 is required. We strongly recommend to use a virtual environment:
 
 Navigate to the crownet root directory
 ```
@@ -12,7 +12,8 @@ Create a virtual enviroment. Install the requirements
 ```
 python3.7 -m venv .venv
 source .venv/bin/activate
-pip3 install -r requirements.txt
+pip install -U pip setuptools
+python3 -m pip install -r requirements.txt
 ```
 ##  Run simulations
 ### Finding the correct entry-point
