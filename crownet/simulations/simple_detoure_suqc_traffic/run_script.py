@@ -3,7 +3,10 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(".."))
-from import_PYTHON_PATHS import *
+try:
+    from import_PYTHON_PATHS import *
+except ImportError:
+    pass
 
 import numpy
 from datetime import datetime
@@ -92,6 +95,7 @@ class SimulationRun(BaseRunner):
 
 
 if __name__ == "__main__":
+    print(sys.argv)
 
     if len(sys.argv) == 1:
         # default behavior of script
