@@ -3,7 +3,7 @@ import os
 import matplotlib
 from matplotlib.lines import Line2D
 
-from roveranalyzer.simulators.rover.dcd.interactive import Interactive2DDensityPlot, InteractiveDelayOverDistance
+from roveranalyzer.simulators.rover.dcd.interactive import InteractiveAreaPlot, InteractiveValueOverDistance
 from roveranalyzer.utils.path import get_or_create
 
 matplotlib.use('TkAgg')
@@ -73,13 +73,13 @@ def analyse_interactive(dcd, what):
 
         time = 2
         id = 0
-        fig, ax = dcd.plot_density_map(time_step=time, node_id=id,
-                                       pcolormesh_dic=dict(vmin=0, vmax=4))
-        i = Interactive2DDensityPlot(dcd, ax)
+        fig, ax = dcd.area_plot(time_step=time, node_id=id,
+                                pcolormesh_dic=dict(vmin=0, vmax=4))
+        i = InteractiveAreaPlot(dcd, ax)
     else:
 
         fig, ax = dcd.plot_delay_over_distance(64, 2, "measurement_age", bins_width=5)
-        i = InteractiveDelayOverDistance(dcd, ax)
+        i = InteractiveValueOverDistance(dcd, ax)
 
     i.show()
 
@@ -89,8 +89,8 @@ def make_density_plot(path, dcd):
     time = [140]
     ids = [0]
     for time, id in list(product(time, ids)):
-        f, ax = dcd.plot_density_map(time_step=time, node_id=id, make_interactive=False,
-                                     pcolormesh_dic=dict(vmin=0, vmax=4))
+        f, ax = dcd.area_plot(time_step=time, node_id=id, make_interactive=False,
+                              pcolormesh_dic=dict(vmin=0, vmax=4))
         print(f"create out/density_map_{id}_t{time}.png")
         ax.set_title("")
         f.savefig(path.join(f"out/density_map_{id}_t{time}.png"))
@@ -172,8 +172,8 @@ def make_sample_map():
     run = runs[3]
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.plot_density_map(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
-                                   pcolormesh_dic=dict(vmin=0, vmax=4))
+    fig, ax = dcd.area_plot(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
+                            pcolormesh_dic=dict(vmin=0, vmax=4))
     fig.savefig(f"{ROOT}/{run['run_name']}_sample_map.pdf")
 
 
@@ -181,8 +181,8 @@ def make_grid_map():
     run = runs[3]
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.plot_density_map(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
-                                   pcolormesh_dic=dict(vmin=0, vmax=4))
+    fig, ax = dcd.area_plot(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
+                            pcolormesh_dic=dict(vmin=0, vmax=4))
     ax.set_title("")
     fig.delaxes(fig.axes[1])
     ax.set_xticks(dcd.meta.X)
