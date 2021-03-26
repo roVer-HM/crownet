@@ -16,7 +16,7 @@
 #
 # Original Authors: Andras Varga, Zoltan Bojthe
 #
-# Modifications for CrowNet (support for coupled simulations with sumo, vadere): Stefan Schuhbaeck 
+# Modifications for CrowNet (support for coupled simulations with sumo, vadere): Stefan Schuhbaeck
 #
 
 from __future__ import absolute_import, division, print_function, unicode_literals
