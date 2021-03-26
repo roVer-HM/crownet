@@ -9,8 +9,9 @@ from roveranalyzer.utils.path import get_or_create
 matplotlib.use('TkAgg')
 
 
-from roveranalyzer.simulators.opp.utils import ScaveTool
-from roveranalyzer.utils import PathHelper
+from roveranalyzer.simulators.opp.scave import ScaveTool
+from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
+from roveranalyzer.utils import PathHelper, from_pickle
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2DMulti
 from itertools import product
 import matplotlib.pyplot as plt

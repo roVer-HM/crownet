@@ -1,0 +1,63 @@
+# Fingerprint tests for the "guiding_crowds_test" scenario
+
+test_1:
+  workingdir: /simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_1
+    - signs_test_5
+    - --vadere-only
+    - --scenario-file
+    - vadere/scenarios/test001_with_signs.scenario
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: file:/simulations/guiding_crowds_test/test/vadere_only_test_1/digest.csv
+  tags:
+
+test_2:
+  workingdir: /simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_2
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --config
+    - final
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: file:/simulations/guiding_crowds_test/test/final_test_2/digest.csv
+  tags: exec:python3;cmd:/simulations/guiding_crowds_test/run_script.py
+
+test_3:
+  workingdir: /simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_3
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --config
+    - final_control
+    - --with-control
+    - control.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: file:/simulations/guiding_crowds_test/test/final_test_3/digest.csv
+  tags: exec:python3;cmd:/simulations/guiding_crowds_test/run_script.py
+
+test_4:
+  workingdir: /simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_4
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --with-control
+    - control.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: file:/simulations/guiding_crowds_test/test/final_test_4/digest.csv
+  tags: exec:python3;cmd:/simulations/guiding_crowds_test/run_script

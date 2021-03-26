@@ -34,6 +34,9 @@ import time
 import unittest
 import logging
 import signal
+from enum import Enum
+
+import yaml
 from io import StringIO
 
 from roveranalyzer.simulators.vadere.runner import VadereRunner
@@ -42,73 +45,138 @@ from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse
 import docker
 from requests.exceptions import ReadTimeout
 
+
 # FIXME this is a hard coded path!!! must be specified from command line or dicovered automatically
-rootDir = os.path.abspath(".")  # the working directory in the CSV file is relative to this dir
-cpuTimeLimit = "900s"
-logFile = "test.out"
-extraOppRunArgs = ""
-debug = False
-release = False
-exitCode = 0
+class TestGlobal:
+    rootDir = os.path.abspath(".")  # the working directory in the CSV file is relative to this dir
+    cpuTimeLimit = "900s"
+    logFile = "test.out"
+    extraArgs = ""
+    debug = False
+    release = False
+    exitCode = 0
+    executable = "/dev/null"
+
+
+class TestCaseType(Enum):
+    SHELL = 1
+    DOCKER = 2
+    CROWNET = 3
 
 
 class FingerprintTestCaseGenerator():
-    fileToSimulationsMap = {}
+    class StoreFingerprintCallback:
+        def __init__(self, simulation):
+            self.simulation = simulation
 
-    def generateFromCSV(self, csvFileList, filterRegexList, excludeFilterRegexList, repeat, use_docker):
+        def __call__(self, fingerprint):
+            self.simulation['computedFingerprint'] = fingerprint
+
+    class StoreExitcodeCallback:
+        def __init__(self, simulation):
+            self.simulation = simulation
+
+        def __call__(self, exitcode):
+            self.simulation['exitcode'] = exitcode
+
+    class SimulationResultCallback:
+
+        def __init__(self, clb):
+            self._clb = clb
+
+        def __call__(self, *args, **kwargs):
+            return self._clb(*args, **kwargs)
+
+        @classmethod
+        def default(cls):
+            return cls(SimulationResult)
+
+        @classmethod
+        def crownet(cls):
+            return cls(SimulationResultCrowNet)
+
+    def __init__(self, filterRegexList, excludeFilterRegexList, repeat, test_case_type_default):
+        self.filterRegexList = filterRegexList
+        self.excludeFilterRegexList = excludeFilterRegexList
+        self.repeat = repeat
+        self.test_case_type_default = test_case_type_default
+        self.fileToSimulationsMap = {}
+
+    def generateFromCSV(self, csvFileList):
         testcases = []
         for csvFile in csvFileList:
             simulations = self.parseSimulationsTable(csvFile)
             self.fileToSimulationsMap[csvFile] = simulations
             testcases.extend(
-                self.generateFromDictList(simulations, filterRegexList, excludeFilterRegexList, repeat, use_docker))
+                self.generateFromDictList(simulations))
         return testcases
 
-    def generateFromDictList(self, simulations, filterRegexList, excludeFilterRegexList, repeat, use_docker):
-        class StoreFingerprintCallback:
-            def __init__(self, simulation):
-                self.simulation = simulation
-
-            def __call__(self, fingerprint):
-                self.simulation['computedFingerprint'] = fingerprint
-
-        class StoreExitcodeCallback:
-            def __init__(self, simulation):
-                self.simulation = simulation
-
-            def __call__(self, exitcode):
-                self.simulation['exitcode'] = exitcode
+    def generateFromDictList(self, simulations):
 
         testcases = []
         for simulation in simulations:
             title = simulation['wd'] + " " + simulation['args'] + " " + simulation['tags']
-            if not filterRegexList or ['x' for regex in filterRegexList if
-                                       re.search(regex, title)]:  # if any regex matches title
-                if not excludeFilterRegexList or not ['x' for regex in excludeFilterRegexList if
-                                                      re.search(regex, title)]:  # if NO exclude-regex matches title
+            if not self.filterRegexList or ['x' for regex in self.filterRegexList if
+                                            re.search(regex, title)]:  # if any regex matches title
+                if not self.excludeFilterRegexList or not ['x' for regex in self.excludeFilterRegexList if
+                                                           re.search(regex,
+                                                                     title)]:  # if NO exclude-regex matches title
 
-                    if use_docker:
+                    test_type = self.get_test_type(simulation["tags"])
+
+                    if test_type == TestCaseType.DOCKER:
                         testcases.append(FingerprintContainerTestCase(title, simulation['file'], simulation['wd'],
                                                                       simulation['args'],
                                                                       simulation['simtimelimit'],
                                                                       simulation['fingerprint'],
                                                                       simulation['expectedResult'],
-                                                                      StoreFingerprintCallback(simulation),
-                                                                      StoreExitcodeCallback(simulation),
-                                                                      repeat,
-                                                                      simulation['tags']))
+                                                                      self.StoreFingerprintCallback(simulation),
+                                                                      self.StoreExitcodeCallback(simulation),
+                                                                      self.SimulationResultCallback(SimulationResult),
+                                                                      simulation['tags'],
+                                                                      self.repeat))
+                    elif test_type == TestCaseType.SHELL:
+                        testcases.append(FingerprintTestCase(title, simulation['file'], simulation['wd'],
+                                                             simulation['args'],
+                                                             simulation['simtimelimit'],
+                                                             simulation['fingerprint'],
+                                                             simulation['expectedResult'],
+                                                             self.StoreFingerprintCallback(simulation),
+                                                             self.StoreExitcodeCallback(simulation),
+                                                             self.SimulationResultCallback(SimulationResult),
+                                                             simulation['tags'],
+                                                             self.repeat))
                     else:
-                        testcases.append(
-                            FingerprintTestCase(title, simulation['file'], simulation['wd'], simulation['args'],
-                                                simulation['simtimelimit'], simulation['fingerprint'],
-                                                simulation['expectedResult'], StoreFingerprintCallback(simulation),
-                                                StoreExitcodeCallback(simulation), repeat))
+                        raise ValueError("")
         return testcases
 
     def commentRemover(self, csvData):
         p = re.compile(' *#.*$')
         for line in csvData:
             yield p.sub('', line.decode('utf-8'))
+
+    def get_test_type(self, tags: dict):
+        if tags is None or "type" not in tags:
+            return self.test_case_type_default
+
+        type_str = tags["type"]
+        if type_str.upper() in TestCaseType.__members__:
+            return TestCaseType[type_str.upper()]
+        else:
+            return self.test_case_type_default
+
+    @staticmethod
+    def parse_tags(tags):
+        _tags = {}
+        if len(tags) > 0 and ";" not in tags:
+            # no key value parse but something was found
+            _tags.setdefault("default", tags)
+        else:
+            for kv in tags.split(";"):
+                if ":" in kv:
+                    _kv = kv.split(":")
+                    _tags[_kv[0]] = _kv[1]
+        return _tags
 
     # parse the CSV into a list of dicts
     def parseSimulationsTable(self, csvFile):
@@ -122,7 +190,8 @@ class FingerprintTestCaseGenerator():
                 if fields[4] in ['PASS', 'FAIL', 'ERROR']:
                     simulations.append({'file': csvFile, 'line': csvReader.line_num,
                                         'wd': fields[0], 'args': fields[1], 'simtimelimit': fields[2],
-                                        'fingerprint': fields[3], 'expectedResult': fields[4], 'tags': fields[5]})
+                                        'fingerprint': fields[3], 'expectedResult': fields[4],
+                                        'tags': self.parse_tags(fields[5])})
                 else:
                     raise Exception(csvFile + " Line " + str(
                         csvReader.line_num) + ": the 5th item must contain one of 'PASS', 'FAIL', 'ERROR'" + ": " + '"' + '", "'.join(
@@ -132,9 +201,10 @@ class FingerprintTestCaseGenerator():
                     csvFile + " Line " + str(csvReader.line_num) + " must contain 6 items, but contains " + str(
                         len(fields)) + ": " + '"' + '", "'.join(fields) + '"')
         f.close()
+
         return simulations
 
-    def writeUpdatedCSVFiles(self):
+    def writeUpdatedFiles(self):
         for csvFile, simulations in self.fileToSimulationsMap.items():
             updatedContents = self.formatUpdatedSimulationsTable(csvFile, simulations)
             if updatedContents:
@@ -144,7 +214,7 @@ class FingerprintTestCaseGenerator():
                 ff.close()
                 print("Check " + updatedFile + " for updated fingerprints")
 
-    def writeFailedCSVFiles(self):
+    def writeFailedFiles(self):
         for csvFile, simulations in self.fileToSimulationsMap.items():
             failedContents = self.formatFailedSimulationsTable(csvFile, simulations)
             if failedContents:
@@ -154,7 +224,7 @@ class FingerprintTestCaseGenerator():
                 ff.close()
                 print("Check " + failedFile + " for failed fingerprints")
 
-    def writeErrorCSVFiles(self):
+    def writeErrorFiles(self):
         for csvFile, simulations in self.fileToSimulationsMap.items():
             errorContents = self.formatErrorSimulationsTable(csvFile, simulations)
             if errorContents:
@@ -243,13 +313,65 @@ class FingerprintTestCaseGenerator():
         return ''.join(result) if containsErrors else None
 
 
+class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
+
+    def __init__(self, filterRegexList, excludeFilterRegexList, repeat, test_case_type_default):
+        super().__init__(filterRegexList, excludeFilterRegexList, repeat, test_case_type_default)
+
+    def generateFromYAML(self, ymlFileList):
+        _testcases = []
+        for yml_f in ymlFileList:
+            simulations = self.parseSimulationsYml(yml_f)
+            self.fileToSimulationsMap[yml_f] = simulations
+            testcases.extend(
+                self.generateFromDictList(simulations)
+            )
+        return _testcases
+
+    def parseSimulationsYml(self, yml_f):
+        return []
+
+    def generateFromDictList(self, simulations):
+        testcases = []
+        for simulation in simulations:
+            title = simulation['wd'] + " " + simulation['args'] + " " + simulation['tags']
+            if not self.filterRegexList or ['x' for regex in self.filterRegexList if
+                                            re.search(regex, title)]:  # if any regex matches title
+                if not self.excludeFilterRegexList or not ['x' for regex in self.excludeFilterRegexList if
+                                                           re.search(regex,
+                                                                     title)]:  # if NO exclude-regex matches title
+
+                    testcases.append(FingerprintTestCase(title, simulation['file'], simulation['wd'],
+                                                         simulation['args'],
+                                                         simulation['simtimelimit'],
+                                                         simulation['fingerprint'],
+                                                         simulation['expectedResult'],
+                                                         self.StoreFingerprintCallback(simulation),
+                                                         self.StoreExitcodeCallback(simulation),
+                                                         self.SimulationResultCallback(SimulationResultCrowNet),
+                                                         # different result callback
+                                                         simulation['tags'],
+                                                         self.repeat))
+
+    def writeUpdatedFiles(self):
+        raise NotImplementedError()
+
+    def writeFailedFiles(self):
+        raise NotImplementedError()
+
+    def writeErrorFiles(self):
+        raise NotImplementedError()
+
+
 class SimulationResult:
-    def __init__(self, command, workingdir, exitcode, errorMsg=None, isFingerprintOK=None,
+    def __init__(self, command, workingdir, exitcode, out, resultdir, errorMsg=None, isFingerprintOK=None,
                  computedFingerprint=None, simulatedTime=None, numEvents=None, elapsedTime=None,
                  cpuTimeLimitReached=None):
         self.command = command
         self.workingdir = workingdir
         self.exitcode = exitcode
+        self.out = out
+        self.resultdir = resultdir
         self.errorMsg = errorMsg
         self.isFingerprintOK = isFingerprintOK
         self.computedFingerprint = computedFingerprint
@@ -258,10 +380,72 @@ class SimulationResult:
         self.elapsedTime = elapsedTime
         self.cpuTimeLimitReached = cpuTimeLimitReached
 
+    def write_to_log(self, _logFile, title):
+        FILE = open(_logFile, "a")
+        FILE.write("------------------------------------------------------\n"
+                   + "Running: " + title + "\n\n"
+                   + "$ cd " + self.workingdir + "\n"
+                   + "$ " + self.command + "\n\n"
+                   + self.out.strip() + "\n\n"
+                   + "Exit code: " + str(self.exitcode) + "\n"
+                   + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
+        FILE.close()
+
+        FILE = open(self.resultdir + "/test.out", "w")
+        FILE.write("------------------------------------------------------\n"
+                   + "Running: " + title + "\n\n"
+                   + "$ cd " + self.workingdir + "\n"
+                   + "$ " + self.command + "\n\n"
+                   + self.out.strip() + "\n\n"
+                   + "Exit code: " + str(self.exitcode) + "\n"
+                   + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
+        FILE.close()
+
+    def parse_result(self):
+        errorLines = re.findall("<!>.*", self.out, re.M)
+        errorMsg = ""
+        for err in errorLines:
+            err = err.strip()
+            if re.search("Fingerprint", err):
+                if re.search("successfully", err):
+                    self.isFingerprintOK = True
+                else:
+                    m = re.search("(computed|calculated): ([-a-zA-Z0-9]+(/[a-zA-Z0]+)?)", err)
+                    if m:
+                        self.isFingerprintOK = False
+                        self.computedFingerprint = m.group(2)
+                    else:
+                        raise Exception("Cannot parse fingerprint-related error message: " + err)
+            else:
+                errorMsg += "\n" + err
+                if re.search("CPU time limit reached", err):
+                    self.cpuTimeLimitReached = True
+                m = re.search(r"at t=([0-9]*(\.[0-9]+)?)s, event #([0-9]+)", err)
+                if m:
+                    self.simulatedTime = float(m.group(1))
+                    self.numEvents = int(m.group(3))
+        self.errormsg = errorMsg.strip()
+
+
+class SimulationResultCrowNet(SimulationResult):
+
+    def __init__(self, command, workingdir, exitcode, out, resultdir):
+        super().__init__(command, workingdir, exitcode, out, resultdir)
+
+    def write_to_log(self, _logFile, title):
+        super().write_to_log(_logFile, title)
+
+    def parse_result(self):
+        return super().parse_result()
+
 
 class SimulationTestCase(unittest.TestCase):
+
+    def __init__(self, createSimulationResultCallback):
+        super().__init__()
+        self.createSimulationResultCallback = createSimulationResultCallback
+
     def runSimulation(self, title, command, workingdir, resultdir):
-        global logFile
         ensure_dir(workingdir + "/results")
 
         # run the program and log the output
@@ -270,53 +454,13 @@ class SimulationTestCase(unittest.TestCase):
         (exitcode, out) = self.runProgram(command, workingdir, resultdir)
 
         elapsedTime = time.time() - t0
-        FILE = open(logFile, "a")
-        FILE.write("------------------------------------------------------\n"
-                   + "Running: " + title + "\n\n"
-                   + "$ cd " + workingdir + "\n"
-                   + "$ " + command + "\n\n"
-                   + out.strip() + "\n\n"
-                   + "Exit code: " + str(exitcode) + "\n"
-                   + "Elapsed time:  " + str(round(elapsedTime, 2)) + "s\n\n")
-        FILE.close()
 
-        FILE = open(resultdir + "/test.out", "w")
-        FILE.write("------------------------------------------------------\n"
-                   + "Running: " + title + "\n\n"
-                   + "$ cd " + workingdir + "\n"
-                   + "$ " + command + "\n\n"
-                   + out.strip() + "\n\n"
-                   + "Exit code: " + str(exitcode) + "\n"
-                   + "Elapsed time:  " + str(round(elapsedTime, 2)) + "s\n\n")
-        FILE.close()
+        result = self.createSimulationResultCallback(command, workingdir, exitcode, out, resultdir,
+                                                     elapsedTime=elapsedTime)
 
-        result = SimulationResult(command, workingdir, exitcode, elapsedTime=elapsedTime)
+        result.write_to_log(TestGlobal.logFile, title)
+        result.parse_result()
 
-        # process error messages
-        errorLines = re.findall("<!>.*", out, re.M)
-        errorMsg = ""
-        for err in errorLines:
-            err = err.strip()
-            if re.search("Fingerprint", err):
-                if re.search("successfully", err):
-                    result.isFingerprintOK = True
-                else:
-                    m = re.search("(computed|calculated): ([-a-zA-Z0-9]+(/[a-zA-Z0]+)?)", err)
-                    if m:
-                        result.isFingerprintOK = False
-                        result.computedFingerprint = m.group(2)
-                    else:
-                        raise Exception("Cannot parse fingerprint-related error message: " + err)
-            else:
-                errorMsg += "\n" + err
-                if re.search("CPU time limit reached", err):
-                    result.cpuTimeLimitReached = True
-                m = re.search(r"at t=([0-9]*(\.[0-9]+)?)s, event #([0-9]+)", err)
-                if m:
-                    result.simulatedTime = float(m.group(1))
-                    result.numEvents = int(m.group(3))
-
-        result.errormsg = errorMsg.strip()
         return result
 
     def runProgram(self, command, workingdir, resultdir):
@@ -332,8 +476,8 @@ class SimulationTestCase(unittest.TestCase):
 
 class FingerprintTestCase(SimulationTestCase):
     def __init__(self, title, csvFile, wd, cmdLine, simtimelimit, fingerprint, expectedResult, storeFingerprintCallback,
-                 storeExitcodeCallback, repeat):
-        SimulationTestCase.__init__(self)
+                 storeExitcodeCallback, createSimulationResultCallback, tags, repeat):
+        super().__init__(createSimulationResultCallback)
         self.title = title
         self.csvFile = csvFile
         self.wd = wd
@@ -343,9 +487,10 @@ class FingerprintTestCase(SimulationTestCase):
         self.expectedResult = expectedResult
         self.storeFingerprintCallback = storeFingerprintCallback
         self.storeExitcodeCallback = storeExitcodeCallback
+        self.tags: dict = tags
         self.repeat = repeat
 
-        self.workingdir = _iif(self.wd.startswith('/'), rootDir + "/" + self.wd, self.wd)
+        self.workingdir = _iif(self.wd.startswith('/'), TestGlobal.rootDir + "/" + self.wd, self.wd)
         self.wdname = '' + self.wd + ' ' + self.cmdLine
         self.wdname = re.sub('/', '_', self.wdname)
         self.wdname = re.sub('[\W]+', '_', self.wdname)
@@ -353,7 +498,6 @@ class FingerprintTestCase(SimulationTestCase):
 
     def runTest(self):
         # CPU time limit is a safety guard: fingerprint checks shouldn't take forever
-        global rootDir, executable, debug, release, cpuTimeLimit, extraOppRunArgs
 
         # run the simulation
         ensure_dir(self.resultdir)
@@ -361,16 +505,17 @@ class FingerprintTestCase(SimulationTestCase):
         # Check if the command line does not contain executable name (starts with an option i.e. - char)
         # and use the executable name from the command line.
         # Otherwise, assume the first word as the name of the executable.
-        (exeName, progArgs) = (executable, self.cmdLine) if (self.cmdLine.startswith("-")) else self.cmdLine.split(None,
-                                                                                                                   1)
+        (exeName, progArgs) = (TestGlobal.executable, self.cmdLine) if (
+            self.cmdLine.startswith("-")) else self.cmdLine.split(None,
+                                                                  1)
 
         command = (
-                      exeName + "_dbg" if debug else exeName + "_release" if release else exeName) + " -u Cmdenv " + progArgs + \
+                      exeName + "_dbg" if TestGlobal.debug else exeName + "_release" if TestGlobal.release else exeName) + " -u Cmdenv " + progArgs + \
                   _iif(self.simtimelimit != "", " --sim-time-limit=" + self.simtimelimit, "") + \
-                  " \"--fingerprint=" + self.fingerprint + "\" --cpu-time-limit=" + cpuTimeLimit + \
+                  " \"--fingerprint=" + self.fingerprint + "\" --cpu-time-limit=" + TestGlobal.cpuTimeLimit + \
                   " --vector-recording=false --scalar-recording=true " + \
                   " --result-dir=" + self.resultdir + \
-                  " " + extraOppRunArgs
+                  " " + TestGlobal.extraArgs
 
         # print("COMMAND: " + command + '\n')
         anyFingerprintBad = False
@@ -407,10 +552,13 @@ class FingerprintTestCase(SimulationTestCase):
 
 class FingerprintContainerTestCase(FingerprintTestCase):
     def __init__(self, title, csvFile, wd, cmdLine, simtimelimit, fingerprint, expectedResult, storeFingerprintCallback,
-                 storeExitcodeCallback, repeat, tags):
+                 storeExitcodeCallback, createSimulationResultCallback, tags, repeat):
         FingerprintTestCase.__init__(self, title, csvFile, wd, cmdLine, simtimelimit, fingerprint, expectedResult,
-                                     storeFingerprintCallback, storeExitcodeCallback, repeat)
-        self.tags = self.parse_tags(tags)
+                                     storeFingerprintCallback, storeExitcodeCallback, createSimulationResultCallback,
+                                     tags, repeat)
+
+        # if omnetpp not present assume latest
+        self.tags.setdefault("omnetpp", "latest")
         self.docker_client = docker.from_env()
 
         if "vadere" in self.tags:
@@ -419,19 +567,6 @@ class FingerprintContainerTestCase(FingerprintTestCase):
             self.mobility_runner = self.build_sumo_runner()
         else:
             self.mobility_runner = None
-
-    @staticmethod
-    def parse_tags(tags):
-        _tags = {}
-        for kv in tags.split(";"):
-            if ":" in kv:
-                _kv = kv.split(":")
-                _tags[_kv[0]] = _kv[1]
-
-        # if omnetpp not present assume latest
-        if "omnetpp" not in _tags:
-            _tags["omnetpp"] = "latest"
-        return _tags
 
     def get_container_base_name(self):
         """
@@ -683,7 +818,7 @@ class SimulationTextTestResult(ThreadedTestResult):
                     file = _f[1].split("/")[-1]
                     line = _f[2].split()[-1]
                     ret = f"{file}:{line}"
-                except :
+                except:
                     ret = f
             _trace = _trace.tb_next
         return ret
@@ -702,8 +837,7 @@ class SimulationTextTestResult(ThreadedTestResult):
             elif self.dots:
                 self.stream.write('E')
                 self.stream.flush()
-            global exitCode
-            exitCode = 1  # result is not the expected result
+            TestGlobal.exitCode = 1  # result is not the expected result
 
     def addExpectedError(self, test, err):
         self.expectedErrors.append((test, self._exc_info_to_string(err, test)))
@@ -730,8 +864,7 @@ class SimulationTextTestResult(ThreadedTestResult):
             elif self.dots:
                 self.stream.write('F')
                 self.stream.flush()
-            global exitCode
-            exitCode = 1  # result is not the expected result
+            TestGlobal.exitCode = 1  # result is not the expected result
 
     def addSkip(self, test, reason):
         super(SimulationTextTestResult, self).addSkip(test, reason)
@@ -761,8 +894,7 @@ class SimulationTextTestResult(ThreadedTestResult):
         elif self.dots:
             self.stream.write("u")
             self.stream.flush()
-        global exitCode
-        exitCode = 1  # result is not the expected result
+        TestGlobal.exitCode = 1  # result is not the expected result
 
     def printErrors(self):
         # modified
@@ -799,38 +931,154 @@ def ensure_dir(f):
         pass  # do nothing if already exist
 
 
-if __name__ == "__main__":
+def run_testcases(cases):
+    test_suite = ThreadedTestSuite()
+    test_suite.addTests(cases)
+    test_suite.thread_count = args.threads
+    test_suite.repeat = args.repeat
+
+    test_runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=9, resultclass=SimulationTextTestResult)
+
+    test_runner.run(test_suite)
+
+
+def opp_main(args):
+
+    if not args.testspecfiles:
+        args.testspecfiles = glob.glob('*.csv')
+
+    if args.test_case_type_default().upper in TestCaseType.__members__:
+        args.test_case_type_default = TestCaseType[args.test_case_type_default.upper()]
+    else:
+        args.test_case_type_default = TestCaseType.SHELL
+
+    TestGlobal.debug = args.debug
+
+    generator = FingerprintTestCaseGenerator(args.match, args.exclude, args.repeat, args.test_case_type_default)
+    testcases = generator.generateFromCSV(args.testspecfiles)
+
+    run_testcases(testcases)
+
+    print()
+    generator.writeUpdatedFiles()
+    generator.writeErrorFiles()
+    generator.writeFailedFiles()
+    print("Log has been saved to %s" % TestGlobal.logFile)
+
+    # FIXME: do not use global exit code
+    return TestGlobal.exitCode
+
+
+def crownet_main(args):
+
+    if not args.testspecfiles:
+        args.testspecfiles = glob.glob('**/*.yaml')
+
+    repeat = 1
+
+    generator = FingerprintTestCaseGeneratorCrowNet(args.match, args.exclude, repeat, TestCaseType.CROWNET)
+    testcases = generator.generateFromYAML(glob.glob(args.yaml, recursive=True))
+
+    run_testcases(testcases)
+
+    generator.writeUpdatedFiles()
+    generator.writeErrorFiles()
+    generator.writeErrorFiles()
+    print("Log has been saved to %s" % TestGlobal.logFile)
+
+    #FIXME: do not use global exit code
+    return TestGlobal.exitCode
+
+
+def opp_argparser(parser: argparse.ArgumentParser):
+    parser.add_argument('testspecfiles', nargs='*', metavar='testspecfile',
+                        help='CSV files that contain the tests to run (default: *.csv). Expected CSV file columns: '
+                             'working directory, command to run, simulation time limit, expected fingerprint, expected'
+                             ' result, tags. '
+                             'The command column may contain only options without a program name (i.e. it starts with - ). '
+                             'In this case the --executable option can be used to specify a program name.'
+                             'use following tags to specify test case type. type:shell or type:docker. If not type '
+                             'tag is '
+                             'set the default behaviour is configured with --test-case-type'
+                        )
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Run debug executables: use the debug version of the executable (appends _dbg to the '
+                             'executable name)')
+    parser.add_argument('-s', '--release', action='store_true',
+                        help='Run release executables: use the release version of the executable (appends _release to '
+                             'the executable name)')
+    parser.add_argument('-a', '--oppargs', action='append', metavar="extra_args", dest='extra_args', nargs=argparse.REMAINDER,
+                        help='extra opp_run arguments until the end of the line')
+    parser.add_argument('-m', '--match', action='append', metavar='regex',
+                        help='Line filter: a line (more precisely, workingdir+SPACE+args) must match any of the regular'
+                             ' expressions in order for that test case to be run')
+    parser.add_argument('-x', '--exclude', action='append', metavar='regex',
+                        help='Negative line filter: a line (more precisely, workingdir+SPACE+args) must NOT match any '
+                             'of the regular expressions in order for that test case to be run')
+    parser.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
+    parser.add_argument('-e', '--executable',
+                        default="opp_run",
+                        help='Determines which binary to execute (e.g. opp_run_dbg, opp_run_release) if the command '
+                             'column in the CSV file does not specify one.')
+    parser.add_argument('--log-file',
+                        required=False,
+                        dest="log_file",
+                        default="opp_test.out",
+                        help="output file for all tests")
+    parser.add_argument('--test-case-type',
+                        dest="test_case_type_default",
+                        default="shell",
+                        required=False,
+                        help="specify test case type as 'shell' or 'docker' ")
+
+    parser.set_defaults(main_func=opp_main)
+    return parser
+
+
+def crownet_argparser(parser: argparse.ArgumentParser):
+
+    parser.add_argument('testspecfiles', nargs='*', metavar='testspecfile',
+                        help='Test files that contain the tests to run (default: **/*.yml)'
+                        )
+    parser.add_argument('-e', '--executable',
+                        default="run_script.py",
+                        help='Determines which binary to execute if the command '
+                             'column in the test file does not specify one.')
+    parser.add_argument('-a', '--crownetargs', action='append', metavar="extraargs", dest='extra_args', nargs=argparse.REMAINDER,
+                        help='extra run_script.py arguments until the end of the line')
+    parser.add_argument('-m', '--match', action='append', metavar='regex',
+                        help='Line filter: a line (more precisely, workingdir+SPACE+args) must match any of the regular'
+                             ' expressions in order for that test case to be run')
+    parser.add_argument('-x', '--exclude', action='append', metavar='regex',
+                        help='Negative line filter: a line (more precisely, workingdir+SPACE+args) must NOT match any '
+                             'of the regular expressions in order for that test case to be run')
+    parser.add_argument('--log-file',
+                        required=False,
+                        dest="log_file",
+                        default="crownet_test.out",
+                        help="output file for all tests")
+
+    parser.set_defaults(main_func=crownet_main)
+    return parser
+
+
+def parse_arguments(_args=None):
     defaultNumThreads = multiprocessing.cpu_count()
     if defaultNumThreads >= 6:
         defaultNumThreads = defaultNumThreads - 1
-    parser = argparse.ArgumentParser(description='Run the fingerprint tests specified in the input files.')
-    parser.add_argument('testspecfiles', nargs='*', metavar='testspecfile',
-                        help='CSV files that contain the tests to run (default: *.csv). Expected CSV file columns: working directory, command to run, simulation time limit, expected fingerprint, expected result, tags. The command column may contain only options without a program name (i.e. it starts with - ). In this case the --executable option can be used to specify a program name.')
-    parser.add_argument('-m', '--match', action='append', metavar='regex',
-                        help='Line filter: a line (more precisely, workingdir+SPACE+args) must match any of the regular expressions in order for that test case to be run')
-    parser.add_argument('-x', '--exclude', action='append', metavar='regex',
-                        help='Negative line filter: a line (more precisely, workingdir+SPACE+args) must NOT match any of the regular expressions in order for that test case to be run')
-    parser.add_argument('-t', '--threads', type=int, default=defaultNumThreads,
+
+    main = argparse.ArgumentParser(
+        prog="Fingerprint Testrunner",
+        description="Run the fingerprint tests specified as OMNeT++ or CrowNet fingerprint files."
+    )
+    # PARENT
+    parent = argparse.ArgumentParser(add_help=False)
+    parent.add_argument('-C', '--directory',
+                        help='Change to DIRECTORY before executing the tests. Working dirs in the test files are relative to this.')
+    parent.add_argument('-t', '--threads', type=int, default=defaultNumThreads,
                         help='number of parallel threads (default: number of CPUs, currently ' + str(
                             defaultNumThreads) + ')')
-    parser.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
-    parser.add_argument('-e', '--executable',
-                        help='Determines which binary to execute (e.g. opp_run_dbg, opp_run_release) if the command column in the CSV file does not specify one.')
-    parser.add_argument('-C', '--directory',
-                        help='Change to DIRECTORY before executing the tests. Working dirs in the CSV files are relative to this.')
-    parser.add_argument('-d', '--debug', action='store_true',
-                        help='Run debug executables: use the debug version of the executable (appends _dbg to the executable name)')
-    parser.add_argument('-s', '--release', action='store_true',
-                        help='Run release executables: use the release version of the executable (appends _release to the executable name)')
-    parser.add_argument('-a', '--oppargs', action='append', metavar='oppargs', nargs=argparse.REMAINDER,
-                        help='extra opp_run arguments until the end of the line')
-    parser.add_argument('--use-docker',
-                        dest="use_docker",
-                        action="store_true",
-                        default=False,
-                        required=False,
-                        help="Execute each test case in dedicated containers. Use Tags in csv to configure which images to use")
-    parser.add_argument(
+    parent.add_argument(
         "--verbose",
         "-v",
         dest="verbose",
@@ -838,7 +1086,7 @@ if __name__ == "__main__":
         default=0,
         help="Set verbosity of command. From warnings and errors only (-v) to debug output (-vvv)",
     )
-    parser.add_argument(
+    parent.add_argument(
         "--create-log-file",
         dest="create_log_file",
         action="store_true",
@@ -846,10 +1094,30 @@ if __name__ == "__main__":
         required=False,
         help="Redirect log messages to Logfile at script location.",
     )
-    args = parser.parse_args()
 
-    # logger
-    # remove existing handlers and overwrite with user settings
+    sub = main.add_subparsers(title="Available Commands")
+
+    # COMMAND 1 "opp"
+    opp_argparser(sub.add_parser(
+        "opp",
+        parents=[parent],
+        description="Run OMNeT++ fingerprints"
+    ))
+    # COMMAND 2 "crownet"
+    crownet_argparser(sub.add_parser(
+        "crownet",
+        parents=[parent],
+        description="Run CrowNet fingerprints"
+    ))
+
+    return main.parse_args(_args)
+
+
+if __name__ == "__main__":
+
+    args = parse_arguments()
+
+    # logger: remove existing handlers and overwrite with user settings
     for h in logging.root.handlers:
         logging.root.removeHandler(h)
 
@@ -867,48 +1135,30 @@ if __name__ == "__main__":
             format="%(asctime)s:%(module)s:%(levelname)s> %(message)s",
         )
 
-    if os.path.isfile(logFile):
-        FILE = open(logFile, "w")
+    # FIXME refactor global object
+    # Set global object
+    TestGlobal.logFile = args.log_file
+    if os.path.isfile(TestGlobal.logFile):
+        FILE = open(TestGlobal.logFile, "w")
         FILE.close()
 
-    if not args.testspecfiles:
-        args.testspecfiles = glob.glob('*.csv')
-
-    if args.oppargs:
-        for oppArgList in args.oppargs:
-            for oppArg in oppArgList:
-                extraOppRunArgs += " " + oppArg
-
     if args.executable:
-        executable = args.executable
+        TestGlobal.executable = args.executable
 
     if args.directory:
-        rootDir = os.path.abspath(args.directory)
+        TestGlobal.rootDir = os.path.abspath(args.directory)
 
-    debug = args.debug
+    if args.extra_args:
+        for _arg_list in args.extra_args:
+            for _arg in _arg_list:
+                TestGlobal.extraArgs += " " + _arg
 
-    generator = FingerprintTestCaseGenerator()
-    testcases = generator.generateFromCSV(args.testspecfiles, args.match, args.exclude, args.repeat, args.use_docker)
+    # call command main
+    ret = args.main_func(args)
 
-    testSuite = ThreadedTestSuite()
-    testSuite.addTests(testcases)
-    testSuite.thread_count = args.threads
-    testSuite.repeat = args.repeat
-
-    testRunner = unittest.TextTestRunner(stream=sys.stdout, verbosity=9, resultclass=SimulationTextTestResult)
-
-    testRunner.run(testSuite)
-
-    print()
-
-    generator.writeUpdatedCSVFiles()
-    generator.writeErrorCSVFiles()
-    generator.writeFailedCSVFiles()
-
-    print("Log has been saved to %s" % logFile)
-
-    if exitCode == 0:
+    if ret == 0:
         print("Test results equals to expected results")
     else:
         print("Test results differ from expected results")
-    exit(exitCode)
+    exit(ret)
+
