@@ -110,6 +110,19 @@ fingerprints:
     - ${CROWNET_HOME}/crownet/tests/fingerprint
     expire_in: 8 weeks
 
+# run the opp tests
+opp-tests:
+  stage: test
+  tags:
+    - crownet-sim
+  script:
+    - "cd ${CROWNET_HOME}/tests/omnetpp"
+    - "${OPP} ./runtest"
+  artifacts:
+    when: always
+    paths:
+    - ${CROWNET_HOME}/crownet/tests/omnetpp
+    expire_in: 8 weeks
 
 # run given simulation-campaign
 simulation-campaign:
