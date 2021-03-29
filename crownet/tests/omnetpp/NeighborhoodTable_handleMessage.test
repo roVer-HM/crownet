@@ -13,7 +13,7 @@ using namespace crownet;
 
 void test()
 {
-	NeighborhoodTable* nTable = new NeighborhoodTable();
+    NeighborhoodTable* nTable = new NeighborhoodTable();
     nTable->handleMessage(new cMessage("InvalidMessage"));
     // getTtlMessage() 
 }
