@@ -28,6 +28,7 @@ echo
 (cd work; opp_makemake -f --deep --no-deep-includes -I./lib -o work -i ../makefrag $EXTRA_INCLUDES; $MAKE) || exit 1
 echo
 echo "opp_test run $OPT -p work_dbg -v $TESTFILES"
-opp_test run $OPT -p work_dbg -v $TESTFILES || exit 1
+# opp_test run $OPT -p work_dbg -v $TESTFILES || exit 1
+opp_test run $OPT -p work -v $TESTFILES || exit 1
 echo
 echo Results can be found in ./work
