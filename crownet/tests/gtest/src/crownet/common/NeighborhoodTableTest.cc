@@ -31,11 +31,11 @@ TEST_F(NeighborhoodTableTest, checkTimeToLive) {
   NeighborhoodTable nTable;
   nTable.setMaxAge(maxAge);
 
-  NeighborhoodTableEntry e0{0, 1.0, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e1{1, 1.0, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e2{2, 1.0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e3{3, 1.0, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e4{4, 1.0, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
+  NeighborhoodTableEntry e0{0, now - maxAge + 2, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
+  NeighborhoodTableEntry e1{1, now - maxAge + 1, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0)};
+  NeighborhoodTableEntry e2{2, now - maxAge + 0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
+  NeighborhoodTableEntry e3{3, now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0)};
+  NeighborhoodTableEntry e4{4, now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
   std::map<int, NeighborhoodTableEntry> internalTable = {{0,e0}, {1,e1}, {2,e2}, {3,e3}, {4,e4}};
   nTable.setTable(internalTable);
 
