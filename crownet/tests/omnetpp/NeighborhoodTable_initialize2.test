@@ -1,0 +1,65 @@
+%description:
+Test the NeighborhoodTable
+
+%includes:
+#include <stdio.h>
+#include "crownet/common/NeighborhoodTable.h"
+
+%file: test.ned
+import crownet.common.NeighborhoodTable;
+
+network test {
+  submodules:
+    foo: NeighborhoodTableTest{}
+}
+
+%file: NeighborhoodTableTest.ned
+import crownet.common.NeighborhoodTable;
+
+simple NeighborhoodTableTest extends NeighborhoodTable{
+    
+    parameters:
+        @class(NeighborhoodTableTest);
+}
+
+%file: Test.cc
+#include "inet/queueing/function/PacketFilterFunction.h"
+#include "inet/common/packet/Packet.h"
+#include "crownet/common/NeighborhoodTable.h"
+
+namespace NeighborhoodTable_initialize2{
+	class NeighborhoodTableTest : public ::crownet::NeighborhoodTable {
+		// cSimpleModule
+		void initialize(int stage) override {
+			::crownet::NeighborhoodTable::initialize(stage);
+		    if (stage == INITSTAGE_LOCAL){
+			  std::cout << "maxAge: " << this->maxAge << std::endl;
+			}
+		}	
+		
+		void finish() override {
+        std::cout << "finished: simtime: " << simTime() << std::endl;
+        for(auto it = this->_table.cbegin(); it != _table.cend(); ++it)
+        {
+            std::cout << "nTable[" << it->first << "]" <<
+                    " -- nodeId: " << it->second.getNodeId() <<
+                    " -- timeSend: " << it->second.getTimeSend() << "\n";
+        }
+		}		
+	};
+Define_Module(NeighborhoodTableTest);
+}
+
+%inifile: omnetpp.ini
+
+# [General]
+network = test
+sim-time-limit=2s
+test.foo.maxAge = 7s
+
+%contains: stdout
+maxAge: 7
+%contains: stdout
+finished: simtime: 2
+%not-contains-regex: stdout
+nTable\[\d\]

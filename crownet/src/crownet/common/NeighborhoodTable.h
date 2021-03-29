@@ -30,6 +30,14 @@ public:
     void handleBeacon(NeighborhoodTableEntry&& beacon);
     void checkTimeToLive();
 
+    //getter
+    const nTable& getTable() const { return _table; }
+    const simtime_t& getMaxAge() const { return maxAge; }
+
+    //setter
+    void setMaxAge(simtime_t _maxAge) { maxAge = _maxAge; }
+    void setTable(std::map<int, NeighborhoodTableEntry> _nTable){ _table = _nTable;}
+
 
     // iterators and visitors
     typename nTable::iterator begin() { return _table.begin(); }
@@ -39,7 +47,7 @@ public:
 
 
 
-private:
+protected:
     nTable _table;
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;

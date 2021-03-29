@@ -58,7 +58,7 @@ void NeighborhoodTable::checkTimeToLive(){
     simtime_t now = simTime();
     for( auto it=_table.cbegin(); it !=_table.cend();){
         // Received + maxAge := time at which entry must be removed.
-        if ((it->second.getTimeReceived() + maxAge) < now){
+        if ((it->second.getTimeSend() + maxAge) < now){
            it = _table.erase(it);
         } else {
             ++it;

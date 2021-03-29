@@ -1,0 +1,26 @@
+%description:
+Test the NeighborhoodTable
+
+%includes:
+#include <stdio.h>
+#include "crownet/common/NeighborhoodTable.h"
+
+%ignore-exitcode: 1
+
+%global:
+
+using namespace crownet;
+
+void test()
+{
+	NeighborhoodTable* nTable = new NeighborhoodTable();
+    nTable->handleMessage(new cMessage("InvalidMessage"));
+    // getTtlMessage() 
+}
+
+%activity:
+
+test();
+
+%contains-regex: stderr
+.* Unknown Message received .*
