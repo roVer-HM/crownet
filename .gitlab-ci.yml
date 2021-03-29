@@ -116,7 +116,7 @@ opp-tests:
   tags:
     - crownet-sim
   script:
-    - "cd ${CROWNET_HOME}/tests/omnetpp"
+    - "cd ${CROWNET_HOME}/crownet/tests/omnetpp"
     - "${OPP} ./runtest"
   artifacts:
     when: always
