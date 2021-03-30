@@ -24,6 +24,8 @@ For our project we also inherit from BaseOppTest to get some functionalities for
 class MyUnitTest : public BaseOppTest { 
  public:
     MyUnitTest() {}
+ protected:
+    MyUnit foo; // some default state to use in alll testcaste
 };
 
 // Demonstrate some basic assertions.
@@ -33,6 +35,8 @@ TEST(HelloTest, BasicAssertions) {
   EXPECT_STRNE(myUnit.returnString("Hello"), "World");
   // Expect equality.
   EXPECT_EQ(7 * 6, 42);
+  int ret = foo.executTestFunction();
+  EXPECT_EQ(ret, 42);
 }
 ```
 

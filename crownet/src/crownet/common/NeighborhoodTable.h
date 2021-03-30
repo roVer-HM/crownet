@@ -36,8 +36,8 @@ public:
     const cMessage* getTitleMessage() const { return ttl_msg;}
 
     //setter
-    void setMaxAge(simtime_t _maxAge) { maxAge = _maxAge; }
-    void setTable(std::map<int, NeighborhoodTableEntry> _nTable){ _table = _nTable;}
+    void setMaxAge(const simtime_t& _maxAge) { maxAge = _maxAge; }
+    void setTable(const std::map<int, NeighborhoodTableEntry>& _nTable){ _table = _nTable;}
     void setTitleMessage(cMessage *msg){ttl_msg = msg;}
 
     // iterators and visitors

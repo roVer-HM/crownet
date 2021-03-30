@@ -26,14 +26,18 @@ class NeighborhoodTableTest : public BaseOppTest {
 };
 
 TEST_F(NeighborhoodTableTest, checkTimeToLive) {
-  simtime_t now = simTime().dbl();
+  setSimTime(20.0); // set some positive simtime (to keep test values positve)
+  simtime_t now = simTime().dbl(); // now == 0.0s
   double maxAge = 3.0;
   NeighborhoodTable nTable;
   nTable.setMaxAge(maxAge);
 
+  //valid, must be present after checkTimeToLive() call
   NeighborhoodTableEntry e0{0, now - maxAge + 2, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
   NeighborhoodTableEntry e1{1, now - maxAge + 1, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0)};
   NeighborhoodTableEntry e2{2, now - maxAge + 0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
+
+  //invalid, must be removed by checkTimeToLive() call
   NeighborhoodTableEntry e3{3, now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0)};
   NeighborhoodTableEntry e4{4, now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
   std::map<int, NeighborhoodTableEntry> internalTable = {{0,e0}, {1,e1}, {2,e2}, {3,e3}, {4,e4}};
@@ -53,23 +57,27 @@ TEST_F(NeighborhoodTableTest, checkTimeToLive) {
 TEST_F(NeighborhoodTableTest, handleBeacon) {
   NeighborhoodTable nTable;
 
+  // add new entry
   NeighborhoodTableEntry b0{0, 1.0, 2.0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
   nTable.handleBeacon(std::move(b0));
   EXPECT_EQ(nTable.getTable().size(), 1);
   EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b0.getTimeSend().dbl());
 
+  // add new entry
   NeighborhoodTableEntry b1{1, 1.0, 3.0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
   nTable.handleBeacon(std::move(b1));
   EXPECT_EQ(nTable.getTable().size(), 2);
   EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b0.getTimeSend().dbl());
   EXPECT_EQ(nTable.getTable().find(1)->second.getTimeSend().dbl(), b1.getTimeSend().dbl());
 
+  // add entry from existing node id (override old value because new value is younger)
   NeighborhoodTableEntry b2{0, 2.0, 4.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
   nTable.handleBeacon(std::move(b2));
-  EXPECT_EQ(nTable.getTable().size(), 2);
+  EXPECT_EQ(nTable.getTable().size(), 2); // size must not increase
   EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b2.getTimeSend().dbl());
   EXPECT_EQ(nTable.getTable().find(1)->second.getTimeSend().dbl(), b1.getTimeSend().dbl());
 
+  // add entry from existing node id (keep old value because new value is to old)
   NeighborhoodTableEntry b3{0, 1.0, 5.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
   nTable.handleBeacon(std::move(b3));
   EXPECT_EQ(nTable.getTable().size(), 2);
@@ -93,7 +101,8 @@ TEST_F(NeighborhoodTableTest, handleMessage) {
   mock.handleMessage(ttl_msg);
   // test expected exception is thrown
   EXPECT_THROW(mock.handleMessage(invalid_msg), cRuntimeError);
-  delete invalid_msg; // suppress weird warning
+  delete invalid_msg;
+  delete ttl_msg;
 }
 
 TEST_F(NeighborhoodTableTest, initialize) {
@@ -111,7 +120,7 @@ TEST_F(NeighborhoodTableTest, initialize) {
   EXPECT_CALL(mock, scheduleAt(time + maxAge, testing::_)).Times(1); // triggers on initialize(0)
   mock.setMaxAge(maxAge);
 
-  mock.initialize(0);
+  mock.initialize(0); // INITSTAGE_LOCAL
   mock.initialize(1);
   mock.initialize(42);
 }
