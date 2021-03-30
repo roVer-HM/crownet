@@ -17,7 +17,6 @@ RUN apt-get update && \
        clang bison flex make qt5-default \
        libstdc++6-8-dbg \
        clang-format \
-       googletest libgtest-dev google-mock \
        bear cmake \
        libboost-all-dev libcrypto++-dev libcrypto++-utils libcrypto++6 libgeographic-dev  \
        doxygen graphviz tcl-dev tk-dev  valgrind \
@@ -30,5 +29,13 @@ RUN apt-get update && \
 # download public key for sam-dev.cs.hm.edu
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -p 6000 sam-dev.cs.hm.edu >> ~/.ssh/known_hosts
 
-RUN cd /usr/src/googletest/googletest && cmake CMakeLists.txt && make install
-RUN cd /usr/src/googletest/googlemock && cmake CMakeLists.txt && make install
+# install google test library
+RUN mkdir download
+WORKDIR /download
+RUN wget https://github.com/google/googletest/archive/release-1.10.0.tar.gz
+RUN tar -xvf release-1.10.0.tar.gz
+WORKDIR /download/googletest-release-1.10.0/
+RUN cmake CMakeLists.txt
+RUN make install
+WORKDIR /
+RUN rm -rf download

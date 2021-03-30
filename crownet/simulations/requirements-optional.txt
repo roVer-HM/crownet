@@ -1,0 +1,2 @@
+https://github.com/roVer-HM/roveranalyzer/archive/refs/heads/master.zip
+https://github.com/roVer-HM/flowcontrol/archive/refs/heads/master.zip

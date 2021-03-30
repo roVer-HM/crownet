@@ -1,17 +1,20 @@
 #!/usr/bin/python3
-import sys, os
-sys.path.append(os.path.abspath(".."))
-from import_PYTHON_PATHS import *
+import os
+import sys
 
+sys.path.append(os.path.abspath(".."))
+try:
+    from import_PYTHON_PATHS import *
+except ImportError:
+    pass
+
+import numpy
 from datetime import datetime
 
-from roveranalyzer.simulators.rover.runner import BaseRunner, process_as # add
-
-
-# scenario-specific python packages
-import numpy
 import matplotlib.pyplot as plt
 import pandas as pd
+
+from roveranalyzer.simulators.rover.runner import BaseRunner, process_as
 
 
 class SimulationRun(BaseRunner):
@@ -29,7 +32,7 @@ class SimulationRun(BaseRunner):
         df_r.index = df_r.index - 249
         return df_r
 
-    @process_as({"prio": 20, "type": "postx"})
+    @process_as({"prio": 20, "type": "post"})
     def degree_informed_extract(self):
         filename = "DegreeInformed.txt"
         # wait for file
@@ -51,7 +54,7 @@ class SimulationRun(BaseRunner):
         plt.title("Information degree")
         plt.savefig(os.path.join(os.path.dirname(filepath), "InformationDegree.png"))
 
-    @process_as({"prio": 10, "type": "postx"})
+    @process_as({"prio": 10, "type": "post"})
     def time_95_informed(self):
         filename = "DegreeInformed.txt"
         # wait for file
@@ -73,7 +76,7 @@ class SimulationRun(BaseRunner):
         f.write(f" timeToInform95PercentAgents\n0 {time95}")
         f.close()
 
-    @process_as({"prio": 30, "type": "postx"})
+    @process_as({"prio": 30, "type": "post"})
     def poisson_parameter(self):
         filename = "numberPedsGen.txt"
         # wait for file
@@ -92,35 +95,28 @@ class SimulationRun(BaseRunner):
 
 
 if __name__ == "__main__":
-
-    scenario_file = os.path.join(os.getcwd(), "scenario002.scenario")
-
-    settings = [
-                    "--qoi",
-                    "degree_informed_extract.txt",
-                    "poisson_parameter.txt",
-                    "--experiment-label",
-                    datetime.now().isoformat().replace(":", "").replace("-", ""),
-                    "--delete-existing-containers",
-                    "--create-vadere-container",
-                    "--with-control",
-                    "control.py",
-                    "--control-vadere-only",
-                    "--scenario",
-                    scenario_file,
-
-                    # docker container tags: both latest
-                ]
+    print(sys.argv)
 
     if len(sys.argv) == 1:
         # default behavior of script
         runner = SimulationRun(
             os.getcwd(),
-            settings
+            [
+                "--qoi",
+                "degree_informed_extract.txt",
+                "poisson_parameter.txt",
+                "--experiment-label",
+                datetime.now().isoformat().replace(":", "").replace("-", ""),
+                "--delete-existing-containers",
+                "--create-vadere-container",
+                "--run-name",
+                "rover_run",
+                "--config",
+                "final", #TODO: change host_name in inifile
+            ],
         )
     else:
         # use arguments from command line
         runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
-
