@@ -75,7 +75,6 @@ TEST_F(NeighborhoodTableTest, handleBeacon) {
   EXPECT_EQ(nTable.getTable().size(), 2);
   EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b2.getTimeSend().dbl());
   EXPECT_EQ(nTable.getTable().find(1)->second.getTimeSend().dbl(), b1.getTimeSend().dbl());
-  EXPECT_TRUE(1==1);
 }
 
 TEST_F(NeighborhoodTableTest, handleMessage) {

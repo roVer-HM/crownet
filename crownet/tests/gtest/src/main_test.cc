@@ -18,7 +18,6 @@ int main(int argc, char **argv) {
   SimTime::setScaleExp(-12);
 
   // create a simulation manager and an environment for the simulation
-//  cEnvir *env = new GtestEnv(argc, argv, new EmptyConfig());
   cEnvir *env = new GtestEnv(argc, argv, new EmptyConfig());
   cSimulation *sim = new cSimulation("simulation", env);
   cSimulation::setActiveSimulation(sim);
