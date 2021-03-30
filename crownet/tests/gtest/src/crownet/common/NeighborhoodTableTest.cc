@@ -102,7 +102,6 @@ TEST_F(NeighborhoodTableTest, handleMessage) {
   // test expected exception is thrown
   EXPECT_THROW(mock.handleMessage(invalid_msg), cRuntimeError);
   delete invalid_msg;
-  delete ttl_msg;
 }
 
 TEST_F(NeighborhoodTableTest, initialize) {
