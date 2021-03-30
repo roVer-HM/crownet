@@ -48,7 +48,7 @@ public:
 
 
 
-private:
+protected:
     nTable _table;
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;

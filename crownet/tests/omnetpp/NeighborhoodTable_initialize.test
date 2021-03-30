@@ -1,0 +1,19 @@
+%description:
+Test the NeighborhoodTable
+
+%#--------------------------------------------------------------------------------------------------------------
+%inifile: omnetpp.ini
+[General]
+network = crownet.test.omnetpp.lib.NeighborhoodTableTestNetwork
+sim-time-limit=2s
+ned-path = ../../lib
+sim-time-limit=2s
+*.foo.maxAge = 7s
+
+%#--------------------------------------------------------------------------------------------------------------
+%contains: stdout
+maxAge: 7
+%contains: stdout
+finished: simtime: 2
+%not-contains-regex: stdout
+nTable\[\d\]

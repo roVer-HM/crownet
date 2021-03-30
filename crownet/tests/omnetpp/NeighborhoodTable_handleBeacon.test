@@ -1,0 +1,56 @@
+%description:
+Test the NeighborhoodTable
+
+%includes:
+#include <stdio.h>
+#include "crownet/common/NeighborhoodTable.h"
+
+%global:
+
+using namespace crownet;
+
+void test()
+{
+    NeighborhoodTable* nTable = new NeighborhoodTable();
+    // nTable->initialize(0);
+
+    NeighborhoodTableEntry b0{0, 1.0, 2.0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
+    nTable->handleBeacon(std::move(b0));
+    std::cout << "nTable size: " << nTable->getTable().size() << std::endl;
+    std::cout << "time send table[0]: " << nTable->getTable().find(0)->second.getTimeSend().dbl() << std::endl;
+
+    NeighborhoodTableEntry b1{1, 1.0, 3.0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
+    nTable->handleBeacon(std::move(b1));
+    std::cout << "nTable size: " << nTable->getTable().size() << std::endl;
+    std::cout << "time send table[0]: " << nTable->getTable().find(0)->second.getTimeSend().dbl() << std::endl;
+    std::cout << "time send table[1]: " << nTable->getTable().find(1)->second.getTimeSend().dbl() << std::endl;
+
+    NeighborhoodTableEntry b2{0, 2.0, 4.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
+    nTable->handleBeacon(std::move(b2));
+    std::cout << "nTable size: " << nTable->getTable().size() << std::endl;
+    std::cout << "time send table[0]: " << nTable->getTable().find(0)->second.getTimeSend().dbl() << std::endl;
+    std::cout << "time send table[1]: " << nTable->getTable().find(1)->second.getTimeSend().dbl() << std::endl;
+
+    NeighborhoodTableEntry b3{0, 1.0, 5.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
+    nTable->handleBeacon(std::move(b3));
+    std::cout << "nTable size: " << nTable->getTable().size() << std::endl;
+    std::cout << "time send table[0]: " << nTable->getTable().find(0)->second.getTimeSend().dbl() << std::endl;
+    std::cout << "time send table[1]: " << nTable->getTable().find(1)->second.getTimeSend().dbl() << std::endl;
+}
+
+%activity:
+
+test();
+
+%contains: stdout
+nTable size: 1
+time send table[0]: 1
+nTable size: 2
+time send table[0]: 1
+time send table[1]: 1
+nTable size: 2
+time send table[0]: 2
+time send table[1]: 1
+nTable size: 2
+time send table[0]: 2
+time send table[1]: 1
