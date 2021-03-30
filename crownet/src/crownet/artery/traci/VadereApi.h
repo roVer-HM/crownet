@@ -12,6 +12,7 @@
 #include <traci/sumo/utils/traci/TraCIAPI.h>
 
 #include "crownet/artery/traci/VadereUtils.h"
+#include "crownet/artery/traci/TraCiForwarder.h"
 #include "crownet/common/converter/OsgCoordinateConverter.h"
 
 namespace crownet {
@@ -51,7 +52,7 @@ struct CoordRef {
   traci::TraCIPosition offset;
 };
 
-class VadereApi : public API {
+class VadereApi : public API, public TraCiForwarder {
  public:
   VadereApi();
   virtual ~VadereApi() {}
@@ -64,8 +65,13 @@ class VadereApi : public API {
     converter = _c;
   }
 
+  // TraCiForwarder
+  virtual void forward(tcpip::Storage& msgIn,  tcpip::Storage& msgResponse) override;
+
  private:
   std::shared_ptr<OsgCoordinateConverter> converter;
+
+
 
  public:
   class VaderePersonScope : public TraCIScopeWrapper {

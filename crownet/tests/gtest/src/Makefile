@@ -48,6 +48,7 @@ OBJS = \
     $O/main_test.o \
     $O/crownet/common/IEntryTest.o \
     $O/crownet/common/NeighborhoodTableTest.o \
+    $O/crownet/control/ControllTest.o \
     $O/crownet/dcd/CellTest.o \
     $O/crownet/dcd/DcDMapFileWriterTest.o \
     $O/crownet/dcd/DcDMapIteratorTest.o \

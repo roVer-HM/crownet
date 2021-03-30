@@ -22,6 +22,7 @@ simulation-campaigns/*results*
 .cmdenv-log
 
 .idea
+.venv
 
 # python analysis
 
@@ -29,6 +30,7 @@ analysis/**/venv
 analysis/**/dist
 analysis/**/test_data
 *.egg-info
+.venv*
 
 # crownet project
 
