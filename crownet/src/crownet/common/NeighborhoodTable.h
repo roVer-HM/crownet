@@ -28,8 +28,17 @@ public:
     virtual void handleMessage(cMessage *msg) override;
 
     void handleBeacon(NeighborhoodTableEntry&& beacon);
-    void checkTimeToLive();
+    virtual void checkTimeToLive();
 
+    //getter
+    const simtime_t& getMaxAge() const { return maxAge; }
+    const nTable& getTable() const { return _table; }
+    const cMessage* getTitleMessage() const { return ttl_msg;}
+
+    //setter
+    void setMaxAge(const simtime_t& _maxAge) { maxAge = _maxAge; }
+    void setTable(const std::map<int, NeighborhoodTableEntry>& _nTable){ _table = _nTable;}
+    void setTitleMessage(cMessage *msg){ttl_msg = msg;}
 
     // iterators and visitors
     typename nTable::iterator begin() { return _table.begin(); }
