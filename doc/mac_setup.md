@@ -18,20 +18,24 @@ Furthermore under xquartz -> Preferences -> Security, the "Allow connections fro
 
 Inside the xquartz console you can run a gui-container and the window should appear.
 
-## Container debugging
+## Container setup
 
-Currently it's not possible to execute sudo commands inside a container on macOS, because the user is unknown inside the container. A possible workaround is to create a new user inside the container based on your current user details.
+Currently it's not possible to execute sudo commands inside a container on macOS, because the user is unknown inside the container. 
+This is leading to some unexpected behavior, since the container can't execute commands on its mounted directories.
+A possible workaround is to create a new user inside the container based on your current user details.
+
 
 Inside the Dockerfile add following code:
 ```
 ARG USER_ID
-RUN adduser --disabled-password --uid $USER_ID user
-RUN usermod -aG sudo user
-RUN passwd -d user
+ARG USER
+RUN adduser --disabled-password --uid $USER_ID $USER
+RUN usermod -aG sudo $USER
+RUN passwd -d $USER
 ```
-Then build the container with the `USER_ID`-Argument set to $(id -u).
+Then build the container with the `USER_ID`-Argument set to $(id -u) and `USER` set to $USER.
 ```
 # example for omnetpp-ide
-docker build -t sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp-ide --build-arg USER_ID=$(id -u) .
+docker build -t sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp-ide --build-arg USER_ID=$(id -u) --build-arg USER=$USER .
 ```
 
