@@ -147,7 +147,7 @@ function run_container_X11() {
     CMD_ARR+=(--env CROWNET_HOME=${CROWNET_HOME})
 	CMD_ARR+=(--workdir=$(pwd))
 	if [[ "$OSTYPE" == "darwin"* ]]; then
-		CMD_ARR+=(--volume="$HOME:/home/$USER")
+		CMD_ARR+=(--volume="/Users/$USER:/home/$USER")
 	else
 		CMD_ARR+=(--volume="/home/$USER:/home/$USER")
 	fi
