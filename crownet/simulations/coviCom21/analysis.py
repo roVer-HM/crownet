@@ -3,24 +3,23 @@ import os
 import matplotlib
 from matplotlib.lines import Line2D
 
-from roveranalyzer.simulators.rover.dcd.interactive import InteractiveAreaPlot, InteractiveValueOverDistance
+from roveranalyzer.simulators.crownet.dcd.interactive import InteractiveAreaPlot, InteractiveValueOverDistance
 from roveranalyzer.utils.path import get_or_create
 
 matplotlib.use('TkAgg')
 
-import matplotlib.animation as animation
 
 from roveranalyzer.simulators.opp.utils import ScaveTool
-from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
-from roveranalyzer.utils import PathHelper, from_pickle
-from roveranalyzer.simulators.rover.dcd.dcd_map import DcdMap2DMulti
+from roveranalyzer.utils import PathHelper
+from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2DMulti
 from itertools import product
 import matplotlib.pyplot as plt
 from roveranalyzer.utils import check_ax
 import pandas as pd
 import numpy as np
 
-ROOT = "/mnt/results200gb"
+# ROOT = "/mnt/results200gb"
+ROOT = "/mnt/data/coviCom/"
 
 runs = [{"run": "vadere00_60_20210214-21:23:26", "run_no": 0, "run_name": "mf_s60_0"},
         {"run": "vadere00_60_20210214-21:51:11", "run_no": 1, "run_name": "mf_s60_1"},
@@ -178,16 +177,17 @@ def make_sample_map():
 
 
 def make_grid_map():
-    run = runs[3]
+    run = runs[0]
+    time = 96
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.area_plot(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
-                            pcolormesh_dic=dict(vmin=0, vmax=4))
+    fig, ax = dcd.area_plot(time_step=time, node_id=0, title="Decentralized Crowed Density Map",
+                            pcolormesh_dic=dict(vmin=0, vmax=4, edgecolors="black"))
     ax.set_title("")
     fig.delaxes(fig.axes[1])
     ax.set_xticks(dcd.meta.X)
     ax.set_yticks(dcd.meta.Y)
-    fig.savefig(f"{ROOT}/{run['run_name']}_grid_map.pdf")
+    fig.savefig(f"{ROOT}/{run['run_name']}{time}_grid_map.pdf")
 
 
 def delay_distance():
@@ -238,9 +238,9 @@ def delay_distance():
 def main():
     # make_figures()
     # make_sample_map()
-    delay_distance()
+    # delay_distance()
     # interactive: select section
-    # make_grid_map()
+    make_grid_map()
 
 
 if __name__ == "__main__":
