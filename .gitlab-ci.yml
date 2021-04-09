@@ -84,6 +84,20 @@ build-for-sim:
     - ${FLOWCONTROL_M}/dist
     expire_in: 1 weeks
 
+# run uq simulation studies -> TODO: move to end of pipeline
+uq-test:
+  stage: uq-integration-test
+  tags:
+    - crownet-sim
+  variables:
+    ANALYSIS_UQ_M: '${CI_PROJECT_DIR}/analysis/uq'
+  script:
+    - virtualenv --system-site-packages --python py38 ./venv
+    - source ./venv/bin/activate
+    - "cd ${ANALYSIS_UQ_M}"
+    - "pip3 install -r requirements.txt"
+    - "python3 -m unittest discover -v"
+
 # run the unit tests
 gtests:
   stage: test
@@ -132,19 +146,6 @@ opp-tests:
     - ${CROWNET_HOME}/crownet/tests/omnetpp
     expire_in: 8 weeks
 
-# run uq simulation studies
-uq-test:
-  stage: uq-integration-test
-  tags:
-    - crownet-sim
-  variables:
-    ANALYSIS_UQ_M: '${CI_PROJECT_DIR}/analysis/uq'
-  script:
-    - virtualenv --system-site-packages --python py38 ./venv
-    - source ./venv/bin/activate
-    - "cd ${ANALYSIS_UQ_M}"
-    - "pip3 install -r requirements.txt"
-    - "python3 -m unittest discover -v"
     
 # run given simulation-campaign
 simulation-campaign:
