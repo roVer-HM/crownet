@@ -11,8 +11,8 @@ variables:
 
 stages:
   - build
-  - uq-integration-test #TODOmove to end of pipeline
   - test
+  - uq-integration-test
   - simulation-campaign
 
 
