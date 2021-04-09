@@ -1,0 +1,3 @@
+git+https://gitlab.lrz.de/vadere/suq-controller.git@master
+https://github.com/roVer-HM/roveranalyzer/archive/refs/heads/master.zip
+https://github.com/roVer-HM/flowcontrol/archive/refs/heads/master.zip

@@ -4,11 +4,15 @@ variables:
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this.
  OPP_CONT_TAG: 'latest'             # tag of OMNeT++ container to be used
  OPP: '${CI_PROJECT_DIR}/scripts/omnetpp ${OPP_CONT_TAG} exec'
+ ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
+ FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
+ VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
 
 
 stages:
   - build
   - test
+  - uq-integration-test
   - simulation-campaign
 
 
@@ -31,7 +35,6 @@ build-for-sim:
     CROWNET_M: '${CI_PROJECT_DIR}/crownet'
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
-    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
     MODE: 'release'
   script:
     # ## update required docker images
@@ -66,6 +69,9 @@ build-for-sim:
     # build analyzer
     - "cd ${ANALYZER_M}"
     - python3 setup.py sdist
+    # build flowcontrol
+    - "cd ${FLOWCONTROL_M}"
+    - python3 setup.py sdist
   artifacts:
     paths:
     - ${CROWNET_HOME}/scripts
@@ -75,6 +81,7 @@ build-for-sim:
     - ${CROWNET_HOME}/veins
     - ${CROWNET_HOME}/artery
     - ${ANALYZER_M}/dist
+    - ${FLOWCONTROL_M}/dist
     expire_in: 1 weeks
 
 # run the unit tests
@@ -102,6 +109,7 @@ fingerprints:
     - virtualenv --system-site-packages --python py38 ./venv
     - source ./venv/bin/activate
     - "pip3 install -I ${ANALYZER_M}/dist/*.tar.gz"
+    - "pip3 install -I ${FLOWCONTROL_M}/dist/*.tar.gz"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
     - ./fingerprints
   artifacts:
@@ -124,6 +132,20 @@ opp-tests:
     - ${CROWNET_HOME}/crownet/tests/omnetpp
     expire_in: 8 weeks
 
+# run uq simulation studies
+uq-test:
+  stage: uq-integration-test
+  tags:
+    - crownet-sim
+  variables:
+    ANALYSIS_UQ_M: '${CI_PROJECT_DIR}/analysis/uq'
+  script:
+    - virtualenv --system-site-packages --python py38 ./venv
+    - source ./venv/bin/activate
+    - "cd ${ANALYSIS_UQ_M}"
+    - "pip3 install -r requirements.txt"
+    - "python3 -m unittest discover -v"
+    
 # run given simulation-campaign
 simulation-campaign:
   stage: simulation-campaign
@@ -147,3 +169,5 @@ simulation-campaign:
       - ${CROWNET_HOME}/veins/src
       - ${CROWNET_HOME}/veins/subprojects/veins_inet/src
     expire_in: 4 weeks
+
+
