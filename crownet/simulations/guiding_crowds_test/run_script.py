@@ -2,11 +2,14 @@
 import sys, os
 
 sys.path.append(os.path.abspath(".."))
-from import_PYTHON_PATHS import *
+try:
+    from import_PYTHON_PATHS import *
+except:
+    pass
 
 from datetime import datetime
 
-from roveranalyzer.simulators.rover.runner import BaseRunner
+from roveranalyzer.simulators.crownet.runner import BaseRunner
 
 
 class SimulationRun(BaseRunner):
