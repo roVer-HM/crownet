@@ -14,18 +14,21 @@ LABEL maintainer "stefan.schuhbaeck@hm.edu"
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        uncrustify nemiver \
-       clang bison flex make qt5-default \
+       perl zlib1g-dev \
+       clang bison flex make qt5-default  libqt5opengl5-dev \
        libstdc++6-8-dbg \
        clang-format \
        bear cmake \
        libboost-all-dev libcrypto++-dev libcrypto++-utils libcrypto++6 libgeographic-dev  \
        doxygen graphviz tcl-dev tk-dev  valgrind \
-       libopenscenegraph-3.4 libopenscenegraph-3.4-dev libosgearth-dev openscenegraph-plugin-osgearth \
+       openscenegraph libopenscenegraph-dev libosgearth-dev openscenegraph-plugin-osgearth \
        openscenegraph osgearth \
-       libopenmpi-dev libxml2-dev libwebkitgtk-3.0-0  && \
+       libopenmpi-dev libxml2-dev libwebkit2gtk-4.0-37  && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-    
+
+RUN python3 -m pip install --upgrade  numpy pandas matplotlib scipy seaborn
+
 # download public key for sam-dev.cs.hm.edu
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -p 6000 sam-dev.cs.hm.edu >> ~/.ssh/known_hosts
 
