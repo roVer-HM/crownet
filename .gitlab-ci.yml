@@ -19,7 +19,7 @@ stages:
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - ./venv
+    - ./out/crownet_user
 
 # Build all dependencies of the crownet project (default: release mode)
 # This is the base for running simulation campaings on a dedicated
@@ -66,12 +66,6 @@ build-for-sim:
     - "find . -name \"*.cc\" -type f -delete"
     - "find build/ -type f -not -path '*.so' -delete"
     - "find extern/vanetza/build -type f -not -path '*.so' -delete"
-    # build analyzer
-    - "cd ${ANALYZER_M}"
-    - python3 setup.py sdist
-    # build flowcontrol
-    - "cd ${FLOWCONTROL_M}"
-    - python3 setup.py sdist
   artifacts:
     paths:
     - ${CROWNET_HOME}/scripts
@@ -80,12 +74,19 @@ build-for-sim:
     - ${CROWNET_HOME}/crownet
     - ${CROWNET_HOME}/veins
     - ${CROWNET_HOME}/artery
-    - ${ANALYZER_M}/dist
-    - ${FLOWCONTROL_M}/dist
     expire_in: 1 weeks
 
-
-
+build-analysis-tools:
+  stage: build
+  tags:
+    - crownet-sim
+  scripts:
+    # ## update required docker images
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker pull $CI_REGISTRY/rover/crownet/omnetpp
+    # ## build python project and setup user enviroment
+    - "${OPP} make analysis-build"
+    - "${OPP} make out/crownet_user"
 
 # run the unit tests
 gtests:
@@ -109,12 +110,9 @@ fingerprints:
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
   script:
-    - virtualenv --system-site-packages --python py38 ./venv
-    - source ./venv/bin/activate
-    - "pip3 install -I ${ANALYZER_M}/dist/*.tar.gz"
-    - "pip3 install -I ${FLOWCONTROL_M}/dist/*.tar.gz"
+    - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
-    - ./fingerprints
+    - "./fingerprints"
   artifacts:
     when: always
     paths:
@@ -135,7 +133,7 @@ opp-tests:
     - ${CROWNET_HOME}/crownet/tests/omnetpp
     expire_in: 8 weeks
 
-# run uq simulation studies 
+# run uq simulation studies
 uq-test:
   stage: uq-integration-test
   tags:
@@ -143,12 +141,9 @@ uq-test:
   variables:
     ANALYSIS_UQ_M: '${CI_PROJECT_DIR}/analysis/uq'
   script:
-    - virtualenv --system-site-packages --python py38 ./venv
-    - source ./venv/bin/activate
-    - "cd ${ANALYSIS_UQ_M}"
-    - "pip3 install -r requirements.txt"
+    - "source ./out/crownet_user/bin/activate"
     - "python3 -m unittest discover -v"
-    
+
 # run given simulation-campaign
 simulation-campaign:
   stage: simulation-campaign
