@@ -1,3 +1,0 @@
-git+https://gitlab.lrz.de/vadere/suq-controller.git@master
-./../roveranalyzer
-./../../flowcontrol

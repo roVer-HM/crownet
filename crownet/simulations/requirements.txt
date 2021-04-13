@@ -1,2 +1,0 @@
--r ../../flowcontrol/requirements.txt
--r ../../analysis/roveranalyzer/requirements.txt
