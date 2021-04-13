@@ -80,7 +80,7 @@ build-analysis-tools:
   stage: build
   tags:
     - crownet-sim
-  scripts:
+  script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker pull $CI_REGISTRY/rover/crownet/omnetpp
