@@ -39,6 +39,7 @@ from enum import Enum
 import yaml
 from io import StringIO
 
+from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
 from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse
@@ -115,7 +116,7 @@ class FingerprintTestCaseGenerator():
 
         testcases = []
         for simulation in simulations:
-            title = simulation['wd'] + " " + simulation['args'] + " " + simulation['tags']
+            title = f"{simulation['wd']}  {simulation['args']}  [{';'.join([f'{k}:{v}' for k, v in simulation['tags'].items()])}]"
             if not self.filterRegexList or ['x' for regex in self.filterRegexList if
                                             re.search(regex, title)]:  # if any regex matches title
                 if not self.excludeFilterRegexList or not ['x' for regex in self.excludeFilterRegexList if
@@ -323,7 +324,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
         for yml_f in ymlFileList:
             simulations = self.parseSimulationsYml(yml_f)
             self.fileToSimulationsMap[yml_f] = simulations
-            testcases.extend(
+            _testcases.extend(
                 self.generateFromDictList(simulations)
             )
         return _testcases
@@ -600,7 +601,18 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         return _mobility_runner
 
     def build_sumo_runner(self):
-        raise NotImplemented()
+        _base_name = self.get_container_base_name()
+        _mobility_runner = SumoRunner(
+            tag=self.tags["sumo"],
+            docker_client=self.docker_client,
+            name=f"sumo_{_base_name}",
+            reuse_policy=DockerReuse.REMOVE_STOPPED,  # error if new container is named the same way as a running one.
+            cleanup_policy=DockerCleanup.KEEP_FAILED,  # keep failed container for debug.
+            detach=True,  # do not block on container start
+        )
+        _mobility_runner.apply_reuse_policy()
+        _mobility_runner.set_working_dir(self.workingdir)
+        return _mobility_runner
 
     def build_opp_runner(self):
         _base_name = self.get_container_base_name()
@@ -619,12 +631,19 @@ class FingerprintContainerTestCase(FingerprintTestCase):
     def runProgram(self, command, workingdir, resultdir):
         opp_runner: OppRunner = self.build_opp_runner()
         ret = 64
+        out = "err"
         try:
             # start mobility provider if needed
-            if self.mobility_runner is not None:
+            if self.mobility_runner is not None and "vadere" in self.tags:
                 self.mobility_runner.exec_single_server(
                     logfile=f"{os.path.relpath(resultdir, self.mobility_runner.working_dir)}/mobilityProvider.log"
                 )
+            elif self.mobility_runner is not None and "sumo" in self.tags:
+                self.mobility_runner.exec_single_server(
+                    config_path=os.path.join(workingdir, self.tags["sumo_cfg"]),
+                    message_log=f"{os.path.relpath(resultdir, self.mobility_runner.working_dir)}/mobilityProvider.log",
+                )
+
             opp_ret = opp_runner.run(command, perform_cleanup=False)
             out = opp_runner.container.logs()
             out = re.sub("\r", "", out.decode('utf-8'))
@@ -947,7 +966,7 @@ def opp_main(args):
     if not args.testspecfiles:
         args.testspecfiles = glob.glob('*.csv')
 
-    if args.test_case_type_default().upper in TestCaseType.__members__:
+    if args.test_case_type_default.upper() in TestCaseType.__members__:
         args.test_case_type_default = TestCaseType[args.test_case_type_default.upper()]
     else:
         args.test_case_type_default = TestCaseType.SHELL
