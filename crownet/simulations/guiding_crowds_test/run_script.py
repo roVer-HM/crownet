@@ -2,10 +2,7 @@
 import sys, os
 
 sys.path.append(os.path.abspath(".."))
-try:
-    from import_PYTHON_PATHS import *
-except:
-    pass
+
 
 from datetime import datetime
 

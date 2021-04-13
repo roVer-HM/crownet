@@ -3,10 +3,6 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(".."))
-try:
-    from import_PYTHON_PATHS import *
-except ImportError:
-    pass
 
 import numpy
 from datetime import datetime

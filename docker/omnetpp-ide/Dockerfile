@@ -21,7 +21,7 @@ ADD ide/ide.tar.gz .
 RUN apt-get update -y
 RUN export SWT_GTK3=1
 RUN apt-get install -y gtk3.0
-RUN apt-get install -y libwebkitgtk-3.0-0
+RUN apt-get install -y libwebkit2gtk-4.0-37
 
 # installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
 RUN pip3 install cpplint

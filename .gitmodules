@@ -19,3 +19,6 @@
 [submodule "flowcontrol"]
 	path = flowcontrol
 	url = ../flowcontrol.git
+[submodule "analysis/suq-controller"]
+	path = analysis/suq-controller
+	url = https://gitlab.lrz.de/vadere/suq-controller.git

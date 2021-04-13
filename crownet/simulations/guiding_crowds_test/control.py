@@ -5,7 +5,6 @@ from flowcontrol.crownetcontrol.setup.vadere import get_scenario_content
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 
 sys.path.append(os.path.abspath(".."))
-from import_PYTHON_PATHS import *
 
 from flowcontrol.crownetcontrol.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc

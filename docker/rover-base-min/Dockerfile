@@ -1,7 +1,7 @@
 # roVer base container
 #
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 LABEL description "roVer base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"
@@ -13,7 +13,8 @@ RUN apt-get update && \
        sudo \
        openssh-client \
        git git-lfs \
-       python3.7 python python3 python3-pip\
+       python3.8 python3.7 python python3 python3-pip \
+       python3.8-venv python3-venv \
        curl wget \
        vim \
        openjdk-11-jre \

@@ -71,7 +71,7 @@ or
 vadere
 ```
 
-Note: 
+Note:
 * The start script will mount your home directory so that it is visible inside the Docker container.
 * The OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
 
@@ -98,8 +98,8 @@ Start the omnetpp container:
 ```
 omnetpp-ide
 ```
-## Step 3: Import project with submodules
-Choose File>Import>General>Exising projects> and import following folders:
+## Step 3: Import project with sub modules
+Choose File>Import>General>Existing projects> and import following folders:
 * inet4
 * crownet
 * simulte
@@ -124,7 +124,7 @@ Start the sumo container by executing the sumo start script:
 ```
 sumo
 ```
-The container will now be listening for incomming TraCi commands and start sumo when a new client connects.
+The container will now be listening for incoming TraCi commands and start sumo when a new client connects.
 
 ## Step 2: Start the omnetpp container and import the subprojects
 Start the omnetpp container:
@@ -190,7 +190,7 @@ first switch to the model subdirectory and than execute make locally.
 
 *Example: Building the INET and SimuLTE Frameworks*
 
-Assuming that you have added the "omnetpp" script to your search path for executibles and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
+Assuming that you have added the "omnetpp" script to your search path for executables and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
 ```
 cd inet
 omnetpp exec make makefiles
@@ -223,6 +223,27 @@ omnetpp exec ./configure --with-inet=../../../inet4
 omnetpp exec make -j4
 cd ../../..
 ```
+
+## Build Python Simulation Environment
+
+Crownet uses multiple python frameworks to create simulation studies using a
+combination of multiple simulators. Use the following to create ready to use
+virtual environments:
+
+```
+omnetpp exec make analysis-all
+```
+This will create two virtual environments `out/crownet_user` and `out/crownet_dev`.
+In the first, the three packages `roveranalyzer`, `flowcontrol` and `suqc` are
+installed based on the current branch of the respective sub modules.
+The second environment (`out/crownet_dev`) only installs the respective
+requirements of the three packages. Use the `out/crownet_dev` environment
+in your IDE. See [this wiki page][345] how to setup a single PyCharm
+project to develop in all python packages.
+
+
+[345]: ../../wikis/How-to-implement-and-test-crowd-control-in-CrowNet
+
 # Additional Installation Steps (optional)
 ## Start SSH agent automatically
  When logging in into your profile, you are asked for your passphrase for your key:
