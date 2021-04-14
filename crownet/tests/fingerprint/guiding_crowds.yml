@@ -1,0 +1,79 @@
+# Fingerprint tests for the "guiding_crowds_test" scenario.
+# See crownet_fingerprinttest crownet --help
+#   * workingdir is realtive to the given '-C' flag of crownet_fingerprinttest
+#   * each toplevel key will be one test case
+#   * if first item in `args` does not start with an `-` it will be 
+#     interpreted as the command to execute
+#   * if fingerprint starts with 'file:' read the given path. If path 
+#     is relative it based on workingdir. An empty path will default 
+#     to hasd./<testcase-name>.csv relative to the current files location
+
+vadere_only_test_1:
+  wd: simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_1
+    - signs_test_5
+    - --vadere-only
+    - --scenario-file
+    - vadere/scenarios/test001_with_signs.scenario
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags: 
+    exec: python3
+    type: shell
+
+final_test_2:
+  wd: simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_2
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --config
+    - final
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags: 
+    exec: python3
+    type: shell
+
+final_test_3:
+  wd: simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_3
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --config
+    - final_control
+    - --with-control
+    - control.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags: 
+    exec: python3
+    type: shell
+
+vadere_controlled_test:
+  wd: simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --experiment-label
+    - test_4
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --with-control
+    - control.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags: 
+    exec: python3
+    type: shell

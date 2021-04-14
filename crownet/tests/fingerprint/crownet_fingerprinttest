@@ -43,6 +43,7 @@ from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
 from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse
+from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv
 import docker
 from requests.exceptions import ReadTimeout
 
@@ -111,14 +112,13 @@ class FingerprintTestCaseGenerator():
                       not ['x' for regex in self.excludeFilterRegexList if re.search(regex, title)]
         return filter_res and exclude_res
 
-    @staticmethod
-    def create_title(simulation: dict):
+    def create_title(self, simulation: dict):
         return f"{simulation['wd']}  {simulation['args']}  [{';'.join([f'{k}:{v}' for k, v in simulation['tags'].items()])}]"
 
     def from_dict_list(self, simulations):
         testcases = []
         for simulation in simulations:
-            title =  self.create_title(simulation)
+            title = self.create_title(simulation)
             if self.check_filter(title, simulation):
 
                 test_type = parse_testcase_type(simulation["tags"], self.test_case_type_default)
@@ -288,19 +288,72 @@ class FingerprintTestCaseGenerator():
 
 class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
 
-    def __init__(self, filterRegexList, excludeFilterRegexList, repeat, test_case_type_default):
-        super().__init__(filterRegexList, excludeFilterRegexList, repeat, test_case_type_default)
+    def __init__(self, args):
+        super().__init__(args.match, args.exclude, args.repeat, TestCaseType.SHELL)
+        self.args = args
 
     # parse YAML file into list of dicts
     def parse_file(self, file_path):
         cases = []
+        expected_keys = {"wd", "args", "simtimelimit", "expectedResult", "fingerprint", "tags"}
         with open(file_path, "r") as f:
-            yml = yaml.load(f)
-        for sim in yml.sims():
-            pass
+            yml = yaml.load(f, Loader=yaml.BaseLoader)
+        for sim_name, test in yml.items():
+            # copy test data to _read_only. We will update the values in `sim`
+            sim = {}
+            sim["_read_only"] = test
+            sim.update(**test)
+            # check for missing keys
+            missing_keys = expected_keys - set(sim.keys())
+            if len(missing_keys) > 0:
+                raise RuntimeError(f"Test file {file_path}:{sim_name} is missing keys: [{', '.join(missing_keys)}]")
+
+            # set simulation name, file, and read fingerprints
+            sim["test_name"] = sim_name
+            sim["file"] = file_path
+            if sim["fingerprint"].startswith("file:"):
+                if sim["fingerprint"] == "file:":
+                    file_name_clean = re.sub("\.yml$", "", os.path.basename(sim["file"]))
+                    hash_path = f"{os.path.dirname(os.path.abspath(file_path))}/hash.d/{file_name_clean}/{sim_name}.csv"
+                else:
+                    hash_path = sim["fingerprint"][5:-1]
+                try:
+                    diffs = csv_to_diffdict(hash_path)
+                    sim["fingerprint"] = diffs
+                    sim["fingerprint_file"] = hash_path
+                except FileNotFoundError:
+                    raise RuntimeError(f"{os.path.abspath(hash_path)} File not found!")
+            # check if `args` contains executable and tags contains exec. Update `args` accordingly
+            if sim["args"][0].startswith("-"):
+                # use executable set in arguments
+                sim["args"].insert(0, args.executable)
+            if "exec" in sim["tags"]:
+                # add runtime to arguments
+                sim["args"].insert(0, sim["tags"]["exec"])
+            # check working dir and output dir and update `wd` and `output_dir` accordingly
+            wd = os.path.join(args.directory, sim["wd"])
+            sim["wd"] = os.path.abspath(wd)
+            result_dir = os.path.join(args.output_dir, sim["file"], sim["test_name"])
+            sim["result_dir"] = os.path.abspath(result_dir)
+
+            cases.append(sim)
 
         return cases
 
+    def from_dict_list(self, simulations):
+        testcases = []
+        for simulation in simulations:
+            title = self.create_title(simulation)
+            if self.check_filter(title, simulation):
+                testcases.append(FingerprintCrowNetTestCase(title,
+                                                            SimulationWrapper(simulation),
+                                                            SimulationResultFactory(SimulationResult),
+                                                            self.repeat))
+
+        return testcases
+
+    def create_title(self, simulation: dict):
+        return f"{simulation['wd']}  {' '.join(simulation['args'])}  [{';'.join([f'{k}:{v}' for k, v in simulation['tags'].items()])}]"
 
     def from_dict_list(self, simulations):
         testcases = []
@@ -308,9 +361,13 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             title = self.create_title(simulation)
 
             if self.check_filter(title, simulation):
-                testcases.append(FingerprintTestCase(title,
-                                                     result_factory=SimulationResultFactory(SimulationResultCrowNet),
-                                                     repeat=self.repeat))
+                testcases.append(FingerprintCrowNetTestCase(title,
+                                                            sim_wrapper=SimulationWrapper(simulation),
+                                                            result_factory=SimulationResultFactory(
+                                                                SimulationResultCrowNet),
+                                                            repeat=self.repeat))
+
+        return testcases
 
     def writeUpdatedFiles(self):
         raise NotImplementedError()
@@ -414,7 +471,6 @@ class SimulationTestCase(unittest.TestCase):
         self.result_factory = result_factory
 
     def runSimulation(self, title, command, workingdir, resultdir):
-        ensure_dir(workingdir + "/results")
 
         # run the program and log the output
         t0 = time.time()
@@ -424,7 +480,7 @@ class SimulationTestCase(unittest.TestCase):
         elapsedTime = time.time() - t0
 
         result = self.result_factory(command, workingdir, exitcode, out, resultdir,
-                                                     elapsedTime=elapsedTime)
+                                     elapsedTime=elapsedTime)
 
         result.write_to_log(TestGlobal.logFile, title)
         result.parse_result()
@@ -476,6 +532,7 @@ class FingerprintTestCase(SimulationTestCase):
                   " --vector-recording=false --scalar-recording=true " + \
                   " --result-dir=" + self.resultdir + \
                   " " + TestGlobal.extraArgs
+        # print("COMMAND: " + command + '\n')
         return command
 
     # will be called by the unittest framework! (Entry point of test)
@@ -520,6 +577,46 @@ class FingerprintTestCase(SimulationTestCase):
 
     def __str__(self):
         return self.title
+
+
+class FingerprintCrowNetTestCase(SimulationTestCase):
+    def __init__(self, title, sim_wrapper: SimulationWrapper, result_factory, repeat):
+        super().__init__(result_factory)
+        self.title = title
+        self.sim_wrapper = sim_wrapper
+        self.repeat = repeat
+
+        self.simtimelimit = sim_wrapper.get_copy("simtimelimit")
+        self.workingdir = sim_wrapper.get_copy("wd")
+        self.resultdir = sim_wrapper.get_copy("result_dir")
+
+    def runTest(self):
+
+        cmd = " ".join(self.sim_wrapper.get_copy("args"))
+        for rep in range(self.repeat):
+            run_result_dir = f"{self.resultdir}_r{rep}"
+            ensure_dir(run_result_dir)
+            result = self.runSimulation(self.title, cmd, self.workingdir, run_result_dir)
+
+            # process the result
+            # note: fingerprint mismatch is technically NOT an error in 4.2 or before! (exitcode==0)
+            self.sim_wrapper.store_exitcode(result.exitcode)
+            # self.storeExitcodeCallback(result.exitcode)
+            if result.exitcode != 0:
+                raise Exception("runtime error with exitcode=" + str(result.exitcode) + ": " + result.errormsg)
+            elif result.cpuTimeLimitReached:
+                raise Exception("cpu time limit exceeded")
+            elif result.simulatedTime == 0 and self.simtimelimit != '0s':
+                raise Exception("zero time simulated")
+            elif result.isFingerprintOK is None:
+                raise Exception("other")
+            elif result.isFingerprintOK == False:
+                # computedFingerprints.add(result.computedFingerprint)
+                anyFingerprintBad = True
+            else:
+                # fingerprint OK:
+                # computedFingerprints.add(self.fingerprint)
+                pass
 
 
 class FingerprintContainerTestCase(FingerprintTestCase):
@@ -918,8 +1015,10 @@ def parse_testcase_type(tags: dict, default_type=TestCaseType.SHELL):
     else:
         return default_type
 
+
 def iif(cond, t, f):
     return t if cond else f
+
 
 def ensure_dir(f):
     try:
@@ -967,12 +1066,10 @@ def opp_main(args):
 
 def crownet_main(args):
     if not args.testspecfiles:
-        args.testspecfiles = glob.glob('**/*.yaml')
+        args.testspecfiles = glob.glob('**/*.yaml', recursive=True)
 
-    repeat = 1
-
-    generator = FingerprintTestCaseGeneratorCrowNet(args.match, args.exclude, repeat, TestCaseType.CROWNET)
-    testcases = generator.generateFromYAML(glob.glob(args.yaml, recursive=True))
+    generator = FingerprintTestCaseGeneratorCrowNet(args)
+    testcases = generator.parse_test_files(args.testspecfiles)
 
     run_testcases(testcases)
 
@@ -1011,7 +1108,6 @@ def opp_argparser(parser: argparse.ArgumentParser):
     parser.add_argument('-x', '--exclude', action='append', metavar='regex',
                         help='Negative line filter: a line (more precisely, workingdir+SPACE+args) must NOT match any '
                              'of the regular expressions in order for that test case to be run')
-    parser.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
     parser.add_argument('-e', '--executable',
                         default="opp_run",
                         help='Determines which binary to execute (e.g. opp_run_dbg, opp_run_release) if the command '
@@ -1048,6 +1144,7 @@ def crownet_argparser(parser: argparse.ArgumentParser):
     parser.add_argument('-x', '--exclude', action='append', metavar='regex',
                         help='Negative line filter: a line (more precisely, workingdir+SPACE+args) must NOT match any '
                              'of the regular expressions in order for that test case to be run')
+    parser.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
     parser.add_argument('--log-file',
                         required=False,
                         dest="log_file",
@@ -1074,6 +1171,8 @@ def parse_arguments(_args=None):
     parent.add_argument('-t', '--threads', type=int, default=defaultNumThreads,
                         help='number of parallel threads (default: number of CPUs, currently ' + str(
                             defaultNumThreads) + ')')
+    parent.add_argument("--output-dir", default="results", dest="output_dir",
+                        help="Directory where simulation output is placed")
     parent.add_argument(
         "--verbose",
         "-v",
