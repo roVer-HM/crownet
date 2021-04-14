@@ -11,13 +11,34 @@
 #include "inet/common/ModuleAccess.h"
 #include "crownet/artery/traci/VadereApi.h"
 #include "crownet/artery/traci/VadereUtils.h"
+#include "crownet/crownet.h"
 
 using namespace traci;
 using namespace omnetpp;
 
 namespace crownet {
 
+
+
 Define_Module(VadereLauchner);
+
+void VadereLauchner::initialize()
+{
+    traci::ConnectLauncher::initialize();
+    // check config override if simulation is run in parallel and container names must be set central
+    auto hostPortOverride = getHostPortConfigOverride(CFGID_VADERE_HOST);
+    if(hostPortOverride.first != ""){
+        EV_INFO << "Config override found for hostname (--vadere-host=XXX:YYYY)! replace " << m_endpoint.hostname << "-->" <<
+                hostPortOverride.first << std::endl;
+        m_endpoint.hostname = hostPortOverride.first;
+
+    }
+    if(hostPortOverride.second != -1){
+        EV_INFO << "Config override found for port (--vadere-host=XXX:YYYY)! replace " << m_endpoint.port << "-->" <<
+                hostPortOverride.first << std::endl;
+        m_endpoint.port = hostPortOverride.second;
+    }
+}
 
 std::pair<API*, LiteAPI*> VadereLauchner::createAPI() {
   VadereApi* api = new VadereApi();
