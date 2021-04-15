@@ -1,15 +1,17 @@
 MAKEMAKE=opp_makemake $(MMOPT)
 
-ARTERY_PROJ=../artery
-VANETZA_PROJ=${ARTERY_PROJ}/extern/vanetza
-INET_PROJ=../inet4
-LTE_PROJ=../simulte
-VEINS_PROJ=../veins
-VEINS_INET_PROJ=../veins/subprojects/veins_inet
+#ARTERY_PROJ=../artery
+#VANETZA_PROJ=${ARTERY_PROJ}/extern/vanetza
+#INET_PROJ=../inet4
+#LTE_PROJ=../simulte
+#VEINS_PROJ=../veins
+#VEINS_INET_PROJ=../veins/subprojects/veins_inet
 
 GOOGLE_TEST_LIB = gtest
 GOOGLE_MOCK_LIB = gmock
 GOOGLE_TEST_INCLUDE = /usr/local/include
+
+TARGT_NAME := CROWNET
 
 ifeq ("$(MODE)","debug")
 	_D=_dbg
@@ -18,10 +20,15 @@ endif
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
 
 all: checkmakefiles
-	cd src && $(MAKE)
+	cd src && $(MAKE) -j $(NUM_CPUS)
 
 clean: checkmakefiles
 	cd src && $(MAKE) clean
+	echo clean all build targets ...
+	-rm -f src/CROWNET_dbg
+	-rm -f src/CROWNET
+	-rm -f src/linCROWNET_dbg
+	-rm -f src/libCROWNET
 
 cleanall: checkmakefiles
 	cd src && $(MAKE) MODE=release clean
@@ -94,6 +101,8 @@ makefiles:
 	   $(VEINS_) \
 	   $(INET_LTE_) \
 	   $(MISC_)
+	rm -f src/__make_sharedlib
+	touch src/__make_executable
 
 
 makefiles-so:
@@ -104,6 +113,8 @@ makefiles-so:
 	   	$(VEINS_) \
 	   	$(INET_LTE_) \
 		$(MISC_)
+	rm -f src/__make_executable
+	touch  src/__make_sharedlib
 
 src/libCROWNET$(_D) : makefiles-so
 	cd src &&  $(MAKE) -j $(NUM_CPUS)

@@ -36,6 +36,7 @@ analysis/**/test_data
 
 crownet/out
 crownet/src/Makefile
+crownet/src/__*
 crownet/tests/gtest/src/Makefile
 crownet/tests/**/*.out
 crownet/.settings
