@@ -7,7 +7,7 @@ import inet.transportlayer.contract.IUdp;
 import inet.transportlayer.contract.ISctp;
 import inet.common.MessageDispatcher;
 
-module PedestrianFull extends TransportLayerPedestrian
+module AidPedestrian extends TransportLayerPedestrian
 {
     parameters:
         @figure[applicationLayer](type=rectangle; pos=250,6; size=600,130; lineColor=#808080; cornerRadius=5; fillColor=#ffff00; fillOpacity=0.1);

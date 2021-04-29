@@ -60,7 +60,7 @@ network World
         traci.nodes.typename = default("VadereNodeManager");
         traci.nodes.objectSinkModule = default(".mobility");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
-        traci.mapper.objectType = default("crownet.nodes.PedestrianFull");
+        traci.mapper.objectType = default("crownet.nodes.AidPedestrian");
 
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);
