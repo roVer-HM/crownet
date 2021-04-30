@@ -1,4 +1,4 @@
-# Fingerprint tests for the "Mobile Communications Lab (R1.009a@MUAS)" scenario
+# Fingerprint tests for CrowNet scenarios
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
