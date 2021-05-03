@@ -3,7 +3,19 @@
 DATE_TAG="$(date "+%y%m%d-%H%M")"
 CONF="$1"
 
-sumo exec sumo -v --remote-port 9999 \
-  --configuration-file "${CONF}" \
-  --message-log "${CONF}${DATE_TAG}.log" --no-step-log --quit-on-end
+CMD_ARG="-v --configuration-file ${CONF} --message-log ${CONF}${DATE_TAG}.log --no-step-log --quit-on-end"
+
+if [[ -z $TRACI_PORT ]];then
+  CMD_ARG+=" --remote-port 9999"
+else
+  CMD_ARG+=" --remote-port $TRACI_PORT"
+fi
+if [[ ${TRACI_GUI} == "true" ]];then
+  CMD="sumo-gui"
+else
+  CMD="sumo"
+fi
+
+
+sumo exec $CMD $CMD_ARG
 

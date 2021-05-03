@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DATE_TAG="$(date "+%y%m%d-%H%M")"
+CONF="$1"
+JAR="/opt/vadere/vadere/VadereManager/target/vadere-server.jar"
+
+CMD="java -jar $JAR"
+CMD_ARG=" --logname ${CONF}${DATE_TAG}.log --bind 0.0.0.0 --single-client"
+
+if [[ -z $TRACI_PORT ]];then
+  CMD_ARG+=" --port 9998"
+else
+  CMD_ARG+=" --port $TRACI_PORT"
+fi
+if [[ ${TRACI_GUI} == "true" ]];then
+  CMD_ARG+=" --gui-mode"
+fi
+
+vadere exec $CMD $CMD_ARG
+
