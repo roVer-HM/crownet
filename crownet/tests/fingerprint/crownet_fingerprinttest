@@ -342,6 +342,9 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # --fingerprint=
             arg_list = ArgList.from_flat_list(sim["args"])
 
+            # set debug logging for test
+            arg_list.add_if_missing("-vvv")
+
             # check if `args` contains executable and tags contains exec. Update `args` accordingly
             if arg_list.to_list()[0].startswith("-"):
                 arg_list.add(args.executable, pos=0)
@@ -415,7 +418,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             for sim in simulations:
                 error_list = sim.get('fingerprint_diff', None)
                 if error_list is not None:
-                    error_file = f"{sim['fingerprint_file']}.ERROR"
+                    error_file = f"{sim['fingerprint_file']}.FAILED"
                     with open(error_file, "w", encoding="utf-8") as e:
                         for row in error_list:
                             e.write(row)
@@ -429,12 +432,11 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
                 if len(vadere_error_list) > 0 or  len(control_error_list) > 0:
                     error_file = f"{sim['fingerprint_file']}.ERROR"
                     with open(error_file, "w", encoding="utf-8") as e:
-                        e.write(f"Vadere Errors: (see container_vadere.out for more detail)\n")
                         for row in vadere_error_list:
                             e.write(row)
                             e.write("\n")
                         e.write("-"*80)
-                        e.write(f"\nControl Errors: (see container_control.out for more detail)\n")
+                        e.write("\n")
                         for row in control_error_list:
                             e.write(row)
                             e.write("\n")
@@ -528,6 +530,10 @@ class SimulationResultCrowNet(SimulationResult):
         self.vadere_out_path = os.path.join(self.output_path, "container_vadere.out")
         self.control_out_path = os.path.join(self.output_path, "container_control.out")
         self.with_opp = os.path.exists(self.opp_out_path)
+        self.errormsg = ""
+        # write command output
+        with open(os.path.join(self.output_path, "command.out"), "w", encoding="utf-8") as f:
+            f.write(out)
 
         # read OMNeT++ container output from file and use this as `out` in the super call
         if self.with_opp:
@@ -548,6 +554,9 @@ class SimulationResultCrowNet(SimulationResult):
             for line in f.readlines():
                 if any([re.match(p, line) for p in match_rx]) and not any([re.match(p, line) for p in ignore_rx]):
                     err.append(line)
+
+        if len(err) > 0:
+            err.insert(0, f"See: {path}")
 
         return err
 
@@ -1218,7 +1227,7 @@ def crownet_main(args):
 
     generator.writeUpdatedFiles()
     generator.writeErrorFiles()
-    generator.writeErrorFiles()
+    generator.writeFailedFiles()
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
