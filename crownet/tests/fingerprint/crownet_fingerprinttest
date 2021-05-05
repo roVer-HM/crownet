@@ -23,9 +23,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import copy
 import csv
+import datetime
 import glob
 import multiprocessing
 import os
+import pprint
 import re
 import subprocess
 import sys
@@ -39,11 +41,12 @@ from enum import Enum
 import yaml
 from io import StringIO
 
+from roveranalyzer.entrypoint.parser import ArgList
 from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
 from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse
-from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv
+from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv, create_dir_diff, compare_diff
 import docker
 from requests.exceptions import ReadTimeout
 
@@ -76,6 +79,15 @@ class SimulationWrapper:
 
     def store_fingerprint(self, fingerprint):
         self._simulation["computedFingerprint"] = fingerprint
+
+    def store_diff_list(self, diff):
+        self._simulation["fingerprint_diff"] = diff
+
+    def store_vadere_error(self, err):
+        self._simulation["vadere_error"] = err
+
+    def store_control_error(self, diff):
+        self._simulation["control_error"] = diff
 
     def get_copy(self, key, default=None):
         """
@@ -308,58 +320,78 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             if len(missing_keys) > 0:
                 raise RuntimeError(f"Test file {file_path}:{sim_name} is missing keys: [{', '.join(missing_keys)}]")
 
+
             # set simulation name, file, and read fingerprints
             sim["test_name"] = sim_name
             sim["file"] = file_path
+            file_name_base = re.sub("\.yml$", "", os.path.basename(sim["file"]))
             if sim["fingerprint"].startswith("file:"):
                 if sim["fingerprint"] == "file:":
-                    file_name_clean = re.sub("\.yml$", "", os.path.basename(sim["file"]))
-                    hash_path = f"{os.path.dirname(os.path.abspath(file_path))}/hash.d/{file_name_clean}/{sim_name}.csv"
+                    hash_path = f"{os.path.dirname(os.path.abspath(file_path))}/hash.d/{file_name_base}/{sim_name}.csv"
                 else:
                     hash_path = sim["fingerprint"][5:-1]
                 try:
                     diffs = csv_to_diffdict(hash_path)
                     sim["fingerprint"] = diffs
-                    sim["fingerprint_file"] = hash_path
                 except FileNotFoundError:
-                    raise RuntimeError(f"{os.path.abspath(hash_path)} File not found!")
+                    print(f"{hash_path} not found! Treat as new test. First run will fail but UPDATED file will be created")
+                    sim["fingerprint"] = {}
+                finally:
+                    sim["fingerprint_file"] = hash_path
+
+            # --fingerprint=
+            arg_list = ArgList.from_flat_list(sim["args"])
+
             # check if `args` contains executable and tags contains exec. Update `args` accordingly
-            if sim["args"][0].startswith("-"):
-                # use executable set in arguments
-                sim["args"].insert(0, args.executable)
+            if arg_list.to_list()[0].startswith("-"):
+                arg_list.add(args.executable, pos=0)
+
             if "exec" in sim["tags"]:
                 # add runtime to arguments
-                sim["args"].insert(0, sim["tags"]["exec"])
+                arg_list.add(sim["tags"]["exec"], pos=0)
+
+            # set run-name if missing
+            arg_list.add_if_missing("--run-name", f"{file_name_base}_{sim_name}")
+            # override host-config for parallel execution of multiple containers
+            arg_list.add_override(f"--override-host-config", value=None)
+            # ensure write-container-log is set
+            arg_list.add_override(f"--write-container-log", value=None)
+            timestamp = datetime.datetime.now().isoformat().replace('-', "").replace(":", "")
+            arg_list.add_override(f"--experiment-label", timestamp)
+
+            # Crownet test can run without OMNeT++
+            if not arg_list.contains_key('--vadere-only'):
+                # get OMNeT++ fingerprint hashes (if missing add dummy value)
+                # FIXME Multiple Fingerprints, Alternative Values (see p.361)
+                f_prints = sim["fingerprint"].setdefault("[[omnetpp]]",  "ffff-ffff/tplx")
+                f_prints = re.sub("\s+", "", f_prints)
+                arg_list.add_override(f"--opp.fingerprint={f_prints}")
+                # FIXME: Workaround due to results are saved based on config-name and experiment-label.
+                # The extra directory is created based on the settings in the omnetpp.ini file
+                sim["data_dir"] = f"{arg_list.get_value('--opp.-c', default='final')}_{timestamp}"
+            else:
+                sim["data_dir"] = ""
+
+            sim["args"] = arg_list
             # check working dir and output dir and update `wd` and `output_dir` accordingly
             wd = os.path.join(args.directory, sim["wd"])
             sim["wd"] = os.path.abspath(wd)
             result_dir = os.path.join(args.output_dir, sim["file"], sim["test_name"])
             sim["result_dir"] = os.path.abspath(result_dir)
+            # do NOT add '--result-dir' to arg_list at this point!
+            # result dir is based on current repeat count and will be added to args just before execution.
 
             cases.append(sim)
-
         return cases
 
-    def from_dict_list(self, simulations):
-        testcases = []
-        for simulation in simulations:
-            title = self.create_title(simulation)
-            if self.check_filter(title, simulation):
-                testcases.append(FingerprintCrowNetTestCase(title,
-                                                            SimulationWrapper(simulation),
-                                                            SimulationResultFactory(SimulationResult),
-                                                            self.repeat))
-
-        return testcases
 
     def create_title(self, simulation: dict):
-        return f"{simulation['wd']}  {' '.join(simulation['args'])}  [{';'.join([f'{k}:{v}' for k, v in simulation['tags'].items()])}]"
+        return f"{simulation['wd']}  {simulation['file']}-{simulation['test_name']}"
 
     def from_dict_list(self, simulations):
         testcases = []
         for simulation in simulations:
             title = self.create_title(simulation)
-
             if self.check_filter(title, simulation):
                 testcases.append(FingerprintCrowNetTestCase(title,
                                                             sim_wrapper=SimulationWrapper(simulation),
@@ -370,13 +402,44 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
         return testcases
 
     def writeUpdatedFiles(self):
-        raise NotImplementedError()
+        for file, simulations in self.fileToSimulationsMap.items():
+            for sim in simulations:
+                computed_fingerprint = sim.get('computedFingerprint', None)
+                if computed_fingerprint is not None:
+                    updated_file = f"{sim['fingerprint_file']}.UPDATED"
+                    print(updated_file)
+                    diffdict_to_csv(updated_file, computed_fingerprint)
 
     def writeFailedFiles(self):
-        raise NotImplementedError()
+        for file, simulations in self.fileToSimulationsMap.items():
+            for sim in simulations:
+                error_list = sim.get('fingerprint_diff', None)
+                if error_list is not None:
+                    error_file = f"{sim['fingerprint_file']}.ERROR"
+                    with open(error_file, "w", encoding="utf-8") as e:
+                        for row in error_list:
+                            e.write(row)
+                            e.write("\n")
 
     def writeErrorFiles(self):
-        raise NotImplementedError()
+        for file, simulations in self.fileToSimulationsMap.items():
+            for sim in simulations:
+                vadere_error_list = sim.get('vadere_error', [])
+                control_error_list = sim.get('control_error', [])
+                if len(vadere_error_list) > 0 or  len(control_error_list) > 0:
+                    error_file = f"{sim['fingerprint_file']}.ERROR"
+                    with open(error_file, "w", encoding="utf-8") as e:
+                        e.write(f"Vadere Errors: (see container_vadere.out for more detail)\n")
+                        for row in vadere_error_list:
+                            e.write(row)
+                            e.write("\n")
+                        e.write("-"*80)
+                        e.write(f"\nControl Errors: (see container_control.out for more detail)\n")
+                        for row in control_error_list:
+                            e.write(row)
+                            e.write("\n")
+
+
 
 
 class SimulationResultFactory:
@@ -431,6 +494,9 @@ class SimulationResult:
         errorMsg = ""
         for err in errorLines:
             err = err.strip()
+            if err.startswith("<!> TraCI server reported Simulation end reached."):
+                # do not track this as an error.
+                continue
             if re.search("Fingerprint", err):
                 if re.search("successfully", err):
                     self.isFingerprintOK = True
@@ -454,21 +520,77 @@ class SimulationResult:
 
 class SimulationResultCrowNet(SimulationResult):
 
-    def __init__(self, command, workingdir, exitcode, out, resultdir):
-        super().__init__(command, workingdir, exitcode, out, resultdir)
+    def __init__(self, command, workingdir, exitcode, out, resultdir, elapsedTime, sim_wrapper):
+        self.sim_wrapper = sim_wrapper
+        # FIXME: omnetpp.ini creates extra directory
+        self.output_path = os.path.join(resultdir, sim_wrapper.get_copy('data_dir'))
+        self.opp_out_path = os.path.join(self.output_path, "container_opp.out")
+        self.vadere_out_path = os.path.join(self.output_path, "container_vadere.out")
+        self.control_out_path = os.path.join(self.output_path, "container_control.out")
+        self.with_opp = os.path.exists(self.opp_out_path)
+
+        # read OMNeT++ container output from file and use this as `out` in the super call
+        if self.with_opp:
+            with (open(os.path.join(self.output_path, "container_opp.out"), "r", encoding="utf-8")) as f:
+                out = f.read()
+        else:
+            out = ""  # no OMNeT++ simulation for this test
+
+        super().__init__(command, workingdir, exitcode, out, resultdir, elapsedTime)
+
+    def parse_error_lines(self, path, match_pattern, ignore_pattern):
+        err = []
+        if not os.path.exists(path):
+            return err
+        match_rx = [re.compile(p) for p in match_pattern]
+        ignore_rx = [re.compile(p) for p in ignore_pattern]
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f.readlines():
+                if any([re.match(p, line) for p in match_rx]) and not any([re.match(p, line) for p in ignore_rx]):
+                    err.append(line)
+
+        return err
+
 
     def write_to_log(self, _logFile, title):
-        super().write_to_log(_logFile, title)
+        pass # nothing to do already persisted
 
     def parse_result(self):
-        return super().parse_result()
+        # parse OMNeT++ results first
+        expected = self.sim_wrapper.get_copy('fingerprint')
+        self.crownet_computed = {}
+        if self.with_opp:
+            super().parse_result()
+            if self.computedFingerprint is None:
+                # all good OMNeT++ finger print matches
+                self.crownet_computed.setdefault("[[omnetpp]]", expected['[[omnetpp]]'])
+            else:
+                self.crownet_computed.setdefault("[[omnetpp]]", self.computedFingerprint)
+
+        # prase Vadere/FlowControll results
+        self.crownet_computed.update(create_dir_diff(f"{self.output_path}/**", remove_front=self.output_path))
+        _ok, _err = compare_diff(expected, self.crownet_computed)
+        self.isFingerprintOK = _ok
+        self.error_list = _err
+        # control errors
+        # FIXME: use container return code to determine errors
+        self.control_error_list = self.parse_error_lines(
+            path=self.control_out_path,
+            match_pattern=[r".*Error:\s+"],
+            ignore_pattern=[r".*connection closed by partner.*"]
+        )
+        # vadere errors
+        # FIXME: use container return code to determine errors
+        # TODO: parse error lines
+        self.vadere_error_list = []
 
 
 class SimulationTestCase(unittest.TestCase):
 
-    def __init__(self, result_factory):
+    def __init__(self, result_factory, sim_wrapper):
         super().__init__()
         self.result_factory = result_factory
+        self.sim_wrapper = sim_wrapper
 
     def runSimulation(self, title, command, workingdir, resultdir):
 
@@ -480,7 +602,7 @@ class SimulationTestCase(unittest.TestCase):
         elapsedTime = time.time() - t0
 
         result = self.result_factory(command, workingdir, exitcode, out, resultdir,
-                                     elapsedTime=elapsedTime)
+                                     elapsedTime=elapsedTime, sim_wrapper=self.sim_wrapper)
 
         result.write_to_log(TestGlobal.logFile, title)
         result.parse_result()
@@ -489,8 +611,6 @@ class SimulationTestCase(unittest.TestCase):
 
     def runProgram(self, command, workingdir, resultdir):
         env = os.environ
-        #        env['CPUPROFILE'] = resultdir+"/cpuprofile"
-        #        env['CPUPROFILE_FREQUENCY'] = "1000"
         process = subprocess.Popen(['sh', '-c', command], shell=sys.platform.startswith('win'), cwd=workingdir,
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         out = process.communicate()[0]
@@ -500,9 +620,8 @@ class SimulationTestCase(unittest.TestCase):
 
 class FingerprintTestCase(SimulationTestCase):
     def __init__(self, title, sim_wrapper: SimulationWrapper, result_factory, repeat):
-        super().__init__(result_factory)
+        super().__init__(result_factory, sim_wrapper)
         self.title = title
-        self.sim_wrapper = sim_wrapper
         self.csvFile = sim_wrapper.get_copy("file")
         self.wd = sim_wrapper.get_copy("wd")
         self.cmdLine = sim_wrapper.get_copy("args")
@@ -581,26 +700,41 @@ class FingerprintTestCase(SimulationTestCase):
 
 class FingerprintCrowNetTestCase(SimulationTestCase):
     def __init__(self, title, sim_wrapper: SimulationWrapper, result_factory, repeat):
-        super().__init__(result_factory)
+        super().__init__(result_factory, sim_wrapper)
         self.title = title
         self.sim_wrapper = sim_wrapper
         self.repeat = repeat
+        self.expectedResult = sim_wrapper.get_copy("expectedResult")
 
         self.simtimelimit = sim_wrapper.get_copy("simtimelimit")
         self.workingdir = sim_wrapper.get_copy("wd")
         self.resultdir = sim_wrapper.get_copy("result_dir")
 
+    def __str__(self):
+        return self.title
+
+
     def runTest(self):
 
-        cmd = " ".join(self.sim_wrapper.get_copy("args"))
+        # FIXME allow multiple runs
+        if self.repeat > 1:
+            print("Warning: Crownet fingerprint currently does not support multiple runs!.")
+            self.repeat = 1
+
+        some_error = False
+        assert_msg = []
         for rep in range(self.repeat):
             run_result_dir = f"{self.resultdir}_r{rep}"
+            cmd = self.sim_wrapper.get_copy("args")
+            cmd.add_override(key="--resultdir", value=run_result_dir)
             ensure_dir(run_result_dir)
-            result = self.runSimulation(self.title, cmd, self.workingdir, run_result_dir)
+            result = self.runSimulation(self.title, cmd.to_string(), self.workingdir, run_result_dir)
 
-            # process the result
+            # process the result (OMNeT++ and Crownet)
             # note: fingerprint mismatch is technically NOT an error in 4.2 or before! (exitcode==0)
             self.sim_wrapper.store_exitcode(result.exitcode)
+            self.sim_wrapper.store_vadere_error(result.vadere_error_list)
+            self.sim_wrapper.store_control_error(result.control_error_list)
             # self.storeExitcodeCallback(result.exitcode)
             if result.exitcode != 0:
                 raise Exception("runtime error with exitcode=" + str(result.exitcode) + ": " + result.errormsg)
@@ -610,13 +744,22 @@ class FingerprintCrowNetTestCase(SimulationTestCase):
                 raise Exception("zero time simulated")
             elif result.isFingerprintOK is None:
                 raise Exception("other")
+            elif len(result.vadere_error_list) > 0:
+                raise Exception("vadere error")
+            elif len(result.control_error_list) > 0:
+                raise Exception("control error")
             elif result.isFingerprintOK == False:
-                # computedFingerprints.add(result.computedFingerprint)
-                anyFingerprintBad = True
+                self.sim_wrapper.store_fingerprint(result.crownet_computed)
+                self.sim_wrapper.store_diff_list(result.error_list)
+                assert_msg.append("some fingerprint mismatch")
+                some_error = True
             else:
                 # fingerprint OK:
-                # computedFingerprints.add(self.fingerprint)
                 pass
+
+        # check OMNeT++ and Crownet stuff here...
+        if some_error:
+             assert False, ";".join(assert_msg)
 
 
 class FingerprintContainerTestCase(FingerprintTestCase):

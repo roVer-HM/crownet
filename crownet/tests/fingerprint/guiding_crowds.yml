@@ -12,16 +12,14 @@ vadere_only_test_1:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --experiment-label
-    - test_1
-    - signs_test_5
+    - --delete-existing-containers
     - --vadere-only
     - --scenario-file
     - vadere/scenarios/test001_with_signs.scenario
   simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
-  tags: 
+  tags:
     exec: python3
     type: shell
 
@@ -29,16 +27,14 @@ final_test_2:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --experiment-label
-    - test_2
     - --delete-existing-containers
     - --create-vadere-container
-    - --config
+    - --opp.-c
     - final
   simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
-  tags: 
+  tags:
     exec: python3
     type: shell
 
@@ -46,34 +42,47 @@ final_test_3:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --experiment-label
-    - test_3
     - --delete-existing-containers
     - --create-vadere-container
-    - --config
+    - --opp.-c
     - final_control
     - --with-control
     - control.py
   simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
-  tags: 
+  tags:
     exec: python3
     type: shell
 
-vadere_controlled_test:
+test_4:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --experiment-label
-    - test_4
     - --delete-existing-containers
     - --create-vadere-container
+    - --control-vadere-only
     - --with-control
     - control.py
   simtimelimit: 100s
+  expectedResult: ERROR
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+test_5:
+  wd: simulations/guiding_crowds_test
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --vadere-only
+    - --scenario-file
+    - "vadere/scenarios/test001_with_signs.scenario"
+  simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
-  tags: 
+  tags:
     exec: python3
     type: shell
