@@ -22,6 +22,8 @@ NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
 all: checkmakefiles
 	cd src && $(MAKE) -j $(NUM_CPUS)
 
+.PHONY: build-lib build-exec
+
 clean: checkmakefiles
 	cd src && $(MAKE) clean
 	echo clean all build targets ...
@@ -38,8 +40,8 @@ cleanall: checkmakefiles
 PROJECTS_VARS := -KARTERY_PROJ=../../artery \
 				 -KINET_PROJ=../../inet4 \
 			 	 -KLTE_PROJ=../../simulte \
-				 -KVEINS_PROJ=../../veins 
-				 -KVEINS_INET_PROJ=../../veins/subprojects/veins_inet 
+				 -KVEINS_PROJ=../../veins
+				 -KVEINS_INET_PROJ=../../veins/subprojects/veins_inet
 
 ARTERY_ := 	-I$$\(ARTERY_PROJ\)/src \
 			-I$$\(ARTERY_PROJ\)/src/traci/sumo \
@@ -63,7 +65,7 @@ ARTERY_ := 	-I$$\(ARTERY_PROJ\)/src \
 		    -lvanetza_geonet$$\(D\) \
 		    -lvanetza_gnss$$\(D\) \
 		    -lvanetza_net$$\(D\) \
-		    -lvanetza_security$$\(D\) 
+		    -lvanetza_security$$\(D\)
 
 VEINS_ := -DVEINS_IMPORT -DVEINS_INET_IMPORT \
 		  -I$$\(VEINS_PROJ\)/src \
@@ -80,8 +82,8 @@ INET_LTE_ := -DINET_IMPORT \
 			 -L$$\(INET_PROJ\)/src \
 			 -L$$\(LTE_PROJ\)/src \
 		     -lINET$$\(D\) \
-		     -llte$$\(D\) 
-		  
+		     -llte$$\(D\)
+
 MISC_ := -lboost_filesystem \
 	     -lboost_system \
 	     -losg \
@@ -118,6 +120,13 @@ makefiles-so:
 
 src/libCROWNET$(_D) : makefiles-so
 	cd src &&  $(MAKE) -j $(NUM_CPUS)
+
+src/CROWNET$(D): makefiles
+	cd src &&  $(MAKE) -j $(NUM_CPUS)
+
+build-lib: src/libCROWNET$(_D)
+
+build-exec: src/CROWNET$(_D)
 
 test: make-test
 	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg; else cd tests/gtest/src && ./rTests;fi
