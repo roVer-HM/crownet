@@ -147,6 +147,8 @@ opp-tests:
   tags:
     - crownet-sim
   script:
+    - "cd ${CROWNET_HOME}/crownet"
+    - "${OPP} make build-lib"
     - "cd ${CROWNET_HOME}/crownet/tests/omnetpp"
     - "${OPP} ./runtest"
   artifacts:
