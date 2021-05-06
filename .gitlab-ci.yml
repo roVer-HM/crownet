@@ -111,12 +111,34 @@ fingerprints:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
   script:
     - "source ./out/crownet_user/bin/activate"
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/results"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/*csv*"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/*.csv"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/*.out"
     - "./fingerprints"
   artifacts:
     when: always
     paths:
     - ${CROWNET_HOME}/crownet/tests/fingerprint
+    expire_in: 8 weeks
+
+# run the fingerprint tests
+fingerprints_crownet:
+  stage: test
+  tags:
+    - crownet-sim
+  variables:
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
+  script:
+    - "source ./out/crownet_user/bin/activate"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
+    - "./fingerprints_crownet"
+  artifacts:
+    when: always
+    paths:
+    - "${crownet_home}/crownet/tests/fingerprint/yml_out.d"
+    - "${crownet_home}/crownet/tests/fingerprint/hash.d"
+    - "${crownet_home}/crownet/tests/fingerprint/*.yml"
     expire_in: 8 weeks
 
 # run the opp tests

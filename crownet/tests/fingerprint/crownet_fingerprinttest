@@ -379,7 +379,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # check working dir and output dir and update `wd` and `output_dir` accordingly
             wd = os.path.join(args.directory, sim["wd"])
             sim["wd"] = os.path.abspath(wd)
-            result_dir = os.path.join(args.output_dir, sim["file"], sim["test_name"])
+            result_dir = os.path.join(args.output_dir, f"{sim['file']}.d", sim["test_name"])
             sim["result_dir"] = os.path.abspath(result_dir)
             # do NOT add '--result-dir' to arg_list at this point!
             # result dir is based on current repeat count and will be added to args just before execution.
@@ -456,7 +456,7 @@ class SimulationResultFactory:
 class SimulationResult:
     def __init__(self, command, workingdir, exitcode, out, resultdir, errorMsg=None, isFingerprintOK=None,
                  computedFingerprint=None, simulatedTime=None, numEvents=None, elapsedTime=None,
-                 cpuTimeLimitReached=None):
+                 cpuTimeLimitReached=None, **kwargs):
         self.command = command
         self.workingdir = workingdir
         self.exitcode = exitcode
@@ -840,10 +840,12 @@ class FingerprintContainerTestCase(FingerprintTestCase):
             reuse_policy=DockerReuse.REMOVE_STOPPED,  # error if new container is named the same way as a running one.
             cleanup_policy=DockerCleanup.KEEP_FAILED,  # keep failed container for debug.
             detach=False,  # block on container start and wait for result
+            run_cmd=os.path.abspath(TestGlobal.executable) # FIXME: do not use global object
             # no fixed name, let docker choose name
         )
         _opp_runner.set_working_dir(self.workingdir)
-        del _opp_runner.environment["NEDPATH"]  # not needed. Provided by command
+        if "NEDPATH" in _opp_runner.environment:
+            del _opp_runner.environment["NEDPATH"]  # not needed. Provided by command
         return _opp_runner
 
     def runProgram(self, command, workingdir, resultdir):
@@ -1157,7 +1159,8 @@ class SimulationTextTestResult(ThreadedTestResult):
             self.stream.write("  %s\n" % (self.getDescription(test)))
 
 
-def parse_testcase_type(tags: dict, default_type=TestCaseType.SHELL):
+def parse_testcase_type(tags: dict, default_type=TestCaseType.DOCKER):
+    # default to docker based tests in the CROWNET project
     if tags is None or "type" not in tags:
         return default_type
 
@@ -1218,7 +1221,7 @@ def opp_main(args):
 
 def crownet_main(args):
     if not args.testspecfiles:
-        args.testspecfiles = glob.glob('**/*.yaml', recursive=True)
+        args.testspecfiles = glob.glob('**/*.yml', recursive=True)
 
     generator = FingerprintTestCaseGeneratorCrowNet(args)
     testcases = generator.parse_test_files(args.testspecfiles)
@@ -1296,7 +1299,6 @@ def crownet_argparser(parser: argparse.ArgumentParser):
     parser.add_argument('-x', '--exclude', action='append', metavar='regex',
                         help='Negative line filter: a line (more precisely, workingdir+SPACE+args) must NOT match any '
                              'of the regular expressions in order for that test case to be run')
-    parser.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
     parser.add_argument('--log-file',
                         required=False,
                         dest="log_file",
@@ -1341,6 +1343,7 @@ def parse_arguments(_args=None):
         required=False,
         help="Redirect log messages to Logfile at script location.",
     )
+    parent.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
 
     sub = main.add_subparsers(title="Available Commands")
 

@@ -1,4 +1,5 @@
 #!/bin/bash
 
-./crownet_fingerprinttest --use-docker -C ../.. -e ../../src/run_crownet $*
+# run all OMNeT++ test cases with docker by default
+./crownet_fingerprinttest opp -C ../.. -e ../../src/run_crownet --test-case-type docker --output-dir results $*
 

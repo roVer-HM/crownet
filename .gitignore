@@ -144,3 +144,4 @@ omnetpp-ws
 build
 dist
 
+/crownet/tests/fingerprint/yml_out.d/
