@@ -19,6 +19,7 @@
 #include <inet/common/ModuleAccess.h>
 #include "crownet/artery/traci/TraCiForwarder.h"
 #include "crownet/artery/traci/VadereCore.h"
+#include "crownet/crownet.h"
 
 namespace crownet {
 
@@ -62,6 +63,21 @@ void ControlManager::traciInit()
     Enter_Method_Silent();
     std::string host = par("host").stdstringValue();
     int port = par("port").intValue();
+
+    // check config override if simulation is run in parallel and container names must be set central
+    auto hostPortOverride = getHostPortConfigOverride(CFGID_FLOW_HOST);
+    if(hostPortOverride.first != ""){
+        EV_INFO << "Config override found for hostname (--flow-host=XXX:YYYY)! replace " << host<< "-->" <<
+                hostPortOverride.first << std::endl;
+        host = hostPortOverride.first;
+
+    }
+    if(hostPortOverride.second != -1){
+        EV_INFO << "Config override found for port (--flow-host=XXX:YYYY)! replace " << port << "-->" <<
+                hostPortOverride.first << std::endl;
+        port = hostPortOverride.second;
+    }
+
     try{
         api->connect(host, port);
     } catch(tcpip::SocketException e){

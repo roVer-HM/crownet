@@ -12,3 +12,13 @@ inline std::ostream &operator<<(std::ostream &os,
   return os << "[ " << pair.first << ", " << pair.second << "]";
 }
 }  // namespace std
+
+namespace crownet {
+
+extern omnetpp::cConfigOption *CFGID_VADERE_HOST;
+extern omnetpp::cConfigOption *CFGID_SUMO_HOST;
+extern omnetpp::cConfigOption *CFGID_FLOW_HOST;
+
+std::pair<std::string, int> getHostPortConfigOverride(omnetpp::cConfigOption *entry);
+
+}

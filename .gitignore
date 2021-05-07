@@ -11,6 +11,7 @@ compile_commands.json
 *.h5
 **/*.csv.ERROR
 **/*.csv.FAILED
+**/*.csv.UPDATED
 **/results
 
 # ignore gitlab-runner local test directory
@@ -36,9 +37,12 @@ analysis/**/test_data
 
 crownet/out
 crownet/src/Makefile
+crownet/src/__*
 crownet/tests/gtest/src/Makefile
+crownet/tests/**/*.out
+crownet/tests/**/work
 crownet/.settings
-crownet/**/libCROWNET*
+crownet/**/*CROWNET*
 crownet/**/rTests*
 crownet/**/results
 crownet/**/measurements
@@ -141,3 +145,4 @@ omnetpp-ws
 build
 dist
 
+/crownet/tests/fingerprint/yml_out.d/

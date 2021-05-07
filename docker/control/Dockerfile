@@ -25,7 +25,7 @@ RUN --mount=type=ssh git clone --depth 1 --branch $BRANCH \
 RUN ln -f -s /opt/flowcontrol/$BRANCH /opt/flowcontrol/flowcontrol
 
 # add a symbolic link to /usr/bin/python3 from /usr/bin/python3.7
-RUN ln -f -s /usr/bin/python3.7 /usr/bin/python3
+RUN ln -f -s /usr/bin/python3.8 /usr/bin/python3
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/flowcontrol/flowcontrol
@@ -35,11 +35,8 @@ RUN --mount=type=ssh git \
             pull ssh://git@sam-dev.cs.hm.edu:6000/rover/flowcontrol.git $BRANCH
 
 # configure and install
-#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python-pkg-resources
-#RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-setuptools python3-pip
 
-RUN python3.7 setup.py install
+RUN python3 setup.py install
 
 # init script (triggered at container start)
 COPY init.sh /init.sh

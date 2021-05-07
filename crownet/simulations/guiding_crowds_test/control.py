@@ -88,6 +88,6 @@ if __name__ == "__main__":
 
     controller.initialize_connection(traci_manager)
     kwargs = {"file_name": scenario_file, "file_content": get_scenario_content(scenario_file)}
-    controller.register_state_listener("default", sub) #? new
+    controller.register_state_listener("default", sub, set_default=True) #? new
     controller.start_controller(**kwargs)
 
