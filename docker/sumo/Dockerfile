@@ -8,7 +8,7 @@ FROM ubuntu:18.04
 
 # Specify the version/tag of sumo to be put in the container:
 # ENV RELEASE master
-ENV RELEASE v1_0_1
+ENV RELEASE v1_9_1
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)
 ENV VEINS_RELEASE hm_master
