@@ -10,7 +10,7 @@
 
 
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
-# FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0pre10
+# FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0pre11
 
 WORKDIR /opt/omnetpp/omnetpp
 
