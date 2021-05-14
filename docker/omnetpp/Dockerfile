@@ -1,8 +1,8 @@
 # syntax = docker/dockerfile:experimental
 #
-# OMNeT++ Simulator (as used within the roVer project)
+# OMNeT++ Simulator (as used within the CrowNet framework)
 #
-# Within roVer, we use two different containers:
+# Within CrowNet, we use two different containers:
 #   1) omnetpp (command line, no GUI, for simulation campaigns)
 #   2) omnetpp-ide (all graphical libs, autostart of IDE)
 #
@@ -13,11 +13,14 @@
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-6.0pre10
+ENV OMNETRELEASE omnetpp-6.0pre11
 # Note: Remember to update the description below when changing OMNETRELEASE
 
-LABEL description "OMNeT++ Simulation Framework (as used in roVer, tag omnetpp-6.0pre10)"
+LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0pre11)"
 LABEL maintainer  "wischhof@ieee.org"
+
+# Use bash shell
+SHELL ["/bin/bash", "-c"]
 
 # install all packages required to compile omnet
 # Note: Since clang does not emit debug info for types within the standard libraries,
@@ -26,7 +29,7 @@ LABEL maintainer  "wischhof@ieee.org"
 # see rover-base-cpp and rover-base-min
 
 # install additionally needed Python modules
-RUN pip3 install numpy pandas matplotlib posix_ipc
+RUN pip3 install numpy pandas matplotlib posix_ipc scipy
 
 # clone the OMNeT++ sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/omnetpp
@@ -51,7 +54,7 @@ RUN --mount=type=ssh git \
 # configure and compile
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY configure.user .
-RUN ./configure && \
+RUN  source setenv -f && ./configure && \
      make -j $(nproc) && \
      find . -type f -name '*.o' -exec rm {} + && \
      find . -type f -name '*.o.d' -exec rm {} +

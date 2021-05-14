@@ -1,9 +1,9 @@
-# roVer base container
+# CrowNet base container
 #
 
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
 
-LABEL description "roVer base container"
+LABEL description "CrowNet base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"
 
 
