@@ -27,8 +27,8 @@ RUN git clone --depth 1 --branch $BRANCH https://gitlab.lrz.de/vadere/vadere.git
 # add a symbolic link so vadere is found in the path
 RUN ln -f -s /opt/vadere/$BRANCH /opt/vadere/vadere
 
-# add a symbolic link to /usr/bin/python3 from /usr/bin/python3.7
-RUN ln -f -s /usr/bin/python3.7 /usr/bin/python3
+# add a symbolic link to /usr/bin/python3 from /usr/bin/python3.8
+RUN ln -f -s /usr/bin/python3.8 /usr/bin/python3
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/vadere/vadere
