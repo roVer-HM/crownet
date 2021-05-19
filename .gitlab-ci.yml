@@ -116,10 +116,10 @@ fingerprints:
   artifacts:
     when: always
     paths:
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/results"
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/*csv*"
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/*.csv"
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/*.out"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/results"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/*csv*"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/*.csv"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/*.out"
     expire_in: 8 weeks
 
 # run the fingerprint tests
@@ -136,9 +136,9 @@ fingerprints_crownet:
   artifacts:
     when: always
     paths:
-    - "${crownet_home}/crownet/tests/fingerprint/yml_out.d"
-    - "${crownet_home}/crownet/tests/fingerprint/hash.d"
-    - "${crownet_home}/crownet/tests/fingerprint/*.yml"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/yml_out.d"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/hash.d"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/*.yml"
     expire_in: 8 weeks
 
 # run the opp tests
