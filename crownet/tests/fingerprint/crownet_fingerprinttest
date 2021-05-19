@@ -45,7 +45,7 @@ from roveranalyzer.entrypoint.parser import ArgList
 from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
-from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse
+from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse, stop_containers
 from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv, create_dir_diff, compare_diff
 import docker
 from requests.exceptions import ReadTimeout
@@ -59,8 +59,9 @@ class TestGlobal:
     extraArgs = ""
     debug = False
     release = False
-    exitCode = 0
+    exitCode = -1
     executable = "/dev/null"
+    container_names = []
 
 
 class TestCaseType(Enum):
@@ -832,6 +833,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         )
         _mobility_runner.apply_reuse_policy()
         _mobility_runner.set_working_dir(self.workingdir)
+        TestGlobal.container_names.append(_mobility_runner.name)
         return _mobility_runner
 
     def build_sumo_runner(self):
@@ -846,6 +848,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         )
         _mobility_runner.apply_reuse_policy()
         _mobility_runner.set_working_dir(self.workingdir)
+        TestGlobal.container_names.append(_mobility_runner.name)
         return _mobility_runner
 
     def build_opp_runner(self):
@@ -854,15 +857,17 @@ class FingerprintContainerTestCase(FingerprintTestCase):
             tag=self.tags["omnetpp"],
             name=f"opp_{_base_name}",
             docker_client=self.docker_client,
-            reuse_policy=DockerReuse.REMOVE_STOPPED,  # error if new container is named the same way as a running one.
+            reuse_policy=DockerReuse.REMOVE_RUNNING,  # error if new container is named the same way as a running one.
             cleanup_policy=DockerCleanup.KEEP_FAILED,  # keep failed container for debug.
             detach=False,  # block on container start and wait for result
             run_cmd=os.path.abspath(TestGlobal.executable)  # FIXME: do not use global object
             # no fixed name, let docker choose name
         )
+        _opp_runner.apply_reuse_policy()
         _opp_runner.set_working_dir(self.workingdir)
         if "NEDPATH" in _opp_runner.environment:
             del _opp_runner.environment["NEDPATH"]  # not needed. Provided by command
+        TestGlobal.container_names.append(_opp_runner.name)
         return _opp_runner
 
     def log_path(self, resultdir):
@@ -1456,10 +1461,13 @@ if __name__ == "__main__":
                 TestGlobal.extraArgs += " " + _arg
 
     # call command main
+    TestGlobal.container_names.clear()
     ret = args.main_func(args)
+
+    stop_containers(TestGlobal.container_names)
 
     if ret == 0:
         print("Test results equals to expected results")
     else:
-        print("Test results differ from expected results")
+        print(f"Test results differ from expected results {ret}")
     exit(ret)
