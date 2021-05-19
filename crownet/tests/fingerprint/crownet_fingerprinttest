@@ -694,7 +694,7 @@ class FingerprintTestCase(SimulationTestCase):
                 raise Exception("cpu time limit exceeded")
             elif result.simulatedTime == 0 and self.simtimelimit != '0s':
                 raise Exception("zero time simulated")
-            elif result.errorMsg is not None:
+            elif result.errorMsg != "":
                 raise Exception("Unknown Errors or Warnings exist")
             elif result.isFingerprintOK is None:
                 raise Exception("other")
