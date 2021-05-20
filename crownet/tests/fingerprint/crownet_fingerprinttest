@@ -45,7 +45,7 @@ from roveranalyzer.entrypoint.parser import ArgList
 from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
-from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse
+from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse, stop_containers
 from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv, create_dir_diff, compare_diff
 import docker
 from requests.exceptions import ReadTimeout
@@ -59,8 +59,11 @@ class TestGlobal:
     extraArgs = ""
     debug = False
     release = False
-    exitCode = 0
+    exitCode = -1
+    FAILED = -1
+    OK = 0
     executable = "/dev/null"
+    container_names = []
 
 
 class TestCaseType(Enum):
@@ -178,10 +181,13 @@ class FingerprintTestCaseGenerator():
                 pass  # empty line
             elif len(fields) == 6:
                 if fields[4] in ['PASS', 'FAIL', 'ERROR']:
-                    simulations.append({'file': file_path, 'line': csvReader.line_num,
-                                        'wd': fields[0], 'args': fields[1], 'simtimelimit': fields[2],
-                                        'fingerprint': fields[3], 'expectedResult': fields[4],
-                                        'tags': self.parse_tags(fields[5])})
+
+                    sim = {'file': file_path, 'line': csvReader.line_num,
+                           'wd': fields[0], 'args': fields[1], 'simtimelimit': fields[2],
+                           'fingerprint': fields[3], 'expectedResult': fields[4],
+                           'tags': self.parse_tags(fields[5])}
+                    sim["arg_list"] = ArgList.from_string(sim["args"])
+                    simulations.append(sim)
                 else:
                     raise Exception(file_path + " Line " + str(
                         csvReader.line_num) + ": the 5th item must contain one of 'PASS', 'FAIL', 'ERROR'" + ": " + '"' + '", "'.join(
@@ -320,7 +326,6 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             if len(missing_keys) > 0:
                 raise RuntimeError(f"Test file {file_path}:{sim_name} is missing keys: [{', '.join(missing_keys)}]")
 
-
             # set simulation name, file, and read fingerprints
             sim["test_name"] = sim_name
             sim["file"] = file_path
@@ -334,7 +339,8 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
                     diffs = csv_to_diffdict(hash_path)
                     sim["fingerprint"] = diffs
                 except FileNotFoundError:
-                    print(f"{hash_path} not found! Treat as new test. First run will fail but UPDATED file will be created")
+                    print(
+                        f"{hash_path} not found! Treat as new test. First run will fail but UPDATED file will be created")
                     sim["fingerprint"] = {}
                 finally:
                     sim["fingerprint_file"] = hash_path
@@ -366,7 +372,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             if not arg_list.contains_key('--vadere-only'):
                 # get OMNeT++ fingerprint hashes (if missing add dummy value)
                 # FIXME Multiple Fingerprints, Alternative Values (see p.361)
-                f_prints = sim["fingerprint"].setdefault("[[omnetpp]]",  "ffff-ffff/tplx")
+                f_prints = sim["fingerprint"].setdefault("[[omnetpp]]", "ffff-ffff/tplx")
                 f_prints = re.sub("\s+", "", f_prints)
                 arg_list.add_override(f"--opp.fingerprint={f_prints}")
                 # FIXME: Workaround due to results are saved based on config-name and experiment-label.
@@ -386,7 +392,6 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
 
             cases.append(sim)
         return cases
-
 
     def create_title(self, simulation: dict):
         return f"{simulation['wd']}  {simulation['file']}-{simulation['test_name']}"
@@ -429,19 +434,17 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             for sim in simulations:
                 vadere_error_list = sim.get('vadere_error', [])
                 control_error_list = sim.get('control_error', [])
-                if len(vadere_error_list) > 0 or  len(control_error_list) > 0:
+                if len(vadere_error_list) > 0 or len(control_error_list) > 0:
                     error_file = f"{sim['fingerprint_file']}.ERROR"
                     with open(error_file, "w", encoding="utf-8") as e:
                         for row in vadere_error_list:
                             e.write(row)
                             e.write("\n")
-                        e.write("-"*80)
+                        e.write("-" * 80)
                         e.write("\n")
                         for row in control_error_list:
                             e.write(row)
                             e.write("\n")
-
-
 
 
 class SimulationResultFactory:
@@ -454,10 +457,18 @@ class SimulationResultFactory:
 
 
 class SimulationResult:
+
+    ignore_err = [
+        "<!> TraCI server reported Simulation end reached.",
+        "<!> Simulation time limit reached"
+        ""
+    ]
+
     def __init__(self, command, workingdir, exitcode, out, resultdir, errorMsg=None, isFingerprintOK=None,
                  computedFingerprint=None, simulatedTime=None, numEvents=None, elapsedTime=None,
                  cpuTimeLimitReached=None, **kwargs):
         self.command = command
+        self.arg_list = ArgList.from_string(self.command)
         self.workingdir = workingdir
         self.exitcode = exitcode
         self.out = out
@@ -471,35 +482,43 @@ class SimulationResult:
         self.cpuTimeLimitReached = cpuTimeLimitReached
 
     def write_to_log(self, _logFile, title):
-        FILE = open(_logFile, "a")
-        FILE.write("------------------------------------------------------\n"
-                   + "Running: " + title + "\n\n"
-                   + "$ cd " + self.workingdir + "\n"
-                   + "$ " + self.command + "\n\n"
-                   + self.out.strip() + "\n\n"
-                   + "Exit code: " + str(self.exitcode) + "\n"
-                   + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
-        FILE.close()
+        with open(_logFile, "a") as fd:
+            fd.write("------------------------------------------------------\n"
+                     + "Running: " + title + "\n\n"
+                     + "$ cd " + self.workingdir + "\n"
+                     + "$ " + self.command + "\n\n"
+                     + self.out.strip() + "\n\n"
+                     + "Exit code: " + str(self.exitcode) + "\n"
+                     + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
 
-        FILE = open(self.resultdir + "/test.out", "w")
-        FILE.write("------------------------------------------------------\n"
-                   + "Running: " + title + "\n\n"
-                   + "$ cd " + self.workingdir + "\n"
-                   + "$ " + self.command + "\n\n"
-                   + self.out.strip() + "\n\n"
-                   + "Exit code: " + str(self.exitcode) + "\n"
-                   + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
-        FILE.close()
+        config = self.arg_list.get_value("-c")
+        experiment_label = self.arg_list.get_value("--experiment-label=", default=None)
+        run_log = check_sim_dir(self.resultdir, config, experiment_label)
+        run_log = os.path.join(run_log, "test.out")
+        if not os.path.exists(os.path.split(run_log)[0]):
+            raise RuntimeError("Result dir not found. Did you use ${resultdir}/${configname}_${experiment} as the result base directory in the omnetpp.ini?")
+        with open(run_log, "w") as fd:
+            fd.write("------------------------------------------------------\n"
+                       + "Running: " + title + "\n\n"
+                       + "$ cd " + self.workingdir + "\n"
+                       + "$ " + self.command + "\n\n"
+                       + self.out.strip() + "\n\n"
+                       + "Exit code: " + str(self.exitcode) + "\n"
+                       + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
+
 
     def parse_result(self):
         errorLines = re.findall("<!>.*", self.out, re.M)
         errorMsg = ""
         for err in errorLines:
             err = err.strip()
-            if err.startswith("<!> TraCI server reported Simulation end reached."):
+            if any([err.startswith(e) for e in self.ignore_err]):
                 # do not track this as an error.
-                continue
-            if re.search("Fingerprint", err):
+                m = re.search(r"at t=([0-9]*(\.[0-9]+)?)s, event #([0-9]+)", err)
+                if m:
+                    self.simulatedTime = float(m.group(1))
+                    self.numEvents = int(m.group(3))
+            elif re.search("Fingerprint", err):
                 if re.search("successfully", err):
                     self.isFingerprintOK = True
                 else:
@@ -517,7 +536,7 @@ class SimulationResult:
                 if m:
                     self.simulatedTime = float(m.group(1))
                     self.numEvents = int(m.group(3))
-        self.errormsg = errorMsg.strip()
+        self.errorMsg = errorMsg.strip()
 
 
 class SimulationResultCrowNet(SimulationResult):
@@ -560,9 +579,8 @@ class SimulationResultCrowNet(SimulationResult):
 
         return err
 
-
     def write_to_log(self, _logFile, title):
-        pass # nothing to do already persisted
+        pass  # nothing to do already persisted
 
     def parse_result(self):
         # parse OMNeT++ results first
@@ -602,7 +620,6 @@ class SimulationTestCase(unittest.TestCase):
         self.sim_wrapper = sim_wrapper
 
     def runSimulation(self, title, command, workingdir, resultdir):
-
         # run the program and log the output
         t0 = time.time()
 
@@ -633,22 +650,27 @@ class FingerprintTestCase(SimulationTestCase):
         self.title = title
         self.csvFile = sim_wrapper.get_copy("file")
         self.wd = sim_wrapper.get_copy("wd")
-        self.cmdLine = sim_wrapper.get_copy("args")
+        self.arg_list = sim_wrapper.get_copy("arg_list")
         self.simtimelimit = sim_wrapper.get_copy("simtimelimit")
         self.fingerprint = sim_wrapper.get_copy("fingerprint")
         self.expectedResult = sim_wrapper.get_copy("expectedResult")
         self.repeat = repeat
 
         self.workingdir = iif(self.wd.startswith('/'), TestGlobal.rootDir + "/" + self.wd, self.wd)
-        self.wdname = '' + self.wd + ' ' + self.cmdLine
-        self.wdname = re.sub('/', '_', self.wdname)
-        self.wdname = re.sub('[\W]+', '_', self.wdname)
+        self.wdname = f"{self.wd}_{self.arg_list.get_value('-f', '')}_{self.arg_list.get_value('-c')}_r{self.arg_list.get_value('-r', '0')}"
+        self.wdname = self.wdname.replace('.', '_')
+        self.wdname = self.wdname.replace('/', '_')
         self.resultdir = os.path.abspath(".") + "/results/" + self.csvFile + "/" + self.wdname
+
+        timestamp = datetime.datetime.now().isoformat().replace('-', "").replace(":", "")
+        self.arg_list.add_override(f"--experiment-label={timestamp}")
+
 
     def build_command(self):
         # Check if the command line does not contain executable name (starts with an option i.e. - char)
         # and use the executable name from the command line.
         # Otherwise, assume the first word as the name of the executable.
+        self.cmdLine = self.arg_list.to_string()
         (exeName, progArgs) = (TestGlobal.executable, self.cmdLine) if (
             self.cmdLine.startswith("-")) else self.cmdLine.split(None,
                                                                   1)
@@ -688,6 +710,8 @@ class FingerprintTestCase(SimulationTestCase):
                 raise Exception("cpu time limit exceeded")
             elif result.simulatedTime == 0 and self.simtimelimit != '0s':
                 raise Exception("zero time simulated")
+            elif result.errorMsg != "":
+                raise Exception("Unknown Errors or Warnings exist")
             elif result.isFingerprintOK is None:
                 raise Exception("other")
             elif result.isFingerprintOK == False:
@@ -721,7 +745,6 @@ class FingerprintCrowNetTestCase(SimulationTestCase):
 
     def __str__(self):
         return self.title
-
 
     def runTest(self):
 
@@ -768,7 +791,7 @@ class FingerprintCrowNetTestCase(SimulationTestCase):
 
         # check OMNeT++ and Crownet stuff here...
         if some_error:
-             assert False, ";".join(assert_msg)
+            assert False, ";".join(assert_msg)
 
 
 class FingerprintContainerTestCase(FingerprintTestCase):
@@ -782,8 +805,10 @@ class FingerprintContainerTestCase(FingerprintTestCase):
 
         if "vadere" in self.tags:
             self.mobility_runner = self.build_vadere_runner()
+            self.arg_list.add_override(f"--vadere-host={self.mobility_runner.name}:9998")
         elif "sumo" in self.tags:
             self.mobility_runner = self.build_sumo_runner()
+            self.arg_list.add_override(f"--sumo-host={self.mobility_runner.name}:9999")
         else:
             self.mobility_runner = None
 
@@ -792,13 +817,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
 
         :return: container base name for mobility provider container. Needed for communication.
         """
-        cmd_list = self.cmdLine.split()
-
-        config_name = ""
-        for idx, cmd_item in enumerate(cmd_list):
-            if cmd_item == "-c":
-                config_name = cmd_list[idx + 1]
-
+        config_name = self.arg_list.get_value("-c")
         base_name = f"{self.wd.replace('/', '_')}{config_name}"
         if base_name.startswith("_"):
             base_name = base_name[1:]
@@ -816,6 +835,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         )
         _mobility_runner.apply_reuse_policy()
         _mobility_runner.set_working_dir(self.workingdir)
+        TestGlobal.container_names.append(_mobility_runner.name)
         return _mobility_runner
 
     def build_sumo_runner(self):
@@ -830,23 +850,34 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         )
         _mobility_runner.apply_reuse_policy()
         _mobility_runner.set_working_dir(self.workingdir)
+        TestGlobal.container_names.append(_mobility_runner.name)
         return _mobility_runner
 
     def build_opp_runner(self):
         _base_name = self.get_container_base_name()
         _opp_runner = OppRunner(
             tag=self.tags["omnetpp"],
+            name=f"opp_{_base_name}",
             docker_client=self.docker_client,
-            reuse_policy=DockerReuse.REMOVE_STOPPED,  # error if new container is named the same way as a running one.
+            reuse_policy=DockerReuse.REMOVE_RUNNING,  # error if new container is named the same way as a running one.
             cleanup_policy=DockerCleanup.KEEP_FAILED,  # keep failed container for debug.
             detach=False,  # block on container start and wait for result
-            run_cmd=os.path.abspath(TestGlobal.executable) # FIXME: do not use global object
+            run_cmd=os.path.abspath(TestGlobal.executable)  # FIXME: do not use global object
             # no fixed name, let docker choose name
         )
+        _opp_runner.apply_reuse_policy()
         _opp_runner.set_working_dir(self.workingdir)
         if "NEDPATH" in _opp_runner.environment:
             del _opp_runner.environment["NEDPATH"]  # not needed. Provided by command
+        TestGlobal.container_names.append(_opp_runner.name)
         return _opp_runner
+
+    def log_path(self, resultdir):
+        config = self.arg_list.get_value("-c")
+        experiment_label = self.arg_list.get_value("--experiment-label=")
+        logfile = os.path.join(resultdir, sim_dir(config, experiment_label), "mobilityProvider.log")
+        logfile = os.path.relpath(logfile, self.mobility_runner.working_dir)
+        return logfile
 
     def runProgram(self, command, workingdir, resultdir):
         opp_runner: OppRunner = self.build_opp_runner()
@@ -856,12 +887,12 @@ class FingerprintContainerTestCase(FingerprintTestCase):
             # start mobility provider if needed
             if self.mobility_runner is not None and "vadere" in self.tags:
                 self.mobility_runner.exec_single_server(
-                    logfile=f"{os.path.relpath(resultdir, self.mobility_runner.working_dir)}/mobilityProvider.log"
+                    logfile=self.log_path(resultdir)
                 )
             elif self.mobility_runner is not None and "sumo" in self.tags:
                 self.mobility_runner.exec_single_server(
                     config_path=os.path.join(workingdir, self.tags["sumo_cfg"]),
-                    message_log=f"{os.path.relpath(resultdir, self.mobility_runner.working_dir)}/mobilityProvider.log",
+                    message_log=self.log_path(resultdir),
                 )
 
             opp_ret = opp_runner.run(command, perform_cleanup=False)
@@ -1076,7 +1107,7 @@ class SimulationTextTestResult(ThreadedTestResult):
             elif self.dots:
                 self.stream.write('E')
                 self.stream.flush()
-            TestGlobal.exitCode = 1  # result is not the expected result
+            TestGlobal.exitCode = TestGlobal.FAILED  # result is not the expected result
 
     def addExpectedError(self, test, err):
         self.expectedErrors.append((test, self._exc_info_to_string(err, test)))
@@ -1103,7 +1134,7 @@ class SimulationTextTestResult(ThreadedTestResult):
             elif self.dots:
                 self.stream.write('F')
                 self.stream.flush()
-            TestGlobal.exitCode = 1  # result is not the expected result
+            TestGlobal.exitCode = TestGlobal.FAILED  # result is not the expected result
 
     def addSkip(self, test, reason):
         super(SimulationTextTestResult, self).addSkip(test, reason)
@@ -1133,7 +1164,7 @@ class SimulationTextTestResult(ThreadedTestResult):
         elif self.dots:
             self.stream.write("u")
             self.stream.flush()
-        TestGlobal.exitCode = 1  # result is not the expected result
+        TestGlobal.exitCode = TestGlobal.FAILED  # result is not the expected result
 
     def printErrors(self):
         # modified
@@ -1157,6 +1188,34 @@ class SimulationTextTestResult(ThreadedTestResult):
             self.stream.write("%s:\n" % flavour)
         for test in errors:
             self.stream.write("  %s\n" % (self.getDescription(test)))
+
+
+def sim_dir(config_name, experiment=None):
+    """
+    ${resultdir}/${configname}_${experiment}/....
+                 ^----    sim_dir       ---^
+    """
+    exp = datetime.datetime.now().isoformat().replace('-', "").replace(":", "") if experiment is None else experiment
+    return f"{config_name}_{exp}"
+
+
+def check_sim_dir(base_dir, config_name,  experiment=None):
+    """
+    In the omnetpp.ini file the use may define multiple ways to save resutl data.
+    1) ${resultdir}/${configname}_${experiment}/....
+    2) ${resultdir}/${configname}/....
+    check if 1) or 2) exist and use the one found. (1) will have precedence
+    """
+    experiment = "" if experiment is None else experiment
+    p1 = os.path.join(base_dir, f"{config_name}_{experiment}")
+    p2 = os.path.join(base_dir, f"{config_name}")
+
+    if os.path.exists(p1):
+        return p1
+    if os.path.exists(p2):
+        return p2
+
+    raise ValueError("simulation dir not found")
 
 
 def parse_testcase_type(tags: dict, default_type=TestCaseType.DOCKER):
@@ -1216,7 +1275,7 @@ def opp_main(args):
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
-    return TestGlobal.exitCode
+    return TestGlobal.OK
 
 
 def crownet_main(args):
@@ -1234,7 +1293,7 @@ def crownet_main(args):
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
-    return TestGlobal.exitCode
+    return TestGlobal.OK
 
 
 def opp_argparser(parser: argparse.ArgumentParser):
@@ -1404,10 +1463,13 @@ if __name__ == "__main__":
                 TestGlobal.extraArgs += " " + _arg
 
     # call command main
+    TestGlobal.container_names.clear()
     ret = args.main_func(args)
+
+    stop_containers(TestGlobal.container_names)
 
     if ret == 0:
         print("Test results equals to expected results")
     else:
-        print("Test results differ from expected results")
+        print(f"Test results differ from expected results {ret}")
     exit(ret)

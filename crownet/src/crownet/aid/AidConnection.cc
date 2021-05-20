@@ -71,6 +71,8 @@ void AidConnection::handleMessage(cMessage* msg) {
 
 bool AidConnection::processAppCommand(cMessage* msg) {
   Enter_Method_Silent();
+  // do not take msg here in case it is a DATA packet (handle by Aid)
+  // take based on event if we will delete the message
 
   printConnBrief();
 
@@ -258,6 +260,7 @@ void AidConnection::stateEntered(int state, int oldState, AidEventCode event) {
 /** Process App Command (Sate Machine) */
 void AidConnection::process_AID_BIND(AidEventCode& event,
                                      AidCommand* aidCommand, cMessage* msg) {
+  take(msg); // msg belongs to us. (We will delete it here)
   // AID_S_INIT ==AID_E_BIND==> AID_S_BIND
   AidBindCommand* cmd = check_and_cast<AidBindCommand*>(aidCommand);
 
@@ -276,6 +279,7 @@ void AidConnection::process_AID_BIND(AidEventCode& event,
 
 void AidConnection::process_AID_APP_REQ(AidEventCode& event,
                                         AidCommand* aidCommand, cMessage* msg) {
+  take(msg); // msg belongs to us. (We will delete it here)
   // AID_S_BIND ==AID_E_APP_REQ==> AID_S_BIND
   // AID_S_ESTABLISHED ==AID_E_APP_REQ==> AID_S_ESTABLISHED
   AidAppReqCommand* cmd = check_and_cast<AidAppReqCommand*>(aidCommand);
@@ -302,6 +306,7 @@ void AidConnection::process_AID_APP_REQ(AidEventCode& event,
 
 void AidConnection::process_AID_APP_CAP(AidEventCode& event,
                                         AidCommand* aidCommand, cMessage* msg) {
+  take(msg); // msg belongs to us. (We will delete it here)
   // AID_S_BIND ==AID_E_APP_REQ==> AID_S_BIND
   // AID_S_ESTABLISHED ==AID_E_APP_REQ==> AID_S_ESTABLISHED
   AidAppCapCommand* cmd = check_and_cast<AidAppCapCommand*>(aidCommand);
@@ -324,6 +329,7 @@ void AidConnection::process_AID_APP_CAP(AidEventCode& event,
 
 void AidConnection::process_AID_CONNECT(AidEventCode& event,
                                         AidCommand* aidCommand, cMessage* msg) {
+  take(msg); // msg belongs to us. (We will delete it here)
   // AID_S_BIND ==AID_E_CONNECT==> AID_S_ESTABLISHED
   AidConnectCommand* cmd = check_and_cast<AidConnectCommand*>(aidCommand);
 
@@ -352,7 +358,6 @@ void AidConnection::process_AID_CONNECT(AidEventCode& event,
 void AidConnection::process_AID_DATA(AidEventCode& event,
                                      AidCommand* aidCommand, cMessage* msg) {
   // AID_S_ESTABLISHED ==AID_E_DATA==> AID_S_ESTABLISHED
-
   switch (fsm.getState()) {
     case AID_S_ESTABLISHED: {
       // add PacketProtocolTag to App Packet.
@@ -372,8 +377,8 @@ void AidConnection::process_AID_DATA(AidEventCode& event,
 
 void AidConnection::process_AID_CLOSE(AidEventCode& event,
                                       AidCommand* aidCommand, cMessage* msg) {
+  take(msg); // msg belongs to us. (We will delete it here)
   AidCloseCommand* cmd = check_and_cast<AidCloseCommand*>(aidCommand);
-
 //  switch (fsm.getState()) {
 //    // todo: action or error for each steady state
 //    default:
@@ -387,6 +392,7 @@ void AidConnection::process_AID_CLOSE(AidEventCode& event,
 
 void AidConnection::process_AID_DESTROY(AidEventCode& event,
                                         AidCommand* aidCommand, cMessage* msg) {
+  take(msg); // msg belongs to us. (We will delete it here)
   delete aidCommand;
   delete msg;
 }
