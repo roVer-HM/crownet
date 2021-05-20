@@ -60,6 +60,8 @@ class TestGlobal:
     debug = False
     release = False
     exitCode = -1
+    FAILED = -1
+    OK = 0
     executable = "/dev/null"
     container_names = []
 
@@ -1105,7 +1107,7 @@ class SimulationTextTestResult(ThreadedTestResult):
             elif self.dots:
                 self.stream.write('E')
                 self.stream.flush()
-            TestGlobal.exitCode = 1  # result is not the expected result
+            TestGlobal.exitCode = TestGlobal.FAILED  # result is not the expected result
 
     def addExpectedError(self, test, err):
         self.expectedErrors.append((test, self._exc_info_to_string(err, test)))
@@ -1132,7 +1134,7 @@ class SimulationTextTestResult(ThreadedTestResult):
             elif self.dots:
                 self.stream.write('F')
                 self.stream.flush()
-            TestGlobal.exitCode = 1  # result is not the expected result
+            TestGlobal.exitCode = TestGlobal.FAILED  # result is not the expected result
 
     def addSkip(self, test, reason):
         super(SimulationTextTestResult, self).addSkip(test, reason)
@@ -1162,7 +1164,7 @@ class SimulationTextTestResult(ThreadedTestResult):
         elif self.dots:
             self.stream.write("u")
             self.stream.flush()
-        TestGlobal.exitCode = 1  # result is not the expected result
+        TestGlobal.exitCode = TestGlobal.FAILED  # result is not the expected result
 
     def printErrors(self):
         # modified
@@ -1273,7 +1275,7 @@ def opp_main(args):
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
-    return TestGlobal.exitCode
+    return TestGlobal.OK
 
 
 def crownet_main(args):
@@ -1291,7 +1293,7 @@ def crownet_main(args):
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
-    return TestGlobal.exitCode
+    return TestGlobal.OK
 
 
 def opp_argparser(parser: argparse.ArgumentParser):
