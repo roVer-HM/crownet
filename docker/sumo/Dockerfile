@@ -67,6 +67,9 @@ RUN --mount=type=ssh git \
     chmod 555 sumo-launchd.py && \
     rm -rf .git
 
+# Setup SUMO_HOME
+ENV SUMO_HOME /opt/sumo/sumo
+
 # default init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
