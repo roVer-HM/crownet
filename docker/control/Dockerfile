@@ -40,5 +40,7 @@ RUN python3 setup.py install
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
+COPY init_dev.sh /init_dev.sh
 RUN chmod 555 /init.sh
+RUN chmod 555 /init_dev.sh
 CMD [ "/init.sh" ]
