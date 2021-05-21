@@ -1275,7 +1275,7 @@ def opp_main(args):
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
-    return TestGlobal.OK
+    return TestGlobal.exitCode
 
 
 def crownet_main(args):
@@ -1293,7 +1293,7 @@ def crownet_main(args):
     print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
-    return TestGlobal.OK
+    return TestGlobal.exitCode
 
 
 def opp_argparser(parser: argparse.ArgumentParser):
