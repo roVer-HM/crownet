@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+OSM_FILE="osm/munich_clean.osm"
+OUT="munich.net.xml"
+OUT_POLY="munich.poly.xml"
+
+sumo exec netconvert --type-files types/osmNetconvert.typ.xml,types/osmNetconvertPedestrians.typ.xml \
+           --osm-files $OSM_FILE --output-file $OUT \
+           --geometry.remove --roundabouts.guess --ramps.guess \
+           --junctions.join --tls.guess-signals --tls.discard-simple --tls.join \
+           --verbose
+
+
+

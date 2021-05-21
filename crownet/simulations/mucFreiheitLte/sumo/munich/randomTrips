@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+sumo exec python3 /opt/sumo/sumo/tools/randomTrips.py --configuration-file cfg.xml
