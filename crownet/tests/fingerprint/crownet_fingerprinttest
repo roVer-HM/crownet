@@ -59,7 +59,7 @@ class TestGlobal:
     extraArgs = ""
     debug = False
     release = False
-    exitCode = -1
+    exitCode = 0
     FAILED = -1
     OK = 0
     executable = "/dev/null"
