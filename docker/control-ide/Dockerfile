@@ -17,8 +17,8 @@ LABEL maintainer  "christina_maria.mayr@hm.edu"
 
 # add ide (pycharm)
 WORKDIR /opt/pycharm
-ADD ide/pycharm-community-2020.3.3.tar.gz .
-ENV PATH="/opt/pycharm/pycharm-community-2020.3.3/bin:${PATH}"
+ADD ~/.cache/crownet/pycharm.tar.gz .
+ENV PATH="/opt/pycharm/pycharm-2021.1.1/bin:${PATH}"
 
 # init script (triggered at container start)
 COPY init.sh /init.sh
