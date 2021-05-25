@@ -2,10 +2,10 @@
 # See crownet_fingerprinttest crownet --help
 #   * workingdir is realtive to the given '-C' flag of crownet_fingerprinttest
 #   * each toplevel key will be one test case
-#   * if first item in `args` does not start with an `-` it will be 
+#   * if first item in `args` does not start with an `-` it will be
 #     interpreted as the command to execute
-#   * if fingerprint starts with 'file:' read the given path. If path 
-#     is relative it based on workingdir. An empty path will default 
+#   * if fingerprint starts with 'file:' read the given path. If path
+#     is relative it based on workingdir. An empty path will default
 #     to hasd./<testcase-name>.csv relative to the current files location
 
 vadere_only_test_1:
@@ -46,6 +46,7 @@ final_test_3:
     - --create-vadere-container
     - --opp.-c
     - final_control
+    - --control-use-local
     - --with-control
     - control.py
   simtimelimit: 100s
@@ -62,10 +63,11 @@ test_4:
     - --delete-existing-containers
     - --create-vadere-container
     - --control-vadere-only
+    - --control-use-local
     - --with-control
     - control.py
   simtimelimit: 100s
-  expectedResult: ERROR
+  expectedResult: PASS
   fingerprint: "file:"
   tags:
     exec: python3

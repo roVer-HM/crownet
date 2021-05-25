@@ -339,8 +339,6 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
                     diffs = csv_to_diffdict(hash_path)
                     sim["fingerprint"] = diffs
                 except FileNotFoundError:
-                    print(
-                        f"{hash_path} not found! Treat as new test. First run will fail but UPDATED file will be created")
                     sim["fingerprint"] = {}
                 finally:
                     sim["fingerprint_file"] = hash_path
@@ -369,7 +367,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             arg_list.add_override(f"--experiment-label", timestamp)
 
             # Crownet test can run without OMNeT++
-            if not arg_list.contains_key('--vadere-only'):
+            if not any([arg_list.contains_key(k) for k in ['--vadere-only', '--control-vadere-only']]):
                 # get OMNeT++ fingerprint hashes (if missing add dummy value)
                 # FIXME Multiple Fingerprints, Alternative Values (see p.361)
                 f_prints = sim["fingerprint"].setdefault("[[omnetpp]]", "ffff-ffff/tplx")
