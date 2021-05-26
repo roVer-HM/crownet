@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package com.example.peopledensitymeasurementprototype.model.proto;
+
+option go_package = "github.com/matthinc/BachelorThesisProject/pb";
+
+message SingleLocationData {
+  int32 deviceId = 1;
+  int64 timestamp = 2; // This will break in 2038
+  int32 zoneId = 3;
+  bool hemisphere = 4;
+  int32 northing = 5;
+  int32 easting = 6;
+  int32 bearing = 7;
+  int32 speed = 8;
+  float accuracy = 9;
+  int32 ttl = 10;
+}
+
+message DensityMap {
+  int32 senderDeviceId = 1;
+  repeated SingleLocationData data = 2;
+}
+
+message WarnMessage {
+  string message = 1;
+  int64 validUntil = 2;
+  double latitude = 3;
+  double longitude = 4;
+}
+
+message LocationMessageWrapper {
+  oneof msg {
+    SingleLocationData single = 1;
+    DensityMap map = 2;
+    WarnMessage message = 3;
+  }
+}
