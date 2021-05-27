@@ -43,6 +43,7 @@ void ControlManager::initialize(int stage)
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
         api->setTraCiForwarder(traciFw);
+        api->setControlHandler(this);
 
     }
 }
@@ -50,6 +51,15 @@ void ControlManager::initialize(int stage)
 void ControlManager::handleMessage(cMessage *msg)
 {
     throw cRuntimeError("Module does not handle messages");
+}
+
+std::string ControlManager::handleCommand(const ControlCmd& cmd){
+    // select sendingNode
+    // actiate application and set model/message
+    // send ACK to flowcontrol
+    Enter_Method_Silent();
+
+    return "";
 }
 
 void ControlManager::finish() {

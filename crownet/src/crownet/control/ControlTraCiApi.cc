@@ -23,8 +23,12 @@ void ControlTraCiApi::setTraCiForwarder(std::shared_ptr<TraCiForwarder> traciFor
     this->traciForwarder = traciForwarder;
 }
 
-ControlCmd ControlTraCiApi::parseCtrlCmd(tcpip::Storage& inMsg){
-    ControlCmd cmd;
+void ControlTraCiApi::setControlHandler(ControlHandler* controlHandler){
+    this->controlHandler = controlHandler;
+}
+
+ForwardCmd ControlTraCiApi::parseCtrlCmd(tcpip::Storage& inMsg){
+    ForwardCmd cmd;
     cmd.offset = inMsg.position();
     cmd.cmdLength = inMsg.readCmdLength();
     cmd.cmdId = inMsg.readUnsignedByte();
@@ -76,10 +80,10 @@ double ControlTraCiApi::handleControlCmd(tcpip::Storage& ctrlCmd){
         // replies must be CMD_CONTROL commands. no result State provided.
         tcpip::Storage reply;
         mySocket->receiveExact(reply);
-        ControlCmd result = parseCtrlCmd(reply);
+        ForwardCmd result = parseCtrlCmd(reply);
 
         if (result.cmdId != CMD_CONTROL){
-            throw libsumo::TraCIException("#Error: expected CMD_CONTROL");
+            throw omnetpp::cRuntimeError("#Error: expected CMD_CONTROL");
         }
 
         if (result.varId == VAR_Step || result.varId == VAR_INIT){
@@ -96,24 +100,24 @@ double ControlTraCiApi::handleControlCmd(tcpip::Storage& ctrlCmd){
 
             if (result.objectIdentifer == SIMULATOR_VADERE){
 
-                    // extract payload and forward
-                    tcpip::Storage forwardCmd;
-                    tcpip::Storage forwardResponse;
+                  // extract payload and forward
+                  tcpip::Storage forwardCmd;
+                  tcpip::Storage forwardResponse;
 
-                    forwardCmd.writeStorage(reply, result.payloadLength);
-                    traciForwarder->forward(forwardCmd, forwardResponse);
+                  forwardCmd.writeStorage(reply, result.payloadLength);
+                  traciForwarder->forward(forwardCmd, forwardResponse);
 
-                    // send response from mobilityProvider to controller
-                    mySocket->sendExact(forwardResponse);
+                  // send response from mobilityProvider to controller
+                  mySocket->sendExact(forwardResponse);
 
-                } else if (result.objectIdentifer == SIMULATOR_OPP){
-                    // extract command and execute
-                    tcpip::Storage result = handleControllerOppRequest(reply);
-                    // send response to controller
-                    mySocket->sendExact(result);
-                } else {
-                    throw omnetpp::cRuntimeError("#Error: expected 'V' or 'O' as objectID to select simulator");
-                }
+              } else if (result.objectIdentifer == SIMULATOR_OPP){
+                  // extract command and execute
+                  tcpip::Storage res = handleControllerOppRequest(reply, result);
+                  // send response to controller
+                  mySocket->sendExact(res);
+              } else {
+                  throw omnetpp::cRuntimeError("#Error: expected 'V' or 'O' as objectID to select simulator");
+              }
 
             // keep receiving commands
             running = true;
@@ -125,8 +129,45 @@ double ControlTraCiApi::handleControlCmd(tcpip::Storage& ctrlCmd){
     return nextControlUpdateAt;
 }
 
-tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn){
-    throw libsumo::TraCIException("#Error: not implemented");
+tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn, ForwardCmd& ctrlCmd){
+    // extract payload and forward
+     tcpip::Storage cmd;
+     ControlCmd controlCmd;
+     cmd.writeStorage(msgIn, ctrlCmd.payloadLength);
+     int cmdLength = cmd.readCmdLength();
+     int cmdId = cmd.readUnsignedByte();
+     int varId = cmd.readUnsignedByte();
+     std::string objectIdentifer = cmd.readString();
+     // compound object
+     int type = cmd.readUnsignedByte();
+     if (type != TYPE_COMPOUND){
+         throw omnetpp::cRuntimeError("expected compound object got");
+     }
+     int cmpSize = cmd.readInt();
+     if (cmpSize != 4) {
+         throw omnetpp::cRuntimeError("expected 4 items in compound object");
+     }
+     type = cmd.readUnsignedByte();
+     controlCmd.packetSize = cmd.readInt();
+     type = cmd.readUnsignedByte();
+     controlCmd.sendingNode = cmd.readString();
+     type = cmd.readUnsignedByte();
+     controlCmd.model = cmd.readString();
+     type = cmd.readUnsignedByte();
+     controlCmd.message = cmd.readString();
+
+
+     std::string ret = this->controlHandler->handleCommand(controlCmd);
+
+     tcpip::Storage response;
+     if (ret.empty()){
+         this->createResponse(response, cmdId, RTYPE_OK, "");
+         // all ok ACK
+     } else {
+         // error occurred send NACK
+         this->createResponse(response, cmdId, RTYPE_ERR, ret);
+     }
+     return response;
 }
 
 
