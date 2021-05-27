@@ -19,7 +19,8 @@
 #include "artery/application/Middleware.h"
 #include "artery/utility/IdentityRegistry.h"
 
-#include "crownet/applications/common/AidBaseApp.h"
+#include "crownet/applications/common/AppFsm.h"
+#include "crownet/applications/common/BaseApp.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/util/FileWriter.h"
@@ -31,7 +32,7 @@ using namespace inet;
 
 namespace crownet {
 
-class BaseDensityMapApp : public AidBaseApp,
+class BaseDensityMapApp : public BaseApp,
                           public IDensityMapHandler<RegularDcdMap>,
                           public omnetpp::cListener {
 public:
@@ -50,10 +51,7 @@ protected:
  void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj,
                     cObject *details) override;
 
- // Aid Socket
- virtual void setAppRequirements() override;
- virtual void setAppCapabilities() override;
- virtual FsmState handleSocketDataArrived(Packet *packet) override;
+ virtual FsmState handleDataArrived(Packet *packet) override;
 
  // FSM
  virtual void setupTimers() override;

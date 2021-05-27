@@ -17,8 +17,6 @@ package crownet.applications.common;
 
 import inet.applications.contract.IApp;
 
-simple Foo {}
-
 simple BaseApp like IApp
 {
   parameters:
@@ -31,6 +29,7 @@ simple BaseApp like IApp
         										  // if set to -1 fsmAppMain will not be used and user must provide own
         										  // handling. fsmAppMain does nothing on default.
         volatile double appMainIntervalJitter @unit(s) = default(0s); // 
+        volatile int messageLength @unit(B);
         // Base addressing paramters
         string localAddress = default("");
         int localPort = default(-1);  // local port (-1: use ephemeral port)
@@ -55,26 +54,3 @@ simple BaseApp like IApp
    		input socketIn;
         output socketOut;
 }
-
-simple AidBaseApp extends BaseApp {
-      parameters:
-        @class(crownet::AidBaseApp);
-        @display("i=block/app");
-}
-
-simple UdpBaseApp extends BaseApp {
-      parameters:
-        @class(crownet::UdpBaseApp);
-        @display("i=block/app");
-        // udp socket options
-        volatile int messageLength @unit(B); // length of messages to generate, in bytes
-        string interfaceTableModule; // The path to the InterfaceTable module
-        int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
-        int dscp = default(-1); // if not -1, set the DSCP field (on IPv4/IPv6) of sent packets to this value
-        int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
-        string multicastInterface = default("");  // if not empty, set the multicast output interface option on the socket (interface name expected)
-        bool receiveBroadcast = default(true); // if true, makes the socket receive broadcast packets
-        bool joinLocalMulticastGroups = default(false); // if true, makes the socket receive packets from all multicast groups set on local interfaces
-}
-
-

@@ -51,13 +51,13 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
 }
 
 
-BaseApp::FsmState ArteryDensityMapApp::fsmSetup(cMessage *msg) {
+FsmState ArteryDensityMapApp::fsmSetup(cMessage *msg) {
   // ensure Density Grid map was initialized by event
   if (dcdMap == nullptr)
     throw omnetpp::cRuntimeError(
         "Density Grid map not initialized. Was the "
         "artery::IdentityRegistry::updateSignal event fired? ");
-  return AidBaseApp::fsmSetup(msg);
+  return BaseApp::fsmSetup(msg);
 }
 
 void ArteryDensityMapApp::updateLocalMap() {

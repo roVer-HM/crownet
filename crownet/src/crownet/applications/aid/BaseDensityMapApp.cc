@@ -34,7 +34,7 @@ BaseDensityMapApp::~BaseDensityMapApp(){
 }
 
 void BaseDensityMapApp::initialize(int stage) {
-    AidBaseApp::initialize(stage);
+    BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
       mapType = par("mapType").stdstringValue();
       mapTypeLog = par("mapTypeLog").stdstringValue();
@@ -64,25 +64,13 @@ void BaseDensityMapApp::receiveSignal(cComponent *source,
     // do nothing
 }
 
-
-// Aid Socket
-void BaseDensityMapApp::setAppRequirements() {
-  L3Address destAddr = chooseDestAddr();
-  socket.setAppRequirements(1.0, 2.0, AidRecipientClass::ALL_LOCAL, destAddr,
-                            destPort);
-}
-
-void BaseDensityMapApp::setAppCapabilities() {
-  // todo: no CAP right now.
-}
-
-BaseApp::FsmState BaseDensityMapApp::handleSocketDataArrived(Packet *packet){
+FsmState BaseDensityMapApp::handleDataArrived(Packet *packet){
     return mergeReceivedMap(packet) ? FsmRootStates::WAIT_ACTIVE  : FsmRootStates::ERR;
 }
 
 // FSM
 void BaseDensityMapApp::setupTimers() {
-  if (destAddresses.empty()) {
+  if (socketHandler->hasDestAddress()) {
     cRuntimeError("No address set.");
   } else {
     // schedule at startTime or current time, whatever is bigger.
@@ -90,15 +78,15 @@ void BaseDensityMapApp::setupTimers() {
   }
 }
 
-BaseApp::FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
+FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
   if (dcdMap == nullptr){
       throw omnetpp::cRuntimeError(
           "Density Grid map not initialized.");
   }
-  return AidBaseApp::fsmSetup(msg);
+  return BaseApp::fsmSetup(msg);
 }
 
-BaseApp::FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
+FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
   // send Message
   updateLocalMap();
   sendMapMap();

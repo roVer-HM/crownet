@@ -14,7 +14,7 @@
 //
 
 package crownet.applications.aid;
-import crownet.applications.common.AidBaseApp;
+import crownet.applications.common.BaseApp;
 import inet.applications.contract.IApp;
 
 moduleinterface IDensityMapApp extends IApp {
@@ -22,7 +22,7 @@ moduleinterface IDensityMapApp extends IApp {
 
 }
 
-simple BaseDensityMapApp  extends AidBaseApp like IDensityMapApp {
+simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
 	parameters:
 	    @class(crownet::ArteryDensityMapBase);
         @signal[RegisterDensityMap];
@@ -33,8 +33,8 @@ simple BaseDensityMapApp  extends AidBaseApp like IDensityMapApp {
         appMainInterval = default(1.0s);
 
 	    // Aid app fix defaults
-        destPort = 30001;
-        localPort = 30001;         
+//        destPort = 30001;
+//        localPort = 30001;         
         
         // App logic
         string coordConverterModule;

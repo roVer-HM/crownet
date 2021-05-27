@@ -19,7 +19,7 @@
 
 #include "inet/common/InitStages.h"
 #include "crownet/applications/aid/BaseDensityMapApp.h"
-#include "crownet/applications/common/AidBaseApp.h"
+#include "crownet/applications/common/BaseApp.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/util/FileWriter.h"

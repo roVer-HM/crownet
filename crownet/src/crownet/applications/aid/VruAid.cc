@@ -30,14 +30,14 @@ VruAid::~VruAid() {
 }
 
 void VruAid::initialize(int stage) {
-  AidBaseApp::initialize(stage);
+  BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
     mobilityModule = check_and_cast<IPositionHistoryProvider*>(
         getParentModule()->getSubmodule("mobility"));
   }
 }
 
-BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
+FsmState VruAid::fsmAppMain(cMessage* msg) {
   const auto& vam = createPacket<ItsVam>(B(par("messageLength")));  // todo calc?
   vam->setGenerationDeltaTime(simTime());
   // VAM Header
@@ -71,9 +71,10 @@ BaseApp::FsmState VruAid::fsmAppMain(cMessage* msg) {
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-BaseApp::FsmState VruAid::handleSocketDataArrived(Packet *packet){
+FsmState VruAid::handleDataArrived(Packet *packet){
     // todo: implement handle packet
     // ...
+
     return FsmRootStates::WAIT_ACTIVE;
 }
 
@@ -81,15 +82,5 @@ Coord VruAid::getCurrentLocation() {
   return mobilityModule->getCurrentPosition();
 }
 
-void VruAid::setAppRequirements() {
-  L3Address destAddr = chooseDestAddr();
-  socket.setAppRequirements(par("minRate").doubleValue(),
-                            par("maxRate").doubleValue(),
-                            AidRecipientClass::ALL_LOCAL, destAddr, destPort);
-}
-
-void VruAid::setAppCapabilities() {
-  // todo: no CAP right now.
-}
 
 }  // namespace crownet

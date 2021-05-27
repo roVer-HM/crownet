@@ -25,14 +25,14 @@ VruUdp::VruUdp() {}
 VruUdp::~VruUdp() {}
 
 void VruUdp::initialize(int stage) {
-  UdpBaseApp::initialize(stage);
+  BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
     mobilityModule = check_and_cast<MobilityBase*>(
         getParentModule()->getSubmodule("mobility"));
   }
 }
 
-BaseApp::FsmState VruUdp::fsmAppMain(cMessage* msg) {
+FsmState VruUdp::fsmAppMain(cMessage* msg) {
   const auto& payload = makeShared<ApplicationPacket>();
   payload->setSequenceNumber(numSent);
   payload->setChunkLength(B(par("messageLength")));
@@ -41,6 +41,10 @@ BaseApp::FsmState VruUdp::fsmAppMain(cMessage* msg) {
   sendPayload(payload);
   scheduleNextAppMainEvent();
   return FsmRootStates::WAIT_ACTIVE;
+}
+
+FsmState VruUdp::handleDataArrived(Packet *packet){
+    return FsmRootStates::WAIT_ACTIVE;
 }
 
 Coord VruUdp::getCurrentLocation() {

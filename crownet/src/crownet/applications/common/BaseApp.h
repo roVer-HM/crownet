@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "crownet/common/result/Simsignals.h"
+#include "crownet/applications/common/AppFsm.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -40,7 +41,7 @@ using namespace inet;
 
 namespace crownet {
 
-class BaseApp : public ApplicationBase {
+class BaseApp : public ApplicationBase, public DataArrivedHandler {
  public:
   BaseApp(){};
   virtual ~BaseApp();
@@ -51,10 +52,6 @@ class BaseApp : public ApplicationBase {
   simtime_t startTime;
   simtime_t stopTime;
 
-  int localPort = -1;
-  int destPort = -1;
-  std::vector<L3Address> destAddresses;
-  std::vector<std::string> destAddressStr;
   const char *packetName = nullptr;
   bool dontFragment = false;
 
@@ -66,22 +63,9 @@ class BaseApp : public ApplicationBase {
   int numSent = 0;
   int numReceived = 0;
 
-  // Root Finite State Machine setup omnetpp::cFSM fsm;
-  enum FsmRootStates {
-    INIT = 0,
-    WAIT_ACTIVE = FSM_Steady(1),
-    WAIT_INACTIVE = FSM_Steady(2),
-    ERR = FSM_Steady(3),
-    SETUP = FSM_Transient(101),  // socket and stopTime
-    APP_MAIN = FSM_Transient(
-        102),  // send data with Interval or more elaborate functions
-    TEARDOWN = FSM_Transient(110),
-    DESTROY = FSM_Transient(120),
-    SUBSTATE = 200  // sub states must be outside of +-200
-  };
-  using FsmState = int;  // state for each FSM.
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
+  SocketHandler* socketHandler;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -97,9 +81,6 @@ class BaseApp : public ApplicationBase {
   virtual void scheduleNextAppMainEvent(simtime_t time = -1);
   virtual void cancelAppMainEvent();
   virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
-  virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload,
-                           L3Address destAddr, int destPort);
-  virtual L3Address chooseDestAddr();
 
   template <typename T>
   IntrusivePtr<T> createPacket(b length = b(-1));
@@ -112,7 +93,7 @@ class BaseApp : public ApplicationBase {
   virtual void setFsmResult(const FsmState &state);
 
   // handle extra self Messages
-  virtual FsmState fsmHandleSelfMsg(cMessage *msg) = 0;
+  virtual FsmState fsmHandleSelfMsg(cMessage *msg);
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
   virtual FsmState fsmAppMain(cMessage *msg) = 0;
@@ -120,11 +101,6 @@ class BaseApp : public ApplicationBase {
   virtual FsmState fsmDestroy(cMessage *msg);
 
   virtual void setupTimers();  // called in fsmSetup
-
-  // socket actions.
-  virtual void initSocket() = 0;
-  virtual ISocket &getSocket() = 0;
-  virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
 
   // Lifecycle management
   virtual void handleStartOperation(

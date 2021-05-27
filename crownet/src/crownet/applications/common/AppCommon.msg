@@ -23,3 +23,8 @@ class CurrentLocationTag extends inet::TagBase
 {
     inet::Coord location;
 }
+
+class AppGate extends inet::TagBase
+{
+ 	string gate;   
+}

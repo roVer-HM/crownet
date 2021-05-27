@@ -17,7 +17,7 @@ BeaconSimple::BeaconSimple() {}
 
 // cSimpleModule
 void BeaconSimple::initialize(int stage) {
-    AidBaseApp::initialize(stage);
+    BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
         mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
@@ -28,7 +28,7 @@ void BeaconSimple::initialize(int stage) {
 
 // FSM
 void BeaconSimple::setupTimers() {
-    if (destAddresses.empty()) {
+    if (socketHandler->hasDestAddress()) {
       cRuntimeError("No address set.");
     } else {
       // schedule at startTime or current time, whatever is bigger.
@@ -36,7 +36,7 @@ void BeaconSimple::setupTimers() {
     }
 }
 
-BaseApp::FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
+FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
 
     const auto &beacon = createPacket<BeaconPacket>(B(224)); //64+64+64+32
     beacon->setTime(simTime());
@@ -48,17 +48,7 @@ BaseApp::FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
     return FsmRootStates::WAIT_ACTIVE;
 }
 
-
-void BeaconSimple::setAppRequirements(){
-    L3Address destAddr = chooseDestAddr();
-    socket.setAppRequirements(1.0, 2.0, AidRecipientClass::ALL_LOCAL, destAddr,
-                              destPort);
-}
-void BeaconSimple::setAppCapabilities(){
-    // todo: no CAP right now.
-}
-
-BaseApp::FsmState BeaconSimple::handleSocketDataArrived(Packet *packet){
+FsmState BeaconSimple::handleDataArrived(Packet *packet){
     auto p = checkEmitGetReceived<BeaconPacket>(packet);
 
     NeighborhoodTableEntry b{p->getNodeId(), p->getTime(), simTime(), p->getPos(), p->getEpsilon()};

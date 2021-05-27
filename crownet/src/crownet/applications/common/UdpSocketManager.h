@@ -3,40 +3,43 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
+// 
+
 
 #pragma once
 
-#include "../../mobility/IPositionHistoryProvider.h"
-#include "inet/mobility/base/MobilityBase.h"
-#include "crownet/applications/common/BaseApp.h"
-#include "crownet/common/ItsPdu_m.h"
+#include "inet/transportlayer/contract/udp/UdpSocket.h"
+#include "crownet/applications/common/BaseSocketManager.h"
+using namespace inet;
 
 namespace crownet {
 
-class VruAid : public BaseApp {
- public:
-  VruAid();
-  virtual ~VruAid();
+class UdpSocketManager : public BaseSocketManager, public UdpSocket::ICallback{
+public:
+    UdpSocketManager();
+    virtual ~UdpSocketManager();
 
- protected:
-  IPositionHistoryProvider* mobilityModule = nullptr;
+protected:
+ UdpSocket socket;
 
- protected:
-  virtual void initialize(int stage) override;
-  virtual FsmState fsmAppMain(cMessage* msg) override;
-  virtual Coord getCurrentLocation();
+protected:
+ virtual void initSocket() override;
+ virtual ISocket &getSocket() override;
 
-  virtual FsmState handleDataArrived(Packet *packet) override;
+ // UdpSocket::ICallback
+ virtual void socketDataArrived(UdpSocket *socket, Packet *packet) override;
+ virtual void socketErrorArrived(UdpSocket *socket,
+                                 Indication *indication) override;
+ virtual void socketClosed(UdpSocket *socket) override;
 
-  // VAM
 };
-}  // namespace crownet
+}
+

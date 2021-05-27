@@ -16,7 +16,6 @@
 package crownet.applications.udpapp.detour;
 
 import inet.applications.contract.IApp;
-import crownet.applications.common.UdpBaseApp;
 
 simple UdpDetourApp like IApp
 {

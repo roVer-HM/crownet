@@ -14,7 +14,7 @@
 // 
 
 package crownet.applications.aid;
-import crownet.applications.common.AidBaseApp;
+import crownet.applications.common.BaseApp;
 import inet.applications.contract.IApp;
 
 
@@ -22,7 +22,7 @@ moduleinterface IBeaconApp extends IApp {
     parameters:
 }
 
-simple BeaconSimple extends AidBaseApp like IBeaconApp {
+simple BeaconSimple extends BaseApp like IBeaconApp {
     
     parameters:
         @class(crownet::BeaconSimple);       
@@ -32,11 +32,11 @@ simple BeaconSimple extends AidBaseApp like IBeaconApp {
         appMainIntervalJitter = default(0s);
         
         // Aid app fix defaults
-        destPort = 30002;
-        localPort = 30002;
+//        destPort = 30002;
+//        localPort = 30002;
         
         // App logic
         string mobilityModule;
         string neighborhoodTableMobdule;
-        
 }
+

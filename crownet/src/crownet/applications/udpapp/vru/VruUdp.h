@@ -16,14 +16,16 @@
 #pragma once
 
 #include "inet/mobility/base/MobilityBase.h"
-#include "crownet/applications/common/UdpBaseApp.h"
+#include "crownet/applications/common/BaseApp.h"
 
 namespace crownet {
 
-class VruUdp : public UdpBaseApp {
+class VruUdp : public BaseApp {
  public:
   VruUdp();
   virtual ~VruUdp();
+
+  virtual FsmState handleDataArrived(Packet *packet) override;
 
  protected:
   MobilityBase *mobilityModule = nullptr;
