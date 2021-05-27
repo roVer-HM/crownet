@@ -64,8 +64,12 @@ RUN --mount=type=ssh git \
         clone -n ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git --depth 1 && \
     cd veins && \
     git checkout $VEINS_RELEASE sumo-launchd.py && \
+    git checkout $VEINS_RELEASE bin/ && \
     chmod 555 sumo-launchd.py && \
     rm -rf .git
+
+# Setup SUMO_HOME
+ENV SUMO_HOME /opt/sumo/sumo
 
 # default init script (triggered at container start)
 COPY init.sh /init.sh

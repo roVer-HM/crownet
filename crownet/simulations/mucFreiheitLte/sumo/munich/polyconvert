@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+OSM_FILE="munich_clean.osm"
+OUT="munich.net.xml"
+OUT_POLY="munich.poly.xml"
+
+
+polyconvert --net-file $OUT --ignore-errors --verbose --osm-files $OSM_FILE  --type-file osmPolyconvert.typ.xml -o $OUT_POLY
+
