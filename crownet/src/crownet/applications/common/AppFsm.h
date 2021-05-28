@@ -19,6 +19,7 @@ enum FsmRootStates {
   SETUP = FSM_Transient(101),  // socket and stopTime
   APP_MAIN = FSM_Transient(
       102),  // send data with Interval or more elaborate functions
+  DATA_IN = FSM_Transient(103),
   TEARDOWN = FSM_Transient(110),
   DESTROY = FSM_Transient(120),
   SUBSTATE = 200  // sub states must be outside of +-200

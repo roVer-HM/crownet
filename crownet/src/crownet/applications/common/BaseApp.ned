@@ -22,23 +22,40 @@ simple BaseApp like IApp
   parameters:
         @class(crownet::BaseApp);
         @display("i=block/app");
+        ///* socket module (should be a sibling model)
+        string socketModule = default("^.socket");
+        
         // Application runtime settings
-        double startTime @unit(s) = default(0.0s); // start first packet, afterwarts time + sendIntervall. Negative values raises cRuntimeError.
-        double stopTime @unit(s) = default(0.0s); // time of finishing sending, 0.0s means forever
-        volatile double appMainInterval @unit(s) = default(-1s); // intervall to enter fsmAppMain to process app logic.
-        										  // if set to -1 fsmAppMain will not be used and user must provide own
-        										  // handling. fsmAppMain does nothing on default.
-        volatile double appMainIntervalJitter @unit(s) = default(0s); // 
+        ///* Start time of application at which message will be received. 
+        ///* Negative values raises cRuntimeError.
+        double startTime @unit(s) = default(0.0s);
+        ///* Time after which no packet will be send or received.
+        ///* stopTime = 0.0s means app will run forever
+        double stopTime @unit(s) = default(0.0s); 
+        
+        // Application send frequency (+ jitter)
+        ///* Additional offset from startTime before app will start sending data.
+        ///* The app will receive message form startTime. Negative values raises cRuntimeError.
+        double appMainIntervalOffset @unit(s) = default(0s); 
+        // TODO use Hertz as unit ############################################################
+        ///* Intervall to enter fsmAppMain to process app logic (sending data). If 
+        ///* set to -1 fsmAppMain() will not be used and user must provide own 
+        ///* handling. fsmAppMain() does nothing on default.
+        volatile double appMainInterval @unit(s) = default(-1s); 
+        ///* TODO use Hertz as unit ############################################################
+        ///* Additional jitter added to appMainInterval on each scheduling 
+        volatile double appMainIntervalJitter @unit(s) = default(0s); 
+        ///* Application messageLength. If set to 0 app implementation must the 
+        ///* message length programmatically
         volatile int messageLength @unit(B);
         string packetName = default("BasicAppData");
-        // IP Setting
+        ///* TODO move to socket ############################################################
         bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing
+       
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
-        // socket module (should be a sibling model)
-        string socketModule = default("^.socket");
-        // signals
+
         @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=inet::Packet);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);

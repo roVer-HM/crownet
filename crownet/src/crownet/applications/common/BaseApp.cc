@@ -132,6 +132,7 @@ void BaseApp::handleCrashOperation(LifecycleOperation *operation) {
  */
 void BaseApp::handleMessageWhenUp(cMessage *msg) {
   socketFsmResult = FsmRootStates::ERR;
+  // fsmRoot == current state
   FSM_Switch(fsmRoot) {
     // Init state ...
     case FSM_Exit(FsmRootStates::INIT):
@@ -149,12 +150,7 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
           FSM_Goto(fsmRoot, msg->getKind());
         }
       } else if (msg->arrivedOn("socketIn")) {
-          numReceived++;
-          Packet* pk = check_and_cast<Packet *>(msg);
-          emit(packetReceivedSignal, pk);
-          socketFsmResult = handleDataArrived(pk);
-          delete pk;
-          FSM_Goto(fsmRoot, socketFsmResult);
+          FSM_Goto(fsmRoot, fsmDataArrived(msg));
       } else {
           throw cRuntimeError("Unkonwn Packet");
       }
@@ -202,6 +198,7 @@ FsmState BaseApp::fsmHandleSelfMsg(cMessage *msg) {
 FsmState BaseApp::fsmSetup(cMessage *msg) {
   socketProvider->setupSocket();
 
+  // todo check msg == appLifeTime (may lead to reschedule without)
   if (stopTime > SIMTIME_ZERO) {
     appLifeTime->setKind(FsmRootStates::TEARDOWN);
     scheduleAt(stopTime, appLifeTime);
@@ -209,6 +206,15 @@ FsmState BaseApp::fsmSetup(cMessage *msg) {
 
   setupTimers();
   return FsmRootStates::WAIT_ACTIVE;
+}
+
+FsmState BaseApp::fsmDataArrived(cMessage *msg){
+    numReceived++;
+    Packet* pk = check_and_cast<Packet *>(msg);
+    emit(packetReceivedSignal, pk);
+    FsmState next = handleDataArrived(pk);
+    delete pk;
+    return next;
 }
 
 FsmState BaseApp::fsmAppMain(cMessage *msg) {

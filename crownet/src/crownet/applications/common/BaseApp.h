@@ -96,9 +96,11 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   virtual FsmState fsmHandleSelfMsg(cMessage *msg);
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
+  virtual FsmState fsmDataArrived(cMessage *msg);
   virtual FsmState fsmAppMain(cMessage *msg) = 0;
   virtual FsmState fsmTeardown(cMessage *msg);
   virtual FsmState fsmDestroy(cMessage *msg);
+
 
   virtual void setupTimers();  // called in fsmSetup
 

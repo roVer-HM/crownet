@@ -11,26 +11,18 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
+// 
 
-import inet.common.INETDefs;
-import inet.common.packet.chunk.Chunk;
-import inet.applications.base.ApplicationPacket;
-import inet.common.geometry.Geometry;
-import inet.common.TagBase;
+package crownet.applications.common;
 
-class CurrentLocationTag extends inet::TagBase
+
+simple BaseBroadcast extends BaseApp 
 {
-    inet::Coord location;
-}
-
-
-class HopCount extends inet::TagBase
-{
- 	int hops;   
-}
-
-class AppGate extends inet::TagBase
-{
- 	string gate;   
+parameters:
+    @class(crownet::BaseBroadcast);
+    @display("i=block/app");
+    
+    int hopCount = default(0); // number of re broadcast hops
+     
+    
 }
