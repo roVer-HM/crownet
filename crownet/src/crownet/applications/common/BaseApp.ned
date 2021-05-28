@@ -30,17 +30,14 @@ simple BaseApp like IApp
         										  // handling. fsmAppMain does nothing on default.
         volatile double appMainIntervalJitter @unit(s) = default(0s); // 
         volatile int messageLength @unit(B);
-        // Base addressing paramters
-        string localAddress = default("");
-        int localPort = default(-1);  // local port (-1: use ephemeral port)
-        string destAddresses = default("224.0.0.1"); // ALL_HOST_MCAST (automatically joined)
-        int destPort; //
         string packetName = default("BasicAppData");
         // IP Setting
         bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
+        // socket module (should be a sibling model)
+        string socketModule = default("^.socket");
         // signals
         @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=inet::Packet);

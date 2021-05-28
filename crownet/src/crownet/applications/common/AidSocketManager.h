@@ -34,7 +34,7 @@ protected:
 
 public:
  virtual void initSocket() override;
- virtual ISocket &getSocket() override;
+
 
 protected:
  virtual void setAppRequirements();
@@ -47,6 +47,9 @@ protected:
  virtual void socketClosed(AidSocket *socket) override;
  virtual void socketStatusArrived(AidSocket *socket,
                                   Indication *indication) override;
+
+ // Socket
+ virtual ISocket &getSocket() override;
 
 };
 }

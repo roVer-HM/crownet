@@ -15,6 +15,7 @@
 
 package crownet.aid;
 import crownet.aid.IAid;
+import crownet.applications.common.CrownetApp;
 import crownet.applications.aid.IDensityMapApp;
 import crownet.applications.aid.IBeaconApp;
 import inet.common.MessageDispatcher;
@@ -32,6 +33,14 @@ module SimpleAidLayer like IAidLayer
 {
     parameters:
         @display("i=block/app");
+	    densityMap.app.typename = default("DensityMapAppSimple");
+		densityMap.socket.typename = "AidSocketManager";
+		densityMap.socket.destPort = 30001;
+		densityMap.socket.localPort = 30001;
+        beacon.app.typename = default("BeaconSimple");
+        beacon.socket.typename = "AidSocketManager";
+        beacon.socket.destPort = 30002;
+        beacon.socket.localPort = 30002;
 
     gates:
         input upperIn;
@@ -44,12 +53,16 @@ module SimpleAidLayer like IAidLayer
             parameters:
                 @display("p=218,121;is=s");
         }
-        densityMapApp: <default("ArteryDensityMapApp")> like IDensityMapApp if typename!="" {
-            @display("p=413,121;i=block/users;is=s");
+        // todo: Repalce with CrownetApp/AidSocketManager
+        densityMap: CrownetApp if typename!="" {
+            parameters:
+	            @display("p=413,121;i=block/users;is=s");
         }
-
-        beaconApp: <default("BeaconSimple")> like IBeaconApp if typename!="" {
-            @display("p=532,121;i=block/broadcast;is=s");
+		
+		// todo: Repalce with CrownetApp/AidSocketManager
+        beacon: CrownetApp if typename!="" {
+            parameters:
+	            @display("p=532,121;i=block/broadcast;is=s");
         }
 
         // Message Dispatcher
@@ -57,6 +70,7 @@ module SimpleAidLayer like IAidLayer
             parameters:
                 @display("p=351,49;b=600,5");
         }
+        
         lower: MessageDispatcher {
             parameters:
                 @display("p=351,186;b=600,5");
@@ -74,10 +88,9 @@ module SimpleAidLayer like IAidLayer
         aid.lowerOut --> lower.in++;
         aid.lowerIn <-- lower.out++;
 
-        densityMapApp.socketIn <-- upper.out++ if  exists(densityMapApp);
-        densityMapApp.socketOut --> upper.in++ if exists(densityMapApp);
+        densityMap.socketIn <-- upper.out++ if  exists(densityMap);
+        densityMap.socketOut --> upper.in++ if exists(densityMap);
 
-        beaconApp.socketIn <-- upper.out++ if exists(beaconApp);
-        beaconApp.socketOut --> upper.in++ if exists(beaconApp);
-
+        beacon.socketIn <-- upper.out++ if exists(beacon);
+        beacon.socketOut --> upper.in++ if exists(beacon);
 }

@@ -16,6 +16,7 @@
 #include "VruAid.h"
 #include "crownet/aid/AidCommand_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
+#include "inet/common/ModuleAccess.h"
 
 namespace crownet {
 
@@ -32,8 +33,7 @@ VruAid::~VruAid() {
 void VruAid::initialize(int stage) {
   BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
-    mobilityModule = check_and_cast<IPositionHistoryProvider*>(
-        getParentModule()->getSubmodule("mobility"));
+    mobilityModule = inet::getModuleFromPar<IPositionHistoryProvider>(par("mobilityModule"), this);
   }
 }
 

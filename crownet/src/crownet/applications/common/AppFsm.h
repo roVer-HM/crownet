@@ -31,15 +31,18 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) = 0;
 };
 
-class SocketHandler {
+class SocketProvider{
 public:
-    virtual ~SocketHandler() = default;
-    virtual void setupSocket();
-    virtual ISocket &getSocket() = 0;
-    virtual void sendTo(Packet *pk) =0;
+    virtual ~SocketProvider() = default;
+    virtual void setupSocket() = 0;
     virtual int getLocalPort() = 0;
     virtual int getDestPort() = 0;
-    virtual bool hasDestAddress() const;
+    virtual bool hasDestAddress() = 0;
+    virtual int getSocketId() = 0;
+    virtual bool belongsToSocket(cMessage *msg) = 0;
+    virtual void close() = 0;
+    virtual void destroy() = 0;
+    virtual bool isOpen() = 0;
 };
 
 }

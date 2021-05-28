@@ -20,6 +20,8 @@ moduleinterface ISocketManager
 {
     parameters:
          @display("i=block/app");
+         int localPort;
+         int destPort;
     gates:
         input fromApp;
         output toApp;

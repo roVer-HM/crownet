@@ -31,6 +31,8 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         // Aid app override defaults
         packetName = default("DcDMap");
         appMainInterval = default(1.0s);
+        messageLength = default(1kB);
+        
 
 	    // Aid app fix defaults
 //        destPort = 30001;

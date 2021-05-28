@@ -65,7 +65,7 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
 
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
-  SocketHandler* socketHandler;
+  SocketProvider* socketProvider;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }

@@ -30,10 +30,7 @@ simple BeaconSimple extends BaseApp like IBeaconApp {
         packetName = default("BeaconSimple");
         appMainInterval = default(1.0s);
         appMainIntervalJitter = default(0s);
-        
-        // Aid app fix defaults
-//        destPort = 30002;
-//        localPort = 30002;
+		messageLength = default(300B);
         
         // App logic
         string mobilityModule;

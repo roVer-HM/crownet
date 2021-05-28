@@ -76,7 +76,6 @@ ISocket &UdpSocketManager::getSocket() { return socket; }
 
 // UdpSocket::ICallback
 void UdpSocketManager::socketDataArrived(UdpSocket *socket, Packet *packet) {
-  emit(packetReceivedSignal, packet);
   send(packet, gate("toApp"));
 }
 

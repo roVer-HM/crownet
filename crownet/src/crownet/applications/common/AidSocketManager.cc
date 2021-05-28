@@ -60,12 +60,13 @@ void AidSocketManager::setAppCapabilities(){
     // todo: no CAP right now.
 }
 
-ISocket &AidSocketManager::getSocket() { return socket; }
+ISocket &AidSocketManager::getSocket() {
+    return socket;
+}
 
 
 // AidSocket::ICallback
 void AidSocketManager::socketDataArrived(AidSocket *socket, Packet *packet) {
-  emit(packetReceivedSignal, packet);
   send(packet, gate("toApp"));
 }
 

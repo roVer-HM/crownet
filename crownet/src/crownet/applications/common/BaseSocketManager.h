@@ -32,17 +32,25 @@ namespace crownet {
 #ifndef CROWNET_APPLICATIONS_COMMON_BASESOCKETMANAGER_H_
 #define CROWNET_APPLICATIONS_COMMON_BASESOCKETMANAGER_H_
 
-class BaseSocketManager: public OperationalBase, public SocketHandler {
+class BaseSocketManager: public OperationalBase, public SocketProvider {
 public:
   BaseSocketManager();
   virtual ~BaseSocketManager();
   virtual void initialize(int stage) override;
 
+  virtual void sendTo(Packet *pk);
+
   virtual void setupSocket() override;
-  virtual void sendTo(Packet *pk) override;
   virtual int getLocalPort() override {return localPort;}
   virtual int getDestPort() override {return destPort;}
-  virtual bool hasDestAddress() const override {return destAddresses.empty();}
+  virtual bool hasDestAddress() override {return destAddresses.empty();}
+
+  //socket api
+  virtual int getSocketId() override;
+  virtual bool belongsToSocket(cMessage *msg) override;
+  virtual void close() override;
+  virtual void destroy() override;
+  virtual bool isOpen() override;
 
 protected:
   virtual bool isInitializeStage(int stage) override { return stage == INITSTAGE_TRANSPORT_LAYER; }
@@ -53,6 +61,7 @@ protected:
   L3Address chooseDestAddr();
 
   virtual void initSocket() = 0;
+  virtual ISocket& getSocket() = 0;
 
   // Lifecycle management
   virtual void handleStartOperation(

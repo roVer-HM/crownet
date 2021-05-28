@@ -42,7 +42,7 @@ void BaseApp::initialize(int stage) {
     appLifeTime = new cMessage("applicationTimer");
     appMainTimer = new cMessage("sendTimer");
 
-    socketHandler = inet::findModuleFromPar<SocketHandler>(par("socketModule"), this);
+    socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
   }
 }
 
@@ -94,7 +94,7 @@ void BaseApp::sendPayload(IntrusivePtr<const ApplicationPacket> payload) {
     packet->insertAtBack(payload);
     emit(packetSentSignal, packet);
     numSent++;
-    send(packet, gate("toSocket"));
+    send(packet, gate("socketOut"));
 }
 
 
@@ -152,7 +152,7 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
           numReceived++;
           Packet* pk = check_and_cast<Packet *>(msg);
           emit(packetReceivedSignal, pk);
-          FsmState s = handleDataArrived(pk);
+          socketFsmResult = handleDataArrived(pk);
           delete pk;
           FSM_Goto(fsmRoot, socketFsmResult);
       } else {
@@ -184,7 +184,7 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
 }
 
 void BaseApp::setupTimers() {
-  if (socketHandler->hasDestAddress()) {
+  if (socketProvider->hasDestAddress()) {
     EV_WARN << "no destination address found. Module will not send packets"
             << endl;
   } else {
@@ -200,7 +200,7 @@ FsmState BaseApp::fsmHandleSelfMsg(cMessage *msg) {
 }
 
 FsmState BaseApp::fsmSetup(cMessage *msg) {
-  socketHandler->setupSocket();
+  socketProvider->setupSocket();
 
   if (stopTime > SIMTIME_ZERO) {
     appLifeTime->setKind(FsmRootStates::TEARDOWN);
@@ -218,7 +218,7 @@ FsmState BaseApp::fsmAppMain(cMessage *msg) {
 }
 
 FsmState BaseApp::fsmTeardown(cMessage *msg) {
-    socketHandler->getSocket().close();
+    socketProvider->close();
 //  delayActiveOperationFinish(par("stopOperationTimeout"));    // todo: correctly  implement ILifecycle ...
   cancelAndDelete(appLifeTime);
   appLifeTime = nullptr;
@@ -229,7 +229,7 @@ FsmState BaseApp::fsmTeardown(cMessage *msg) {
 }
 
 FsmState BaseApp::fsmDestroy(cMessage *msg) {
-    socketHandler->getSocket().destroy();
+    socketProvider->destroy();
   // TODO  in real operating systems, program crash detected
   // by OS and OS closes sockets of crashed programs.
   cancelAndDelete(appLifeTime);

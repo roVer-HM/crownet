@@ -42,6 +42,7 @@ void BaseSocketManager::initialize(int stage) {
 }
 
 void BaseSocketManager::setupSocket(){
+    Enter_Method_Silent();
     const char *destAddrs = par("destAddresses");
     cStringTokenizer tokenizer(destAddrs);
     const char *token;
@@ -106,6 +107,29 @@ void BaseSocketManager::handleStopOperation(LifecycleOperation *operation) {
 void BaseSocketManager::handleCrashOperation(LifecycleOperation *operation) {
     // todo: check nothing to do
 }
+
+//socket api
+int BaseSocketManager::getSocketId() {
+    Enter_Method_Silent();
+    return getSocket().getSocketId();
+}
+bool BaseSocketManager::belongsToSocket(cMessage *msg) {
+    Enter_Method_Silent();
+    return getSocket().belongsToSocket(msg);
+}
+void BaseSocketManager::close() {
+    Enter_Method_Silent();
+    getSocket().close();
+}
+void BaseSocketManager::destroy() {
+    Enter_Method_Silent();
+    getSocket().destroy();
+}
+bool BaseSocketManager::isOpen() {
+    Enter_Method_Silent();
+    return getSocket().isOpen();
+}
+
 
 }
 

@@ -28,7 +28,7 @@ void BeaconSimple::initialize(int stage) {
 
 // FSM
 void BeaconSimple::setupTimers() {
-    if (socketHandler->hasDestAddress()) {
+    if (socketProvider->hasDestAddress()) {
       cRuntimeError("No address set.");
     } else {
       // schedule at startTime or current time, whatever is bigger.

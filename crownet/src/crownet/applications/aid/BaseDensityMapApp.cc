@@ -70,7 +70,7 @@ FsmState BaseDensityMapApp::handleDataArrived(Packet *packet){
 
 // FSM
 void BaseDensityMapApp::setupTimers() {
-  if (socketHandler->hasDestAddress()) {
+  if (socketProvider->hasDestAddress()) {
     cRuntimeError("No address set.");
   } else {
     // schedule at startTime or current time, whatever is bigger.

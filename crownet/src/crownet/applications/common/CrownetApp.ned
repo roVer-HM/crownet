@@ -23,8 +23,6 @@ import crownet.applications.common.ISocketManager;
 module CrownetApp like IApp
 {
     parameters:
-
-
         @display("bgb=500,225");
     gates:
         output socketOut;
@@ -35,19 +33,26 @@ module CrownetApp like IApp
             @display("p=95,115,row,140");
         }
 
-        socketMgr: <> like ISocketManager {
+        socket: <> like ISocketManager {
             @display("p=255,115");
         }
 
-
     connections:
+        app.socketOut --> socket.fromApp;
+        app.socketIn <-- socket.toApp;
 
-        app.socketOut --> socketMgr.fromApp;
-        app.socketIn <-- socketMgr.toApp;
-
-        socketMgr.toStack --> socketOut;
-        socketMgr.fromStack <-- socketIn;
+        socket.toStack --> socketOut;
+        socket.fromStack <-- socketIn;
 }
 
+module CrownetUdpApp extends CrownetApp {
+    parameters:
+        socket.typename = default("UdpSocketManager");   
+}
+
+module CrownetAidApp extends CrownetApp {
+    parameters:
+        socket.typename = default("AidSocketManager");   
+}
 
 
