@@ -5,8 +5,8 @@
  *      Author: sts
  */
 
-#include "BeaconSimple.h"
-#include "crownet/applications/Beacon_m.h"
+#include "crownet/applications/beacon/BeaconSimple.h"
+#include "crownet/applications/beacon/Beacon_m.h"
 #include "inet/common/ModuleAccess.h"
 
 namespace crownet {

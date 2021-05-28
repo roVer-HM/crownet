@@ -13,13 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "BaseDensityMapApp.h"
+#include "crownet/applications/dmap/BaseDensityMapApp.h"
 
 #include <omnetpp/cwatch.h>
 #include <omnetpp/cstlwatch.h>
 
 #include "crownet/common/GlobalDensityMap.h"
-#include "crownet/applications/PositionMapPacket_m.h"
+#include "crownet/applications/beacon/PositionMapPacket_m.h"
 #include "crownet/common/GlobalDensityMap.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"

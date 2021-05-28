@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package crownet.applications.udpapp.detour;
+package crownet.applications.detour;
 
 import inet.applications.contract.IApp;
 

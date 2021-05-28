@@ -16,7 +16,7 @@
 #pragma once
 
 #include "inet/mobility/contract/IMobility.h"
-#include "crownet/applications/aid/BaseDensityMapApp.h"
+#include "crownet/applications/dmap/BaseDensityMapApp.h"
 #include "crownet/common/NeighborhoodTable.h"
 
 using namespace omnetpp;

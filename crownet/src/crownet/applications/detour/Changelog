@@ -1,0 +1,4 @@
+# 20201-05-28
+
+* move DetourApp to applications/detour 
+* TODO: use CrownetApp to seperate socket and app logic

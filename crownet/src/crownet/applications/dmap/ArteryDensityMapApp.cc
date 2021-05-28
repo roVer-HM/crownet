@@ -5,7 +5,7 @@
  *      Author: sts
  */
 
-#include "crownet/applications/aid/ArteryDensityMapApp.h"
+#include "crownet/applications/dmap/ArteryDensityMapApp.h"
 
 #include <inet/common/ModuleAccess.h>
 #include <memory>

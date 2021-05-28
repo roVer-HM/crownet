@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package crownet.applications.aid;
+package crownet.applications.dmap;
 import crownet.applications.common.BaseApp;
 import inet.applications.contract.IApp;
 
@@ -32,11 +32,6 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         packetName = default("DcDMap");
         appMainInterval = default(1.0s);
         messageLength = default(1kB);
-        
-
-	    // Aid app fix defaults
-//        destPort = 30001;
-//        localPort = 30001;         
         
         // App logic
         string coordConverterModule;
@@ -67,6 +62,3 @@ simple DensityMapAppSimple  extends BaseDensityMapApp  {
          string neighborhoodTableMobdule;
 }
 
-//simple SimpleNeighbourhood like INeighbourhood {
-//
-//}

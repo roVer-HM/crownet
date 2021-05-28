@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.applications.aid;
+package crownet.applications.beacon;
 import crownet.applications.common.BaseApp;
 import inet.applications.contract.IApp;
 

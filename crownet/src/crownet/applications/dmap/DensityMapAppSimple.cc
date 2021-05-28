@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "DensityMapAppSimple.h"
+#include "crownet/applications/dmap/DensityMapAppSimple.h"
 
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 

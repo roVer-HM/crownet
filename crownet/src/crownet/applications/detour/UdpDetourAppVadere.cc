@@ -5,7 +5,7 @@
  *      Author: sts
  */
 
-#include "crownet/applications/udpapp/detour/UdpDetourAppVadere.h"
+#include "crownet/applications/detour/UdpDetourAppVadere.h"
 #include <artery/traci/ControllableObject.h>
 
 #include "inet/common/ModuleAccess.h"
@@ -19,7 +19,7 @@
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
-#include "crownet/applications/udpapp/detour/DetourAppPacket_m.h"
+#include "crownet/applications/detour/DetourAppPacket_m.h"
 
 using namespace inet;
 using omnetpp::cStringTokenizer;

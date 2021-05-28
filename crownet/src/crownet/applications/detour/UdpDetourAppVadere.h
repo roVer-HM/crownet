@@ -15,8 +15,8 @@
 #include "inet/common/geometry/common/Coord.h"
 #include "inet/mobility/base/MobilityBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
-#include "crownet/applications/udpapp/detour/DetourAppPacket_m.h"
-#include "crownet/applications/udpapp/detour/UdpDetourApp.h"
+#include "crownet/applications/detour/DetourAppPacket_m.h"
+#include "crownet/applications/detour/UdpDetourApp.h"
 
 #include "crownet/artery/traci/VaderePersonController.h"
 using namespace inet;

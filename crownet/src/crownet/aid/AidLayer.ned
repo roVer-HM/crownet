@@ -16,8 +16,8 @@
 package crownet.aid;
 import crownet.aid.IAid;
 import crownet.applications.common.CrownetApp;
-import crownet.applications.aid.IDensityMapApp;
-import crownet.applications.aid.IBeaconApp;
+import crownet.applications.dmap.IDensityMapApp;
+import crownet.applications.beacon.IBeaconApp;
 import inet.common.MessageDispatcher;
 
 moduleinterface IAidLayer

@@ -5,7 +5,7 @@
  *      Author: sts
  */
 
-#include "crownet/applications/udpapp/detour/UdpDetourApp.h"
+#include "crownet/applications/detour/UdpDetourApp.h"
 
 #include "crownet/common/result/Simsignals.h"
 #include "inet/common/ModuleAccess.h"
@@ -19,7 +19,7 @@
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
-#include "crownet/applications/udpapp/detour/DetourAppPacket_m.h"
+#include "crownet/applications/detour/DetourAppPacket_m.h"
 
 using namespace inet;
 using omnetpp::cStringTokenizer;
@@ -213,6 +213,7 @@ void UdpDetourApp::handleCrashOperation(LifecycleOperation *operation) {
 
 void UdpDetourApp::socketDataArrived(UdpSocket *socket, Packet *packet) {
   emit(packetReceivedSignal, packet);
+  numReceived++;
   IntrusivePtr<const DetourAppPacket> pkt =
       packet->popAtFront<DetourAppPacket>();
 
