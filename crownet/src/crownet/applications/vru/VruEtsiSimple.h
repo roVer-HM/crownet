@@ -22,10 +22,10 @@
 
 namespace crownet {
 
-class VruAid : public BaseApp {
+class VruEtsiSimple : public BaseApp {
  public:
-  VruAid();
-  virtual ~VruAid();
+  VruEtsiSimple();
+  virtual ~VruEtsiSimple();
 
  protected:
   IPositionHistoryProvider* mobilityModule = nullptr;

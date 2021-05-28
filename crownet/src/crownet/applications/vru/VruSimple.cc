@@ -13,18 +13,19 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "VruUdp.h"
+#include "VruSimple.h"
+
 #include "crownet/applications/common/AppCommon_m.h"
 
 namespace crownet {
 
-Define_Module(VruUdp);
+Define_Module(VruSimple);
 
-VruUdp::VruUdp() {}
+VruSimple::VruSimple() {}
 
-VruUdp::~VruUdp() {}
+VruSimple::~VruSimple() {}
 
-void VruUdp::initialize(int stage) {
+void VruSimple::initialize(int stage) {
   BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
     mobilityModule = check_and_cast<MobilityBase*>(
@@ -32,7 +33,7 @@ void VruUdp::initialize(int stage) {
   }
 }
 
-FsmState VruUdp::fsmAppMain(cMessage* msg) {
+FsmState VruSimple::fsmAppMain(cMessage* msg) {
   const auto& payload = makeShared<ApplicationPacket>();
   payload->setSequenceNumber(numSent);
   payload->setChunkLength(B(par("messageLength")));
@@ -43,11 +44,11 @@ FsmState VruUdp::fsmAppMain(cMessage* msg) {
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-FsmState VruUdp::handleDataArrived(Packet *packet){
+FsmState VruSimple::handleDataArrived(Packet *packet){
     return FsmRootStates::WAIT_ACTIVE;
 }
 
-Coord VruUdp::getCurrentLocation() {
+Coord VruSimple::getCurrentLocation() {
   return mobilityModule->getCurrentPosition();
 }
 }  // namespace crownet

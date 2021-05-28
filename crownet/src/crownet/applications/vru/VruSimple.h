@@ -20,10 +20,10 @@
 
 namespace crownet {
 
-class VruUdp : public BaseApp {
+class VruSimple : public BaseApp {
  public:
-  VruUdp();
-  virtual ~VruUdp();
+  VruSimple();
+  virtual ~VruSimple();
 
   virtual FsmState handleDataArrived(Packet *packet) override;
 

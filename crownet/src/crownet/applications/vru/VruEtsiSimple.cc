@@ -13,31 +13,32 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "VruAid.h"
+#include "VruEtsiSimple.h"
+
 #include "crownet/aid/AidCommand_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
 #include "inet/common/ModuleAccess.h"
 
 namespace crownet {
 
-Define_Module(VruAid);
+Define_Module(VruEtsiSimple);
 
-VruAid::VruAid() {
+VruEtsiSimple::VruEtsiSimple() {
   // TODO Auto-generated constructor stub
 }
 
-VruAid::~VruAid() {
+VruEtsiSimple::~VruEtsiSimple() {
   // TODO Auto-generated destructor stub
 }
 
-void VruAid::initialize(int stage) {
+void VruEtsiSimple::initialize(int stage) {
   BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
     mobilityModule = inet::getModuleFromPar<IPositionHistoryProvider>(par("mobilityModule"), this);
   }
 }
 
-FsmState VruAid::fsmAppMain(cMessage* msg) {
+FsmState VruEtsiSimple::fsmAppMain(cMessage* msg) {
   const auto& vam = createPacket<ItsVam>(B(par("messageLength")));  // todo calc?
   vam->setGenerationDeltaTime(simTime());
   // VAM Header
@@ -71,14 +72,14 @@ FsmState VruAid::fsmAppMain(cMessage* msg) {
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-FsmState VruAid::handleDataArrived(Packet *packet){
+FsmState VruEtsiSimple::handleDataArrived(Packet *packet){
     // todo: implement handle packet
     // ...
 
     return FsmRootStates::WAIT_ACTIVE;
 }
 
-Coord VruAid::getCurrentLocation() {
+Coord VruEtsiSimple::getCurrentLocation() {
   return mobilityModule->getCurrentPosition();
 }
 

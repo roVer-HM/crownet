@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package crownet.applications.common;
+package crownet.applications.vru;
 import crownet.applications.common.BaseApp;
 import inet.applications.contract.IApp;
 
@@ -23,9 +23,9 @@ moduleinterface IVRU extends IApp {
 }
 
 
-simple VruAid extends BaseApp like IVRU {
+simple VruEtsiSimple extends BaseApp like IVRU {
     parameters:
-        @class(crownet::VruAid);
+        @class(crownet::VruEtsiSimple);
 	    appMainInterval =  default(0.1s);
 	    messageLength @unit(B) = default(1000B); // length of messages to generate, in bytes
 	    packetName = default("VRU_AID");
@@ -36,9 +36,9 @@ simple VruAid extends BaseApp like IVRU {
 
 }
 
-simple VruUdp extends BaseApp like IVRU {
+simple VruSimple extends BaseApp like IVRU {
     parameters:
-        @class(crownet::VruUdp);
+        @class(crownet::VruSimple);
 	    appMainInterval =  default(0.1s);
 	    messageLength = default(1000B);
 	    packetName = default("VRU_AID");
