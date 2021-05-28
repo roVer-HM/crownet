@@ -1,5 +1,5 @@
 {
-  "name" : "simplified_equal_division",
+  "name" : "simplified_default_division_groups",
   "description" : "",
   "release" : "1.15",
   "processWriters" : {
@@ -168,7 +168,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -200,6 +200,10 @@
           "width" : 0.2,
           "height" : 1.0
         }
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
@@ -227,7 +231,7 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 30.0,
-          "height" : 145.0
+          "height" : 150.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -256,7 +260,7 @@
           "x" : 0.5,
           "y" : 25.0,
           "width" : 1.5,
-          "height" : 29.2,
+          "height" : 27.0,
           "type" : "RECTANGLE"
         },
         "id" : 16
@@ -265,7 +269,7 @@
           "x" : 4.5,
           "y" : 25.0,
           "width" : 3.5,
-          "height" : 48.7,
+          "height" : 46.0,
           "type" : "RECTANGLE"
         },
         "id" : 17
@@ -274,7 +278,7 @@
           "x" : 10.5,
           "y" : 25.0,
           "width" : 3.5,
-          "height" : 94.3,
+          "height" : 86.0,
           "type" : "RECTANGLE"
         },
         "id" : 18
@@ -283,7 +287,7 @@
           "x" : 16.5,
           "y" : 25.0,
           "width" : 3.5,
-          "height" : 111.8,
+          "height" : 106.0,
           "type" : "RECTANGLE"
         },
         "id" : 19
@@ -292,7 +296,7 @@
           "x" : 22.5,
           "y" : 25.0,
           "width" : 3.5,
-          "height" : 119.1,
+          "height" : 118.0,
           "type" : "RECTANGLE"
         },
         "id" : 20
@@ -305,58 +309,13 @@
           "type" : "RECTANGLE"
         },
         "id" : 21
-      }, {
-        "shape" : {
-          "x" : -8.6,
-          "y" : 52.0,
-          "width" : 13.6,
-          "height" : 106.4,
-          "type" : "RECTANGLE"
-        },
-        "id" : 22
-      }, {
-        "shape" : {
-          "x" : 0.6,
-          "y" : 72.0,
-          "width" : 11.5,
-          "height" : 79.3,
-          "type" : "RECTANGLE"
-        },
-        "id" : 23
-      }, {
-        "shape" : {
-          "x" : 3.8,
-          "y" : 112.0,
-          "width" : 13.3,
-          "height" : 41.1,
-          "type" : "RECTANGLE"
-        },
-        "id" : 24
-      }, {
-        "shape" : {
-          "x" : 12.0,
-          "y" : 132.0,
-          "width" : 12.1,
-          "height" : 18.3,
-          "type" : "RECTANGLE"
-        },
-        "id" : 25
-      }, {
-        "shape" : {
-          "x" : 23.8,
-          "y" : 144.0,
-          "width" : 4.9,
-          "height" : 0.9,
-          "type" : "RECTANGLE"
-        },
-        "id" : 7
       } ],
       "measurementAreas" : [ {
         "shape" : {
           "x" : 2.0,
           "y" : 25.0,
           "width" : 2.5,
-          "height" : 25.0,
+          "height" : 27.0,
           "type" : "RECTANGLE"
         },
         "id" : 1
@@ -365,7 +324,7 @@
           "x" : 26.0,
           "y" : 25.0,
           "width" : 2.5,
-          "height" : 117.0,
+          "height" : 118.0,
           "type" : "RECTANGLE"
         },
         "id" : 5
@@ -374,7 +333,7 @@
           "x" : 20.0,
           "y" : 25.0,
           "width" : 2.5,
-          "height" : 105.0,
+          "height" : 106.0,
           "type" : "RECTANGLE"
         },
         "id" : 4
@@ -383,7 +342,7 @@
           "x" : 14.0,
           "y" : 25.0,
           "width" : 2.5,
-          "height" : 85.0,
+          "height" : 86.0,
           "type" : "RECTANGLE"
         },
         "id" : 3
@@ -392,7 +351,7 @@
           "x" : 8.0,
           "y" : 25.0,
           "width" : 2.5,
-          "height" : 45.0,
+          "height" : 46.0,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -405,7 +364,7 @@
           "x" : 2.0,
           "y" : 50.0,
           "width" : 2.5,
-          "height" : 2.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -422,7 +381,7 @@
           "x" : 8.0,
           "y" : 70.0,
           "width" : 2.5,
-          "height" : 2.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -439,7 +398,7 @@
           "x" : 14.0,
           "y" : 110.0,
           "width" : 2.5,
-          "height" : 2.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -456,7 +415,7 @@
           "x" : 20.0,
           "y" : 130.0,
           "width" : 2.5,
-          "height" : 2.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -473,7 +432,7 @@
           "x" : 26.0,
           "y" : 142.0,
           "width" : 2.5,
-          "height" : 2.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -483,21 +442,136 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 1000,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 0.5,
+            "y" : 52.0
+          }, {
+            "x" : 0.5,
+            "y" : 149.5
+          }, {
+            "x" : 28.5,
+            "y" : 149.5
+          }, {
+            "x" : 28.5,
+            "y" : 143.0
+          }, {
+            "x" : 22.5,
+            "y" : 143.0
+          }, {
+            "x" : 22.5,
+            "y" : 131.0
+          }, {
+            "x" : 16.5,
+            "y" : 131.0
+          }, {
+            "x" : 16.5,
+            "y" : 111.0
+          }, {
+            "x" : 10.5,
+            "y" : 111.0
+          }, {
+            "x" : 10.5,
+            "y" : 71.0
+          }, {
+            "x" : 4.5,
+            "y" : 71.0
+          }, {
+            "x" : 4.5,
+            "y" : 52.0
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 11,
+        "shape" : {
+          "x" : 2.0,
+          "y" : 47.0,
+          "width" : 2.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 1000 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 9,
+        "shape" : {
+          "x" : 8.0,
+          "y" : 67.0,
+          "width" : 2.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 1000 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 10,
+        "shape" : {
+          "x" : 14.0,
+          "y" : 107.0,
+          "width" : 2.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 1000 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 12,
+        "shape" : {
+          "x" : 20.0,
+          "y" : 127.0,
+          "width" : 2.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 1000 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 13,
+        "shape" : {
+          "x" : 26.0,
+          "y" : 139.0,
+          "width" : 2.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 1000 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 8.8,
-          "y" : 6.7,
+          "x" : 9.0,
+          "y" : 6.0,
           "width" : 3.5,
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 12.0 ],
-        "spawnNumber" : 4,
+        "distributionParameters" : [ 10.0 ],
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
@@ -505,43 +579,21 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 11 ],
-        "groupSizeDistribution" : [ 3.0 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
         "id" : 3,
         "shape" : {
-          "x" : 9.5,
-          "y" : 2.7,
+          "x" : 9.0,
+          "y" : 2.5,
           "width" : 3.5,
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 12.0 ],
-        "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 1000.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 31 ],
-        "groupSizeDistribution" : [ 3.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 2,
-        "shape" : {
-          "x" : 13.2,
-          "y" : 1.4,
-          "width" : 3.5,
-          "height" : 3.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 12.0 ],
-        "spawnNumber" : 4,
+        "distributionParameters" : [ 10.0 ],
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
@@ -549,21 +601,43 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 21 ],
-        "groupSizeDistribution" : [ 3.0 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 5,
+        "id" : 2,
         "shape" : {
-          "x" : 16.9,
-          "y" : 6.7,
+          "x" : 13.0,
+          "y" : 1.0,
           "width" : 3.5,
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 12.0 ],
-        "spawnNumber" : 4,
+        "distributionParameters" : [ 10.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 1000.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 31 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 5,
+        "shape" : {
+          "x" : 17.0,
+          "y" : 6.0,
+          "width" : 3.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 10.0 ],
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
@@ -571,21 +645,21 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 51 ],
-        "groupSizeDistribution" : [ 3.0 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
         "id" : 4,
         "shape" : {
-          "x" : 16.8,
-          "y" : 3.0,
+          "x" : 17.0,
+          "y" : 2.5,
           "width" : 3.5,
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 12.0 ],
-        "spawnNumber" : 4,
+        "distributionParameters" : [ 10.0 ],
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
@@ -593,7 +667,7 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 41 ],
-        "groupSizeDistribution" : [ 3.0 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],

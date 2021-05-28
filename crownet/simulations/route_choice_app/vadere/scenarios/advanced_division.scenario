@@ -103,6 +103,16 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 13
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityGaussianProcessor",
+      "id" : 14,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 0,
+        "scale" : 10.0,
+        "standardDeviation" : 0.7,
+        "obstacleDensity" : true
+      }
     } ],
     "isTimestamped" : false,
     "isWriteMetaData" : false
