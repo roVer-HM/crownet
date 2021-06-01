@@ -49,7 +49,7 @@ module TransportLayerPedestrian like INetworkNode
         *.mobility.visualRepresentation = "^";
 
         //# Artery
-        bool useArtery = default(true);
+        bool useArtery = default(false);
         string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddelwareEmpyt");
 
         //# Transport layer
