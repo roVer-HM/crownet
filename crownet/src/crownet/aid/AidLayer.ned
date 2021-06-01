@@ -33,14 +33,6 @@ module SimpleAidLayer like IAidLayer
 {
     parameters:
         @display("i=block/app");
-	    densityMap.app.typename = default("DensityMapAppSimple");
-		densityMap.socket.typename = "AidSocketManager";
-		densityMap.socket.destPort = 30001;
-		densityMap.socket.localPort = 30001;
-        beacon.app.typename = default("BeaconSimple");
-        beacon.socket.typename = "AidSocketManager";
-        beacon.socket.destPort = 30002;
-        beacon.socket.localPort = 30002;
 
     gates:
         input upperIn;
@@ -52,17 +44,6 @@ module SimpleAidLayer like IAidLayer
         aid: <default("Aid")> like IAid {
             parameters:
                 @display("p=218,121;is=s");
-        }
-        // todo: Repalce with CrownetApp/AidSocketManager
-        densityMap: CrownetApp if typename!="" {
-            parameters:
-	            @display("p=413,121;i=block/users;is=s");
-        }
-		
-		// todo: Repalce with CrownetApp/AidSocketManager
-        beacon: CrownetApp if typename!="" {
-            parameters:
-	            @display("p=532,121;i=block/broadcast;is=s");
         }
 
         // Message Dispatcher
@@ -87,10 +68,39 @@ module SimpleAidLayer like IAidLayer
 
         aid.lowerOut --> lower.in++;
         aid.lowerIn <-- lower.out++;
+}
 
+module DcdAidLayer extends SimpleAidLayer {
+       parameters:
+        @display("i=block/app");
+	    densityMap.app.typename = default("DensityMapAppSimple");
+		densityMap.socket.typename = "AidSocketManager";
+		densityMap.socket.destPort = 30001;
+		densityMap.socket.localPort = 30001;
+        beacon.app.typename = default("BeaconSimple");
+        beacon.socket.typename = "AidSocketManager";
+        beacon.socket.destPort = 30002;
+        beacon.socket.localPort = 30002;
+
+    submodules:
+        densityMap: CrownetApp if typename!="" {
+            parameters:
+	            @display("p=413,121;i=block/users;is=s");
+        }
+		
+        beacon: CrownetApp if typename!="" {
+            parameters:
+	            @display("p=532,121;i=block/broadcast;is=s");
+        }
+
+    connections allowunconnected:
+        
         densityMap.socketIn <-- upper.out++ if  exists(densityMap);
         densityMap.socketOut --> upper.in++ if exists(densityMap);
 
         beacon.socketIn <-- upper.out++ if exists(beacon);
         beacon.socketOut --> upper.in++ if exists(beacon);
-}
+}        
+        
+        
+       
