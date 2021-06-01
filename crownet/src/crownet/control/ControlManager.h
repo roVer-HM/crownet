@@ -39,7 +39,7 @@ public:
     virtual void initialize(int stage) override ;
     virtual int numInitStages() const  override {return NUM_INIT_STAGES;}
     virtual void handleMessage(cMessage *msg) override;
-    virtual std::string handleCommand(const ControlCmd& cmd) override;
+    virtual void handleCommand(const ControlCmd& cmd) override;
 
     using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
     void finish() override;
@@ -52,6 +52,7 @@ public:
   private:
     std::shared_ptr<ControlTraCiApi> api;
     simtime_t nextTime = simtime_t::ZERO;
+    std::string controlGate;
 };
 
 }

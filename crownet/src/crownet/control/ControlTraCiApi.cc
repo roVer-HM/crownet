@@ -157,16 +157,10 @@ tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn
      controlCmd.message = cmd.readString();
 
 
-     std::string ret = this->controlHandler->handleCommand(controlCmd);
+     this->controlHandler->handleCommand(controlCmd);
 
      tcpip::Storage response;
-     if (ret.empty()){
-         this->createResponse(response, cmdId, RTYPE_OK, "");
-         // all ok ACK
-     } else {
-         // error occurred send NACK
-         this->createResponse(response, cmdId, RTYPE_ERR, ret);
-     }
+     this->createResponse(response, cmdId, RTYPE_OK, "");
      return response;
 }
 

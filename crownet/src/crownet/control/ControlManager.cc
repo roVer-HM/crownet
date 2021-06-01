@@ -17,9 +17,11 @@
 
 
 #include <inet/common/ModuleAccess.h>
+#include "inet/common/packet/Message.h"
 #include "crownet/artery/traci/TraCiForwarder.h"
 #include "crownet/artery/traci/VadereCore.h"
 #include "crownet/crownet.h"
+#include "crownet/applications/control/control_m.h"
 
 namespace crownet {
 
@@ -44,6 +46,7 @@ void ControlManager::initialize(int stage)
         api = std::make_shared<ControlTraCiApi>();
         api->setTraCiForwarder(traciFw);
         api->setControlHandler(this);
+        controlGate = par("controlGate").stdstringValue();
 
     }
 }
@@ -53,13 +56,19 @@ void ControlManager::handleMessage(cMessage *msg)
     throw cRuntimeError("Module does not handle messages");
 }
 
-std::string ControlManager::handleCommand(const ControlCmd& cmd){
-    // select sendingNode
-    // actiate application and set model/message
-    // send ACK to flowcontrol
+void ControlManager::handleCommand(const ControlCmd& cmd){
     Enter_Method_Silent();
+    cModule* sendingApp = this->findModuleByPath(cmd.sendingNode.c_str());
+    if (!sendingApp){
+        throw cRuntimeError("Cannot find module with path %s", cmd.sendingNode.c_str());
+    }
 
-    return "";
+    Message* msg = new Message();
+    auto data = msg->addTagIfAbsent<SimpleControlCfg>();
+    data->setModelString(cmd.model.c_str());
+    data->setModelData(cmd.message.c_str());
+
+    this->sendDirect(msg, sendingApp, controlGate.c_str());
 }
 
 void ControlManager::finish() {

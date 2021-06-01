@@ -31,7 +31,7 @@ struct ControlCmd {
 class ControlHandler {
 public:
     virtual ~ControlHandler() = default;
-    virtual std::string handleCommand(const ControlCmd& cmd) = 0;
+    virtual void handleCommand(const ControlCmd& cmd) = 0;
 
 };
 

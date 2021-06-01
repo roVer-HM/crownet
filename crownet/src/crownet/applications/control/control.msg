@@ -13,22 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.control;
+//
+// TODO generated message class
+//
+
+import inet.common.INETDefs;
+import inet.common.packet.chunk.Chunk;
+import inet.common.TagBase;
+
 
 //
-// TODO auto-generated module
+// Data received from crowed-guidance to disseminate 
 //
-moduleinterface IControlManager {
+class SimpleControlCfg extends inet::TagBase {
 
-}
-
-simple ControlManager like IControlManager
-{
-    parameters:
-        @class(crownet::ControlManager);
-        string host;
-        int port;
-        string coreModule;
-        double startTime  @unit(s) = default(0.0s);
-        string controlGate = default("configIn");
+	string modelString;		// (tag) payload to propagate via TraCI
+	string modelData;		// (tag) payload to propagate via TraCI
 }

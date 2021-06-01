@@ -14,8 +14,6 @@
 //
 
 import inet.common.INETDefs;
-import inet.common.packet.chunk.Chunk;
-import inet.applications.base.ApplicationPacket;
 import inet.common.geometry.Geometry;
 import inet.common.TagBase;
 
@@ -28,9 +26,4 @@ class CurrentLocationTag extends inet::TagBase
 class HopCount extends inet::TagBase
 {
  	int hops;   
-}
-
-class AppGate extends inet::TagBase
-{
- 	string gate;   
 }
