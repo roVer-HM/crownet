@@ -80,7 +80,8 @@ void DcDMap<C, N, T>::visitCells(Fn visitor) {
 template <typename C, typename N, typename T>
 template <typename Fn>
 void DcDMap<C, N, T>::computeValues(Fn visitor) {
-  if (lastComputedAt < this->timeProvider->now()) {
+  // only compute values if needed. Ensure that first computation ( lastComputedAt == ZERO) takes place
+  if (lastComputedAt < this->timeProvider->now() || lastComputedAt == this->timeProvider->zero()) {
     for (auto& entry : this->cells) {
       entry.second.computeValue(visitor);
     }
