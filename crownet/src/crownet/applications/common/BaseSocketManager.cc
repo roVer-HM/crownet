@@ -16,6 +16,7 @@
 #include "crownet/applications/common/BaseSocketManager.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/transportlayer/common/L4PortTag_m.h"
+#include "inet/networklayer/common/FragmentationTag_m.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/common/ModuleAccess.h"
@@ -38,6 +39,7 @@ void BaseSocketManager::initialize(int stage) {
     if (stage == INITSTAGE_LOCAL){
         localPort = par("localPort").intValue();
         destPort = par("destPort").intValue();
+        dontFragment = par("dontFragment").boolValue();
     }
 }
 
@@ -62,6 +64,7 @@ void BaseSocketManager::setupSocket(){
 }
 
 void BaseSocketManager::sendTo(Packet *pk){
+    if (dontFragment) pk->addTag<FragmentationReq>()->setDontFragment(true);
     if(!pk->findTag<L3AddressReq>()){
         auto addrReq = pk->addTagIfAbsent<L3AddressReq>();
         addrReq->setDestAddress(chooseDestAddr());

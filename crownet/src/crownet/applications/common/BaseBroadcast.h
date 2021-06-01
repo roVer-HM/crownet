@@ -13,28 +13,30 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.applications.beacon;
-import crownet.applications.common.BaseApp;
-import inet.applications.contract.IApp;
+
+#pragma once
+
+#include "crownet/applications/common/AppFsm.h"
+#include "crownet/applications/common/BaseApp.h"
 
 
-moduleinterface IBeaconApp extends IApp {
-    parameters:
-}
+namespace crownet {
+class BaseBroadcast : public BaseApp{
+public:
+    BaseBroadcast();
+    virtual ~BaseBroadcast();
 
-simple BeaconSimple extends BaseApp like IBeaconApp {
-    
-    parameters:
-        @class(crownet::BeaconSimple);       
-        // Aid app override defaults
-        packetName = default("BeaconSimple");
-        mainInterval = default(1.0s);
-        mainIntervalJitter = default(0s);
-		messageLength = default(300B);
-		allEmptyDestAddress = false;
-        
-        // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;
+    virtual FsmState handleDataArrived(Packet *packet) override;
+    virtual FsmState fsmAppMain(cMessage *msg) override;
+    virtual FsmState handlePayload(const Ptr<const ApplicationPacket> pkt);
+
+protected:
+    // cSimpleModule
+    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+    virtual void initialize(int stage) override;
+
+protected:
+    int initialHopCount = 1;
+};
 }
 

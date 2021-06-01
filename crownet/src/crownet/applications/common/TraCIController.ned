@@ -13,28 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.applications.beacon;
-import crownet.applications.common.BaseApp;
-import inet.applications.contract.IApp;
+package crownet.applications.common;
 
 
-moduleinterface IBeaconApp extends IApp {
-    parameters:
-}
-
-simple BeaconSimple extends BaseApp like IBeaconApp {
+simple TraCIControler {
+ 	
+ 	parameters:
+ 	    string mobilityModule;
+ 
     
-    parameters:
-        @class(crownet::BeaconSimple);       
-        // Aid app override defaults
-        packetName = default("BeaconSimple");
-        mainInterval = default(1.0s);
-        mainIntervalJitter = default(0s);
-		messageLength = default(300B);
-		allEmptyDestAddress = false;
-        
-        // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;
 }
-

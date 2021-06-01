@@ -17,7 +17,12 @@ package crownet.applications.common;
 
 import inet.applications.contract.IApp;
 
-simple BaseApp like IApp
+moduleinterface IBaseApp extends IApp {
+    gates:
+        input configIn;
+}
+
+simple BaseApp like IBaseApp
 {
   parameters:
         @class(crownet::BaseApp);
@@ -36,21 +41,24 @@ simple BaseApp like IApp
         // Application send frequency (+ jitter)
         ///* Additional offset from startTime before app will start sending data.
         ///* The app will receive message form startTime. Negative values raises cRuntimeError.
-        double appMainIntervalOffset @unit(s) = default(0s); 
-        // TODO use Hertz as unit ############################################################
+        double mainIntervalOffset @unit(s) = default(0s); 
         ///* Intervall to enter fsmAppMain to process app logic (sending data). If 
         ///* set to -1 fsmAppMain() will not be used and user must provide own 
         ///* handling. fsmAppMain() does nothing on default.
-        volatile double appMainInterval @unit(s) = default(-1s); 
-        ///* TODO use Hertz as unit ############################################################
+        volatile double mainInterval @unit(s) = default(-1s); 
         ///* Additional jitter added to appMainInterval on each scheduling 
-        volatile double appMainIntervalJitter @unit(s) = default(0s); 
+        volatile double mainIntervalJitter @unit(s) = default(0s); 
+        ///* Number of messages to send with this app. If -1 : not limit.
+        int mainMsgLimit = default(-1);
         ///* Application messageLength. If set to 0 app implementation must the 
-        ///* message length programmatically
+        ///* message length programmatically        
         volatile int messageLength @unit(B);
         string packetName = default("BasicAppData");
-        ///* TODO move to socket ############################################################
-        bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing
+        ///* If true app will not throw an error if destiantion address is empty.
+        ///* Set to true if app only passivly receives messages or has other means 
+        ///* to find a valid destination address.
+        bool allEmptyDestAddress = default(true);
+
        
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
@@ -67,4 +75,5 @@ simple BaseApp like IApp
 	 gates:
    		input socketIn;
         output socketOut;
+        input configIn;
 }

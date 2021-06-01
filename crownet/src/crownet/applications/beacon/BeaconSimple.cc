@@ -27,15 +27,6 @@ void BeaconSimple::initialize(int stage) {
 }
 
 // FSM
-void BeaconSimple::setupTimers() {
-    if (socketProvider->hasDestAddress()) {
-      cRuntimeError("No address set.");
-    } else {
-      // schedule at startTime or current time, whatever is bigger.
-      scheduleNextAppMainEvent(std::max(startTime, simTime()));
-    }
-}
-
 FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
 
     const auto &beacon = createPacket<BeaconPacket>(B(224)); //64+64+64+32
@@ -49,7 +40,7 @@ FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
 }
 
 FsmState BeaconSimple::handleDataArrived(Packet *packet){
-    auto p = checkEmitGetReceived<BeaconPacket>(packet);
+    auto p = packet->popAtFront<BeaconPacket>();
 
     NeighborhoodTableEntry b{p->getNodeId(), p->getTime(), simTime(), p->getPos(), p->getEpsilon()};
     nTable->handleBeacon(std::move(b));

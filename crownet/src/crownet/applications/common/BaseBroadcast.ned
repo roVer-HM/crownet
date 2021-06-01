@@ -16,6 +16,8 @@
 package crownet.applications.common;
 
 
+
+
 simple BaseBroadcast extends BaseApp 
 {
 parameters:
@@ -23,6 +25,8 @@ parameters:
     @display("i=block/app");
     
     int hopCount = default(0); // number of re broadcast hops
+    
+    allEmptyDestAddress = false;
      
     
 }

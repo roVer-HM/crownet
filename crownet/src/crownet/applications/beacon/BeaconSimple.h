@@ -26,7 +26,6 @@ public:
     virtual void initialize(int stage) override;
 
     // FSM
-    virtual void setupTimers() override;
     virtual FsmState fsmAppMain(cMessage *msg) override;
 
     // Aid Socket

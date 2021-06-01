@@ -38,6 +38,7 @@ simple BaseSocketManager like ISocketManager {
         int localPort = default(-1);  // local port (-1: use ephemeral port)
         string destAddresses = default("224.0.0.1"); // ALL_HOST_MCAST (automatically joined)
         int destPort; //
+        bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing
         
         string appModule = "^.app";
         
@@ -58,7 +59,7 @@ simple UdpSocketManager extends BaseSocketManager {
         int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
         string multicastInterface = default("");  // if not empty, set the multicast output interface option on the socket (interface name expected)
         bool receiveBroadcast = default(true); // if true, makes the socket receive broadcast packets
-        bool joinLocalMulticastGroups = default(false); // if true, makes the socket receive packets from all multicast groups set on local interfaces
+        bool joinLocalMulticastGroups = default(true); // if true, makes the socket receive packets from all multicast groups set on local interfaces
         
 }
 

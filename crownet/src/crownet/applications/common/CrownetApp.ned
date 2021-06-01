@@ -18,18 +18,21 @@ package crownet.applications.common;
 
 import inet.applications.contract.IApp;
 import crownet.applications.common.ISocketManager;
+import crownet.applications.common.IBaseApp;
 
 
-module CrownetApp like IApp
+
+module CrownetApp like IBaseApp
 {
     parameters:
         @display("bgb=500,225");
     gates:
         output socketOut;
         input socketIn;
+        input configIn;
 
     submodules:
-        app: <> like IApp {
+        app: <> like IBaseApp {
             @display("p=95,115,row,140");
         }
 
@@ -43,6 +46,8 @@ module CrownetApp like IApp
 
         socket.toStack --> socketOut;
         socket.fromStack <-- socketIn;
+        
+        app.configIn <-- configIn;
 }
 
 module CrownetUdpApp extends CrownetApp {

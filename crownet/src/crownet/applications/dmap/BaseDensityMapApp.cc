@@ -68,16 +68,6 @@ FsmState BaseDensityMapApp::handleDataArrived(Packet *packet){
     return mergeReceivedMap(packet) ? FsmRootStates::WAIT_ACTIVE  : FsmRootStates::ERR;
 }
 
-// FSM
-void BaseDensityMapApp::setupTimers() {
-  if (socketProvider->hasDestAddress()) {
-    cRuntimeError("No address set.");
-  } else {
-    // schedule at startTime or current time, whatever is bigger.
-    scheduleNextAppMainEvent(std::max(startTime, simTime()));
-  }
-}
-
 FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
   if (dcdMap == nullptr){
       throw omnetpp::cRuntimeError(
@@ -160,7 +150,7 @@ void BaseDensityMapApp::sendMapMap() {
 }
 
 bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
-  auto p = checkEmitGetReceived<PositionMapPacket>(packet);
+  auto p = packet->popAtFront<PositionMapPacket>();
   int numCells = p->getNumCells();
 
   int sourceNodeId = p->getNodeId();

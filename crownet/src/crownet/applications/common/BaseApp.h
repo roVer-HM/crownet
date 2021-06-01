@@ -19,6 +19,8 @@
 
 #include "crownet/common/result/Simsignals.h"
 #include "crownet/applications/common/AppFsm.h"
+#include "crownet/applications/common/AppCommon_m.h"
+
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -32,7 +34,6 @@
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/packet/Packet.h"
 #include "inet/common/packet/printer/PacketPrinter.h"
-#include "inet/networklayer/common/FragmentationTag_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
@@ -51,9 +52,10 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   // parameters
   simtime_t startTime;
   simtime_t stopTime;
+  simtime_t appMainIntervalOffset;
+  int sendLimit;
 
   const char *packetName = nullptr;
-  bool dontFragment = false;
 
   // state
   cMessage *appLifeTime = nullptr;
@@ -80,20 +82,18 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
    */
   virtual void scheduleNextAppMainEvent(simtime_t time = -1);
   virtual void cancelAppMainEvent();
-  virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
+  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload);
+  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port);
 
   template <typename T>
   IntrusivePtr<T> createPacket(b length = b(-1));
-
-  template <typename T>
-  IntrusivePtr<const T> checkEmitGetReceived(Packet *pkt);
 
   // fsmRoot actions
 
   virtual void setFsmResult(const FsmState &state);
 
-  // handle extra self Messages
-  virtual FsmState fsmHandleSelfMsg(cMessage *msg);
+  // handle extra self SubState
+  virtual FsmState fsmHandleSubState(cMessage *msg);
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
   virtual FsmState fsmDataArrived(cMessage *msg);
@@ -103,6 +103,7 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
 
 
   virtual void setupTimers();  // called in fsmSetup
+  simtime_t getInitialMainAppTime();
 
   // Lifecycle management
   virtual void handleStartOperation(
@@ -118,14 +119,6 @@ inline IntrusivePtr<T> BaseApp::createPacket(b length) {
   payload->setSequenceNumber(numSent);
   payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
   return payload;
-}
-
-template <typename T>
-inline IntrusivePtr<const T> BaseApp::checkEmitGetReceived(Packet *pkt) {
-  emit(packetReceivedSignal, pkt);
-  numReceived++;
-
-  return pkt->popAtFront<T>();
 }
 
 }  // namespace crownet

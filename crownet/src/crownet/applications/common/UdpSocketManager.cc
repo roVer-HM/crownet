@@ -31,7 +31,7 @@ UdpSocketManager::~UdpSocketManager() {
 }
 
 void UdpSocketManager::initSocket() {
-    socket.setOutputGate(gate("socketOut"));
+    socket.setOutputGate(gate("toStack"));
     const char *localAddress = par("localAddress");
     socket.bind(
         *localAddress ? L3AddressResolver().resolve(localAddress) : L3Address(),

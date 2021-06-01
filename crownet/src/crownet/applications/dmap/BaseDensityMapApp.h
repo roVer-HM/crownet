@@ -54,7 +54,6 @@ protected:
  virtual FsmState handleDataArrived(Packet *packet) override;
 
  // FSM
- virtual void setupTimers() override;
  virtual FsmState fsmSetup(cMessage *msg) override;
  virtual FsmState fsmAppMain(cMessage *msg) override;
 

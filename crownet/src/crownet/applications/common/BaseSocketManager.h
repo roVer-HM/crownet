@@ -43,7 +43,7 @@ public:
   virtual void setupSocket() override;
   virtual int getLocalPort() override {return localPort;}
   virtual int getDestPort() override {return destPort;}
-  virtual bool hasDestAddress() override {return destAddresses.empty();}
+  virtual bool hasDestAddress() override {return !destAddresses.empty();}
 
   //socket api
   virtual int getSocketId() override;
@@ -72,6 +72,7 @@ protected:
 protected:
   int localPort = -1;
   int destPort = -1;
+  bool dontFragment = false;
   std::vector<L3Address> destAddresses;
   std::vector<std::string> destAddressStr;
 };

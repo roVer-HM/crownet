@@ -26,7 +26,7 @@ moduleinterface IVRU extends IApp {
 simple VruEtsiSimple extends BaseApp like IVRU {
     parameters:
         @class(crownet::VruEtsiSimple);
-	    appMainInterval =  default(0.1s);
+	    mainInterval =  default(0.1s);
 	    messageLength @unit(B) = default(1000B); // length of messages to generate, in bytes
 	    packetName = default("VRU_AID");
 	    double minRate = default(1); // Hz
@@ -39,7 +39,7 @@ simple VruEtsiSimple extends BaseApp like IVRU {
 simple VruSimple extends BaseApp like IVRU {
     parameters:
         @class(crownet::VruSimple);
-	    appMainInterval =  default(0.1s);
+	    mainInterval =  default(0.1s);
 	    messageLength = default(1000B);
 	    packetName = default("VRU_AID");
 }
