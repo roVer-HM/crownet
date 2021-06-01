@@ -40,6 +40,7 @@ class VaderePersonController : public traci::MovingNodeController {
   virtual void appendTarget(const std::string& targetId, bool back = true);
   virtual void setInformed(const simtime_t& start, const simtime_t& obsolte_at,
                            const std::string& data);
+  virtual void send_control(std::string model, std::string metadata);
 
  private:
   VaderePersonController(const std::string& id,

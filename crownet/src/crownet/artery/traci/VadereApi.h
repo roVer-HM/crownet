@@ -22,6 +22,7 @@ namespace constants {
 constexpr traci::ubyte VAR_TARGET_LIST = 0xfe;
 constexpr traci::ubyte VAR_CACHE_HASH = 0x7d;
 constexpr traci::ubyte VAR_SIM_CONFIG = 0x7e;
+constexpr traci::ubyte VAR_EXTERNAL_INPUT = 0x20;
 constexpr traci::ubyte VAR_PERSON_STIMULUS = 0xfd;
 constexpr traci::ubyte CMD_FILE_SEND = 0x75;
 constexpr traci::ubyte VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
@@ -136,6 +137,8 @@ class VadereApi : public API, public TraCiForwarder {
     std::string getScenarioHash(const std::string& scenario) const;
     CoordRef getCoordRef() const;
     void sendSimulationConfig(const vadere::SimCfg& cfg) const;
+    void send_control(const std::string& personID, std::string model, std::string metadata) const;
+
 
    private:
     /// @brief invalidated copy constructor
