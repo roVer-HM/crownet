@@ -38,7 +38,7 @@ import lte.common.LteNetworkConfigurator;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
-import crownet.common.GlobalDensityMap;
+import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
 
 import artery.storyboard.IStoryboard;
@@ -56,7 +56,6 @@ network World
         bool hasLteCoreNetwork = default(hasLte);
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
-        bool hasGlobalMap = default(true);
 
         traci.nodes.typename = default("VadereNodeManager");
         traci.nodes.objectSinkModule = default(".mobility");
@@ -128,7 +127,7 @@ network World
             parameters:
                 @display("p=523.74,148.995");
         }
-        gloablDensityMap: GlobalDensityMap if hasGlobalMap {
+        gloablDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
 
