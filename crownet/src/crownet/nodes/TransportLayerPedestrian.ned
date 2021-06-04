@@ -101,7 +101,7 @@ module TransportLayerPedestrian like INetworkNode
         nTable: <default("NeighborhoodTable")> like INeighborhoodTable if typename!="" {
             @display("p=216.384,147.392;i=block/table2;is=s");
         }
-        middleware: <default(middlewareType)> like IMiddleware {
+        middleware: <default(middlewareType)> like IMiddleware if typename!="" {
             parameters:
                 @display("p=109.76,296.352");
         }
