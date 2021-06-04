@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath(".."))
 
 from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
-from flowcontrol.utils.opp.scenario import get_scenario_file
+from flowcontrol.utils.misc import get_scenario_file
 
 class PingPong(Controller):
 
