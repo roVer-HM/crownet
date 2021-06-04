@@ -83,8 +83,8 @@ if __name__ == "__main__":
     else:
         controller = get_controller_from_args(
             working_dir=os.path.dirname(os.path.abspath(__file__)),
-            controller=controller,
-        )
+            controller=controller,)
+
 
     kwargs = {"file_name": scenario_file, "file_content": get_scenario_content(scenario_file)}
     controller.register_state_listener("default", sub, set_default=True) #? new

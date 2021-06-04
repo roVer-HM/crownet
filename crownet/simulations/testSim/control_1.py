@@ -8,9 +8,8 @@ from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateLi
 
 sys.path.append(os.path.abspath(".."))
 
-from flowcontrol.crownetcontrol.controller.dummy_controller import Controller
+from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
-from flowcontrol.utils.opp.scenario import get_scenario_file
 
 
 class ChangeTarget(Controller):
@@ -71,14 +70,13 @@ if __name__ == "__main__":
         ]
 
 
-        traci_manager = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
+        controller = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
     else:
-        traci_manager = get_controller_from_args(
+        controller = get_controller_from_args(
             working_dir=os.path.dirname(os.path.abspath(__file__)),
-            controller=controller,
-        )
+            controller=controller,)
 
-    controller.initialize_connection(traci_manager)
+
     controller.register_state_listener("default", sub, set_default=True)
     print("start...")
     controller.start_controller()

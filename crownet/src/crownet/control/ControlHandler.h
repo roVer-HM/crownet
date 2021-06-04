@@ -22,7 +22,6 @@ struct ForwardCmd {
 };
 
 struct ControlCmd {
-    int packetSize;
     std::string sendingNode;
     std::string model;
     std::string message;

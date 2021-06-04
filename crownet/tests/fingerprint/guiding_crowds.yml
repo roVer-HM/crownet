@@ -50,7 +50,7 @@ final_test_3:
     - --with-control
     - control.py
   simtimelimit: 100s
-  expectedResult: ERROR
+  expectedResult: PASS
   fingerprint: "file:"
   tags:
     exec: python3

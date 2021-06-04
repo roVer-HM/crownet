@@ -144,11 +144,9 @@ tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn
          throw omnetpp::cRuntimeError("expected compound object got");
      }
      int cmpSize = cmd.readInt();
-     if (cmpSize != 4) {
-         throw omnetpp::cRuntimeError("expected 4 items in compound object");
+     if (cmpSize != 3) {
+         throw omnetpp::cRuntimeError("expected 3 items in compound object");
      }
-     type = cmd.readUnsignedByte();
-     controlCmd.packetSize = cmd.readInt();
      type = cmd.readUnsignedByte();
      controlCmd.sendingNode = cmd.readString();
      type = cmd.readUnsignedByte();
