@@ -16,7 +16,7 @@
 #include "crownet/common/result/ResultFilters.h"
 
 #include "inet/common/packet/Packet.h"
-#include "crownet/applications/udpapp/detour/DetourAppPacket_m.h"
+#include "crownet/applications/detour/DetourAppPacket_m.h"
 
 using namespace inet;
 

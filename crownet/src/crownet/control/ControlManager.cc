@@ -16,10 +16,14 @@
 #include "ControlManager.h"
 
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <inet/common/ModuleAccess.h>
+#include "inet/common/packet/Message.h"
 #include "crownet/artery/traci/TraCiForwarder.h"
 #include "crownet/artery/traci/VadereCore.h"
 #include "crownet/crownet.h"
+#include "crownet/applications/control/control_m.h"
 
 namespace crownet {
 
@@ -43,6 +47,8 @@ void ControlManager::initialize(int stage)
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
         api->setTraCiForwarder(traciFw);
+        api->setControlHandler(this);
+        controlGate = par("controlGate").stdstringValue();
 
     }
 }
@@ -50,6 +56,37 @@ void ControlManager::initialize(int stage)
 void ControlManager::handleMessage(cMessage *msg)
 {
     throw cRuntimeError("Module does not handle messages");
+}
+
+void ControlManager::handleCommand(const ControlCmd& cmd){
+    Enter_Method_Silent();
+    cModule* sendingApp = this->findModuleByPath(cmd.sendingNode.c_str());
+    if (!sendingApp){
+        throw cRuntimeError("Cannot find module with path %s", cmd.sendingNode.c_str());
+    }
+
+    Message* msg = new Message();
+    auto data = msg->addTagIfAbsent<SimpleControlCfg>();
+    data->setModelString(cmd.model.c_str());
+    data->setModelData(cmd.message.c_str());
+
+    try {
+        std::stringstream ss;
+        ss << cmd.message;
+
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(ss, pt);
+
+        data->setAppTTL(pt.get<double>("time"));
+
+
+    }
+    catch (std::exception const& e)
+    {
+        throw cRuntimeError("Cannot parse message from controller into property_tree (Json): %s", e.what());
+    }
+    this->sendDirect(msg, sendingApp, controlGate.c_str());
+
 }
 
 void ControlManager::finish() {

@@ -204,6 +204,8 @@ void VadereApi::VaderePersonScope::setInformation(
   check_resultState(inMsg, CMD_SET_PERSON_VARIABLE);
 }
 
+
+
 // ---------------------------------------------------------------------------
 // VadereApi::VaderSimulationScope-methods
 // ---------------------------------------------------------------------------
@@ -339,5 +341,25 @@ void VadereApi::VaderSimulationScope::sendSimulationConfig(
   tcpip::Storage inMsg;
   check_resultState(inMsg, myCmdSetID);
 }
+
+void VadereApi::VaderSimulationScope::send_control(const std::string& personID, std::string model, std::string metadata) const
+{
+    tcpip::Storage content;
+    content.writeByte(TYPE_COMPOUND);
+    content.writeInt(3);
+    content.writeByte(TYPE_STRING);
+    content.writeString(personID); // the current nodeId
+    content.writeByte(TYPE_STRING);
+    content.writeString(model); // model name to use
+    content.writeByte(TYPE_STRING);
+    content.writeString(metadata); // json to configure given model
+
+    send_commandSetValueExtLenghtField(
+        myCmdSetID, crownet::constants::VAR_EXTERNAL_INPUT, "", content);
+    tcpip::Storage inMsg;
+    check_resultState(inMsg, myCmdSetID);
+
+}
+
 
 } /* namespace crownet */

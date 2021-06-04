@@ -14,6 +14,8 @@
 //
 
 #include "BaseApp.h"
+#include "inet/networklayer/common/L3AddressTag_m.h"
+#include "inet/transportlayer/common/L4PortTag_m.h"
 
 using namespace inet;
 
@@ -31,19 +33,26 @@ void BaseApp::initialize(int stage) {
     WATCH(numSent);
     WATCH(numReceived);
 
-    // addressing
-    localPort = par("localPort").intValue();
-    destPort = par("destPort").intValue();
+
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
+    appMainIntervalOffset = par("mainIntervalOffset").doubleValue();
+    sendLimit = par("mainMsgLimit").intValue();
+
+    if (appMainIntervalOffset < 0.){
+        throw cRuntimeError("Invalid mainIntervalOffset parameters must be >= 0");
+    }
     // packet and IP options
     packetName = par("packetName");
-    dontFragment = par("dontFragment").boolValue();
 
-    if (stopTime > SIMTIME_ZERO && stopTime < startTime)
+
+    if (stopTime > SIMTIME_ZERO && stopTime < startTime){
       throw cRuntimeError("Invalid startTime/stopTime parameters");
+    }
     appLifeTime = new cMessage("applicationTimer");
     appMainTimer = new cMessage("sendTimer");
+
+    socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
   }
 }
 
@@ -64,19 +73,28 @@ void BaseApp::refreshDisplay() const {
 }
 
 void BaseApp::scheduleNextAppMainEvent(simtime_t time) {
-  if (par("appMainInterval").doubleValue() < 0.0) {
+  if (par("mainInterval").doubleValue() < 0.0) {
     EV_INFO << "AppMain processing deactivated" << endl;
     return;
   }
-  simtime_t base = time < 0.0 ? omnetpp::simTime() : time;
-  simtime_t nextSend = base + par("appMainInterval") + par ("appMainIntervalJitter");
+  simtime_t nextSend;
+  if (time < SIMTIME_ZERO){
+      nextSend = omnetpp::simTime() + par("mainInterval") + par ("mainIntervalJitter");
+  } else {
+      nextSend = time;
+  }
 
   if ((stopTime == SIMTIME_ZERO) || (nextSend < stopTime)) {
     if (appMainTimer->isScheduled()) {
       throw cRuntimeError("Cannot reschedule selfMsgSendTimer message.");
     }
-    appMainTimer->setKind(FsmRootStates::APP_MAIN);
-    scheduleAt(nextSend, appMainTimer);
+    if (sendLimit !=0){
+        // schedule if sendLimit is not reached  >0 or if sendLimit is deactivated <0
+        appMainTimer->setKind(FsmRootStates::APP_MAIN);
+        scheduleAt(nextSend, appMainTimer);
+    } else {
+        EV_INFO << "Message limit reached." << endl;
+    }
   } else {
     EV_INFO << "Next send time after stopTime. Do not schedule new send event."
             << endl;
@@ -87,32 +105,40 @@ void BaseApp::cancelAppMainEvent() {
   if (appMainTimer->isScheduled()) cancelEvent(appMainTimer);
 }
 
-void BaseApp::sendPayload(IntrusivePtr<const ApplicationPacket> payload) {
-  L3Address destAddr = chooseDestAddr();
-  sendPayload(payload, destAddr, destPort);
+/**
+ * use default address and port configured in socket
+ */
+void BaseApp::sendPayload(IntrusivePtr<ApplicationPacket> payload) {
+    std::ostringstream str;
+    str << packetName << "-" << getId() << "#" << numSent;
+    Packet *packet = new Packet(str.str().c_str());
+    packet->insertAtBack(payload);
+    emit(packetSentSignal, packet);
+    numSent++;
+    if (sendLimit > 0){
+        sendLimit--;
+    }
+    send(packet, gate("socketOut"));
 }
 
-void BaseApp::sendPayload(IntrusivePtr<const ApplicationPacket> payload,
-                          L3Address destAddr, int destPort) {
-  std::ostringstream str;
-  str << packetName << "-" << getId() << "#" << numSent;
-  Packet *packet = new Packet(str.str().c_str());
-  if (dontFragment) packet->addTag<FragmentationReq>()->setDontFragment(true);
-  packet->insertAtBack(payload);
-  emit(packetSentSignal, packet);
-  EV_TRACE << "send packet: " << str.str().c_str()
-           << " to destAddr: " << destAddr << " destPort: " << destPort << endl;
-  sendToSocket(packet, destAddr, destPort);
-  numSent++;
+/**
+ * use application logic dependent address and port and override socket default
+ */
+void BaseApp::sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port){
+    std::ostringstream str;
+    str << packetName << "-" << getId() << "#" << numSent;
+    Packet *packet = new Packet(str.str().c_str());
+    packet->insertAtBack(payload);
+    packet->addTagIfAbsent<L3AddressReq>()->setDestAddress(addr);
+    packet->addTagIfAbsent<L4PortReq>()->setDestPort(port);
+    emit(packetSentSignal, packet);
+    numSent++;
+    if (sendLimit > 0){
+        sendLimit--;
+    }
+    send(packet, gate("socketOut"));
 }
 
-L3Address BaseApp::chooseDestAddr() {
-  int k = intrand(destAddresses.size());
-  if (destAddresses[k].isUnspecified() || destAddresses[k].isLinkLocal()) {
-    L3AddressResolver().tryResolve(destAddressStr[k].c_str(), destAddresses[k]);
-  }
-  return destAddresses[k];
-}
 
 // Lifecycle management
 
@@ -146,6 +172,7 @@ void BaseApp::handleCrashOperation(LifecycleOperation *operation) {
  */
 void BaseApp::handleMessageWhenUp(cMessage *msg) {
   socketFsmResult = FsmRootStates::ERR;
+  // fsmRoot == current state
   FSM_Switch(fsmRoot) {
     // Init state ...
     case FSM_Exit(FsmRootStates::INIT):
@@ -158,15 +185,17 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
         FsmState state = msg->getKind();
         if (std::abs(state) >= FsmRootStates::SUBSTATE) {
           // Handle sub states in fsmHandleSelfMsg
-          FSM_Goto(fsmRoot, fsmHandleSelfMsg(msg));
+          FSM_Goto(fsmRoot, fsmHandleSubState(msg));
         } else {
           FSM_Goto(fsmRoot, msg->getKind());
         }
+      } else if (msg->arrivedOn("socketIn")) {
+          FSM_Goto(fsmRoot, fsmDataArrived(msg));
+      } else if (msg->arrivedOn("configIn")){
+          // send config message to sub state handler
+          FSM_Goto(fsmRoot, fsmHandleSubState(msg));
       } else {
-        // received message is a packet. Let corresponding socket handle this.
-        // This call will set socketFsmResult
-        getSocket().processMessage(msg);
-        FSM_Goto(fsmRoot, socketFsmResult);
+          throw cRuntimeError("Unkonwn Packet");
       }
       break;
     case FSM_Exit(FsmRootStates::WAIT_INACTIVE):
@@ -194,50 +223,56 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
 }
 
 void BaseApp::setupTimers() {
-  if (destAddresses.empty()) {
-    EV_WARN << "no destination address found. Module will not send packets"
-            << endl;
-  } else {
-    // schedule at startTime or current time, whatever is bigger.
-    scheduleNextAppMainEvent(std::max(startTime, simTime()));
-  }
+    // schedule first mainApp interval
+    scheduleNextAppMainEvent(getInitialMainAppTime());
 }
+
+simtime_t BaseApp::getInitialMainAppTime(){
+    return std::max(startTime, simTime()) + appMainIntervalOffset;
+}
+
 
 // FSM
 
-BaseApp::FsmState BaseApp::fsmSetup(cMessage *msg) {
-  const char *destAddrs = par("destAddresses");
-  cStringTokenizer tokenizer(destAddrs);
-  const char *token;
+FsmState BaseApp::fsmHandleSubState(cMessage *msg) {
+    throw cRuntimeError("No Substate on BaseApp");
+}
 
-  while ((token = tokenizer.nextToken()) != nullptr) {
-    destAddressStr.push_back(token);
-    L3Address result;
-    L3AddressResolver().tryResolve(token, result);
-    if (result.isUnspecified())
-      EV_ERROR << "cannot resolve destination address: " << token << endl;
-    destAddresses.push_back(result);
-  }
+FsmState BaseApp::fsmSetup(cMessage *msg) {
+  socketProvider->setupSocket();
 
-  initSocket();
-
+  // todo check msg == appLifeTime (may lead to reschedule without)
   if (stopTime > SIMTIME_ZERO) {
     appLifeTime->setKind(FsmRootStates::TEARDOWN);
     scheduleAt(stopTime, appLifeTime);
+  }
+
+  if ( !par("allEmptyDestAddress").boolValue() && !socketProvider->hasDestAddress()) {
+      cRuntimeError("No destination address found.");
   }
 
   setupTimers();
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-BaseApp::FsmState BaseApp::fsmAppMain(cMessage *msg) {
-  // do nothing just reschedule
-  scheduleNextAppMainEvent();
+FsmState BaseApp::fsmDataArrived(cMessage *msg){
+    numReceived++;
+    Packet* pk = check_and_cast<Packet *>(msg);
+    emit(packetReceivedSignal, pk);
+    FsmState next = handleDataArrived(pk);
+    delete pk;
+    return next;
+}
+
+FsmState BaseApp::fsmAppMain(cMessage *msg) {
+  // do nothing
+  EV_WARN << "BaseApp has no AppMain. Implement for active message generate. App will still receive messages!"
+          << std::endl;
   return FsmRootStates::WAIT_ACTIVE;
 }
 
-BaseApp::FsmState BaseApp::fsmTeardown(cMessage *msg) {
-  getSocket().close();
+FsmState BaseApp::fsmTeardown(cMessage *msg) {
+    socketProvider->close();
 //  delayActiveOperationFinish(par("stopOperationTimeout"));    // todo: correctly  implement ILifecycle ...
   cancelAndDelete(appLifeTime);
   appLifeTime = nullptr;
@@ -247,8 +282,8 @@ BaseApp::FsmState BaseApp::fsmTeardown(cMessage *msg) {
   return FsmRootStates::WAIT_INACTIVE;
 }
 
-BaseApp::FsmState BaseApp::fsmDestroy(cMessage *msg) {
-  getSocket().destroy();
+FsmState BaseApp::fsmDestroy(cMessage *msg) {
+    socketProvider->destroy();
   // TODO  in real operating systems, program crash detected
   // by OS and OS closes sockets of crashed programs.
   cancelAndDelete(appLifeTime);

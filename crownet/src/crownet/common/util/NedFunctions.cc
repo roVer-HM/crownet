@@ -11,6 +11,19 @@
   #include <omnetpp/cnedvalue.h>
 #endif
 
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
+#define DEF(FUNCTION, SIGNATURE, CATEGORY, DESCRIPTION) \
+        cValue FUNCTION(cComponent *context, cValue argv[], int argc); \
+        Define_NED_Function2(FUNCTION, SIGNATURE, CATEGORY, DESCRIPTION);
+
+#define DEF2(FUNCTION, SIGNATURE, CATEGORY, DESCRIPTION) \
+        cValue FUNCTION(cExpression::Context *context, cValue argv[], int argc); \
+        Define_NED_Function2(FUNCTION, SIGNATURE, CATEGORY, DESCRIPTION);
+
+
+
 using namespace omnetpp;
 
 namespace crownet {
@@ -28,10 +41,30 @@ cNEDValue nedf_ifTrueOrElse(cComponent *context, cNEDValue argv[], int argc) {
   }
 }
 
-Define_NED_Function2(
+DEF(
     nedf_ifTrueOrElse,
     "string ifTrueOrElse(bool pred, string first, string second)", "misc",
     "if pred is true return first else second.");
+
+
+DEF2(
+    nedf_absFilePath,
+    "string absFilePath(string path)", "misc",
+    "return absolute file path based on current file the configuration is set.");
+
+
+cValue nedf_absFilePath(cExpression::Context  *context, cValue argv[], int argc){
+    fs::path filename(argv[0].stringValue());
+    fs::path filepath;
+    if (strlen(context->baseDirectory) == 0){
+        filepath = filename;
+    } else {
+        fs::path base(context->baseDirectory);
+        filepath = base / filename;
+    }
+    return filepath.string();
+}
+
 
 }  // namespace utils
 }  // namespace crownet

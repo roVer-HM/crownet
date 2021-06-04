@@ -13,6 +13,10 @@
 #include "crownet/artery/traci/VadereUtils.h"
 #include "crownet/crownet.h"
 
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 using namespace traci;
 using namespace omnetpp;
 
@@ -47,26 +51,33 @@ std::pair<API*, LiteAPI*> VadereLauchner::createAPI() {
 }
 
 void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
-  // default basedir is where current network file was loaded from
-  std::string basedir = cSimulation::getActiveSimulation()
-                            ->getEnvir()
-                            ->getConfig()
-                            ->getConfigEntry("network")
-                            .getBaseDirectory();
-  std::string vadereScenarioPath = par("vadereScenarioPath").stdstringValue();
-  std::string vadereCachePath = par("vadereCachePath").stdstringValue();
+
+  // use current directory as fallback to create absolute paths for Vadere.
+  fs::path iniBaseDir = fs::current_path();
+
+  fs::path resultDir (cSimulation::getActiveSimulation()
+                                                    ->getEnvir()
+                                                    ->getConfigEx()
+                                                    ->getVariable(CFGVAR_RESULTDIR));
+  resultDir = resultDir.is_relative() ? fs::absolute(resultDir, iniBaseDir) : resultDir;
+
+  fs::path vSPath (par("vadereScenarioPath").stdstringValue());
+  vSPath = vSPath.is_relative() ? fs::absolute(vSPath, iniBaseDir) : vSPath;
+  fs::path vCPath (par("vadereCachePath").stdstringValue());
+  vCPath = vCPath.is_relative() ? fs::absolute(vCPath, iniBaseDir) : vCPath;
 
   vadere::VadereScenario scenario =
-      vadere::getScenarioContent(basedir, vadereScenarioPath);
+      vadere::getScenarioContent(vSPath.string());
 
   // get scenarioHash for cache location
   std::string scenarioHash =
       m_lite->vSimulation().getScenarioHash(scenario.second);
 
   std::vector<vadere::VadereCache> cachePaths;
-  cachePaths = vadere::getCachePaths(basedir, vadereCachePath, scenarioHash);
+  cachePaths = vadere::getCachePaths(vCPath.string(), scenarioHash);
 
   vadere::SimCfg simCfg;
+  simCfg.oppResultRootDir = resultDir.string();
   simCfg.oppConfigName = cSimulation::getActiveSimulation()
                              ->getEnvir()
                              ->getConfigEx()
@@ -79,15 +90,8 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
                            ->getEnvir()
                            ->getConfigEx()
                            ->getVariable(CFGVAR_DATETIME);
-  std::string resultDir = cSimulation::getActiveSimulation()
-                                                  ->getEnvir()
-                                                  ->getConfigEx()
-                                                  ->getVariable(CFGVAR_RESULTDIR);
-  if (resultDir.find("/", 0) == 0 || resultDir.find("\\", 0)){
-      simCfg.oppResultRootDir = resultDir;
-  } else {
-      simCfg.oppResultRootDir = basedir + resultDir;
-  }
+
+
 
   simCfg.oppIterationVariables = cSimulation::getActiveSimulation()
                                      ->getEnvir()

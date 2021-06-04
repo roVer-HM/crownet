@@ -31,7 +31,6 @@ network World_Wlan extends World
         hasLteCoreNetwork = false;
         hasWlan = true;
         hasStoryboard = false;
-		hasGlobalMap = false;
 
     submodules:
 

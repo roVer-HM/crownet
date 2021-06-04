@@ -112,4 +112,8 @@ void VaderePersonController::setInformed(const simtime_t& start,
   m_api.vPerson().setInformation(m_id, start.dbl(), obsolte_at.dbl(), data);
 }
 
+void VaderePersonController::send_control(std::string model, std::string metadata){
+    m_api.vSimulation().send_control(m_id, model, metadata);
+}
+
 } /* namespace crownet */

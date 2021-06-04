@@ -11,12 +11,14 @@
 
 #include <traci/sumo/utils/traci/TraCIAPI.h>
 #include "crownet/artery/traci/TraCiForwarder.h"
+#include "crownet/control/ControlHandler.h"
 
 namespace traci {
 namespace constants {
 
 // command: simulation step
-constexpr ubyte CMD_CONTROL = 0x0d;
+// constexpr ubyte CMD_CONTROL = 0x0d;
+constexpr ubyte CMD_CONTROL = 0x06;
 constexpr ubyte RESPONSE_CMD_CONTROL = 0x1d;
 
 constexpr ubyte VAR_FORWARD = 0xff;
@@ -32,17 +34,6 @@ constexpr char SIMULATOR_OPP[] = "O";
 
 namespace crownet {
 
-struct ControlCmd {
-    int cmdId;
-    int varId;
-    std::string objectIdentifer;
-    int offset;
-    int cmdLength;
-    int payloadOffset;
-    int payloadLength;
-};
-
-
 class ControlTraCiApi: public TraCIAPI {
 public:
     ControlTraCiApi();
@@ -52,16 +43,17 @@ public:
     virtual double handleSimStep(double simtime);
     virtual double handleInit(double simtime);
     void setTraCiForwarder(std::shared_ptr<TraCiForwarder> traciForwarder);
+    void setControlHandler(ControlHandler* controlHandler);
 
 protected:
     virtual double handleControlCmd(tcpip::Storage& ctrlCmd);
+    virtual tcpip::Storage handleControllerOppRequest(tcpip::Storage& msgIn, ForwardCmd& ctrlCmd);
 
-    virtual tcpip::Storage handleControllerOppRequest(tcpip::Storage& msgIn);
-
-    ControlCmd parseCtrlCmd(tcpip::Storage& inMsg);
+    ForwardCmd parseCtrlCmd(tcpip::Storage& inMsg);
     TraCiResult parseResult(tcpip::Storage& inMsg);
 
     std::shared_ptr<TraCiForwarder> traciForwarder;
+    ControlHandler* controlHandler;
 };
 
 } /* namespace crownet */

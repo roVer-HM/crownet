@@ -20,7 +20,7 @@
 #include "inet/common/Simsignals_m.h"
 #include "crownet/aid/AidCommand_m.h"
 #include "crownet/aid/AidHeader_m.h"
-#include "crownet/applications/udpapp/detour/DetourAppPacket_m.h"
+#include "crownet/applications/detour/DetourAppPacket_m.h"
 #include "crownet/common/SocketHandler.h"
 
 using namespace inet;

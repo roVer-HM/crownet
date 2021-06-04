@@ -30,4 +30,5 @@ simple ControlManager like IControlManager
         int port;
         string coreModule;
         double startTime  @unit(s) = default(0.0s);
+        string controlGate = default("configIn");
 }

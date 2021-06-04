@@ -18,7 +18,9 @@ package crownet.common;
 //
 // TODO auto-generated type
 //
-simple GlobalDensityMap
+moduleinterface IGlobalDensityMap {}
+
+simple GlobalDensityMap like IGlobalDensityMap
 {
     parameters:
         @class(crownet::GlobalDensityMap);

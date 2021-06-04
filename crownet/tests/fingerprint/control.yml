@@ -1,0 +1,121 @@
+# Fingerprint tests for the "guiding_crowds_test" scenario.
+# See crownet_fingerprinttest crownet --help
+#   * workingdir is realtive to the given '-C' flag of crownet_fingerprinttest
+#   * each toplevel key will be one test case
+#   * if first item in `args` does not start with an `-` it will be
+#     interpreted as the command to execute
+#   * if fingerprint starts with 'file:' read the given path. If path
+#     is relative it based on workingdir. An empty path will default
+#     to hasd./<testcase-name>.csv relative to the current files location
+
+control001_aid:
+  wd: simulations/testSim
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --opp.-c
+    - test_control001_aid
+    - --control-use-local
+    - --with-control
+    - control_1.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+control001_udp:
+  wd: simulations/testSim
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --opp.-c
+    - test_control001_udp
+    - --control-use-local
+    - --with-control
+    - control_1.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+
+control001_udp_only:
+  wd: simulations/testSim
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --opp.-c
+    - test_control001_udp_only
+    - --control-use-local
+    - --with-control
+    - control_1.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+
+control002_aid:
+  wd: simulations/testSim
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --opp.-c
+    - test_control002_aid
+    - --control-use-local
+    - --with-control
+    - control_1.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+control002_udp:
+  wd: simulations/testSim
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --opp.-c
+    - test_control002_udp
+    - --control-use-local
+    - --with-control
+    - control_1.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+
+control002_udp_only:
+  wd: simulations/testSim
+  args:
+    - run_script.py
+    - --delete-existing-containers
+    - --create-vadere-container
+    - --opp.-c
+    - test_control002_udp_only
+    - --control-use-local
+    - --with-control
+    - control_1.py
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+

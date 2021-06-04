@@ -17,32 +17,53 @@ package crownet.applications.common;
 
 import inet.applications.contract.IApp;
 
-simple Foo {}
+moduleinterface IBaseApp extends IApp {
+    gates:
+        input configIn;
+}
 
-simple BaseApp like IApp
+simple BaseApp like IBaseApp
 {
   parameters:
         @class(crownet::BaseApp);
         @display("i=block/app");
+        ///* socket module (should be a sibling model)
+        string socketModule = default("^.socket");
+        
         // Application runtime settings
-        double startTime @unit(s) = default(0.0s); // start first packet, afterwarts time + sendIntervall. Negative values raises cRuntimeError.
-        double stopTime @unit(s) = default(0.0s); // time of finishing sending, 0.0s means forever
-        volatile double appMainInterval @unit(s) = default(-1s); // intervall to enter fsmAppMain to process app logic.
-        										  // if set to -1 fsmAppMain will not be used and user must provide own
-        										  // handling. fsmAppMain does nothing on default.
-        volatile double appMainIntervalJitter @unit(s) = default(0s); // 
-        // Base addressing paramters
-        string localAddress = default("");
-        int localPort = default(-1);  // local port (-1: use ephemeral port)
-        string destAddresses = default("224.0.0.1"); // ALL_HOST_MCAST (automatically joined)
-        int destPort; //
+        ///* Start time of application at which message will be received. 
+        ///* Negative values raises cRuntimeError.
+        double startTime @unit(s) = uniform(0s,0.02s);
+        ///* Time after which no packet will be send or received.
+        ///* stopTime = 0.0s means app will run forever
+        double stopTime @unit(s) = default(0.0s); 
+        
+        // Application send frequency (+ jitter)
+        ///* Additional offset from startTime before app will start sending data.
+        ///* The app will receive message form startTime. Negative values raises cRuntimeError.
+        double mainIntervalOffset @unit(s) = default(0s); 
+        ///* Intervall to enter fsmAppMain to process app logic (sending data). If 
+        ///* set to -1 fsmAppMain() will not be used and user must provide own 
+        ///* handling. fsmAppMain() does nothing on default.
+        volatile double mainInterval @unit(s) = default(-1s); 
+        ///* Additional jitter added to appMainInterval on each scheduling 
+        volatile double mainIntervalJitter @unit(s) = default(0s); 
+        ///* Number of messages to send with this app. If -1 : not limit.
+        int mainMsgLimit = default(-1);
+        ///* Application messageLength. If set to 0 app implementation must the 
+        ///* message length programmatically        
+        volatile int messageLength @unit(B);
         string packetName = default("BasicAppData");
-        // IP Setting
-        bool dontFragment = default(false); // if true, asks IP to not fragment the message during routing
+        ///* If true app will not throw an error if destiantion address is empty.
+        ///* Set to true if app only passivly receives messages or has other means 
+        ///* to find a valid destination address.
+        bool allEmptyDestAddress = default(true);
+
+       
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
-        // signals
+
         @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=inet::Packet);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
@@ -54,27 +75,5 @@ simple BaseApp like IApp
 	 gates:
    		input socketIn;
         output socketOut;
+        input configIn;
 }
-
-simple AidBaseApp extends BaseApp {
-      parameters:
-        @class(crownet::AidBaseApp);
-        @display("i=block/app");
-}
-
-simple UdpBaseApp extends BaseApp {
-      parameters:
-        @class(crownet::UdpBaseApp);
-        @display("i=block/app");
-        // udp socket options
-        volatile int messageLength @unit(B); // length of messages to generate, in bytes
-        string interfaceTableModule; // The path to the InterfaceTable module
-        int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
-        int dscp = default(-1); // if not -1, set the DSCP field (on IPv4/IPv6) of sent packets to this value
-        int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
-        string multicastInterface = default("");  // if not empty, set the multicast output interface option on the socket (interface name expected)
-        bool receiveBroadcast = default(true); // if true, makes the socket receive broadcast packets
-        bool joinLocalMulticastGroups = default(false); // if true, makes the socket receive packets from all multicast groups set on local interfaces
-}
-
-

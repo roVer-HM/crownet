@@ -27,7 +27,8 @@ import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
-import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+//import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+import inet.node.inet.INetworkNode;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;
 import lte.corenetwork.nodes.Ue;
@@ -38,7 +39,7 @@ import lte.common.LteNetworkConfigurator;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
-import crownet.common.GlobalDensityMap;
+import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
 
 import artery.storyboard.IStoryboard;
@@ -56,12 +57,12 @@ network World
         bool hasLteCoreNetwork = default(hasLte);
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
-        bool hasGlobalMap = default(true);
+        int numMisc = default(0);
 
         traci.nodes.typename = default("VadereNodeManager");
         traci.nodes.objectSinkModule = default(".mobility");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
-        traci.mapper.objectType = default("crownet.nodes.AidPedestrian");
+        traci.mapper.objectType = default("crownet.nodes.ApplicationLayerPedestrian");
 
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);
@@ -128,12 +129,15 @@ network World
             parameters:
                 @display("p=523.74,148.995");
         }
-        gloablDensityMap: GlobalDensityMap if hasGlobalMap {
+        gloablDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
 
         flowController: <default("")> like IControlManager if typename != "" {
             @display("p=308.14874,319.43625;i=block/table2;is=s");
+        }
+        misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
+            
         }
 
 

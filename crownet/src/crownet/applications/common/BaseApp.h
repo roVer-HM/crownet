@@ -18,6 +18,9 @@
 #include <vector>
 
 #include "crownet/common/result/Simsignals.h"
+#include "crownet/applications/common/AppFsm.h"
+#include "crownet/applications/common/AppCommon_m.h"
+
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -31,7 +34,6 @@
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/packet/Packet.h"
 #include "inet/common/packet/printer/PacketPrinter.h"
-#include "inet/networklayer/common/FragmentationTag_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
@@ -40,7 +42,7 @@ using namespace inet;
 
 namespace crownet {
 
-class BaseApp : public ApplicationBase {
+class BaseApp : public ApplicationBase, public DataArrivedHandler {
  public:
   BaseApp(){};
   virtual ~BaseApp();
@@ -50,13 +52,10 @@ class BaseApp : public ApplicationBase {
   // parameters
   simtime_t startTime;
   simtime_t stopTime;
+  simtime_t appMainIntervalOffset;
+  int sendLimit;
 
-  int localPort = -1;
-  int destPort = -1;
-  std::vector<L3Address> destAddresses;
-  std::vector<std::string> destAddressStr;
   const char *packetName = nullptr;
-  bool dontFragment = false;
 
   // state
   cMessage *appLifeTime = nullptr;
@@ -66,22 +65,9 @@ class BaseApp : public ApplicationBase {
   int numSent = 0;
   int numReceived = 0;
 
-  // Root Finite State Machine setup omnetpp::cFSM fsm;
-  enum FsmRootStates {
-    INIT = 0,
-    WAIT_ACTIVE = FSM_Steady(1),
-    WAIT_INACTIVE = FSM_Steady(2),
-    ERR = FSM_Steady(3),
-    SETUP = FSM_Transient(101),  // socket and stopTime
-    APP_MAIN = FSM_Transient(
-        102),  // send data with Interval or more elaborate functions
-    TEARDOWN = FSM_Transient(110),
-    DESTROY = FSM_Transient(120),
-    SUBSTATE = 200  // sub states must be outside of +-200
-  };
-  using FsmState = int;  // state for each FSM.
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
+  SocketProvider* socketProvider;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -96,35 +82,28 @@ class BaseApp : public ApplicationBase {
    */
   virtual void scheduleNextAppMainEvent(simtime_t time = -1);
   virtual void cancelAppMainEvent();
-  virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload);
-  virtual void sendPayload(IntrusivePtr<const ApplicationPacket> payload,
-                           L3Address destAddr, int destPort);
-  virtual L3Address chooseDestAddr();
+  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload);
+  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port);
 
   template <typename T>
   IntrusivePtr<T> createPacket(b length = b(-1));
-
-  template <typename T>
-  IntrusivePtr<const T> checkEmitGetReceived(Packet *pkt);
 
   // fsmRoot actions
 
   virtual void setFsmResult(const FsmState &state);
 
-  // handle extra self Messages
-  virtual FsmState fsmHandleSelfMsg(cMessage *msg) = 0;
+  // handle extra self SubState
+  virtual FsmState fsmHandleSubState(cMessage *msg);
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
+  virtual FsmState fsmDataArrived(cMessage *msg);
   virtual FsmState fsmAppMain(cMessage *msg) = 0;
   virtual FsmState fsmTeardown(cMessage *msg);
   virtual FsmState fsmDestroy(cMessage *msg);
 
-  virtual void setupTimers();  // called in fsmSetup
 
-  // socket actions.
-  virtual void initSocket() = 0;
-  virtual ISocket &getSocket() = 0;
-  virtual void sendToSocket(Packet *msg, L3Address destAddr, int destPort) = 0;
+  virtual void setupTimers();  // called in fsmSetup
+  simtime_t getInitialMainAppTime();
 
   // Lifecycle management
   virtual void handleStartOperation(
@@ -140,14 +119,6 @@ inline IntrusivePtr<T> BaseApp::createPacket(b length) {
   payload->setSequenceNumber(numSent);
   payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
   return payload;
-}
-
-template <typename T>
-inline IntrusivePtr<const T> BaseApp::checkEmitGetReceived(Packet *pkt) {
-  emit(packetReceivedSignal, pkt);
-  numReceived++;
-
-  return pkt->popAtFront<T>();
 }
 
 }  // namespace crownet

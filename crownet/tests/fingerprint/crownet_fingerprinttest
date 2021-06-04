@@ -330,9 +330,10 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             sim["test_name"] = sim_name
             sim["file"] = file_path
             file_name_base = re.sub("\.yml$", "", os.path.basename(sim["file"]))
+            hash_base_dir = f"{os.path.dirname(os.path.abspath(file_path))}/hash.d/{file_name_base}"
             if sim["fingerprint"].startswith("file:"):
                 if sim["fingerprint"] == "file:":
-                    hash_path = f"{os.path.dirname(os.path.abspath(file_path))}/hash.d/{file_name_base}/{sim_name}.csv"
+                    hash_path = f"{hash_base_dir}/{sim_name}.csv"
                 else:
                     hash_path = sim["fingerprint"][5:-1]
                 try:
@@ -340,6 +341,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
                     sim["fingerprint"] = diffs
                 except FileNotFoundError:
                     sim["fingerprint"] = {}
+                    os.makedirs(hash_base_dir, exist_ok=True)
                 finally:
                     sim["fingerprint_file"] = hash_path
 
@@ -549,6 +551,7 @@ class SimulationResultCrowNet(SimulationResult):
         self.with_opp = os.path.exists(self.opp_out_path)
         self.errormsg = ""
         # write command output
+        os.makedirs(self.output_path, exist_ok=True)
         with open(os.path.join(self.output_path, "command.out"), "w", encoding="utf-8") as f:
             f.write(out)
 

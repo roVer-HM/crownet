@@ -100,19 +100,11 @@ std::pair<std::string,
                                              // transferal
 std::pair<std::string, std::string> typedef VadereScenario;  // (scenarioPath /
                                                              // scenarioContent)
-// read list of cachId->cachePath pairs from configuration xml.
-std::vector<VadereCache> getCachePaths(const std::string basedir,
-                                       const std::string vadereCachePath,
-                                       const std::string hash);
-// read scenarioPath->scenarioContent from configuration xml.
-VadereScenario getScenarioContent(const std::string basedir,
-                                  const std::string vadereScenarioPath);
 
-std::vector<VadereCache> getCachePaths(const std::string basedir,
-                                       const std::string vadereCachePath,
+std::vector<VadereCache> getCachePaths(const std::string vadereCachePath,
                                        const std::string hash) {
   std::vector<VadereCache> cachePaths;
-  std::string cacheLocation = basedir + vadereCachePath + "/" + hash + "*";
+  std::string cacheLocation = vadereCachePath + "/" + hash + "*";
 
   glob_t glob_res;
 
@@ -134,10 +126,9 @@ std::vector<VadereCache> getCachePaths(const std::string basedir,
   return cachePaths;
 }
 
-VadereScenario getScenarioContent(const std::string basedir,
-                                  const std::string vadereScenarioPath) {
+VadereScenario getScenarioContent(const std::string vadereScenarioPath) {
   VadereScenario ret;
-  ret.first = basedir + vadereScenarioPath;
+  ret.first = vadereScenarioPath;
 
   std::ifstream file(ret.first.c_str());
   if (file) {
