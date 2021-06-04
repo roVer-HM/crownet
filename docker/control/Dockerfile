@@ -38,6 +38,11 @@ RUN --mount=type=ssh git \
 
 RUN python3 setup.py install
 
+RUN python3 -m venv /opt/local_venv
+RUN . /opt/local_venv/bin/activate && pip install -r requirements.txt
+RUN chmod -R ugo+w /opt/local_venv
+
+
 # init script (triggered at container start)
 COPY init.sh /init.sh
 COPY init_dev.sh /init_dev.sh
