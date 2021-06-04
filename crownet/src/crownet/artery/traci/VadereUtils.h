@@ -107,17 +107,11 @@ using VadereCache = std::pair<std::string, std::string>;
 using VadereScenario = std::pair<std::string, std::string>;
 
 // read list of cachId->cachePath pairs from configuration xml.
-std::vector<VadereCache> getCachePaths(const std::string basedir,
-                                       const std::string vadereCachePath,
+std::vector<VadereCache> getCachePaths(const std::string vadereCachePath,
                                        const std::string hash);
 // read scenarioPath->scenarioContent from configuration xml.
-VadereScenario getScenarioContent(const std::string basedir,
-                                  const std::string vadereScenarioPath);
+VadereScenario getScenarioContent(const std::string vadereScenarioPath);
 
-
-using OppInit = std::pair<std::string, std::string>;
-OppInit getOppInitFile(const std::string basedir,
-                       const std::string initFile);
 
 
 }  // namespace vadere
