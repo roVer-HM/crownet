@@ -29,4 +29,5 @@ class SimpleControlCfg extends inet::TagBase {
 
 	string modelString;		// (tag) payload to propagate via TraCI
 	string modelData;		// (tag) payload to propagate via TraCI
+	double appTTL;			// time at which control command is not handle by application anymore
 }

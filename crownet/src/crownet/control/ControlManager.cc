@@ -16,6 +16,8 @@
 #include "ControlManager.h"
 
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <inet/common/ModuleAccess.h>
 #include "inet/common/packet/Message.h"
 #include "crownet/artery/traci/TraCiForwarder.h"
@@ -68,7 +70,23 @@ void ControlManager::handleCommand(const ControlCmd& cmd){
     data->setModelString(cmd.model.c_str());
     data->setModelData(cmd.message.c_str());
 
+    try {
+        std::stringstream ss;
+        ss << cmd.message;
+
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(ss, pt);
+
+        data->setAppTTL(pt.get<double>("time"));
+
+
+    }
+    catch (std::exception const& e)
+    {
+        throw cRuntimeError("Cannot parse message from controller into property_tree (Json): %s", e.what());
+    }
     this->sendDirect(msg, sendingApp, controlGate.c_str());
+
 }
 
 void ControlManager::finish() {
