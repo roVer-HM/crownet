@@ -1,5 +1,5 @@
 {
-  "name" : "test001",
+  "name" : "test002",
   "description" : "",
   "release" : "1.15",
   "processWriters" : {
@@ -260,7 +260,7 @@
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 20.0 ],
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 4,
+        "maxSpawnNumberTotal" : 8,
         "startTime" : 0.0,
         "endTime" : 50.0,
         "spawnAtRandomPositions" : true,

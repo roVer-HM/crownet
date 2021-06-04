@@ -27,7 +27,8 @@ import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
-import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+//import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+import inet.node.inet.INetworkNode;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;
 import lte.corenetwork.nodes.Ue;
@@ -56,6 +57,7 @@ network World
         bool hasLteCoreNetwork = default(hasLte);
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
+        int numMisc = default(0);
 
         traci.nodes.typename = default("VadereNodeManager");
         traci.nodes.objectSinkModule = default(".mobility");
@@ -133,6 +135,9 @@ network World
 
         flowController: <default("")> like IControlManager if typename != "" {
             @display("p=308.14874,319.43625;i=block/table2;is=s");
+        }
+        misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
+            
         }
 
 
