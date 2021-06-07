@@ -29,6 +29,8 @@ simple ControlManager like IControlManager
         string host;
         int port;
         string coreModule;
+        // todo: (CM) must be set to emtpy string to allow simulations without specifiying a 'sensor'
+        string globalDcdModule = default("");
         double startTime  @unit(s) = default(0.0s);
         string controlGate = default("configIn");
 }

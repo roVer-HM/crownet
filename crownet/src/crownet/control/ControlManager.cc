@@ -43,6 +43,8 @@ void ControlManager::initialize(int stage)
         VadereCore* core =
             inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
         subscribeTraCI(core);
+        //todo: (CM) save pointer DensityMap in proteced or private field use getModuleFromPar like with core
+        //todo: (CM) check if parameter is empty first! if (par("globalDcdModule).stdstringValue().empty()){...}
 
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
@@ -57,6 +59,10 @@ void ControlManager::handleMessage(cMessage *msg)
 {
     throw cRuntimeError("Module does not handle messages");
 }
+
+
+//todo: (CM) implement handle method for sensor command here. Access global densityMap in this method.
+
 
 void ControlManager::handleCommand(const ControlCmd& cmd){
     Enter_Method_Silent();

@@ -31,6 +31,7 @@ class ControlHandler {
 public:
     virtual ~ControlHandler() = default;
     virtual void handleCommand(const ControlCmd& cmd) = 0;
+    //todo: (CM) add handle method for sensor command here
 
 };
 
