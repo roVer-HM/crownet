@@ -354,6 +354,7 @@ void VadereApi::VaderSimulationScope::send_control(const std::string& personID, 
     check_resultState(inMsg, myCmdSetID);
 
 }
+//todo: (CM) add method to translate a DCD map into a traci packet. (implement here)
 
 
 } /* namespace crownet */

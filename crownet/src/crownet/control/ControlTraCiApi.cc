@@ -132,12 +132,15 @@ double ControlTraCiApi::handleControlCmd(tcpip::Storage& ctrlCmd){
 tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn, ForwardCmd& ctrlCmd){
     // extract payload and forward
      tcpip::Storage cmd;
-     ControlCmd controlCmd;
      cmd.writeStorage(msgIn, ctrlCmd.payloadLength);
      int cmdLength = cmd.readCmdLength();
      int cmdId = cmd.readUnsignedByte();
      int varId = cmd.readUnsignedByte();
      std::string objectIdentifer = cmd.readString();
+
+     //todo: (CM) check cmdId to separate controlCmd and Sensor query
+
+     ControlCmd controlCmd;
      // compound object
      int type = cmd.readUnsignedByte();
      if (type != TYPE_COMPOUND){
