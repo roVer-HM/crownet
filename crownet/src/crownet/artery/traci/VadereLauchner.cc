@@ -134,22 +134,6 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
   m_lite->vSimulation().sendSimulationConfig(simCfg);
 
   m_api->sendFile(scenario);
-
-  auto converter_m = inet::findModuleFromPar<OsgCoordConverter>(
-      par("coordConverterModule"), this);
-
-  if (!converter_m || !converter_m->isInitialized()) {
-    // no OsgCoordConverter module found --> not set create
-    // OsgCoordianteTransformer only for TraCI
-    CoordRef ref = m_api->v_simulation.getCoordRef();
-    traci::Boundary netBound =
-        traci::Boundary(m_api->v_simulation.getNetBoundary());
-
-    auto converter = std::make_shared<OsgCoordinateConverter>(
-        ref.offset, netBound, ref.epsg_code);
-    m_api->setConverter(converter);
-    if (converter_m) converter_m->initializeConverter(converter);
-  }
 }
 
 } /* namespace crownet */

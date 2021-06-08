@@ -42,7 +42,7 @@ void BaseDensityMapApp::initialize(int stage) {
       WATCH(hostId);
 
     } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-      converter = inet::getModuleFromPar<OsgCoordConverter>(
+      converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                       par("coordConverterModule"), this)
                       ->getConverter();
     } else if (stage == INITSTAGE_LAST){

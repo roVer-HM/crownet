@@ -76,7 +76,7 @@ network World
 
     submodules:
 
-        coordConverter: <default("OsgCoordConverterRemote")> like ICoordConverter if typename != "" {
+        coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
             @display("p=308.14874,207.69;i=block/table2;is=s");
         }
         visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
