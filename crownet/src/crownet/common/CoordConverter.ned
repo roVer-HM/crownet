@@ -24,7 +24,7 @@ moduleinterface ICoordConverter {
 // locally defined converter. Use configuration of parameters
 simple OsgCoordConverterLocal like ICoordConverter {
     parameters:
-        @class(crownet::OsgCoordConverter);
+        @class(crownet::OsgCoordConverterLocal);
         string epsg_code = default("EPSG:32632");
         double offset_x = default(0.0);
         double offset_y = default(0.0);
@@ -32,8 +32,17 @@ simple OsgCoordConverterLocal like ICoordConverter {
         double yBound;
 }
 
-// remotly defined converter. The converter is configured dynamically using TraCI.
-simple OsgCoordConverterRemote like ICoordConverter {
+
+simple OsgCoordConverterVadere like ICoordConverter {
     parameters:
-        @class(crownet::OsgCoordConverter);
+        @class(crownet::OsgCoordConverterVadere);
+        string coreModule = default("traci.core");
 }
+
+simple OsgCoordConverterSumo like ICoordConverter {
+    parameters:
+        @class(crownet::OsgCoordConverterSumo);
+        string coreModule = default("traci.core");
+        string epsg_code = default("EPSG:32632");
+}
+

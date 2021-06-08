@@ -9,47 +9,90 @@
 
 #include <omnetpp.h>
 #include <memory>
+#include <traci/Core.h>
+#include <inet/common/ModuleAccess.h>
 #include "inet/common/INETDefs.h"
 #include "inet/common/geometry/common/Coord.h"
+#include "crownet/artery/traci/VadereApi.h"
+#include "crownet/artery/traci/VadereCore.h"
 
 namespace crownet {
 
-Define_Module(OsgCoordConverter);
+Define_Module(OsgCoordConverterLocal);
+Define_Module(OsgCoordConverterVadere);
+Define_Module(OsgCoordConverterSumo);
 
-OsgCoordConverter::OsgCoordConverter() : _converter(nullptr) {}
-
-void OsgCoordConverter::initialize(int stage) {
+void OsgCoordConverterLocal::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
-    if (hasPar("epgs_code")) {
       _converter = std::make_shared<OsgCoordinateConverter>(
           inet::Coord{par("offset_x").doubleValue(),
                       par("offset_y").doubleValue()},
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
-          par("epsg_code").stdstringValue());
+                      par("epsg_code").stdstringValue());
     }
-  }
 }
 
-std::shared_ptr<OsgCoordinateConverter> OsgCoordConverter::getConverter()
-    const {
-  return _converter;
-}
-
-bool OsgCoordConverter::isInitialized() const { return _converter != nullptr; }
-
-void OsgCoordConverter::initializeConverter(
-    std::shared_ptr<OsgCoordinateConverter> converter) {
-  if (!_converter) {
-    _converter = converter;
-  } else {
-    throw omnetpp::cRuntimeError(
-        "OsgCoordianteTransformer already initialized.");
-  }
-}
-
-void OsgCoordConverter::handleMessage(omnetpp::cMessage*) {
+void OsgCoordConverterLocal::handleMessage(omnetpp::cMessage*) {
   throw omnetpp::cRuntimeError("OsgCoordConverter does not handle messages");
 }
+
+////////////////////////////////////////////
+
+
+void OsgCoordConverterVadere::initialize(int stage) {
+    cSimpleModule::initialize(stage);
+  if (stage == inet::INITSTAGE_LOCAL) {
+
+  } else if (stage == inet::INITSTAGE_LAST){
+      VadereCore* core = inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
+      subscribeTraCI(core);
+  }
+}
+
+void OsgCoordConverterVadere::traciConnected(){
+    VadereCore* core =
+                inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
+    auto m_api = core->getVadereApi();
+    CoordRef ref = m_api->v_simulation.getCoordRef();
+    traci::Boundary netBound = traci::Boundary(m_api->v_simulation.getNetBoundary());
+    _converter = std::make_shared<OsgCoordinateConverter>(
+              ref.offset, netBound, ref.epsg_code);
+    m_api->setConverter(_converter);
+
+}
+
+void OsgCoordConverterVadere::handleMessage(omnetpp::cMessage*) {
+  throw omnetpp::cRuntimeError("OsgCoordConverterVadere does not handle messages");
+}
+
+////////////////////////////////////////////
+
+void OsgCoordConverterSumo::initialize(int stage) {
+    cSimpleModule::initialize(stage);
+  if (stage == inet::INITSTAGE_LOCAL) {
+
+  } else if (stage == inet::INITSTAGE_LAST){
+      Core* core = inet::getModuleFromPar<Core>(par("coreModule"), this);
+      subscribeTraCI(core);
+  }
+}
+
+void OsgCoordConverterSumo::traciConnected(){
+    Core* core =
+                inet::getModuleFromPar<Core>(par("coreModule"), this);
+    auto api = core->getLiteAPI();
+    traci::Boundary netBoundary =
+              traci::Boundary(api.simulation().getNetBoundary());
+    traci::TraCIPosition offset = traci::TraCIPosition(0, 0);
+    _converter = std::make_shared<OsgCoordinateConverter>(
+             offset, netBoundary, par("epsg_code").stdstringValue());
+}
+
+void OsgCoordConverterSumo::handleMessage(omnetpp::cMessage*) {
+  throw omnetpp::cRuntimeError("OsgCoordConverterSumo does not handle messages");
+}
+
+////////////////////////////////////////////
 
 } /* namespace crownet */

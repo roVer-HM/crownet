@@ -20,6 +20,7 @@ class VadereCore : public traci::Core {
   virtual VadereLiteApi* getVadereLiteAPI();
 
   virtual std::shared_ptr<TraCiForwarder> getTraCiForwarder();
+  virtual std::shared_ptr<VadereApi> getVadereApi();
 
  protected:
   virtual void handleMessage(omnetpp::cMessage*) override;

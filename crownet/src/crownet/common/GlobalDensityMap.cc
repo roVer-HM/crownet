@@ -75,7 +75,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
                                      const SimTime &t, cObject *details) {
   if (signalID == traciInit) {
     // 1) setup map
-    converter = inet::getModuleFromPar<OsgCoordConverter>(
+    converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
                     ->getConverter();
     nodeManager = inet::getModuleFromPar<traci::NodeManager>(
@@ -111,7 +111,6 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
 void GlobalDensityMap::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
-    std::string x = par("coordConverterModule").stdstringValue();
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_middelwareModule = par("middelwareModule").stdstringValue();
 
