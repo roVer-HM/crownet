@@ -27,10 +27,17 @@ struct ControlCmd {
     std::string message;
 };
 
+struct SensorCmd {
+
+
+};
+
 class ControlHandler {
 public:
     virtual ~ControlHandler() = default;
-    virtual void handleCommand(const ControlCmd& cmd) = 0;
+    virtual void handleControlCommand(const ControlCmd& cmd) = 0;
+    virtual void handleSensorCommand(const SensorCmd& cmd) = 0;
+
     //todo: (CM) add handle method for sensor command here
 
 };

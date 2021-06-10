@@ -158,7 +158,9 @@ tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn
      controlCmd.message = cmd.readString();
 
 
-     this->controlHandler->handleCommand(controlCmd);
+     this->controlHandler->handleControlCommand(controlCmd);
+
+     this->controlHandler->handleSensorCommand(cmd);
 
      tcpip::Storage response;
      this->createResponse(response, cmdId, RTYPE_OK, "");

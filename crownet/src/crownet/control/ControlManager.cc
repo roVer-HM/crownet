@@ -39,12 +39,12 @@ void ControlManager::initialize(int stage)
 {
     if (stage == INITSTAGE_APPLICATION_LAYER){
         // register TraCiForwardProvider in controller api and set controller as listener
-
         VadereCore* core =
             inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
         subscribeTraCI(core);
         //todo: (CM) save pointer DensityMap in proteced or private field use getModuleFromPar like with core
         //todo: (CM) check if parameter is empty first! if (par("globalDcdModule).stdstringValue().empty()){...}
+        globalMap = nullptr; //getModuleFromPar<>(par("globalDcdModule));
 
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
@@ -62,9 +62,14 @@ void ControlManager::handleMessage(cMessage *msg)
 
 
 //todo: (CM) implement handle method for sensor command here. Access global densityMap in this method.
+void ControlManager::handleSensorCommand(const SensorCmd& cmd){
+    auto map = globalMap->getDcdMapGlobal();
+    map->vaild();
+    map->toArray();
 
+}
 
-void ControlManager::handleCommand(const ControlCmd& cmd){
+void ControlManager::handleActionCommand(const ControlCmd& cmd){
     Enter_Method_Silent();
     cModule* sendingApp = this->findModuleByPath(cmd.sendingNode.c_str());
     if (!sendingApp){
