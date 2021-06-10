@@ -38,31 +38,6 @@ VadereApi::VadereApi() : API(), v_simulation(*this), v_person(*this) {
   myDomains[RESPONSE_SUBSCRIBE_PERSON_VARIABLE] = &v_person;
 }
 
-void VadereApi::sendFile(const vadere::VadereScenario& scenario) const {
-  // todo: handle cache send? Currently cache will not be send
-
-  tcpip::Storage outMsg;
-  // command length (length[1+4=5] + cmdId[1] + strLengthField[4] +
-  // strLenght[scenario.first] + strLengthField[4] + strLenght[scenario.second]
-
-  int length = 5 + 1 + 4 + static_cast<int>(scenario.first.length()) + 4 +
-               static_cast<int>(scenario.second.length());
-
-  outMsg.writeUnsignedByte(
-      0);  // first byte of extended length field must be zero
-  outMsg.writeInt(length);
-
-  outMsg.writeByte(CMD_FILE_SEND);
-  //  outMsg.writeByte(TYPE_STRING);
-  outMsg.writeString(scenario.first);
-  //  outMsg.writeByte(TYPE_STRING);
-  outMsg.writeString(scenario.second);
-
-  mySocket->sendExact(outMsg);
-  tcpip::Storage inMsg;
-  check_resultState(inMsg, crownet::constants::CMD_FILE_SEND);
-}
-
 // ---------------------------------------------------------------------------
 // // TraCIAPI::VaderePersonScope-methods
 //  ---------------------------------------------------------------------------

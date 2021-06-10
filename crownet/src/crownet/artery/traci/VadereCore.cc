@@ -49,22 +49,17 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
           throw omnetpp::cRuntimeError("Cannot connect to Vadere server using <<%s:%s>>. "
                   "Is server or container started or check hostname and port configuration?",
                   endpoint.hostname.c_str(), std::to_string(endpoint.port).c_str());
-    }
-
-
-    auto traciLauchner = omnetpp::check_and_cast<VadereLauchner*>(m_launcher);
-    {  // scope of raw pointer
-      auto tmp_vadereLiteApi =
-          omnetpp::check_and_cast<VadereLiteApi*>(m_lite.get());
-      auto tmp_vadereAPI = omnetpp::check_and_cast<VadereApi*>(m_traci.get());
-      traciLauchner->initializeServer(tmp_vadereLiteApi, tmp_vadereAPI);
-    }
-    checkVersion();
-    syncTime();
-    emit(connectedSignal, simTime()); // pre subscribe
-    emit(initSignal, simTime());
-    m_updateInterval = Time{m_traci->simulation.getDeltaT()};
-    scheduleAt(simTime() + m_updateInterval, m_updateEvent);
+      }
+      checkVersion();
+      syncTime();
+      // pre subscribe
+      auto traciLauchner = omnetpp::check_and_cast<VadereLauchner*>(m_launcher);
+      traciLauchner->initializeServer(m_lite.get());
+      emit(connectedSignal, simTime());
+      // send initSignal to setup subscriptions
+      emit(initSignal, simTime());
+      m_updateInterval = Time{m_traci->simulation.getDeltaT()};
+      scheduleAt(simTime() + m_updateInterval, m_updateEvent);
   }
 }
 
