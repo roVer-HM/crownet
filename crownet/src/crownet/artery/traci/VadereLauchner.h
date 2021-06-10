@@ -20,7 +20,7 @@ class VadereLauchner : public traci::ConnectLauncher {
  public:
   void initialize() override;
   std::pair<API*, LiteAPI*> createAPI() override;
-  void initializeServer(VadereLiteApi* m_lite, VadereApi* m_api);
+  void initializeServer(LiteAPI* m_lite) override;
 };
 
 } /* namespace crownet */

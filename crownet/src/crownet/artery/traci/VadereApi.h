@@ -58,7 +58,6 @@ class VadereApi : public API, public TraCiForwarder {
   VadereApi();
   virtual ~VadereApi() {}
 
-  void sendFile(const vadere::VadereScenario&) const;
   virtual TraCIGeoPosition convertGeo(const TraCIPosition&) const override;
   virtual TraCIPosition convert2D(const TraCIGeoPosition&) const override;
 
