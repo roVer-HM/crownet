@@ -51,7 +51,7 @@ class DistributeAgentsOverCorridors(Controller):
         self.counter += 1
 
     def handle_init(self, sim_time, sim_state):
-        print("TikTokController: handle_init")
+        print("Distribute: handle_init")
         self.con_manager.next_call_at(0.0)
         print(sim_state)
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         init_sub=True,
     )
 
-    for control in ['DistributeAgentsOverCorridors','DistributeAgentsOverCorridorsInform']:
+    for control in ['DistributeAgentsOverCorridors']:#,'DistributeAgentsOverCorridorsInform']:
 
         settings_ = settings
         settings_.extend(["--output-dir", os.path.join(os.getcwd(), control)])
