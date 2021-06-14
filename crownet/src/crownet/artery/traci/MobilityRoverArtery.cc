@@ -14,6 +14,7 @@
 #include <cmath>
 #include "crownet/artery/traci/VaderePersonController.h"
 #include "crownet/artery/traci/VariableCache.h"
+#include "crownet/artery/traci/VadereApi.h"
 
 #ifdef WITH_VISUALIZERS
 #include <inet/visualizer/mobility/MobilityCanvasVisualizer.h>
@@ -48,16 +49,12 @@ void MobilityRoverArtery::initialize(int stage) {
   }
 }
 
-void MobilityRoverArtery::initializeSink(
-    traci::LiteAPI* api, const std::string& id, const traci::Boundary& boundary,
-    std::shared_ptr<traci::VariableCache> cache) {
+void MobilityRoverArtery::initializeSink(std::shared_ptr<API> api, std::shared_ptr<PersonCache> cache, const Boundary& boundary) {
   ASSERT(api);
   ASSERT(cache);
-  ASSERT(cache->getId() == id);
-  ASSERT(&cache->getLiteAPI() == api);
   mTraci = api;
-  mObjectId = id;
   mNetBoundary = boundary;
+  mObjectId = cache->getId(); //FIXME mPersonId
 
 
   const auto& max = mNetBoundary.upperRightPosition();
@@ -174,8 +171,9 @@ void MobilityRoverArtery::update(const Position& pos, Angle heading,
 }
 
 omnetpp::simtime_t MobilityRoverArtery::getUpdateTime() {
-  auto vApi = omnetpp::check_and_cast<VadereLiteApi*>(mTraci);
-  return vApi->vSimulation().getTime();
+
+  auto vApi = std::dynamic_pointer_cast<VadereApi>(mTraci);
+  return vApi->v_simulation.getTime();
 }
 
 void MobilityRoverArtery::emitMobilityStateChangedSignal() {

@@ -9,7 +9,6 @@
 
 #include <mutex>
 #include "artery/inet/InetRadioDriver.h"
-#include "artery/inet/VanetRx.h"
 #include "artery/networking/GeoNetIndication.h"
 #include "artery/networking/GeoNetRequest.h"
 #include "artery/nic/RadioDriverProperties.h"

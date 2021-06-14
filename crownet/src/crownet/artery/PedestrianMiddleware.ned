@@ -26,6 +26,5 @@ simple PedestrianMiddleware extends Middleware
 		string localEnvironmentModule = default("");
 		string globalEnvironmentModule = default("");
 		string mobilityModule = default(".mobility");
-    	routerModule = default(".vanetza.router");
 
 }

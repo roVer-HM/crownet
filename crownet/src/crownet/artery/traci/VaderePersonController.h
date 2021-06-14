@@ -8,7 +8,7 @@
 #pragma once
 
 #include <artery/traci/MovingNodeController.h>
-#include "crownet/artery/traci/VadereLiteApi.h"
+#include "crownet/artery/traci/VadereApi.h"
 #include "crownet/artery/traci/VariableCache.h"
 
 namespace crownet {
@@ -16,7 +16,7 @@ namespace crownet {
 class VaderePersonController : public traci::MovingNodeController {
  public:
   virtual ~VaderePersonController() = default;
-  VaderePersonController(const std::string& id, crownet::VadereLiteApi& api);
+  VaderePersonController(const std::string& id, std::shared_ptr<API> api);
   VaderePersonController(std::shared_ptr<VaderePersonCache> cache);
 
   // MovingNodeController
@@ -45,11 +45,11 @@ class VaderePersonController : public traci::MovingNodeController {
  private:
   VaderePersonController(const std::string& id,
                          std::shared_ptr<VaderePersonCache> cache,
-                         traci::LiteAPI& api);
+                         std::shared_ptr<API> api);
 
   std::string m_id;
   std::shared_ptr<VaderePersonCache> m_cache;
-  VadereLiteApi& m_api;
+  std::shared_ptr<VadereApi> m_api;
   traci::Boundary m_boundary;
 };
 

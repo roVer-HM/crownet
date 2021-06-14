@@ -8,6 +8,7 @@
 #pragma once
 
 #include <artery/traci/MobilityBase.h>
+#include <artery/inet/InetMobility.h>
 #include <omnetpp/csimplemodule.h>
 
 #include "inet/mobility/contract/IMobility.h"
@@ -24,17 +25,14 @@ using namespace omnetpp;
 
 namespace crownet {
 
-class MobilityRoverArtery : public artery::MobilityBase,
-                            public omnetpp::cSimpleModule,
-                            public inet::IMobility,
+//todo: check if still working after update?
+class MobilityRoverArtery : public InetPersonMobility,
                             public IPositionHistoryProvider {
  public:
   virtual ~MobilityRoverArtery() = default;
 
-  // artery::MobilityBase
-  void initializeSink(traci::LiteAPI*, const std::string& id,
-                      const traci::Boundary&,
-                      std::shared_ptr<traci::VariableCache> cache) override;
+  // traci::PersonSink interface
+  virtual void initializeSink(std::shared_ptr<traci::API> api, std::shared_ptr<traci::PersonCache>, const traci::Boundary&) override;
 
   // inet::IMobility interface
   virtual int getId() const override { return cSimpleModule::getId(); }

@@ -12,7 +12,6 @@
 #include <vanetza/geonet/areas.hpp>
 #include "artery/utility/IdentityRegistry.h"
 #include "traci/Core.h"
-#include "traci/LiteAPI.h"
 #include "traci/Position.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 

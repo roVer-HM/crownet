@@ -10,6 +10,7 @@
 #include <omnetpp.h>
 #include <memory>
 #include <traci/Core.h>
+#include <traci/Position.h>
 #include <inet/common/ModuleAccess.h>
 #include "inet/common/INETDefs.h"
 #include "inet/common/geometry/common/Coord.h"
@@ -81,9 +82,9 @@ void OsgCoordConverterSumo::initialize(int stage) {
 void OsgCoordConverterSumo::traciConnected(){
     Core* core =
                 inet::getModuleFromPar<Core>(par("coreModule"), this);
-    auto api = core->getLiteAPI();
+    auto api = core->getAPI();
     traci::Boundary netBoundary =
-              traci::Boundary(api.simulation().getNetBoundary());
+              traci::Boundary(api->simulation.getNetBoundary());
     traci::TraCIPosition offset = traci::TraCIPosition(0, 0);
     _converter = std::make_shared<OsgCoordinateConverter>(
              offset, netBoundary, par("epsg_code").stdstringValue());

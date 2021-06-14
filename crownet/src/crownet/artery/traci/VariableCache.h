@@ -3,17 +3,18 @@
 
 #include <traci/VariableCache.h>
 #include <string>
+#include "crownet/artery/traci/VadereApi.h"
 
 namespace crownet {
 
 class VaderePersonCache : public traci::VariableCache {
  public:
-  VaderePersonCache(traci::LiteAPI&, const std::string& id);
+  VaderePersonCache(std::shared_ptr<API> api, const std::string& id);
 };
 
 class VadereSimulationCache : public traci::VariableCache {
  public:
-  VadereSimulationCache(traci::LiteAPI&);
+  VadereSimulationCache(std::shared_ptr<API> api);
 };
 
 }  // namespace crownet

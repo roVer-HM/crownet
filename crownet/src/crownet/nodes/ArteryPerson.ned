@@ -80,7 +80,6 @@ module ArteryPerson like IMobileUe
         middleware: VehicleMiddleware {
             parameters:
                 @display("p=250,100");
-                routerModule = ".vanetza.router";
                 mobilityModule = ".mobility";
         }
 

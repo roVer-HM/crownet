@@ -12,6 +12,7 @@
 #include "crownet/artery/traci/VadereCore.h"
 
 using namespace omnetpp;
+using namespace libsumo;
 
 namespace crownet {
 
@@ -22,7 +23,7 @@ VadereSubscriptionManager::VadereSubscriptionManager() : m_api(nullptr) {}
 VadereSubscriptionManager::~VadereSubscriptionManager() {}
 
 void VadereSubscriptionManager::step() {
-  const auto& simvars = m_api->vSimulation().getSubscriptionResults("");
+  const auto& simvars = m_api->v_simulation.getSubscriptionResults("");
   m_sim_cache->reset(simvars);
   // todo check timeSync
   // ASSERT(traci::checkTimeSync(*m_sim_cache, omnetpp::simTime()));
@@ -37,7 +38,7 @@ void VadereSubscriptionManager::step() {
     subscribePerson(id);
   }
 
-  const auto& persons = m_api->vPerson();
+  const auto& persons = m_api->v_person;
   for (const std::string& person : m_subscribed_persons) {
     const auto& vars = persons.getSubscriptionResults(person);
     getPersonCache(person)->reset(vars);
@@ -68,7 +69,7 @@ void VadereSubscriptionManager::subscribeSimulationVariables(
   ASSERT(m_sim_vars.size() >= tmp_vars.size());
 
   if (m_sim_vars.size() != tmp_vars.size()) {
-    m_api->vSimulation().subscribe("", m_sim_vars, INVALID_DOUBLE_VALUE,
+    m_api->v_simulation.subscribe("", m_sim_vars, INVALID_DOUBLE_VALUE,
                                    INVALID_DOUBLE_VALUE);
   }
 }
@@ -88,7 +89,9 @@ std::shared_ptr<VaderePersonCache> VadereSubscriptionManager::getPersonCache(
   auto found = m_person_caches.find(id);
   if (found == m_person_caches.end()) {
     std::tie(found, std::ignore) = m_person_caches.emplace(
-        id, std::make_shared<VaderePersonCache>(*m_api, id));
+        id,
+        std::make_shared<VaderePersonCache>(m_api, id)
+        );
   }
   return found->second;
 }
@@ -103,9 +106,8 @@ void VadereSubscriptionManager::initialize() {
   VadereCore* core =
       inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
   subscribeTraCI(core);
-  auto _api = &core->getLiteAPI();
-  m_api = check_and_cast<VadereLiteApi*>(_api);
-  m_sim_cache = std::make_shared<VadereSimulationCache>(*m_api);
+  m_api =core->getVadereApi();
+  m_sim_cache = std::make_shared<VadereSimulationCache>(m_api);
 }
 
 void VadereSubscriptionManager::finish() {
@@ -115,13 +117,13 @@ void VadereSubscriptionManager::finish() {
 }
 
 void VadereSubscriptionManager::traciInit() {
-  using namespace traci::constants;
+  using namespace libsumo;
   static const std::set<int> vars{VAR_DELTA_T, VAR_TIME};
   subscribeSimulationVariables(vars);
 
   // subscribe already running persons
   if (!m_person_vars.empty()) {
-    for (const std::string& id : m_api->vPerson().getIDList()) {
+    for (const std::string& id : m_api->v_person.getIDList()) {
       subscribePerson(id);
     }
   }
@@ -147,7 +149,7 @@ void VadereSubscriptionManager::unsubscribePerson(const std::string& id,
 
 void VadereSubscriptionManager::updatePersonSubscription(
     const std::string& id, const std::vector<int>& vars) {
-  m_api->vPerson().subscribe(id, vars, INVALID_DOUBLE_VALUE,
+  m_api->v_person.subscribe(id, vars, INVALID_DOUBLE_VALUE,
                              INVALID_DOUBLE_VALUE);
 }
 

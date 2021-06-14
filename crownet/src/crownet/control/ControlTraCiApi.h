@@ -18,12 +18,12 @@ namespace constants {
 
 // command: simulation step
 // constexpr ubyte CMD_CONTROL = 0x0d;
-constexpr ubyte CMD_CONTROL = 0x06;
-constexpr ubyte RESPONSE_CMD_CONTROL = 0x1d;
+constexpr int CMD_CONTROL = 0x06;
+constexpr int RESPONSE_CMD_CONTROL = 0x1d;
 
-constexpr ubyte VAR_FORWARD = 0xff;
-constexpr ubyte VAR_INIT = 0x00;
-constexpr ubyte VAR_Step = 0x02;
+constexpr int VAR_FORWARD = 0xff;
+constexpr int VAR_INIT = 0x00;
+constexpr int VAR_Step = 0x02;
 
 constexpr char SIMULATOR_VADERE[] = "V";
 constexpr char SIMULATOR_OPP[] = "O";
@@ -46,11 +46,11 @@ public:
     void setControlHandler(ControlHandler* controlHandler);
 
 protected:
-    virtual double handleControlCmd(tcpip::Storage& ctrlCmd);
-    virtual tcpip::Storage handleControllerOppRequest(tcpip::Storage& msgIn, ForwardCmd& ctrlCmd);
+    virtual double handleControlLoop();
+    virtual tcpip::Storage handleControllerOppRequest(ForwardCmd& ctrlCmd);
 
     ForwardCmd parseCtrlCmd(tcpip::Storage& inMsg);
-    TraCiResult parseResult(tcpip::Storage& inMsg);
+    libsumo::TraCIResult parseResult(tcpip::Storage& inMsg);
 
     std::shared_ptr<TraCiForwarder> traciForwarder;
     ControlHandler* controlHandler;

@@ -10,13 +10,13 @@
 #include <omnetpp/ccomponent.h>
 #include <traci/Listener.h>
 #include <traci/ModuleMapper.h>
-#include <traci/MovingObjectSink.h>
 #include <traci/NodeManager.h>
 #include <traci/VariableCache.h>
 #include <functional>
 #include "crownet/artery/traci.h"
 #include "crownet/artery/traci/VadereSubscriptionManager.h"
 #include "crownet/artery/traci/VariableCache.h"
+#include "crownet/artery/traci/VaderePersonSink.h"
 
 namespace crownet {
 
@@ -31,7 +31,7 @@ class VadereNodeManager : public traci::NodeManager,
   static const omnetpp::simsignal_t updatePersonSignal;
   static const omnetpp::simsignal_t removePersonSignal;
 
-  LiteAPI* getLiteAPI() override { return m_api; }
+  std::shared_ptr<API> getAPI() override { return m_api; }
   std::size_t getNumberOfNodes() const override;
 
   class VaderePersonObject : public traci::NodeManager::MovingObject {
@@ -51,7 +51,7 @@ class VadereNodeManager : public traci::NodeManager,
 
   virtual void addMovingObject(const std::string&);
   virtual void removeMovingObject(const std::string&);
-  virtual void updateMovingObject(const std::string&, MovingObjectSink*);
+  virtual void updateMovingObject(const std::string&, VaderePersonSink*);
   virtual omnetpp::cModule* createModule(const std::string&,
                                          omnetpp::cModuleType*);
   virtual omnetpp::cModule* addNodeModule(const std::string&,
@@ -59,20 +59,20 @@ class VadereNodeManager : public traci::NodeManager,
                                           NodeInitializer&);
   virtual void removeNodeModule(const std::string&);
   virtual omnetpp::cModule* getNodeModule(const std::string&);
-  virtual MovingObjectSink* getObjectSink(omnetpp::cModule*);
-  virtual MovingObjectSink* getObjectSink(const std::string&);
+  virtual VaderePersonSink* getObjectSink(omnetpp::cModule*);
+  virtual VaderePersonSink* getObjectSink(const std::string&);
 
  private:
   void traciInit() override;
   void traciStep() override;
   void traciClose() override;
 
-  VadereLiteApi* m_api;
+  std::shared_ptr<VadereApi> m_api;
   ModuleMapper* m_mapper;
   Boundary m_boundary;
   VadereSubscriptionManager* m_subscriptions;
   unsigned m_nodeIndex;
-  std::map<std::string, MovingObjectSink*> m_persons;
+  std::map<std::string, VaderePersonSink*> m_persons;
   std::string m_objectSinkModule;
 };
 

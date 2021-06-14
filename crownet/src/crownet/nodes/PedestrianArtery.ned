@@ -66,7 +66,6 @@ module Pedestrian like INetworkNode
         middleware: PedestrianMiddleware {
             parameters:
                 @display("p=250,100");
-                routerModule = ".vanetza.router";
                 mobilityModule = ".mobility";
         }
 

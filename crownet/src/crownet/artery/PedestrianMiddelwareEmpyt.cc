@@ -16,6 +16,7 @@
 #include "PedestrianMiddelwareEmpyt.h"
 #include <artery/application/MovingNodeDataProvider.h>
 #include <artery/traci/MobilityBase.h>
+#include <artery/application/VehicleKinematics.h>
 #include <artery/utility/InitStages.h>
 #include <vanetza/geonet/station_type.hpp>
 #include "inet/common/ModuleAccess.h"
@@ -35,7 +36,8 @@ void PedestrianMiddelwareEmpyt::initialize(int stage) {
     initializeController(par("mobilityModule"));
     mDataProvider.setStationType(StationType::Pedestrian);
     getFacilities().register_const(&mDataProvider);
-    mDataProvider.update(mPersonController);
+    // todo introduce PersonKinematics struct
+    mDataProvider.update(getKinematics(*mPersonController));
 
     Identity identity;
     identity.traci = mPersonController->getNodeId();
@@ -62,7 +64,8 @@ void PedestrianMiddelwareEmpyt::receiveSignal(cComponent* component,
                                               simsignal_t signal, cObject* obj,
                                               cObject* details) {
   if (signal == MobilityBase::stateChangedSignal) {
-    mDataProvider.update(mPersonController);
+    // todo introduce PersonKinematics struct
+    mDataProvider.update(getKinematics(*mPersonController));
   }
 }
 

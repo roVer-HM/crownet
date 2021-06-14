@@ -8,6 +8,8 @@
 #include <omnetpp/cexpression.h>
 #include "ControlTraCiApi.h"
 
+using namespace libsumo;
+
 namespace crownet {
 
 ControlTraCiApi::ControlTraCiApi() {
@@ -48,10 +50,9 @@ double ControlTraCiApi::handleSimStep(double simtime){
     content.writeByte(TYPE_DOUBLE);
     content.writeDouble(simtime);
 
-    //todo directly pull vadere subscription here to reduce roundtrip?
-    tcpip::Storage outMsg = build_command(CMD_CONTROL, CMD_SIMSTEP, objId, content);
+    createCommand(traci::constants::CMD_CONTROL, CMD_SIMSTEP, objId, &content);
     // call controller and set next time
-    return handleControlCmd(outMsg);
+    return handleControlLoop();
 }
 
 double ControlTraCiApi::handleInit(double simtime){
@@ -63,56 +64,55 @@ double ControlTraCiApi::handleInit(double simtime){
     content.writeByte(TYPE_DOUBLE);
     content.writeDouble(simtime);
 
-    tcpip::Storage outMsg = build_command(CMD_CONTROL, VAR_INIT, objId, content);
-    // call controller and set next time
-    return handleControlCmd(outMsg);
+    createCommand(traci::constants::CMD_CONTROL, traci::constants::VAR_INIT, objId, &content);
+    return handleControlLoop();
 }
 
 
-double ControlTraCiApi::handleControlCmd(tcpip::Storage& ctrlCmd){
+double ControlTraCiApi::handleControlLoop(){
     // send  command to controller
-    mySocket->sendExact(ctrlCmd);
+    mySocket->sendExact(myOutput);
+    myInput.reset();
     bool running = true;
     double nextControlUpdateAt = -1.0; // -1.0 means next simStep
 
     while(running){
-        // receive replay and decided what to do
+        // receive myInput and decided what to do
         // replies must be CMD_CONTROL commands. no result State provided.
-        tcpip::Storage reply;
-        mySocket->receiveExact(reply);
-        ForwardCmd result = parseCtrlCmd(reply);
+        mySocket->receiveExact(myInput);
+        ForwardCmd result = parseCtrlCmd(myInput);
 
-        if (result.cmdId != CMD_CONTROL){
+        if (result.cmdId != traci::constants::CMD_CONTROL){
             throw omnetpp::cRuntimeError("#Error: expected CMD_CONTROL");
         }
 
-        if (result.varId == VAR_Step || result.varId == VAR_INIT){
+        if (result.varId == traci::constants::VAR_Step || result.varId == traci::constants::VAR_INIT){
             // Acknowledgment of simStep from controller [simAck]
             // read next call time
-            if (reply.readUnsignedByte() != TYPE_DOUBLE){
+            if (myInput.readUnsignedByte() != TYPE_DOUBLE){
                 throw omnetpp::cRuntimeError("#Error: expected TYPE_DOUBLE");
             }
-            nextControlUpdateAt = reply.readDouble();
+            nextControlUpdateAt = myInput.readDouble();
 
             // stop receiving mode. (Other side is waiting for next 'sendExact' call)
             running = false;
-        } else if (result.varId == VAR_FORWARD){
+        } else if (result.varId == traci::constants::VAR_FORWARD){
 
-            if (result.objectIdentifer == SIMULATOR_VADERE){
+            if (result.objectIdentifer == traci::constants::SIMULATOR_VADERE){
 
                   // extract payload and forward
                   tcpip::Storage forwardCmd;
                   tcpip::Storage forwardResponse;
 
-                  forwardCmd.writeStorage(reply, result.payloadLength);
+                  forwardCmd.writeStorage(myInput, result.payloadLength);
                   traciForwarder->forward(forwardCmd, forwardResponse);
 
                   // send response from mobilityProvider to controller
                   mySocket->sendExact(forwardResponse);
 
-              } else if (result.objectIdentifer == SIMULATOR_OPP){
+              } else if (result.objectIdentifer == traci::constants::SIMULATOR_OPP){
                   // extract command and execute
-                  tcpip::Storage res = handleControllerOppRequest(reply, result);
+                  tcpip::Storage res = handleControllerOppRequest(result);
                   // send response to controller
                   mySocket->sendExact(res);
               } else {
@@ -129,11 +129,11 @@ double ControlTraCiApi::handleControlCmd(tcpip::Storage& ctrlCmd){
     return nextControlUpdateAt;
 }
 
-tcpip::Storage ControlTraCiApi::handleControllerOppRequest(tcpip::Storage& msgIn, ForwardCmd& ctrlCmd){
+tcpip::Storage ControlTraCiApi::handleControllerOppRequest(ForwardCmd& ctrlCmd){
     // extract payload and forward
      tcpip::Storage cmd;
      ControlCmd controlCmd;
-     cmd.writeStorage(msgIn, ctrlCmd.payloadLength);
+     cmd.writeStorage(myInput, ctrlCmd.payloadLength);
      int cmdLength = cmd.readCmdLength();
      int cmdId = cmd.readUnsignedByte();
      int varId = cmd.readUnsignedByte();
