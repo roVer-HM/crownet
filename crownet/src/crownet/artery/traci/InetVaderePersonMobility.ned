@@ -18,10 +18,10 @@ package crownet.artery.traci;
 import inet.mobility.contract.IMobility;
 
 
-simple MobilityRoverArtery like IMobility, artery.traci.Mobility
+simple InetVaderePersonMobility like IMobility, artery.traci.Mobility
 {
     parameters:
-        @class(crownet::MobilityRoverArtery);
+        @class(crownet::InetVaderePersonMobility);
         @signal[mobilityStateChanged];
         string visualRepresentation = default("^");
         bool updateDisplayString = default(true);

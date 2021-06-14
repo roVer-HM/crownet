@@ -274,26 +274,29 @@ double VadereApi::VaderSimulationScope::getDistance2D(double x1, double y1,
 //  send_commandGetVariable(CMD_GET_SIM_VARIABLE, DISTANCE_REQUEST, "", &content);
 //  tcpip::Storage inMsg;
 //  processGET(inMsg, CMD_GET_SIM_VARIABLE, TYPE_DOUBLE);
+  processGet(TYPE_DOUBLE);
   return getInput().readDouble();
 
 }
 
 std::string VadereApi::VaderSimulationScope::getScenarioHash(
     const std::string& scenario) const {
-  tcpip::Storage content;
-  content.writeByte(TYPE_STRING);
-  content.writeString(scenario);
-  createGetCommand(crownet::constants::VAR_CACHE_HASH, "", &content);
+    tcpip::Storage content;
+    content.writeByte(TYPE_STRING);
+    content.writeString(scenario);
+    createGetCommand(crownet::constants::VAR_CACHE_HASH, "", &content);
 //  send_commandGetVariableExtLenghtField(
 //      myCmdGetID, crownet::constants::VAR_CACHE_HASH, "", &content);
 //  tcpip::Storage inMsg;
 //  processGET(inMsg, myCmdGetID, TYPE_STRING);
 //  return inMsg.readString();
+   processGet(TYPE_STRING);
    return getInput().readString();
 }
 
 CoordRef VadereApi::VaderSimulationScope::getCoordRef() const {
     createGetCommand(constants::VAR_COORD_REF, "");
+    processGet(TYPE_COMPOUND);
 //  send_commandGetVariable(myCmdGetID, constants::VAR_COORD_REF, "");
   tcpip::Storage& inMsg = getInput();
 //  processGET(inMsg, myCmdGetID, TYPE_COMPOUND, true);

@@ -94,7 +94,7 @@ module TransportLayerPedestrian like INetworkNode
         interfaceTable: InterfaceTable {
             @display("p=84.672,147.392;is=s");
         }
-        mobility: <default("crownet.artery.traci.MobilityRoverArtery")> like IMobility {
+        mobility: <default("crownet.artery.traci.InetVaderePersonMobility")> like IMobility {
             parameters:
                 @display("p=83.104004,54.88;is=s");
         }

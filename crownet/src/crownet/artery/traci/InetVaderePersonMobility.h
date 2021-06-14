@@ -14,6 +14,7 @@
 #include "inet/mobility/contract/IMobility.h"
 #include "crownet/common/util/crownet_util.h"
 #include "crownet/mobility/IPositionHistoryProvider.h"
+#include "crownet/artery/traci/VaderePersonSink.h"
 #include "crownet/crownet.h"
 
 namespace inet {
@@ -26,13 +27,19 @@ using namespace omnetpp;
 namespace crownet {
 
 //todo: check if still working after update?
-class MobilityRoverArtery : public InetPersonMobility,
+class InetVaderePersonMobility : public InetMobility,
+                            public VaderePersonSink,
                             public IPositionHistoryProvider {
  public:
-  virtual ~MobilityRoverArtery() = default;
+  virtual ~InetVaderePersonMobility() = default;
 
   // traci::PersonSink interface
-  virtual void initializeSink(std::shared_ptr<traci::API> api, std::shared_ptr<traci::PersonCache>, const traci::Boundary&) override;
+  virtual void initializeSink(std::shared_ptr<traci::API> api, std::shared_ptr<VaderePersonCache>, const traci::Boundary&) override;
+  virtual void initializePerson(const TraCIPosition&, TraCIAngle, double speed) override;
+  virtual void updatePerson(const TraCIPosition&, TraCIAngle, double speed) override;
+
+  const std::string& getPersonId() const { return mObjectId; }
+
 
   // inet::IMobility interface
   virtual int getId() const override { return cSimpleModule::getId(); }
@@ -49,11 +56,12 @@ class MobilityRoverArtery : public InetPersonMobility,
   // omnetpp::cSimpleModule
   void initialize(int stage) override;
   int numInitStages() const override;
-  //  void setInitialPosition() override;
+
 
   virtual void move();
   virtual void moveAndUpdate();
 
+  // IPositionHistoryProvider
   virtual void recoredTimeCoord(simtime_t time, inet::Coord coord) override;
 
   virtual std::vector<PathPoint> getPositionHistory() override;
@@ -80,11 +88,12 @@ class MobilityRoverArtery : public InetPersonMobility,
   simtime_t lastRecordedTime;
   RingBuffer<PathPoint> coordBuffer;
 
- private:
+ protected:
   void initialize(const Position& pos, Angle heading, double speed) override;
   void update(const Position& pos, Angle heading, double speed) override;
   simtime_t getUpdateTime();
 
+  std::shared_ptr<VaderePersonCache> mCache;
   double mAntennaHeight = 1.5;
   omnetpp::cModule* mVisualRepresentation = nullptr;
   const inet::CanvasProjection* mCanvasProjection = nullptr;
