@@ -17,7 +17,7 @@ network World
         traci.core.typename = default("VadereCore");
         traci.launcher.typename = default("VadereLauchner");
         traci.nodes.objectSinkModule = ".mobility";
-        traci.mapper.objectType = default("crownet.artery.Pedestrian");
+        traci.mapper.personType = default("crownet.artery.Pedestrian");
         traci.nodes.objectSinkModule = default(".mobility");
         storyboard.middlewareModule = default(".middleware");
 
