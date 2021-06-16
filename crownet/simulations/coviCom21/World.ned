@@ -58,7 +58,7 @@ network World
         bool hasGlobalMap = default(true);
 
         traci.nodes.typename = default("VadereNodeManager");
-        traci.nodes.objectSinkModule = default(".mobility");
+        traci.nodes.personSinkModule = default(".mobility");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
         traci.mapper.personType = default("crownet.nodes.AidPedestrian");
 

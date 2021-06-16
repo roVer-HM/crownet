@@ -16,9 +16,9 @@ network World
         traci.subscriptions.typename = default("VadereSubscriptionManager");
         traci.core.typename = default("VadereCore");
         traci.launcher.typename = default("VadereLauchner");
-        traci.nodes.objectSinkModule = ".mobility";
+        traci.nodes.personSinkModule = ".mobility";
         traci.mapper.personType = default("crownet.artery.Pedestrian");
-        traci.nodes.objectSinkModule = default(".mobility");
+        traci.nodes.personSinkModule = default(".mobility");
         storyboard.middlewareModule = default(".middleware");
 
     submodules:

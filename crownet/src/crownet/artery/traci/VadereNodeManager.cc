@@ -64,7 +64,7 @@ void VadereNodeManager::initialize() {
   m_api = std::dynamic_pointer_cast<VadereApi>(core->getAPI());
   m_mapper = inet::getModuleFromPar<ModuleMapper>(par("mapperModule"), this);
   m_nodeIndex = 0;
-  m_objectSinkModule = par("objectSinkModule").stringValue();
+  m_personSinkModule = par("personSinkModule").stringValue();
   m_subscriptions = inet::getModuleFromPar<VadereSubscriptionManager>(
       par("subscriptionsModule"), this);
 }
@@ -213,10 +213,10 @@ std::size_t VadereNodeManager::getNumberOfNodes() const {
 
 VaderePersonSink* VadereNodeManager::getObjectSink(cModule* node) {
   ASSERT(node);
-  cModule* module = node->getModuleByPath(m_objectSinkModule.c_str());
+  cModule* module = node->getModuleByPath(m_personSinkModule.c_str());
   if (!module) {
     throw cRuntimeError("No module found at %s relative to %s",
-                        m_objectSinkModule.c_str(),
+                        m_personSinkModule.c_str(),
                         node->getFullPath().c_str());
   }
 

@@ -60,10 +60,12 @@ network World
         int numMisc = default(0);
 
         traci.nodes.typename = default("VadereNodeManager");
-        traci.nodes.objectSinkModule = default(".mobility");
+        traci.nodes.personSinkModule = default(".mobility");
+        traci.nodes.vehicleSinkModule = default(".mobility");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
         traci.mapper.typename = default("VadereModuleMapper");
         traci.mapper.personType = default("crownet.nodes.ApplicationLayerPedestrian");
+        traci.mapper.vehicleType = default("artery.inet.Car");
 
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);

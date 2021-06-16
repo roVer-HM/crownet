@@ -48,12 +48,12 @@ std::shared_ptr<API> VadereLauchner::createAPI() {
   return std::make_shared<VadereApi>();
 }
 
+
 void VadereLauchner::initializeServer(std::shared_ptr<API> api) {
   auto vApi = std::dynamic_pointer_cast<VadereApi>(api);
 
   // use current directory as fallback to create absolute paths for Vadere.
   fs::path iniBaseDir = fs::current_path();
-
   fs::path resultDir (cSimulation::getActiveSimulation()
                                                     ->getEnvir()
                                                     ->getConfigEx()

@@ -73,7 +73,7 @@ class VadereNodeManager : public traci::NodeManager,
   VadereSubscriptionManager* m_subscriptions;
   unsigned m_nodeIndex;
   std::map<std::string, VaderePersonSink*> m_persons;
-  std::string m_objectSinkModule;
+  std::string m_personSinkModule;
 };
 
 } /* namespace crownet */

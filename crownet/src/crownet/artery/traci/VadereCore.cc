@@ -51,11 +51,10 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
                   endpoint.hostname.c_str(), std::to_string(endpoint.port).c_str());
       }
       checkVersion();
-      syncTime();
       // pre subscribe
-      auto traciLauchner = omnetpp::check_and_cast<VadereLauchner*>(m_launcher);
-      traciLauchner->initializeServer(m_traci);
+      m_launcher->initializeServer(m_traci);
       emit(connectedSignal, simTime());
+      syncTime();
       // send initSignal to setup subscriptions
       emit(initSignal, simTime());
       m_updateInterval = Time{m_traci->simulation.getDeltaT()};
