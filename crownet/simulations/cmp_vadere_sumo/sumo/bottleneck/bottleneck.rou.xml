@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Wed Feb  3 15:39:35 2021 by Eclipse SUMO duarouter Version 1.0.1
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="bottleneck.net.xml"/>
+        <route-files value="bottleneck.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="bottleneck.rou.xml"/>
+    </output>
+    
+    <time>
+        <begin value="0.0"/>
+        <end value="1000.0"/>
+    </time>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+
+	<vType id="type1" vClass="pedestrian" speedFactor="normc(1.0,0.186,0.143,1.43)" maxSpeed="1.4"/>
+    
+    <person id="0" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE1 gneE36"/>
+    </person>
+    <person id="1" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE1 gneE36"/>
+    </person>
+    <person id="2" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE1 gneE36"/>
+    </person>
+    <person id="3" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE1 gneE36"/>
+    </person>
+    <person id="4" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE1 gneE36"/>
+    </person>
+    <person id="5" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE1 gneE36"/>
+    </person>
+    
+    <person id="6" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE4 gneE37"/>
+    </person>
+    <person id="7" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE4 gneE37"/>
+    </person>
+    <person id="8" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE4 gneE37"/>
+    </person>
+    <person id="9" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE4 gneE37"/>
+    </person>
+    <person id="10" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE4 gneE37"/>
+    </person>
+    <person id="11" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE4 gneE37"/>
+    </person>    
+    
+    <person id="12" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE2 gneE38"/>
+    </person>
+    <person id="13" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE2 gneE38"/>
+    </person>
+    <person id="14" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE2 gneE38"/>
+    </person>
+    <person id="15" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE2 gneE38"/>
+    </person>
+    <person id="16" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE2 gneE38"/>
+    </person>
+    <person id="17" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE2 gneE38"/>
+    </person>    
+    
+    <person id="18" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE3 gneE39"/>
+    </person>
+    <person id="19" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE3 gneE39"/>
+    </person>
+    <person id="20" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE3 gneE39"/>
+    </person>
+    <person id="21" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE3 gneE39"/>
+    </person>
+    <person id="22" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE3 gneE39"/>
+    </person>    
+    <person id="23" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE3 gneE39"/>
+    </person>       
+    
+    <person id="24" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE5 gneE40"/>
+    </person>
+    <person id="25" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE5 gneE40"/>
+    </person>     
+    <person id="26" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE5 gneE40"/>
+    </person>     
+    <person id="27" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE5 gneE40"/>
+    </person>     
+    <person id="28" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE5 gneE40"/>
+    </person>
+    <person id="29" depart="0.00" type="type1">
+        <walk edges="gneE31 gneE32 gneE33 gneE34 gneE35 gneE5 gneE40"/>
+    </person>                    
+</routes>

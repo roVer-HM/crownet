@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Wed Feb  3 15:39:35 2021 by Eclipse SUMO duarouter Version 1.0.1
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="combined.net.xml"/>
+        <route-files value="combined.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="combined.rou.xml"/>
+    </output>
+    
+    <time>
+        <begin value="0.0"/>
+        <end value="200.0"/>
+    </time>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    
+    <person id="1" depart="0.00">
+        <walk edges="gneE3 gneE8"/>
+    </person>
+    
+    <person id="2" depart="0.00">
+        <walk edges="gneE3 gneE8"/>
+    </person>
+    
+    <person id="3" depart="0.00">
+        <walk edges="gneE5 gneE6"/>
+    </person>
+    
+    <person id="4" depart="0.00">
+        <walk edges="gneE5 gneE6"/>
+    </person>
+    
+    <vType id="type1" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70"/>
+
+    <vehicle id="5" type="type1" depart="1.0" color="1,0,0">
+      <route edges="gneE3 gneE8"/>
+    </vehicle>
+               
+    <vehicle id="6" type="type1" depart="1.0" color="1,0,0">
+      <route edges="gneE5 gneE6"/>
+    </vehicle>           
+               
+</routes>
