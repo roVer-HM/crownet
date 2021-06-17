@@ -61,6 +61,7 @@ void LteRadioDriver::initialize(int stage) {
 
     numSent = 0;
     numPassedUp = 0;
+    channelNumber = artery::parseChannelNumber(par("channelNumber").stdstringValue());
 
     WATCH(numSent);
     WATCH(numPassedUp);
@@ -75,6 +76,7 @@ void LteRadioDriver::initialize(int stage) {
                      gate("lowerLayerIn"));
     auto properties = new artery::RadioDriverProperties();
     properties->LinkLayerAddress = convert(interfaceEntry->getMacAddress());
+    properties->ServingChannel = channelNumber;
     numPassedUp++;
     indicateProperties(properties);
   }

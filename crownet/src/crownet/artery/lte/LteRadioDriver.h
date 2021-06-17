@@ -8,6 +8,7 @@
 #pragma once
 
 #include <artery/inet/InetRadioDriver.h>
+#include <artery/utility/Channel.h>
 #include <inet/networklayer/common/NetworkInterface.h>
 #include <omnetpp/clistener.h>
 
@@ -31,6 +32,7 @@ class LteRadioDriver : public artery::RadioDriverBase,
  private:
   inet::NetworkInterface* interfaceEntry = nullptr;
   int numPassedUp, numSent;
+  artery::ChannelNumber channelNumber;
 };
 
 } /* namespace crownet */

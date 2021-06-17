@@ -25,6 +25,10 @@ simple LteRadioDriver like IDispatchRadioDriver
  	    @signal[ChannelLoad](type=double);
  	    string dispatchInterfaceName = default("cellular"); //todo make this configuratabel
  	    string interfaceTableModule;
+ 	    // CCH=180 (default) see  TS 102 965 V1.3.1 Annex A,
+ 	    // the XmlMultiChannelPolicy class and the Middleware.ned parameter mcoPolicy
+ 	    // [SCH0 = CCH,  SCH1 = 176, SCH2 = 178, SCH3 = 174]
+ 	    string channelNumber = default("CCH");
 
     gates:
    		inout upperLayer;

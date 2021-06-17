@@ -25,12 +25,11 @@ import inet.transportlayer.contract.ISctp;
 import inet.common.MessageDispatcher;
 import lte.stack.ILteNic;
 
-module TransportLayerPedestrian like INetworkNode
+module TransportLayerRoadUser like INetworkNode
 {
     parameters:
         @networkNode();
         @labels(node,ethernet-node,wireless-node);
-        @display("i=crownet/node/pedestrian;is=vs;bgb=860,780");
         
         @figure[transportLayer](type=rectangle; pos=250,306; size=600,130; fillColor=#ff0000; lineColor=#808080; cornerRadius=5; fillOpacity=0.1);
         @figure[transportLayer.title](type=text; pos=845,311; anchor=ne; text="transport layer");
@@ -50,7 +49,7 @@ module TransportLayerPedestrian like INetworkNode
 
         //# Artery
         bool useArtery = default(false);
-        string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddelwareEmpyt");
+        string middlewareType = ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddlewareEmpty");
 
         //# Transport layer
         bool hasUdp = default(firstAvailableOrEmpty("Udp") != "");
@@ -112,7 +111,6 @@ module TransportLayerPedestrian like INetworkNode
                 *.mobilityModule = absPath("^.mobility");
                 *.radioDriverModule = absPath("^.radioDriver[0]");
                 runtime.datetime = middleware.datetime;
-                *.position.typename = "PedestrianPositionProvider";
         }
         radioDriver: <default("LteRadioDriver")> like IDispatchRadioDriver if useArtery {
             parameters:

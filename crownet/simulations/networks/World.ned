@@ -27,7 +27,6 @@ import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
-//import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import inet.node.inet.INetworkNode;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;

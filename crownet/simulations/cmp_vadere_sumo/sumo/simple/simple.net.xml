@@ -49,5 +49,4 @@
     <junction id="gneJ3" type="dead_end" x="163.00" y="178.00" incLanes="gneE3_0" intLanes="" shape="159.80,178.00 163.00,178.00"/>
 
     <connection from="gneE1" to="gneE3" fromLane="0" toLane="0" dir="s" state="M"/>
-
 </net>

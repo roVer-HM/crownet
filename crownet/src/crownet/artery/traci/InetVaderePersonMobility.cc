@@ -1,5 +1,5 @@
 /*
- * MobilityRoverArtery.cc
+ * InetVaderePersonMobility.cc
  *
  *  Created on: Aug 10, 2020
  *      Author: sts
@@ -247,7 +247,7 @@ std::vector<PathPoint> InetVaderePersonMobility::getDeltaPositionHistory() {
   return history;
 }
 
-void InetVaderePersonMobility::recoredTimeCoord(simtime_t time, inet::Coord coord) {
+void InetVaderePersonMobility::recoredTimeCoord(const simtime_t& time, const inet::Coord& coord) {
   if ((time - lastRecordedTime) > recordThreshold) {
     coordBuffer.put(PathPoint(coord, time));
     lastRecordedTime = time;

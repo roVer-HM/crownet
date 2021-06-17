@@ -13,7 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "PedestrianMiddelwareEmpyt.h"
+#include "PedestrianMiddlewareEmpty.h"
+
 #include <artery/application/MovingNodeDataProvider.h>
 #include <artery/traci/MobilityBase.h>
 #include <artery/application/VehicleKinematics.h>
@@ -25,9 +26,9 @@ using namespace artery;
 
 namespace crownet {
 
-Define_Module(PedestrianMiddelwareEmpyt);
+Define_Module(PedestrianMiddlewareEmpty);
 
-void PedestrianMiddelwareEmpyt::initialize(int stage) {
+void PedestrianMiddlewareEmpty::initialize(int stage) {
   using vanetza::geonet::StationType;
   MiddlewareBase::initialize(stage);
 
@@ -47,12 +48,12 @@ void PedestrianMiddelwareEmpyt::initialize(int stage) {
   }
 }
 
-void PedestrianMiddelwareEmpyt::finish() {
+void PedestrianMiddlewareEmpty::finish() {
   MiddlewareBase::finish();
   findHost()->unsubscribe(MobilityBase::stateChangedSignal, this);
 }
 
-void PedestrianMiddelwareEmpyt::initializeController(cPar& mobilityPar) {
+void PedestrianMiddlewareEmpty::initializeController(cPar& mobilityPar) {
   auto mobility =
       inet::getModuleFromPar<ControllableObject>(mobilityPar, findHost());
   mPersonController = mobility->getController<VaderePersonController>();
@@ -60,7 +61,7 @@ void PedestrianMiddelwareEmpyt::initializeController(cPar& mobilityPar) {
   getFacilities().register_mutable(mPersonController);
 }
 
-void PedestrianMiddelwareEmpyt::receiveSignal(cComponent* component,
+void PedestrianMiddlewareEmpty::receiveSignal(cComponent* component,
                                               simsignal_t signal, cObject* obj,
                                               cObject* details) {
   if (signal == MobilityBase::stateChangedSignal) {

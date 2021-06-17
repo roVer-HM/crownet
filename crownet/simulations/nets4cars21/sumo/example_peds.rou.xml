@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    
+    <person id="1" depart="0.00">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <person id="2" depart="0.00">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <person id="3" depart="0.00">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+               
+</routes>

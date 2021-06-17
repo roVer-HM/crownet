@@ -51,6 +51,7 @@ simple ArteryDensityMapApp  extends BaseDensityMapApp  {
         @class(crownet::ArteryDensityMapApp);
         string middelwareModule = default("^.^.middleware"); //node internal
         string identiyRegistryModule = default("identiyRegistry");
+        string routerModule = default("^.^.vanetza.router");
         
 }
 

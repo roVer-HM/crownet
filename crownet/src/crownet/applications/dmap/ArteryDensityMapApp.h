@@ -54,6 +54,7 @@ class ArteryDensityMapApp : public BaseDensityMapApp {
   // application
   artery::Middleware *middleware = nullptr;
   artery::IdentityRegistry *identiyRegistry = nullptr;
+  artery::Router* mRouter = nullptr;
 };
 
 } /* namespace crownet */

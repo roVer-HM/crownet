@@ -26,6 +26,7 @@ void ArteryDensityMapApp::initialize(int stage) {
             par("middelwareModule"), this);
         identiyRegistry = inet::getModuleFromPar<artery::IdentityRegistry>(
             par("identiyRegistryModule"), this);
+        mRouter = inet::getModuleFromPar<artery::Router>(par("routerModule"), this);
 
 
         // subscribe updateSignal at host module level (pedestrian, vehicle) to
@@ -106,8 +107,8 @@ void ArteryDensityMapApp::updateLocalMap() {
       };
 
   // visit
-  const auto &table =
-      middleware->getFacilities().getConst<artery::Router>().getLocationTable();
+  const auto &table = mRouter->getLocationTable();
+//      middleware->getFacilities().getConst<artery::Router>().getLocationTable();
   table.visit(eVisitor);
 
   using namespace omnetpp;

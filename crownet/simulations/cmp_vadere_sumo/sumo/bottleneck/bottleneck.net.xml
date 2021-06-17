@@ -181,6 +181,7 @@
     <connection from="gneE1" to="gneE36" fromLane="0" toLane="0" via=":gneJ3_0_0" dir="s" state="M"/>
     <connection from="gneE2" to="gneE38" fromLane="0" toLane="0" via=":gneJ4_0_0" dir="s" state="M"/>
     <connection from="gneE3" to="gneE39" fromLane="0" toLane="0" via=":gneJ5_0_0" dir="s" state="M"/>
+
     <connection from="gneE31" to="gneE32" fromLane="0" toLane="0" via=":2_0_0" dir="s" state="M"/>
     <connection from="gneE32" to="gneE33" fromLane="0" toLane="0" via=":3_0_0" dir="s" state="M"/>
     <connection from="gneE33" to="gneE34" fromLane="0" toLane="0" via=":4_0_0" dir="s" state="M"/>
@@ -192,6 +193,7 @@
     <connection from=":3_0" to="gneE33" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":4_0" to="gneE34" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":5_0" to="gneE35" fromLane="0" toLane="0" dir="s" state="M"/>
+
     <connection from=":gneJ3_0" to="gneE36" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":gneJ4_0" to="gneE38" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":gneJ5_0" to="gneE39" fromLane="0" toLane="0" dir="s" state="M"/>

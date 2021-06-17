@@ -31,5 +31,6 @@ parameters:
     string mapperModule;
     string personSinkModule;
     string subscriptionsModule;
+    string personNode = default("pNode");
 
 }

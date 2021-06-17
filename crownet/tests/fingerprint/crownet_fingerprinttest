@@ -29,6 +29,7 @@ import multiprocessing
 import os
 import pprint
 import re
+import signal
 import subprocess
 import sys
 import threading
@@ -895,7 +896,6 @@ class FingerprintContainerTestCase(FingerprintTestCase):
                     config_path=os.path.join(workingdir, self.tags["sumo_cfg"]),
                     message_log=self.log_path(resultdir),
                 )
-
             opp_ret = opp_runner.run(command, perform_cleanup=False)
             out = opp_runner.container.logs()
             out = re.sub("\r", "", out.decode('utf-8'))

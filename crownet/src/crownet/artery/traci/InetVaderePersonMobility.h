@@ -1,5 +1,5 @@
 /*
- * MobilityRoverArtery.h
+ * InetVaderePersonMobility.h
  *
  *  Created on: Aug 10, 2020
  *      Author: sts
@@ -9,6 +9,7 @@
 
 #include <artery/traci/MobilityBase.h>
 #include <artery/inet/InetMobility.h>
+#include <artery/utility/Geometry.h>
 #include <omnetpp/csimplemodule.h>
 
 #include "inet/mobility/contract/IMobility.h"
@@ -53,6 +54,7 @@ class InetVaderePersonMobility : public InetMobility,
   virtual const inet::Coord& getConstraintAreaMax() const override;
   virtual const inet::Coord& getConstraintAreaMin() const override;
 
+
   // omnetpp::cSimpleModule
   void initialize(int stage) override;
   int numInitStages() const override;
@@ -62,7 +64,7 @@ class InetVaderePersonMobility : public InetMobility,
   virtual void moveAndUpdate();
 
   // IPositionHistoryProvider
-  virtual void recoredTimeCoord(simtime_t time, inet::Coord coord) override;
+  virtual void recoredTimeCoord(const simtime_t& time, const inet::Coord& coord) override;
 
   virtual std::vector<PathPoint> getPositionHistory() override;
   virtual std::vector<PathPoint> getDeltaPositionHistory() override;

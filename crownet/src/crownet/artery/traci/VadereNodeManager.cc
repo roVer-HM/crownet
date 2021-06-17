@@ -67,6 +67,7 @@ void VadereNodeManager::initialize() {
   m_personSinkModule = par("personSinkModule").stringValue();
   m_subscriptions = inet::getModuleFromPar<VadereSubscriptionManager>(
       par("subscriptionsModule"), this);
+  m_personModuleVectorName = par("personNode").stdstringValue();
 }
 
 void VadereNodeManager::finish() {
@@ -162,7 +163,7 @@ void VadereNodeManager::updateMovingObject(const std::string& id,
 cModule* VadereNodeManager::createModule(const std::string&,
                                          cModuleType* type) {
   cModule* module =
-      type->create("node", getSystemModule(), m_nodeIndex, m_nodeIndex);
+      type->create(m_personModuleVectorName.c_str(), getSystemModule(), m_nodeIndex, m_nodeIndex);
   ++m_nodeIndex;
   return module;
 }

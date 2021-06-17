@@ -74,6 +74,7 @@ class VadereNodeManager : public traci::NodeManager,
   unsigned m_nodeIndex;
   std::map<std::string, VaderePersonSink*> m_persons;
   std::string m_personSinkModule;
+  std::string m_personModuleVectorName;
 };
 
 } /* namespace crownet */
