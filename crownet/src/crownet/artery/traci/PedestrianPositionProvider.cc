@@ -21,15 +21,16 @@ void PedestrianPositionProvider::initialize(int stage) {
     mRuntime =
         inet::getModuleFromPar<artery::Runtime>(par("runtimeModule"), this);
     auto& mobilityPar = par("mobilityModule");
-    auto* mobilityModule = getModuleByPath(mobilityPar);
-    if (mobilityModule) {
-      mobilityModule->subscribe(artery::MobilityBase::stateChangedSignal, this);
+    mMobility = check_and_cast<InetVaderePersonMobility*>(getModuleByPath(mobilityPar));
+    if (mMobility) {
+        mMobility->subscribe(artery::MobilityBase::stateChangedSignal, this);
       if (auto mobilityBase =
-              dynamic_cast<artery::MobilityBase*>(mobilityModule)) {
+              dynamic_cast<artery::MobilityBase*>(mMobility)) {
+
         mController = mobilityBase->getController<VaderePersonController>();
       } else {
         error("Module on path '%s' is not a MobilityBase",
-              mobilityModule->getFullPath().c_str());
+                mMobility->getFullPath().c_str());
       }
     } else {
       error("Module not found on path '%s' defined by par '%s'",
@@ -39,6 +40,20 @@ void PedestrianPositionProvider::initialize(int stage) {
     updatePosition();
   }
 }
+
+
+Position PedestrianPositionProvider::getCartesianPosition() const
+{
+    // todo move to mobiliy
+    return mController->getPosition();
+}
+
+GeoPosition PedestrianPositionProvider::getGeodeticPosition() const
+{
+    // todo move to mobiliy
+    return mController->getGeoPosition();
+}
+
 
 int PedestrianPositionProvider::numInitStages() const {
   return artery::InitStages::Total;

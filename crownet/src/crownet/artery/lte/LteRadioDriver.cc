@@ -9,7 +9,6 @@
 
 #include <mutex>
 #include "artery/inet/InetRadioDriver.h"
-#include "artery/inet/VanetRx.h"
 #include "artery/networking/GeoNetIndication.h"
 #include "artery/networking/GeoNetRequest.h"
 #include "artery/nic/RadioDriverProperties.h"
@@ -62,6 +61,7 @@ void LteRadioDriver::initialize(int stage) {
 
     numSent = 0;
     numPassedUp = 0;
+    channelNumber = artery::parseChannelNumber(par("channelNumber").stdstringValue());
 
     WATCH(numSent);
     WATCH(numPassedUp);
@@ -76,6 +76,7 @@ void LteRadioDriver::initialize(int stage) {
                      gate("lowerLayerIn"));
     auto properties = new artery::RadioDriverProperties();
     properties->LinkLayerAddress = convert(interfaceEntry->getMacAddress());
+    properties->ServingChannel = channelNumber;
     numPassedUp++;
     indicateProperties(properties);
   }

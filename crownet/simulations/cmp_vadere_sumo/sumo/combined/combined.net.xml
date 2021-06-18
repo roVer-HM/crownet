@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Mon May  3 15:07:39 2021 by Eclipse SUMO netedit Version 1.0.1
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="/home/max/Git/crownet/crownet/simulations/cmp_vadere_sumo/sumo/combined/combined.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/home/max/Git/crownet/crownet/simulations/cmp_vadere_sumo/sumo/combined/combined.net.xml"/>
+    </output>
+
+    <processing>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+    </processing>
+
+    <junctions>
+        <no-internal-links value="true"/>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="5.5"/>
+        <rectangular-lane-cut value="false"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="false"/>
+    </pedestrian>
+
+</configuration>
+-->
+
+<net version="1.0" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="20.00,-90.00,200.00,90.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
+
+    <edge id="gneE3" from="gneJ4" to="gneJ6" priority="-1">
+        <lane id="gneE3_0" index="0" allow="pedestrian" speed="13.89" length="90.00" width="2.00" shape="20.00,-7.40 99.60,-7.40"/>
+        <lane id="gneE3_1" index="1" disallow="pedestrian" speed="13.89" length="90.00" shape="20.00,-4.80 99.60,-4.80"/>
+        <lane id="gneE3_2" index="2" disallow="pedestrian" speed="13.89" length="90.00" shape="20.00,-1.60 99.60,-1.60"/>
+    </edge>
+    <edge id="gneE5" from="gneJ2" to="gneJ6" priority="-1">
+        <lane id="gneE5_0" index="0" allow="pedestrian" speed="13.89" length="90.00" width="2.00" shape="102.60,90.00 102.60,2.00"/>
+        <lane id="gneE5_1" index="1" disallow="pedestrian" speed="13.89" length="90.00" shape="105.20,90.00 105.20,2.00"/>
+        <lane id="gneE5_2" index="2" disallow="pedestrian" speed="13.89" length="90.00" shape="108.40,90.00 108.40,2.00"/>
+    </edge>
+    <edge id="gneE6" from="gneJ6" to="gneJ3" priority="-1">
+        <lane id="gneE6_0" index="0" allow="pedestrian" speed="13.89" length="90.00" width="2.00" shape="102.60,-10.40 102.60,-90.00"/>
+        <lane id="gneE6_1" index="1" disallow="pedestrian" speed="13.89" length="90.00" shape="105.20,-10.40 105.20,-90.00"/>
+        <lane id="gneE6_2" index="2" disallow="pedestrian" speed="13.89" length="90.00" shape="108.40,-10.40 108.40,-90.00"/>
+    </edge>
+    <edge id="gneE8" from="gneJ6" to="gneJ5" priority="-1">
+        <lane id="gneE8_0" index="0" allow="pedestrian" speed="13.89" length="90.00" width="2.00" shape="112.00,-7.40 200.00,-7.40"/>
+        <lane id="gneE8_1" index="1" disallow="pedestrian" speed="13.89" length="90.00" shape="112.00,-4.80 200.00,-4.80"/>
+        <lane id="gneE8_2" index="2" disallow="pedestrian" speed="13.89" length="90.00" shape="112.00,-1.60 200.00,-1.60"/>
+    </edge>
+
+    <junction id="gneJ2" type="dead_end" x="110.00" y="90.00" incLanes="" intLanes="" shape="110.00,90.00 101.60,90.00"/>
+    <junction id="gneJ3" type="dead_end" x="110.00" y="-90.00" incLanes="gneE6_0 gneE6_1 gneE6_2" intLanes="" shape="101.60,-90.00 110.00,-90.00"/>
+    <junction id="gneJ4" type="dead_end" x="20.00" y="0.00" incLanes="" intLanes="" shape="20.00,0.00 20.00,-8.40"/>
+    <junction id="gneJ5" type="dead_end" x="200.00" y="0.00" incLanes="gneE8_0 gneE8_1 gneE8_2" intLanes="" shape="200.00,-8.40 200.00,0.00"/>
+    <junction id="gneJ6" type="priority" x="110.00" y="0.00" incLanes="gneE5_0 gneE5_1 gneE5_2 gneE3_0 gneE3_1 gneE3_2" intLanes="" shape="101.60,2.00 110.00,2.00 110.22,0.89 110.50,0.50 110.89,0.22 111.39,0.06 112.00,0.00 112.00,-8.40 110.89,-8.62 110.50,-8.90 110.22,-9.29 110.06,-9.79 110.00,-10.40 101.60,-10.40 101.38,-9.29 101.10,-8.90 100.71,-8.62 100.21,-8.46 99.60,-8.40 99.60,0.00 100.71,0.22 101.10,0.50 101.38,0.89 101.54,1.39">
+        <request index="0" response="111000" foes="111000"/>
+        <request index="1" response="111000" foes="111000"/>
+        <request index="2" response="110000" foes="110000"/>
+        <request index="3" response="000000" foes="000011"/>
+        <request index="4" response="000000" foes="000111"/>
+        <request index="5" response="000000" foes="000111"/>
+    </junction>
+
+    <connection from="gneE3" to="gneE6" fromLane="1" toLane="1" dir="r" state="M"/>
+    <connection from="gneE3" to="gneE8" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from="gneE3" to="gneE8" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from="gneE5" to="gneE6" fromLane="1" toLane="1" dir="s" state="m"/>
+    <connection from="gneE5" to="gneE6" fromLane="2" toLane="2" dir="s" state="m"/>
+    <connection from="gneE5" to="gneE8" fromLane="2" toLane="2" dir="l" state="m"/>
+
+</net>

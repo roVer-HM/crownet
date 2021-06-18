@@ -29,7 +29,8 @@ parameters:
     @signal[traci.person.remove](type=string);
     string coreModule;
     string mapperModule;
-    string objectSinkModule;
+    string personSinkModule;
     string subscriptionsModule;
+    string personNode = default("pNode");
 
 }

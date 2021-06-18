@@ -1,0 +1,5 @@
+<launch>
+<copy file="combined.net.xml"/>
+<copy file="combined.rou.xml"/>
+<copy file="combined.sumo.cfg" type="config"/>
+</launch>

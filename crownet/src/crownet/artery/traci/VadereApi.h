@@ -15,21 +15,22 @@
 #include "crownet/artery/traci/TraCiForwarder.h"
 #include "crownet/common/converter/OsgCoordinateConverter.h"
 
+
+
 namespace crownet {
 namespace constants {
 
 // command: set connection priority (execution order)
-constexpr traci::ubyte VAR_TARGET_LIST = 0xfe;
-constexpr traci::ubyte VAR_CACHE_HASH = 0x7d;
-constexpr traci::ubyte VAR_SIM_CONFIG = 0x7e;
-constexpr traci::ubyte VAR_EXTERNAL_INPUT = 0x20;
-constexpr traci::ubyte VAR_PERSON_STIMULUS = 0xfd;
-constexpr traci::ubyte CMD_FILE_SEND = 0x75;
-constexpr traci::ubyte VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
-constexpr traci::ubyte VAR_DEPARTED_PEDESTRIANS_IDS = 0x74;
-constexpr traci::ubyte VAR_COORD_REF = 0x90;
+constexpr int VAR_TARGET_LIST = 0xfe;
+constexpr int VAR_CACHE_HASH = 0x7d;
+constexpr int VAR_SIM_CONFIG = 0x7e;
+constexpr int VAR_EXTERNAL_INPUT = 0x20;
+constexpr int VAR_PERSON_STIMULUS = 0xfd;
+constexpr int CMD_FILE_SEND = 0x75;
+constexpr int VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
+constexpr int VAR_DEPARTED_PEDESTRIANS_IDS = 0x74;
+constexpr int VAR_COORD_REF = 0x90;
 //todo: (CM) add constexpr for sensor  VAR_ID
-
 
 }  // namespace constants
 }  // namespace crownet
@@ -60,7 +61,6 @@ class VadereApi : public API, public TraCiForwarder {
   VadereApi();
   virtual ~VadereApi() {}
 
-  void sendFile(const vadere::VadereScenario&) const;
   virtual TraCIGeoPosition convertGeo(const TraCIPosition&) const override;
   virtual TraCIPosition convert2D(const TraCIGeoPosition&) const override;
 
@@ -81,12 +81,15 @@ class VadereApi : public API, public TraCiForwarder {
    public:
     VaderePersonScope(API& parent)
         : TraCIScopeWrapper(
-              parent, CMD_GET_PERSON_VARIABLE, CMD_SET_PERSON_VARIABLE,
-              CMD_SUBSCRIBE_PERSON_VARIABLE, CMD_SUBSCRIBE_PERSON_CONTEXT) {}
+              parent,
+              libsumo::CMD_GET_PERSON_VARIABLE,
+              libsumo::CMD_SET_PERSON_VARIABLE,
+              libsumo::CMD_SUBSCRIBE_PERSON_VARIABLE,
+              libsumo::CMD_SUBSCRIBE_PERSON_CONTEXT) {}
     virtual ~VaderePersonScope() {}
 
-    std::vector<std::string> getIDList() const;
-    int getIDCount() const;
+//    std::vector<std::string> getIDList() const override;
+//    int getIDCount() const override;
     double getSpeed(const std::string& personID) const;
     libsumo::TraCIPosition getPosition(const std::string& personID) const;
     std::string getTypeID(const std::string& personID) const;
@@ -119,9 +122,11 @@ class VadereApi : public API, public TraCiForwarder {
   class VaderSimulationScope : public TraCIScopeWrapper {
    public:
     VaderSimulationScope(API& parent)
-        : TraCIScopeWrapper(parent, CMD_GET_SIM_VARIABLE, CMD_SET_SIM_VARIABLE,
-                            CMD_SUBSCRIBE_SIM_VARIABLE,
-                            CMD_SUBSCRIBE_SIM_CONTEXT) {}
+        : TraCIScopeWrapper(parent,
+                libsumo::CMD_GET_SIM_VARIABLE,
+                libsumo::CMD_SET_SIM_VARIABLE,
+                libsumo::CMD_SUBSCRIBE_SIM_VARIABLE,
+                libsumo::CMD_SUBSCRIBE_SIM_CONTEXT) {}
     virtual ~VaderSimulationScope() {}
 
     int getCurrentTime() const;
@@ -143,12 +148,9 @@ class VadereApi : public API, public TraCiForwarder {
     //todo: (CM) add method to translate a DCD map into a traci packet.
 
 
-   private:
-    /// @brief invalidated copy constructor
-    VaderSimulationScope(const VaderSimulationScope& src);
-
-    /// @brief invalidated assignment operator
-    VaderSimulationScope& operator=(const VaderSimulationScope& src);
+//   private:
+//    /// @brief invalidated assignment operator
+//    VaderSimulationScope& operator=(const VaderSimulationScope& src) = delete;
   };
 
  public:

@@ -44,17 +44,16 @@ void VadereLauchner::initialize()
     }
 }
 
-std::pair<API*, LiteAPI*> VadereLauchner::createAPI() {
-  VadereApi* api = new VadereApi();
-  VadereLiteApi* liteApi = new VadereLiteApi(*api);
-  return std::make_pair(api, liteApi);
+std::shared_ptr<API> VadereLauchner::createAPI() {
+  return std::make_shared<VadereApi>();
 }
 
-void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
+
+void VadereLauchner::initializeServer(std::shared_ptr<API> api) {
+  auto vApi = std::dynamic_pointer_cast<VadereApi>(api);
 
   // use current directory as fallback to create absolute paths for Vadere.
   fs::path iniBaseDir = fs::current_path();
-
   fs::path resultDir (cSimulation::getActiveSimulation()
                                                     ->getEnvir()
                                                     ->getConfigEx()
@@ -71,7 +70,7 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
 
   // get scenarioHash for cache location
   std::string scenarioHash =
-      m_lite->vSimulation().getScenarioHash(scenario.second);
+          vApi->v_simulation.getScenarioHash(scenario.second);
 
   std::vector<vadere::VadereCache> cachePaths;
   cachePaths = vadere::getCachePaths(vCPath.string(), scenarioHash);
@@ -131,9 +130,9 @@ void VadereLauchner::initializeServer(VadereLiteApi* m_lite, VadereApi* m_api) {
   simCfg.seed = seed;
   simCfg.useVadereSeed = par("useVadereSeed").boolValue();
 
-  m_lite->vSimulation().sendSimulationConfig(simCfg);
+  vApi->v_simulation.sendSimulationConfig(simCfg);
 
-  m_api->sendFile(scenario);
+  vApi->sendFile(scenario.first, scenario.second);
 }
 
 } /* namespace crownet */

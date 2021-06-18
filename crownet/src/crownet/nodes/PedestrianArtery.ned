@@ -58,7 +58,7 @@ module Pedestrian like INetworkNode
                 *.position.typename = "PedestrianPositionProvider";
         }
 
-        mobility: <default("crownet.artery.traci.MobilityRoverArtery")> like IMobility {
+        mobility: <default("crownet.artery.traci.InetVaderePersonMobility")> like IMobility {
             parameters:
                 @display("p=50,200");
         }
@@ -66,7 +66,6 @@ module Pedestrian like INetworkNode
         middleware: PedestrianMiddleware {
             parameters:
                 @display("p=250,100");
-                routerModule = ".vanetza.router";
                 mobilityModule = ".mobility";
         }
 

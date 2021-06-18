@@ -13,9 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-#include "PedestrianMiddelwareEmpyt.h"
+#include "PedestrianMiddlewareEmpty.h"
+
 #include <artery/application/MovingNodeDataProvider.h>
 #include <artery/traci/MobilityBase.h>
+#include <artery/application/VehicleKinematics.h>
 #include <artery/utility/InitStages.h>
 #include <vanetza/geonet/station_type.hpp>
 #include "inet/common/ModuleAccess.h"
@@ -24,9 +26,9 @@ using namespace artery;
 
 namespace crownet {
 
-Define_Module(PedestrianMiddelwareEmpyt);
+Define_Module(PedestrianMiddlewareEmpty);
 
-void PedestrianMiddelwareEmpyt::initialize(int stage) {
+void PedestrianMiddlewareEmpty::initialize(int stage) {
   using vanetza::geonet::StationType;
   MiddlewareBase::initialize(stage);
 
@@ -35,7 +37,8 @@ void PedestrianMiddelwareEmpyt::initialize(int stage) {
     initializeController(par("mobilityModule"));
     mDataProvider.setStationType(StationType::Pedestrian);
     getFacilities().register_const(&mDataProvider);
-    mDataProvider.update(mPersonController);
+    // todo introduce PersonKinematics struct
+    mDataProvider.update(getKinematics(*mPersonController));
 
     Identity identity;
     identity.traci = mPersonController->getNodeId();
@@ -45,12 +48,12 @@ void PedestrianMiddelwareEmpyt::initialize(int stage) {
   }
 }
 
-void PedestrianMiddelwareEmpyt::finish() {
+void PedestrianMiddlewareEmpty::finish() {
   MiddlewareBase::finish();
   findHost()->unsubscribe(MobilityBase::stateChangedSignal, this);
 }
 
-void PedestrianMiddelwareEmpyt::initializeController(cPar& mobilityPar) {
+void PedestrianMiddlewareEmpty::initializeController(cPar& mobilityPar) {
   auto mobility =
       inet::getModuleFromPar<ControllableObject>(mobilityPar, findHost());
   mPersonController = mobility->getController<VaderePersonController>();
@@ -58,11 +61,12 @@ void PedestrianMiddelwareEmpyt::initializeController(cPar& mobilityPar) {
   getFacilities().register_mutable(mPersonController);
 }
 
-void PedestrianMiddelwareEmpyt::receiveSignal(cComponent* component,
+void PedestrianMiddlewareEmpty::receiveSignal(cComponent* component,
                                               simsignal_t signal, cObject* obj,
                                               cObject* details) {
   if (signal == MobilityBase::stateChangedSignal) {
-    mDataProvider.update(mPersonController);
+    // todo introduce PersonKinematics struct
+    mDataProvider.update(getKinematics(*mPersonController));
   }
 }
 

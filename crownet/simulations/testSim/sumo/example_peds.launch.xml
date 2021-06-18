@@ -1,0 +1,5 @@
+<launch>
+<copy file="example.net.xml"/>
+<copy file="example_peds.rou.xml"/>
+<copy file="example_peds.sumo.cfg" type="config"/>
+</launch>

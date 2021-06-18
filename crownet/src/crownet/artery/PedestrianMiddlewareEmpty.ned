@@ -17,10 +17,10 @@ package crownet.artery;
 import artery.application.MiddlewareBase;
 
 
-simple PedestrianMiddelwareEmpyt extends MiddlewareBase
+simple PedestrianMiddlewareEmpty extends MiddlewareBase
 {
     	parameters:
-		@class(crownet::PedestrianMiddelwareEmpyt);
+		@class(crownet::PedestrianMiddlewareEmpty);
 		@signal[IdentityChanged](type=long);
 		string mobilityModule = default(".mobility");
 }

@@ -58,15 +58,9 @@ RUN mkdir build/cmake-build && cd build/cmake-build && \
 WORKDIR /opt/sumo/sumo
 RUN rm -rf build/cmake-build
 
-# Next, we need to aquire the python script to lauch sumo for TraCI from the VEINS project
-WORKDIR /opt
-RUN --mount=type=ssh git \
-        clone -n ssh://git@sam-dev.cs.hm.edu:6000/rover/veins.git --depth 1 && \
-    cd veins && \
-    git checkout $VEINS_RELEASE sumo-launchd.py && \
-    git checkout $VEINS_RELEASE bin/ && \
-    chmod 555 sumo-launchd.py && \
-    rm -rf .git
+
+COPY veins_launchd /veins_launchd
+RUN chmod 555 /veins_launchd
 
 # Setup SUMO_HOME
 ENV SUMO_HOME /opt/sumo/sumo

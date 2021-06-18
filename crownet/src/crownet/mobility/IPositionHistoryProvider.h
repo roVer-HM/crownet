@@ -17,7 +17,7 @@ class IPositionHistoryProvider {
  public:
   virtual ~IPositionHistoryProvider() = default;
 
-  virtual void recoredTimeCoord(omnetpp::simtime_t time, inet::Coord coord) = 0;
+  virtual void recoredTimeCoord(const omnetpp::simtime_t& time, const inet::Coord& coord) = 0;
 
   virtual std::vector<PathPoint> getPositionHistory() = 0;
   virtual std::vector<PathPoint> getDeltaPositionHistory() = 0;
