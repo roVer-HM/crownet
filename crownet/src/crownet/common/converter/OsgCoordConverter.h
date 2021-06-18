@@ -13,23 +13,46 @@
 
 #include "inet/common/InitStages.h"
 #include "crownet/common/converter/OsgCoordinateConverter.h"
+#include "traci/Listener.h"
 
 namespace crownet {
 
-class OsgCoordConverter : public omnetpp::cSimpleModule {
+class OsgCoordConverterProvider {
+public:
+    virtual ~OsgCoordConverterProvider() = default;
+    std::shared_ptr<OsgCoordinateConverter> getConverter() const { return _converter;}
+
+protected:
+ std::shared_ptr<OsgCoordinateConverter> _converter;
+};
+
+
+class OsgCoordConverterLocal : public omnetpp::cSimpleModule, public OsgCoordConverterProvider {
  public:
-  OsgCoordConverter();
-  virtual ~OsgCoordConverter() = default;
+  virtual ~OsgCoordConverterLocal() = default;
   virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
   virtual void initialize(int stage) override;
   virtual void handleMessage(omnetpp::cMessage*) override;
 
-  std::shared_ptr<OsgCoordinateConverter> getConverter() const;
-  bool isInitialized() const;
-  void initializeConverter(std::shared_ptr<OsgCoordinateConverter> converter);
+};
 
- private:
-  std::shared_ptr<OsgCoordinateConverter> _converter;
+
+class OsgCoordConverterVadere : public omnetpp::cSimpleModule, public OsgCoordConverterProvider, public traci::Listener {
+    virtual ~OsgCoordConverterVadere() = default;
+    virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
+    virtual void initialize(int stage) override;
+    virtual void handleMessage(omnetpp::cMessage*) override;
+
+    virtual void traciConnected() override;
+};
+
+class OsgCoordConverterSumo : public omnetpp::cSimpleModule, public OsgCoordConverterProvider, public traci::Listener {
+    virtual ~OsgCoordConverterSumo() = default;
+    virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
+    virtual void initialize(int stage) override;
+    virtual void handleMessage(omnetpp::cMessage*) override;
+
+    virtual void traciConnected() override;
 };
 
 } /* namespace crownet */

@@ -39,7 +39,11 @@ public:
     virtual void initialize(int stage) override ;
     virtual int numInitStages() const  override {return NUM_INIT_STAGES;}
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleCommand(const ControlCmd& cmd) override;
+
+    // implement ControlHander interface
+    virtual void handleActionCommand(const ControlCmd& cmd) override;
+    virtual void handleSensorCommand(const SensorCmd& cmd) override;
+
 
     using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
     void finish() override;
@@ -51,6 +55,7 @@ public:
 
   private:
     std::shared_ptr<ControlTraCiApi> api;
+    GlobalDensityMap* globalMap;
     simtime_t nextTime = simtime_t::ZERO;
     std::string controlGate;
 };

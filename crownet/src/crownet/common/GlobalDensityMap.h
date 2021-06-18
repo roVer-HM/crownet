@@ -62,6 +62,8 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual void visitNode(const std::string &traciNodeId,
                          omnetpp::cModule *mod) override;
 
+  virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal();
+
  protected:
   virtual void handleMessage(cMessage *msg) override;
 

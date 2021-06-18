@@ -17,6 +17,7 @@ using namespace traci;
 using namespace omnetpp;
 
 namespace {
+const simsignal_t connectedSignal = cComponent::registerSignal("traci.connected");
 const simsignal_t initSignal = cComponent::registerSignal("traci.init");
 const simsignal_t stepSignal = cComponent::registerSignal("traci.step");
 const simsignal_t closeSignal = cComponent::registerSignal("traci.close");
@@ -60,6 +61,7 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
     }
     checkVersion();
     syncTime();
+    emit(connectedSignal, simTime()); // pre subscribe
     emit(initSignal, simTime());
     m_updateInterval = Time{m_traci->simulation.getDeltaT()};
     scheduleAt(simTime() + m_updateInterval, m_updateEvent);
@@ -72,6 +74,10 @@ std::shared_ptr<TraCiForwarder> VadereCore::getTraCiForwarder(){
 
 VadereLiteApi* VadereCore::getVadereLiteAPI() {
   return omnetpp::check_and_cast<VadereLiteApi*>(m_lite.get());
+}
+
+std::shared_ptr<VadereApi> VadereCore::getVadereApi(){
+    return std::dynamic_pointer_cast<VadereApi>(m_traci);
 }
 
 } /* namespace crownet */

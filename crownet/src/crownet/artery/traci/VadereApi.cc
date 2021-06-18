@@ -24,12 +24,6 @@ TraCIPosition VadereApi::convert2D(const TraCIGeoPosition& pos) const {
     return API::convert2D(pos);
   } else {
     return converter->convertToCartTraCIPosition(pos);
-    //    inet::Coord p = converter->convert2D(pos.longitude, pos.latitude);
-    //    TraCIPosition out;
-    //    out.x = p.x;
-    //    out.y = p.y;
-    //    out.z = p.z;
-    //    return out;
   }
 }
 
