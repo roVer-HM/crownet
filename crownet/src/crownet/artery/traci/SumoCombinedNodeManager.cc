@@ -25,6 +25,7 @@
 #include "traci/PersonSink.h"
 #include "traci/VariableCache.h"
 #include "traci/VehicleSink.h"
+#include "inet/common/scenario/ScenarioManager.h"
 
 using namespace omnetpp;
 using namespace traci;
@@ -305,7 +306,15 @@ cModule* SumoCombinedNodeManager::addNodeModule(const std::string& id, cModuleTy
     getNodeVector(moduleVector)[id] = module;
     init(module);
     module->scheduleStart(simTime());
+
+    inet::cPreModuleInitNotification pre;
+    pre.module = module;
+    emit(POST_MODEL_CHANGE, &pre);
     module->callInitialize();
+    inet::cPostModuleInitNotification post;
+    post.module = module;
+    emit(POST_MODEL_CHANGE, &post);
+
     emit(addNodeSignal, id.c_str(), module);
 
     return module;

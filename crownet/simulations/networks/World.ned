@@ -58,21 +58,18 @@ network World
         bool hasWlan = default(false);
         int numMisc = default(0);
 
+        traci.core.typename = default("VadereCore");
+        traci.core.version = default(-1);
+        traci.core.selfStopping = default(false);
+        traci.launcher.typename = default("VadereLauchner");
+        traci.launcher.hostname = default("vadere");
+        traci.launcher.port = default(9998);
+        traci.mapper.typename = default("VadereModuleMapper");
+        traci.mapper.personType = default("crownet.nodes.ApplicationLayerPedestrian");
         traci.nodes.typename = default("VadereNodeManager");
         traci.nodes.personSinkModule = default(".mobility");
         traci.nodes.vehicleSinkModule = default(".mobility");
         traci.subscriptions.typename = default("VadereSubscriptionManager");
-        traci.mapper.typename = default("VadereModuleMapper");
-        traci.mapper.personType = default("crownet.nodes.ApplicationLayerPedestrian");
-        traci.mapper.vehicleType = default("artery.inet.Car");
-
-        traci.core.version = default(-1);
-        traci.core.selfStopping = default(false);
-        traci.core.typename = default("VadereCore");
-
-        traci.launcher.typename = default("VadereLauchner");
-        traci.launcher.hostname = default("vadere");
-        traci.launcher.port = default(9998);
 
         storyboard.middlewareModule = default(".middleware");
 

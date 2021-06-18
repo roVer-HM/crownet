@@ -624,7 +624,7 @@ class SimulationTestCase(unittest.TestCase):
     def runSimulation(self, title, command, workingdir, resultdir):
         # run the program and log the output
         t0 = time.time()
-
+        
         (exitcode, out) = self.runProgram(command, workingdir, resultdir)
 
         elapsedTime = time.time() - t0
@@ -879,6 +879,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         experiment_label = self.arg_list.get_value("--experiment-label=")
         logfile = os.path.join(resultdir, sim_dir(config, experiment_label), "mobilityProvider.log")
         logfile = os.path.relpath(logfile, self.mobility_runner.working_dir)
+        os.makedirs(os.path.split(logfile)[0], exist_ok=True)
         return logfile
 
     def runProgram(self, command, workingdir, resultdir):
@@ -892,8 +893,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
                     logfile=self.log_path(resultdir)
                 )
             elif self.mobility_runner is not None and "sumo" in self.tags:
-                self.mobility_runner.exec_single_server(
-                    config_path=os.path.join(workingdir, self.tags["sumo_cfg"]),
+                self.mobility_runner.single_launcher(
                     message_log=self.log_path(resultdir),
                 )
             opp_ret = opp_runner.run(command, perform_cleanup=False)

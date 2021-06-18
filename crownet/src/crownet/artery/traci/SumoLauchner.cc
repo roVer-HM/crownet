@@ -64,7 +64,9 @@ void SumoLauchner::initializeServer(std::shared_ptr<API> api){
 
     std::string xmlString = cfgFile->getXML();
 
-    api->sendFile(cfgFilePath.filename().string(), xmlString);
+    // cfgFilePath.filename().string()
+    // fixme: veins dispatcher script expects this name.
+    api->sendFile("sumo-launchd.launch.xml", xmlString);
 }
 
 } /* namespace crownet */

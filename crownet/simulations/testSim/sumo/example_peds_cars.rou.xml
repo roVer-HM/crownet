@@ -16,11 +16,11 @@
     
     <vType id="type1" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70"/>
 
-    <vehicle id="4" type="type1" depart="18.0" color="1,0,0">
+    <vehicle id="4" type="type1" depart="5.0" color="1,0,0">
       <route edges="e_v0_C e_C_v1"/>
     </vehicle>
            
-    <vehicle id="5" type="type1" depart="60.0" color="1,0,0">
+    <vehicle id="5" type="type1" depart="10.0" color="1,0,0">
       <route edges="e_v0_C e_C_v1"/>
     </vehicle>
                

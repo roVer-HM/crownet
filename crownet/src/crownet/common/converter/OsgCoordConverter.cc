@@ -83,7 +83,7 @@ void OsgCoordConverterSumo::traciConnected(){
     Core* core =
                 inet::getModuleFromPar<Core>(par("coreModule"), this);
     auto api = core->getAPI();
-    traci::Boundary netBoundary =
+    traci::Boundary netBoundary = //Boundary(); // todo
               traci::Boundary(api->simulation.getNetBoundary());
     traci::TraCIPosition offset = traci::TraCIPosition(0, 0);
     _converter = std::make_shared<OsgCoordinateConverter>(
