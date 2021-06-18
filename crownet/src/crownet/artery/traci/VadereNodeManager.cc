@@ -11,6 +11,7 @@
 #include "crownet/artery/traci/VadereCore.h"
 
 using namespace crownet::constants;
+using namespace libsumo;
 
 namespace crownet {
 
@@ -60,12 +61,13 @@ void VadereNodeManager::initialize() {
   VadereCore* core =
       inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
   subscribeTraCI(core);
-  m_api = core->getVadereLiteAPI();
+  m_api = std::dynamic_pointer_cast<VadereApi>(core->getAPI());
   m_mapper = inet::getModuleFromPar<ModuleMapper>(par("mapperModule"), this);
   m_nodeIndex = 0;
-  m_objectSinkModule = par("objectSinkModule").stringValue();
+  m_personSinkModule = par("personSinkModule").stringValue();
   m_subscriptions = inet::getModuleFromPar<VadereSubscriptionManager>(
       par("subscriptionsModule"), this);
+  m_personModuleVectorName = par("personNode").stdstringValue();
 }
 
 void VadereNodeManager::finish() {
@@ -75,13 +77,13 @@ void VadereNodeManager::finish() {
 }
 
 void VadereNodeManager::traciInit() {
-  using namespace traci::constants;
-  m_boundary = Boundary{m_api->simulation().getNetBoundary()};
+
+  m_boundary = Boundary{m_api->v_simulation.getNetBoundary()};
   m_subscriptions->subscribeSimulationVariables(sSimulationVariables);
   m_subscriptions->subscribePersonVariables(sVehicleVariables);
 
   // insert and subscribe to already running nodes
-  for (const std::string& id : m_api->vPerson().getIDList()) {
+  for (const std::string& id : m_api->v_person.getIDList()) {
     addMovingObject(id);
     m_subscriptions->subscribePerson(id);
   }
@@ -106,7 +108,7 @@ void VadereNodeManager::traciStep() {
 
   for (auto& obj : m_persons) {
     const std::string& id = obj.first;
-    MovingObjectSink* sink = obj.second;
+    VaderePersonSink* sink = obj.second;
     updateMovingObject(id, sink);
   }
 
@@ -121,18 +123,18 @@ void VadereNodeManager::traciClose() {
 
 void VadereNodeManager::addMovingObject(const std::string& id) {
   NodeInitializer init = [this, &id](cModule* module) {
-    MovingObjectSink* objectSink = getObjectSink(module);
-    auto& traci = m_api->vPerson();
-    objectSink->initializeSink(m_api, id, m_boundary,
-                               m_subscriptions->getPersonCache(id));
-    objectSink->initializeObject(traci.getPosition(id),
+      VaderePersonSink* objectSink = getObjectSink(module);
+    auto& traci = m_api->v_person;
+    objectSink->initializeSink(m_api, m_subscriptions->getPersonCache(id), m_boundary);
+    objectSink->initializePerson(traci.getPosition(id),
                                  TraCIAngle{traci.getAngle(id)},
                                  traci.getSpeed(id));
     m_persons[id] = objectSink;
   };
 
   emit(addPersonSignal, id.c_str());
-  cModuleType* type = m_mapper->getMovingObjectType(*this, id);
+  //fixme implement mapper for vadere person
+  cModuleType* type = m_mapper->person(*this, id);
   if (type != nullptr) {
     addNodeModule(id, type, init);
   } else {
@@ -147,12 +149,12 @@ void VadereNodeManager::removeMovingObject(const std::string& id) {
 }
 
 void VadereNodeManager::updateMovingObject(const std::string& id,
-                                           MovingObjectSink* sink) {
+        VaderePersonSink* sink) {
   auto person = m_subscriptions->getPersonCache(id);
   VaderePersonObjectImpl update(person);
   emit(updatePersonSignal, id.c_str(), &update);
   if (sink) {
-    sink->updateObject(person->get<VAR_POSITION>(),
+    sink->updatePerson(person->get<VAR_POSITION>(),
                        TraCIAngle{person->get<VAR_ANGLE>()},
                        person->get<VAR_SPEED>());
   }
@@ -161,7 +163,7 @@ void VadereNodeManager::updateMovingObject(const std::string& id,
 cModule* VadereNodeManager::createModule(const std::string&,
                                          cModuleType* type) {
   cModule* module =
-      type->create("node", getSystemModule(), m_nodeIndex, m_nodeIndex);
+      type->create(m_personModuleVectorName.c_str(), getSystemModule(), m_nodeIndex, m_nodeIndex);
   ++m_nodeIndex;
   return module;
 }
@@ -210,16 +212,16 @@ std::size_t VadereNodeManager::getNumberOfNodes() const {
   return m_nodes.size();
 }
 
-MovingObjectSink* VadereNodeManager::getObjectSink(cModule* node) {
+VaderePersonSink* VadereNodeManager::getObjectSink(cModule* node) {
   ASSERT(node);
-  cModule* module = node->getModuleByPath(m_objectSinkModule.c_str());
+  cModule* module = node->getModuleByPath(m_personSinkModule.c_str());
   if (!module) {
     throw cRuntimeError("No module found at %s relative to %s",
-                        m_objectSinkModule.c_str(),
+                        m_personSinkModule.c_str(),
                         node->getFullPath().c_str());
   }
 
-  auto* mobility = dynamic_cast<MovingObjectSink*>(module);
+  auto* mobility = dynamic_cast<VaderePersonSink*>(module);
   if (!mobility) {
     throw cRuntimeError("Module %s is not a VehicleSink",
                         module->getFullPath().c_str());
@@ -228,7 +230,7 @@ MovingObjectSink* VadereNodeManager::getObjectSink(cModule* node) {
   return mobility;
 }
 
-MovingObjectSink* VadereNodeManager::getObjectSink(const std::string& id) {
+VaderePersonSink* VadereNodeManager::getObjectSink(const std::string& id) {
   auto found = m_persons.find(id);
   return found != m_persons.end() ? found->second : nullptr;
 }

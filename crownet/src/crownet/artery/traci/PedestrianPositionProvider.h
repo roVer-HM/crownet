@@ -2,15 +2,18 @@
 
 #include <omnetpp/clistener.h>
 #include <omnetpp/csimplemodule.h>
+#include <artery/networking/PositionProvider.h>
 #include <vanetza/common/position_provider.hpp>
-#include "artery/networking/PositionFixObject.h"
+#include <artery/networking/PositionFixObject.h>
 #include "crownet/artery/traci/VaderePersonController.h"
+#include "crownet/artery/traci/InetVaderePersonMobility.h"
 
 namespace crownet {
 
 class PedestrianPositionProvider : public omnetpp::cSimpleModule,
                                    public omnetpp::cListener,
-                                   public vanetza::PositionProvider {
+                                   public artery::PositionProvider,
+                                   public vanetza::PositionProvider{
  public:
   // cSimpleModule
   void initialize(int stage) override;
@@ -23,12 +26,16 @@ class PedestrianPositionProvider : public omnetpp::cSimpleModule,
   // PositionProvider
   const vanetza::PositionFix& position_fix() override { return mPositionFix; }
 
+  virtual Position getCartesianPosition() const override;
+  virtual GeoPosition getGeodeticPosition() const override;
+
  private:
   void updatePosition();
 
   artery::PositionFixObject mPositionFix;
   artery::Runtime* mRuntime = nullptr;
   VaderePersonController* mController = nullptr;
+  InetVaderePersonMobility* mMobility = nullptr;
 };
 
 }  // namespace crownet

@@ -62,7 +62,7 @@ def read_app_data(root_path, run=0, *args, **kwargs):
     inputs = f"{root_path}/vars_rep_{run}.vec"
     scave = ScaveTool()
     scave_f = scave.filter_builder() \
-        .gOpen().module("*.node[*].aid.densityMapApp").OR().module("*.node[*].aid.beaconApp").gClose() \
+        .gOpen().module("*.pNode[*].aid.densityMapApp").OR().module("*.pNode[*].aid.beaconApp").gClose() \
         .AND().name("rcvdPkLifetime:vector")
     _df = scave.load_df_from_scave(input_paths=inputs, scave_filter=scave_f)
     return _df

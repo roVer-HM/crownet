@@ -20,6 +20,7 @@
 #include <osgEarth/GeoTransform>
 #include <osgEarth/SpatialReference>
 #include <vanetza/geonet/areas.hpp>
+#include <artery/traci/Cast.h>
 #include "artery/utility/Geometry.h"
 #include "inet/common/Units.h"
 #include "inet/common/geometry/common/Coord.h"
@@ -174,7 +175,7 @@ template <>
 inline artery::Position OsgCoordinateConverter::position_cast_artery(
     const traci::TraCIPosition& pos) const {
   // TCS->OCS
-  return traci::position_cast(simBound, pos);
+  return artery::position_cast(simBound, pos);
 }
 
 template <>
@@ -197,7 +198,7 @@ template <>
 inline traci::TraCIPosition OsgCoordinateConverter::position_cast_traci(
     const artery::Position& pos) const {
   // OCS->TCS
-  return traci::position_cast(simBound, pos);
+  return artery::position_cast(simBound, pos);
 }
 
 template <>

@@ -11,7 +11,7 @@ echo "  docker exec sumo sumo-gui"
 export PATH=/opt/sumo/sumo/bin:$PATH
 
 # start sumo-launchd (command: sumo-gui, sumo)
-CMD_ARR=(/opt/veins/sumo-launchd.py -v)
+CMD_ARR=(/veins_launchd -v)
 CMD_ARR+=(--bind=0.0.0.0)
 if [[ -z $TRACI_PORT ]];then
   CMD_ARR+=(--port=9999)

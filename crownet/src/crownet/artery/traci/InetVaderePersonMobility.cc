@@ -1,11 +1,12 @@
 /*
- * MobilityRoverArtery.cc
+ * InetVaderePersonMobility.cc
  *
  *  Created on: Aug 10, 2020
  *      Author: sts
  */
 
-#include "MobilityRoverArtery.h"
+#include "InetVaderePersonMobility.h"
+
 #include <inet/common/ModuleAccess.h>
 #include <inet/common/geometry/common/CanvasProjection.h>
 #include <inet/common/geometry/common/Coord.h>
@@ -14,6 +15,7 @@
 #include <cmath>
 #include "crownet/artery/traci/VaderePersonController.h"
 #include "crownet/artery/traci/VariableCache.h"
+#include "crownet/artery/traci/VadereApi.h"
 
 #ifdef WITH_VISUALIZERS
 #include <inet/visualizer/mobility/MobilityCanvasVisualizer.h>
@@ -23,13 +25,13 @@
 
 namespace crownet {
 
-Define_Module(MobilityRoverArtery)
+Define_Module(InetVaderePersonMobility)
 
-    int MobilityRoverArtery::numInitStages() const {
+    int InetVaderePersonMobility::numInitStages() const {
   return inet::INITSTAGE_PHYSICAL_ENVIRONMENT + 1;
 }
 
-void MobilityRoverArtery::initialize(int stage) {
+void InetVaderePersonMobility::initialize(int stage) {
   //  inet::MobilityBase::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
     mVisualRepresentation = inet::findModuleFromPar<cModule>(
@@ -48,16 +50,13 @@ void MobilityRoverArtery::initialize(int stage) {
   }
 }
 
-void MobilityRoverArtery::initializeSink(
-    traci::LiteAPI* api, const std::string& id, const traci::Boundary& boundary,
-    std::shared_ptr<traci::VariableCache> cache) {
+void InetVaderePersonMobility::initializeSink(std::shared_ptr<API> api, std::shared_ptr<VaderePersonCache> cache, const Boundary& boundary) {
   ASSERT(api);
   ASSERT(cache);
-  ASSERT(cache->getId() == id);
-  ASSERT(&cache->getLiteAPI() == api);
   mTraci = api;
-  mObjectId = id;
   mNetBoundary = boundary;
+  mCache = cache;
+  mObjectId = cache->getId(); //FIXME mPersonId
 
 
   const auto& max = mNetBoundary.upperRightPosition();
@@ -75,47 +74,66 @@ void MobilityRoverArtery::initializeSink(
   mController.reset(new VaderePersonController(vehicleCache));
 }
 
-double MobilityRoverArtery::getMaxSpeed() const { return NaN; }
 
-const inet::Coord& MobilityRoverArtery::getCurrentPosition() {
+void InetVaderePersonMobility::initializePerson(const TraCIPosition& traci_pos, TraCIAngle traci_heading, double traci_speed)
+{
+    auto position = position_cast(mNetBoundary, traci_pos);
+    auto heading = angle_cast(traci_heading);
+    auto speed = traci_speed;
+    initialize(position, heading, speed);
+}
+
+void InetVaderePersonMobility::updatePerson(const TraCIPosition& traci_pos, TraCIAngle traci_heading, double traci_speed)
+{
+    auto position = position_cast(mNetBoundary, traci_pos);
+    auto heading = angle_cast(traci_heading);
+    auto speed = traci_speed;
+    update(position, heading, speed);
+}
+
+
+
+double InetVaderePersonMobility::getMaxSpeed() const { return NaN; }
+
+const inet::Coord& InetVaderePersonMobility::getCurrentPosition() {
   moveAndUpdate();
   return lastPosition;
 }
 
-const inet::Coord& MobilityRoverArtery::getCurrentVelocity() {
+const inet::Coord& InetVaderePersonMobility::getCurrentVelocity() {
   moveAndUpdate();
   return lastVelocity;
 }
 
-const inet::Coord& MobilityRoverArtery::getCurrentAcceleration() {
+const inet::Coord& InetVaderePersonMobility::getCurrentAcceleration() {
   //  return inet::Coord::NIL;
   throw cRuntimeError("Invalid operation");
 }
 
-const inet::Quaternion& MobilityRoverArtery::getCurrentAngularPosition() {
+const inet::Quaternion& InetVaderePersonMobility::getCurrentAngularPosition() {
   moveAndUpdate();
   return lastOrientation;
 }
 
-const inet::Quaternion& MobilityRoverArtery::getCurrentAngularVelocity() {
+const inet::Quaternion& InetVaderePersonMobility::getCurrentAngularVelocity() {
   //  return inet::Quaternion::NIL;
   throw cRuntimeError("Invalid operation");
 }
 
-const inet::Quaternion& MobilityRoverArtery::getCurrentAngularAcceleration() {
+const inet::Quaternion& InetVaderePersonMobility::getCurrentAngularAcceleration() {
   //  return inet::Quaternion::NIL;
   throw cRuntimeError("Invalid operation");
 }
 
-const inet::Coord& MobilityRoverArtery::getConstraintAreaMax() const {
+const inet::Coord& InetVaderePersonMobility::getConstraintAreaMax() const {
     return constrainedAreaMax;
 }
 
-const inet::Coord& MobilityRoverArtery::getConstraintAreaMin() const {
+const inet::Coord& InetVaderePersonMobility::getConstraintAreaMin() const {
     return constrainedAreaMin;
 }
 
-void MobilityRoverArtery::initialize(const Position& pos, Angle heading,
+void InetVaderePersonMobility::initialize(const Position& pos, Angle heading,
                                      double speed) {
   // setup coordBuffer. Must be done here and not in initialize due to dynamic
   // creation with TraCI.
@@ -148,7 +166,7 @@ void MobilityRoverArtery::initialize(const Position& pos, Angle heading,
   //  mOrientation = inet::Quaternion(angles);
 }
 
-void MobilityRoverArtery::update(const Position& pos, Angle heading,
+void InetVaderePersonMobility::update(const Position& pos, Angle heading,
                                  double speed) {
   if (lastUpdate == simTime()) return;  // do not update twice
   using boost::units::si::meter;
@@ -173,18 +191,19 @@ void MobilityRoverArtery::update(const Position& pos, Angle heading,
   emitMobilityStateChangedSignal();
 }
 
-omnetpp::simtime_t MobilityRoverArtery::getUpdateTime() {
-  auto vApi = omnetpp::check_and_cast<VadereLiteApi*>(mTraci);
-  return vApi->vSimulation().getTime();
+omnetpp::simtime_t InetVaderePersonMobility::getUpdateTime() {
+
+  auto vApi = std::dynamic_pointer_cast<VadereApi>(mTraci);
+  return vApi->v_simulation.getTime();
 }
 
-void MobilityRoverArtery::emitMobilityStateChangedSignal() {
+void InetVaderePersonMobility::emitMobilityStateChangedSignal() {
   ASSERT(inet::IMobility::mobilityStateChangedSignal ==
          artery::MobilityBase::stateChangedSignal);
   emit(artery::MobilityBase::stateChangedSignal, this);
 }
 
-void MobilityRoverArtery::refreshDisplay() const {
+void InetVaderePersonMobility::refreshDisplay() const {
   // following code is taken from INET's MobilityBase::refreshDisplay
   if (mVisualRepresentation) {
     //    moveAndUpdate();
@@ -199,7 +218,7 @@ void MobilityRoverArtery::refreshDisplay() const {
   }
 }
 
-void MobilityRoverArtery::moveAndUpdate() {
+void InetVaderePersonMobility::moveAndUpdate() {
   simtime_t now = simTime();
   if (lastUpdate != now) {
     move();
@@ -209,17 +228,17 @@ void MobilityRoverArtery::moveAndUpdate() {
   recoredTimeCoord(lastUpdate, lastPosition);
 }
 
-void MobilityRoverArtery::move() {
+void InetVaderePersonMobility::move() {
   double elapsedTime = (simTime() - lastUpdate).dbl();
   lastPosition += lastVelocity * elapsedTime;
 }
 
-std::vector<PathPoint> MobilityRoverArtery::getPositionHistory() {
+std::vector<PathPoint> InetVaderePersonMobility::getPositionHistory() {
   std::vector<PathPoint> ret = coordBuffer.getData(true);  // new->old
   return ret;
 }
 
-std::vector<PathPoint> MobilityRoverArtery::getDeltaPositionHistory() {
+std::vector<PathPoint> InetVaderePersonMobility::getDeltaPositionHistory() {
   PathPoint basePoint(lastPosition, lastUpdate);
   std::vector<PathPoint> history = getPositionHistory();
   for (int i = 0; i < history.size(); i++) {
@@ -228,7 +247,7 @@ std::vector<PathPoint> MobilityRoverArtery::getDeltaPositionHistory() {
   return history;
 }
 
-void MobilityRoverArtery::recoredTimeCoord(simtime_t time, inet::Coord coord) {
+void InetVaderePersonMobility::recoredTimeCoord(const simtime_t& time, const inet::Coord& coord) {
   if ((time - lastRecordedTime) > recordThreshold) {
     coordBuffer.put(PathPoint(coord, time));
     lastRecordedTime = time;
@@ -238,6 +257,6 @@ void MobilityRoverArtery::recoredTimeCoord(simtime_t time, inet::Coord coord) {
   }
 }
 
-int MobilityRoverArtery::historySize() { return coordBuffer.size(); }
+int InetVaderePersonMobility::historySize() { return coordBuffer.size(); }
 
 } /* namespace crownet */

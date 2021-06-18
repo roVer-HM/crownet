@@ -29,7 +29,8 @@ void PedestrianMiddleware::initialize(int stage) {
     mDataProvider.setStationType(StationType::Pedestrian);
     setStationType(StationType::Pedestrian);
     getFacilities().register_const(&mDataProvider);
-    mDataProvider.update(mPersonController);
+    // todo introduce PersonKinematics struct
+    mDataProvider.update(getKinematics(*mPersonController));
 
     // emit will update mIdenity of Middelware base
     Identity identity;
@@ -58,7 +59,8 @@ void PedestrianMiddleware::receiveSignal(cComponent* component,
                                          simsignal_t signal, cObject* obj,
                                          cObject* details) {
   if (signal == MobilityBase::stateChangedSignal) {
-    mDataProvider.update(mPersonController);
+      // todo introduce PersonKinematics struct
+    mDataProvider.update(getKinematics(*mPersonController));
   }
 }
 

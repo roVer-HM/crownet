@@ -17,7 +17,6 @@
 #include <traci/Listener.h>
 #include <traci/SubscriptionManager.h>
 #include "crownet/artery/traci/VadereApi.h"
-#include "crownet/artery/traci/VadereLiteApi.h"
 #include "crownet/artery/traci/VariableCache.h"
 
 namespace crownet {
@@ -59,7 +58,7 @@ class VadereSubscriptionManager : public traci::Listener,
   void traciStep() override;
   void traciClose() override;
 
-  VadereLiteApi* m_api;
+  std::shared_ptr<VadereApi> m_api;
   std::unordered_set<std::string> m_subscribed_persons;
   std::vector<int> m_person_vars;
   std::vector<int> m_sim_vars;

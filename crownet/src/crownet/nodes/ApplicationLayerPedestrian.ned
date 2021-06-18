@@ -6,14 +6,24 @@ import inet.transportlayer.contract.IUdp;
 import inet.transportlayer.contract.ISctp;
 import inet.common.MessageDispatcher;
 
-module ApplicationLayerPedestrian extends TransportLayerPedestrian 
+module ApplicationLayerPedestrian extends TransportLayerRoadUser 
 {
     parameters:
-        @figure[applicationLayer](type=rectangle; pos=250,156; size=600,130; lineColor=#808080; cornerRadius=5; fillColor=#ffff00; fillOpacity=0.1);
+        @display("i=crownet/node/pedestrian;is=vs;bgb=860,780");
+        @figure[applicationLayer](type=rectangle; pos=250,6; size=600,280; lineColor=#808080; cornerRadius=5; fillColor=#ffff00; fillOpacity=0.1);
         @figure[applicationLayer.title](type=text; pos=845,11; anchor=ne; text="application layer");
         
         int numApps = default(0);   // no of apps.
                                     // Specify the app types in INI file with app[0..1].typename="UdpVideoStreamClient" syntax
+        
+        //# Use vadere for pedestrian simulation? If false, sumo is assumed.
+        bool useVadere = default(true);
+        
+        middleware.typename = default(ifTrueOrElse(useVadere,
+            ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddlewareEmpty"),
+            ifTrueOrElse(useArtery, "PersonMiddleware", "PersonMiddlewareEmpty")));
+        mobility.typename = default(ifTrueOrElse(useVadere, "crownet.artery.traci.InetVaderePersonMobility", "artery.inet.PersonMobility"));
+        vanetza.position.typename = default(ifTrueOrElse(useVadere, "PedestrianPositionProvider", "PersonPositionProvider"));
    
     submodules:
         app[numApps]: <> like IApp {

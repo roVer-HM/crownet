@@ -10,7 +10,7 @@ import crownet.applications.dmap.IDensityMapApp;
 import crownet.applications.beacon.IBeaconApp;
 import inet.common.MessageDispatcher;
 
-module DcdPedestrian extends TransportLayerPedestrian
+module DcdPedestrian extends TransportLayerRoadUser
 {
     parameters:
         @figure[applicationLayer](type=rectangle; pos=250,6; size=600,130; lineColor=#808080; cornerRadius=5; fillColor=#ffff00; fillOpacity=0.1);

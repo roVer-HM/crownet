@@ -20,8 +20,8 @@
 #include "crownet/artery/traci/VaderePersonController.h"
 
 namespace crownet {
-class PedestrianMiddelwareEmpyt : public artery::MiddlewareBase {
-  virtual ~PedestrianMiddelwareEmpyt() = default;
+class PedestrianMiddlewareEmpty : public artery::MiddlewareBase {
+  virtual ~PedestrianMiddlewareEmpty() = default;
   void initialize(int stage) override;
 
  protected:

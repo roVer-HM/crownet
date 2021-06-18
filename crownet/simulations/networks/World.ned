@@ -27,7 +27,6 @@ import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
-//import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 import inet.node.inet.INetworkNode;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;
@@ -59,18 +58,18 @@ network World
         bool hasWlan = default(false);
         int numMisc = default(0);
 
-        traci.nodes.typename = default("VadereNodeManager");
-        traci.nodes.objectSinkModule = default(".mobility");
-        traci.subscriptions.typename = default("VadereSubscriptionManager");
-        traci.mapper.objectType = default("crownet.nodes.ApplicationLayerPedestrian");
-
+        traci.core.typename = default("VadereCore");
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);
-        traci.core.typename = default("VadereCore");
-
         traci.launcher.typename = default("VadereLauchner");
         traci.launcher.hostname = default("vadere");
         traci.launcher.port = default(9998);
+        traci.mapper.typename = default("VadereModuleMapper");
+        traci.mapper.personType = default("crownet.nodes.ApplicationLayerPedestrian");
+        traci.nodes.typename = default("VadereNodeManager");
+        traci.nodes.personSinkModule = default(".mobility");
+        traci.nodes.vehicleSinkModule = default(".mobility");
+        traci.subscriptions.typename = default("VadereSubscriptionManager");
 
         storyboard.middlewareModule = default(".middleware");
 

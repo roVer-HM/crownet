@@ -1,0 +1,5 @@
+<launch>
+<copy file="bottleneck.net.xml"/>
+<copy file="bottleneck.rou.xml"/>
+<copy file="bottleneck.sumo.cfg" type="config"/>
+</launch>

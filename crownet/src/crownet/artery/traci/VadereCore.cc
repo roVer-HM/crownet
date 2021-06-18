@@ -51,11 +51,10 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
                   endpoint.hostname.c_str(), std::to_string(endpoint.port).c_str());
       }
       checkVersion();
-      syncTime();
       // pre subscribe
-      auto traciLauchner = omnetpp::check_and_cast<VadereLauchner*>(m_launcher);
-      traciLauchner->initializeServer(m_lite.get());
+      m_launcher->initializeServer(m_traci);
       emit(connectedSignal, simTime());
+      syncTime();
       // send initSignal to setup subscriptions
       emit(initSignal, simTime());
       m_updateInterval = Time{m_traci->simulation.getDeltaT()};
@@ -67,9 +66,6 @@ std::shared_ptr<TraCiForwarder> VadereCore::getTraCiForwarder(){
     return  std::dynamic_pointer_cast<VadereApi>(this->m_traci);
 }
 
-VadereLiteApi* VadereCore::getVadereLiteAPI() {
-  return omnetpp::check_and_cast<VadereLiteApi*>(m_lite.get());
-}
 
 std::shared_ptr<VadereApi> VadereCore::getVadereApi(){
     return std::dynamic_pointer_cast<VadereApi>(m_traci);
