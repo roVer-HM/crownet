@@ -42,6 +42,7 @@ build-for-sim:
     - docker pull $CI_REGISTRY/rover/crownet/omnetpp
     - docker pull $CI_REGISTRY/rover/crownet/sumo
     - docker pull $CI_REGISTRY/rover/crownet/vadere
+    - docker pull $CI_REGISTRY/rover/crownet/flowcontrol
     # ## build all models
     - "${OPP} make makefiles"
     - "${OPP} make MODE=${MODE}"
