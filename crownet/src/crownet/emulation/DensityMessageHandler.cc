@@ -16,7 +16,7 @@
 #include "../emulation/DensityMessageHandler.h"
 
 #include "inet/networklayer/common/L3AddressResolver.h"
-#include "crownet/applications/Beacon_m.h"
+#include "crownet/applications/beacon/Beacon_m.h"
 #include "crownet/aid/AidHeader_m.h"
 
 #include <time.h>
