@@ -3,7 +3,7 @@ variables:
  GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vadere submodule)
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this.
  OPP_CONT_TAG: 'latest'             # tag of OMNeT++ container to be used
- OPP: '${CI_PROJECT_DIR}/scripts/omnetpp ${OPP_CONT_TAG} exec'
+ OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${OPP_CONT_TAG} exec'
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
