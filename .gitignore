@@ -59,7 +59,6 @@ crownet/**/simulations/*/plots/*.eps
 crownet/**/venv
 crownet/**/*_m.cc
 crownet/**/*_m.h
-crownet/**/core
 
 
 # Python
