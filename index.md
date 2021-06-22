@@ -33,4 +33,4 @@ We welcome contributions from anyone, who is interested in extending or improvin
 
 ###  Contact
 
-Having trouble with CrowNet? Please feel free to contact us.
+Having trouble with CrowNet? Please feel free to contact [us](https://github.com/orgs/roVer-HM/people).
