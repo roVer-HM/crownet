@@ -20,7 +20,7 @@ communication models. It can be used to evaluate pedestrian communication in urb
 
 CrowNet is the only simulation framework that allows to simulate interactions of crowd motion and mobile networks. Other simulation frameworks  simulate pedestrian locomotion separately and before they simulate the communication in the network. Therefore, interactions can not be observed. Using CrowNet, interactions between locomotion and information dissemination can be investigated for the first time systematically in simulation studies.
 
-The source code can be found [here](https://sam-dev.cs.hm.edu/rover/crownet).
+The source code can be found [here](https://github.com/roVer-HM/crownet).
 
 
 ### Research project
