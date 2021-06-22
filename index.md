@@ -7,14 +7,14 @@ A central element of intelligent transport infrastructures as well as innovative
   </p>
 
 
-### The first simulation framework to simulate interactions between pedestrians and mobile networks.
+### The open-source simulation framework to simulate interactions between pedestrians and mobile networks.
 
 CrowNet (for crowd network) is an open-source simulation environment which couples state-of-the art pedestrian locomotion models with wireless
 communication models. It can be used to evaluate pedestrian communication in urban and rural environments.
 
 
 <p align="center"> 
- <img src="coverage_szenarien_dense_ITS_en.png" alt="Communication for different types of coverage" width="80%"/>
+ <img src="coverage_szenarien_dense_ITS_en.png" alt="Communication for different types of coverage" width="100%"/>
 </p>
 
 
