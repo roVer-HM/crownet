@@ -14,7 +14,7 @@ communication models. It can be used to evaluate pedestrian communication in urb
 
 
 <p align="center"> 
- <img src="coverage_szenarien_dense_ITS_en.png" alt="Communication for different types of coverage" width="80%"/></center>
+ <img src="coverage_szenarien_dense_ITS_en.png" alt="Communication for different types of coverage" width="80%"/>
 </p>
 
 
