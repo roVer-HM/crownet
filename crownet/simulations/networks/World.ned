@@ -28,6 +28,7 @@ import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
 import inet.node.inet.INetworkNode;
+import inet.common.geometry.common.IGeographicCoordinateSystem;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;
 import lte.corenetwork.nodes.Ue;
@@ -75,6 +76,7 @@ network World
 
     submodules:
 
+		// implements IGeographicCoordinateSystem
         coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
             @display("p=308.14874,207.69;i=block/table2;is=s");
         }
@@ -136,7 +138,8 @@ network World
             @display("p=308.14874,319.43625;i=block/table2;is=s");
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
-            
+
+            @display("p=308.14874,406.35");
         }
 
 

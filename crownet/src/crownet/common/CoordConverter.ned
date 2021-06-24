@@ -25,7 +25,7 @@ moduleinterface ICoordConverter {
 simple OsgCoordConverterLocal like ICoordConverter {
     parameters:
         @class(crownet::OsgCoordConverterLocal);
-        string epsg_code = default("EPSG:32632");
+        string srs_code = default("EPSG:32632");
         double offset_x = default(0.0);
         double offset_y = default(0.0);
         double xBound;
@@ -39,10 +39,34 @@ simple OsgCoordConverterVadere like ICoordConverter {
         string coreModule = default("traci.core");
 }
 
+// provide network xml to parse needed location information from the location element.
 simple OsgCoordConverterSumo like ICoordConverter {
     parameters:
         @class(crownet::OsgCoordConverterSumo);
-        string coreModule = default("traci.core");
-        string epsg_code = default("EPSG:32632");
+        xml netFile;        
 }
+
+// Manually provide lcation inforation present in sumo net file.
+simple OsgCoordConverterSumoLocal like ICoordConverter {
+    parameters:
+        @class(crownet::OsgCoordConverterSumo);
+        string netOffset =  default("-686820.86,-5334157.15");
+        string convBoundary= "0.00,0.00,7910.48,6016.93"; // 4 comma seperated double values
+        //string origBoundary = default("11.512107,48.117927,11.624853,48.186458");
+        string projParameter = default("+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
