@@ -495,17 +495,23 @@ class SimulationResult:
         config = self.arg_list.get_value("-c")
         experiment_label = self.arg_list.get_value("--experiment-label=", default=None)
         run_log = check_sim_dir(self.resultdir, config, experiment_label)
-        run_log = os.path.join(run_log, "test.out")
-        if not os.path.exists(os.path.split(run_log)[0]):
-            raise RuntimeError("Result dir not found. Did you use ${resultdir}/${configname}_${experiment} as the result base directory in the omnetpp.ini?")
-        with open(run_log, "w") as fd:
-            fd.write("------------------------------------------------------\n"
-                       + "Running: " + title + "\n\n"
-                       + "$ cd " + self.workingdir + "\n"
-                       + "$ " + self.command + "\n\n"
-                       + self.out.strip() + "\n\n"
-                       + "Exit code: " + str(self.exitcode) + "\n"
-                       + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
+        if run_log is not None:
+            run_log = os.path.join(run_log, "test.out")
+            if not os.path.exists(os.path.split(run_log)[0]):
+                raise RuntimeError("Result dir not found. Did you use ${resultdir}/${configname}_${experiment} as the result base directory in the omnetpp.ini?")
+            with open(run_log, "w") as fd:
+                fd.write("------------------------------------------------------\n"
+                           + "Running: " + title + "\n\n"
+                           + "$ cd " + self.workingdir + "\n"
+                           + "$ " + self.command + "\n\n"
+                           + self.out.strip() + "\n\n"
+                           + "Exit code: " + str(self.exitcode) + "\n"
+                           + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
+        else:
+            logging.error(f"Output directory not found for.\n  "
+                          f"resultdir:{self.resultdir}\n  "
+                          f"config:{config}\n  "
+                          f"experiment_label:{experiment_label}")
 
 
     def parse_result(self):
@@ -885,7 +891,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
     def runProgram(self, command, workingdir, resultdir):
         opp_runner: OppRunner = self.build_opp_runner()
         ret = 64
-        out = "err"
+        out = "err during starting or accessing container logs (no container logs available)"
         try:
             # start mobility provider if needed
             if self.mobility_runner is not None and "vadere" in self.tags:
@@ -910,6 +916,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
                 )
                 ret = 255
         except RuntimeError as cErr:
+            logging.error("runProgram docker runtime error:")
             logging.error(cErr)
             ret = 255
         except KeyboardInterrupt as K:
@@ -1215,8 +1222,7 @@ def check_sim_dir(base_dir, config_name,  experiment=None):
         return p1
     if os.path.exists(p2):
         return p2
-
-    raise ValueError("simulation dir not found")
+    return None
 
 
 def parse_testcase_type(tags: dict, default_type=TestCaseType.DOCKER):
