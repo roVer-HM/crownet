@@ -210,7 +210,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 520.0,
+      "finishTime" : 530.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -262,24 +262,6 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 13.5,
-            "y" : 10.0
-          }, {
-            "x" : 13.5,
-            "y" : 11.0
-          }, {
-            "x" : 0.5,
-            "y" : 11.0
-          }, {
-            "x" : 0.5,
-            "y" : 10.0
-          } ]
-        },
-        "id" : 23
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
             "x" : 20.0,
             "y" : 131.0
           }, {
@@ -298,17 +280,17 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 16.0,
-            "y" : 11.0
+            "x" : 5.5,
+            "y" : 0.5
           }, {
-            "x" : 16.0,
-            "y" : 10.0
-          }, {
-            "x" : 29.5,
-            "y" : 10.0
+            "x" : 5.5,
+            "y" : 15.5
           }, {
             "x" : 29.5,
-            "y" : 11.0
+            "y" : 15.5
+          }, {
+            "x" : 29.5,
+            "y" : 0.5
           } ]
         },
         "id" : 25
@@ -496,6 +478,15 @@
           } ]
         },
         "id" : 7
+      }, {
+        "shape" : {
+          "x" : 0.5,
+          "y" : 0.5,
+          "width" : 5.0,
+          "height" : 15.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 99
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -606,9 +597,9 @@
       "sources" : [ {
         "id" : 39,
         "shape" : {
-          "x" : 11.0,
-          "y" : 1.0,
-          "width" : 7.5,
+          "x" : 0.5,
+          "y" : 0.5,
+          "width" : 5.0,
           "height" : 7.5,
           "type" : "RECTANGLE"
         },

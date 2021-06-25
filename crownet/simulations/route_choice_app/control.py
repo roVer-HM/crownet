@@ -1,8 +1,9 @@
-import sys, os
+import os
+import sys
+
 import numpy as np
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
-from flowcontrol.crownetcontrol.setup.vadere import get_scenario_content
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 
 sys.path.append(os.path.abspath(".."))
@@ -37,13 +38,13 @@ class NoController(Controller):
         self.measure_state(sim_time)
 
         # necessary, because time intervals for sensoring and applying a control action differ
-        if sim_time % self.time_step_size == 0:
+        if (sim_time-self.sensor_time_step_size) % self.time_step_size == 0:
+            print()
             self.compute_next_corridor_choice(sim_time)
             self.apply_redirection_measure()
 
         self.next_call += self.sensor_time_step_size
         self.con_manager.next_call_at(self.next_call)
-
 
     def measure_state(self, sim_time):
 
@@ -70,7 +71,7 @@ class NoController(Controller):
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
         self.con_manager.next_call_at(0.4)
-        self._get_measurement_areas()
+        self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
         self.measure_state(0.0)
 
     def check_density_measures(self):
@@ -87,8 +88,8 @@ class NoController(Controller):
                 delimiter=" ",
                 index_col=[0],
             )
-                .sort_index(axis=1)
-                .round(PRECISION)
+            .sort_index(axis=1)
+            .round(PRECISION)
         )
         if densities.equals(dens_check) is False:
 
@@ -101,51 +102,56 @@ class NoController(Controller):
                     "INFO: Simulation time might differ for last time step. Skipped time step in comparison."
                 )
 
-    def _get_measurement_areas(self):
+    def _get_measurement_areas(self, measurement_area_ids):
         areas = list()
-        for measurement_id in [1, 2, 3, 4, 5]:
+        for measurement_id in measurement_area_ids:
             polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
             polygon_ = Polygon(np.array(polygon))
             areas.append(polygon_)
-        self.measurement_areas = areas
 
+        return areas
 
     def collect_data(self):
 
         self.check_density_measures()
         self.plot_densities()
 
-
     def plot_densities(self):
 
-        densities = pd.read_csv(os.path.join(working_dir["path"], "densities.txt"), delimiter=" ",index_col=[0])
-
+        densities = pd.read_csv(
+            os.path.join(working_dir["path"], "densities.txt"),
+            delimiter=" ",
+            index_col=[0],
+        )
 
         dataprocessor_name_density = "areaDensityCountingNormed-PID"
-        corridor_name = 'Corridor'
-        dataprocessormapping_density = {f'{dataprocessor_name_density}14': f'{corridor_name} 1 (left)',  # shortest path
-                                        f'{dataprocessor_name_density}15': f'{corridor_name} 2',
-                                        f'{dataprocessor_name_density}16': f'{corridor_name} 3',
-                                        f'{dataprocessor_name_density}17': f'{corridor_name} 4',
-                                        f'{dataprocessor_name_density}18': f'{corridor_name} 5 (right)',  # longest path
-                                        }
+        corridor_name = "Corridor"
+        dataprocessormapping_density = {
+            f"{dataprocessor_name_density}14": f"{corridor_name} 1 (left)",  # shortest path
+            f"{dataprocessor_name_density}15": f"{corridor_name} 2",
+            f"{dataprocessor_name_density}16": f"{corridor_name} 3",
+            f"{dataprocessor_name_density}17": f"{corridor_name} 4",
+            f"{dataprocessor_name_density}18": f"{corridor_name} 5 (right)",  # longest path
+        }
         cut = 250
         # densities
-        densities = densities.iloc[cut:cut + 1000, :]
+        densities = densities.iloc[cut : cut + 1000, :]
         densities.rename(columns=dataprocessormapping_density, inplace=True)
         densities.sort_index(axis=1, inplace=True)
 
         densities.plot()
         plt.ylabel("Density [1/m^2]")
         plt.title(f"Setting: {working_dir['path']}")
-        plt.ylim([0,2])
+        plt.ylim([0, 2])
         plt.savefig(os.path.join(working_dir["path"], "density_over_time.png"))
         plt.show()
 
         densities.boxplot()
         plt.ylabel("Density [1/m^2]")
-        plt.title(f"{working_dir['path']}: Number of pedestrians (sample size = {len(densities)})")
-        plt.ylim([0,2])
+        plt.title(
+            f"{working_dir['path']}: Number of pedestrians (sample size = {len(densities)})"
+        )
+        plt.ylim([0, 1.2])
         plt.savefig(os.path.join(working_dir["path"], "density_distribution.png"))
         plt.show()
 
@@ -154,12 +160,8 @@ class NoController(Controller):
 
 
 class OpenLoop(NoController, Controller):
-
     def __init__(self):
         super().__init__()
-        self.x_center = 15
-        self.y_center = 5
-        self.radius = 15
 
         self.target_ids = [11, 21, 31, 41, 51]
         self.redirected_agents = list()
@@ -170,11 +172,8 @@ class OpenLoop(NoController, Controller):
         self.path_choice()
         self.plot_densities()
 
-
     def in_circle(self, x, y):
-        square_dist = (self.x_center - x) ** 2 + (self.y_center - y) ** 2
-        return square_dist <= self.radius ** 2
-
+        return self.spatial_restriction.contains(Point(x, y))
 
     def apply_redirection_measure(self):
 
@@ -191,7 +190,6 @@ class OpenLoop(NoController, Controller):
             self.con_manager.domains.v_person.set_target_list(str(ped_id), [target_id])
             self.redirected_agents.append(ped_id)
 
-
     def _increase_counter(self):
         self.counter += 1
         self._reset_counter()
@@ -199,7 +197,6 @@ class OpenLoop(NoController, Controller):
     def _reset_counter(self):
         if self.counter >= len(self.target_ids):
             self.counter = 0
-
 
     def compute_next_corridor_choice(self, sim_time):
 
@@ -214,29 +211,37 @@ class OpenLoop(NoController, Controller):
     def choose_corridor(self):
         self._increase_counter()
 
-
     def path_choice(self):
 
-        corridor_corrections = pd.DataFrame(data = np.array(self.corridor_choice_over_time), columns= ['timeStep', 'OldCorridor', 'NewCorridor'])
-        corridor_corrections.set_index('timeStep', inplace=True)
-        corridor_corrections.to_csv(os.path.join(working_dir["path"], "path_choice.txt"))
+        corridor_corrections = pd.DataFrame(
+            data=np.array(self.corridor_choice_over_time),
+            columns=["timeStep", "OldCorridor", "NewCorridor"],
+        )
+        corridor_corrections.set_index("timeStep", inplace=True)
+        corridor_corrections.to_csv(
+            os.path.join(working_dir["path"], "path_choice.txt")
+        )
 
-        plt.scatter(corridor_corrections.index.to_numpy(), corridor_corrections['NewCorridor']+1)
-        plt.ylim([0.5,5.5])
-        plt.yticks([1,2,3,4,5])
-        plt.xlabel('Simulation time [s]')
-        plt.ylabel('Corridor proposal')
+        plt.scatter(
+            corridor_corrections.index.to_numpy(),
+            corridor_corrections["NewCorridor"] + 1,
+        )
+        plt.ylim([0.5, 5.5])
+        plt.yticks([1, 2, 3, 4, 5])
+        plt.xlabel("Simulation time [s]")
+        plt.ylabel("Corridor proposal")
         plt.savefig(os.path.join(working_dir["path"], "path_choice.png"))
         plt.show()
 
+    def handle_init(self, sim_time, sim_state):
 
+        self.spatial_restriction = self._get_measurement_areas([99])[0]
+        super().handle_init(sim_time, sim_state)
 
 
 class ClosedLoop(OpenLoop, Controller):
-
     def __init__(self):
         super().__init__()
-
 
     def choose_corridor(self):
         # measure densities in corridors
@@ -255,7 +260,10 @@ class ClosedLoop(OpenLoop, Controller):
             f"The densities are: {densities.round(3)}. Minimum: index = {self.counter}."
         )
 
-def main(settings, controller_type = 'OpenLoop', scenario= 'simplified_default_sequential'):
+
+def main(
+    settings, controller_type="OpenLoop", scenario="simplified_default_sequential"
+):
 
     sub = VadereDefaultStateListener.with_vars(
         "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
@@ -264,26 +272,22 @@ def main(settings, controller_type = 'OpenLoop', scenario= 'simplified_default_s
     scenario_file = get_scenario_file(f"vadere/scenarios/{scenario}.scenario")
     kwargs = {
         "file_name": scenario_file,
-        "file_content": get_scenario_content(scenario_file),
     }
 
-    working_dir["path"] = os.path.join(
-        os.getcwd(), f"{scenario}_{controller_type}"
-    )
+    working_dir["path"] = os.path.join(os.getcwd(), f"{scenario}_{controller_type}")
 
     settings_ = settings
     settings_.extend(["--output-dir", working_dir["path"]])
     settings_.extend(["--controller-type", controller_type])
 
-    controller = get_controller_from_args(
-        working_dir=os.getcwd(), args=settings_
-    )
+    controller = get_controller_from_args(working_dir=os.getcwd(), args=settings_)
 
     controller.register_state_listener("default", sub, set_default=True)
     controller.start_controller(**kwargs)
 
 
 if __name__ == "__main__":
+    # TODO add comments
 
     if len(sys.argv) == 1:
         settings = [
@@ -294,20 +298,36 @@ if __name__ == "__main__":
             "--client-mode",
             "--start-server",
             "--gui-mode",
+            "--path-to-vadere-repo",
+            os.path.abspath("../../../vadere"),
+            "--suppress-prompts",
         ]
 
-
-
-        main(settings, controller_type='NoController', scenario='simplified_default_sequential')
-        main(settings, controller_type='OpenLoop', scenario='simplified_default_sequential')
-        main(settings, controller_type='ClosedLoop', scenario='simplified_default_sequential')
-        main(settings, controller_type='OpenLoop', scenario='simplified_default_sequential_disturbance')
-        main(settings, controller_type='ClosedLoop', scenario='simplified_default_sequential_disturbance')
+        main(
+            settings,
+            controller_type="NoController",
+            scenario="simplified_default_sequential",
+        )
+        main(
+            settings,
+            controller_type="OpenLoop",
+            scenario="simplified_default_sequential",
+        )
+        main(
+            settings,
+            controller_type="ClosedLoop",
+            scenario="simplified_default_sequential",
+        )
+        main(
+            settings,
+            controller_type="OpenLoop",
+            scenario="simplified_default_sequential_disturbance",
+        )
+        main(
+            settings,
+            controller_type="ClosedLoop",
+            scenario="simplified_default_sequential_disturbance",
+        )
 
     else:
         settings = sys.argv[1:]
-
-
-
-
-
