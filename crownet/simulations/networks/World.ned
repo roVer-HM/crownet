@@ -58,6 +58,7 @@ network World
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
         int numMisc = default(0);
+        int numEnb = default(1);
 
         traci.core.typename = default("VadereCore");
         traci.core.version = default(-1);
@@ -99,8 +100,8 @@ network World
         binder: LteBinder if hasLte {
             @display("p=411.99374,207.69;is=s");
         }
-        eNB: eNodeB if hasLte {
-            @display("p=37,51;is=vl");
+        eNB[numEnb]: eNodeB if hasLte {
+            @display("p=37,51;is=vs");
         }
         server: StandardHost if hasLteCoreNetwork {
             @display("p=308.14874,148.995;is=s;i=device/server");
@@ -146,5 +147,7 @@ network World
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++ if hasLteCoreNetwork;
         router.pppg++ <--> Eth10G <--> pgw.filterGate if hasLteCoreNetwork;
-        pgw.pppg++ <--> Eth10G <--> eNB.ppp if hasLteCoreNetwork;
+        for i=0..numEnb-1 {
+            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasLteCoreNetwork;
+        }
 }
