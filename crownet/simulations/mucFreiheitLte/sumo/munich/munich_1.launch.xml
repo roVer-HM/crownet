@@ -1,5 +1,0 @@
-<launch>
-<copy file="munich.net.xml"/>
-<copy file="munich_ped3.rou.xml"/>
-<copy file="munich.sumo.cfg" type="config"/>
-</launch>
