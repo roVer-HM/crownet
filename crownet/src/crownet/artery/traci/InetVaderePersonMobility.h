@@ -15,6 +15,7 @@
 #include "inet/mobility/contract/IMobility.h"
 #include "crownet/common/util/crownet_util.h"
 #include "crownet/mobility/IPositionHistoryProvider.h"
+#include "crownet/mobility/IPositionEmulator.h"
 #include "crownet/artery/traci/VaderePersonSink.h"
 #include "crownet/crownet.h"
 
@@ -30,7 +31,8 @@ namespace crownet {
 //todo: check if still working after update?
 class InetVaderePersonMobility : public InetMobility,
                             public VaderePersonSink,
-                            public IPositionHistoryProvider {
+                            public IPositionHistoryProvider,
+                            public IPositionEmulator {
  public:
   virtual ~InetVaderePersonMobility() = default;
 
@@ -70,6 +72,12 @@ class InetVaderePersonMobility : public InetMobility,
   virtual std::vector<PathPoint> getDeltaPositionHistory() override;
   virtual int historySize() override;
 
+  // IPositionEmulator
+  virtual void useEmulatedPositionSource(bool) override;
+  virtual bool usesEmulatedPositionSource() override;
+
+  virtual void injectEmulatedPosition(inet::Coord pos, Angle heading, double speed) override;
+
  protected:
   //  virtual void handleSelfMessage(omnetpp::cMessage* message) override;
   void refreshDisplay() const override;
@@ -89,6 +97,8 @@ class InetVaderePersonMobility : public InetMobility,
   simtime_t recordThreshold;
   simtime_t lastRecordedTime;
   RingBuffer<PathPoint> coordBuffer;
+
+  bool usesEmulatedPosition = false;
 
  protected:
   void initialize(const Position& pos, Angle heading, double speed) override;

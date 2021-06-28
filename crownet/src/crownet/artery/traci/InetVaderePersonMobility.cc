@@ -85,9 +85,12 @@ void InetVaderePersonMobility::initializePerson(const TraCIPosition& traci_pos, 
 
 void InetVaderePersonMobility::updatePerson(const TraCIPosition& traci_pos, TraCIAngle traci_heading, double traci_speed)
 {
+    if (usesEmulatedPosition) return;
+
     auto position = position_cast(mNetBoundary, traci_pos);
     auto heading = angle_cast(traci_heading);
     auto speed = traci_speed;
+
     update(position, heading, speed);
 }
 
@@ -258,5 +261,19 @@ void InetVaderePersonMobility::recoredTimeCoord(const simtime_t& time, const ine
 }
 
 int InetVaderePersonMobility::historySize() { return coordBuffer.size(); }
+
+void InetVaderePersonMobility::useEmulatedPositionSource(bool use) {
+    usesEmulatedPosition = use;
+}
+
+bool InetVaderePersonMobility::usesEmulatedPositionSource() {
+    return usesEmulatedPosition;
+}
+
+void InetVaderePersonMobility::injectEmulatedPosition(inet::Coord pos, Angle heading, double speed) {
+    auto position = Position{pos.getX(), pos.getY()};
+    lastUpdate = 0.0;
+    update(position, heading, speed);
+}
 
 } /* namespace crownet */

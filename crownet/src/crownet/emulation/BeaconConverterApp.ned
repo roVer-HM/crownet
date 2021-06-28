@@ -17,41 +17,67 @@ package crownet.emulation;
 
 import inet.applications.contract.IApp;
 import inet.emulation.transportlayer.udp.ExtLowerUdp;
+import crownet.emulation.inbound.InboundEmulation;
 
 
 module BeaconConverterApp like IApp
 {
     parameters:
-        int localPort;
-        int externalPort = default(1510);
-        string interfaceTableModule;
+        int internalPort;
+
+        int outboundPort = default(1510);
+        int inboundPort = default(1510);
+
         string externalAddress;
+
+        string interfaceTableModule;
+
         int offsetNorthing;
         int offsetEasting;
+        
+        int deviceId;
 
+        @display("bgb=418,236");
     gates:
         input socketIn @labels(UdpControlInfo/up);
         output socketOut @labels(UdpControlInfo/down);
 
     submodules:
         densityMessageHandler: DensityMessageHandler {
-            localPort = localPort;
+            localPort = internalPort;
             localAddress = "0.0.0.0";
-            externalPort = externalPort;
+            externalPort = outboundPort;
             externalAddress = externalAddress;
             offsetNorthing = offsetNorthing;
             offsetEasting = offsetEasting;
-           	interfaceTableModule = interfaceTableModule;
-            @display("p=100,200");
-            	
+            interfaceTableModule = interfaceTableModule;
+            @display("p=114,72");
+
         }
 
-        extLowerUdp: ExtLowerUdp {
-            @display("p=100,100");
+        inboundEmulation: InboundEmulation {
+            externalPort = inboundPort;
+            externalAddress = externalAddress;
+            offsetNorthing = offsetNorthing;
+            offsetEasting = offsetEasting;
+            interfaceTableModule = interfaceTableModule;
+            deviceId = deviceId;
+            @display("p=114,164");
+
+        }
+
+        outboundSocket: ExtLowerUdp {
+            @display("p=332,72");
+        }
+
+        inboundSocket: ExtLowerUdp {
+            @display("p=332,164");
         }
     connections:
         densityMessageHandler.socketIn <-- socketIn;
         densityMessageHandler.socketOut --> socketOut;
-        densityMessageHandler.socketInExternal <-- extLowerUdp.appOut;
-        densityMessageHandler.socketOutExternal --> extLowerUdp.appIn;
+        densityMessageHandler.socketInExternal <-- outboundSocket.appOut;
+        densityMessageHandler.socketOutExternal --> outboundSocket.appIn;
+        inboundEmulation.socketInExternal <-- inboundSocket.appOut;
+        inboundEmulation.socketOutExternal --> inboundSocket.appIn;
 }

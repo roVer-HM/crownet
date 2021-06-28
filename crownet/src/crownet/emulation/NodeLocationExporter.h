@@ -19,6 +19,7 @@
 #include "inet/applications/base/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
 #include "../mobility/IPositionHistoryProvider.h"
+#include "../mobility/IPositionEmulator.h"
 
 namespace crownet {
 

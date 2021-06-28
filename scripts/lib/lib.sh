@@ -108,7 +108,8 @@ function run_container_X11() {
 	CMD_ARR=(docker run $MODE)
 	CMD_ARR+=(--cap-add=SYS_PTRACE)
 	CMD_ARR+=(--user $(id -u))
-	CMD_ARR+=(--network $INTNET)
+	#CMD_ARR+=(--network $INTNET)
+	CMD_ARR+=(--net=host)
 	if [[ "$OSTYPE" == "darwin"* ]];then
 		CMD_ARR+=(--env DISPLAY="host.docker.internal:0")
 	else

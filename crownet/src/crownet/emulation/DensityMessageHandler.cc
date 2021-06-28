@@ -130,7 +130,7 @@ void crownet::DensityMessageHandler::processStart()
 
     // External socket
     socketExt.setOutputGate(gate("socketOutExternal"));
-    socketExt.bind(externalPort);
+    socketExt.bind(1234);
     socketExt.setCallback(this);
 }
 

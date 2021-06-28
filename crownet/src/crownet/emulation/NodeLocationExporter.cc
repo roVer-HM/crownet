@@ -18,6 +18,7 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "crownet/applications/beacon/Beacon_m.h"
 #include "crownet/aid/AidHeader_m.h"
+#include "crownet/crownet.h"
 
 #include <time.h>
 #include <sstream>
@@ -76,7 +77,7 @@ void crownet::NodeLocationExporter::processStart()
 {
     // External socket
     socketExt.setOutputGate(gate("socketOutExternal"));
-    socketExt.bind(port);
+    socketExt.bind(1234);
 }
 
 void crownet::NodeLocationExporter::processStop() {
