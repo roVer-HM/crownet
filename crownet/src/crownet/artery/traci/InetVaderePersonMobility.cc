@@ -180,6 +180,7 @@ void InetVaderePersonMobility::update(const Position& pos, Angle heading,
   lastUpdate = nextPosTime;
 
   nextPosition = inet::Coord{pos.x / meter, pos.y / meter, mAntennaHeight};
+
   nextPosTime = getUpdateTime();
   lastVelocity =
       (nextPosition - lastPosition) / (nextPosTime - lastUpdate).dbl();
@@ -223,7 +224,7 @@ void InetVaderePersonMobility::refreshDisplay() const {
 
 void InetVaderePersonMobility::moveAndUpdate() {
   simtime_t now = simTime();
-  if (lastUpdate != now) {
+  if (lastUpdate != now && !usesEmulatedPosition) {
     move();
     lastUpdate = simTime();
     emitMobilityStateChangedSignal();

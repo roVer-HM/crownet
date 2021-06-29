@@ -72,7 +72,7 @@ void crownet::InboundEmulation::socketDataArrived(UdpSocket *socket, Packet *pac
         int northing = single.northing();
         int easting = single.easting();
 
-        double y = static_cast<double>(northing - offsetNorthing);
+        double y = -static_cast<double>(northing - offsetNorthing);
         double x = static_cast<double>(easting - offsetEasting);
 
         int bearing = single.bearing();
