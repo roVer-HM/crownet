@@ -101,7 +101,7 @@ network World
             @display("p=411.99374,207.69;is=s");
         }
         eNB[numEnb]: eNodeB if hasLte {
-            @display("p=37,51;is=vs");
+            @display("p=39.50625,54.18");
         }
         server: StandardHost if hasLteCoreNetwork {
             @display("p=308.14874,148.995;is=s;i=device/server");
@@ -140,7 +140,7 @@ network World
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
 
-            @display("p=308.14874,406.35");
+            @display("p=308.14874,406.35;is=s");
         }
 
 
@@ -150,4 +150,10 @@ network World
         for i=0..numEnb-1 {
             pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasLteCoreNetwork;
         }
+        
+		//# X2 connections (full mesh)
+        for i=0..numEnb-1, for j=0..numEnb-1 {
+            eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j;
+        }
+        
 }
