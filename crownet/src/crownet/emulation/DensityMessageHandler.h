@@ -50,6 +50,7 @@ class DensityMessageHandler : public ApplicationBase, public UdpSocket::ICallbac
     int offsetNorthing;
     int offsetEasting;
 
+    cOutVector *numMessages = nullptr;
 
     enum SelfMsgKinds { START = 1, STOP };
 

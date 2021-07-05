@@ -43,6 +43,8 @@ void crownet::DensityMessageHandler::initialize()
     offsetEasting = par("offsetEasting");
 
     selfMsg = new cMessage("UdpMessageHandler");
+
+    numMessages = new cOutVector("numMessages");
 }
 
 void crownet::DensityMessageHandler::handleMessage(cMessage *msg)
@@ -89,6 +91,8 @@ void crownet::DensityMessageHandler::socketDataArrived(UdpSocket *socket, Packet
     single->set_ttl(30);
 
     sendSingleLocationBroadcast(socketExt, single);
+    numMessages->record(1);
+
     delete packet;
 }
 
