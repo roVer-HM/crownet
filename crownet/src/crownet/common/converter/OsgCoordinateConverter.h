@@ -28,8 +28,38 @@
 #include "traci/Boundary.h"
 #include "traci/GeoPosition.h"
 #include "traci/Position.h"
+#include "inet/common/geometry/common/RotationMatrix.h"
+
 
 namespace crownet {
+
+
+class Projection {
+  protected:
+    inet::RotationMatrix rotation;
+    inet::Coord scale;
+    inet::Coord translation;
+  public:
+    Projection(): scale(inet::Coord(1.0, 1.0, 1.0)){}
+    Projection(inet::RotationMatrix rotation, inet::Coord scale, inet::Coord translation):
+        rotation(rotation), scale(scale), translation(translation){}
+
+    const inet::RotationMatrix& getRotation() const { return rotation; }
+    void setRotation(const inet::RotationMatrix& rotation) { this->rotation = rotation; }
+
+    const inet::Coord& getScale() const { return scale; }
+    void setScale(const inet::Coord& scale) { this->scale = scale; }
+
+    const inet::Coord& getTranslation() const { return translation; }
+    void setTranslation(const inet::Coord& translation) { this->translation = translation; }
+
+    inet::Coord compute(const inet::Coord& point) const;
+    inet::Coord computeInverse(const inet::Coord& point) const;
+
+    traci::TraCIPosition compute(const traci::TraCIPosition& point) const;
+    traci::TraCIPosition computeInverse(const traci::TraCIPosition& point) const;
+};
+
 
 class OsgCoordinateConverter {
  public:
@@ -50,8 +80,13 @@ class OsgCoordinateConverter {
   template <typename T>
   inet::Coord position_cast_inet(const T& pos) const;
 
-  inet::Coord convert2D(inet::GeoCoord& c) const;
-  inet::Coord convert2D(double lon, double lat) const;
+  inet::Coord convert2D(const inet::GeoCoord& c, const bool project = false) const;
+  inet::Coord convert2D(double lon, double lat, const bool project = false) const;
+
+  inet::Coord moveCoordinateSystemTraCi_Opp(const inet::Coord& c) const;
+  inet::Coord moveCoordinateSystemOpp_TraCi(const inet::Coord& c) const;
+
+  inet::GeoCoord getScenePosition() const;
 
   template <typename T>
   osgEarth::GeoPoint convert2DOsgEarth(const T& c) const {
@@ -141,21 +176,20 @@ class OsgCoordinateConverter {
   osgEarth::GeoPoint addZoneOriginOffset(const traci::TraCIPosition& pos) const;
   void removeZoneOriginOffset(osgEarth::GeoPoint& pos) const;
 
-  // TraCI coordinate system (TCS):
+  // TraCI Cartesian system (TCS):
   //  * right-hand-rule z-positive *OUT* of plane.
   //  * origin lower left corner of canvas
   //  * x positive to right
   //  * y positive up
-  // OMNeT++ coordinate system (OCS)
+  // OMNeT++ Cartesian system (OCS)
   //  * right-hand-rule z-positive *INTO* of plane.
   //  * origin upper left corner of canvas
   //  * x positive to right
   //  * y positive down
   traci::TraCIPosition zoneOriginOffset;  // TCS base
   traci::Boundary simBound;               // TCS base
-  std::string epsg_code;
-  osgEarth::SpatialReference*
-      c_srs;  // Cartesian TCS base (with zoneOriginOffset applied)
+  osgEarth::SpatialReference* c_srs;
+  Projection zoneOffsetProjection;
 };
 
 template <>
@@ -205,13 +239,11 @@ template <>
 inline traci::TraCIPosition OsgCoordinateConverter::position_cast_traci(
     const inet::Coord& pos) const {
   // OCS->TCS
-  const double x = pos.x + simBound.lowerLeftPosition().x;
-  const double y = simBound.upperRightPosition().y - pos.y;
-  const double z = pos.z;
+  auto posProjected = moveCoordinateSystemOpp_TraCi(pos);
   traci::TraCIPosition tmp;
-  tmp.x = x;
-  tmp.y = y;
-  tmp.z = z;
+  tmp.x = posProjected.x;
+  tmp.y = posProjected.y;
+  tmp.z = posProjected.z;
   return tmp;
 }
 
@@ -230,10 +262,8 @@ template <>
 inline inet::Coord OsgCoordinateConverter::position_cast_inet(
     const traci::TraCIPosition& pos) const {
   // TCS->OCS
-  const double x = pos.x - simBound.lowerLeftPosition().x;
-  const double y = simBound.upperRightPosition().y - pos.y;
-  const double z = pos.z;
-  return inet::Coord(x, y, z);
+
+    return moveCoordinateSystemTraCi_Opp(inet::Coord(pos.x, pos.y, pos.z));
 }
 
 template <>
@@ -247,10 +277,7 @@ template <>
 inline inet::Coord OsgCoordinateConverter::position_cast_inet(
     const osgEarth::GeoPoint& pos) const {
   // osgCoord always represents TCS: (TCS -> OCS)
-  const double x = pos.x() - simBound.lowerLeftPosition().x;
-  const double y = simBound.upperRightPosition().y - pos.y();
-  const double z = pos.z();
-  return inet::Coord(x, y, z);
+    return moveCoordinateSystemTraCi_Opp(inet::Coord(pos.x(), pos.y(), pos.z()));
 }
 
 template <>

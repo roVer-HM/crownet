@@ -7,8 +7,7 @@
     <net-file value="munich.net.xml"/>
     <pedestrians value="True"/>
     <remove-loops value="True"/>
-    <route-file value="munich.rou.xml"/>
     <trip-attributes value="type=&quot;pedType1&quot;"/>
-    <output-trip-file value="munich.trips.xml"/>
+    <output-trip-file value="munich2.trips.xml"/>
     <verbose value="True"/>
 </configuration>

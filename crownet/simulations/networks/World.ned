@@ -28,6 +28,7 @@ import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
 import inet.node.inet.INetworkNode;
+import inet.common.geometry.common.IGeographicCoordinateSystem;
 import lte.world.radio.ChannelControl;
 import lte.corenetwork.binder.LteBinder;
 import lte.corenetwork.nodes.Ue;
@@ -57,6 +58,7 @@ network World
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
         int numMisc = default(0);
+        int numEnb = default(1);
 
         traci.core.typename = default("VadereCore");
         traci.core.version = default(-1);
@@ -75,6 +77,7 @@ network World
 
     submodules:
 
+		// implements IGeographicCoordinateSystem
         coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
             @display("p=308.14874,207.69;i=block/table2;is=s");
         }
@@ -97,8 +100,8 @@ network World
         binder: LteBinder if hasLte {
             @display("p=411.99374,207.69;is=s");
         }
-        eNB: eNodeB if hasLte {
-            @display("p=37,51;is=vl");
+        eNB[numEnb]: eNodeB if hasLte {
+            @display("p=39.50625,54.18");
         }
         server: StandardHost if hasLteCoreNetwork {
             @display("p=308.14874,148.995;is=s;i=device/server");
@@ -136,12 +139,21 @@ network World
             @display("p=308.14874,319.43625;i=block/table2;is=s");
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
-            
+
+            @display("p=308.14874,406.35;is=s");
         }
 
 
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++ if hasLteCoreNetwork;
         router.pppg++ <--> Eth10G <--> pgw.filterGate if hasLteCoreNetwork;
-        pgw.pppg++ <--> Eth10G <--> eNB.ppp if hasLteCoreNetwork;
+        for i=0..numEnb-1 {
+            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasLteCoreNetwork;
+        }
+        
+		//# X2 connections (full mesh)
+        for i=0..numEnb-1, for j=0..numEnb-1 {
+            eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j;
+        }
+        
 }
