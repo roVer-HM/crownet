@@ -152,4 +152,15 @@ inet::GeoCoord OsgCoordinateConverter::getScenePosition() const{
     return convertToGeoInet(origin);
 }
 
+// always apply TCS->OCS
+const omnetpp::cFigure::Point OsgCoordinateConverter::toCanvas(double x, double y, const bool isGeo){
+    if (isGeo){
+        throw cRuntimeError("not implemented");
+    } else {
+        auto p = moveCoordinateSystemTraCi_Opp(inet::Coord(x, y));
+        return cFigure::Point(p.x, p.y);
+    }
+}
+
+
 }  // namespace crownet
