@@ -43,6 +43,11 @@ module TransportLayerRoadUser like INetworkNode
 
         @statistic[posX](source="xCoord(mobilityPos(mobilityStateChanged))"; record=vector?);
         @statistic[posY](source="yCoord(mobilityPos(mobilityStateChanged))"; record=vector?);
+        string osgModel = default(""); // 3D model for OSG visualization, no 3D model by default
+        string osgModelColor = default(""); // tint color, no colorization by default
+        string canvasImage = default(""); // image for canvas visualization, no image by default
+        string canvasImageColor = default(""); // tint color, no colorization by default
+        
         int numRadios = default(1);
         bool withAntennaMobility = default(false);
         *.mobility.visualRepresentation = "^";

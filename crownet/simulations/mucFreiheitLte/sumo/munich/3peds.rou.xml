@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2021-06-25 14:35:27 by Eclipse SUMO duarouter Version 1.9.2
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="munich.net.xml"/>
+        <additional-files value="trip_custom.xml"/>
+        <route-files value="3peds.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="3peds.rou.xml"/>
+        <alternatives-output value="3peds.rou.alt.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pedType1" maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)"/>
+    <person id="0" type="pedType1" depart="0.00">
+        <walk edges="86414059#0 -86414067#1 -86414067#0 -86414053 155548876 -155546685"/>
+    </person>
+    <person id="1" type="pedType1" depart="0.00">
+        <walk edges="30247195#1 154782356#1 86414071 -86414064 -86414058 618310626 251805203#0 252700830#0 252700829 -33487028#4 41726075 158399739#1 -4662541#2"/>
+    </person>
+    <person id="2" type="pedType1" depart="0.00">
+        <walk edges="371746586#10 -71360468#1 151542345#3 146203609#0 -60363514 214785685#9 214785685#10 214785685#11 214785685#12 214785685#13 371746586#17 371746586#18 371746586#19 371746586#20 371746586#21 371746586#22 371746586#23 371746586#24 371746586#25 371746586#26 371746586#27 -482117464 151263118#2 -151263118#0 365762133 135588108#1 93192024#0 50220178#3 50220178#2 151334113#4 -48242678 -89840540#1 -89840540#0 -39321854#2 -39321854#1 -242358064#0"/>
+    </person>
+</routes>

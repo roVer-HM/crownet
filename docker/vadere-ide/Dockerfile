@@ -13,12 +13,13 @@ FROM sam-dev.cs.hm.edu:5023/rover/crownet/vadere:latest
 ENV RELEASE master
 
 LABEL description "vadere Crowd Simulator (as used in roVer)"
-LABEL maintainer  "wischhof@ieee.org"
+LABEL maintainer  "christina_maria.mayr@hm.edu"
 
 # add ide (intellij)
 WORKDIR /opt/intellij
-ADD ide/ideaIU-2019.3.3.tar.gz .
-ENV PATH="/opt/intellij/idea-IU-193.6494.35/bin:${PATH}"
+ADD ~/.cache/crownet/intellij.tar.gz .
+ENV PATH="/opt/intellij/idea-IU-211.7442.40/bin:${PATH}"
+# for community version: replace 'idea-IU-211.7442.40' by 'idea-IC-211.7442.40'
 
 # init script (triggered at container start)
 COPY init.sh /init.sh

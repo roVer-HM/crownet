@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2021-06-25 14:35:27 by Eclipse SUMO duarouter Version 1.9.2
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="munich.net.xml"/>
+        <additional-files value="trip_custom.xml"/>
+        <route-files value="3peds.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="3peds.rou.xml"/>
+        <alternatives-output value="3peds.rou.alt.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pedType1" maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)"/>
+    <person id="0" type="pedType1" depart="0.00">
+        <personTrip from="86414059#0" to="-155546685" walkFactor="0.75" costs="279.53"/>
+    </person>
+    <person id="1" type="pedType1" depart="0.00">
+        <personTrip from="30247195#1" to="-4662541#2" walkFactor="0.75" costs="369.62"/>
+    </person>
+    <person id="2" type="pedType1" depart="0.00">
+        <personTrip from="371746586#10" to="-242358064#0" walkFactor="0.75" costs="978.55"/>
+    </person>
+</routes>

@@ -22,12 +22,57 @@ using namespace inet;
 
 namespace crownet {
 
-OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zBound,
+
+inet::Coord Projection::compute(const inet::Coord& point) const{
+    inet::Coord rotatedPoint = rotation.rotateVector(point);
+    return inet::Coord(rotatedPoint.x * scale.x + translation.x,
+                       rotatedPoint.y * scale.y + translation.y,
+                       rotatedPoint.z * scale.z + translation.z );
+
+}
+
+inet::Coord Projection::computeInverse(const inet::Coord& point) const{
+    inet::Coord p((point.x - translation.x) / scale.x, (point.y - translation.y) / scale.y, (point.z - translation.z) / scale.z);
+    return rotation.rotateVectorInverse(p);
+}
+
+traci::TraCIPosition Projection::compute(const traci::TraCIPosition& p) const{
+    inet::Coord rotatedPoint = rotation.rotateVector(inet::Coord(p.x, p.y, p.z));
+    return traci::TraCIPosition(rotatedPoint.x * scale.x + translation.x,
+                               rotatedPoint.y * scale.y + translation.y,
+                               rotatedPoint.z * scale.z + translation.z );
+
+}
+
+
+traci::TraCIPosition Projection::computeInverse(const traci::TraCIPosition& point) const{
+    inet::Coord p((point.x - translation.x) / scale.x, (point.y - translation.y) / scale.y, (point.z - translation.z) / scale.z);
+    p = rotation.rotateVectorInverse(p);
+    return traci::TraCIPosition(p.x, p.y, p.z);
+}
+
+
+
+
+OsgCoordinateConverter::~OsgCoordinateConverter() {}
+
+OsgCoordinateConverter::OsgCoordinateConverter(
+    traci::TraCIPosition zoneOriginOffset, traci::Boundary simBound,
+    std::string srs_code)
+    : zoneOriginOffset(zoneOriginOffset),
+      simBound(simBound),
+      c_srs(osgEarth::SpatialReference::get(srs_code)) {
+
+    zoneOffsetProjection.setTranslation(inet::Coord(zoneOriginOffset.x, zoneOriginOffset.y, zoneOriginOffset.z));
+}
+
+OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zoneOriginOffset,
                                                inet::Coord _simBound,
-                                               std::string epgs_code) {
-  zoneOriginOffset.x = zBound.x;
-  zoneOriginOffset.y = zBound.y;
-  zoneOriginOffset.z = zBound.z;
+                                               std::string srs_code){
+  this->zoneOriginOffset.x = zoneOriginOffset.x;
+  this->zoneOriginOffset.y = zoneOriginOffset.y;
+  this->zoneOriginOffset.z = zoneOriginOffset.z;
+  zoneOffsetProjection.setTranslation(inet::Coord(zoneOriginOffset.x, zoneOriginOffset.y, zoneOriginOffset.z));
 
   std::vector<traci::TraCIPosition> vec;
   traci::TraCIPosition upperRight;
@@ -37,7 +82,7 @@ OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zBound,
   vec.push_back(upperRight);
   simBound = traci::Boundary(vec);
 
-  epgs_code = epgs_code;
+  this->c_srs = osgEarth::SpatialReference::get(srs_code);
 }
 
 double OsgCoordinateConverter::getBoundaryWidth() const {
@@ -49,21 +94,11 @@ double OsgCoordinateConverter::getBoundaryHeight() const {
                   simBound.lowerLeftPosition().y);
 }
 
-OsgCoordinateConverter::OsgCoordinateConverter(
-    traci::TraCIPosition zoneOriginOffset, traci::Boundary simBound,
-    std::string epgs_code)
-    : zoneOriginOffset(zoneOriginOffset),
-      simBound(simBound),
-      epsg_code(epgs_code),
-      c_srs(osgEarth::SpatialReference::get(epgs_code)) {}
-
-OsgCoordinateConverter::~OsgCoordinateConverter() {}
 
 osgEarth::GeoPoint OsgCoordinateConverter::addZoneOriginOffset(
     const traci::TraCIPosition& pos) const {
-  return osgEarth::GeoPoint{c_srs, pos.x + zoneOriginOffset.x,
-                            pos.y + zoneOriginOffset.y,
-                            pos.z + zoneOriginOffset.z};
+  auto realPos = zoneOffsetProjection.computeInverse(pos); //revert zone offset
+  return osgEarth::GeoPoint{c_srs, realPos.x, realPos.y, realPos.z};
 }
 
 void OsgCoordinateConverter::removeZoneOriginOffset(
@@ -73,21 +108,59 @@ void OsgCoordinateConverter::removeZoneOriginOffset(
   pos.z() -= zoneOriginOffset.z;
 }
 
-inet::Coord OsgCoordinateConverter::convert2D(inet::GeoCoord& c) const {
-  return convert2D(c.latitude.get(), c.longitude.get());
+inet::Coord OsgCoordinateConverter::convert2D(const inet::GeoCoord& c, const bool project) const {
+  return convert2D(c.latitude.get(), c.longitude.get(), project);
 }
 
-inet::Coord OsgCoordinateConverter::convert2D(double lat, double lon) const {
+
+inet::Coord OsgCoordinateConverter::convert2D(double lat, double lon, const bool project) const {
   osgEarth::GeoPoint input{c_srs->getGeographicSRS(), lon,
                            lat};  // order!! lon first
   osgEarth::GeoPoint output = input.transform(c_srs);
+  inet::Coord ret;
   if (output.isValid()) {
-    return inet::Coord(output.x() - zoneOriginOffset.x,
-                       output.y() - zoneOriginOffset.y,
-                       output.z() - zoneOriginOffset.z);
+    ret = zoneOffsetProjection.compute(inet::Coord(output.x(), output.y(), output.z()));
   } else {
     throw cRuntimeError("invalid transformation");
   }
+  if (project){
+      ret = moveCoordinateSystemTraCi_Opp(ret);
+  }
+  return ret;
 }
+
+inet::Coord OsgCoordinateConverter::moveCoordinateSystemTraCi_Opp(const inet::Coord& c) const{
+    inet::Coord ret;
+    ret.x = c.x - simBound.lowerLeftPosition().x;
+    ret.y = simBound.upperRightPosition().y - c.y;
+    ret.z = c.z;
+    return ret;
+}
+
+inet::Coord OsgCoordinateConverter::moveCoordinateSystemOpp_TraCi(const inet::Coord& c) const{
+    inet::Coord ret;
+    ret.x = c.x + simBound.lowerLeftPosition().x;
+    ret.y = simBound.upperRightPosition().y - c.y;
+    ret.z = c.z;
+    return ret;
+}
+
+
+inet::GeoCoord OsgCoordinateConverter::getScenePosition() const{
+    // Scene position is allays OCS (opp Cartesian with origin at top/left)
+    inet::Coord origin(0.0, 0.0, 0.0);
+    return convertToGeoInet(origin);
+}
+
+// always apply TCS->OCS
+const omnetpp::cFigure::Point OsgCoordinateConverter::toCanvas(double x, double y, const bool isGeo){
+    if (isGeo){
+        throw cRuntimeError("not implemented");
+    } else {
+        auto p = moveCoordinateSystemTraCi_Opp(inet::Coord(x, y));
+        return cFigure::Point(p.x, p.y);
+    }
+}
+
 
 }  // namespace crownet

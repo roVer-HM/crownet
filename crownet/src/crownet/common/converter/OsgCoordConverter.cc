@@ -9,6 +9,7 @@
 
 #include <omnetpp.h>
 #include <memory>
+#include <algorithm>
 #include <traci/Core.h>
 #include <traci/Position.h>
 #include <inet/common/ModuleAccess.h>
@@ -31,8 +32,19 @@ void OsgCoordConverterLocal::initialize(int stage) {
                       par("offset_y").doubleValue()},
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
                       par("epsg_code").stdstringValue());
+      sceneOrientation = inet::Quaternion::NIL;
+      scenePosition = _converter->getScenePosition();
     }
 }
+
+inet::Coord OsgCoordConverterLocal::computeSceneCoordinate(const inet::GeoCoord& geographicCoordinate) const{
+    return _converter->convert2D(geographicCoordinate, true);
+}
+
+inet::GeoCoord OsgCoordConverterLocal::computeGeographicCoordinate(const inet::Coord& sceneCoordinate) const {
+    return _converter->convertToGeoInet(sceneCoordinate);
+}
+
 
 void OsgCoordConverterLocal::handleMessage(omnetpp::cMessage*) {
   throw omnetpp::cRuntimeError("OsgCoordConverter does not handle messages");
@@ -63,35 +75,49 @@ void OsgCoordConverterVadere::traciConnected(){
 
 }
 
-void OsgCoordConverterVadere::handleMessage(omnetpp::cMessage*) {
-  throw omnetpp::cRuntimeError("OsgCoordConverterVadere does not handle messages");
-}
-
 ////////////////////////////////////////////
 
 void OsgCoordConverterSumo::initialize(int stage) {
-    cSimpleModule::initialize(stage);
+  cSimpleModule::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
+      traci::TraCIPosition offset;
+      traci::Boundary netBoundary;
+      std::string projParameter;
+      std::vector<double> netOffset;
+      std::vector<double> convBoundary;
 
-  } else if (stage == inet::INITSTAGE_LAST){
-      Core* core = inet::getModuleFromPar<Core>(par("coreModule"), this);
-      subscribeTraCI(core);
+      if (hasPar("netFile")){
+          // configure based on netFile content
+          omnetpp::cXMLElement* netFile = par("netFile").xmlValue();
+          auto location = netFile->getFirstChildWithTag("location");
+          if(location == nullptr){
+              throw cRuntimeError("expected location element");
+          }
+          netOffset = parse(location->getAttribute("netOffset"), 2);
+          convBoundary = parse(location->getAttribute("convBoundary"), 4);
+          projParameter = location->getAttribute("projParameter");
+
+      } else {
+          // manual configuration
+          netOffset = parse(par("netOffset").stdstringValue(), 2);
+          convBoundary = parse(par("convBoundary").stdstringValue(), 4);
+//          auto origBoundary = parse(par("origBoundary").stdstringValue(), 4);
+          projParameter = par("projParameter").stdstringValue();
+      }
+      netBoundary = traci::Boundary(convBoundary);
+      offset = traci::TraCIPosition(netOffset[0], netOffset[1]);
+
+      _converter = std::make_shared<OsgCoordinateConverter>(offset, netBoundary, projParameter);
   }
 }
 
-void OsgCoordConverterSumo::traciConnected(){
-    Core* core =
-                inet::getModuleFromPar<Core>(par("coreModule"), this);
-    auto api = core->getAPI();
-    traci::Boundary netBoundary = //Boundary(); // todo
-              traci::Boundary(api->simulation.getNetBoundary());
-    traci::TraCIPosition offset = traci::TraCIPosition(0, 0);
-    _converter = std::make_shared<OsgCoordinateConverter>(
-             offset, netBoundary, par("epsg_code").stdstringValue());
-}
-
-void OsgCoordConverterSumo::handleMessage(omnetpp::cMessage*) {
-  throw omnetpp::cRuntimeError("OsgCoordConverterSumo does not handle messages");
+std::vector<double> OsgCoordConverterSumo::parse(const std::string& input, const int count) const{
+    omnetpp::cStringTokenizer tokenizer(input.c_str(), ",");
+    std::vector<double> ret = tokenizer.asDoubleVector();
+    if(ret.size() != count){
+        throw cRuntimeError("expected %d tokens but found %d '%s'", count, ret.size(), input.c_str());
+    }
+    return ret;
 }
 
 ////////////////////////////////////////////
