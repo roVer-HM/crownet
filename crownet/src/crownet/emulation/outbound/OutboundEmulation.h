@@ -18,41 +18,51 @@
 
 #include "inet/applications/base/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
-#include "../mobility/IPositionHistoryProvider.h"
-#include "../mobility/IPositionEmulator.h"
+
+// Fix re-declaration error
+#undef NaN
+
+#include "../definitions.pb.h"
 
 namespace crownet {
 
+using com::example::peopledensitymeasurementprototype::model::proto::SingleLocationData;
 using namespace inet;
 
-class NodeLocationExporter : public ApplicationBase
+class OutboundEmulation : public ApplicationBase, public UdpSocket::ICallback
 {
   public:
-    virtual ~NodeLocationExporter();
+    virtual ~OutboundEmulation();
 
   protected:
     UdpSocket socketExt;
+    UdpSocket socket;
+
 
     simtime_t startTime;
     simtime_t stopTime;
-
     cMessage *selfMsg = nullptr;
 
-    int port;
-    const char* address;
-    int xOffset;
-    int yOffset;
-    double interval;
+    int localPort;
+    int externalPort;
+    const char* localAddress;
+    const char* externalAddress;
+    int offsetNorthing;
+    int offsetEasting;
 
-    IPositionHistoryProvider* mobilityModule = nullptr;
+    cOutVector *numMessages = nullptr;
 
-    enum SelfMsgKinds { START = 1, STOP, UPDATE };
+    enum SelfMsgKinds { START = 1, STOP };
 
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
 
     virtual void handleMessageWhenUp(cMessage *msg) override;
     virtual void finish() override;
+
+    virtual void socketDataArrived(UdpSocket *socket, Packet *packet) override;
+    virtual void socketErrorArrived(UdpSocket *socket, Indication *indication) override;
+    virtual void socketClosed(UdpSocket *socket) override;
 
     virtual void processStart();
     virtual void processStop();
@@ -62,10 +72,7 @@ class NodeLocationExporter : public ApplicationBase
     virtual void handleCrashOperation(LifecycleOperation *operation) override;
 
   private:
-    void sendLocationPacket();
-
-    int lastX = 0;
-    int lastY = 0;
+    virtual void sendSingleLocationBroadcast(UdpSocket socket, SingleLocationData *data);
 };
 
 }

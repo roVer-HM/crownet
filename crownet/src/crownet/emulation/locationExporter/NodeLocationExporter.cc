@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "../emulation/NodeLocationExporter.h"
+#include "NodeLocationExporter.h"
 
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "crownet/applications/beacon/Beacon_m.h"
@@ -37,8 +37,8 @@ void crownet::NodeLocationExporter::initialize()
     stopTime = par("stopTime");
     port = par("port");
     address = par("address");
-    xOffset = par("xOffset");
-    yOffset = par("yOffset");
+    xOffset = par("offsetEasting");
+    yOffset = par("offsetNorthing");
     interval = par("interval").doubleValue();
 
     selfMsg = new cMessage("NodeLocationExporter");

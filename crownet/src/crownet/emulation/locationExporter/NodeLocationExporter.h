@@ -18,50 +18,41 @@
 
 #include "inet/applications/base/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
-
-// Fix re-declaration error
-#undef NaN
-
-#include "../emulation/definitions.pb.h"
+#include "../../mobility/IPositionHistoryProvider.h"
+#include "../../mobility/IPositionEmulator.h"
 
 namespace crownet {
 
-using com::example::peopledensitymeasurementprototype::model::proto::SingleLocationData;
 using namespace inet;
 
-class DensityMessageHandler : public ApplicationBase, public UdpSocket::ICallback
+class NodeLocationExporter : public ApplicationBase
 {
   public:
-    virtual ~DensityMessageHandler();
+    virtual ~NodeLocationExporter();
 
   protected:
     UdpSocket socketExt;
-    UdpSocket socket;
-
 
     simtime_t startTime;
     simtime_t stopTime;
+
     cMessage *selfMsg = nullptr;
 
-    int localPort;
-    int externalPort;
-    const char* localAddress;
-    const char* externalAddress;
-    int offsetNorthing;
-    int offsetEasting;
+    int port;
+    const char* address;
+    int xOffset;
+    int yOffset;
+    double interval;
 
+    IPositionHistoryProvider* mobilityModule = nullptr;
 
-    enum SelfMsgKinds { START = 1, STOP };
+    enum SelfMsgKinds { START = 1, STOP, UPDATE };
 
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
 
     virtual void handleMessageWhenUp(cMessage *msg) override;
     virtual void finish() override;
-
-    virtual void socketDataArrived(UdpSocket *socket, Packet *packet) override;
-    virtual void socketErrorArrived(UdpSocket *socket, Indication *indication) override;
-    virtual void socketClosed(UdpSocket *socket) override;
 
     virtual void processStart();
     virtual void processStop();
@@ -71,7 +62,10 @@ class DensityMessageHandler : public ApplicationBase, public UdpSocket::ICallbac
     virtual void handleCrashOperation(LifecycleOperation *operation) override;
 
   private:
-    virtual void sendSingleLocationBroadcast(UdpSocket socket, SingleLocationData *data);
+    void sendLocationPacket();
+
+    int lastX = 0;
+    int lastY = 0;
 };
 
 }

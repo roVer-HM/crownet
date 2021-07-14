@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "../emulation/DensityMessageHandler.h"
+#include "OutboundEmulation.h"
 
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "crownet/applications/beacon/Beacon_m.h"
@@ -21,17 +21,17 @@
 
 #include <time.h>
 
-Define_Module(crownet::DensityMessageHandler);
+Define_Module(crownet::OutboundEmulation);
 
 using com::example::peopledensitymeasurementprototype::model::proto::LocationMessageWrapper;
 using com::example::peopledensitymeasurementprototype::model::proto::SingleLocationData;
 
-crownet::DensityMessageHandler::~DensityMessageHandler()
+crownet::OutboundEmulation::~OutboundEmulation()
 {
     cancelAndDelete(selfMsg);
 }
 
-void crownet::DensityMessageHandler::initialize()
+void crownet::OutboundEmulation::initialize()
 {
     startTime = par("startTime");
     stopTime = par("stopTime");
@@ -43,9 +43,11 @@ void crownet::DensityMessageHandler::initialize()
     offsetEasting = par("offsetEasting");
 
     selfMsg = new cMessage("UdpMessageHandler");
+
+    numMessages = new cOutVector("numMessages");
 }
 
-void crownet::DensityMessageHandler::handleMessage(cMessage *msg)
+void crownet::OutboundEmulation::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
         switch (msg->getKind()) {
@@ -60,10 +62,10 @@ void crownet::DensityMessageHandler::handleMessage(cMessage *msg)
     }
 }
 
-void crownet::DensityMessageHandler::handleMessageWhenUp(cMessage *msg) {};
-void crownet::DensityMessageHandler::finish() {};
+void crownet::OutboundEmulation::handleMessageWhenUp(cMessage *msg) {};
+void crownet::OutboundEmulation::finish() {};
 
-void crownet::DensityMessageHandler::socketDataArrived(UdpSocket *socket, Packet *packet)
+void crownet::OutboundEmulation::socketDataArrived(UdpSocket *socket, Packet *packet)
 {
     // Extract beacon
     auto header = packet->popAtFront<AidHeader>();
@@ -89,16 +91,18 @@ void crownet::DensityMessageHandler::socketDataArrived(UdpSocket *socket, Packet
     single->set_ttl(30);
 
     sendSingleLocationBroadcast(socketExt, single);
+    numMessages->record(1);
+
     delete packet;
 }
 
-void crownet::DensityMessageHandler::socketErrorArrived(UdpSocket *socket, Indication *indication) {
+void crownet::OutboundEmulation::socketErrorArrived(UdpSocket *socket, Indication *indication) {
     EV_INFO << "Socket error." << endl;
 }
 
-void crownet::DensityMessageHandler::socketClosed(UdpSocket *socket) {}
+void crownet::OutboundEmulation::socketClosed(UdpSocket *socket) {}
 
-void crownet::DensityMessageHandler::sendSingleLocationBroadcast(UdpSocket socket, SingleLocationData *data)
+void crownet::OutboundEmulation::sendSingleLocationBroadcast(UdpSocket socket, SingleLocationData *data)
 {
     LocationMessageWrapper wrapper;
     wrapper.set_allocated_single(data);
@@ -119,7 +123,7 @@ void crownet::DensityMessageHandler::sendSingleLocationBroadcast(UdpSocket socke
     delete[] buffer;
 }
 
-void crownet::DensityMessageHandler::processStart()
+void crownet::OutboundEmulation::processStart()
 {
     socket.setOutputGate(gate("socketOut"));
     MulticastGroupList mgl = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this)->collectMulticastGroups();
@@ -134,12 +138,12 @@ void crownet::DensityMessageHandler::processStart()
     socketExt.setCallback(this);
 }
 
-void crownet::DensityMessageHandler::processStop() {
+void crownet::OutboundEmulation::processStop() {
     socket.close();
     socketExt.close();
 }
 
-void crownet::DensityMessageHandler::handleStartOperation(LifecycleOperation *operation)
+void crownet::OutboundEmulation::handleStartOperation(LifecycleOperation *operation)
 {
     simtime_t start = std::max(startTime, simTime());
 
@@ -149,5 +153,5 @@ void crownet::DensityMessageHandler::handleStartOperation(LifecycleOperation *op
     }
 }
 
-void crownet::DensityMessageHandler::handleStopOperation(LifecycleOperation *operation) {}
-void crownet::DensityMessageHandler::handleCrashOperation(LifecycleOperation *operation) {}
+void crownet::OutboundEmulation::handleStopOperation(LifecycleOperation *operation) {}
+void crownet::OutboundEmulation::handleCrashOperation(LifecycleOperation *operation) {}

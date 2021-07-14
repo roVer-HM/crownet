@@ -13,6 +13,8 @@
 #include "crownet/artery/traci/VadereLauchner.h"
 #include "crownet/artery/traci/VadereSubscriptionManager.h"
 
+#include "inet/common/scheduler/RealTimeScheduler.h"
+
 using namespace traci;
 using namespace omnetpp;
 
@@ -59,6 +61,10 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
       emit(initSignal, simTime());
       m_updateInterval = Time{m_traci->simulation.getDeltaT()};
       scheduleAt(simTime() + m_updateInterval, m_updateEvent);
+
+      if (auto scheduler = dynamic_cast<inet::RealTimeScheduler *>(getSimulation()->getScheduler())) {
+          scheduler->executionResumed();
+      }
   }
 }
 

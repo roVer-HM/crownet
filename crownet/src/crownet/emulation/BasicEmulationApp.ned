@@ -17,25 +17,26 @@ package crownet.emulation;
 
 import inet.applications.contract.IApp;
 import inet.emulation.transportlayer.udp.ExtLowerUdp;
-import crownet.emulation.inbound.InboundEmulation;
+import crownet.emulation.locationExporter.NodeLocationExporter;
+import crownet.emulation.outbound.OutboundEmulation;
 
 
-module BeaconConverterApp like IApp
+
+module BasicEmulationApp like IApp
 {
     parameters:
         int internalPort;
 
-        int outboundPort = default(1510);
-        int inboundPort = default(1510);
+        int externalPort = default(1510);
 
         string externalAddress;
-
         string interfaceTableModule;
 
         int offsetNorthing;
         int offsetEasting;
         
-        int deviceId;
+        double locationExportInterval;
+        
 
         @display("bgb=418,236");
     gates:
@@ -43,10 +44,10 @@ module BeaconConverterApp like IApp
         output socketOut @labels(UdpControlInfo/down);
 
     submodules:
-        densityMessageHandler: DensityMessageHandler {
+        outboundEmulation: OutboundEmulation {
             localPort = internalPort;
             localAddress = "0.0.0.0";
-            externalPort = outboundPort;
+            externalPort = externalPort;
             externalAddress = externalAddress;
             offsetNorthing = offsetNorthing;
             offsetEasting = offsetEasting;
@@ -55,13 +56,13 @@ module BeaconConverterApp like IApp
 
         }
 
-        inboundEmulation: InboundEmulation {
-            externalPort = inboundPort;
-            externalAddress = externalAddress;
+        locationExporter: NodeLocationExporter {
+            address = externalAddress;
+            port = externalPort;
             offsetNorthing = offsetNorthing;
             offsetEasting = offsetEasting;
             interfaceTableModule = interfaceTableModule;
-            deviceId = deviceId;
+            interval = locationExportInterval;
             @display("p=114,164");
 
         }
@@ -70,14 +71,14 @@ module BeaconConverterApp like IApp
             @display("p=332,72");
         }
 
-        inboundSocket: ExtLowerUdp {
+        locationExporterSocket: ExtLowerUdp {
             @display("p=332,164");
         }
     connections:
-        densityMessageHandler.socketIn <-- socketIn;
-        densityMessageHandler.socketOut --> socketOut;
-        densityMessageHandler.socketInExternal <-- outboundSocket.appOut;
-        densityMessageHandler.socketOutExternal --> outboundSocket.appIn;
-        inboundEmulation.socketInExternal <-- inboundSocket.appOut;
-        inboundEmulation.socketOutExternal --> inboundSocket.appIn;
+        outboundEmulation.socketIn <-- socketIn;
+        outboundEmulation.socketOut --> socketOut;
+        outboundEmulation.socketInExternal <-- outboundSocket.appOut;
+        outboundEmulation.socketOutExternal --> outboundSocket.appIn;
+        locationExporter.socketInExternal <-- locationExporterSocket.appOut;
+        locationExporter.socketOutExternal --> locationExporterSocket.appIn;
 }

@@ -12,44 +12,29 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
-
-package crownet.emulation;
+//
+package crownet.emulation.outbound;
 
 import inet.applications.contract.IApp;
-import inet.emulation.transportlayer.udp.ExtLowerUdp;
 
-module NodeLocationExporterApp like IApp
+simple OutboundEmulation like IApp
 {
     parameters:
-        int port;
-        string address;
+        @display("i=block/sink");
+        @class(crownet::OutboundEmulation);
         string interfaceTableModule;
-        int xOffset = default(0);
-        int yOffset = default(0);
-        double interval;
-        
-        @display("bgb=225,330");
+        double startTime @unit(s) = default(0s); // application start time
+        double stopTime @unit(s) = default(-1s);  // time of finishing receiving
+        int localPort;
+        int externalPort;
+        string localAddress;
+        string externalAddress;
+        int offsetNorthing;
+        int offsetEasting;
         
     gates:
         input socketIn @labels(UdpControlInfo/up);
         output socketOut @labels(UdpControlInfo/down);
-
-    submodules:
-        extLowerUdp: ExtLowerUdp {
-            @display("p=101,249");
-        }
-
-        nodeLocationExporter: NodeLocationExporter {
-			port = port;
-			address = address;
-			interfaceTableModule = interfaceTableModule;
-			xOffset = xOffset;
-			yOffset = yOffset;
-			interval = interval;
-            @display("p=101,84");
-        }
-
-    connections allowunconnected:
-        nodeLocationExporter.socketInExternal <-- extLowerUdp.appOut;
-        nodeLocationExporter.socketOutExternal --> extLowerUdp.appIn;
+        input socketInExternal @labels(UdpControlInfo/up);
+        output socketOutExternal @labels(UdpControlInfo/down);
 }

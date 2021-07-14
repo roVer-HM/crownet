@@ -12,29 +12,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
-//
-package crownet.emulation;
 
-import inet.applications.contract.IApp;
+package crownet.emulation.locationExporter;
 
-simple DensityMessageHandler like IApp
+module NodeLocationExporter
 {
     parameters:
         @display("i=block/sink");
-        @class(crownet::DensityMessageHandler);
+        int port;
+        string address;
         string interfaceTableModule;
+        int offsetEasting = default(0);
+        int offsetNorthing = default(0);
         double startTime @unit(s) = default(0s); // application start time
         double stopTime @unit(s) = default(-1s);  // time of finishing receiving
-        int localPort;
-        int externalPort;
-        string localAddress;
-        string externalAddress;
-        int offsetNorthing;
-        int offsetEasting;
+        double interval;
+        
+        @class(crownet::NodeLocationExporter);
         
     gates:
-        input socketIn @labels(UdpControlInfo/up);
-        output socketOut @labels(UdpControlInfo/down);
         input socketInExternal @labels(UdpControlInfo/up);
         output socketOutExternal @labels(UdpControlInfo/down);
+    
 }

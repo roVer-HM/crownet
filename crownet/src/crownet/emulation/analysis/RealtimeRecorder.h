@@ -13,24 +13,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.emulation;
+#ifndef __CROWNET_REALTIMERECORDER_H_
+#define __CROWNET_REALTIMERECORDER_H_
 
-module NodeLocationExporter
+#include <omnetpp.h>
+#include "inet/common/scheduler/RealTimeScheduler.h"
+
+using namespace omnetpp;
+
+/**
+ * TODO - Generated class
+ */
+class RealtimeRecorder : public cSimpleModule
 {
-    parameters:
-        int port;
-        string address;
-        string interfaceTableModule;
-        int xOffset = default(0);
-        int yOffset = default(0);
-        double startTime @unit(s) = default(0s); // application start time
-        double stopTime @unit(s) = default(-1s);  // time of finishing receiving
-        double interval;
-        
-        @class(crownet::NodeLocationExporter);
-        
-    gates:
-        input socketInExternal @labels(UdpControlInfo/up);
-        output socketOutExternal @labels(UdpControlInfo/down);
-    
-}
+  protected:
+    virtual void initialize() override;
+    virtual void handleMessage(cMessage *msg) override;
+
+    cMessage *selfMsg = nullptr;
+    cOutVector *rtTime;
+  private:
+    virtual void tick();
+};
+
+#endif
