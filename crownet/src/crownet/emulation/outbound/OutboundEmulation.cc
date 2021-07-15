@@ -23,9 +23,6 @@
 
 Define_Module(crownet::OutboundEmulation);
 
-using com::example::peopledensitymeasurementprototype::model::proto::LocationMessageWrapper;
-using com::example::peopledensitymeasurementprototype::model::proto::SingleLocationData;
-
 crownet::OutboundEmulation::~OutboundEmulation()
 {
     cancelAndDelete(selfMsg);
@@ -41,6 +38,7 @@ void crownet::OutboundEmulation::initialize()
     externalAddress = par("externalAddress").stringValue();
     offsetNorthing = par("offsetNorthing");
     offsetEasting = par("offsetEasting");
+    ttl = par("ttl");
 
     selfMsg = new cMessage("UdpMessageHandler");
 
@@ -79,7 +77,7 @@ void crownet::OutboundEmulation::socketDataArrived(UdpSocket *socket, Packet *pa
     int northing = offsetNorthing - (ypos - ypos % 5);
     int easting = offsetEasting + (xpos - xpos % 5);
 
-    SingleLocationData *single = new SingleLocationData();
+    SingleLocationData* single = new SingleLocationData();
     single->set_deviceid(beacon->getNodeId());
     single->set_hemisphere(true);
     single->set_bearing(0);
@@ -88,9 +86,20 @@ void crownet::OutboundEmulation::socketDataArrived(UdpSocket *socket, Packet *pa
     single->set_zoneid(32);
     single->set_accuracy(10);
     single->set_timestamp(time(NULL));
-    single->set_ttl(30);
+    single->set_ttl(ttl);
+
+    // Add to local density map
+    densityMap.addSingle(single);
 
     sendSingleLocationBroadcast(socketExt, single);
+
+    // Send density map
+    DensityMap* dmap = new DensityMap();
+    dmap->set_senderdeviceid(beacon->getNodeId());
+    densityMap.writeToDensityMap(dmap);
+
+    sendDensityMap(socketExt, dmap);
+
     numMessages->record(1);
 
     delete packet;
@@ -106,7 +115,18 @@ void crownet::OutboundEmulation::sendSingleLocationBroadcast(UdpSocket socket, S
 {
     LocationMessageWrapper wrapper;
     wrapper.set_allocated_single(data);
+    sendWrapper(socket, wrapper);
+}
 
+void crownet::OutboundEmulation::sendDensityMap(UdpSocket socket, DensityMap *data)
+{
+    LocationMessageWrapper wrapper;
+    wrapper.set_allocated_map(data);
+    sendWrapper(socket, wrapper);
+}
+
+void crownet::OutboundEmulation::sendWrapper(UdpSocket socket, LocationMessageWrapper const & wrapper)
+{
     int size = wrapper.ByteSize();
     uint8_t *buffer = new uint8_t[size];
 
