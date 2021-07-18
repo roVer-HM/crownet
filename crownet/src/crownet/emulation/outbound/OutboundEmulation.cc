@@ -93,12 +93,16 @@ void crownet::OutboundEmulation::socketDataArrived(UdpSocket *socket, Packet *pa
 
     sendSingleLocationBroadcast(socketExt, single);
 
+    delete single;
+
     // Send density map
     DensityMap* dmap = new DensityMap();
     dmap->set_senderdeviceid(beacon->getNodeId());
     densityMap.writeToDensityMap(dmap);
 
     sendDensityMap(socketExt, dmap);
+
+    delete dmap;
 
     numMessages->record(1);
 
