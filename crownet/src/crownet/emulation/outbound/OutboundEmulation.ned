@@ -31,6 +31,7 @@ simple OutboundEmulation like IApp
         string externalAddress;
         int offsetNorthing;
         int offsetEasting;
+        int ttl = default(120);
         
     gates:
         input socketIn @labels(UdpControlInfo/up);

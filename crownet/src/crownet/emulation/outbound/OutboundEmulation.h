@@ -18,6 +18,7 @@
 
 #include "inet/applications/base/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
+#include "OutboundDensityMap.h"
 
 // Fix re-declaration error
 #undef NaN
@@ -27,6 +28,8 @@
 namespace crownet {
 
 using com::example::peopledensitymeasurementprototype::model::proto::SingleLocationData;
+using com::example::peopledensitymeasurementprototype::model::proto::LocationMessageWrapper;
+using com::example::peopledensitymeasurementprototype::model::proto::DensityMap;
 using namespace inet;
 
 class OutboundEmulation : public ApplicationBase, public UdpSocket::ICallback
@@ -49,6 +52,8 @@ class OutboundEmulation : public ApplicationBase, public UdpSocket::ICallback
     const char* externalAddress;
     int offsetNorthing;
     int offsetEasting;
+
+    int ttl;
 
     cOutVector *numMessages = nullptr;
 
@@ -73,6 +78,10 @@ class OutboundEmulation : public ApplicationBase, public UdpSocket::ICallback
 
   private:
     virtual void sendSingleLocationBroadcast(UdpSocket socket, SingleLocationData *data);
+    virtual void sendDensityMap(UdpSocket socket, DensityMap *data);
+    virtual void sendWrapper(UdpSocket socket, LocationMessageWrapper const & wrapper);
+
+    OutboundDensityMap densityMap;
 };
 
 }
