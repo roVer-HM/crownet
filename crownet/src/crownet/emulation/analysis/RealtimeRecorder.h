@@ -17,13 +17,10 @@
 #define __CROWNET_REALTIMERECORDER_H_
 
 #include <omnetpp.h>
-#include "inet/common/scheduler/RealTimeScheduler.h"
+#include "../sched/EmulationScheduler.h"
 
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
 class RealtimeRecorder : public cSimpleModule
 {
   protected:
@@ -35,5 +32,6 @@ class RealtimeRecorder : public cSimpleModule
   private:
     virtual void tick();
 };
+
 
 #endif

@@ -37,8 +37,8 @@ void RealtimeRecorder::handleMessage(cMessage *msg)
 
 void RealtimeRecorder::tick()
 {
-    if (auto scheduler = dynamic_cast<inet::RealTimeScheduler *>(getSimulation()->getScheduler())) {
-        rtTime->record(opp_get_monotonic_clock_nsecs() - scheduler->getBaseTime());
+    if (auto scheduler = dynamic_cast<crownet::EmulationScheduler *>(getSimulation()->getScheduler())) {
+        rtTime->record(scheduler->getElapsedRealtime());
     }
 }
 
