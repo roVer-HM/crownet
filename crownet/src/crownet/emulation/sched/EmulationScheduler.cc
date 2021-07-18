@@ -22,5 +22,5 @@ int64_t crownet::EmulationScheduler::getElapsedRealtime()
 
 void crownet::EmulationScheduler::startEmulation()
 {
-    executionResumed();
+    baseTime = inet::opp_get_monotonic_clock_nsecs() - sim->getSimTime().inUnit(inet::SIMTIME_NS);
 }
