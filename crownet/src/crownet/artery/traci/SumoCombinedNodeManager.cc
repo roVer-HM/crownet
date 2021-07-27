@@ -446,4 +446,14 @@ PersonSink* SumoCombinedNodeManager::getPersonSink(const std::string& id)
     return found != m_persons.end() ? found->second : nullptr;
 }
 
+void SumoCombinedNodeManager::visit(ITraciNodeVisitor *visitor) const{
+    for (const auto& entry : m_personNodes) {
+        visitor->visitNode(entry.first, entry.second);
+    }
+    for (const auto& entry : m_vehicleNodes) {
+        visitor->visitNode(entry.first, entry.second);
+    }
+}
+
+
 }
