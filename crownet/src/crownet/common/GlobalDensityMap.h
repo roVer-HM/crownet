@@ -77,7 +77,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
   gridMap_t dezentralMaps;
-  std::string m_middelwareModule;
+  std::string m_mobilityModule;
   std::unique_ptr<FileWriter> fileWriter;
 };
 

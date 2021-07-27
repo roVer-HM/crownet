@@ -112,7 +112,7 @@ void GlobalDensityMap::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-    m_middelwareModule = par("middelwareModule").stdstringValue();
+    m_mobilityModule = par("mobilityModule").stdstringValue();
 
     updateTimer = new cMessage("GlobalDensityMapTimer");
     updateInterval = par("updateInterval").doubleValue();
@@ -139,15 +139,9 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
 
 void GlobalDensityMap::visitNode(const std::string &traciNodeId,
                                  omnetpp::cModule *mod) {
-  // access middelware for position
-
-  auto middleware = check_and_cast<artery::MiddlewareBase *>(
-      mod->getModuleByPath(m_middelwareModule.c_str()));
-
+  const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));
   // convert to traci 2D position
-  const auto &pos = middleware->getFacilities()
-                        .getConst<artery::MovingNodeDataProvider>()
-                        .position();
+  const auto &pos = mobility->getCurrentPosition();
   const auto &posInet = converter->position_cast_traci(pos);
 
   // visitNode is called for *all* nodes thus this 'local' map of the global
