@@ -25,13 +25,14 @@
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/util/FileWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/dcd/generic/CellVisitors.h"
+#include "crownet/dcd/regularGrid/RegularCell.h"
 
 using namespace omnetpp;
 using namespace inet;
 
 
 namespace crownet {
-
 class BaseDensityMapApp : public BaseApp,
                           public IDensityMapHandler<RegularDcdMap>,
                           public omnetpp::cListener {
@@ -76,9 +77,9 @@ protected:
  std::shared_ptr<OsgCoordinateConverter> converter;
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::unique_ptr<FileWriter> fileWriter;
+ std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
  std::shared_ptr<GridCellDistance> distProvider;
  simtime_t lastUpdate = -1.0;
-
  std::string mapType;
  std::string mapTypeLog;
 

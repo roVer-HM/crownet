@@ -91,12 +91,9 @@ class VoidCellVisitor : public CellVisitor<C, void> {
 };
 
 template <typename C>
-class TimestampedVisitor : public VoidCellVisitor<C> {
+class TimestampedVoidCellVisitor : public VoidCellVisitor<C>, public Timestamped<C> {
  public:
-  TimestampedVisitor(typename C::time_t time) : time(time) {}
-
- protected:
-  typename C::time_t time;
+    TimestampedVoidCellVisitor(typename C::time_t time) :  Timestamped<C>(time) {}
 };
 
 /**

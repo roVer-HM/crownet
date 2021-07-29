@@ -95,6 +95,7 @@ void BaseDensityMapApp::initDcdMap(){
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
     // if global is present will be overwritten to share one provider between all maps
     distProvider = f.createDistanceProvider();
+    valueVisitor = f.createValueVisitor(mapType);
 }
 void BaseDensityMapApp::initWriter(){
     if (par("writeDensityLog").boolValue()) {
@@ -201,8 +202,8 @@ void BaseDensityMapApp::setDistanceProvider(std::shared_ptr<GridCellDistance> di
 
 
 void BaseDensityMapApp::computeValues() {
-  YmfVisitor ymf_v;  // todo make settable in config
-  dcdMap->computeValues(ymf_v);
+  valueVisitor->setTime(simTime());
+  dcdMap->computeValues(valueVisitor);
 }
 
 } // namespace crownet

@@ -12,10 +12,10 @@
 
 namespace crownet {
 // test only makes no sense to increment all IEntries
-class IncrementerVisitor : public TimestampedVisitor<RegularCell> {
+class IncrementerVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   IncrementerVisitor(RegularCell::time_t time)
-      : TimestampedVisitor<RegularCell>(time) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time) {}
   virtual void applyTo(RegularCell& cell) override {
     for (auto e : cell) {
       e.second->incrementCount(time);
@@ -26,10 +26,10 @@ class IncrementerVisitor : public TimestampedVisitor<RegularCell> {
 /**
  * Reset all IEntries within a RegularCell
  */
-class ResetVisitor : public TimestampedVisitor<RegularCell> {
+class ResetVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   ResetVisitor(RegularCell::time_t time)
-      : TimestampedVisitor<RegularCell>(time) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time) {}
   virtual void applyTo(RegularCell& cell) override {
     for (auto e : cell) {
       e.second->reset(time);
@@ -40,10 +40,10 @@ class ResetVisitor : public TimestampedVisitor<RegularCell> {
 /**
  * Clear all IEntries within a RegularCell
  */
-class ClearVisitor : public TimestampedVisitor<RegularCell> {
+class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   ClearVisitor(RegularCell::time_t time)
-      : TimestampedVisitor<RegularCell>(time) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time) {}
   virtual void applyTo(RegularCell& cell) override {
     for (auto e : cell) {
       e.second->clear(time);
@@ -61,10 +61,10 @@ class ClearSelection : public VoidCellVisitor<RegularCell> {
   }
 };
 
-class ClearLocalVisitor : public TimestampedVisitor<RegularCell> {
+class ClearLocalVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   ClearLocalVisitor(RegularCell::time_t time)
-      : TimestampedVisitor<RegularCell>(time) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time) {}
   virtual void applyTo(RegularCell& cell) override {
     if (cell.hasLocal()) {
       cell.getLocal()->clear(time);
@@ -72,10 +72,10 @@ class ClearLocalVisitor : public TimestampedVisitor<RegularCell> {
   }
 };
 
-class ClearCellIdVisitor : public TimestampedVisitor<RegularCell> {
+class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   ClearCellIdVisitor(RegularCell::node_key_t id, RegularCell::time_t time)
-      : TimestampedVisitor<RegularCell>(time), id(id) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time), id(id) {}
   virtual void applyTo(RegularCell& cell) override {
     if (cell.hasData(id)) {
       cell.get(id)->clear(time);
@@ -91,8 +91,10 @@ class ClearCellIdVisitor : public TimestampedVisitor<RegularCell> {
  *
  * Only look at valid items.
  */
-class YmfVisitor : public GetEntryVisitor<RegularCell> {
+class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
  public:
+    YmfVisitor(RegularCell::time_t t = 0.0)
+      : TimestampedGetEntryVisitor<RegularCell>(t) {}
   virtual RegularCell::entry_t_ptr applyTo(
       const RegularCell& cell) const override;
   virtual std::string getName() const override { return "ymf"; }
@@ -116,6 +118,9 @@ public:
         const RegularCell& cell) const override;
     virtual std::string getName() const override { return "mean"; }
 };
+
+
+
 
 /**
  * todo: Return mean measurement with weighted based on the distance between the
