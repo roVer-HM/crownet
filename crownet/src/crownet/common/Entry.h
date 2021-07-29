@@ -15,6 +15,12 @@
 
 #include "crownet/common/util/FilePrinter.h"
 
+struct EntryDist{
+    double sourceOwner;
+    double sourceEntry;
+    double ownerEntry;
+};
+
 template <typename K, typename T>
 class IEntry : public crownet::FilePrinter {
  public:
@@ -149,15 +155,29 @@ inline IEntry<K, T>::IEntry(const double count, const time_type& m_t,
       measurement_time(m_t),
       received_time(r_t),
       _valid(true),
-      source() {}
+      source(),
+      entryDist(){}
+
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(const double count, const time_type& m_t,
-                            const time_type& r_t, const key_type& source)
+                            const time_type& r_t, const key_type& source, const EntryDist& dist)
     : count(count),
       measurement_time(m_t),
       received_time(r_t),
       _valid(true),
-      source(source) {}
+      source(source),
+      entryDist(dist){}
+
+template <typename K, typename T>
+inline IEntry<K, T>::IEntry(const double count, const time_type& m_t, const time_type& r_t,
+        const key_type&& source, const EntryDist&& dist)
+    : count(count),
+      measurement_time(m_t),
+      received_time(r_t),
+      _valid(true),
+      source(std::move(source)),
+      entryDist(std::move(dist)){}
+
 
 template <typename K, typename T>
 inline const bool IEntry<K, T>::empty() const {

@@ -67,6 +67,8 @@ protected:
  virtual void computeValues() override;
  virtual void writeMap() override;
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
+ virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) override;
+
 
 protected:
  int hostId;
@@ -74,6 +76,7 @@ protected:
  std::shared_ptr<OsgCoordinateConverter> converter;
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::unique_ptr<FileWriter> fileWriter;
+ std::shared_ptr<GridCellDistance> distProvider;
  simtime_t lastUpdate = -1.0;
 
  std::string mapType;

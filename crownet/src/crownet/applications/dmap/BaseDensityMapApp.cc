@@ -93,6 +93,8 @@ void BaseDensityMapApp::initDcdMap(){
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
+    // if global is present will be overwritten to share one provider between all maps
+    distProvider = f.createDistanceProvider();
 }
 void BaseDensityMapApp::initWriter(){
     if (par("writeDensityLog").boolValue()) {
@@ -154,7 +156,7 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
   int numCells = p->getNumCells();
 
   int sourceNodeId = p->getNodeId();
-  GridCellID _cellId = GridCellID(p->getCellId(0), p->getCellId(1));
+  GridCellID sourceCellId = GridCellID(p->getCellId(0), p->getCellId(1));
 
   simtime_t _received = simTime();
   // 1) set count of all cells in local map to zero.
@@ -163,16 +165,17 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
 
   // 2) update new measurements
   for (int i = 0; i < numCells; i++) {
-    GridCellID _cId{p->getCellX(i), p->getCellY(i)};
+    GridCellID entryCellId{p->getCellX(i), p->getCellY(i)};
+    EntryDist entryDist = distProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
     simtime_t _measured = p->getMTime(i);
     auto _m = std::make_shared<RegularCell::entry_t>(
-        p->getCellCount(i), _measured, _received, sourceNodeId);
-    dcdMap->update(_cId, std::move(_m));
+        p->getCellCount(i), _measured, _received, std::move(sourceNodeId), std::move(entryDist));
+    dcdMap->update(entryCellId, std::move(_m));
   }
 
   // 3) check local map for _nodeId and compare if the local and packet
   //    place the _nodeId in the same cell.
-  dcdMap->addToNeighborhood(sourceNodeId, _cellId);
+  dcdMap->addToNeighborhood(sourceNodeId, sourceCellId);
   //  using namespace omnetpp;
   //  EV_DEBUG << dMap->getView(mapType)->str();
   //  EV_DEBUG << dMap->getView("local")->str();
@@ -191,6 +194,10 @@ void BaseDensityMapApp::writeMap() {
 }
 
 std::shared_ptr<RegularDcdMap> BaseDensityMapApp::getMap() { return dcdMap; }
+
+void BaseDensityMapApp::setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider){
+    this->distProvider = distProvider;
+}
 
 
 void BaseDensityMapApp::computeValues() {

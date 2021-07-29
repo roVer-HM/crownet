@@ -10,6 +10,8 @@
 #include "crownet/dcd/generic/Cell.h"
 #include "crownet/dcd/generic/DcdMap.h"
 #include "crownet/dcd/generic/DcdMapWatcher.h"
+#include "crownet/dcd/regularGrid/DistanceProvider.h"
+#include "crownet/dcd/regularGrid/RegularCell.h"
 
 namespace crownet {
 
@@ -24,6 +26,7 @@ class RegularDcdMapFactory {
 
   RegularDcdMap create(const IntIdentifer& ownerID);
   std::shared_ptr<RegularDcdMap> create_shared_ptr(const IntIdentifer& ownerID);
+  std::shared_ptr<GridCellDistance> createDistanceProvider();
 
  private:
   std::pair<double, double> gridSize;

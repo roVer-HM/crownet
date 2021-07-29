@@ -12,6 +12,8 @@
 
 namespace crownet {
 
+class GridCellDistance;
+
 template <typename GRID>
 class IDensityMapHandler {
  public:
@@ -23,6 +25,7 @@ class IDensityMapHandler {
   virtual std::shared_ptr<GRID> getMap() = 0;
   //  FIXME: make mergeMap independent from Packet (see ArteryDensityMapApp.cc)
   //  virtual void mergeMap(const GRID map) = 0;
+  virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) = 0;
 };
 
 }  // namespace crownet
