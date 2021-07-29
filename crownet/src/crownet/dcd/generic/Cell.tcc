@@ -216,3 +216,10 @@ void Cell<C, N, T>::incrementLocal(const node_key_t& countedNodeId,
     lEntry->touch(time);
   }
 }
+
+template <typename C, typename N, typename T>
+typename Cell<C, N, T>::entry_t_ptr  Cell<C, N, T>::createEntry(const double count) const{
+    auto e = this->entryCtor.localEntry();
+    e->setCount(count);
+    return e;
+}

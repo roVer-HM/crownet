@@ -108,6 +108,14 @@ class YmfVisitor : public GetEntryVisitor<RegularCell> {
  * todo: Return mean measurement with all cells weighted equally
  */
 // Implement ...
+class MeanVisitor : public TimestampedGetEntryVisitor<RegularCell> {
+public:
+    MeanVisitor(RegularCell::time_t t) :
+        TimestampedGetEntryVisitor<RegularCell>(t) {}
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) const override;
+    virtual std::string getName() const override { return "mean"; }
+};
 
 /**
  * todo: Return mean measurement with weighted based on the distance between the

@@ -23,6 +23,19 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
   return ret;
 }
 
+
+RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell) const {
+  double sum = 0;
+  double num = 0;
+  for (const auto& e : cell.validIter()) {
+      ++num;
+      sum += e.second->getCount();
+  }
+  auto entry = cell.createEntry(sum/num);
+  entry->touch(this->time);
+  return entry;
+}
+
 RegularCell::entry_t_ptr AlgBiggest::applyTo(const RegularCell& cell) const {
   RegularCell::value_type ret;
   for (const auto& e : cell) {

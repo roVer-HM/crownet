@@ -381,3 +381,39 @@ TEST_F(RegularCellTest, ymfVisitor_2) {
   auto data_17 = cell.getData()[IntIdentifer(17)];
   EXPECT_EQ(*(cell.val()), *data_17);
 }
+
+TEST_F(RegularCellTest, meanVisitor_1) {
+    setSimTime(112.0);
+    MeanVisitor visitor(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    // cell mean: (2 + 1 + 2 + 1 + 4)/5
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), 10/5);
+    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 112.0);
+    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 112.0);
+
+    auto& m = cell.getData();
+    m[IntIdentifer(17)]->incrementCount(2);
+    visitor.setTime(115.0);
+    // increment count and time. -> must change calcualted value
+    // cell mean: (2 + 1 + 2 + 2 + 4)/5
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), 11/5);
+    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 115.0);
+    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 115.0);
+}
+
+TEST_F(RegularCellTest, meanVisitor_2) {
+    setSimTime(112.0);
+    MeanVisitor visitor(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    // cell mean: (2 + 1 + 2 + 1 + 4)/5
+    auto& m = cell.getData();
+    // invalidate entry which thus must not be part of the average
+    m[IntIdentifer(42)]->reset();
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), (2+1+2+1)/5);
+    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 112.0);
+    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 112.0);
+
+}

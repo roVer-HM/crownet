@@ -21,9 +21,9 @@ class IEntry : public crownet::FilePrinter {
   using key_type = K;
   using time_type = T;
   IEntry();
-  IEntry(const int, const time_type&, const time_type&);
-  IEntry(const int, const time_type&, const time_type&, const key_type& source);
-  IEntry(const int);
+  IEntry(const double, const time_type&, const time_type&);
+  IEntry(const double, const time_type&, const time_type&, const key_type& source);
+  IEntry(const double);
   virtual ~IEntry() = default;
   virtual void reset(const time_type& t) {
     count = 0;
@@ -53,6 +53,8 @@ class IEntry : public crownet::FilePrinter {
   virtual const time_type& getReceivedTime() const;
   virtual const int getCount() const;
 
+  virtual void setCount(double count);
+
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
 
@@ -76,7 +78,7 @@ class IEntry : public crownet::FilePrinter {
   bool operator==(const IEntry<K, T>& rhs) const;
 
  protected:
-  int count;
+  double count;
   time_type measurement_time;
   time_type received_time;
   bool _valid;
@@ -105,23 +107,23 @@ template <typename K, typename T>
 class EntryCtor {
  public:
   virtual ~EntryCtor() = default;
-  virtual std::shared_ptr<IEntry<K, T>> entry() = 0;
-  virtual std::shared_ptr<ILocalEntry<K, T>> localEntry() = 0;
-  virtual std::shared_ptr<IEntry<K, T>> empty() = 0;
+  virtual std::shared_ptr<IEntry<K, T>> entry() const = 0;
+  virtual std::shared_ptr<ILocalEntry<K, T>> localEntry() const = 0;
+  virtual std::shared_ptr<IEntry<K, T>> empty() const = 0;
 };
 
 template <typename K, typename T>
 class EntryDefaultCtorImpl : public EntryCtor<K, T> {
  public:
-  std::shared_ptr<IEntry<K, T>> entry() override {
+  std::shared_ptr<IEntry<K, T>> entry() const override{
     return std::make_shared<IEntry<K, T>>();
   }
 
-  std::shared_ptr<ILocalEntry<K, T>> localEntry() override {
+  std::shared_ptr<ILocalEntry<K, T>> localEntry() const override {
     return std::make_shared<ILocalEntry<K, T>>();
   }
 
-  std::shared_ptr<IEntry<K, T>> empty() override {
+  std::shared_ptr<IEntry<K, T>> empty() const override {
     return std::make_shared<IEntry<K, T>>(-1);
   }
 };
@@ -133,7 +135,7 @@ inline IEntry<K, T>::IEntry()
     : count(0), measurement_time(), received_time(), _valid(true), source() {}
 
 template <typename K, typename T>
-inline IEntry<K, T>::IEntry(int count)
+inline IEntry<K, T>::IEntry(double count)
     : count(count),
       measurement_time(),
       received_time(),
@@ -141,7 +143,7 @@ inline IEntry<K, T>::IEntry(int count)
       source() {}
 
 template <typename K, typename T>
-inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
+inline IEntry<K, T>::IEntry(const double count, const time_type& m_t,
                             const time_type& r_t)
     : count(count),
       measurement_time(m_t),
@@ -149,7 +151,7 @@ inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
       _valid(true),
       source() {}
 template <typename K, typename T>
-inline IEntry<K, T>::IEntry(const int count, const time_type& m_t,
+inline IEntry<K, T>::IEntry(const double count, const time_type& m_t,
                             const time_type& r_t, const key_type& source)
     : count(count),
       measurement_time(m_t),
@@ -202,6 +204,11 @@ inline const typename IEntry<K, T>::time_type& IEntry<K, T>::getReceivedTime()
 template <typename K, typename T>
 inline const int IEntry<K, T>::getCount() const {
   return count;
+}
+
+template <typename K, typename T>
+inline  void IEntry<K, T>::setCount(double count){
+    this->count = count;
 }
 
 template <typename K, typename T>
