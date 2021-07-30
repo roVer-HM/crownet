@@ -17,8 +17,10 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> gridSize,
           gridDim(gridDim),
           timeProvider(std::make_shared<SimTimeProvider>()) {
 
-    vistor_dispatcher ["ymf"] = [this](){return std::make_shared<YmfVisitor>(timeProvider->now());};
-    vistor_dispatcher ["mean"] = [this](){return std::make_shared<MeanVisitor>(timeProvider->now());};
+    visitor_dispatcher["ymf"] = [this](){return std::make_shared<YmfVisitor>(timeProvider->now());};
+    visitor_dispatcher["mean"] = [this](){return std::make_shared<MeanVisitor>(timeProvider->now());};
+    visitor_dispatcher["median"] = [this](){return std::make_shared<MedianVisitor>(timeProvider->now());};
+    visitor_dispatcher["invSourceDist"] = [this](){return std::make_shared<InvSourceDistVisitor>(timeProvider->now());};
 
 }
 
@@ -41,10 +43,10 @@ std::shared_ptr<GridCellDistance> RegularDcdMapFactory::createDistanceProvider()
 }
 
 std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::createValueVisitor(const std::string& mapType){
-    if (vistor_dispatcher.find(mapType) == vistor_dispatcher.end()){
+    if (visitor_dispatcher.find(mapType) == visitor_dispatcher.end()){
         throw cRuntimeError("No visitor defined for mapType %s", mapType.c_str());
     }
-    return vistor_dispatcher[mapType]();
+    return visitor_dispatcher[mapType]();
 }
 
 }  // namespace crownet

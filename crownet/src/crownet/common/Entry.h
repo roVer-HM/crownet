@@ -28,7 +28,8 @@ class IEntry : public crownet::FilePrinter {
   using time_type = T;
   IEntry();
   IEntry(const double, const time_type&, const time_type&);
-  IEntry(const double, const time_type&, const time_type&, const key_type& source);
+  IEntry(const double, const time_type&, const time_type&, const key_type& source, const EntryDist& entryDist = EntryDist{});
+  IEntry(const double, const time_type&, const time_type&, const key_type&&, const EntryDist&&);
   IEntry(const double);
   virtual ~IEntry() = default;
   virtual void reset(const time_type& t) {
@@ -57,9 +58,12 @@ class IEntry : public crownet::FilePrinter {
 
   virtual const time_type& getMeasureTime() const;
   virtual const time_type& getReceivedTime() const;
-  virtual const int getCount() const;
 
+  virtual const double getCount() const;
   virtual void setCount(double count);
+
+  virtual const EntryDist getEntryDist() const;
+  virtual void setEntryDist(const EntryDist&);
 
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
@@ -89,6 +93,7 @@ class IEntry : public crownet::FilePrinter {
   time_type received_time;
   bool _valid;
   key_type source;
+  EntryDist entryDist;
   std::string selected_in;
 };
 
@@ -222,13 +227,22 @@ inline const typename IEntry<K, T>::time_type& IEntry<K, T>::getReceivedTime()
 }
 
 template <typename K, typename T>
-inline const int IEntry<K, T>::getCount() const {
+inline const double IEntry<K, T>::getCount() const {
   return count;
 }
 
 template <typename K, typename T>
 inline  void IEntry<K, T>::setCount(double count){
     this->count = count;
+}
+
+template <typename K, typename T>
+inline const EntryDist IEntry<K, T>::getEntryDist() const{
+    return this->entryDist;
+}
+template <typename K, typename T>
+void IEntry<K, T>::setEntryDist(const EntryDist& dist){
+    this->entryDist = dist;
 }
 
 template <typename K, typename T>

@@ -6,6 +6,9 @@
  */
 
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include <math.h>
+#include <algorithm>
+#include <vector>
 
 namespace crownet {
 
@@ -36,15 +39,46 @@ RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell) const {
   return entry;
 }
 
-RegularCell::entry_t_ptr AlgBiggest::applyTo(const RegularCell& cell) const {
-  RegularCell::value_type ret;
-  for (const auto& e : cell) {
-    if (!ret.second) ret.second = e.second;
-    if (e.second->getCount() > ret.second->getCount()) {
-      ret = std::make_pair(e.first, e.second);
-    }
+RegularCell::entry_t_ptr MedianVisitor::applyTo(const RegularCell& cell) const {
+  std::vector<double> count;
+  for (const auto& e : cell.validIter()) {
+      count.push_back(e.second->getCount());
   }
-  return ret.second;
+  auto m  = count.begin() + count.size()/2;
+  int left = (int)(count.size()-1)/2; // lower-right
+  int right = (int)count.size()/2;    // upper-left
+  std::nth_element(count.begin(), m, count.end()); // only sort half of the data
+
+  // calc median
+  std::cout << count.size() << " " << count[left] << ", " << count[right] << std::endl;
+  auto entry = cell.createEntry((double)(count[left] + count[right])/2);
+  entry->touch(this->time);
+  return entry;
+}
+
+RegularCell::entry_t_ptr InvSourceDistVisitor::applyTo(const RegularCell& cell) const {
+  double itemSum = 0;
+  double weightSum = 0;
+  for (const auto& e : cell.validIter()) {
+      EntryDist dist = e.second->getEntryDist();
+      double w = 1.0 / std::max(1.0, dist.sourceEntry);
+      weightSum += w;
+      itemSum += w * e.second->getCount();
+  }
+  auto entry = cell.createEntry(itemSum/weightSum);
+  entry->touch(this->time);
+  return entry;
+}
+
+RegularCell::entry_t_ptr MaxCountVisitor::applyTo(const RegularCell& cell) const {
+  double count = 0.0;
+  for (const auto& e : cell) {
+    count = std::max(count, e.second->getCount());
+  }
+
+  auto entry = cell.createEntry(count);
+  entry->touch(this->time);
+  return entry;
 }
 
 RegularCell::entry_t_ptr AlgSmall::applyTo(const RegularCell& cell) const {

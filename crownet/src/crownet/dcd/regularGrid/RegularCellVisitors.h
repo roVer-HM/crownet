@@ -107,12 +107,20 @@ class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
 //};
 
 /**
- * todo: Return mean measurement with all cells weighted equally
+ * Return mean measurement with all cells weighted equally
  */
-// Implement ...
 class MeanVisitor : public TimestampedGetEntryVisitor<RegularCell> {
 public:
-    MeanVisitor(RegularCell::time_t t) :
+    MeanVisitor(RegularCell::time_t t = 0.0) :
+        TimestampedGetEntryVisitor<RegularCell>(t) {}
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) const override;
+    virtual std::string getName() const override { return "mean"; }
+};
+
+class MedianVisitor : public TimestampedGetEntryVisitor<RegularCell> {
+public:
+    MedianVisitor(RegularCell::time_t t = 0.0) :
         TimestampedGetEntryVisitor<RegularCell>(t) {}
     virtual RegularCell::entry_t_ptr applyTo(
         const RegularCell& cell) const override;
@@ -120,18 +128,30 @@ public:
 };
 
 
-
-
 /**
- * todo: Return mean measurement with weighted based on the distance between the
+ * Return mean measurement with weighted based on the distance between the
  * cell origin and the Entry owner
  */
-// Implement ...
+class InvSourceDistVisitor : public TimestampedGetEntryVisitor<RegularCell> {
+public:
+    InvSourceDistVisitor(RegularCell::time_t t = 0.0) :
+        TimestampedGetEntryVisitor<RegularCell>(t) {}
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) const override;
+    virtual std::string getName() const override { return "invSourceDist"; }
+};
 
-class AlgBiggest : public GetEntryVisitor<RegularCell> {
+
+
+class MaxCountVisitor : public TimestampedGetEntryVisitor<RegularCell> {
  public:
+    MaxCountVisitor(RegularCell::time_t t = 0.0) :
+        TimestampedGetEntryVisitor<RegularCell>(t) {}
+
   virtual RegularCell::entry_t_ptr applyTo(
       const RegularCell& cell) const override;
+  virtual std::string getName() const override { return "maxCount"; }
+
 };
 
 class AlgSmall : public GetEntryVisitor<RegularCell> {

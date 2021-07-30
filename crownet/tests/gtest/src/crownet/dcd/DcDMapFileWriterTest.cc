@@ -84,7 +84,7 @@ TEST_F(DcDMapFileWriterTest, print_header) {
 }
 
 TEST_F(DcDMapFileWriterTest, print_all_valid) {
-  YmfVisitor ymf_v;
+  std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
   std::stringstream out;
   RegularDcdMapValuePrinter p(&mapFull);
   mapFull.setOwnerCell(GridCellID(3, 3));
@@ -142,7 +142,7 @@ TEST_F(DcDMapFileWriterTest, print_all_valid) {
 }
 
 TEST_F(DcDMapFileWriterTest, computeValues_idenpotent) {
-  YmfVisitor ymf_v;
+  std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
   mapFull.setOwnerCell(GridCellID(3, 3));
 
   setSimTime(1.4);
@@ -170,7 +170,7 @@ TEST_F(DcDMapFileWriterTest, print_duplicate_selections) {
      *  calls to MAP.computeValues() to ensure only on 'selected' value
      *  to be set if the hole map is printed. with RegularDcdMapAllPrinter
      */
-    YmfVisitor ymf_v;
+    std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
     std::stringstream out;
     RegularDcdMapAllPrinter p(&mapFull);
     mapFull.setOwnerCell(GridCellID(3, 3));
@@ -216,7 +216,7 @@ TEST_F(DcDMapFileWriterTest, print_duplicate_selections) {
 }
 
 TEST_F(DcDMapFileWriterTest, printall_all_valid) {
-  YmfVisitor ymf_v;
+  std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
   std::stringstream out;
   RegularDcdMapAllPrinter p(&mapFull);
   mapFull.setOwnerCell(GridCellID(3, 3));

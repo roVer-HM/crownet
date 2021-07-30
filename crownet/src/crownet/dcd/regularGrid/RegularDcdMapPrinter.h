@@ -25,6 +25,7 @@ class RegularDcdMapValuePrinter : public FilePrinter {
   virtual void writeHeaderTo(std::ostream& out,
                              const std::string& sep) const override;
 
+
  protected:
   RegularDcdMap* map;
 };

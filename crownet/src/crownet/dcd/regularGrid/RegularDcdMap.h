@@ -27,7 +27,7 @@ class RegularDcdMapFactory {
   RegularDcdMapFactory(std::pair<double, double> gridSize,
                        std::pair<int, int> gridDim);
 
-  std::map<std::string, VisitorCreator>vistor_dispatcher;
+  std::map<std::string, VisitorCreator>visitor_dispatcher;
 
   RegularDcdMap create(const IntIdentifer& ownerID);
   std::shared_ptr<RegularDcdMap> create_shared_ptr(const IntIdentifer& ownerID);
