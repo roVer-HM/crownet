@@ -63,6 +63,7 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
     dezentralMaps[mapHandler->getMap()->getOwnerId()] = mapHandler;
     EV_DEBUG << "register DensityMap for node: "
              << mapHandler->getMap()->getOwnerId();
+    mapHandler->setDistanceProvider(distProvider);
 
   } else if (signalId == removeMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
@@ -88,6 +89,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
+    distProvider = f.createDistanceProvider();
 
     // 2) setup writer.
     FileWriterBuilder fBuilder{};
