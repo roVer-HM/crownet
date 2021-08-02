@@ -93,7 +93,6 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
 }
 
 std::vector<std::string> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
-    // todo: neues command für density map ohne model und node
     Enter_Method_Silent();
 
     auto map = globalMap->getDcdMapGlobal();
@@ -105,11 +104,6 @@ std::vector<std::string> ControlManager::handleDensityMapCommand(const DensityMa
         retDensityIds.push_back(nodeId);
     }
     return retDensityIds;
-    //         std::vector<std::string> string_payload;
-    //         for(const auto& element : payload){
-    //             string_payload.push_back(std::to_string(element));
-    //         }
-
 }
 
 void ControlManager::finish() {
