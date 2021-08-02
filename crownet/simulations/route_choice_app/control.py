@@ -51,6 +51,8 @@ class NoController(Controller):
         peds1 = self.con_manager.sub_listener["default"].pedestrians
         density = list()
 
+        # TODO: replace this for loop by 'get_density_measure_from_density_map'
+        #   density = self.con_manager.domains.v_sim.get_density_map()
         for a in self.measurement_areas:
             counts = len(
                 [p["id"] for p in peds1 if a.contains(Point(p["pos"][0], p["pos"][1]))]

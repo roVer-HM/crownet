@@ -33,8 +33,8 @@ ForwardCmd ControlTraCiApi::parseCtrlCmd(tcpip::Storage& inMsg){
     ForwardCmd cmd;
     cmd.offset = inMsg.position();
     cmd.cmdLength = inMsg.readCmdLength();
-    cmd.cmdId = inMsg.readUnsignedByte();
-    cmd.varId = inMsg.readUnsignedByte();
+    cmd.cmdId = inMsg.readUnsignedByte(); // cmdId -> executeControlCommand
+    cmd.varId = inMsg.readUnsignedByte(); // varId -> what Control to execute
     cmd.objectIdentifer = inMsg.readString();
     cmd.payloadOffset = inMsg.position();
     cmd.payloadLength = (int)inMsg.size() - cmd.payloadOffset;
@@ -121,7 +121,8 @@ double ControlTraCiApi::handleControlLoop(){
 
             // keep receiving commands
             running = true;
-        } else {
+        }
+        else {
             throw omnetpp::cRuntimeError("#Error: expected VAR_Step or VAR_FORWARD");
         }
     }
@@ -133,35 +134,45 @@ tcpip::Storage ControlTraCiApi::handleControllerOppRequest(ForwardCmd& ctrlCmd){
     // extract payload and forward
      tcpip::Storage cmd;
      ControlCmd controlCmd;
+     DensityMapCmd densityCmd;
      cmd.writeStorage(myInput, ctrlCmd.payloadLength);
      int cmdLength = cmd.readCmdLength();
      int cmdId = cmd.readUnsignedByte();
-     int varId = cmd.readUnsignedByte();
+     int varId = cmd.readUnsignedByte(); // varId = 32, das was von python geschickt wurde
      std::string objectIdentifer = cmd.readString();
 
      //todo: (CM) check cmdId to separate controlCmd and Sensor query
 
-     ControlCmd controlCmd;
+
      // compound object
      int type = cmd.readUnsignedByte();
      if (type != TYPE_COMPOUND){
          throw omnetpp::cRuntimeError("expected compound object got");
      }
      int cmpSize = cmd.readInt();
-     if (cmpSize != 3) {
+     // todo if else if
+     // if cmpSize == 1 schauen ob .ID für Dichtekarte gesetzt ist
+     if(cmpSize == 1){ // varId == 34
+         type = cmd.readUnsignedByte();
+         densityCmd.nodeId = cmd.readString();
+         std::vector<std::string> payload =
+                 this->controlHandler->handleDensityMapCommand(densityCmd);
+         tcpip::Storage response;
+         this->createPayloadResponse(response, cmdId, RTYPE_OK, "", payload);
+         return response;
+     } else if (cmpSize == 3){ // varId == 32
+         type = cmd.readUnsignedByte();
+         controlCmd.sendingNode = cmd.readString();
+         type = cmd.readUnsignedByte();
+         controlCmd.model = cmd.readString();
+         type = cmd.readUnsignedByte();
+         controlCmd.message = cmd.readString();
+         this->controlHandler->handleActionCommand(controlCmd);
+
+     }
+     else {
          throw omnetpp::cRuntimeError("expected 3 items in compound object");
      }
-     type = cmd.readUnsignedByte();
-     controlCmd.sendingNode = cmd.readString();
-     type = cmd.readUnsignedByte();
-     controlCmd.model = cmd.readString();
-     type = cmd.readUnsignedByte();
-     controlCmd.message = cmd.readString();
-
-
-     this->controlHandler->handleControlCommand(controlCmd);
-
-     this->controlHandler->handleSensorCommand(cmd);
 
      tcpip::Storage response;
      this->createResponse(response, cmdId, RTYPE_OK, "");

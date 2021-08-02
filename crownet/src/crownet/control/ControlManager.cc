@@ -44,7 +44,8 @@ void ControlManager::initialize(int stage)
         subscribeTraCI(core);
         //todo: (CM) save pointer DensityMap in proteced or private field use getModuleFromPar like with core
         //todo: (CM) check if parameter is empty first! if (par("globalDcdModule).stdstringValue().empty()){...}
-        globalMap = nullptr; //getModuleFromPar<>(par("globalDcdModule));
+//        GlobalDensityMap* globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
+        globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
 
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
@@ -58,15 +59,6 @@ void ControlManager::initialize(int stage)
 void ControlManager::handleMessage(cMessage *msg)
 {
     throw cRuntimeError("Module does not handle messages");
-}
-
-
-//todo: (CM) implement handle method for sensor command here. Access global densityMap in this method.
-void ControlManager::handleSensorCommand(const SensorCmd& cmd){
-    auto map = globalMap->getDcdMapGlobal();
-    map->vaild();
-    map->toArray();
-
 }
 
 void ControlManager::handleActionCommand(const ControlCmd& cmd){
@@ -97,6 +89,26 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
         throw cRuntimeError("Cannot parse message from controller into property_tree (Json): %s", e.what());
     }
     this->sendDirect(msg, sendingApp, controlGate.c_str());
+
+}
+
+std::vector<std::string> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
+    // todo: neues command für density map ohne model und node
+    Enter_Method_Silent();
+
+    auto map = globalMap->getDcdMapGlobal();
+    auto nh = map->getNeighborhood();
+
+    std::vector<std::string> retDensityIds;
+    for(const auto& neighbor : nh){
+        std::string nodeId = std::to_string(neighbor.first.value());
+        retDensityIds.push_back(nodeId);
+    }
+    return retDensityIds;
+    //         std::vector<std::string> string_payload;
+    //         for(const auto& element : payload){
+    //             string_payload.push_back(std::to_string(element));
+    //         }
 
 }
 

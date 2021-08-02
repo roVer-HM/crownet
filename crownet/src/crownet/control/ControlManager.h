@@ -21,6 +21,7 @@
 #include <traci/Listener.h>
 #include "crownet/control/ControlTraCiApi.h"
 #include "crownet/control/ControlHandler.h"
+#include "crownet/common/GlobalDensityMap.h"
 #include "inet/common/InitStages.h"
 
 using namespace omnetpp;
@@ -42,7 +43,7 @@ public:
 
     // implement ControlHander interface
     virtual void handleActionCommand(const ControlCmd& cmd) override;
-    virtual void handleSensorCommand(const SensorCmd& cmd) override;
+    virtual std::vector<std::string> handleDensityMapCommand(const DensityMapCmd& cmd) override;
 
 
     using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]

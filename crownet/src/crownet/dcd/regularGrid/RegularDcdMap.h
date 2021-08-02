@@ -24,6 +24,8 @@ class RegularDcdMapFactory {
 
   RegularDcdMap create(const IntIdentifer& ownerID);
   std::shared_ptr<RegularDcdMap> create_shared_ptr(const IntIdentifer& ownerID);
+  // todo: toArray
+  // todo: valid
 
  private:
   std::pair<double, double> gridSize;
