@@ -26,7 +26,7 @@
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 namespace {
-const simsignal_t traciInit = cComponent::registerSignal("traci.init");
+const simsignal_t traciConnected = cComponent::registerSignal("traci.connected");
 }  // namespace
 
 namespace crownet {
@@ -45,13 +45,15 @@ GlobalDensityMap::~GlobalDensityMap() {
 void GlobalDensityMap::initialize() {
   getSystemModule()->subscribe(registerMap, this);
   getSystemModule()->subscribe(removeMap, this);
-  getSystemModule()->subscribe(traciInit, this);
+  // listen to traciConnected signal to setup density map *before*
+  // subscriptions and node are initialized.
+  getSystemModule()->subscribe(traciConnected, this);
 }
 
 void GlobalDensityMap::finish() {
   getSystemModule()->unsubscribe(registerMap, this);
   getSystemModule()->unsubscribe(removeMap, this);
-  getSystemModule()->unsubscribe(traciInit, this);
+  getSystemModule()->unsubscribe(traciConnected, this);
 }
 
 void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
@@ -74,7 +76,7 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
 }
 void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
                                      const SimTime &t, cObject *details) {
-  if (signalID == traciInit) {
+  if (signalID == traciConnected) {
     // 1) setup map
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
