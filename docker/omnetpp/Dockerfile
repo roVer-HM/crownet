@@ -62,6 +62,14 @@ RUN  source setenv -f && ./configure && \
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
 
+# Install the ASN1C Compiler (Version 0.9.29)
+WORKDIR /opt
+RUN git clone https://github.com/vlm/asn1c.git && \
+    cd asn1c && git checkout 9925dbbda86b436896108439ea3e0a31280a6065
+RUN cd asn1c && test -f configure || autoreconf -iv && \
+    ./configure && \
+    make install
+
 # init script (triggered at container start)
 COPY init.sh /init.sh
 RUN chmod 555 /init.sh
