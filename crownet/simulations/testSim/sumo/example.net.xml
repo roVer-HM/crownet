@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2021-06-18 12:16:19 by Eclipse SUMO netedit Version 1.9.2
+<!-- generated on 2021-07-08 14:33:26 by Eclipse SUMO netedit Version 1.9.2
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
@@ -41,44 +41,44 @@
     <location netOffset="0.00,0.00" convBoundary="0.00,0.00,150.00,70.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
 
     <edge id=":C_0" function="internal">
-        <lane id=":C_0_0" index="0" speed="13.89" length="9.00" shape="104.50,54.80 95.50,54.80"/>
-        <lane id=":C_0_1" index="1" speed="13.89" length="9.00" shape="104.50,51.60 95.50,51.60"/>
+        <lane id=":C_0_0" index="0" speed="13.89" length="9.00" width="5.00" shape="104.50,57.50 95.50,57.50"/>
+        <lane id=":C_0_1" index="1" speed="13.89" length="9.00" width="5.00" shape="104.50,52.50 95.50,52.50"/>
     </edge>
     <edge id=":C_2" function="internal">
-        <lane id=":C_2_0" index="0" speed="13.89" length="9.00" shape="95.50,45.20 104.50,45.20"/>
-        <lane id=":C_2_1" index="1" speed="13.89" length="9.00" shape="95.50,48.40 104.50,48.40"/>
+        <lane id=":C_2_0" index="0" speed="13.89" length="9.00" width="5.00" shape="95.50,42.50 104.50,42.50"/>
+        <lane id=":C_2_1" index="1" speed="13.89" length="9.00" width="5.00" shape="95.50,47.50 104.50,47.50"/>
     </edge>
 
     <edge id="-e_C_p0" from="p0" to="C" priority="-1">
-        <lane id="-e_C_p0_0" index="0" allow="pedestrian" speed="5.55" length="42.10" width="3.00" shape="101.50,0.00 101.50,42.10"/>
+        <lane id="-e_C_p0_0" index="0" allow="pedestrian" speed="5.55" length="38.50" width="3.00" shape="101.50,0.00 101.50,38.50"/>
     </edge>
     <edge id="-e_C_v1" from="v1" to="C" priority="-1">
-        <lane id="-e_C_v1_0" index="0" speed="13.89" length="45.50" shape="150.00,54.80 104.50,54.80"/>
-        <lane id="-e_C_v1_1" index="1" speed="13.89" length="45.50" shape="150.00,51.60 104.50,51.60"/>
+        <lane id="-e_C_v1_0" index="0" speed="13.89" length="45.50" width="5.00" shape="150.00,57.50 104.50,57.50"/>
+        <lane id="-e_C_v1_1" index="1" speed="13.89" length="45.50" width="5.00" shape="150.00,52.50 104.50,52.50"/>
     </edge>
     <edge id="-e_p1_C" from="C" to="p1" priority="-1">
-        <lane id="-e_p1_C_0" index="0" allow="pedestrian" speed="5.55" length="12.10" width="3.00" shape="101.50,57.90 101.50,70.00"/>
+        <lane id="-e_p1_C_0" index="0" allow="pedestrian" speed="5.55" length="8.50" width="3.00" shape="101.50,61.50 101.50,70.00"/>
     </edge>
     <edge id="-e_v0_C" from="C" to="v0" priority="-1">
-        <lane id="-e_v0_C_0" index="0" speed="13.89" length="95.50" shape="95.50,54.80 0.00,54.80"/>
-        <lane id="-e_v0_C_1" index="1" speed="13.89" length="95.50" shape="95.50,51.60 0.00,51.60"/>
+        <lane id="-e_v0_C_0" index="0" speed="13.89" length="95.50" width="5.00" shape="95.50,57.50 0.00,57.50"/>
+        <lane id="-e_v0_C_1" index="1" speed="13.89" length="95.50" width="5.00" shape="95.50,52.50 0.00,52.50"/>
     </edge>
     <edge id="e_C_p0" from="C" to="p0" priority="-1">
-        <lane id="e_C_p0_0" index="0" allow="pedestrian" speed="5.55" length="42.10" width="3.00" shape="98.50,42.10 98.50,0.00"/>
+        <lane id="e_C_p0_0" index="0" allow="pedestrian" speed="5.55" length="38.50" width="3.00" shape="98.50,38.50 98.50,0.00"/>
     </edge>
     <edge id="e_C_v1" from="C" to="v1" priority="-1">
-        <lane id="e_C_v1_0" index="0" speed="13.89" length="45.50" shape="104.50,45.20 150.00,45.20"/>
-        <lane id="e_C_v1_1" index="1" speed="13.89" length="45.50" shape="104.50,48.40 150.00,48.40"/>
+        <lane id="e_C_v1_0" index="0" speed="13.89" length="45.50" width="5.00" shape="104.50,42.50 150.00,42.50"/>
+        <lane id="e_C_v1_1" index="1" speed="13.89" length="45.50" width="5.00" shape="104.50,47.50 150.00,47.50"/>
     </edge>
     <edge id="e_p1_C" from="p1" to="C" priority="-1">
-        <lane id="e_p1_C_0" index="0" allow="pedestrian" speed="5.55" length="12.10" width="3.00" shape="98.50,70.00 98.50,57.90"/>
+        <lane id="e_p1_C_0" index="0" allow="pedestrian" speed="5.55" length="8.50" width="3.00" shape="98.50,70.00 98.50,61.50"/>
     </edge>
     <edge id="e_v0_C" from="v0" to="C" priority="-1">
-        <lane id="e_v0_C_0" index="0" speed="13.89" length="95.50" shape="0.00,45.20 95.50,45.20"/>
-        <lane id="e_v0_C_1" index="1" speed="13.89" length="95.50" shape="0.00,48.40 95.50,48.40"/>
+        <lane id="e_v0_C_0" index="0" speed="13.89" length="95.50" width="5.00" shape="0.00,42.50 95.50,42.50"/>
+        <lane id="e_v0_C_1" index="1" speed="13.89" length="95.50" width="5.00" shape="0.00,47.50 95.50,47.50"/>
     </edge>
 
-    <junction id="C" type="priority" x="100.00" y="50.00" incLanes="e_p1_C_0 -e_C_v1_0 -e_C_v1_1 -e_C_p0_0 e_v0_C_0 e_v0_C_1" intLanes=":C_0_0 :C_0_1 :C_2_0 :C_2_1" shape="97.00,57.90 103.00,57.90 103.17,57.07 103.38,56.78 103.67,56.57 104.04,56.44 104.50,56.40 104.50,43.60 103.67,43.43 103.38,43.23 103.17,42.93 103.04,42.56 103.00,42.10 97.00,42.10 96.83,42.93 96.62,43.22 96.33,43.43 95.96,43.56 95.50,43.60 95.50,56.40 96.33,56.57 96.62,56.77 96.83,57.07 96.96,57.44">
+    <junction id="C" type="priority" x="100.00" y="50.00" incLanes="e_p1_C_0 -e_C_v1_0 -e_C_v1_1 -e_C_p0_0 e_v0_C_0 e_v0_C_1" intLanes=":C_0_0 :C_0_1 :C_2_0 :C_2_1" shape="97.00,61.50 103.00,61.50 103.17,60.67 103.38,60.38 103.67,60.17 104.04,60.04 104.50,60.00 104.50,40.00 103.67,39.83 103.38,39.62 103.17,39.33 103.04,38.96 103.00,38.50 97.00,38.50 96.83,39.33 96.62,39.62 96.33,39.83 95.96,39.96 95.50,40.00 95.50,60.00 96.33,60.17 96.62,60.38 96.83,60.67 96.96,61.04">
         <request index="0" response="0000" foes="0000" cont="0"/>
         <request index="1" response="0000" foes="0000" cont="0"/>
         <request index="2" response="0000" foes="0000" cont="0"/>
@@ -86,8 +86,8 @@
     </junction>
     <junction id="p0" type="dead_end" x="100.00" y="0.00" incLanes="e_C_p0_0" intLanes="" shape="100.00,0.00 97.00,0.00 100.00,0.00"/>
     <junction id="p1" type="dead_end" x="100.00" y="70.00" incLanes="-e_p1_C_0" intLanes="" shape="100.00,70.00 103.00,70.00 100.00,70.00"/>
-    <junction id="v0" type="dead_end" x="0.00" y="50.00" incLanes="-e_v0_C_0 -e_v0_C_1" intLanes="" shape="0.00,50.00 0.00,56.40 0.00,50.00"/>
-    <junction id="v1" type="dead_end" x="150.00" y="50.00" incLanes="e_C_v1_0 e_C_v1_1" intLanes="" shape="150.00,50.00 150.00,43.60 150.00,50.00"/>
+    <junction id="v0" type="dead_end" x="0.00" y="50.00" incLanes="-e_v0_C_0 -e_v0_C_1" intLanes="" shape="0.00,50.00 0.00,60.00 0.00,50.00"/>
+    <junction id="v1" type="dead_end" x="150.00" y="50.00" incLanes="e_C_v1_0 e_C_v1_1" intLanes="" shape="150.00,50.00 150.00,40.00 150.00,50.00"/>
 
     <connection from="-e_C_v1" to="-e_v0_C" fromLane="0" toLane="0" via=":C_0_0" dir="s" state="M"/>
     <connection from="-e_C_v1" to="-e_v0_C" fromLane="1" toLane="1" via=":C_0_1" dir="s" state="M"/>
