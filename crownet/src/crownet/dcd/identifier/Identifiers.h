@@ -27,6 +27,7 @@ class GridCellID : public CellIdentifiere {
  public:
   GridCellID() {}
   GridCellID(int i, int j) : id(std::make_pair(i, j)) {}
+  GridCellID(const GridCellID& other): id(other.id) {}
   std::string str() const override;
   bool operator<(const GridCellID& rhs) const;
   bool operator==(const GridCellID& rhs) const;
@@ -36,6 +37,8 @@ class GridCellID : public CellIdentifiere {
   virtual void writeHeaderTo(std::ostream& out,
                              const std::string& sep) const override;
   virtual std::pair<int, int> val() const { return id; }
+  virtual int x() const {return id.first;}
+  virtual int y() const {return id.second;}
 
  private:
   std::pair<int, int> id;

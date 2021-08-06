@@ -76,8 +76,9 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   traci::NodeManager *nodeManager = nullptr;
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
+  std::shared_ptr<GridCellDistance> distProvider;
   gridMap_t dezentralMaps;
-  std::string m_middelwareModule;
+  std::string m_mobilityModule;
   std::unique_ptr<FileWriter> fileWriter;
 };
 

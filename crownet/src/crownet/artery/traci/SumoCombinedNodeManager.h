@@ -103,6 +103,8 @@ protected:
     virtual void processPersons();
     virtual void processVehicles();
 
+    virtual void visit(ITraciNodeVisitor *visitor) const override;
+
 private:
     virtual void eraseNode(const std::string& id);
     virtual std::map<std::string, omnetpp::cModule*>& getNodeVector(const std::string& vectorName);
