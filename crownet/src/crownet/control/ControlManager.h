@@ -43,7 +43,7 @@ public:
 
     // implement ControlHander interface
     virtual void handleActionCommand(const ControlCmd& cmd) override;
-    virtual std::vector<std::string> handleDensityMapCommand(const DensityMapCmd& cmd) override;
+    virtual std::vector<double> handleDensityMapCommand(const DensityMapCmd& cmd) override;
 
 
     using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]

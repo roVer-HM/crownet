@@ -92,17 +92,14 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
 
 }
 
-std::vector<std::string> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
+std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
     Enter_Method_Silent();
 
     auto map = globalMap->getDcdMapGlobal();
     auto nh = map->getNeighborhood();
 
-    std::vector<std::string> retDensityIds;
-    for(const auto& neighbor : nh){
-        std::string nodeId = std::to_string(neighbor.first.value());
-        retDensityIds.push_back(nodeId);
-    }
+    std::vector<double> retDensityIds {1.0, 2.0, 3.0, 4.0}; // [x, y, count, x, y, count, ...]
+    // todo ...
     return retDensityIds;
 }
 

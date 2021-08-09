@@ -36,7 +36,7 @@ class ControlHandler {
 public:
     virtual ~ControlHandler() = default;
     virtual void handleActionCommand(const ControlCmd& cmd) = 0;
-    virtual std::vector<std::string> handleDensityMapCommand(const DensityMapCmd& cmd) = 0;
+    virtual std::vector<double> handleDensityMapCommand(const DensityMapCmd& cmd) = 0;
 
     //todo: (CM) add handle method for sensor command here
 
