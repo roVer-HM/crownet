@@ -85,6 +85,8 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
         par("traciNodeManager"), this);
 
     std::pair<int, int> gridDim;
+    simBoundHeight = converter->getBoundaryHeight();
+    simBoundWidth = converter->getBoundaryWidth();
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
     gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
@@ -117,6 +119,9 @@ void GlobalDensityMap::initialize(int stage) {
   if (stage == INITSTAGE_LOCAL) {
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
+    WATCH(simBoundWidth);
+    WATCH(simBoundHeight);
+
 
     updateTimer = new cMessage("GlobalDensityMapTimer");
     updateInterval = par("updateInterval").doubleValue();
