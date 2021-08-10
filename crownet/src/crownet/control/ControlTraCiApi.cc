@@ -130,52 +130,72 @@ double ControlTraCiApi::handleControlLoop(){
     return nextControlUpdateAt;
 }
 
+void ControlTraCiApi::checkCompound(tcpip::Storage& cmd, int numElements){
+    int type = cmd.readUnsignedByte();
+    if (type != TYPE_COMPOUND){
+        throw omnetpp::cRuntimeError("expected compound object got %s", type);
+    }
+    int cmpSize = cmd.readInt();
+    if (cmpSize != numElements){
+        throw omnetpp::cRuntimeError("expected %s itmes in compound object got %s", numElements, cmpSize);
+    }
+
+}
+
 tcpip::Storage ControlTraCiApi::handleControllerOppRequest(ForwardCmd& ctrlCmd){
     // extract payload and forward
      tcpip::Storage cmd;
-     ControlCmd controlCmd;
-     DensityMapCmd densityCmd;
      cmd.writeStorage(myInput, ctrlCmd.payloadLength);
      int cmdLength = cmd.readCmdLength();
      int cmdId = cmd.readUnsignedByte();
      int varId = cmd.readUnsignedByte(); // varId = 32, das was von python geschickt wurde
      std::string objectIdentifer = cmd.readString();
 
-     //todo: (CM) check cmdId to separate controlCmd and Sensor query
 
+     tcpip::Storage response;
 
-     // compound object
-     int type = cmd.readUnsignedByte();
-     if (type != TYPE_COMPOUND){
-         throw omnetpp::cRuntimeError("expected compound object got");
-     }
-     int cmpSize = cmd.readInt();
-     // todo if else if
-     // if cmpSize == 1 schauen ob .ID für Dichtekarte gesetzt ist
-     if(cmpSize == 1){ // varId == 34
-         type = cmd.readUnsignedByte();
+     if(varId == traci::constants::VAR_DENSITY_MAP){ // varId == 34
+         // compound object
+         checkCompound(cmd, 1);
+
+         DensityMapCmd densityCmd;
+         cmd.readUnsignedByte(); // string
          densityCmd.nodeId = cmd.readString();
-         std::vector<std::string> payload =
+
+         std::vector<double> payload =
                  this->controlHandler->handleDensityMapCommand(densityCmd);
-         tcpip::Storage response;
-         this->createPayloadResponse(response, cmdId, RTYPE_OK, "", payload);
-         return response;
-     } else if (cmpSize == 3){ // varId == 32
-         type = cmd.readUnsignedByte();
+         this->createResponse(response, cmdId, RTYPE_OK, ""); // assume all is ok
+
+         tcpip::Storage cmdData;
+         cmdData.writeByte(TYPE_DOUBLELIST);
+         cmdData.writeDoubleList(payload);
+         // create result command for given cmdId. Use ResultComandId in this
+         // command where the result commandID equals cmdID+0x10
+         // createCommand(...) will create the command in this->myOutput
+         this->createCommand(cmdId+0x10, varId, objectIdentifer, &cmdData);
+         // append command output to response object and reset this->myOutput
+         response.writeStorage(myOutput);
+         myOutput.reset();
+
+     } else if (varId == traci::constants::VAR_EXTERNAL_INPUT){ // varId == 32
+         checkCompound(cmd, 3);
+
+         ControlCmd controlCmd;
+         cmd.readUnsignedByte(); // string
          controlCmd.sendingNode = cmd.readString();
-         type = cmd.readUnsignedByte();
+         cmd.readUnsignedByte(); // string
          controlCmd.model = cmd.readString();
-         type = cmd.readUnsignedByte();
+         cmd.readUnsignedByte(); // string
          controlCmd.message = cmd.readString();
          this->controlHandler->handleActionCommand(controlCmd);
+         this->createResponse(response, cmdId, RTYPE_OK, ""); // assume all is ok
 
      }
      else {
          throw omnetpp::cRuntimeError("expected 3 items in compound object");
      }
 
-     tcpip::Storage response;
-     this->createResponse(response, cmdId, RTYPE_OK, "");
+
      return response;
 }
 
