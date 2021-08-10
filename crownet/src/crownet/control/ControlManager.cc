@@ -95,12 +95,28 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
 std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
     Enter_Method_Silent();
 
-    auto map = globalMap->getDcdMapGlobal();
-    auto nh = map->getNeighborhood();
+    auto node_module = this->findModuleByPath(cmd.nodeId.c_str());
+    IDensityMapHandler<RegularDcdMap>* map_handler =
+            check_and_cast<IDensityMapHandler<RegularDcdMap>*>(node_module);
 
-    std::vector<double> retDensityIds {1.0, 2.0, 3.0, 4.0}; // [x, y, count, x, y, count, ...]
-    // todo ...
-    return retDensityIds;
+    std::vector<double> density_vals;
+    auto iter = map_handler->getMap()->valid();
+     for( auto item: iter){
+         const auto cell = item.first.val();
+         const auto measure = item.second.val();
+         if(measure){
+             auto x = item.first.val().first;
+             auto y = item.first.val().second;
+             auto count = item.second.val()->getCount();
+             density_vals.push_back(x);
+             density_vals.push_back(y);
+             density_vals.push_back(count);
+             std::cout << "x-y-count: " <<
+                     x << "-" << y <<"-"<< count << std::endl;
+         }
+    }
+
+     return density_vals;
 }
 
 void ControlManager::finish() {
