@@ -23,7 +23,7 @@ import inet.transportlayer.contract.ITcp;
 import inet.transportlayer.contract.IUdp;
 import inet.transportlayer.contract.ISctp;
 import inet.common.MessageDispatcher;
-import lte.stack.ILteNic;
+import simu5g.stack.ICellularNic;
 
 module TransportLayerRoadUser like INetworkNode
 {
@@ -146,7 +146,7 @@ module TransportLayerRoadUser like INetworkNode
             parameters:
                 @display("p=681.312,526.688;q=queue");
         }
-        lteNic: <nicType> like ILteNic if hasLte {
+        lteNic: <nicType> like ICellularNic if hasLte {
             nodeType = nodeType;
             ip2lte.typename = "Geo2Lte";
             //d2dCapable = d2dCapable;

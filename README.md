@@ -18,7 +18,7 @@ The CrowNet project provides easy to install docker containers for these three. 
 ## CrowNet Communication and Information Dissemination Simulation
 The OMNeT++ simulation of communication and networking for disseminating mobility information is based on four open source simulation projects:
 * [INET](https://inet.omnetpp.org/) - The INET Framework is a widely-used open-source model suite for wireless and wired networks. It includes models for all major Internet protocols.
-* [SimuLTE](http://simulte.com/) - SimuLTE provides a LTE/LTE-A user plane simulation model for INET and OMNeT++.
+* [Simu5G](http://simu5g.org/) - Sim5G provides a 5G and LTE/LTE-A user plane simulation model for INET and OMNeT++.
 * [Artery](http://artery.v2x-research.eu/) - Artery V2X Simulation Framework
 * [VEINS](https://veins.car2x.org/) - Vehicles in Network Simulation (VEINS) is an open-source vehicular network simulation framework.
 

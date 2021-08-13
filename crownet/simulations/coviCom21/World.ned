@@ -28,13 +28,12 @@ import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
 import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
-import lte.world.radio.ChannelControl;
-import lte.corenetwork.binder.LteBinder;
-import lte.corenetwork.nodes.Ue;
-import lte.corenetwork.nodes.eNodeB;
-import lte.world.radio.LteChannelControl;
-import lte.epc.PgwStandardSimplified;
-import lte.common.LteNetworkConfigurator;
+import simu5g.world.radio.ChannelControl;
+import simu5g.common.binder.Binder;
+import simu5g.nodes.Ue;
+import simu5g.nodes.eNodeB;
+import simu5g.world.radio.LteChannelControl;
+import simu5g.nodes.PgwStandard;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
@@ -94,7 +93,7 @@ network World
         channelControl: LteChannelControl if hasLte {
             @display("p=410.865,148.995;is=s");
         }
-        binder: LteBinder if hasLte {
+        binder: Binder if hasLte {
             @display("p=411.99374,198.66;is=s");
         }
         eNB: eNodeB if hasLte {
@@ -106,8 +105,7 @@ network World
         router: Router if hasLteCoreNetwork {
             @display("p=308.14874,110.6175;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandardSimplified if hasLteCoreNetwork {
-            nodeType = "PGW";
+        pgw: PgwStandard if hasLteCoreNetwork {
             @display("p=307.02,42.892498;is=l");
         }
         // WLAN

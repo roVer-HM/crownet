@@ -13,11 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package crownet.simulte.corenetwork.lteip;
+package crownet.simu5g.stack.ip2nic;
 
-import lte.corenetwork.lteip.INetworkLayer2lte;
+import simu5g.stack.ip2nic.INetworkLayer2CellularNic;
 
-simple Geo2Lte like INetworkLayer2lte
+simple Geo2Nic like INetworkLayer2CellularNic
 {
     parameters:
         string nodeType;
@@ -25,13 +25,13 @@ simple Geo2Lte like INetworkLayer2lte
         string routingTableModule;
         string interfaceName = default("cellular");
         @display("i=block/layer");
-        @class(crownet::Geo2Lte);
+        @class(crownet::Geo2Nic);
     gates:
         // connection to network layer.
         // These gate names are recognized by the network layer (same as the ones in the INetworkInterface interface)
         input upperLayerIn;
         output upperLayerOut;
 
-        // connection to the lte stack
-        inout stackLte @labels(IPDatagram);
+        // connection to the cellular stack
+        inout stackNic @labels(IPDatagram);
 }

@@ -20,5 +20,5 @@
 	path = analysis/suq-controller
 	url = https://gitlab.lrz.de/vadere/suq-controller.git
 [submodule "Simu5G"]
-	path = Simu5G
+	path = simu5g
 	url = ../Simu5G.git

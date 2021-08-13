@@ -15,12 +15,13 @@ import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.common.misc.ThruputMeteringChannel;
-import lte.corenetwork.binder.LteBinder;
-import lte.corenetwork.nodes.Ue;
-import lte.corenetwork.nodes.eNodeB;
-import lte.world.radio.LteChannelControl;
-import lte.epc.PgwStandardSimplified;
-import lte.common.LteNetworkConfigurator;
+import simu5g.common.binder.Binder;
+import simu5g.common.carrierAggregation.CarrierAggregation;
+import simu5g.nodes.Ue;
+import simu5g.nodes.eNodeB;
+import simu5g.world.radio.LteChannelControl;
+import simu5g.nodes.PgwStandard;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 
 
 network LabSingleCellBase
@@ -37,17 +38,19 @@ network LabSingleCellBase
         routingRecorder: RoutingTableRecorder {
             @display("p=8,2;is=s");
         }
-        configurator: LteNetworkConfigurator {
+        configurator: Ipv4NetworkConfigurator {
             @display("p=8,3");
         }
-        binder: LteBinder {
+        binder: Binder {
             @display("p=8,4;is=s");
+        }
+        carrierAggregation: CarrierAggregation {
+            @display("p=8,5;is=s");
         }
         eNB[numENB]: eNodeB {
             @display("p=1.0457151,2.6142879;is=vl");
         }
-        pgw: PgwStandardSimplified {
-            nodeType = "PGW";
+        pgw: PgwStandard {
             @display("p=1.0293758,4.4116106;is=l");
         }
         router: Router {

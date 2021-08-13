@@ -29,13 +29,13 @@ import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
 import inet.node.inet.INetworkNode;
 import inet.common.geometry.common.IGeographicCoordinateSystem;
-import lte.world.radio.ChannelControl;
-import lte.corenetwork.binder.LteBinder;
-import lte.corenetwork.nodes.Ue;
-import lte.corenetwork.nodes.eNodeB;
-import lte.world.radio.LteChannelControl;
-import lte.epc.PgwStandardSimplified;
-import lte.common.LteNetworkConfigurator;
+import simu5g.world.radio.ChannelControl;
+import simu5g.common.binder.Binder;
+import simu5g.common.carrierAggregation.CarrierAggregation;
+import simu5g.nodes.Ue;
+import simu5g.nodes.eNodeB;
+import simu5g.world.radio.LteChannelControl;
+import simu5g.nodes.PgwStandard;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
@@ -97,8 +97,11 @@ network World
         channelControl: LteChannelControl if hasLte {
             @display("p=410.865,148.995;is=s");
         }
-        binder: LteBinder if hasLte {
+        binder: Binder if hasLte {
             @display("p=411.99374,207.69;is=s");
+        }
+        carrierAggregation: CarrierAggregation {
+            @display("p=411.99374,319.43625;is=s");
         }
         eNB[numEnb]: eNodeB if hasLte {
             @display("p=39.50625,54.18");
@@ -109,8 +112,7 @@ network World
         router: Router if hasLteCoreNetwork {
             @display("p=308.14874,110.6175;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandardSimplified if hasLteCoreNetwork {
-            nodeType = "PGW";
+        pgw: PgwStandard if hasLteCoreNetwork {
             @display("p=307.02,42.892498;is=l");
         }
         // WLAN
@@ -150,10 +152,10 @@ network World
         for i=0..numEnb-1 {
             pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasLteCoreNetwork;
         }
-        
+
 		//# X2 connections (full mesh)
         for i=0..numEnb-1, for j=0..numEnb-1 {
             eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j;
         }
-        
+
 }

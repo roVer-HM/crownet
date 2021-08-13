@@ -1,11 +1,11 @@
 /*
- * Geo2Lte.cc
+ * Geo2Nic.cc
  *
  *  Created on: Aug 17, 2020
  *      Author: sts
  */
 
-#include "crownet/simulte/corenetwork/lteip/Geo2Lte.h"
+#include "Geo2Nic.h"
 
 #include <inet/networklayer/ipv4/Ipv4Header_m.h>
 #include "crownet/artery/lte/GeoNetTag_m.h"
@@ -18,10 +18,10 @@ using namespace omnetpp;
 
 namespace crownet {
 
-Define_Module(Geo2Lte);
+Define_Module(Geo2Nic);
 
-void Geo2Lte::initialize(int stage) {
-    IP2lte::initialize(stage);
+void Geo2Nic::initialize(int stage) {
+    IP2Nic::initialize(stage);
     if (stage == inet::INITSTAGE_APPLICATION_LAYER){
         // register geonet protocol
         registerService(artery::InetRadioDriver::geonet, gate("upperLayerIn"),
@@ -29,28 +29,18 @@ void Geo2Lte::initialize(int stage) {
     }
 }
 
-void Geo2Lte::toStackUe(inet::Packet* pkt) {
+void Geo2Nic::toStackUe(inet::Packet* pkt) {
   // if IP let parent handle it.
   auto pTag = pkt->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2lte::toStackUe(pkt);
+    IP2Nic::toStackUe(pkt);
   } else if (pTag->getProtocol() == &artery::InetRadioDriver::geonet) {
     auto geoTag = pkt->getTag<crownet::GeoNetTag>();
     // if needed, create a new structure for the flow
-
-    AddressPair pair(inet::Ipv4Address(geoTag->getSrcAddrIp()),
-                     inet::Ipv4Address(geoTag->getDstAddrIp()));
-    if (seqNums_.find(pair) == seqNums_.end()) {
-      std::pair<AddressPair, unsigned int> p(pair, 0);
-      seqNums_.insert(p);
-    }
     int headerSize = B(10).get();  // todo: set correct
 
     pkt->addTagIfAbsent<FlowControlInfo>()->setSrcAddr(geoTag->getSrcAddrIp());
     pkt->addTagIfAbsent<FlowControlInfo>()->setDstAddr(geoTag->getDstAddrIp());
-    pkt->addTagIfAbsent<FlowControlInfo>()->setSrcPort(-1);
-    pkt->addTagIfAbsent<FlowControlInfo>()->setDstPort(-1);
-    pkt->addTagIfAbsent<FlowControlInfo>()->setSequenceNumber(seqNums_[pair]++);
     pkt->addTagIfAbsent<FlowControlInfo>()->setHeaderSize(headerSize);
 
     printControlInfo(pkt);
@@ -65,22 +55,22 @@ void Geo2Lte::toStackUe(inet::Packet* pkt) {
   //
 }
 
-void Geo2Lte::toStackEnb(inet::Packet* datagram) {
+void Geo2Nic::toStackBs(inet::Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2lte::toStackUe(datagram);
+    IP2Nic::toStackUe(datagram);
   } else {
     error("GeoProtocol not supported from backend (Enb->UE)");
   }
 }
 
-void Geo2Lte::toIpUe(Packet* datagram) {
+void Geo2Nic::toIpUe(Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   auto geoTag = datagram->findTag<crownet::GeoNetTag>();
   if (!geoTag && pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2lte::toIpUe(datagram);
+    IP2Nic::toIpUe(datagram);
   } else {
     EV << "Geo2lte::toIpUe - message from stack: send to Geo layer" << endl;
     datagram->removeTagIfPresent<inet::PacketProtocolTag>();
@@ -89,17 +79,17 @@ void Geo2Lte::toIpUe(Packet* datagram) {
   }
 }
 
-void Geo2Lte::toIpEnb(inet::Packet* datagram) {
+void Geo2Nic::toIpBs(inet::Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2lte::toIpEnb(datagram);
+    IP2Nic::toIpBs(datagram);
   } else {
     error("GeoProtocol not supported from backend (Enb->to IP->to core net)");
   }
 }
 
-void Geo2Lte::prepareForGeo(inet::Packet* datagram,
+void Geo2Nic::prepareForGeo(inet::Packet* datagram,
                             const inet::Protocol* protocol) {
   // set geonet tag instead of ip4
   // add DispatchProtocolRequest so that the packet is handled by the specified protocol
@@ -108,7 +98,7 @@ void Geo2Lte::prepareForGeo(inet::Packet* datagram,
   pDispatch_tag->setServicePrimitive(inet::ServicePrimitive::SP_INDICATION);
   datagram->addTagIfAbsent<PacketProtocolTag>()->setProtocol(protocol);
   // add Interface-Indication to indicate which interface this packet was received from
-  datagram->addTagIfAbsent<InterfaceInd>()->setInterfaceId(interfaceEntry->getInterfaceId());
+  datagram->addTagIfAbsent<InterfaceInd>()->setInterfaceId(networkIf->getInterfaceId());
 }
 
 } /* namespace crownet */

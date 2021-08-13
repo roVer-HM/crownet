@@ -16,7 +16,7 @@
 package crownet.nodes;
 
 import crownet.nodes.IMobileUe;
-import lte.corenetwork.nodes.Ue;
+import simu5g.nodes.Ue;
 import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 
 // see lte.corenetwork.nodes.cars;

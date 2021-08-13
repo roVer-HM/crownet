@@ -3,7 +3,7 @@ MAKEMAKE=opp_makemake $(MMOPT)
 #ARTERY_PROJ=../artery
 #VANETZA_PROJ=${ARTERY_PROJ}/extern/vanetza
 #INET_PROJ=../inet4
-#LTE_PROJ=../simulte
+#5G_PROJ=../simu5g
 #VEINS_PROJ=../veins
 #VEINS_INET_PROJ=../veins/subprojects/veins_inet
 
@@ -39,7 +39,7 @@ cleanall: checkmakefiles
 
 PROJECTS_VARS := -KARTERY_PROJ=../../artery \
 				 -KINET_PROJ=../../inet4 \
-			 	 -KLTE_PROJ=../../simulte \
+			 	 -K5G_PROJ=../../simu5g \
 				 -KVEINS_PROJ=../../veins
 				 -KVEINS_INET_PROJ=../../veins/subprojects/veins_inet
 
@@ -76,13 +76,13 @@ VEINS_ := -DVEINS_IMPORT -DVEINS_INET_IMPORT \
 		  -lveins$$\(D\) \
 	      -lveins_inet$$\(D\)
 
-INET_LTE_ := -DINET_IMPORT \
+INET_5G_ := -DINET_IMPORT \
 	  		 -I$$\(INET_PROJ\)/src \
-			 -I$$\(LTE_PROJ\)/src \
+			 -I$$\(5G_PROJ\)/src \
 			 -L$$\(INET_PROJ\)/src \
-			 -L$$\(LTE_PROJ\)/src \
+			 -L$$\(5G_PROJ\)/src \
 		     -lINET$$\(D\) \
-		     -llte$$\(D\)
+		     -lsimu5g$$\(D\)
 
 MISC_ := -lboost_filesystem \
 	     -lboost_system \
@@ -101,7 +101,7 @@ makefiles:
 	   -I. \
 	   $(ARTERY_) \
 	   $(VEINS_) \
-	   $(INET_LTE_) \
+	   $(INET_5G_) \
 	   $(MISC_)
 	rm -f src/__make_sharedlib
 	touch src/__make_executable
@@ -113,7 +113,7 @@ makefiles-so:
 		-I. \
 		$(ARTERY_) \
 	   	$(VEINS_) \
-	   	$(INET_LTE_) \
+	   	$(INET_5G_) \
 		$(MISC_)
 	rm -f src/__make_executable
 	touch  src/__make_sharedlib
@@ -144,7 +144,7 @@ makefiles-test: src/libCROWNET$(_D)
 		-KCROWNET_PORJ=../../../../crownet \
         -KARTERY_PROJ=../../../../artery \
 		-KINET_PROJ=../../../../inet4 \
-		-KLTE_PROJ=../../../../simulte \
+		-K5G_PROJ=../../../../simu5g \
 		-KVEINS_PROJ=../../../../veins \
 		-KVEINS_INET_PROJ=../../../../veins/subprojects/veins_inet \
 		-I. \
@@ -153,7 +153,7 @@ makefiles-test: src/libCROWNET$(_D)
 		-lCROWNET$$\(D\) \
 		$(ARTERY_) \
 	   	$(VEINS_) \
-	   	$(INET_LTE_) \
+	   	$(INET_5G_) \
 		$(MISC_) \
 		$(TEST_)
 
