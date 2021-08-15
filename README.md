@@ -102,7 +102,7 @@ omnetpp-ide
 Choose File>Import>General>Existing projects> and import following folders:
 * inet4
 * crownet
-* simulte
+* simu5g
 * artery
 
 When importing the folder veins only import the modules 1 (veins) and 3 (inet).
@@ -201,9 +201,9 @@ Instead of using the top-level Makefile, the models can also be built individual
 first switch to the model subdirectory and than execute make locally.
 
 
-*Example: Building the INET and SimuLTE Frameworks*
+*Example: Building the INET and Simu5G Frameworks*
 
-Assuming that you have added the "omnetpp" script to your search path for executables and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
+Assuming that you have added the "omnetpp" script to your search path for executables and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and Simu5G models by the following commands:
 ```
 cd inet
 omnetpp exec make makefiles
@@ -211,7 +211,7 @@ omnetpp exec make -j4 MODE=release
 omnetpp exec make -j4 MODE=debug
 cd ..
 
-cd simulte
+cd simu5g
 omnetpp exec make makefiles
 omnetpp exec make -j4
 
