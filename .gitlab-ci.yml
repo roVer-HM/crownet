@@ -31,7 +31,7 @@ build-for-sim:
   variables:
     ARTERY_M: '${CI_PROJECT_DIR}/artery'
     INET_M: '${CI_PROJECT_DIR}/inet4'
-    5G_M: '${CI_PROJECT_DIR}/simu5g'
+    MOBILENETWORK_M: '${CI_PROJECT_DIR}/simu5g'
     CROWNET_M: '${CI_PROJECT_DIR}/crownet'
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
