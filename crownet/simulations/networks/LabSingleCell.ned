@@ -8,7 +8,6 @@
 //
 package crownet.simulations.networks;
 
-import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.networklayer.ipv4.RoutingTableRecorder;
 import inet.node.ethernet.Eth10G;
 import inet.node.ethernet.Eth10M;
@@ -21,7 +20,7 @@ import simu5g.nodes.Ue;
 import simu5g.nodes.eNodeB;
 import simu5g.world.radio.LteChannelControl;
 import simu5g.nodes.PgwStandard;
-import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
+import simu5g.common.CellularNetworkConfigurator;
 
 
 network LabSingleCellBase
@@ -38,7 +37,7 @@ network LabSingleCellBase
         routingRecorder: RoutingTableRecorder {
             @display("p=8,2;is=s");
         }
-        configurator: Ipv4NetworkConfigurator {
+        configurator: CellularNetworkConfigurator {
             @display("p=8,3");
         }
         binder: Binder {
