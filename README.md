@@ -114,51 +114,64 @@ Choose the folder omnetpp-ws to see the project which was just created.
 
 # Running Your First Coupled Simulation
 
-*Note: As a first test for testing coupled mobility and mobile node simulation, we are simply running the
-VEINS example simulation in the CrowNet containers. This example will be updated to an example illustrating pedistrian mobility as soon as the required TraCI interfaces have been implemented.*
 
-In this example, we will use the sumo container for simulating the mobility and the omnetpp container for simulating mobile communication (as within the VEINS Erlangen example).
+## Step 1: Start the mobility container
 
-## Step 1: Start the sumo container
-Start the sumo container by executing the sumo start script:
+Start the sumo and/or vadere container by executing the respective start script:
 ```
-sumo
-```
-The container will now be listening for incoming TraCi commands and start sumo when a new client connects.
+$> sumo
+/bin/bash -c "cd /home/vm-sts; /init.sh "
+Welcome to the roVer sumo Docker Container.
 
-## Step 2: Start the omnetpp container and import the subprojects
+Using TRACI_PORT='' TRACI_GUI='false'
+
+If you want to start sumo-gui manually, you can do this via docker exec:
+  docker exec sumo sumo-gui
+Listening on port 9999
+```
+or 
+```
+$> vadere
+used image: sam-dev.cs.hm.edu:5023/rover/crownet/vadere:latest
+/bin/bash -c "cd /home/vm-sts; /init.sh "
+Welcome to the roVer vadere Docker Container.
+
+Using TRACI_PORT='' TRACI_GUI='false' TRACI_DEBUG='' VADERE_LOG_LEVEL=''  VADERE_LOG=''
+
+To launch vadere-gui call vadere exec vadere-gui
+Vadere 1.15 (Commit Hash: 05e16522ef78086194e58fee6c713cb713faa6f7) [TraCI: VadereTraCI-20.0.2 This is a TraCI Server implementing only a small subset of TraCI Version 20]
+INFO:root> vadere launcher listening on port 9998 ..
+```
+
+The container will now be listening for incoming TraCi commands and start mobiliy simulator. The 
+TraCI port for sumo defaults to `9999` and for vadere to `9998`.
+
+## Step 2: Start the omnetpp container and open workspace
 Start the omnetpp container:
 ```
 omnetpp-ide
 ```
 
-Open a (new) OMNeT++ workspace (path should be within your home directory!), **do not** import the examples and **do not** import the INET framework. Instead, you need to import the INET and VEINS projects within the 'crownet' folder that have been created when cloning the 'crownet' repository. (Import of these projects is done via File->Import->General->Existing Project into workspace.) Wait until the C++ indexer has completed its work (takes some minutes). Build both projects (takes some more minutes...).
+Open the workspace as described in **Configure the Eclipse-Environment for a certain project** and build the project in
+relase or debug mode.
 
 
 ## Step 3: Run the simulation
-Within the VEINS project, locate the file 'omnetpp.ini' within the 'examples/veins' folder. Run the simulation by doing a right-click and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible, select a configuration and start the simulation. The sumo container will be connected and start a sumo instance automatically.
+Got to `crownet/simulations/testSim` in the project view and search for the `omentpp.ini` file.
+Run the simulation by doing a right-click and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible, 
+select one of the following configuration and start the simulation:
 
-*Note: Currently there seems to be a bug which leads to a black window in the configuration-selection dialog
-the first time the simulation is started. Workaround: Simply close the dialog and rebuild the network (File->Setup a configuration...).
+1. vadere_test001 (requires vadere)
+2. sumo_crossing_peds (requires sumo)
+3. sumo_crossing_peds_cars (requires sumo)
+4. test_control00* (requires vadere **and** control) tbd!
+
+_Note: See crownet/simulations/networks/default_configs.ini for common settings such as traci host and port setup._
 
 ## Step 4: Create and Run Own Coupled Simulations
 Now you are ready to create and run your own coupled simulations. Good starting points are the [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/), [INET User's Guide](https://inet.omnetpp.org/docs/users-guide/), [INET Developer's Guide](https://inet.omnetpp.org/docs/developers-guide/), and the [VEINS tutorial](https://veins.car2x.org/tutorial/).
 
 *TODO: Create CrowNet Tutorial and name it as primary reference here*
-
-_Important note:_ Since within the CrowNet project we run the mobility simulation and the network simulation in separate containers, remember to update the respective ``omnetpp.ini`` to refer to the container running the mobility simulation - ``localhost`` *will not work*. This can easily be done by adapting the ``*.manager.host`` parameter.
-
-Example: Connect to sumo within the sumo container
-```
-##########################################################
-#            TraCIScenarioManager parameters             #
-##########################################################
-*.manager.updateInterval = 1s
-# *.manager.host = "localhost"
-*.manager.host = "sumo"
-*.manager.port = 9999
-
-```
 
 # Working with the Command Line (instead of using the OMNeT++ IDE)
 If you prefer to work on the command line instead of using the graphical IDE of OMNeT++, you can use the "exec" option

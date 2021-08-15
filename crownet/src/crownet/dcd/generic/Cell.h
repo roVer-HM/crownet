@@ -50,10 +50,11 @@ class Cell {
   using time_t = T;
 
   using entry_t = IEntry<node_key_t, time_t>;
-  using localEntry_t = ILocalEntry<node_key_t, time_t>;
   using entry_t_ptr = std::shared_ptr<entry_t>;
-  using localEntry_t_ptr = std::shared_ptr<localEntry_t>;
   using entry_ctor_t = EntryDefaultCtorImpl<node_key_t, time_t>;
+
+  using localEntry_t = ILocalEntry<node_key_t, time_t>; // the measurement created by the owner itself
+  using localEntry_t_ptr = std::shared_ptr<localEntry_t>;
 
   using map_t = std::map<node_key_t, entry_t_ptr>;
   using value_type_const = typename map_t::value_type;
@@ -127,6 +128,7 @@ class Cell {
   // compute value of cell based on computeAlg
   template <typename Fn>
   void computeValue(const Fn computeAlg);
+  entry_t_ptr createEntry(const double count) const;
 
   // display
   std::string str() const;

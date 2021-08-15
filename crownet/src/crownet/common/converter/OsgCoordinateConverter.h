@@ -16,6 +16,7 @@
 #pragma once
 
 #include <omnetpp/cexception.h>
+#include <omnetpp/ccanvas.h>
 #include <memory>
 #include <osgEarth/GeoTransform>
 #include <osgEarth/SpatialReference>
@@ -53,6 +54,8 @@ class Projection {
     const inet::Coord& getTranslation() const { return translation; }
     void setTranslation(const inet::Coord& translation) { this->translation = translation; }
 
+
+
     inet::Coord compute(const inet::Coord& point) const;
     inet::Coord computeInverse(const inet::Coord& point) const;
 
@@ -87,6 +90,10 @@ class OsgCoordinateConverter {
   inet::Coord moveCoordinateSystemOpp_TraCi(const inet::Coord& c) const;
 
   inet::GeoCoord getScenePosition() const;
+
+  // always apply TCS->OCS
+  const omnetpp::cFigure::Point toCanvas(double x, double y, const bool isGeo=false);
+
 
   template <typename T>
   osgEarth::GeoPoint convert2DOsgEarth(const T& c) const {

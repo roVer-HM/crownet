@@ -36,6 +36,18 @@ class ConstCellVisitor {
   virtual std::string getName() const { return ""; };
 };
 
+template <typename C>
+class Timestamped{
+ public:
+    Timestamped(typename C::time_t time) : time(time) {}
+    void setTime(const typename C::time_t& t){
+        this->time = t;
+    }
+
+ protected:
+  typename C::time_t time;
+};
+
 /**
  * Convenient Visitor for returning value_type !! const !!
  *
@@ -50,6 +62,13 @@ class ConstCellVisitor {
 template <typename C>
 class GetEntryVisitor : public ConstCellVisitor<C, typename C::entry_t_ptr> {
  public:
+  virtual typename C::entry_t_ptr applyTo(const C& cell) const = 0;
+};
+
+template <typename C>
+class TimestampedGetEntryVisitor : public GetEntryVisitor<C>, public Timestamped<C>  {
+ public:
+  TimestampedGetEntryVisitor(typename C::time_t time): Timestamped<C>(time) {}
   virtual typename C::entry_t_ptr applyTo(const C& cell) const = 0;
 };
 
@@ -72,12 +91,9 @@ class VoidCellVisitor : public CellVisitor<C, void> {
 };
 
 template <typename C>
-class TimestampedVisitor : public VoidCellVisitor<C> {
+class TimestampedVoidCellVisitor : public VoidCellVisitor<C>, public Timestamped<C> {
  public:
-  TimestampedVisitor(typename C::time_t time) : time(time) {}
-
- protected:
-  typename C::time_t time;
+    TimestampedVoidCellVisitor(typename C::time_t time) :  Timestamped<C>(time) {}
 };
 
 /**

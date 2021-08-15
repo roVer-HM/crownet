@@ -41,19 +41,27 @@ class RegularCellTest : public BaseOppTest {
     m[IntIdentifer(14)]->incrementCount(3);
     m[IntIdentifer(14)]->incrementCount(3);
     m[IntIdentifer(14)]->setSource(14);
+    m[IntIdentifer(14)]->setEntryDist(EntryDist{5.0, 3.0, 4.0}); // w=1/3.0
 
     m[IntIdentifer(15)] = ctor.entry();  // count 1
     m[IntIdentifer(15)]->incrementCount(1);
     m[IntIdentifer(15)]->setSource(15);
+    m[IntIdentifer(15)]->setEntryDist(EntryDist{5.0, 10.0, 4.0}); // w=1/10.0
+
 
     m[IntIdentifer(16)] = ctor.entry();  // count 2
     m[IntIdentifer(16)]->incrementCount(1);
     m[IntIdentifer(16)]->incrementCount(1);
     m[IntIdentifer(16)]->setSource(16);
+    m[IntIdentifer(16)]->setEntryDist(EntryDist{5.0, 2.0, 4.0}); // w=1/2.0
+
 
     m[IntIdentifer(17)] = ctor.entry();  // count 1
     m[IntIdentifer(17)]->incrementCount(2);
     m[IntIdentifer(17)]->setSource(17);
+    m[IntIdentifer(17)]->setEntryDist(EntryDist{5.0, 20.0, 4.0}); // w=1/20.0
+
+
 
     auto lentry = ctor.localEntry();
     m[IntIdentifer(42)] = lentry;  // count 4
@@ -66,6 +74,7 @@ class RegularCellTest : public BaseOppTest {
     lentry->incrementCount(1);
     lentry->nodeIds.insert(19);
     lentry->setSource(42);
+    lentry->setEntryDist(EntryDist{}); // {0, 0, 0}  w=0.0 -> 1.0/1.0 (same cell)
   }
 
  protected:
@@ -371,7 +380,7 @@ TEST_F(RegularCellTest, ymfVisitor) {
 }
 
 TEST_F(RegularCellTest, ymfVisitor_2) {
-  YmfVisitor ymf_v;
+  std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>(simTime());
   auto data_14 = cell.getData()[IntIdentifer(14)];  // ymf value
   cell.computeValue(ymf_v);
   EXPECT_EQ(*(cell.val()), *data_14);
@@ -380,4 +389,83 @@ TEST_F(RegularCellTest, ymfVisitor_2) {
   cell.computeValue(ymf_v);
   auto data_17 = cell.getData()[IntIdentifer(17)];
   EXPECT_EQ(*(cell.val()), *data_17);
+}
+
+TEST_F(RegularCellTest, meanVisitor_1) {
+    setSimTime(112.0);
+    std::shared_ptr<MeanVisitor> visitor = std::make_shared<MeanVisitor>(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    // cell mean: (2 + 1 + 2 + 1 + 4)/5
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), 10/5);
+    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 112.0);
+    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 112.0);
+
+    auto& m = cell.getData();
+    m[IntIdentifer(17)]->incrementCount(2);
+    visitor->setTime(115.0);
+    // increment count and time. -> must change calcualted value
+    // cell mean: (2 + 1 + 2 + 2 + 4)/5
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), (double)11/5);
+    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 115.0);
+    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 115.0);
+}
+
+TEST_F(RegularCellTest, meanVisitor_2) {
+    setSimTime(112.0);
+    std::shared_ptr<MeanVisitor> visitor = std::make_shared<MeanVisitor>(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    // cell mean: (2 + 1 + 2 + 1)/4
+    auto& m = cell.getData();
+    // invalidate entry which thus must not be part of the average
+    m[IntIdentifer(42)]->reset();
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), (double)(2+1+2+1)/4);
+    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 112.0);
+    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 112.0);
+
+}
+
+TEST_F(RegularCellTest, medianVisitor_1) {
+    setSimTime(112.0);
+    std::shared_ptr<MedianVisitor> visitor = std::make_shared<MedianVisitor>(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    // (2 + 1 + 2 + 1 + 4)
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), 2);
+}
+
+TEST_F(RegularCellTest, medianVisitor_2) {
+    setSimTime(112.0);
+    std::shared_ptr<MedianVisitor> visitor = std::make_shared<MedianVisitor>(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    auto& m = cell.getData();
+    // invalidate entry which thus must not be part of the average
+    m[IntIdentifer(42)]->reset();
+    // [1, 1, 2, 2]
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), 1.5);
+}
+
+TEST_F(RegularCellTest, maxVisitor_1) {
+    setSimTime(112.0);
+    std::shared_ptr<MaxCountVisitor> visitor = std::make_shared<MaxCountVisitor>(simTime());
+    // calculate mean count of all valid measurements in the given cell.
+    // cell mean: (2 + 1 + 2 + 1 + 4)/5
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), 4);
+}
+
+// 2.0/3.0 + 1.0*/10.0 + 2.0/2.0 + 1.0/20.0
+
+
+TEST_F(RegularCellTest, invSourceDistVisitor_1) {
+    setSimTime(112.0);
+    std::shared_ptr<InvSourceDistVisitor> visitor = std::make_shared<InvSourceDistVisitor>(simTime());
+    double wSum = 1.0/3.0 + 1.0/10.0 + 1.0/2.0 + 1.0/20.0 + 1.0;
+    double entrySum = 2.0/3.0 + 1.0/10.0 + 2.0/2.0 + 1.0/20.0 + 4.0/1.0;
+    double wMean =  entrySum/wSum;
+    cell.computeValue(visitor);
+    EXPECT_EQ(cell.val()->getCount(), wMean);
 }

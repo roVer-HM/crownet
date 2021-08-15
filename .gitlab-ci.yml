@@ -31,7 +31,7 @@ build-for-sim:
   variables:
     ARTERY_M: '${CI_PROJECT_DIR}/artery'
     INET_M: '${CI_PROJECT_DIR}/inet4'
-    LTE_M: '${CI_PROJECT_DIR}/simulte'
+    5G_M: '${CI_PROJECT_DIR}/simu5g'
     CROWNET_M: '${CI_PROJECT_DIR}/crownet'
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
@@ -70,7 +70,7 @@ build-for-sim:
   artifacts:
     paths:
     - ${CROWNET_HOME}/scripts
-    - ${CROWNET_HOME}/simulte
+    - ${CROWNET_HOME}/simu5g
     - ${CROWNET_HOME}/inet4
     - ${CROWNET_HOME}/crownet
     - ${CROWNET_HOME}/veins
@@ -186,7 +186,7 @@ simulation-campaign:
       - ${CROWNET_HOME}/$SIM_SCRIPT
       - ${CROWNET_HOME}/$SIM_SCRIPT-results
       - ${CROWNET_HOME}/scripts
-      - ${CROWNET_HOME}/simulte/src
+      - ${CROWNET_HOME}/simu5g/src
       - ${CROWNET_HOME}/inet4/src
       - ${CROWNET_HOME}/crownet
       - ${CROWNET_HOME}/veins/src

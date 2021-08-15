@@ -72,7 +72,7 @@ void Geo2Nic::toIpUe(Packet* datagram) {
   if (!geoTag && pTag->getProtocol() == &inet::Protocol::ipv4) {
     IP2Nic::toIpUe(datagram);
   } else {
-    EV << "Geo2lte::toIpUe - message from stack: send to Geo layer" << endl;
+    EV << "Geo2Nic::toIpUe - message from stack: send to Geo layer" << endl;
     datagram->removeTagIfPresent<inet::PacketProtocolTag>();
     prepareForGeo(datagram);
     send(datagram, ipGateOut_);

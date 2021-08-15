@@ -27,6 +27,7 @@ class ChangeTarget(Controller):
 
     def __init__(self):
         super().__init__()
+        self.nextCmdId = 1
 
 
     def initialize_connection(self, con_manager):
@@ -37,7 +38,11 @@ class ChangeTarget(Controller):
         sending_node = "misc[0].app[0]"
         model = "RouteChoice"
         command = {"targetIds" : [3] , "probability" : [1.0]}
-        action = { "time" : 50.0, "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, "command" : command}
+        action = { "time" : 50.0, 
+                  "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
+                  "command" : command, 
+                  "commandId": self.nextCmdId}
+        self.nextCmdId =+ 1 
         action = json.dumps(action)
 
         self.con_manager.domains.v_sim.send_control(message=action, model=model, sending_node_id=sending_node)
