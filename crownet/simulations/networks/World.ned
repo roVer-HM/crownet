@@ -100,7 +100,7 @@ network World
         binder: Binder if hasLte {
             @display("p=411.99374,207.69;is=s");
         }
-        carrierAggregation: CarrierAggregation {
+        carrierAggregation: CarrierAggregation if hasLte {
             @display("p=411.99374,319.43625;is=s");
         }
         eNB[numEnb]: eNodeB if hasLte {
