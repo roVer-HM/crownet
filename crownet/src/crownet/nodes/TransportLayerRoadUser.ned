@@ -148,7 +148,7 @@ module TransportLayerRoadUser like INetworkNode
         }
         cellularNic: <nicType> like ICellularNic if hasLte {
             nodeType = nodeType;
-            ip2lte.typename = "Geo2Lte";
+            ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;
             @display("p=710.304,672.672");
         }
