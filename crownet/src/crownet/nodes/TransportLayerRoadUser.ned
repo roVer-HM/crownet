@@ -146,7 +146,7 @@ module TransportLayerRoadUser like INetworkNode
             parameters:
                 @display("p=681.312,526.688;q=queue");
         }
-        lteNic: <nicType> like ICellularNic if hasLte {
+        cellularNic: <nicType> like ICellularNic if hasLte {
             nodeType = nodeType;
             ip2lte.typename = "Geo2Lte";
             //d2dCapable = d2dCapable;
@@ -173,10 +173,10 @@ module TransportLayerRoadUser like INetworkNode
 
     connections allowunconnected:
         //# LTE Nic
-        lteNic.radioIn <-- lteRadioIn if exists(lteNic);
+        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic);
 
-        lteNic.upperLayerOut --> nl.in++ if exists(lteNic);
-        lteNic.upperLayerIn <-- nl.out++ if exists(lteNic);
+        cellularNic.upperLayerOut --> nl.in++ if exists(cellularNic);
+        cellularNic.upperLayerIn <-- nl.out++ if exists(cellularNic);
 
         //# Wlan Nic
         for i=0..sizeof(radioIn)-1 {
