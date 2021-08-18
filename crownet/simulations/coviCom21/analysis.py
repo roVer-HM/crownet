@@ -73,7 +73,7 @@ def analyse_interactive(dcd, what):
 
         time = 2
         id = 0
-        fig, ax = dcd.area_plot(time_step=time, node_id=id,
+        fig, ax = dcd.plot_area(time_step=time, node_id=id,
                                 pcolormesh_dic=dict(vmin=0, vmax=4))
         i = InteractiveAreaPlot(dcd, ax)
     else:
@@ -89,7 +89,7 @@ def make_density_plot(path, dcd):
     time = [140]
     ids = [0]
     for time, id in list(product(time, ids)):
-        f, ax = dcd.area_plot(time_step=time, node_id=id, make_interactive=False,
+        f, ax = dcd.plot_area(time_step=time, node_id=id, make_interactive=False,
                               pcolormesh_dic=dict(vmin=0, vmax=4))
         print(f"create out/density_map_{id}_t{time}.png")
         ax.set_title("")
@@ -172,7 +172,7 @@ def make_sample_map():
     run = runs[3]
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.area_plot(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
+    fig, ax = dcd.plot_area(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
                             pcolormesh_dic=dict(vmin=0, vmax=4))
     fig.savefig(f"{ROOT}/{run['run_name']}_sample_map.pdf")
 
@@ -182,7 +182,7 @@ def make_grid_map():
     time = 96
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.area_plot(time_step=time, node_id=0, title="Decentralized Crowed Density Map",
+    fig, ax = dcd.plot_area(time_step=time, node_id=0, title="Decentralized Crowed Density Map",
                             pcolormesh_dic=dict(vmin=0, vmax=4, edgecolors="black"))
     ax.set_title("")
     fig.delaxes(fig.axes[1])
