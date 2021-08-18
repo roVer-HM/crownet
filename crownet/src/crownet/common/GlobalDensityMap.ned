@@ -25,7 +25,7 @@ simple GlobalDensityMap like IGlobalDensityMap
     parameters:
         @class(crownet::GlobalDensityMap);
         string traciNodeManager = default("traci.nodes");
-        string middelwareModule = default(".middleware"); // relative to moving object module
+        string mobilityModule = default (".mobility");
         string coordConverterModule = default("coordConverter");
         double gridSize = default(3.0) @units(m);
 

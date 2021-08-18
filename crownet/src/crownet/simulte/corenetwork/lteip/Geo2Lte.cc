@@ -48,8 +48,6 @@ void Geo2Lte::toStackUe(inet::Packet* pkt) {
 
     pkt->addTagIfAbsent<FlowControlInfo>()->setSrcAddr(geoTag->getSrcAddrIp());
     pkt->addTagIfAbsent<FlowControlInfo>()->setDstAddr(geoTag->getDstAddrIp());
-    pkt->addTagIfAbsent<FlowControlInfo>()->setSrcPort(-1);
-    pkt->addTagIfAbsent<FlowControlInfo>()->setDstPort(-1);
     pkt->addTagIfAbsent<FlowControlInfo>()->setSequenceNumber(seqNums_[pair]++);
     pkt->addTagIfAbsent<FlowControlInfo>()->setHeaderSize(headerSize);
 

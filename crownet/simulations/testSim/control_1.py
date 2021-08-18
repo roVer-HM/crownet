@@ -1,5 +1,5 @@
 import sys, os
-
+import json
 
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
@@ -26,14 +26,24 @@ class ChangeTarget(Controller):
 
     def __init__(self):
         super().__init__()
+        self.nextCmdId = 1
 
     def initialize_connection(self, con_manager):
         self.con_manager = con_manager
 
     def handle_sim_step(self, sim_time, sim_state):
-        sending_node = "pNode[1].densityMap.app"
-        density_map = self.con_manager.domains.v_sim.get_density_map(sending_node)
-        print(density_map)
+        sending_node = "misc[0].app[0]"
+        model = "RouteChoice"
+        command = {"targetIds" : [3] , "probability" : [1.0]}
+        action = { "time" : 50.0, 
+                  "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
+                  "command" : command, 
+                  "commandId": self.nextCmdId}
+        self.nextCmdId =+ 1 
+        action = json.dumps(action)
+
+        self.con_manager.domains.v_sim.send_control(message=action, model=model, sending_node_id=sending_node)
+        print("send RouteChoice")
         self.con_manager.next_call_at(500.0)  # do not call again (simualtion only taks ~50 seconds(
 
     def handle_init(self, sim_time, sim_state):

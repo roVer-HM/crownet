@@ -26,7 +26,7 @@
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 namespace {
-const simsignal_t traciInit = cComponent::registerSignal("traci.init");
+const simsignal_t traciConnected = cComponent::registerSignal("traci.connected");
 }  // namespace
 
 namespace crownet {
@@ -45,13 +45,15 @@ GlobalDensityMap::~GlobalDensityMap() {
 void GlobalDensityMap::initialize() {
   getSystemModule()->subscribe(registerMap, this);
   getSystemModule()->subscribe(removeMap, this);
-  getSystemModule()->subscribe(traciInit, this);
+  // listen to traciConnected signal to setup density map *before*
+  // subscriptions and node are initialized.
+  getSystemModule()->subscribe(traciConnected, this);
 }
 
 void GlobalDensityMap::finish() {
   getSystemModule()->unsubscribe(registerMap, this);
   getSystemModule()->unsubscribe(removeMap, this);
-  getSystemModule()->unsubscribe(traciInit, this);
+  getSystemModule()->unsubscribe(traciConnected, this);
 }
 
 void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
@@ -63,6 +65,7 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
     dezentralMaps[mapHandler->getMap()->getOwnerId()] = mapHandler;
     EV_DEBUG << "register DensityMap for node: "
              << mapHandler->getMap()->getOwnerId();
+    mapHandler->setDistanceProvider(distProvider);
 
   } else if (signalId == removeMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
@@ -73,7 +76,7 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
 }
 void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
                                      const SimTime &t, cObject *details) {
-  if (signalID == traciInit) {
+  if (signalID == traciConnected) {
     // 1) setup map
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
@@ -82,12 +85,15 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
         par("traciNodeManager"), this);
 
     std::pair<int, int> gridDim;
+    simBoundHeight = converter->getBoundaryHeight();
+    simBoundWidth = converter->getBoundaryWidth();
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
     gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
+    distProvider = f.createDistanceProvider();
 
     // 2) setup writer.
     FileWriterBuilder fBuilder{};
@@ -112,7 +118,10 @@ void GlobalDensityMap::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-    m_middelwareModule = par("middelwareModule").stdstringValue();
+    m_mobilityModule = par("mobilityModule").stdstringValue();
+    WATCH(simBoundWidth);
+    WATCH(simBoundHeight);
+
 
     updateTimer = new cMessage("GlobalDensityMapTimer");
     updateInterval = par("updateInterval").doubleValue();
@@ -139,15 +148,9 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
 
 void GlobalDensityMap::visitNode(const std::string &traciNodeId,
                                  omnetpp::cModule *mod) {
-  // access middelware for position
-
-  auto middleware = check_and_cast<artery::MiddlewareBase *>(
-      mod->getModuleByPath(m_middelwareModule.c_str()));
-
+  const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));
   // convert to traci 2D position
-  const auto &pos = middleware->getFacilities()
-                        .getConst<artery::MovingNodeDataProvider>()
-                        .position();
+  const auto &pos = mobility->getCurrentPosition();
   const auto &posInet = converter->position_cast_traci(pos);
 
   // visitNode is called for *all* nodes thus this 'local' map of the global
