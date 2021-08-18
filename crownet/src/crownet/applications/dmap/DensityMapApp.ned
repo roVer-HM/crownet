@@ -25,6 +25,7 @@ moduleinterface IDensityMapApp extends IApp {
 simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
 	parameters:
 	    @class(crownet::ArteryDensityMapBase);
+	    @signal[InitDensityMap];
         @signal[RegisterDensityMap];
         @signal[RemoveDensityMap];
         

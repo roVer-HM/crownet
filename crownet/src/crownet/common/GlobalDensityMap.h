@@ -41,6 +41,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   using GridHandler = IDensityMapHandler<RegularDcdMap>;
   using gridMap_t = std::map<RegularDcdMap::node_key_t, GridHandler *>;
 
+  static const omnetpp::simsignal_t initMap;
   static const omnetpp::simsignal_t registerMap;
   static const omnetpp::simsignal_t removeMap;
 
@@ -65,7 +66,6 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
 
   virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal(){
       return dcdMapGlobal;
-      // TODO: muss geändert werden um für beliebigen knoten anzuwenden
   }
 
  protected:

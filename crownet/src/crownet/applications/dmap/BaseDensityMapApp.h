@@ -63,13 +63,14 @@ protected:
  virtual void initWriter();
  virtual void sendMapMap();
  virtual bool mergeReceivedMap(Packet *packet);
+
  // IDensityMapHandler
  virtual void updateLocalMap() override;
  virtual void computeValues() override;
  virtual void writeMap() override;
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
  virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) override;
-
+ virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
 
 protected:
  int hostId;

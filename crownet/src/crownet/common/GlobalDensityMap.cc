@@ -33,6 +33,8 @@ namespace crownet {
 
 Define_Module(GlobalDensityMap);
 
+const simsignal_t GlobalDensityMap::initMap =
+        cComponent::registerSignal("InitDensityMap");
 const simsignal_t GlobalDensityMap::registerMap =
     cComponent::registerSignal("RegisterDensityMap");
 const simsignal_t GlobalDensityMap::removeMap =
@@ -43,6 +45,7 @@ GlobalDensityMap::~GlobalDensityMap() {
 }
 
 void GlobalDensityMap::initialize() {
+    getSystemModule()->subscribe(initMap, this);
   getSystemModule()->subscribe(registerMap, this);
   getSystemModule()->subscribe(removeMap, this);
   // listen to traciConnected signal to setup density map *before*
@@ -60,12 +63,16 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
                                      omnetpp::simsignal_t signalId,
                                      omnetpp::cObject *obj,
                                      omnetpp::cObject *details) {
-  if (signalId == registerMap) {
+  if (signalId == initMap){
+      auto mapHandler = check_and_cast<GridHandler *>(obj);
+      mapHandler->setDistanceProvider(distProvider);
+      mapHandler->setCoordinateConverter(converter);
+  }
+  else if (signalId == registerMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
     dezentralMaps[mapHandler->getMap()->getOwnerId()] = mapHandler;
     EV_DEBUG << "register DensityMap for node: "
              << mapHandler->getMap()->getOwnerId();
-    mapHandler->setDistanceProvider(distProvider);
 
   } else if (signalId == removeMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
