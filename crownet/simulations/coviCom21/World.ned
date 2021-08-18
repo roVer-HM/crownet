@@ -50,8 +50,8 @@ network World
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
         @display("bgb=899,473");
 
-        bool hasLte = default(true);
-        bool hasLteCoreNetwork = default(hasLte);
+        bool hasCellular = default(true);
+        bool hasCellularCoreNetwork = default(hasCellular);
         bool hasWlan = default(false);
         bool hasStoryboard = default(false);
 
@@ -90,22 +90,22 @@ network World
             @display("p=523.74,198.66;is=s");
         }
         // LTE
-        channelControl: LteChannelControl if hasLte {
+        channelControl: LteChannelControl if hasCellular {
             @display("p=410.865,148.995;is=s");
         }
-        binder: Binder if hasLte {
+        binder: Binder if hasCellular {
             @display("p=411.99374,198.66;is=s");
         }
-        eNB: eNodeB if hasLte {
+        eNB: eNodeB if hasCellular {
             @display("p=37,51;is=vl");
         }
-        server: StandardHost if hasLteCoreNetwork {
+        server: StandardHost if hasCellularCoreNetwork {
             @display("p=308.14874,148.995;is=s;i=device/server");
         }
-        router: Router if hasLteCoreNetwork {
+        router: Router if hasCellularCoreNetwork {
             @display("p=308.14874,110.6175;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandard if hasLteCoreNetwork {
+        pgw: PgwStandard if hasCellularCoreNetwork {
             @display("p=307.02,42.892498;is=l");
         }
         // WLAN
@@ -132,7 +132,7 @@ network World
 
 
     connections:
-        server.pppg++ <--> Eth10G <--> router.pppg++ if hasLteCoreNetwork;
-        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasLteCoreNetwork;
-        pgw.pppg++ <--> Eth10G <--> eNB.ppp if hasLteCoreNetwork;
+        server.pppg++ <--> Eth10G <--> router.pppg++ if hasCellularCoreNetwork;
+        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasCellularCoreNetwork;
+        pgw.pppg++ <--> Eth10G <--> eNB.ppp if hasCellularCoreNetwork;
 }

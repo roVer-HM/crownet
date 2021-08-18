@@ -75,7 +75,7 @@ module TransportLayerRoadUser like INetworkNode
         bool hasIpv6 = default(false);
 
         //# Link Layer specs
-        bool hasLte = default(true);
+        bool hasCellular = default(true);
         bool hasWlan = default(false);
         int numWlanNic = default(0);
 
@@ -146,7 +146,7 @@ module TransportLayerRoadUser like INetworkNode
             parameters:
                 @display("p=681.312,526.688;q=queue");
         }
-        cellularNic: <nicType> like ICellularNic if hasLte {
+        cellularNic: <nicType> like ICellularNic if hasCellular {
             nodeType = nodeType;
             ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;
