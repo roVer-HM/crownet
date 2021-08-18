@@ -26,7 +26,7 @@
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 namespace {
-const simsignal_t traciInit = cComponent::registerSignal("traci.init");
+const simsignal_t traciConnected = cComponent::registerSignal("traci.connected");
 }  // namespace
 
 namespace crownet {
@@ -45,13 +45,15 @@ GlobalDensityMap::~GlobalDensityMap() {
 void GlobalDensityMap::initialize() {
   getSystemModule()->subscribe(registerMap, this);
   getSystemModule()->subscribe(removeMap, this);
-  getSystemModule()->subscribe(traciInit, this);
+  // listen to traciConnected signal to setup density map *before*
+  // subscriptions and node are initialized.
+  getSystemModule()->subscribe(traciConnected, this);
 }
 
 void GlobalDensityMap::finish() {
   getSystemModule()->unsubscribe(registerMap, this);
   getSystemModule()->unsubscribe(removeMap, this);
-  getSystemModule()->unsubscribe(traciInit, this);
+  getSystemModule()->unsubscribe(traciConnected, this);
 }
 
 void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
@@ -74,7 +76,7 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
 }
 void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
                                      const SimTime &t, cObject *details) {
-  if (signalID == traciInit) {
+  if (signalID == traciConnected) {
     // 1) setup map
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
@@ -83,6 +85,8 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
         par("traciNodeManager"), this);
 
     std::pair<int, int> gridDim;
+    simBoundHeight = converter->getBoundaryHeight();
+    simBoundWidth = converter->getBoundaryWidth();
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
     gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
@@ -115,6 +119,9 @@ void GlobalDensityMap::initialize(int stage) {
   if (stage == INITSTAGE_LOCAL) {
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
+    WATCH(simBoundWidth);
+    WATCH(simBoundHeight);
+
 
     updateTimer = new cMessage("GlobalDensityMapTimer");
     updateInterval = par("updateInterval").doubleValue();
