@@ -16,6 +16,28 @@ When a fingerprint test fails, the simulation's correctness has to be
 verified by some other means, and the fingerprints in the tests
 updated.
 
+## Running the Tests manually
+In order to execute the tests, perform the following steps:
+
+1) Create the Python environment (assumption: current directory is the CrowNet home
+   directory `CROWNET_HOME`)
+    ```
+    $> omnetpp exec make analysis-all
+    ```
+2) Activate the Python environment `crownet_user`
+    ```
+    $> source out/crownet_user/bin/activate
+    ```
+3) Change to the fingerprint folder and start the fingerprint tests.
+    ```
+    (crownet_user) $> cd crownet/tests/fingerprint
+    (crownet_user) $> ./fingerprints
+    ```
+    As you might notice, the fingerprint script is *not* specifically run within an
+    OMNeT++ Docker container, i.e. we do not use the `omnetpp exec [cmd]` statement here.
+    This is correct, since the fingerprint script itself starts the required Docker
+    containers.
+
 ## Containerized Fingerprint Tests
 
 For simulations in the rover research project coupled simulations with 
