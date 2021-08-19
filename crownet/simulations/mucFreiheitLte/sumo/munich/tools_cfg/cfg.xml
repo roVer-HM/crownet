@@ -1,6 +1,6 @@
 <configuration>
     <additional-files value="trip_custom.xml"/>
-    <period value="0.25"/>
+    <period value="0.1"/>
     <end value="30"/>
     <max-distance value="1000.0"/>
     <min-distance value="30.0"/>
@@ -8,7 +8,8 @@
     <pedestrians value="True"/>
     <remove-loops value="True"/>
     <trip-attributes value="type=&quot;pedType1&quot;"/>
-    <output-trip-file value="munich_ped120.trips.xml"/>
-    <route-file value="munich_ped120.rou.xml"/>
+    <output-trip-file value="munich_ped120_small.trips.xml"/>
+    <route-file value="munich_ped120_small.rou.xml"/>
     <verbose value="True"/>
+    <bound-box value="1638.,1218,2876.,2330.0"/>
 </configuration>
