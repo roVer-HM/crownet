@@ -37,7 +37,7 @@ The CrowNet environment requires a Linux System. We are currently using Ubuntu 1
 Clone the CrowNet repository including all submodules within your home directory:
 ```
 cd ~
-git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.git
+git clone --recurse-submodules --branch emulation_omnetsummit21 https://github.com/roVer-HM/crownet.git
 ```
 
 Install Docker (if not already available on your system):
