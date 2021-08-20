@@ -24,6 +24,7 @@
 #include "crownet/artery/traci/VadereCore.h"
 #include "crownet/crownet.h"
 #include "crownet/applications/control/control_m.h"
+#include "crownet/dcd/identifier/CellKeyProvider.h"
 
 namespace crownet {
 
@@ -100,7 +101,14 @@ std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd&
             check_and_cast<IDensityMapHandler<RegularDcdMap>*>(node_module);
 
     std::vector<double> density_vals;
-    auto iter = map_handler->getMap()->valid();
+    auto map = map_handler->getMap();
+    auto cellProvider = std::dynamic_pointer_cast<GridCellIDKeyProvider>(map->getCellKeyProvider());
+
+    density_vals.push_back(cellProvider->getGridDim().first);
+    density_vals.push_back(cellProvider->getGridDim().second);
+    density_vals.push_back(cellProvider->getGridSize().first);
+    density_vals.push_back(cellProvider->getGridSize().second);
+    auto iter = map->valid();
      for( auto item: iter){
          const auto cell = item.first.val();
          const auto measure = item.second.val();

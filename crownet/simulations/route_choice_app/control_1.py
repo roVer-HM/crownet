@@ -49,7 +49,7 @@ class NoController(Controller):
     def measure_state(self, sim_time):
 
         sending_node = "misc[0].app[1].app"
-        density = self.con_manager.domains.v_sim.get_density_map(sending_node)
+        cell_dim, density = self.con_manager.domains.v_sim.get_density_map(sending_node)
         # TODO: manage (N,3) array [[x,y,count],[x,y,count],...]
         print(density)
 
@@ -186,6 +186,8 @@ class OpenLoop(NoController, Controller):
             f"Simulation time: {self.next_call:.1f} \t Set target {target_id}, Ids: {ids}"
         )
         for ped_id in ids:
+            # todo
+            # self.con_manager.domains.v_sim.send_control(message={...}, model="", sendingnode="misc[0].app[0].app")
             self.con_manager.domains.v_person.set_target_list(str(ped_id), [target_id])
             self.redirected_agents.append(ped_id)
 
