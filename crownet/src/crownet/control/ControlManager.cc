@@ -46,7 +46,7 @@ void ControlManager::initialize(int stage)
         //todo: (CM) save pointer DensityMap in proteced or private field use getModuleFromPar like with core
         //todo: (CM) check if parameter is empty first! if (par("globalDcdModule).stdstringValue().empty()){...}
 //        GlobalDensityMap* globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
-        globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
+//        globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
 
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
