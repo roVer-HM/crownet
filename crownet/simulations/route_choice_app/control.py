@@ -1,7 +1,9 @@
 import os
 import sys
+import time
 
 import numpy as np
+import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
@@ -39,7 +41,6 @@ class NoController(Controller):
 
         # necessary, because time intervals for sensoring and applying a control action differ
         if (sim_time-self.sensor_time_step_size) % self.time_step_size == 0:
-            print()
             self.compute_next_corridor_choice(sim_time)
             self.apply_redirection_measure()
 
@@ -86,9 +87,15 @@ class NoController(Controller):
             columns=[f"areaDensityCountingNormed-PID{x}" for x in [14, 15, 16, 17, 18]],
             index=index,
         ).round(PRECISION)
+
+        density_file = os.path.join(working_dir["path"], "densities.txt")
+        while os.path.isfile(density_file) is False:
+            time.sleep(1)
+        time.sleep(1)
+        
         dens_check = (
             pd.read_csv(
-                os.path.join(working_dir["path"], "densities.txt"),
+                density_file,
                 delimiter=" ",
                 index_col=[0],
             )
@@ -131,11 +138,11 @@ class NoController(Controller):
         dataprocessor_name_density = "areaDensityCountingNormed-PID"
         corridor_name = "Corridor"
         dataprocessormapping_density = {
-            f"{dataprocessor_name_density}14": f"{corridor_name} 1 (left)",  # shortest path
+            f"{dataprocessor_name_density}14": f"{corridor_name} 1",  # shortest path
             f"{dataprocessor_name_density}15": f"{corridor_name} 2",
             f"{dataprocessor_name_density}16": f"{corridor_name} 3",
             f"{dataprocessor_name_density}17": f"{corridor_name} 4",
-            f"{dataprocessor_name_density}18": f"{corridor_name} 5 (right)",  # longest path
+            f"{dataprocessor_name_density}18": f"{corridor_name} 5",  # longest path
         }
         cut = 250
         # densities
@@ -144,31 +151,47 @@ class NoController(Controller):
         densities.sort_index(axis=1, inplace=True)
 
         densities.plot()
+        plt.legend(loc='upper left')
+        densities.index = densities.index * self.sensor_time_step_size
+        plt.xlim([0, self.sensor_time_step_size*(cut+1000)])
+        plt.xlabel("Simulation time [s]")
         plt.ylabel("Density [1/m^2]")
-        plt.title(f"Setting: {working_dir['path']}")
+        plt.title(f"Density over time")
         plt.ylim([0, 2])
-        plt.savefig(os.path.join(working_dir["path"], "density_over_time.png"))
-        plt.show()
+        plt.legend()
+        plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_density_over_time.png"))
+        plt.show(block=False)
 
         densities.boxplot()
         plt.ylabel("Density [1/m^2]")
         plt.title(
-            f"{working_dir['path']}: Number of pedestrians (sample size = {len(densities)})"
+            f"Number of pedestrians (sample size = {len(densities)})"
         )
-        plt.ylim([0, 1.2])
-        plt.savefig(os.path.join(working_dir["path"], "density_distribution.png"))
-        plt.show()
+        plt.ylim([0, 2])
+        plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_density_distribution.png"))
+        plt.show(block=False)
 
     def compute_next_corridor_choice(self, sim_time):
+        pass
+
+    def set_reaction_model_parameters(self, reaction_probability):
         pass
 
 
 class OpenLoop(NoController, Controller):
     def __init__(self):
         super().__init__()
-
         self.target_ids = [11, 21, 31, 41, 51]
         self.redirected_agents = list()
+        self.controlModelType = "RouteChoice"
+        self.controlModelName = "distributePeds"
+        self.commandID = 111
+
+        self.reaction_model = {
+            "isBernoulliParameterCertain": True,
+            "BernoulliParameter": 1.0,
+        }
+
 
     def collect_data(self):
 
@@ -176,23 +199,22 @@ class OpenLoop(NoController, Controller):
         self.path_choice()
         self.plot_densities()
 
-    def in_circle(self, x, y):
-        return self.spatial_restriction.contains(Point(x, y))
 
     def apply_redirection_measure(self):
 
-        target_id = str(self.target_ids[self.counter])
-        peds1 = self.con_manager.sub_listener["default"].pedestrians
-        ids = [p["id"] for p in peds1 if self.in_circle(p["pos"][0], p["pos"][1])]
+        probabilities = [0, 0, 0, 0, 0]
+        probabilities[self.counter] = 1.0 # all of the agents should use one specific corridor
 
-        # allow one redirection measure per agent
-        ids = set(ids) - set(self.redirected_agents)
-        print(
-            f"Simulation time: {self.next_call:.1f} \t Set target {target_id}, Ids: {ids}"
-        )
-        for ped_id in ids:
-            self.con_manager.domains.v_person.set_target_list(str(ped_id), [target_id])
-            self.redirected_agents.append(ped_id)
+        command = {"targetIds": self.target_ids, "probability": probabilities}
+        action = {
+            "commandId": self.commandID,
+            "command": command,
+            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15}, # get information direclty after spawning process
+        }
+        action = json.dumps(action)
+        self.commandID += 1
+        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
+
 
     def _increase_counter(self):
         self.counter += 1
@@ -231,15 +253,27 @@ class OpenLoop(NoController, Controller):
             corridor_corrections["NewCorridor"] + 1,
         )
         plt.ylim([0.5, 5.5])
+        plt.xlim([0, 500])
         plt.yticks([1, 2, 3, 4, 5])
         plt.xlabel("Simulation time [s]")
-        plt.ylabel("Corridor proposal")
-        plt.savefig(os.path.join(working_dir["path"], "path_choice.png"))
-        plt.show()
+        plt.ylabel("Corridor recommendation")
+        plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_path_choice.png"))
+        plt.show(block=False)
+
+    def get_reaction_model_parameters(self):
+        return json.dumps(
+          self.reaction_model
+        )
+
+    def set_reaction_model_parameters(self, reaction_probability):
+        self.reaction_model["BernoulliParameter"] = reaction_probability
+
+
 
     def handle_init(self, sim_time, sim_state):
-
-        self.spatial_restriction = self._get_measurement_areas([99])[0]
+        self.con_manager.domains.v_sim.init_control(
+            self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
+        )
         super().handle_init(sim_time, sim_state)
 
 
@@ -266,7 +300,7 @@ class ClosedLoop(OpenLoop, Controller):
 
 
 def main(
-    settings, controller_type="OpenLoop", scenario="simplified_default_sequential"
+    settings, controller_type="OpenLoop", scenario="simplified_default_sequential", reaction_probability=1.0
 ):
 
     sub = VadereDefaultStateListener.with_vars(
@@ -278,20 +312,19 @@ def main(
         "file_name": scenario_file,
     }
 
-    working_dir["path"] = os.path.join(os.getcwd(), f"{scenario}_{controller_type}")
+    working_dir["path"] = os.path.join(os.getcwd(), f"{scenario}_{controller_type}_prob_{int(reaction_probability)}")
 
     settings_ = settings
     settings_.extend(["--output-dir", working_dir["path"]])
     settings_.extend(["--controller-type", controller_type])
 
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings_)
-
     controller.register_state_listener("default", sub, set_default=True)
+    controller.set_reaction_model_parameters(reaction_probability=reaction_probability)
     controller.start_controller(**kwargs)
 
 
 if __name__ == "__main__":
-    # TODO add comments
 
     if len(sys.argv) == 1:
         settings = [
@@ -321,6 +354,18 @@ if __name__ == "__main__":
             settings,
             controller_type="ClosedLoop",
             scenario="simplified_default_sequential",
+        )
+        main(
+            settings,
+            controller_type="OpenLoop",
+            scenario="simplified_default_sequential",
+            reaction_probability=0.5
+        )
+        main(
+            settings,
+            controller_type="ClosedLoop",
+            scenario="simplified_default_sequential",
+            reaction_probability=0.5
         )
         main(
             settings,
