@@ -94,11 +94,13 @@ class DcDMap {
   template <typename Fn>
   void applyVisitorTo(const cell_key_t& cell_id, Fn visitor);
 
+  std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() {return cellKeyProvider;}
+
  private:
   map_t cells;
   node_key_t owner_id;
-  cell_key_t owner_cell;
-  time_t lastComputedAt;
+  cell_key_t owner_cell; // owner position
+  time_t lastComputedAt; // Zeitpunkt an dem der Wert berechnet wird
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
   std::shared_ptr<TimeProvider<T>> timeProvider;
   std::map<node_key_t, cell_key_t> neighborhood;

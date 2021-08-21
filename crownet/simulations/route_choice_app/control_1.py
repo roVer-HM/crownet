@@ -48,18 +48,10 @@ class NoController(Controller):
 
     def measure_state(self, sim_time):
 
-        peds1 = self.con_manager.sub_listener["default"].pedestrians
-        density = list()
-
-        # TODO: replace this for loop by 'get_density_measure_from_density_map'
-        #   density = self.con_manager.domains.v_sim.get_density_map()
-        #         sending_node = "pNode[1].densityMap.app"
-        #         density_map = self.con_manager.domains.v_sim.get_density_map(sending_node)
-        for a in self.measurement_areas:
-            counts = len(
-                [p["id"] for p in peds1 if a.contains(Point(p["pos"][0], p["pos"][1]))]
-            )
-            density.append(counts / a.area)
+        sending_node = "misc[0].app[1].app"
+        cell_dim, density = self.con_manager.domains.v_sim.get_density_map(sending_node)
+        # TODO: manage (N,3) array [[x,y,count],[x,y,count],...]
+        print(density)
 
         time_step = (
             np.round(sim_time / self.sensor_time_step_size, 0) + 1
@@ -74,9 +66,12 @@ class NoController(Controller):
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
-        self.con_manager.next_call_at(0.4)
+        self.con_manager.next_call_at(3.0)
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
-        self.measure_state(0.0)
+        # does not work not setup at this stage
+        # TODO: in init stage you can only access vadere. OMNeT++ is not fully available
+        #       at this time. Access state only in handle_sim_step
+        # self.measure_state(0.0)
 
     def check_density_measures(self):
         self.measure_state(self.next_call + self.sensor_time_step_size)
@@ -191,6 +186,8 @@ class OpenLoop(NoController, Controller):
             f"Simulation time: {self.next_call:.1f} \t Set target {target_id}, Ids: {ids}"
         )
         for ped_id in ids:
+            # todo
+            # self.con_manager.domains.v_sim.send_control(message={...}, model="", sendingnode="misc[0].app[0].app")
             self.con_manager.domains.v_person.set_target_list(str(ped_id), [target_id])
             self.redirected_agents.append(ped_id)
 
@@ -294,17 +291,24 @@ if __name__ == "__main__":
     # TODO add comments
 
     if len(sys.argv) == 1:
+        # settings = [
+        #     "--port",
+        #     "9999",
+        #     "--host-name",
+        #     "localhost",
+        #     "--client-mode",
+        #     "--start-server",
+        #     "--gui-mode",
+        #     "--path-to-vadere-repo",
+        #     os.path.abspath("../../../vadere"),
+        #     "--suppress-prompts",
+        # ]
+
         settings = [
             "--port",
-            "9999",
+            "9997",
             "--host-name",
-            "localhost",
-            "--client-mode",
-            "--start-server",
-            "--gui-mode",
-            "--path-to-vadere-repo",
-            os.path.abspath("../../../vadere"),
-            "--suppress-prompts",
+            "0.0.0.0",
         ]
 
         main(
@@ -312,26 +316,26 @@ if __name__ == "__main__":
             controller_type="NoController",
             scenario="simplified_default_sequential",
         )
-        main(
-            settings,
-            controller_type="OpenLoop",
-            scenario="simplified_default_sequential",
-        )
-        main(
-            settings,
-            controller_type="ClosedLoop",
-            scenario="simplified_default_sequential",
-        )
-        main(
-            settings,
-            controller_type="OpenLoop",
-            scenario="simplified_default_sequential_disturbance",
-        )
-        main(
-            settings,
-            controller_type="ClosedLoop",
-            scenario="simplified_default_sequential_disturbance",
-        )
+        # main(
+        #     settings,
+        #     controller_type="OpenLoop",
+        #     scenario="simplified_default_sequential",
+        # )
+        # main(
+        #     settings,
+        #     controller_type="ClosedLoop",
+        #     scenario="simplified_default_sequential",
+        # )
+        # main(
+        #     settings,
+        #     controller_type="OpenLoop",
+        #     scenario="simplified_default_sequential_disturbance",
+        # )
+        # main(
+        #     settings,
+        #     controller_type="ClosedLoop",
+        #     scenario="simplified_default_sequential_disturbance",
+        # )
 
     else:
         settings = sys.argv[1:]

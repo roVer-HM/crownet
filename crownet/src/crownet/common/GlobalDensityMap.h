@@ -35,11 +35,13 @@ namespace crownet {
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
                          public traci::ITraciNodeVisitor {
+    // 4. Inteface das nur getMap implementiert woe OTraceNodeVisitor
  public:
   //  using Grid = RegularGridMap<std::string>;
   using GridHandler = IDensityMapHandler<RegularDcdMap>;
   using gridMap_t = std::map<RegularDcdMap::node_key_t, GridHandler *>;
 
+  static const omnetpp::simsignal_t initMap;
   static const omnetpp::simsignal_t registerMap;
   static const omnetpp::simsignal_t removeMap;
 
@@ -61,6 +63,10 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   // ITraciNodeVisitor
   virtual void visitNode(const std::string &traciNodeId,
                          omnetpp::cModule *mod) override;
+
+  virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal(){
+      return dcdMapGlobal;
+  }
 
  protected:
   virtual void handleMessage(cMessage *msg) override;

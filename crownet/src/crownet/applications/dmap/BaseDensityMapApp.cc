@@ -40,14 +40,8 @@ void BaseDensityMapApp::initialize(int stage) {
       mapTypeLog = par("mapTypeLog").stdstringValue();
       hostId = getContainingNode(this)->getId();
       WATCH(hostId);
-
-    } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-      converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
-                      par("coordConverterModule"), this)
-                      ->getConverter();
     } else if (stage == INITSTAGE_LAST){
-        initDcdMap();
-        initWriter();
+
         WATCH_MAP(dcdMap->getNeighborhood());
         watcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
     }
@@ -69,10 +63,19 @@ FsmState BaseDensityMapApp::handleDataArrived(Packet *packet){
 }
 
 FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
-  if (dcdMap == nullptr){
-      throw omnetpp::cRuntimeError(
-          "Density Grid map not initialized.");
-  }
+
+  // allow GlobalDensityMap context to set shared objects like the converter or distProvider.
+  // If GlobalDensityMap is not present initDcdMap will initialize these objects
+  // manually for each node. Important: This will be create multiple distProviders
+  // which will affect performance.
+  emit(GlobalDensityMap::initMap, this);
+
+  initDcdMap();
+  initWriter();
+
+  // register map to GlobalDensityMap to allow synchronized logging.
+  emit(GlobalDensityMap::registerMap, this);
+
   return BaseApp::fsmSetup(msg);
 }
 
@@ -86,6 +89,12 @@ FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
 
 // App logic
 void BaseDensityMapApp::initDcdMap(){
+    // check if set by globalDensityMap (shared between all nodes)
+    if (!converter){
+        setCoordinateConverter(inet::getModuleFromPar<OsgCoordConverterProvider>(
+                        par("coordConverterModule"), this)->getConverter());
+    }
+
     std::pair<int, int> gridDim;
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
@@ -93,8 +102,11 @@ void BaseDensityMapApp::initDcdMap(){
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
-    // if global is present will be overwritten to share one provider between all maps
-    distProvider = f.createDistanceProvider();
+    // check if set by globalDensityMap (shared between all nodes)
+    if(!distProvider) {
+        distProvider = f.createDistanceProvider();
+    }
+    // do not share valueVisitor between nodes.
     valueVisitor = f.createValueVisitor(mapType);
 }
 void BaseDensityMapApp::initWriter(){
@@ -114,9 +126,6 @@ void BaseDensityMapApp::initWriter(){
               dcdMap.get(), par("mapTypeLog").stdstringValue()));
       fileWriter->writeHeader();
     }
-
-    // register density map for use in GlobalDensityMap context.
-    emit(GlobalDensityMap::registerMap, this);
 }
 
 void BaseDensityMapApp::sendMapMap() {
@@ -198,6 +207,10 @@ std::shared_ptr<RegularDcdMap> BaseDensityMapApp::getMap() { return dcdMap; }
 
 void BaseDensityMapApp::setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider){
     this->distProvider = distProvider;
+}
+
+void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter){
+    this->converter = converter;
 }
 
 

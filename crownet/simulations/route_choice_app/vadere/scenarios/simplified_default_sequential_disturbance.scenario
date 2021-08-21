@@ -238,7 +238,14 @@
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
-        "referenceCoordinateSystem" : null
+        "referenceCoordinateSystem" : {
+          "epsgCode" : "EPSG:32632",
+          "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
+          "translation" : {
+            "x" : 0.0,
+            "y" : 0.0
+          }
+        }
       },
       "obstacles" : [ {
         "shape" : {
