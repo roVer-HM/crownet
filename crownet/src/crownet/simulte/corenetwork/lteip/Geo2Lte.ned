@@ -26,6 +26,11 @@ simple Geo2Lte like INetworkLayer2lte
         string interfaceName = default("cellular");
         @display("i=block/layer");
         @class(crownet::Geo2Lte);
+        @signal[registerMacId];
+        @statistic[registerMacId](title="MacId used for this nic"; source="registerMacId";record=vector);
+        @signal[unregisterMacId];
+        @statistic[unregisterMacId](title="MacId removed when node is destroyed"; source="unregisterMacId";record=vector);
+        
     gates:
         // connection to network layer.
         // These gate names are recognized by the network layer (same as the ones in the INetworkInterface interface)
