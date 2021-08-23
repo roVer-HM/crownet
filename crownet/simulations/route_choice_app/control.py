@@ -161,6 +161,7 @@ class NoController(Controller):
         plt.legend()
         plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_density_over_time.png"))
         plt.show(block=False)
+        plt.close()
 
         densities.boxplot()
         plt.ylabel("Density [1/m^2]")
@@ -170,6 +171,7 @@ class NoController(Controller):
         plt.ylim([0, 2])
         plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_density_distribution.png"))
         plt.show(block=False)
+        plt.close()
 
     def compute_next_corridor_choice(self, sim_time):
         pass
@@ -259,6 +261,7 @@ class OpenLoop(NoController, Controller):
         plt.ylabel("Corridor recommendation")
         plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_path_choice.png"))
         plt.show(block=False)
+        plt.close()
 
     def get_reaction_model_parameters(self):
         return json.dumps(
