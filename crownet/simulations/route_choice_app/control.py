@@ -144,16 +144,18 @@ class NoController(Controller):
             f"{dataprocessor_name_density}17": f"{corridor_name} 4",
             f"{dataprocessor_name_density}18": f"{corridor_name} 5",  # longest path
         }
-        cut = 250
+
+        densities.index = densities.index * self.sensor_time_step_size
+        cut = 250 # cut off simulation results before simulation time t=100s (250*0.4)
+        interval = 1000 # cut off simulation results before  after t=100s+400s=500s (1000*0.4)
         # densities
-        densities = densities.iloc[cut : cut + 1000, :]
+        densities = densities.iloc[cut : cut + interval, :]
         densities.rename(columns=dataprocessormapping_density, inplace=True)
         densities.sort_index(axis=1, inplace=True)
 
         densities.plot()
         plt.legend(loc='upper left')
-        densities.index = densities.index * self.sensor_time_step_size
-        plt.xlim([0, self.sensor_time_step_size*(cut+1000)])
+        plt.xlim([0, self.sensor_time_step_size*(cut+interval)])
         plt.xlabel("Simulation time [s]")
         plt.ylabel("Density [1/m^2]")
         plt.title(f"Density over time")
@@ -383,3 +385,8 @@ if __name__ == "__main__":
 
     else:
         settings = sys.argv[1:]
+        main(
+            settings,
+            controller_type="NoController",
+            scenario="simplified_default_sequential",
+        )
