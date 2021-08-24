@@ -37,11 +37,11 @@ class MeasurementArea:
 
         print(f"Initialize cell contributions for measurement area with id = {self.id}.")
 
-        for cell in cells:
-            common_area = cell.intersection(self.area).area
+        for key, cell in cells.items():
+            common_area = cell.polygon.intersection(self.area).area
 
             if common_area > 0:
-                self.cell_contribution[cell] = common_area/cell.polygon.area
+                self.cell_contribution[key] = common_area/cell.polygon.area
 
         return self.cell_contribution
 
@@ -67,11 +67,11 @@ class DensityMapper:
     def __init__(self, cell_dimensions, cell_size, measurement_areas : dict):
         self.cell_dimensions = cell_dimensions
         self.cell_size = cell_size
-        self.cells = None
+        self.cells = dict()
         self.measurement_areas = measurement_areas
 
     def get_cells(self):
-        if self.cells is not None:
+        if len(self.cells) > 0:
             return self.cells
 
         print("Initialize cell grid.")
@@ -109,7 +109,7 @@ class DensityMapper:
 
         densities = dict()
 
-        for id, measurement_area in self.measurement_areas:
+        for id, measurement_area in self.measurement_areas.items():
 
             area, counts = self.compute_counts_area(measurement_area)
 
@@ -121,9 +121,13 @@ class DensityMapper:
         count = 0
         unit_area = 0
 
-        for cell, area in zip(cell_contributions.keys(), cell_contributions.values()):
-            count += self.get_count(cell) # weights the counts -> if 50% of the cell area overlaps with the measurement area, the weight would be 50%
-            unit_area += area
+        for key, weight in cell_contributions.items():
+            count_raw = self.get_cells()[key].get_count()
+            count += count_raw*weight # weights the counts -> if 50% of the cell area overlaps with the measurement area, the weight would be 50%
+            unit_area += weight
+
+        if not np.isclose(unit_area*self.get_cell_area(), measurement_area.area.area):
+            raise ValueError(f"Measurement area computed: {unit_area*self.get_cell_area()}. Should be {measurement_area.area.area}.")
 
         return count, unit_area*self.get_cell_area()
 
@@ -138,7 +142,7 @@ class DensityMapper:
     def update_cell(self, x_coor, y_coor, count):
         cell_key = self.get_cell_key(x_coor, y_coor)
 
-        if self.get_cells().contains(cell_key) is False:
+        if cell_key not in self.get_cells().keys():
             raise ValueError(f"Key {cell_key} not found.")
         self.get_cells()[cell_key].set_count(count)
 
