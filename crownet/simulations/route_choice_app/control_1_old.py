@@ -1,11 +1,7 @@
 import os
 import sys
-import time
-
-from typing import Union
 
 import numpy as np
-import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
@@ -24,124 +20,6 @@ import matplotlib.pyplot as plt
 working_dir = dict()
 PRECISION = 8
 
-class MeasurementArea:
-
-    def __init__(self, id, polygon: Polygon):
-        self.id = id
-        self.area = polygon
-        self.cell_contribution = dict()
-
-    def get_cell_contribution(self, cells):
-        if len(self.cell_contribution) > 0:
-            return self.cell_contribution
-
-        print(f"Initialize cell contributions for measurement area with id = {self.id}.")
-
-        for cell in cells:
-            common_area = cell.intersection(self.area).area
-
-            if common_area > 0:
-                self.cell_contribution[cell] = common_area/cell.polygon.area
-
-        return self.cell_contribution
-
-
-
-class Cell:
-    def __init__(self, id, polygon : Polygon, count=0):
-        self.id = id
-        self.polygon = polygon
-        self.number_of_agents_in_cell = count
-
-    def get_density(self):
-        return self.number_of_agents_in_cell/self.polygon.area
-
-    def get_count(self):
-        return self.number_of_agents_in_cell
-
-    def set_count(self, count):
-        self.number_of_agents_in_cell = count
-
-class DensityMapper:
-
-    def __init__(self, cell_dimensions, cell_size, measurement_areas : dict):
-        self.cell_dimensions = cell_dimensions
-        self.cell_size = cell_size
-        self.cells = None
-        self.measurement_areas = measurement_areas
-
-    def get_cells(self):
-        if self.cells is not None:
-            return self.cells
-
-        print("Initialize cell grid.")
-
-        delta_x = self.cell_size[0]
-        delta_y = self.cell_size[1]
-
-        index = 0
-
-        for x_coor in np.arange(0, self.cell_dimensions[0])*delta_x:
-            for y_coor in np.arange(0, self.cell_dimensions[1])*delta_y:
-                lower_left_corner = [x_coor,y_coor]
-                lower_right_corner = [x_coor+delta_x, y_coor]
-                upper_right_corner = [x_coor+delta_x, y_coor+delta_y]
-                upper_left_corner = [x_coor, y_coor+delta_y]
-                polygon = Polygon(np.array([lower_left_corner, lower_right_corner, upper_right_corner, upper_left_corner]))
-                key = self.get_cell_key(x_coor, y_coor)
-                self.cells[key] = Cell(id=index, polygon=polygon)
-                index += 1
-
-        return self.cells
-
-    def get_cell_key(self, x_coor, y_coor):
-        return f"x={x_coor:.1f}_y={y_coor:.1f}"
-
-    def get_density_in_area(self, distribution = "uniform"):
-
-        if distribution=="uniform":
-            densities = self.get_density_uniform_assumption()
-        else:
-            raise NotImplementedError("Not implemented yet. Use distribution type uniform.")
-        return densities
-
-    def get_density_uniform_assumption(self):
-
-        densities = dict()
-
-        for id, measurement_area in self.measurement_areas:
-
-            area, counts = self.compute_counts_area(measurement_area)
-
-            densities[id] = area/counts
-
-    def compute_counts_area(self, measurement_area : MeasurementArea):
-        cell_contributions = measurement_area.get_cell_contribution(self.get_cells())
-
-        count = 0
-        unit_area = 0
-
-        for cell, area in zip(cell_contributions.keys(), cell_contributions.values()):
-            count += self.get_count(cell) # weights the counts -> if 50% of the cell area overlaps with the measurement area, the weight would be 50%
-            unit_area += area
-
-        return count, unit_area*self.get_cell_area()
-
-
-    def get_cell_area(self):
-        return self.cell_size[0]*self.cell_size[1]
-
-    def update_density(self, result):
-        for entry in result:
-            self.update_cell(x_coor=entry[0], y_coor = entry[1], count= entry[2])
-
-    def update_cell(self, x_coor, y_coor, count):
-        cell_key = self.get_cell_key(x_coor, y_coor)
-
-        if self.get_cells().contains(cell_key) is False:
-            raise ValueError(f"Key {cell_key} not found.")
-        self.get_cells()[cell_key].set_count(count)
-
 
 class NoController(Controller):
     def __init__(self):
@@ -155,14 +33,13 @@ class NoController(Controller):
         self.next_call = 0
         self.time_step_size = 10
 
-        self.densityMapper = None
-
     def handle_sim_step(self, sim_time, sim_state):
 
         self.measure_state(sim_time)
 
         # necessary, because time intervals for sensoring and applying a control action differ
         if (sim_time-self.sensor_time_step_size) % self.time_step_size == 0:
+            print()
             self.compute_next_corridor_choice(sim_time)
             self.apply_redirection_measure()
 
@@ -171,31 +48,30 @@ class NoController(Controller):
 
     def measure_state(self, sim_time):
 
-        cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(sending_node="misc[0].app[1].app")
-        self.update_density_map(cell_dim, cell_size, result)
-
-        densities = self.densityMapper.get_density_in_area(distribution="uniform")
+        sending_node = "misc[0].app[1].app"
+        cell_dim, density = self.con_manager.domains.v_sim.get_density_map(sending_node)
+        # TODO: manage (N,3) array [[x,y,count],[x,y,count],...]
+        print(density)
 
         time_step = (
             np.round(sim_time / self.sensor_time_step_size, 0) + 1
         )  # time = 0.0s := timestep 1, time step size: 0.4
 
         # print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {density}")
-        self.density_over_time.append(np.array(densities.values()))
+        self.density_over_time.append(density)
         self.time_step.append(time_step)
-
-    def update_density_map(self, cell_dim, cell_size, result):
-        if self.densityMapper is None:
-            self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size, measurement_areas=self.measurement_areas)
-        self.densityMapper.update_density(result)
 
     def apply_redirection_measure(self):
         pass
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
-        self.con_manager.next_call_at(0.01) #set to 0.4, 0.01 -> test case
+        self.con_manager.next_call_at(3.0)
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
+        # does not work not setup at this stage
+        # TODO: in init stage you can only access vadere. OMNeT++ is not fully available
+        #       at this time. Access state only in handle_sim_step
+        # self.measure_state(0.0)
 
     def check_density_measures(self):
         self.measure_state(self.next_call + self.sensor_time_step_size)
@@ -205,15 +81,9 @@ class NoController(Controller):
             columns=[f"areaDensityCountingNormed-PID{x}" for x in [14, 15, 16, 17, 18]],
             index=index,
         ).round(PRECISION)
-
-        density_file = os.path.join(working_dir["path"], "densities.txt")
-        while os.path.isfile(density_file) is False:
-            time.sleep(1)
-        time.sleep(1)
-        
         dens_check = (
             pd.read_csv(
-                density_file,
+                os.path.join(working_dir["path"], "densities.txt"),
                 delimiter=" ",
                 index_col=[0],
             )
@@ -232,10 +102,11 @@ class NoController(Controller):
                 )
 
     def _get_measurement_areas(self, measurement_area_ids):
-        areas = dict()
+        areas = list()
         for measurement_id in measurement_area_ids:
             polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
-            areas[measurement_id] = MeasurementArea(polygon=Polygon(np.array(polygon)), id=measurement_id)
+            polygon_ = Polygon(np.array(polygon))
+            areas.append(polygon_)
 
         return areas
 
@@ -255,71 +126,44 @@ class NoController(Controller):
         dataprocessor_name_density = "areaDensityCountingNormed-PID"
         corridor_name = "Corridor"
         dataprocessormapping_density = {
-            f"{dataprocessor_name_density}14": f"{corridor_name} 1",  # shortest path
+            f"{dataprocessor_name_density}14": f"{corridor_name} 1 (left)",  # shortest path
             f"{dataprocessor_name_density}15": f"{corridor_name} 2",
             f"{dataprocessor_name_density}16": f"{corridor_name} 3",
             f"{dataprocessor_name_density}17": f"{corridor_name} 4",
-            f"{dataprocessor_name_density}18": f"{corridor_name} 5",  # longest path
+            f"{dataprocessor_name_density}18": f"{corridor_name} 5 (right)",  # longest path
         }
-
-        densities.index = densities.index * self.sensor_time_step_size
-        cut = 250 # cut off simulation results before simulation time t=100s (250*0.4)
-        interval = 1000 # cut off simulation results before  after t=100s+400s=500s (1000*0.4)
+        cut = 250
         # densities
-        densities = densities.iloc[cut : cut + interval, :]
+        densities = densities.iloc[cut : cut + 1000, :]
         densities.rename(columns=dataprocessormapping_density, inplace=True)
         densities.sort_index(axis=1, inplace=True)
 
         densities.plot()
-        plt.legend(loc='upper left')
-        plt.xlim([0, self.sensor_time_step_size*(cut+interval)])
-        plt.xlabel("Simulation time [s]")
         plt.ylabel("Density [1/m^2]")
-        plt.title(f"Density over time")
+        plt.title(f"Setting: {working_dir['path']}")
         plt.ylim([0, 2])
-        plt.legend()
-        plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_density_over_time.png"))
-        plt.show(block=False)
-        plt.close()
+        plt.savefig(os.path.join(working_dir["path"], "density_over_time.png"))
+        plt.show()
 
         densities.boxplot()
         plt.ylabel("Density [1/m^2]")
         plt.title(
-            f"Number of pedestrians (sample size = {len(densities)})"
+            f"{working_dir['path']}: Number of pedestrians (sample size = {len(densities)})"
         )
-        plt.ylim([0, 2])
-        plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_density_distribution.png"))
-        plt.show(block=False)
-        plt.close()
+        plt.ylim([0, 1.2])
+        plt.savefig(os.path.join(working_dir["path"], "density_distribution.png"))
+        plt.show()
 
     def compute_next_corridor_choice(self, sim_time):
         pass
-
-    def set_reaction_model_parameters(self, reaction_probability):
-        pass
-
-    def get_mapped_counts_from_density_map(self, cell_dim, density, a):
-        #approximate the density in a specified area by using the counts stored in the omnetpp/density map
-        density_mapper = self.densityMapper.get_density_in_area()
-
-        return density
-
 
 
 class OpenLoop(NoController, Controller):
     def __init__(self):
         super().__init__()
+
         self.target_ids = [11, 21, 31, 41, 51]
         self.redirected_agents = list()
-        self.controlModelType = "RouteChoice"
-        self.controlModelName = "distributePeds"
-        self.commandID = 111
-
-        self.reaction_model = {
-            "isBernoulliParameterCertain": True,
-            "BernoulliParameter": 1.0,
-        }
-
 
     def collect_data(self):
 
@@ -327,22 +171,25 @@ class OpenLoop(NoController, Controller):
         self.path_choice()
         self.plot_densities()
 
+    def in_circle(self, x, y):
+        return self.spatial_restriction.contains(Point(x, y))
 
     def apply_redirection_measure(self):
 
-        probabilities = [0, 0, 0, 0, 0]
-        probabilities[self.counter] = 1.0 # all of the agents should use one specific corridor
+        target_id = str(self.target_ids[self.counter])
+        peds1 = self.con_manager.sub_listener["default"].pedestrians
+        ids = [p["id"] for p in peds1 if self.in_circle(p["pos"][0], p["pos"][1])]
 
-        command = {"targetIds": self.target_ids, "probability": probabilities}
-        action = {
-            "commandId": self.commandID,
-            "command": command,
-            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15}, # get information direclty after spawning process
-        }
-        action = json.dumps(action)
-        self.commandID += 1
-        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName, sending_node_id="misc[0].app[0].app")
-
+        # allow one redirection measure per agent
+        ids = set(ids) - set(self.redirected_agents)
+        print(
+            f"Simulation time: {self.next_call:.1f} \t Set target {target_id}, Ids: {ids}"
+        )
+        for ped_id in ids:
+            # todo
+            # self.con_manager.domains.v_sim.send_control(message={...}, model="", sendingnode="misc[0].app[0].app")
+            self.con_manager.domains.v_person.set_target_list(str(ped_id), [target_id])
+            self.redirected_agents.append(ped_id)
 
     def _increase_counter(self):
         self.counter += 1
@@ -381,28 +228,15 @@ class OpenLoop(NoController, Controller):
             corridor_corrections["NewCorridor"] + 1,
         )
         plt.ylim([0.5, 5.5])
-        plt.xlim([0, 500])
         plt.yticks([1, 2, 3, 4, 5])
         plt.xlabel("Simulation time [s]")
-        plt.ylabel("Corridor recommendation")
-        plt.savefig(os.path.join(working_dir["path"], f"{os.path.basename(working_dir['path'])}_path_choice.png"))
-        plt.show(block=False)
-        plt.close()
-
-    def get_reaction_model_parameters(self):
-        return json.dumps(
-          self.reaction_model
-        )
-
-    def set_reaction_model_parameters(self, reaction_probability):
-        self.reaction_model["BernoulliParameter"] = reaction_probability
-
-
+        plt.ylabel("Corridor proposal")
+        plt.savefig(os.path.join(working_dir["path"], "path_choice.png"))
+        plt.show()
 
     def handle_init(self, sim_time, sim_state):
-        self.con_manager.domains.v_sim.init_control(
-            self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
-        )
+
+        self.spatial_restriction = self._get_measurement_areas([99])[0]
         super().handle_init(sim_time, sim_state)
 
 
@@ -429,7 +263,7 @@ class ClosedLoop(OpenLoop, Controller):
 
 
 def main(
-    settings, controller_type="OpenLoop", scenario="simplified_default_sequential", reaction_probability=1.0
+    settings, controller_type="OpenLoop", scenario="simplified_default_sequential"
 ):
 
     sub = VadereDefaultStateListener.with_vars(
@@ -441,19 +275,21 @@ def main(
         "file_name": scenario_file,
     }
 
-    working_dir["path"] = os.path.join(os.getcwd(), f"{scenario}_{controller_type}_prob_{int(reaction_probability)}")
+    working_dir["path"] = os.path.join(os.getcwd(), f"{scenario}_{controller_type}")
 
     settings_ = settings
     settings_.extend(["--output-dir", working_dir["path"]])
     settings_.extend(["--controller-type", controller_type])
 
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings_)
+
     controller.register_state_listener("default", sub, set_default=True)
-    controller.set_reaction_model_parameters(reaction_probability=reaction_probability)
     controller.start_controller(**kwargs)
 
 
 if __name__ == "__main__":
+    # TODO add comments
+
     if len(sys.argv) == 1:
         # settings = [
         #     "--port",

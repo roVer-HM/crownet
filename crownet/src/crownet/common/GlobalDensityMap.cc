@@ -96,7 +96,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     simBoundWidth = converter->getBoundaryWidth();
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
-    gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
+    gridDim.second = floor(converter->getBoundaryHeight() / gridSize);
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global

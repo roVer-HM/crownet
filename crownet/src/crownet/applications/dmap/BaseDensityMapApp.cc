@@ -98,7 +98,7 @@ void BaseDensityMapApp::initDcdMap(){
     std::pair<int, int> gridDim;
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
-    gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
+    gridDim.second = floor(converter->getBoundaryHeight() / gridSize);
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
