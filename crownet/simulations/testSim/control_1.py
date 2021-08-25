@@ -1,9 +1,8 @@
 import sys, os
-
 import json
 
+
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
-from flowcontrol.crownetcontrol.setup.vadere import get_scenario_content
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 
 sys.path.append(os.path.abspath(".."))
@@ -27,31 +26,33 @@ class ChangeTarget(Controller):
 
     def __init__(self):
         super().__init__()
-
+        self.nextCmdId = 1
 
     def initialize_connection(self, con_manager):
         self.con_manager = con_manager
 
     def handle_sim_step(self, sim_time, sim_state):
-
         sending_node = "misc[0].app[0]"
         model = "RouteChoice"
         command = {"targetIds" : [3] , "probability" : [1.0]}
-        action = { "time" : 50.0, "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, "command" : command}
+        action = { "time" : 50.0, 
+                  "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
+                  "command" : command, 
+                  "commandId": self.nextCmdId}
+        self.nextCmdId =+ 1 
         action = json.dumps(action)
 
         self.con_manager.domains.v_sim.send_control(message=action, model=model, sending_node_id=sending_node)
         print("send RouteChoice")
-
         self.con_manager.next_call_at(500.0)  # do not call again (simualtion only taks ~50 seconds(
 
     def handle_init(self, sim_time, sim_state):
-        self.con_manager.next_call_at(3.0) # call first at time 1.0 s
+        print("DBG: ChangeTarget.handle_init()")
+        self.con_manager.next_call_at(3.0)  # call first at time 1.0 s
         print("init")
 
 
 if __name__ == "__main__":
-
     sub = VadereDefaultStateListener.with_vars(
         "persons",
         {"pos": tc.VAR_POSITION, "speed": tc.VAR_SPEED, "angle": tc.VAR_ANGLE},
@@ -69,16 +70,13 @@ if __name__ == "__main__":
             "0.0.0.0",
         ]
 
-
         controller = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
     else:
         controller = get_controller_from_args(
             working_dir=os.path.dirname(os.path.abspath(__file__)),
-            controller=controller,)
-
+            controller=controller, )
 
     controller.register_state_listener("default", sub, set_default=True)
     print("start...")
     controller.start_controller()
-
-
+    print("start_2...")
