@@ -60,6 +60,9 @@ class Cell:
         return self.number_of_agents_in_cell
 
     def set_count(self, count):
+        if not np.round(count, 6).is_integer():
+            raise ValueError(f"Number of pedestrians in cell must be int values. Got {count}.")
+
         self.number_of_agents_in_cell = count
 
 class DensityMapper:
@@ -109,9 +112,7 @@ class DensityMapper:
 
         densities = dict()
         for id, measurement_area in self.measurement_areas.items():
-
             area, counts = self.compute_counts_area(measurement_area)
-
             densities[id] = area/counts
         return densities
 
@@ -199,8 +200,10 @@ class NoController(Controller):
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
+        working_dir["path"] = self.con_manager.domains.v_sim.get_output_directory()
         self.con_manager.next_call_at(0.4) #set to 0.4, 0.01 -> test case
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
+
 
     def check_density_measures(self):
         print("Compare Vadere output with collected measurement data.")
@@ -228,8 +231,12 @@ class NoController(Controller):
         )
         if densities.equals(dens_check) is False:
 
+            diff = dens_check.join(densities, how="inner", rsuffix='_check')
+            diff = (diff-densities).dropna(axis=1)
+            error = diff.abs().max().max()
+
             if densities[:-1].equals(dens_check[:-1]) is False:
-                raise ValueError(
+                print(
                     "Densities from data processors do not equal THESE densities."
                 )
             else:
@@ -403,7 +410,6 @@ class OpenLoop(NoController, Controller):
         self.con_manager.domains.v_sim.init_control(
             self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
         )
-        working_dir["path"] = self.con_manager.domains.v_sim
         super().handle_init(sim_time, sim_state)
 
 
