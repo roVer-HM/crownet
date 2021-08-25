@@ -213,7 +213,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 530.0,
+      "finishTime" : 3.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,

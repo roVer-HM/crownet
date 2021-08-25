@@ -108,12 +108,12 @@ class DensityMapper:
     def get_density_uniform_assumption(self):
 
         densities = dict()
-
         for id, measurement_area in self.measurement_areas.items():
 
             area, counts = self.compute_counts_area(measurement_area)
 
             densities[id] = area/counts
+        return densities
 
     def compute_counts_area(self, measurement_area : MeasurementArea):
         cell_contributions = measurement_area.get_cell_contribution(self.get_cells())
@@ -162,6 +162,7 @@ class NoController(Controller):
         self.densityMapper = None
 
     def handle_sim_step(self, sim_time, sim_state):
+        print(f"handle_sim_step: simulation time = {sim_time}." )
 
         self.measure_state(sim_time)
 
@@ -181,11 +182,11 @@ class NoController(Controller):
         densities = self.densityMapper.get_density_in_area(distribution="uniform")
 
         time_step = (
-            np.round(sim_time / self.sensor_time_step_size, 0) + 1
+            np.round(sim_time / self.sensor_time_step_size, 0) # +1 remove add because init was set to 0.4
         )  # time = 0.0s := timestep 1, time step size: 0.4
 
         # print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {density}")
-        self.density_over_time.append(np.array(densities.values()))
+        self.density_over_time.append(np.array(list(densities.values())))
         self.time_step.append(time_step)
 
     def update_density_map(self, cell_dim, cell_size, result):
@@ -198,11 +199,12 @@ class NoController(Controller):
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
-        self.con_manager.next_call_at(0.01) #set to 0.4, 0.01 -> test case
+        self.con_manager.next_call_at(0.4) #set to 0.4, 0.01 -> test case
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
 
     def check_density_measures(self):
-        self.measure_state(self.next_call + self.sensor_time_step_size)
+        print("Compare Vadere output with collected measurement data.")
+        #self.measure_state(self.next_call + self.sensor_time_step_size)
         index = pd.Index(data=self.time_step, name="timeStep", dtype=int)
         densities = pd.DataFrame(
             data=np.array(self.density_over_time),
@@ -301,12 +303,6 @@ class NoController(Controller):
 
     def set_reaction_model_parameters(self, reaction_probability):
         pass
-
-    def get_mapped_counts_from_density_map(self, cell_dim, density, a):
-        #approximate the density in a specified area by using the counts stored in the omnetpp/density map
-        density_mapper = self.densityMapper.get_density_in_area()
-
-        return density
 
 
 
@@ -407,6 +403,7 @@ class OpenLoop(NoController, Controller):
         self.con_manager.domains.v_sim.init_control(
             self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
         )
+        working_dir["path"] = self.con_manager.domains.v_sim
         super().handle_init(sim_time, sim_state)
 
 
@@ -444,8 +441,8 @@ def main(
     kwargs = {
         "file_name": scenario_file,
     }
-
-    working_dir["path"] = os.path.join(os.getcwd(), f"{scenario}_{controller_type}_prob_{int(reaction_probability)}")
+    experiment_name = f"{scenario}_{controller_type}_prob_{int(reaction_probability)}"
+    working_dir["path"] = os.path.join(os.getcwd(), experiment_name)
 
     settings_ = settings
     settings_.extend(["--output-dir", working_dir["path"]])
