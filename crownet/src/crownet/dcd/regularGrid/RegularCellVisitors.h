@@ -100,6 +100,16 @@ class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
   virtual std::string getName() const override { return "ymf"; }
 };
 
+class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {
+ public:
+    LocalSelector(RegularCell::time_t t = 0.0)
+      : TimestampedGetEntryVisitor<RegularCell>(t) {}
+  virtual RegularCell::entry_t_ptr applyTo(
+      const RegularCell& cell) const override;
+  virtual std::string getName() const override { return "local"; }
+};
+
+
 // class LocalVisitor : public GetCellVisitor<RegularCell> {
 // public:
 //  virtual RegularCell::value_type applyTo(

@@ -24,6 +24,21 @@ import matplotlib.pyplot as plt
 working_dir = dict()
 PRECISION = 8
 
+
+class Scenario:
+    def __init__(self, path):
+        with open(path, "r", encoding="utf-8") as f:
+            self._scenario_json = json.load(f)
+        self._obstacles = None
+
+    def get_obstacles(self):
+        if self._obstacles is not None:
+            return self._obstacles
+
+        elements = self._scenario_json["scenario"]["topography"]["obstacles"]
+        polygons = [Polygon(e["shape"]) for e in elements]
+        return polygons
+
 class MeasurementArea:
 
     def __init__(self, id, polygon: Polygon):
@@ -177,7 +192,9 @@ class NoController(Controller):
 
     def measure_state(self, sim_time):
 
-        cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(sending_node="misc[0].app[1].app")
+        #cell_dim0, cell_size0, result0 = self.con_manager.domains.v_sim.get_density_map(sending_node="misc[0].app[1].app")
+        cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(sending_node="gloablDensityMap")
+
         self.update_density_map(cell_dim, cell_size, result)
 
         densities = self.densityMapper.get_density_in_area(distribution="uniform")
@@ -193,7 +210,8 @@ class NoController(Controller):
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
             self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size, measurement_areas=self.measurement_areas)
-        self.densityMapper.update_density(result)
+        if result is not None:
+            self.densityMapper.update_density(result)
 
     def apply_redirection_measure(self):
         pass
@@ -201,7 +219,7 @@ class NoController(Controller):
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
         working_dir["path"] = self.con_manager.domains.v_sim.get_output_directory()
-        self.con_manager.next_call_at(0.4) #set to 0.4, 0.01 -> test case
+        self.con_manager.next_call_at(2.4) #set to 0.4, 0.01 -> test case
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
 
 
