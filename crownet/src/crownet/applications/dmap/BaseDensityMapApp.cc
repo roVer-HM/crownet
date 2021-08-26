@@ -153,8 +153,6 @@ void BaseDensityMapApp::sendMapMap() {
     const auto &measure = (*iter).second.val();
     payload->setCellX(currCell, cell.val().first);
     payload->setCellY(currCell, cell.val().second);
-
-    unsigned short int count = measure->getCount();
     payload->setCellCount(currCell, measure->getCount());
     payload->setMTime(currCell, measure->getMeasureTime());
     currCell++;
