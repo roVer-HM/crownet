@@ -2,8 +2,6 @@ import os
 import sys
 import time
 
-from typing import Union
-
 import numpy as np
 import json
 
@@ -82,11 +80,12 @@ class Cell:
 
 class DensityMapper:
 
-    def __init__(self, cell_dimensions, cell_size, measurement_areas : dict):
+    def __init__(self, cell_dimensions, cell_size, measurement_areas : dict, obstacles):
         self.cell_dimensions = cell_dimensions
         self.cell_size = cell_size
         self.cells = dict()
         self.measurement_areas = measurement_areas
+        self.obstacles = obstacles
 
     def get_cells(self):
         if len(self.cells) > 0:
@@ -209,9 +208,18 @@ class NoController(Controller):
 
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
-            self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size, measurement_areas=self.measurement_areas)
+            obs = self.get_obstacles_as_polygons()
+            self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size, measurement_areas=self.measurement_areas, obstacles=obs)
         if result is not None:
             self.densityMapper.update_density(result)
+
+    def get_obstacles_as_polygons(self):
+        obs = self.con_manager.domains.v_sim.get_obstacles()
+        obstacles = list()
+        for polygon in obs.items():
+            polygon = Polygon(np.array(polygon))
+            obstacles.append(polygon)
+        return obstacles
 
     def apply_redirection_measure(self):
         pass
