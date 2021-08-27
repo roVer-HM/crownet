@@ -5,6 +5,8 @@ import time
 import numpy as np
 import json
 
+import shapely.ops
+
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 
@@ -23,20 +25,6 @@ working_dir = dict()
 PRECISION = 8
 
 
-class Scenario:
-    def __init__(self, path):
-        with open(path, "r", encoding="utf-8") as f:
-            self._scenario_json = json.load(f)
-        self._obstacles = None
-
-    def get_obstacles(self):
-        if self._obstacles is not None:
-            return self._obstacles
-
-        elements = self._scenario_json["scenario"]["topography"]["obstacles"]
-        polygons = [Polygon(e["shape"]) for e in elements]
-        return polygons
-
 class MeasurementArea:
 
     def __init__(self, id, polygon: Polygon):
@@ -44,7 +32,7 @@ class MeasurementArea:
         self.area = polygon
         self.cell_contribution = dict()
 
-    def get_cell_contribution(self, cells):
+    def get_cell_contribution(self, cells, obstacles):
         if len(self.cell_contribution) > 0:
             return self.cell_contribution
 
@@ -54,10 +42,61 @@ class MeasurementArea:
             common_area = cell.polygon.intersection(self.area).area
 
             if common_area > 0:
-                self.cell_contribution[key] = common_area/cell.polygon.area
+                area_contribution = common_area/cell.polygon.area
+
+                if area_contribution < 1:
+                    # cell is partially in measurement area
+                    count_contribution = self.get_counts_considering_obstacles(area_contribution, cell, obstacles)
+                else:
+                    count_contribution = 1 # cell is within measurement area
+
+                self.cell_contribution[key] = {"area": area_contribution, "count": count_contribution}
 
         return self.cell_contribution
 
+    def get_counts_considering_obstacles(self, area_contribution, cell, obstacles):
+
+        self.check_integrity(area_contribution, cell)
+
+        non_reachable_area = self.compute_non_reachable_area(cell, obstacles)
+        non_reachable_area = non_reachable_area / cell.polygon.area
+        count_contribution = np.round(area_contribution / (1 - non_reachable_area), 8)
+
+        self.print_information(area_contribution, count_contribution, non_reachable_area, cell)
+
+        return count_contribution
+
+    def print_information(self, area_contribution, count_contribution, non_reachable_area, cell):
+        if count_contribution > 0 and count_contribution < 1:
+            print(f"Cell {cell.polygon}: ")
+            print(f"{(area_contribution * 100):.1f}% of the cell is inside measurement area {self.id}.")
+            print(f"{(non_reachable_area * 100):.1f}% of the cell is non-reachable (obstacles).")
+            print(f"{(1 - area_contribution - non_reachable_area)*100:.1f}% of the agents ({(1 - area_contribution - non_reachable_area)*100:.1f}%) are not counted, because they are in the remaining part ({(1 - area_contribution - non_reachable_area) * 100:.1f}%) of the cell.")
+            print(
+                f"The count contribution is {count_contribution:.1f} (={area_contribution * 100:.1f}% / 100% - {non_reachable_area*100:.1f}%).")
+
+    def check_integrity(self, area_contribution, cell):
+        outside_area = cell.polygon.difference(self.area)
+        if outside_area.area == 0 and area_contribution < 1:
+            raise ValueError("The outside area must be zeto, if the cell is fully contained in the "
+                             "measurement area.")
+
+    def compute_non_reachable_area(self, cell, obstacles):
+        obstacles_overlapping = [cell.polygon.intersection(obstacle) for obstacle in obstacles if
+                                 cell.polygon.intersection(obstacle).area > 0]
+        non_reachable_area = 0
+        # make sure that obstacles area that overlap with other obstacle areas are not counted twice
+        obstacles_overlapping = shapely.ops.unary_union(obstacles_overlapping)
+
+        if obstacles_overlapping.is_empty:
+            return non_reachable_area
+
+        if isinstance(obstacles_overlapping, Polygon):
+            return obstacles_overlapping.intersection(cell.polygon).area
+
+        for obstacle_ in obstacles_overlapping.geoms:
+            non_reachable_area += obstacle_.intersection(cell.polygon).area
+        return non_reachable_area
 
 
 class Cell:
@@ -131,15 +170,15 @@ class DensityMapper:
         return densities
 
     def compute_counts_area(self, measurement_area : MeasurementArea):
-        cell_contributions = measurement_area.get_cell_contribution(self.get_cells())
+        cell_contributions = measurement_area.get_cell_contribution(self.get_cells(), self.obstacles)
 
         count = 0
         unit_area = 0
 
         for key, weight in cell_contributions.items():
             count_raw = self.get_cells()[key].get_count()
-            count += count_raw*weight # weights the counts -> if 50% of the cell area overlaps with the measurement area, the weight would be 50%
-            unit_area += weight
+            count += count_raw*weight["count"] # weights the counts -> if 50% of the cell area overlaps with the measurement area, the weight would be 50%
+            unit_area += weight["area"]
 
         if not np.isclose(unit_area*self.get_cell_area(), measurement_area.area.area):
             raise ValueError(f"Measurement area computed: {unit_area*self.get_cell_area()}. Should be {measurement_area.area.area}.")
@@ -216,7 +255,7 @@ class NoController(Controller):
     def get_obstacles_as_polygons(self):
         obs = self.con_manager.domains.v_sim.get_obstacles()
         obstacles = list()
-        for polygon in obs.items():
+        for __, polygon in obs.items():
             polygon = Polygon(np.array(polygon))
             obstacles.append(polygon)
         return obstacles
@@ -272,6 +311,7 @@ class NoController(Controller):
 
     def _get_measurement_areas(self, measurement_area_ids):
         areas = dict()
+
         for measurement_id in measurement_area_ids:
             polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
             areas[measurement_id] = MeasurementArea(polygon=Polygon(np.array(polygon)), id=measurement_id)
