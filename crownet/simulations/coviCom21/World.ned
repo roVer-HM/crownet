@@ -34,6 +34,7 @@ import simu5g.nodes.Ue;
 import simu5g.nodes.eNodeB;
 import simu5g.world.radio.LteChannelControl;
 import simu5g.nodes.PgwStandard;
+import simu5g.common.carrierAggregation.CarrierAggregation;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
@@ -95,6 +96,9 @@ network World
         }
         binder: Binder if hasCellular {
             @display("p=411.99374,198.66;is=s");
+        }
+        carrierAggregation: CarrierAggregation {
+            @display("p=8,5;is=s");
         }
         eNB: eNodeB if hasCellular {
             @display("p=37,51;is=vl");
