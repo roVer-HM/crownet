@@ -5,10 +5,9 @@ import time
 import numpy as np
 import json
 
-import shapely.ops
-
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
+from flowcontrol.strategy.sensor.density import MeasurementArea, DensityMapper
 
 sys.path.append(os.path.abspath(".."))
 
@@ -16,7 +15,7 @@ from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 from flowcontrol.utils.misc import get_scenario_file
 
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,194 +23,16 @@ import matplotlib.pyplot as plt
 working_dir = dict()
 PRECISION = 8
 
-
-class MeasurementArea:
-
-    def __init__(self, id, polygon: Polygon):
-        self.id = id
-        self.area = polygon
-        self.cell_contribution = dict()
-
-    def get_cell_contribution(self, cells, obstacles):
-        if len(self.cell_contribution) > 0:
-            return self.cell_contribution
-
-        print(f"Initialize cell contributions for measurement area with id = {self.id}.")
-
-        for key, cell in cells.items():
-            common_area = cell.polygon.intersection(self.area).area
-
-            if common_area > 0:
-                area_contribution = common_area/cell.polygon.area
-
-                if area_contribution < 1:
-                    # cell is partially in measurement area
-                    count_contribution = self.get_counts_considering_obstacles(area_contribution, cell, obstacles)
-                else:
-                    count_contribution = 1 # cell is within measurement area
-
-                self.cell_contribution[key] = {"area": area_contribution, "count": count_contribution}
-
-        return self.cell_contribution
-
-    def get_counts_considering_obstacles(self, area_contribution, cell, obstacles):
-
-        self.check_integrity(area_contribution, cell)
-
-        non_reachable_area = self.compute_non_reachable_area(cell, obstacles)
-        non_reachable_area = non_reachable_area / cell.polygon.area
-        count_contribution = np.round(area_contribution / (1 - non_reachable_area), 8)
-
-        self.print_information(area_contribution, count_contribution, non_reachable_area, cell)
-
-        return count_contribution
-
-    def print_information(self, area_contribution, count_contribution, non_reachable_area, cell):
-        if count_contribution > 0 and count_contribution < 1:
-            print(f"Cell {cell.polygon}: ")
-            print(f"{(area_contribution * 100):.1f}% of the cell is inside measurement area {self.id}.")
-            print(f"{(non_reachable_area * 100):.1f}% of the cell is non-reachable (obstacles).")
-            print(f"{(1 - area_contribution - non_reachable_area)*100:.1f}% of the agents ({(1 - area_contribution - non_reachable_area)*100:.1f}%) are not counted, because they are in the remaining part ({(1 - area_contribution - non_reachable_area) * 100:.1f}%) of the cell.")
-            print(
-                f"The count contribution is {count_contribution:.1f} (={area_contribution * 100:.1f}% / 100% - {non_reachable_area*100:.1f}%).")
-
-    def check_integrity(self, area_contribution, cell):
-        outside_area = cell.polygon.difference(self.area)
-        if outside_area.area == 0 and area_contribution < 1:
-            raise ValueError("The outside area must be zeto, if the cell is fully contained in the "
-                             "measurement area.")
-
-    def compute_non_reachable_area(self, cell, obstacles):
-        obstacles_overlapping = [cell.polygon.intersection(obstacle) for obstacle in obstacles if
-                                 cell.polygon.intersection(obstacle).area > 0]
-        non_reachable_area = 0
-        # make sure that obstacles area that overlap with other obstacle areas are not counted twice
-        obstacles_overlapping = shapely.ops.unary_union(obstacles_overlapping)
-
-        if obstacles_overlapping.is_empty:
-            return non_reachable_area
-
-        if isinstance(obstacles_overlapping, Polygon):
-            return obstacles_overlapping.intersection(cell.polygon).area
-
-        for obstacle_ in obstacles_overlapping.geoms:
-            non_reachable_area += obstacle_.intersection(cell.polygon).area
-        return non_reachable_area
-
-
-class Cell:
-    def __init__(self, id, polygon : Polygon, count=0):
-        self.id = id
-        self.polygon = polygon
-        self.number_of_agents_in_cell = count
-
-    def get_density(self):
-        return self.number_of_agents_in_cell/self.polygon.area
-
-    def get_count(self):
-        return self.number_of_agents_in_cell
-
-    def set_count(self, count):
-        if not np.round(count, 6).is_integer():
-            raise ValueError(f"Number of pedestrians in cell must be int values. Got {count}.")
-
-        self.number_of_agents_in_cell = count
-
-class DensityMapper:
-
-    def __init__(self, cell_dimensions, cell_size, measurement_areas : dict, obstacles):
-        self.cell_dimensions = cell_dimensions
-        self.cell_size = cell_size
-        self.cells = dict()
-        self.measurement_areas = measurement_areas
-        self.obstacles = obstacles
-
-    def get_cells(self):
-        if len(self.cells) > 0:
-            return self.cells
-
-        print("Initialize cell grid.")
-
-        delta_x = self.cell_size[0]
-        delta_y = self.cell_size[1]
-
-        index = 0
-
-        for x_coor in np.arange(0, self.cell_dimensions[0])*delta_x:
-            for y_coor in np.arange(0, self.cell_dimensions[1])*delta_y:
-                lower_left_corner = [x_coor,y_coor]
-                lower_right_corner = [x_coor+delta_x, y_coor]
-                upper_right_corner = [x_coor+delta_x, y_coor+delta_y]
-                upper_left_corner = [x_coor, y_coor+delta_y]
-                polygon = Polygon(np.array([lower_left_corner, lower_right_corner, upper_right_corner, upper_left_corner]))
-                key = self.get_cell_key(x_coor, y_coor)
-                self.cells[key] = Cell(id=index, polygon=polygon)
-                index += 1
-
-        return self.cells
-
-    def get_cell_key(self, x_coor, y_coor):
-        return f"x={x_coor:.1f}_y={y_coor:.1f}"
-
-    def get_density_in_area(self, distribution = "uniform"):
-
-        if distribution=="uniform":
-            densities = self.get_density_uniform_assumption()
-        else:
-            raise NotImplementedError("Not implemented yet. Use distribution type uniform.")
-        return densities
-
-    def get_density_uniform_assumption(self):
-
-        densities = dict()
-        for id, measurement_area in self.measurement_areas.items():
-            area, counts = self.compute_counts_area(measurement_area)
-            densities[id] = area/counts
-        return densities
-
-    def compute_counts_area(self, measurement_area : MeasurementArea):
-        cell_contributions = measurement_area.get_cell_contribution(self.get_cells(), self.obstacles)
-
-        count = 0
-        unit_area = 0
-
-        for key, weight in cell_contributions.items():
-            count_raw = self.get_cells()[key].get_count()
-            count += count_raw*weight["count"] # weights the counts -> if 50% of the cell area overlaps with the measurement area, the weight would be 50%
-            unit_area += weight["area"]
-
-        if not np.isclose(unit_area*self.get_cell_area(), measurement_area.area.area):
-            raise ValueError(f"Measurement area computed: {unit_area*self.get_cell_area()}. Should be {measurement_area.area.area}.")
-
-        return count, unit_area*self.get_cell_area()
-
-
-    def get_cell_area(self):
-        return self.cell_size[0]*self.cell_size[1]
-
-    def update_density(self, result):
-        for entry in result:
-            self.update_cell(x_coor=entry[0], y_coor = entry[1], count= entry[2])
-
-    def update_cell(self, x_coor, y_coor, count):
-        cell_key = self.get_cell_key(x_coor, y_coor)
-
-        if cell_key not in self.get_cells().keys():
-            raise ValueError(f"Key {cell_key} not found.")
-        self.get_cells()[cell_key].set_count(count)
-
-
 class NoController(Controller):
     def __init__(self):
         super().__init__()
-        print("Dummy controller.")
 
         self.density_over_time = list()
         self.time_step = list()
         self.sensor_time_step_size = 0.4
         self.corridor_choice_over_time = list()
-        self.next_call = 0
-        self.time_step_size = 10
+        self.next_call = 0.0
+        self.time_step_size = 10.0
 
         self.densityMapper = None
 
@@ -222,8 +43,9 @@ class NoController(Controller):
 
         # necessary, because time intervals for sensoring and applying a control action differ
         if (sim_time-self.sensor_time_step_size) % self.time_step_size == 0:
+            print(f"Current Simtime: {sim_time-self.sensor_time_step_size}, apply control measure at {sim_time}")
             self.compute_next_corridor_choice(sim_time)
-            self.apply_redirection_measure()
+            self.apply_redirection_measure(sim_time + 0.4) # vadere time step size
 
         self.next_call += self.sensor_time_step_size
         self.con_manager.next_call_at(self.next_call)
@@ -241,7 +63,7 @@ class NoController(Controller):
             np.round(sim_time / self.sensor_time_step_size, 0) # +1 remove add because init was set to 0.4
         )  # time = 0.0s := timestep 1, time step size: 0.4
 
-        # print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {density}")
+        print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {densities.values()}")
         self.density_over_time.append(np.array(list(densities.values())))
         self.time_step.append(time_step)
 
@@ -260,54 +82,15 @@ class NoController(Controller):
             obstacles.append(polygon)
         return obstacles
 
-    def apply_redirection_measure(self):
+    def apply_redirection_measure(self, executation_time):
         pass
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
         working_dir["path"] = self.con_manager.domains.v_sim.get_output_directory()
-        self.con_manager.next_call_at(2.4) #set to 0.4, 0.01 -> test case
+        self.con_manager.next_call_at(self.next_call)
+        print(f"Set next call to: {self.next_call}")
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
-
-
-    def check_density_measures(self):
-        print("Compare Vadere output with collected measurement data.")
-        #self.measure_state(self.next_call + self.sensor_time_step_size)
-        index = pd.Index(data=self.time_step, name="timeStep", dtype=int)
-        densities = pd.DataFrame(
-            data=np.array(self.density_over_time),
-            columns=[f"areaDensityCountingNormed-PID{x}" for x in [14, 15, 16, 17, 18]],
-            index=index,
-        ).round(PRECISION)
-
-        density_file = os.path.join(working_dir["path"], "densities.txt")
-        while os.path.isfile(density_file) is False:
-            time.sleep(1)
-        time.sleep(1)
-        
-        dens_check = (
-            pd.read_csv(
-                density_file,
-                delimiter=" ",
-                index_col=[0],
-            )
-            .sort_index(axis=1)
-            .round(PRECISION)
-        )
-        if densities.equals(dens_check) is False:
-
-            diff = dens_check.join(densities, how="inner", rsuffix='_check')
-            diff = (diff-densities).dropna(axis=1)
-            error = diff.abs().max().max()
-
-            if densities[:-1].equals(dens_check[:-1]) is False:
-                print(
-                    "Densities from data processors do not equal THESE densities."
-                )
-            else:
-                print(
-                    "INFO: Simulation time might differ for last time step. Skipped time step in comparison."
-                )
 
     def _get_measurement_areas(self, measurement_area_ids):
         areas = dict()
@@ -318,13 +101,29 @@ class NoController(Controller):
 
         return areas
 
-    def collect_data(self):
+    def postprocess_sim_results(self):
+        self.write_data()
+        self.check_data()
+        self.plot_data()
+    
+    def write_data(self):
+        self.write_densities()
 
-        self.check_density_measures()
+    def write_densities(self):
+        index = pd.Index(data=self.time_step, name="timeStep", dtype=int)
+        densities = pd.DataFrame(
+            data=np.array(self.density_over_time),
+            columns=[f"areaDensityCountingNormed-PID{x}" for x in [14, 15, 16, 17, 18]],
+            index=index,
+        ).round(PRECISION)
+        densities.to_csv(
+            os.path.join(working_dir["path"], "densities_measurement_areas_flowcontrol.txt"), index=True, sep=" ",
+        )
+
+    def plot_data(self):
         self.plot_densities()
 
     def plot_densities(self):
-
         densities = pd.read_csv(
             os.path.join(working_dir["path"], "densities.txt"),
             delimiter=" ",
@@ -377,6 +176,8 @@ class NoController(Controller):
     def set_reaction_model_parameters(self, reaction_probability):
         pass
 
+    def check_data(self):
+        pass
 
 
 class OpenLoop(NoController, Controller):
@@ -394,14 +195,7 @@ class OpenLoop(NoController, Controller):
         }
 
 
-    def collect_data(self):
-
-        self.check_density_measures()
-        self.path_choice()
-        self.plot_densities()
-
-
-    def apply_redirection_measure(self):
+    def apply_redirection_measure(self, executation_time):
 
         probabilities = [0, 0, 0, 0, 0]
         probabilities[self.counter] = 1.0 # all of the agents should use one specific corridor
@@ -410,11 +204,12 @@ class OpenLoop(NoController, Controller):
         action = {
             "commandId": self.commandID,
             "command": command,
-            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15}, # get information direclty after spawning process
+            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},
+            #"time": executation_time, # get information direclty after spawning process
         }
         action = json.dumps(action)
         self.commandID += 1
-        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName, sending_node_id="misc[0].app[0].app")
+        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName, sending_node_id="misc[0].app[0]")
 
 
     def _increase_counter(self):
@@ -438,17 +233,12 @@ class OpenLoop(NoController, Controller):
     def choose_corridor(self):
         self._increase_counter()
 
-    def path_choice(self):
-
-        corridor_corrections = pd.DataFrame(
-            data=np.array(self.corridor_choice_over_time),
-            columns=["timeStep", "OldCorridor", "NewCorridor"],
-        )
-        corridor_corrections.set_index("timeStep", inplace=True)
-        corridor_corrections.to_csv(
-            os.path.join(working_dir["path"], "path_choice.txt")
-        )
-
+    def plot_data(self):
+        super().plot_data()
+        self.plot_path_choice(None)
+    
+    def plot_path_choice(self, file_path):
+        corridor_corrections = pd.read_csv(os.path.join(working_dir["path"], "path_choice.txt"))
         plt.scatter(
             corridor_corrections.index.to_numpy(),
             corridor_corrections["NewCorridor"] + 1,
@@ -462,6 +252,20 @@ class OpenLoop(NoController, Controller):
         plt.show(block=False)
         plt.close()
 
+    def write_data(self):
+        super().write_data()
+        self.write_path_choice()
+
+    def write_path_choice(self):
+        corridor_corrections = pd.DataFrame(
+            data=np.array(self.corridor_choice_over_time),
+            columns=["timeStep", "OldCorridor", "NewCorridor"],
+        )
+        corridor_corrections.set_index("timeStep", inplace=True)
+        corridor_corrections.to_csv(
+            os.path.join(working_dir["path"], "path_choice.txt")
+        )
+
     def get_reaction_model_parameters(self):
         return json.dumps(
           self.reaction_model
@@ -469,8 +273,6 @@ class OpenLoop(NoController, Controller):
 
     def set_reaction_model_parameters(self, reaction_probability):
         self.reaction_model["BernoulliParameter"] = reaction_probability
-
-
 
     def handle_init(self, sim_time, sim_state):
         self.con_manager.domains.v_sim.init_control(
@@ -550,7 +352,7 @@ if __name__ == "__main__":
 
         main(
             settings,
-            controller_type="NoController",
+            controller_type="OpenLoop",
             scenario="simplified_default_sequential",
         )
         # main(

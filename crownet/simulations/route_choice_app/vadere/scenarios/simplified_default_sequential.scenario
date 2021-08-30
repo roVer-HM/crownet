@@ -43,6 +43,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "targetIds.txt",
       "processors" : [ 19 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
+      "filename" : "countsCellwise.txt",
+      "processors" : [ 21 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -148,6 +152,13 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
       "id" : 20
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridCountingSparseProcessor",
+      "id" : 21,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
+      "attributes" : {
+        "cellSize" : 3.0
+      }
     } ],
     "isTimestamped" : false,
     "isWriteMetaData" : false

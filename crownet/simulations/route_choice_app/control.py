@@ -122,7 +122,7 @@ class NoController(Controller):
 
         return areas
 
-    def collect_data(self):
+    def postprocess_sim_results(self):
 
         self.check_density_measures()
         self.plot_densities()
@@ -197,7 +197,7 @@ class OpenLoop(NoController, Controller):
         }
 
 
-    def collect_data(self):
+    def postprocess_sim_results(self):
 
         self.check_density_measures()
         self.path_choice()

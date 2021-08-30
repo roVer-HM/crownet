@@ -81,7 +81,8 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
         boost::property_tree::ptree pt;
         boost::property_tree::read_json(ss, pt);
 
-        data->setAppTTL(pt.get<double>("time"));
+        //TODO: discuss what to do with the time attribute
+        //data->setAppTTL(pt.get<double>("time"));
 
 
     }

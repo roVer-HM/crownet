@@ -86,7 +86,7 @@ FsmState BroadcastControlApp::fsmHandleSubState(cMessage *msg){
 
     // cancel main app loop and reset with received  configuration.
     cancelAppMainEvent();
-    scheduleNextAppMainEvent(simTime() + appMainIntervalOffset);
+    scheduleNextAppMainEvent(simTime() + appMainIntervalOffset); //TODO: 0.4?
 
     return FsmRootStates::WAIT_ACTIVE;
 }

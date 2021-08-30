@@ -110,7 +110,7 @@ class NoController(Controller):
 
         return areas
 
-    def collect_data(self):
+    def postprocess_sim_results(self):
 
         self.check_density_measures()
         self.plot_densities()
@@ -165,7 +165,7 @@ class OpenLoop(NoController, Controller):
         self.target_ids = [11, 21, 31, 41, 51]
         self.redirected_agents = list()
 
-    def collect_data(self):
+    def postprocess_sim_results(self):
 
         self.check_density_measures()
         self.path_choice()
