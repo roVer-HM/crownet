@@ -38,6 +38,8 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 
+#include "crownet/applications/common/info/AppInfoLocal.h"
+
 using namespace inet;
 
 namespace crownet {
@@ -61,13 +63,10 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   cMessage *appLifeTime = nullptr;
   cMessage *appMainTimer = nullptr;
 
-  // statistics
-  int numSent = 0;
-  int numReceived = 0;
-
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
   SocketProvider* socketProvider;
+  AppInfoLocal* localInfo = nullptr;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -82,8 +81,16 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
    */
   virtual void scheduleNextAppMainEvent(simtime_t time = -1);
   virtual void cancelAppMainEvent();
+  // use simple ApplicationPacket based application.
+  // No separate header, footer
   virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload);
   virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port);
+  // let application create complex packet structure. BaseApp child classes must ensure correct
+  // sequence number and tags.
+  virtual void sendPayload(Packet *packet);
+  virtual void sendPayload(Packet *packet,  L3Address addr, int port);
+
+  virtual AppInfoLocal* createLocalAppInfo();
 
   template <typename T>
   IntrusivePtr<T> createPacket(b length = b(-1));
@@ -116,7 +123,7 @@ template <typename T>
 inline IntrusivePtr<T> BaseApp::createPacket(b length) {
   auto payload = makeShared<T>();
   payload->setChunkLength(length);
-  payload->setSequenceNumber(numSent);
+  payload->setSequenceNumber(localInfo->nextSequenceNumber());
   payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
   return payload;
 }

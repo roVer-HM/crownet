@@ -3,7 +3,7 @@ Test the NeighborhoodTable
 
 %includes:
 #include <stdio.h>
-#include "crownet/common/NeighborhoodTable.h"
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
 %ignore-exitcode: 1
 

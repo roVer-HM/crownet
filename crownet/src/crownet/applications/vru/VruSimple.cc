@@ -35,7 +35,7 @@ void VruSimple::initialize(int stage) {
 
 FsmState VruSimple::fsmAppMain(cMessage* msg) {
   const auto& payload = makeShared<ApplicationPacket>();
-  payload->setSequenceNumber(numSent);
+  payload->setSequenceNumber(localInfo->nextSequenceNumber());
   payload->setChunkLength(B(par("messageLength")));
   payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
   payload->addTag<CurrentLocationTag>()->setLocation(getCurrentLocation());

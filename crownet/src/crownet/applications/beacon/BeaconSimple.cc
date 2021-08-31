@@ -29,7 +29,7 @@ void BeaconSimple::initialize(int stage) {
 // FSM
 FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
 
-    const auto &beacon = createPacket<BeaconPacket>(B(224)); //64+64+64+32
+    const auto &beacon = createPacket<BeaconPacketSimple>(B(224)); //64+64+64+32
     beacon->setTime(simTime());
     beacon->setPos(mobility->getCurrentPosition());
     beacon->setNodeId(hostId);
@@ -40,10 +40,14 @@ FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
 }
 
 FsmState BeaconSimple::handleDataArrived(Packet *packet){
-    auto p = packet->popAtFront<BeaconPacket>();
+    auto p = packet->popAtFront<BeaconPacketSimple>();
 
-    NeighborhoodTableEntry b{p->getNodeId(), p->getTime(), simTime(), p->getPos(), p->getEpsilon()};
-    nTable->handleBeacon(std::move(b));
+    auto info = nTable->getOrCreateEntry(p->getNodeId());
+    info->setSentTimePrio(p->getTime());
+    info->setReceivedTimePrio(simTime());
+    info->setPos(p->getPos());
+    info->setEpsilon(p->getEpsilon());
+
     return FsmRootStates::WAIT_ACTIVE;
 }
 

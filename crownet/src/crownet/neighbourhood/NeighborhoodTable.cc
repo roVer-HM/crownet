@@ -5,7 +5,8 @@
  *      Author: sts
  */
 
-#include "NeighborhoodTable.h"
+#include "crownet/neighbourhood/NeighborhoodTable.h"
+
 #include <omnetpp/simtime_t.h>
 #include <omnetpp/cstlwatch.h>
 #include <omnetpp/cwatch.h>
@@ -21,6 +22,9 @@ Define_Module(NeighborhoodTable);
 NeighborhoodTable::~NeighborhoodTable(){
     if (ttl_msg != nullptr)
         cancelAndDelete(ttl_msg);
+    for(auto entry : _table){
+        delete entry.second;
+    }
 }
 
 // cSimpleModule
@@ -30,7 +34,7 @@ void NeighborhoodTable::initialize(int stage){
         maxAge = par("maxAge");
         ttl_msg = new cMessage("NeighborhoodTable_ttl");
         scheduleAt(simTime() + maxAge, ttl_msg);
-        WATCH_MAP(_table);
+        WATCH_PTRMAP(_table);
         WATCH(maxAge);
     }
 }
@@ -44,22 +48,24 @@ void NeighborhoodTable::handleMessage(cMessage *msg){
     }
 }
 
-void NeighborhoodTable::handleBeacon(NeighborhoodTableEntry&& beacon){
-    Enter_Method_Silent();
-    const auto& iter = _table.find(beacon.getNodeId());
-    if (iter != _table.end() && iter->second.getTimeSend() > beacon.getTimeSend()){
-        // ignore received beacon is older than beacon already in map
-        return;
+BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
+    if (_table.find(sourceId) == _table.end()){
+        BeaconReceptionInfo* info = new BeaconReceptionInfo();
+        info->setNodeId(sourceId);
+        take(info);
+        _table[sourceId] = info;
     }
-    _table[beacon.getNodeId()] = std::move(beacon);
+    return _table[sourceId];
 }
+
 
 void NeighborhoodTable::checkTimeToLive(){
     simtime_t now = simTime();
     for( auto it=_table.cbegin(); it !=_table.cend();){
         // Received + maxAge := time at which entry must be removed.
-        if ((it->second.getTimeSend() + maxAge) < now){
-           it = _table.erase(it);
+        if ((it->second->getReceivedTimePrio() + maxAge) < now){
+            delete it->second;
+            it = _table.erase(it);
         } else {
             ++it;
         }

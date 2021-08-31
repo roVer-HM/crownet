@@ -1,6 +1,6 @@
 package crownet.test.omnetpp.lib;
 
-import crownet.common.NeighborhoodTable;
+import crownet.neighbourhood.NeighborhoodTable;
 
 simple NeighborhoodTableTestApp{
     

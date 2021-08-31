@@ -23,21 +23,23 @@ namespace crownet {
 BaseApp::~BaseApp() {
   if (appLifeTime) cancelAndDelete(appLifeTime);
   if (appMainTimer) cancelAndDelete(appMainTimer);
+  delete localInfo;
 }
 
 void BaseApp::initialize(int stage) {
   ApplicationBase::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
-    numSent = 0;
-    numReceived = 0;
-    WATCH(numSent);
-    WATCH(numReceived);
-
 
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
     appMainIntervalOffset = par("mainIntervalOffset").doubleValue();
     sendLimit = par("mainMsgLimit").intValue();
+
+    auto info = createLocalAppInfo();
+    info->setWalltimeStart(startTime);
+    localInfo = info;
+    take(localInfo);
+
 
     if (appMainIntervalOffset < 0.){
         throw cRuntimeError("Invalid mainIntervalOffset parameters must be >= 0");
@@ -56,11 +58,20 @@ void BaseApp::initialize(int stage) {
   }
 }
 
+AppInfoLocal* BaseApp::createLocalAppInfo(){
+    // todo: select AppInfoType based on config
+    auto appInfo = new AppInfoLocal();
+
+    appInfo->setNodeId(getId());
+    appInfo->setSequencenumber(0);
+    return appInfo;
+}
+
 void BaseApp::setFsmResult(const FsmState &state) { socketFsmResult = state; }
 
 void BaseApp::finish() {
-  recordScalar("packets sent", numSent);
-  recordScalar("packets received", numReceived);
+  recordScalar("packets sent", localInfo->getPacketsSentCount());
+  recordScalar("packets received", localInfo->getPacketsReceivedCount());
   ApplicationBase::finish();
 }
 
@@ -68,7 +79,7 @@ void BaseApp::refreshDisplay() const {
   ApplicationBase::refreshDisplay();
 
   char buf[100];
-  sprintf(buf, "rcvd: %d pks\nsent: %d pks", numReceived, numSent);
+  sprintf(buf, "rcvd: %d pks\nsent: %d pks", localInfo->getPacketsReceivedCount(), localInfo->getPacketsSentCount());
   getDisplayString().setTagArg("t", 0, buf);
 }
 
@@ -109,30 +120,34 @@ void BaseApp::cancelAppMainEvent() {
  * use default address and port configured in socket
  */
 void BaseApp::sendPayload(IntrusivePtr<ApplicationPacket> payload) {
-    std::ostringstream str;
-    str << packetName << "-" << getId() << "#" << numSent;
-    Packet *packet = new Packet(str.str().c_str());
+    Packet *packet = new Packet(localInfo->packetName(packetName).c_str());
     packet->insertAtBack(payload);
-    emit(packetSentSignal, packet);
-    numSent++;
-    if (sendLimit > 0){
-        sendLimit--;
-    }
-    send(packet, gate("socketOut"));
+    sendPayload(packet);
 }
 
 /**
  * use application logic dependent address and port and override socket default
  */
 void BaseApp::sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port){
-    std::ostringstream str;
-    str << packetName << "-" << getId() << "#" << numSent;
-    Packet *packet = new Packet(str.str().c_str());
+    Packet *packet = new Packet(localInfo->packetName(packetName).c_str());
     packet->insertAtBack(payload);
+    sendPayload(packet, addr, port);
+}
+
+void BaseApp::sendPayload(Packet *packet){
+    emit(packetSentSignal, packet);
+    localInfo->incrSent();
+    if (sendLimit > 0){
+        sendLimit--;
+    }
+    send(packet, gate("socketOut"));
+}
+
+void BaseApp::sendPayload(Packet *packet,  L3Address addr, int port){
     packet->addTagIfAbsent<L3AddressReq>()->setDestAddress(addr);
     packet->addTagIfAbsent<L4PortReq>()->setDestPort(port);
     emit(packetSentSignal, packet);
-    numSent++;
+    localInfo->incrSent();
     if (sendLimit > 0){
         sendLimit--;
     }
@@ -256,7 +271,7 @@ FsmState BaseApp::fsmSetup(cMessage *msg) {
 }
 
 FsmState BaseApp::fsmDataArrived(cMessage *msg){
-    numReceived++;
+    localInfo->incrReceivd();
     Packet* pk = check_and_cast<Packet *>(msg);
     emit(packetReceivedSignal, pk);
     FsmState next = handleDataArrived(pk);

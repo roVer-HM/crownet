@@ -9,10 +9,11 @@
 
 #include "inet/common/InitStages.h"
 #include "inet/mobility/contract/IMobility.h"
-#include "crownet/common/NeighborhoodTable.h"
 #include "crownet/applications/common/BaseApp.h"
 
 #include "artery/utility/IdentityRegistry.h"
+
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
 namespace crownet {
 
@@ -27,8 +28,6 @@ public:
 
     // FSM
     virtual FsmState fsmAppMain(cMessage *msg) override;
-
-    // Aid Socket
     virtual FsmState handleDataArrived(Packet *packet) override;
 
 

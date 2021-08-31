@@ -8,7 +8,8 @@
 #pragma once
 
 #include <omnetpp/cobject.h>
-#include "crownet/common/NeighborhoodTableEntry.h"
+
+#include "crownet/applications/beacon/BeaconReceptionInfo.h"
 #include "inet/common/InitStages.h"
 
 
@@ -19,7 +20,7 @@ namespace crownet {
 
 class NeighborhoodTable : public omnetpp::cSimpleModule {
 public:
-    using nTable = std::map<int, NeighborhoodTableEntry>;
+    using nTable = std::map<int, BeaconReceptionInfo*>;
     virtual ~NeighborhoodTable();
 
     // cSimpleModule
@@ -27,8 +28,9 @@ public:
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
 
-    void handleBeacon(NeighborhoodTableEntry&& beacon);
+    BeaconReceptionInfo* getOrCreateEntry(const int sourceId);
     virtual void checkTimeToLive();
+
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }
@@ -37,7 +39,7 @@ public:
 
     //setter
     void setMaxAge(const simtime_t& _maxAge) { maxAge = _maxAge; }
-    void setTable(const std::map<int, NeighborhoodTableEntry>& _nTable){ _table = _nTable;}
+    void setTable(const std::map<int, BeaconReceptionInfo*>& _nTable){ _table = _nTable;}
     void setTitleMessage(cMessage *msg){ttl_msg = msg;}
 
     // iterators and visitors
