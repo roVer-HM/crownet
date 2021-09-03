@@ -47,6 +47,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
       "filename" : "countsCellwise.txt",
       "processors" : [ 21 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "commandIdsReceived.txt",
+      "processors" : [ 22 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -159,6 +163,9 @@
       "attributes" : {
         "cellSize" : 3.0
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianCommandIdsReceivedTimesProcessor",
+      "id" : 22
     } ],
     "isTimestamped" : false,
     "isWriteMetaData" : false

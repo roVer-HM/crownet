@@ -7,12 +7,15 @@ import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
+from flowcontrol.crownetcontrol.traci.connection_manager import ServerModeConnection, ClientModeConnection
 
 sys.path.append(os.path.abspath(".."))
 
 from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 from flowcontrol.utils.misc import get_scenario_file
+from flowcontrol.strategy.sensor.density import MeasurementArea, DensityMapper
+
 
 from shapely.geometry import Polygon, Point
 
@@ -47,37 +50,75 @@ class NoController(Controller):
         self.next_call += self.sensor_time_step_size
         self.con_manager.next_call_at(self.next_call)
 
+    # def measure_state(self, sim_time):
+    #
+    #     peds1 = self.con_manager.sub_listener["default"].pedestrians
+    #     density = list()
+    #
+    #     # TODO: replace this for loop by 'get_density_measure_from_density_map'
+    #     #   density = self.con_manager.domains.v_sim.get_density_map()
+    #     #         sending_node = "pNode[1].densityMap.app"
+    #     #         density_map = self.con_manager.domains.v_sim.get_density_map(sending_node)
+    #     for a in self.measurement_areas:
+    #         counts = len(
+    #             [p["id"] for p in peds1 if a.contains(Point(p["pos"][0], p["pos"][1]))]
+    #         )
+    #         density.append(counts / a.area)
+    #
+    #     time_step = (
+    #         np.round(sim_time / self.sensor_time_step_size, 0) + 1
+    #     )  # time = 0.0s := timestep 1, time step size: 0.4
+    #
+    #     # print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {density}")
+    #     self.density_over_time.append(density)
+    #     self.time_step.append(time_step)
+
     def measure_state(self, sim_time):
+        # cell_dim0, cell_size0, result0 = self.con_manager.domains.v_sim.get_density_map(sending_node="misc[0].app[1].app")
+        if isinstance(self.con_manager, ServerModeConnection):
+            cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(
+                sending_node="gloablDensityMap")
 
-        peds1 = self.con_manager.sub_listener["default"].pedestrians
-        density = list()
+            self.update_density_map(cell_dim, cell_size, result)
 
-        # TODO: replace this for loop by 'get_density_measure_from_density_map'
-        #   density = self.con_manager.domains.v_sim.get_density_map()
-        #         sending_node = "pNode[1].densityMap.app"
-        #         density_map = self.con_manager.domains.v_sim.get_density_map(sending_node)
-        for a in self.measurement_areas:
-            counts = len(
-                [p["id"] for p in peds1 if a.contains(Point(p["pos"][0], p["pos"][1]))]
-            )
-            density.append(counts / a.area)
+            densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
+        elif isinstance(self.con_manager, ClientModeConnection):
+            densities = list()
+            peds1 = self.con_manager.sub_listener["default"].pedestrians
+            for a in self.measurement_areas.values():
+                counts = len([p["id"] for p in peds1 if a.area.contains(Point(p["pos"][0], p["pos"][1]))])
+                densities.append(counts / a.area.area)
+        else:
+            raise ValueError("..")
 
         time_step = (
-            np.round(sim_time / self.sensor_time_step_size, 0) + 1
+            np.round(sim_time / self.sensor_time_step_size, 0)  # +1 remove add because init was set to 0.4
         )  # time = 0.0s := timestep 1, time step size: 0.4
 
-        # print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {density}")
-        self.density_over_time.append(density)
+        print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {densities}")
+        self.density_over_time.append(np.array(list(densities)))
         self.time_step.append(time_step)
+
+
 
     def apply_redirection_measure(self):
         pass
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
-        self.con_manager.next_call_at(0.4)
+        working_dir["path"] = self.con_manager.domains.v_sim.get_output_directory()
+        self.con_manager.next_call_at(self.next_call)
+        print(f"Set next call to: {self.next_call}")
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
-        self.measure_state(0.0)
+
+    def _get_measurement_areas(self, measurement_area_ids):
+        areas = dict()
+
+        for measurement_id in measurement_area_ids:
+            polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
+            areas[measurement_id] = MeasurementArea(polygon=Polygon(np.array(polygon)), id=measurement_id)
+
+        return areas
 
     def check_density_measures(self):
         self.measure_state(self.next_call + self.sensor_time_step_size)
@@ -114,11 +155,11 @@ class NoController(Controller):
                 )
 
     def _get_measurement_areas(self, measurement_area_ids):
-        areas = list()
+        areas = dict()
+
         for measurement_id in measurement_area_ids:
             polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
-            polygon_ = Polygon(np.array(polygon))
-            areas.append(polygon_)
+            areas[measurement_id] = MeasurementArea(polygon=Polygon(np.array(polygon)), id=measurement_id)
 
         return areas
 
@@ -209,7 +250,10 @@ class OpenLoop(NoController, Controller):
         probabilities = [0, 0, 0, 0, 0]
         probabilities[self.counter] = 1.0 # all of the agents should use one specific corridor
 
-        command = {"targetIds": self.target_ids, "probability": probabilities}
+        command = {"targetIds": self.target_ids,
+                   "probability": probabilities,
+                   "reactionProbability" : list(np.ones(len(self.target_ids))*self.reaction_model['BernoulliParameter'])
+                   }
         action = {
             "commandId": self.commandID,
             "command": command,
@@ -222,7 +266,6 @@ class OpenLoop(NoController, Controller):
 
     def _increase_counter(self):
         self.counter += 1
-        self._reset_counter()
 
     def _reset_counter(self):
         if self.counter >= len(self.target_ids):
@@ -334,54 +377,54 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         settings = [
             "--port",
-            "9999",
+            "9999", #9999
             "--host-name",
-            "localhost",
+            "vadere", #localhost
             "--client-mode",
-            "--start-server",
-            "--gui-mode",
-            "--path-to-vadere-repo",
-            os.path.abspath("../../../vadere"),
-            "--suppress-prompts",
+            #"--start-server",
+            #"--gui-mode",
+            #"--path-to-vadere-repo",
+            #os.path.abspath("../../../vadere"),
+            #"--suppress-prompts",
         ]
 
-        main(
-            settings,
-            controller_type="NoController",
-            scenario="simplified_default_sequential",
-        )
-        main(
-            settings,
-            controller_type="OpenLoop",
-            scenario="simplified_default_sequential",
-        )
-        main(
-            settings,
-            controller_type="ClosedLoop",
-            scenario="simplified_default_sequential",
-        )
+        # main(
+        #     settings,
+        #     controller_type="NoController",
+        #     scenario="simplified_default_sequential",
+        # )
         main(
             settings,
             controller_type="OpenLoop",
             scenario="simplified_default_sequential",
-            reaction_probability=0.5
         )
-        main(
-            settings,
-            controller_type="ClosedLoop",
-            scenario="simplified_default_sequential",
-            reaction_probability=0.5
-        )
-        main(
-            settings,
-            controller_type="OpenLoop",
-            scenario="simplified_default_sequential_disturbance",
-        )
-        main(
-            settings,
-            controller_type="ClosedLoop",
-            scenario="simplified_default_sequential_disturbance",
-        )
+        # main(
+        #     settings,
+        #     controller_type="ClosedLoop",
+        #     scenario="simplified_default_sequential",
+        # )
+        # main(
+        #     settings,
+        #     controller_type="OpenLoop",
+        #     scenario="simplified_default_sequential",
+        #     reaction_probability=0.5
+        # )
+        # main(
+        #     settings,
+        #     controller_type="ClosedLoop",
+        #     scenario="simplified_default_sequential",
+        #     reaction_probability=0.5
+        # )
+        # main(
+        #     settings,
+        #     controller_type="OpenLoop",
+        #     scenario="simplified_default_sequential_disturbance",
+        # )
+        # main(
+        #     settings,
+        #     controller_type="ClosedLoop",
+        #     scenario="simplified_default_sequential_disturbance",
+        # )
 
     else:
         settings = sys.argv[1:]

@@ -1,12 +1,12 @@
 import os
 import sys
-import time
 
 import numpy as np
 import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
+from flowcontrol.crownetcontrol.traci.connection_manager import ClientModeConnection, ServerModeConnection
 from flowcontrol.strategy.sensor.density import MeasurementArea, DensityMapper
 
 sys.path.append(os.path.abspath(".."))
@@ -15,7 +15,7 @@ from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 from flowcontrol.utils.misc import get_scenario_file
 
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -51,20 +51,29 @@ class NoController(Controller):
         self.con_manager.next_call_at(self.next_call)
 
     def measure_state(self, sim_time):
+        # cell_dim0, cell_size0, result0 = self.con_manager.domains.v_sim.get_density_map(sending_node="misc[0].app[1].app")
+        if isinstance(self.con_manager, ServerModeConnection):
+            cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(
+                sending_node="gloablDensityMap")
 
-        #cell_dim0, cell_size0, result0 = self.con_manager.domains.v_sim.get_density_map(sending_node="misc[0].app[1].app")
-        cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(sending_node="gloablDensityMap")
+            self.update_density_map(cell_dim, cell_size, result)
 
-        self.update_density_map(cell_dim, cell_size, result)
-
-        densities = self.densityMapper.get_density_in_area(distribution="uniform")
+            densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
+        elif isinstance(self.con_manager, ClientModeConnection):
+            densities = list()
+            peds1 = self.con_manager.sub_listener["default"].pedestrians
+            for a in self.measurement_areas.values():
+                counts = len([p["id"] for p in peds1 if a.area.contains(Point(p["pos"][0], p["pos"][1]))])
+                densities.append(counts / a.area.area)
+        else:
+            raise ValueError("Cannot handle send_ctl command.")
 
         time_step = (
-            np.round(sim_time / self.sensor_time_step_size, 0) # +1 remove add because init was set to 0.4
-        )  # time = 0.0s := timestep 1, time step size: 0.4
+            np.round(sim_time / self.sensor_time_step_size, 0) + 1
+        )
 
-        print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {densities.values()}")
-        self.density_over_time.append(np.array(list(densities.values())))
+        print(f"Sim-time: {sim_time}, timeStep: {time_step}) \t Density measured: {densities}")
+        self.density_over_time.append(np.array(list(densities)))
         self.time_step.append(time_step)
 
     def update_density_map(self, cell_dim, cell_size, result):
@@ -194,22 +203,24 @@ class OpenLoop(NoController, Controller):
             "BernoulliParameter": 1.0,
         }
 
-
-    def apply_redirection_measure(self, executation_time):
+    def apply_redirection_measure(self, executionTime):
 
         probabilities = [0, 0, 0, 0, 0]
         probabilities[self.counter] = 1.0 # all of the agents should use one specific corridor
 
-        command = {"targetIds": self.target_ids, "probability": probabilities}
+        command = {"targetIds": self.target_ids,
+                   "probability": probabilities,
+                   "reactionProbability" : list(np.ones(len(self.target_ids))*self.reaction_model['BernoulliParameter'])
+                   }
         action = {
             "commandId": self.commandID,
             "command": command,
-            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},
-            #"time": executation_time, # get information direclty after spawning process
+            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15}, # get information direclty after spawning process
         }
         action = json.dumps(action)
         self.commandID += 1
-        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName, sending_node_id="misc[0].app[0]")
+        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
+
 
 
     def _increase_counter(self):
@@ -329,6 +340,26 @@ def main(
 
 
 if __name__ == "__main__":
+
+    isUseOmnet = False
+
+    if isUseOmnet:
+        settings = [
+            "--port",
+            "9997",
+            "--host-name",
+            "0.0.0.0",
+        ]
+    else:
+        settings = [
+            "--port",
+            "9999",  # 9999
+            "--host-name",
+            "vadere",  # localhost
+            "--client-mode",
+        ]
+
+
     if len(sys.argv) == 1:
         # settings = [
         #     "--port",
@@ -342,13 +373,6 @@ if __name__ == "__main__":
         #     os.path.abspath("../../../vadere"),
         #     "--suppress-prompts",
         # ]
-
-        settings = [
-            "--port",
-            "9997",
-            "--host-name",
-            "0.0.0.0",
-        ]
 
         main(
             settings,
