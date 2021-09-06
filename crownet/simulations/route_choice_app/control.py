@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import numpy as np
 import json
@@ -221,7 +222,7 @@ class OpenLoop(NoController, Controller):
             "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information direclty after spawning process
         }
         action = json.dumps(action)
-        self.commandIDwriter.append([executionTime, self.commandID])
+        self.commandIDwriter.append([np.round(executionTime/0.4), self.commandID])
 
         self.commandID += 1
         self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
@@ -248,9 +249,9 @@ class OpenLoop(NoController, Controller):
 
     def plot_data(self):
         super().plot_data()
-        self.plot_path_choice(None)
+        self.plot_path_choice()
 
-    def plot_path_choice(self, file_path):
+    def plot_path_choice(self):
         corridor_corrections = pd.read_csv(os.path.join(working_dir["path"], "path_choice.txt"))
         plt.scatter(
             corridor_corrections.index.to_numpy(),
@@ -269,6 +270,7 @@ class OpenLoop(NoController, Controller):
         super().write_data()
         self.write_path_choice()
         self.write_commandIds()
+        self.write_sendingTime()
 
     def write_path_choice(self):
         corridor_corrections = pd.DataFrame(
@@ -295,15 +297,34 @@ class OpenLoop(NoController, Controller):
         super().handle_init(sim_time, sim_state)
 
     def write_commandIds(self):
-        key = "sendTime"
+        key = "timeStep"
         commandIds = pd.DataFrame(
             data=np.array(self.commandIDwriter),
-            columns=[key, "commandId"]
+            columns=[key, "commandId"],
+            dtype=int
         )
         commandIds.set_index(key, inplace=True)
         commandIds.to_csv(
             os.path.join(working_dir["path"], "commandIds.txt")
         )
+
+    def write_sendingTime(self):
+        sent = pd.read_csv(os.path.join(working_dir["path"], "commandIds.txt"), index_col=[1])
+        received = pd.read_csv(os.path.join(working_dir["path"], "commandIdsReceived.txt"), index_col=[0], sep=" ")
+
+        # TODO iterate through sent, not received
+        for commandId, receivedTimeStep in received.groupby("commandId-PID22").groups.items():
+            if commandId > 0:
+                sentTimeStep = sent.loc[commandId, :].values[0]
+                sending_times = pd.DataFrame(data = (receivedTimeStep-sentTimeStep-1)*self.sensor_time_step_size,
+                                             )
+                print(sending_times)
+
+            print()
+
+        print()
+
+
 
 
 class ClosedLoop(OpenLoop, Controller):
@@ -335,7 +356,7 @@ if __name__ == "__main__":
     scenario_file = "simplified_default_sequential.scenario"
     settings = ["--controller-type", "OpenLoop",
                 "--scenario-file", scenario_file ,
-                "--experiment-label", f"{scenario_file}_open"] #TODO change this
+                "--experiment-label", f"no_disturbance_openControl_{time.time()}"] #TODO change this
 
     _settings = list()
     if len(sys.argv) == 1:
