@@ -325,13 +325,14 @@ def main(
     )
     timeStamp = time.time()
     experiment_name = f"{scenario}_{controller_type}_prob_{int(reaction_probability)}_{timeStamp}"
-    working_dir["path"] = os.path.join(os.getcwd(), "results", f"_{experiment_name}", "vadere.d")
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    working_dir["path"] = os.path.join(dirname, "results", f"_{experiment_name}", "vadere.d")
 
     print(working_dir["path"])
     scenario_file = get_scenario_file(f"vadere/scenarios/{scenario}.scenario")
     kwargs = {
         "file_name": scenario_file,
-        "rootDir": os.path.join(os.getcwd(), "results"),
+        "rootDir": os.path.join(dirname, "results"),
         "experiment_label": experiment_name,
         "time": timeStamp,
     }
