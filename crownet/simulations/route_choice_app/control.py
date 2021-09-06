@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 import numpy as np
 import json
@@ -14,7 +13,6 @@ sys.path.append(os.path.abspath(".."))
 
 from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
-from flowcontrol.utils.misc import get_scenario_file
 
 from shapely.geometry import Polygon, Point
 
@@ -315,61 +313,64 @@ class ClosedLoop(OpenLoop, Controller):
         )
 
 
-def main(
-        settings, controller_type="OpenLoop", scenario="simplified_default_sequential", reaction_probability=1.0
-):
-    sub = VadereDefaultStateListener.with_vars(
-        "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
-    )
-    timeStamp = time.time()
-    experiment_name = f"{scenario}_{controller_type}_prob_{int(reaction_probability)}_{timeStamp}"
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    working_dir["path"] = os.path.join(dirname, "results", f"_{experiment_name}", "vadere.d")
 
-    print(working_dir["path"])
-    scenario_file = get_scenario_file(f"vadere/scenarios/{scenario}.scenario")
-    kwargs = {
-        "file_name": scenario_file,
-        "rootDir": os.path.join(dirname, "results"),
-        "experiment_label": experiment_name,
-        "time": timeStamp,
-    }
 
-    settings_ = settings
-    settings_.extend(["--controller-type", controller_type])
-
-    controller = get_controller_from_args(working_dir=os.getcwd(), args=settings_)
-    controller.register_state_listener("default", sub, set_default=True)
-    controller.set_reaction_model_parameters(reaction_probability=reaction_probability)
-    controller.start_controller(**kwargs)
 
 
 if __name__ == "__main__":
 
     isUseOmnet = False
+    isRunInDockerContainer = True
+    scenario_file = "simplified_default_sequential.scenario"
+    settings = ["--controller-type", "OpenLoop",
+                "--scenario-file", scenario_file ,
+                "--experiment-label", f"{scenario_file}_open"] #TODO change this
 
-    if isUseOmnet:
-        settings = [
-            "--port",
-            "9997",
-            "--host-name",
-            "0.0.0.0",
-        ]
-    else:
-        settings = [
-            "--port",
-            "9999",  # 9999
-            "--host-name",
-            "vadere",  # localhost
-            "--client-mode",
-        ]
-
+    _settings = list()
     if len(sys.argv) == 1:
-        main(
-            settings,
-            controller_type="OpenLoop",
-            scenario="simplified_default_sequential",
-        )
+        if isUseOmnet:
+            _settings = [
+                "--port",
+                "9997",
+                "--host-name",
+                "0.0.0.0",
+            ]
+        else:
+            if isRunInDockerContainer:
+                _settings = [
+                    "--port",
+                    "9999",
+                    "--host-name",
+                    "vadere",
+                    "--client-mode",
+                ]
+            else:
+                _settings = [
+                    "--port",
+                    "9999",  # 9999
+                    "--host-name",
+                    "localhost",
+                    "--client-mode",
+                    "--start-server",
+                    "--gui-mode",
+                    "--path-to-vadere-repo",
+                    os.path.abspath("../../../vadere"),
+                    "--suppress-prompts",
+                ]
+            _settings.extend(["--output-dir", os.path.join(os.path.abspath(os.path.dirname(__file__)), "results")])
 
     else:
-        settings = sys.argv[1:]
+        settings_ = sys.argv[1:]
+
+    settings.extend(_settings)
+
+    sub = VadereDefaultStateListener.with_vars(
+        "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
+    )
+    controller = get_controller_from_args(working_dir=os.getcwd(), args=settings)
+    controller.register_state_listener("default", sub, set_default=True)
+    controller.set_reaction_model_parameters(reaction_probability=1.0)
+    controller.start_controller()
+
+
+
