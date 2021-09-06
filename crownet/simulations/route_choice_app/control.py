@@ -199,6 +199,7 @@ class OpenLoop(NoController, Controller):
         self.controlModelType = "RouteChoice"
         self.controlModelName = "distributePeds"
         self.commandID = 111
+        self.commandIDwriter = list()
 
         self.reaction_model = {
             "isBernoulliParameterCertain": True,
@@ -220,6 +221,8 @@ class OpenLoop(NoController, Controller):
             "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information direclty after spawning process
         }
         action = json.dumps(action)
+        self.commandIDwriter.append([executionTime, self.commandID])
+
         self.commandID += 1
         self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
 
@@ -265,6 +268,7 @@ class OpenLoop(NoController, Controller):
     def write_data(self):
         super().write_data()
         self.write_path_choice()
+        self.write_commandIds()
 
     def write_path_choice(self):
         corridor_corrections = pd.DataFrame(
@@ -290,6 +294,17 @@ class OpenLoop(NoController, Controller):
         )
         super().handle_init(sim_time, sim_state)
 
+    def write_commandIds(self):
+        key = "sendTime"
+        commandIds = pd.DataFrame(
+            data=np.array(self.commandIDwriter),
+            columns=[key, "commandId"]
+        )
+        commandIds.set_index(key, inplace=True)
+        commandIds.to_csv(
+            os.path.join(working_dir["path"], "commandIds.txt")
+        )
+
 
 class ClosedLoop(OpenLoop, Controller):
     def __init__(self):
@@ -311,10 +326,6 @@ class ClosedLoop(OpenLoop, Controller):
         print(
             f"The densities are: {densities.round(3)}. Minimum: index = {self.counter}."
         )
-
-
-
-
 
 
 if __name__ == "__main__":
