@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import numpy as np
 import json
@@ -37,7 +38,7 @@ class NoController(Controller):
         self.densityMapper = None
 
     def handle_sim_step(self, sim_time, sim_state):
-        print(f"handle_sim_step: simulation time = {sim_time}." )
+        print(f"handle_sim_step: simulation time = {sim_time}.")
 
         self.measure_state(sim_time)
 
@@ -97,6 +98,7 @@ class NoController(Controller):
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
         working_dir["path"] = self.con_manager.domains.v_sim.get_output_directory()
+        print(f"Output is stored in {working_dir['path']}.")
         self.con_manager.next_call_at(self.next_call)
         print(f"Set next call to: {self.next_call}")
         self.measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
@@ -321,13 +323,18 @@ def main(
     sub = VadereDefaultStateListener.with_vars(
         "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
     )
+    timeStamp = time.time()
+    experiment_name = f"{scenario}_{controller_type}_prob_{int(reaction_probability)}_{timeStamp}"
+    working_dir["path"] = os.path.join(os.getcwd(), "results", f"_{experiment_name}", "vadere.d")
 
+    print(working_dir["path"])
     scenario_file = get_scenario_file(f"vadere/scenarios/{scenario}.scenario")
     kwargs = {
         "file_name": scenario_file,
+        "rootDir": os.path.join(os.getcwd(), "results"),
+        "experiment_label": experiment_name,
+        "time": timeStamp,
     }
-    experiment_name = f"{scenario}_{controller_type}_prob_{int(reaction_probability)}"
-    working_dir["path"] = os.path.join(os.getcwd(), experiment_name)
 
     settings_ = settings
     settings_.extend(["--output-dir", working_dir["path"]])
