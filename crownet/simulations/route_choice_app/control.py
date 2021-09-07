@@ -23,7 +23,6 @@ import matplotlib.pyplot as plt
 working_dir = dict()
 PRECISION = 8
 
-
 class NoController(Controller):
     def __init__(self):
         super().__init__()
@@ -51,13 +50,20 @@ class NoController(Controller):
         self.next_call += self.sensor_time_step_size
         self.con_manager.next_call_at(self.next_call)
 
+
+    def updateCommandIds(self):
+        #TODO move to DataProcessorManager
+        timeStep, pedIds, commandIds = self.con_manager.domains.v_sim.get_data_processor_value(str(22))
+        print(timeStep, pedIds, commandIds)
+
+
     def measure_state(self, sim_time):
+        self.updateCommandIds()
+
         if isinstance(self.con_manager, ServerModeConnection):
             cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(
                 sending_node="gloablDensityMap")  # "misc[0].app[1].app" OR "gloablDensityMap"
-
             self.update_density_map(cell_dim, cell_size, result)
-
             densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
         elif isinstance(self.con_manager, ClientModeConnection):
             densities = list()
