@@ -72,35 +72,35 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
       "id" : 5
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 1
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 2
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 8,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 9,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 4
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 10,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
