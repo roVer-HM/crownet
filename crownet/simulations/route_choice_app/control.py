@@ -32,7 +32,8 @@ class NoController(Controller):
         self.measure_state(sim_time)
 
         # necessary, because time intervals for sensoring and applying a control action differ
-        if sim_time % self.time_step_size == 0:
+        #if sim_time % self.time_step_size == 0 and sim_time > 5.0:
+        if sim_time % self.time_step_size == 0: # produces an error for simtime = 0.0 in send_ctl_command
             self.compute_next_corridor_choice(sim_time)
             self.apply_redirection_measure()
             self.commandID += 1
@@ -135,7 +136,11 @@ class OpenLoop(NoController, Controller):
         action = json.dumps(action)
 
         self.processor_manager.write("commandId", self.commandID)
-        self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
+        if isinstance(self.con_manager, ServerModeConnection):
+            self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName,
+                                                        sending_node_id="misc[0].app[0]")
+        else:
+            self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
 
 
     def _increase_counter(self):
@@ -194,12 +199,9 @@ class ClosedLoop(OpenLoop, Controller):
 
 if __name__ == "__main__":
 
-    isUseOmnet = False
+    isUseOmnet = True
     isRunInDockerContainer = True
-    scenario_file = "simplified_default_sequential.scenario"
-    settings = ["--controller-type", "OpenLoop",
-                "--scenario-file", scenario_file ,
-                "--experiment-label", f"no_disturbance_openControl_{time.time()}"] #TODO change this
+    settings = ["--controller-type", "OpenLoop"]
 
     _settings = list()
     if len(sys.argv) == 1:
@@ -211,6 +213,10 @@ if __name__ == "__main__":
                 "0.0.0.0",
             ]
         else:
+            scenario_file = "simplified_default_sequential.scenario"
+            settings.extend(["--scenario-file", scenario_file ,
+                "--experiment-label", f"no_disturbance_openControl_{time.time()}"]) #TODO change this)
+
             if isRunInDockerContainer:
                 _settings = [
                     "--port",
