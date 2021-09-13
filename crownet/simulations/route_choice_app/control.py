@@ -1,8 +1,9 @@
 import os
+import shutil
 import sys
 import time
 
-import numpy as np
+from shutil import rmtree
 import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
@@ -19,7 +20,6 @@ from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 from shapely.geometry import Polygon, Point
 
 
-working_dir = dict()
 PRECISION = 8
 
 class NoController(Controller):
@@ -33,6 +33,7 @@ class NoController(Controller):
         self.time_step_size = 10.0
         self.densityMapper = None
         self.processor_manager = Manager()
+        self.output_dir = None
 
     def handle_sim_step(self, sim_time, sim_state):
         self.processor_manager.update_sim_time(sim_time)
@@ -40,11 +41,11 @@ class NoController(Controller):
         self.measure_state(sim_time)
 
         # necessary, because time intervals for sensoring and applying a control action differ
-        if (sim_time - self.sensor_time_step_size) % self.time_step_size == 0:
-            print(f"Current Simtime: {sim_time - self.sensor_time_step_size}, apply control measure at {sim_time}")
+        if sim_time % self.time_step_size == 0:
+            print(f"Current Simtime: {sim_time}, apply control measure at {sim_time + self.sensor_time_step_size}")
             self.processor_manager.write("commandId", self.commandID)
             self.compute_next_corridor_choice(sim_time)
-            self.apply_redirection_measure(sim_time + 0.4)  # vadere time step size
+            self.apply_redirection_measure(sim_time + self.sensor_time_step_size)  # vadere time step size
 
         self.next_call += self.sensor_time_step_size
         self.con_manager.next_call_at(self.next_call)
@@ -95,11 +96,10 @@ class NoController(Controller):
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
-        working_dir["path"] = self.con_manager.domains.v_sim.get_output_directory()
-        print(f"Output is stored in {working_dir['path']}.")
-        self.con_manager.next_call_at(self.next_call)
-        print(f"Set next call to: {self.next_call}")
-        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer("commandIds.txt")))
+        self.set_output_dir(os.path.dirname(self.con_manager.domains.v_sim.get_output_directory()))
+        self.con_manager.next_call_at(0.4)
+        print(f"Init call to: {0.4}")
+        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer(os.path.join(self.output_dir,"commandIds.txt"))))
 
     def compute_next_corridor_choice(self, sim_time):
         pass
@@ -109,6 +109,19 @@ class NoController(Controller):
 
     def write_data(self):
         self.processor_manager.finish()
+
+    def set_output_dir(self, parent_folder):
+        if os.path.isdir(parent_folder):
+            output_dir = os.path.join(parent_folder, "flowcontrol.d")
+            if os.path.isdir(output_dir):
+                shutil.rmtree(output_dir, ignore_errors=True)
+            os.mkdir(output_dir)
+        else:
+            raise ValueError("Output directory structure not provided.")
+        self.output_dir = output_dir
+
+
+
 
 class OpenLoop(NoController, Controller):
     def __init__(self):
@@ -180,14 +193,12 @@ class OpenLoop(NoController, Controller):
         self.reaction_model["BernoulliParameter"] = reaction_probability
 
     def handle_init(self, sim_time, sim_state):
+        super().handle_init(sim_time, sim_state)
         self.con_manager.domains.v_sim.init_control(
             self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
         )
-        self.processor_manager.registerProcessor("sending_times", SendingTimes(Writer("sending_times.txt")))
-        self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(Writer("path_choice.txt")))
-        super().handle_init(sim_time, sim_state)
-
-
+        self.processor_manager.registerProcessor("sending_times", SendingTimes(Writer(os.path.join(self.output_dir, "sending_times.txt"))))
+        self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(Writer(os.path.join(self.output_dir,"path_choice.txt"))))
 
 
 class ClosedLoop(OpenLoop, Controller):
@@ -195,8 +206,6 @@ class ClosedLoop(OpenLoop, Controller):
         super().__init__()
 
     def choose_corridor(self):
-        # measure densities in corridors
-        # average densities between two controller calls
         number_of_time_steps_for_measurement = int(
             np.round(self.time_step_size / self.sensor_time_step_size, 0)
         )
