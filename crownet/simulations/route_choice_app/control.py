@@ -1,9 +1,5 @@
 import os
-import shutil
 import sys
-import time
-
-from shutil import rmtree
 import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
@@ -17,7 +13,7 @@ sys.path.append(os.path.abspath(".."))
 from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon
 
 
 PRECISION = 8
@@ -25,15 +21,10 @@ PRECISION = 8
 class NoController(Controller):
     def __init__(self):
         super().__init__()
-        self.density_over_time = list()
-        self.time_step = list()
-        self.sensor_time_step_size = 0.4
-        self.corridor_choice_over_time = list()
-        self.next_call = 0.0
         self.time_step_size = 10.0
         self.densityMapper = None
-        self.processor_manager = Manager()
-        self.output_dir = None
+        self.counter = 0
+        self.density_over_time = list()
 
     def handle_sim_step(self, sim_time, sim_state):
         self.processor_manager.update_sim_time(sim_time)
@@ -42,13 +33,9 @@ class NoController(Controller):
 
         # necessary, because time intervals for sensoring and applying a control action differ
         if sim_time % self.time_step_size == 0:
-            print(f"Current Simtime: {sim_time}, apply control measure at {sim_time + self.sensor_time_step_size}")
-            self.processor_manager.write("commandId", self.commandID)
             self.compute_next_corridor_choice(sim_time)
-            self.apply_redirection_measure(sim_time + self.sensor_time_step_size)  # vadere time step size
-
-        self.next_call += self.sensor_time_step_size
-        self.con_manager.next_call_at(self.next_call)
+            self.apply_redirection_measure()
+            self.commandID += 1
 
     def measure_state(self, sim_time):
         if isinstance(self.con_manager, ServerModeConnection):
@@ -63,8 +50,8 @@ class NoController(Controller):
                 densities.append(density)
         else:
             raise ValueError("Cannot handle send_ctl command.")
+        self.density_over_time.append(densities)
 
-        print(f"Sim-time: {sim_time}, timeStep: {self.next_call}) \t Density measured: {densities}")
 
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
@@ -80,7 +67,6 @@ class NoController(Controller):
         for measurement_id in measurement_area_ids:
             polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
             areas[measurement_id] = MeasurementArea(polygon=Polygon(np.array(polygon)), id=measurement_id)
-
         return areas
 
     def _get_obstacles_as_polygons(self):
@@ -91,15 +77,12 @@ class NoController(Controller):
             obstacles.append(polygon)
         return obstacles
 
-    def apply_redirection_measure(self, executation_time):
+    def apply_redirection_measure(self):
         pass
 
     def handle_init(self, sim_time, sim_state):
         self.counter = 0
-        self.set_output_dir(os.path.dirname(self.con_manager.domains.v_sim.get_output_directory()))
-        self.con_manager.next_call_at(0.4)
-        print(f"Init call to: {0.4}")
-        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer(os.path.join(self.output_dir,"commandIds.txt"))))
+        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer(os.path.join(self.output_dir, "commandIds.txt"))))
 
     def compute_next_corridor_choice(self, sim_time):
         pass
@@ -109,18 +92,6 @@ class NoController(Controller):
 
     def write_data(self):
         self.processor_manager.finish()
-
-    def set_output_dir(self, parent_folder):
-        if os.path.isdir(parent_folder):
-            output_dir = os.path.join(parent_folder, "flowcontrol.d")
-            if os.path.isdir(output_dir):
-                shutil.rmtree(output_dir, ignore_errors=True)
-            os.mkdir(output_dir)
-        else:
-            raise ValueError("Output directory structure not provided.")
-        self.output_dir = output_dir
-
-
 
 
 class OpenLoop(NoController, Controller):
@@ -143,11 +114,11 @@ class OpenLoop(NoController, Controller):
         super().measure_state(sim_time)
 
     def write_data(self):
-        commandIds = self.processor_manager.get_processor_values("commandId")
-        self.processor_manager.post_loop("sending_times", commandIds)
+        commandIdsSent = self.processor_manager.get_processor_values("commandId")
+        self.processor_manager.post_loop("sending_times", commandIdsSent)
         super().write_data()
 
-    def apply_redirection_measure(self, executionTime):
+    def apply_redirection_measure(self):
         probabilities = [0, 0, 0, 0, 0]
         probabilities[self.counter] = 1.0  # all of the agents should use one specific corridor
 
@@ -159,11 +130,13 @@ class OpenLoop(NoController, Controller):
         action = {
             "commandId": self.commandID,
             "command": command,
-            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information direclty after spawning process
+            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information directly after spawning process
         }
         action = json.dumps(action)
-        self.commandID += 1
+
+        self.processor_manager.write("commandId", self.commandID)
         self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
+
 
     def _increase_counter(self):
         self.counter += 1
@@ -174,12 +147,9 @@ class OpenLoop(NoController, Controller):
             self.counter = 0
 
     def compute_next_corridor_choice(self, sim_time):
-        old_counter = self.counter
-
         self.choose_corridor()
-
         print(f"Use corridor {self.target_ids[self.counter]}.")
-        self.processor_manager.write("path_choice", self.counter)
+        self.processor_manager.write("path_choice", self.target_ids[self.counter])
 
     def choose_corridor(self):
         self._increase_counter()
@@ -197,7 +167,7 @@ class OpenLoop(NoController, Controller):
         self.con_manager.domains.v_sim.init_control(
             self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
         )
-        self.processor_manager.registerProcessor("sending_times", SendingTimes(Writer(os.path.join(self.output_dir, "sending_times.txt"))))
+        self.processor_manager.registerProcessor("sending_times", SendingTimes(Writer(os.path.join(self.output_dir,"sending_times.txt"))))
         self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(Writer(os.path.join(self.output_dir,"path_choice.txt"))))
 
 
@@ -209,6 +179,7 @@ class ClosedLoop(OpenLoop, Controller):
         number_of_time_steps_for_measurement = int(
             np.round(self.time_step_size / self.sensor_time_step_size, 0)
         )
+
         densities = np.array(
             self.density_over_time[-number_of_time_steps_for_measurement:]
         ).mean(axis=0)
