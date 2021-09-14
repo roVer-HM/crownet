@@ -9,6 +9,8 @@
 
 namespace crownet {
 
+Register_Class(AppInfoLocal);
+
 //std::string AppInfoLocal::str() const{
 //    return "foo";
 //}

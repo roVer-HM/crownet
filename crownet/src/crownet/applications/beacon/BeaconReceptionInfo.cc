@@ -9,6 +9,8 @@
 
 namespace crownet {
 
+Register_Class(BeaconReceptionInfo);
+
 BeaconReceptionInfo::~BeaconReceptionInfo() {
     // TODO Auto-generated destructor stub
 }

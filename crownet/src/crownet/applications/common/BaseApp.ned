@@ -29,6 +29,7 @@ simple BaseApp like IBaseApp
         @display("i=block/app");
         ///* socket module (should be a sibling model)
         string socketModule = default("^.socket");
+        object localInfo = default({});
         
         // Application runtime settings
         ///* Start time of application at which message will be received. 

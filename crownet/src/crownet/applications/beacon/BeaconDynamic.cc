@@ -22,8 +22,10 @@ void BeaconDynamic::initialize(int stage) {
     if (stage == INITSTAGE_LOCAL){
         mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
-        hostId = (uint32_t)getContainingNode(this)->getId();
-        WATCH(hostId);
+
+        minSentFrequency = par("minSentFrequency");
+        maxSentFrequyncy = par("maxSentFrequency");
+        maxBandwith = par("maxBandwith");
     }
 }
 
@@ -38,7 +40,7 @@ FsmState BeaconDynamic::fsmAppMain(cMessage *msg) {
 
     const auto& header = makeShared<DynamicBeaconHeader>();
     header->setSequencenumber(localInfo->nextSequenceNumber());
-    header->setSourceId(hostId);
+    header->setSourceId(getHostId());
     // mod 32
     uint32_t time = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
     header->setTimestamp(time);
@@ -50,7 +52,7 @@ FsmState BeaconDynamic::fsmAppMain(cMessage *msg) {
     // assume position measurement time is same as packet creation.
     beacon->setPosTimestamp(time);
     // todo access neighbourhood table.
-    beacon->setNumberOfNeighbours(3);
+    beacon->setNumberOfNeighbours(nTable->getNeighbourCount());
     beacon->addTag<CreationTimeTag>()->setCreationTime(simTime());
 
     Packet *pk = new Packet(localInfo->packetName(packetName).c_str());

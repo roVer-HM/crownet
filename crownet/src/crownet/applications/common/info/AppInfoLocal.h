@@ -17,6 +17,11 @@ public:
     virtual ~AppInfoLocal() = default;
     AppInfoLocal(): AppInfoLocal_Base() {}
 
+    virtual AppInfoLocal_Base *dup() const override {
+        return new AppInfoLocal(*this);
+    }
+
+
 //    virtual std::string str() const override;
 
 

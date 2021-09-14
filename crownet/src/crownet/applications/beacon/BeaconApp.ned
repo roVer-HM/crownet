@@ -48,9 +48,15 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         mainIntervalJitter = default(0s);
 		messageLength = default(300B);
 		allEmptyDestAddress = false;
+
+		
+		double minSentFrequency @unit(Hz)= default(0.5Hz);
+		double maxSentFrequency @unit(Hz)= default(10Hz);
+        int maxBandwith @unit(Bytes) = default(2000B);
         
         // App logic
         string mobilityModule;
         string neighborhoodTableMobdule;
+        
 }
 

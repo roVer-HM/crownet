@@ -67,6 +67,7 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   FsmState socketFsmResult = FsmRootStates::ERR;
   SocketProvider* socketProvider;
   AppInfoLocal* localInfo = nullptr;
+  int hostId;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -74,6 +75,10 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   virtual void initialize(int stage) override;
   virtual void finish() override;
   virtual void refreshDisplay() const override;
+
+  // omnetpp based id as unique and constant identifier.
+  int getHostId() const {return hostId;}
+
   /**
    * schedule selfMsgSendTimer with base + par("sendInterval").
    * base = -1 defaults to the current time.
@@ -90,7 +95,7 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   virtual void sendPayload(Packet *packet);
   virtual void sendPayload(Packet *packet,  L3Address addr, int port);
 
-  virtual AppInfoLocal* createLocalAppInfo();
+  virtual void initLocalAppInfo();
 
   template <typename T>
   IntrusivePtr<T> createPacket(b length = b(-1));

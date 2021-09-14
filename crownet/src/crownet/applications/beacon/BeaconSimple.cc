@@ -21,8 +21,6 @@ void BeaconSimple::initialize(int stage) {
     if (stage == INITSTAGE_LOCAL){
         mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
-        hostId = getContainingNode(this)->getId();
-        WATCH(hostId);
     }
 }
 
@@ -32,7 +30,7 @@ FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
     const auto &beacon = createPacket<BeaconPacketSimple>(B(224)); //64+64+64+32
     beacon->setTime(simTime());
     beacon->setPos(mobility->getCurrentPosition());
-    beacon->setNodeId(hostId);
+    beacon->setNodeId(getHostId());
 
     sendPayload(beacon);
     scheduleNextAppMainEvent();

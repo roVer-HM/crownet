@@ -33,7 +33,9 @@ public:
 private:
     inet::IMobility *mobility = nullptr;
     NeighborhoodTable* nTable = nullptr;
-    uint32_t hostId;
+    double minSentFrequency;
+    double maxSentFrequyncy;
+    double maxBandwith;
 };
 
 } /* namespace crownet */

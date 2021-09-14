@@ -35,10 +35,12 @@ void BaseApp::initialize(int stage) {
     appMainIntervalOffset = par("mainIntervalOffset").doubleValue();
     sendLimit = par("mainMsgLimit").intValue();
 
-    auto info = createLocalAppInfo();
-    info->setWalltimeStart(startTime);
-    localInfo = info;
+    hostId = getContainingNode(this)->getId();
+    WATCH(hostId);
+
+    localInfo = (AppInfoLocal*)(par("localInfo").objectValue()->dup());
     take(localInfo);
+    initLocalAppInfo();
 
 
     if (appMainIntervalOffset < 0.){
@@ -55,16 +57,14 @@ void BaseApp::initialize(int stage) {
     appMainTimer = new cMessage("sendTimer");
 
     socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
+    // todo appS
   }
 }
 
-AppInfoLocal* BaseApp::createLocalAppInfo(){
-    // todo: select AppInfoType based on config
-    auto appInfo = new AppInfoLocal();
-
-    appInfo->setNodeId(getId());
-    appInfo->setSequencenumber(0);
-    return appInfo;
+void BaseApp::initLocalAppInfo(){
+    localInfo->setNodeId(getHostId());
+    localInfo->setSequencenumber(0);
+    localInfo->setWalltimeStart(startTime);
 }
 
 void BaseApp::setFsmResult(const FsmState &state) { socketFsmResult = state; }
@@ -209,6 +209,9 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
       } else if (msg->arrivedOn("configIn")){
           // send config message to sub state handler
           FSM_Goto(fsmRoot, fsmHandleSubState(msg));
+//      } else if (msg->arrivedOn("schdedluerIn")){
+//
+//
       } else {
           throw cRuntimeError("Unkonwn Packet");
       }

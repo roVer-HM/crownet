@@ -38,6 +38,7 @@ class AppInfoLocal extends AppInfoBase {
     uint16_t sequencecycle;
     int packetsSentCount;
     int packetsReceivedCount;
+    double receivedBandwith;
 };
 
 
