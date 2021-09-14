@@ -61,15 +61,23 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
 
 void NeighborhoodTable::checkTimeToLive(){
     simtime_t now = simTime();
-    for( auto it=_table.cbegin(); it !=_table.cend();){
-        // Received + maxAge := time at which entry must be removed.
-        if ((it->second->getReceivedTimePrio() + maxAge) < now){
-            delete it->second;
-            it = _table.erase(it);
-        } else {
-            ++it;
+    if (now >lastCheck){
+        for( auto it=_table.cbegin(); it !=_table.cend();){
+            // Received + maxAge := time at which entry must be removed.
+            if ((it->second->getReceivedTimePrio() + maxAge) < now){
+                delete it->second;
+                it = _table.erase(it);
+            } else {
+                ++it;
+            }
         }
+        lastCheck = now;
     }
+}
+
+const int NeighborhoodTable::getNeighbourCount(){
+    checkTimeToLive();
+    return _table.size();
 }
 
 

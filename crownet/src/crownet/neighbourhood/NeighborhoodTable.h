@@ -30,12 +30,13 @@ public:
 
     BeaconReceptionInfo* getOrCreateEntry(const int sourceId);
     virtual void checkTimeToLive();
-
+    const int getNeighbourCount();
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }
     const nTable& getTable() const { return _table; }
     const cMessage* getTitleMessage() const { return ttl_msg;}
+
 
     //setter
     void setMaxAge(const simtime_t& _maxAge) { maxAge = _maxAge; }
@@ -54,6 +55,7 @@ protected:
     nTable _table;
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;
+    simtime_t lastCheck;
 };
 
 } /* namespace crownet */
