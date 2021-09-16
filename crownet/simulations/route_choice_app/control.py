@@ -28,12 +28,9 @@ class NoController(Controller):
 
     def handle_sim_step(self, sim_time, sim_state):
         self.processor_manager.update_sim_time(sim_time)
-        print(f"handle_sim_step: simulation time = {sim_time}.")
         self.measure_state(sim_time)
 
-        # necessary, because time intervals for sensoring and applying a control action differ
-        #if sim_time % self.time_step_size == 0 and sim_time > 5.0:
-        if sim_time % self.time_step_size == 0: # produces an error for simtime = 0.0 in send_ctl_command
+        if sim_time % self.time_step_size == 0 and sim_time>=self.time_step_size: #TODO allow >= 0 in second condition
             self.compute_next_corridor_choice(sim_time)
             self.apply_redirection_measure()
             self.commandID += 1

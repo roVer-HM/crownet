@@ -34,11 +34,12 @@ class ChangeTarget(Controller):
     def handle_sim_step(self, sim_time, sim_state):
         sending_node = "misc[0].app[0]"
         model = "RouteChoice"
-        command = {"targetIds" : [3] , "probability" : [1.0]}
+        command = {"targetIds" : [3] , "probability" : [1.0], "reactionProbability" : [1.0]}
         action = { "time" : 50.0, 
                   "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
                   "command" : command, 
-                  "commandId": self.nextCmdId}
+                  "commandId": self.nextCmdId,
+                }
         self.nextCmdId =+ 1 
         action = json.dumps(action)
 
@@ -46,10 +47,6 @@ class ChangeTarget(Controller):
         print("send RouteChoice")
         self.con_manager.next_call_at(500.0)  # do not call again (simualtion only taks ~50 seconds(
 
-    def handle_init(self, sim_time, sim_state):
-        print("DBG: ChangeTarget.handle_init()")
-        self.con_manager.next_call_at(3.0)  # call first at time 1.0 s
-        print("init")
 
 
 if __name__ == "__main__":
