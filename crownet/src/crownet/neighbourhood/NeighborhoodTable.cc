@@ -49,6 +49,7 @@ void NeighborhoodTable::handleMessage(cMessage *msg){
 }
 
 BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
+    Enter_Method_Silent();
     if (_table.find(sourceId) == _table.end()){
         BeaconReceptionInfo* info = new BeaconReceptionInfo();
         info->setNodeId(sourceId);
@@ -60,6 +61,7 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
 
 
 void NeighborhoodTable::checkTimeToLive(){
+    Enter_Method_Silent();
     simtime_t now = simTime();
     if (now >lastCheck){
         for( auto it=_table.cbegin(); it !=_table.cend();){
@@ -76,6 +78,7 @@ void NeighborhoodTable::checkTimeToLive(){
 }
 
 const int NeighborhoodTable::getNeighbourCount(){
+    Enter_Method_Silent();
     checkTimeToLive();
     return _table.size();
 }
