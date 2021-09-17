@@ -33,7 +33,7 @@ simple BaseApp like IBaseApp
         // Application runtime settings
         ///* Start time of application at which message will be received. 
         ///* Negative values raises cRuntimeError.
-        double startTime @unit(s) = uniform(0s,0.02s);
+        double startTime @unit(s) = default(uniform(0s,0.02s));
         ///* Time after which no packet will be send or received.
         ///* stopTime = 0.0s means app will run forever
         double stopTime @unit(s) = default(0.0s); 
