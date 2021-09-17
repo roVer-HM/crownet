@@ -15,9 +15,9 @@
 
 package crownet.applications.dmap;
 import crownet.applications.common.BaseApp;
-import inet.applications.contract.IApp;
+import crownet.applications.common.IBaseApp;
 
-moduleinterface IDensityMapApp extends IApp {
+moduleinterface IDensityMapApp extends IBaseApp {
     parameters:
 
 }
@@ -31,14 +31,16 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         
         // Aid app override defaults
         packetName = default("DcDMap");
-        mainInterval = default(1.0s);
-        messageLength = default(1kB);
+        packetLength = default(1kB);
         allEmptyDestAddress = false;
         
         // App logic
         string coordConverterModule;
-        
         double gridSize = default(3.0) @units(m);
+        // update interval of local maps with neighborhood table 
+        // This interval is independent of the sent interval of the application in 
+        // its basic configuration. 
+        double localMapUpdateInterval @unit(s) = default(1.0s); 
         
         bool writeDensityLog = default(true);
         string mapType = default("ymf"); // select map algorithm to calculate cell values

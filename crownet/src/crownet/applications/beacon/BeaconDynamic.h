@@ -22,12 +22,11 @@ public:
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;
 
-
-    virtual void scheduleNextAppMainEvent(simtime_t time = -1) override;
+    //CrownetPacketSourceBase
+    virtual Packet *createPacket() override;
 
 
     // FSM
-    virtual FsmState fsmAppMain(cMessage *msg) override;
     virtual FsmState handleDataArrived(Packet *packet) override;
 
 private:

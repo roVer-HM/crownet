@@ -22,11 +22,7 @@ public:
     }
 
 
-//    virtual std::string str() const override;
-
-
     const uint16_t nextSequenceNumber();
-    std::string packetName(const std::string& baseName) const;
     void incrSent(){ ++packetsSentCount; }
     void incrReceivd() {++packetsReceivedCount; }
 

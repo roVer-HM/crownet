@@ -24,17 +24,14 @@ void BeaconSimple::initialize(int stage) {
     }
 }
 
-// FSM
-FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
+Packet *BeaconSimple::createPacket() {
 
-    const auto &beacon = createPacket<BeaconPacketSimple>(B(224)); //64+64+64+32
+    auto beacon = createPayload<BeaconPacketSimple>();
     beacon->setTime(simTime());
     beacon->setPos(mobility->getCurrentPosition());
     beacon->setNodeId(getHostId());
 
-    sendPayload(beacon);
-    scheduleNextAppMainEvent();
-    return FsmRootStates::WAIT_ACTIVE;
+    return buildPacket(beacon);
 }
 
 FsmState BeaconSimple::handleDataArrived(Packet *packet){

@@ -16,24 +16,22 @@
 #include "BaseApp.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/transportlayer/common/L4PortTag_m.h"
+#include "inet/common/Simsignals.h"
 
 using namespace inet;
 
 namespace crownet {
 BaseApp::~BaseApp() {
   if (appLifeTime) cancelAndDelete(appLifeTime);
-  if (appMainTimer) cancelAndDelete(appMainTimer);
   delete localInfo;
 }
 
 void BaseApp::initialize(int stage) {
-  ApplicationBase::initialize(stage);
+  crownet::queueing::CrownetActivePacketSourceBase::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
 
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
-    appMainIntervalOffset = par("mainIntervalOffset").doubleValue();
-    sendLimit = par("mainMsgLimit").intValue();
 
     hostId = getContainingNode(this)->getId();
     WATCH(hostId);
@@ -43,21 +41,15 @@ void BaseApp::initialize(int stage) {
     initLocalAppInfo();
 
 
-    if (appMainIntervalOffset < 0.){
-        throw cRuntimeError("Invalid mainIntervalOffset parameters must be >= 0");
-    }
-    // packet and IP options
-    packetName = par("packetName");
-
-
     if (stopTime > SIMTIME_ZERO && stopTime < startTime){
       throw cRuntimeError("Invalid startTime/stopTime parameters");
     }
     appLifeTime = new cMessage("applicationTimer");
-    appMainTimer = new cMessage("sendTimer");
 
     socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
-    // todo appS
+    scheduler = inet::getModuleFromPar<IAppScheduler>(par("schedulerModule"), this);
+  } else if (stage == INITSTAGE_APPLICATION_LAYER){
+      handleStartOperation(nullptr);
   }
 }
 
@@ -72,11 +64,11 @@ void BaseApp::setFsmResult(const FsmState &state) { socketFsmResult = state; }
 void BaseApp::finish() {
   recordScalar("packets sent", localInfo->getPacketsSentCount());
   recordScalar("packets received", localInfo->getPacketsReceivedCount());
-  ApplicationBase::finish();
+  crownet::queueing::CrownetActivePacketSourceBase::finish();
 }
 
 void BaseApp::refreshDisplay() const {
-  ApplicationBase::refreshDisplay();
+    crownet::queueing::CrownetActivePacketSourceBase::refreshDisplay();
 
   char buf[100];
   sprintf(buf, "rcvd: %d pks\nsent: %d pks", localInfo->getPacketsReceivedCount(), localInfo->getPacketsSentCount());
@@ -84,78 +76,14 @@ void BaseApp::refreshDisplay() const {
 }
 
 void BaseApp::scheduleNextAppMainEvent(simtime_t time) {
-  if (par("mainInterval").doubleValue() < 0.0) {
-    EV_INFO << "AppMain processing deactivated" << endl;
-    return;
-  }
-  simtime_t nextSend;
-  if (time < SIMTIME_ZERO){
-      nextSend = omnetpp::simTime() + par("mainInterval") + par ("mainIntervalJitter");
-  } else {
-      nextSend = time;
-  }
-
-  if ((stopTime == SIMTIME_ZERO) || (nextSend < stopTime)) {
-    if (appMainTimer->isScheduled()) {
-      throw cRuntimeError("Cannot reschedule selfMsgSendTimer message.");
-    }
-    if (sendLimit !=0){
-        // schedule if sendLimit is not reached  >0 or if sendLimit is deactivated <0
-        appMainTimer->setKind(FsmRootStates::APP_MAIN);
-        scheduleAt(nextSend, appMainTimer);
-    } else {
-        EV_INFO << "Message limit reached." << endl;
-    }
-  } else {
-    EV_INFO << "Next send time after stopTime. Do not schedule new send event."
-            << endl;
-  }
+    // do nothing
 }
 
-void BaseApp::cancelAppMainEvent() {
-  if (appMainTimer->isScheduled()) cancelEvent(appMainTimer);
-}
-
-/**
- * use default address and port configured in socket
- */
-void BaseApp::sendPayload(IntrusivePtr<ApplicationPacket> payload) {
-    Packet *packet = new Packet(localInfo->packetName(packetName).c_str());
-    packet->insertAtBack(payload);
-    sendPayload(packet);
-}
-
-/**
- * use application logic dependent address and port and override socket default
- */
-void BaseApp::sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port){
-    Packet *packet = new Packet(localInfo->packetName(packetName).c_str());
-    packet->insertAtBack(payload);
-    sendPayload(packet, addr, port);
-}
-
-void BaseApp::sendPayload(Packet *packet){
-    emit(packetSentSignal, packet);
-    localInfo->incrSent();
-    if (sendLimit > 0){
-        sendLimit--;
-    }
-    send(packet, gate("socketOut"));
-}
-
-void BaseApp::sendPayload(Packet *packet,  L3Address addr, int port){
+void BaseApp::overrideSocketDest(Packet *packet, L3Address addr, int port){
     packet->addTagIfAbsent<L3AddressReq>()->setDestAddress(addr);
     packet->addTagIfAbsent<L4PortReq>()->setDestPort(port);
-    emit(packetSentSignal, packet);
-    localInfo->incrSent();
-    if (sendLimit > 0){
-        sendLimit--;
-    }
-    send(packet, gate("socketOut"));
 }
 
-
-// Lifecycle management
 
 void BaseApp::handleStartOperation(LifecycleOperation *operation) {
   simtime_t start = std::max(startTime, simTime());
@@ -168,24 +96,12 @@ void BaseApp::handleStartOperation(LifecycleOperation *operation) {
   }
 }
 
-void BaseApp::handleStopOperation(LifecycleOperation *operation) {
-  cancelEvent(appLifeTime);
-  appLifeTime->setKind(FsmRootStates::TEARDOWN);
-  handleMessageWhenUp(appLifeTime);
-}
-
-void BaseApp::handleCrashOperation(LifecycleOperation *operation) {
-  cancelEvent(appLifeTime);
-  appLifeTime->setKind(FsmRootStates::DESTROY);
-  handleMessageWhenUp(appLifeTime);
-}
-
 /**
  * The root Finite State Machine handles basic lifecycle operations and
  * delegate selfMessage and Packet handling to fsmHandleSelfMsg and
  * fsmHandleWithSocket
  */
-void BaseApp::handleMessageWhenUp(cMessage *msg) {
+void BaseApp::handleMessage(cMessage *msg) {
   socketFsmResult = FsmRootStates::ERR;
   // fsmRoot == current state
   FSM_Switch(fsmRoot) {
@@ -204,21 +120,22 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
         } else {
           FSM_Goto(fsmRoot, msg->getKind());
         }
-      } else if (msg->arrivedOn("socketIn")) {
+      } else if (msg->arrivedOn("in")) {
           FSM_Goto(fsmRoot, fsmDataArrived(msg));
-      } else if (msg->arrivedOn("configIn")){
-          // send config message to sub state handler
-          FSM_Goto(fsmRoot, fsmHandleSubState(msg));
-//      } else if (msg->arrivedOn("schdedluerIn")){
-//
-//
+      } else if (msg->arrivedOn("scheduleIn")){
+          if (msg->isPacket()){
+              // scheduler sends an already assembled packet. Just send it on its way.
+              FSM_Goto(fsmRoot, fsmSendPacket(check_and_cast<Packet *>(msg)));
+          } else {
+              // scheduler event to be handled by the application logic
+              FSM_Goto(fsmRoot, fsmHandleSubState(msg));
+          }
       } else {
           throw cRuntimeError("Unkonwn Packet");
       }
       break;
     case FSM_Exit(FsmRootStates::WAIT_INACTIVE):
       EV_INFO << "Application stop time reached! WAIT_INACTIVE" << std::endl;
-//      throw cRuntimeError("Application stop time reached! WAIT_INACTIVE");
       break;
     case FSM_Enter(FsmRootStates::ERR):  // error! if state is entered
       throw cRuntimeError("Reached Error state");
@@ -240,18 +157,36 @@ void BaseApp::handleMessageWhenUp(cMessage *msg) {
   }
 }
 
-void BaseApp::setupTimers() {
-    // schedule first mainApp interval
-    scheduleNextAppMainEvent(getInitialMainAppTime());
+void BaseApp::setupTimers() { }
+
+
+void BaseApp::handlePacketProcessed(Packet *packet)
+{
+    // called before pushOrSendPacket.
+    // Packet count already updated during packet creation
+    emit(packetSentSignal, packet);
 }
 
-simtime_t BaseApp::getInitialMainAppTime(){
-    return std::max(startTime, simTime()) + appMainIntervalOffset;
-}
+Packet *BaseApp::buildPacket(Ptr<Chunk> content, Ptr<Chunk> header){
 
+    applyContentTags(content);
+
+    auto packetName = createPacketName(content);
+    auto packet = new Packet(packetName, content);
+
+
+    if (header != nullptr){
+        packet->insertAtFront(header);
+    }
+    applyPacketTags(packet);
+
+    numProcessedPackets++;
+    processedTotalLength += packet->getDataLength();
+    emit(packetCreatedSignal, packet);
+    return packet;
+}
 
 // FSM
-
 FsmState BaseApp::fsmHandleSubState(cMessage *msg) {
     throw cRuntimeError("No Substate on BaseApp");
 }
@@ -259,7 +194,6 @@ FsmState BaseApp::fsmHandleSubState(cMessage *msg) {
 FsmState BaseApp::fsmSetup(cMessage *msg) {
   socketProvider->setupSocket();
 
-  // todo check msg == appLifeTime (may lead to reschedule without)
   if (stopTime > SIMTIME_ZERO) {
     appLifeTime->setKind(FsmRootStates::TEARDOWN);
     scheduleAt(stopTime, appLifeTime);
@@ -282,6 +216,12 @@ FsmState BaseApp::fsmDataArrived(cMessage *msg){
     return next;
 }
 
+FsmState BaseApp::fsmSendPacket(Packet *pkt){
+    handlePacketProcessed(pkt);
+    pushOrSendPacket(pkt, outputGate, consumer);
+    return FsmRootStates::WAIT_ACTIVE;
+}
+
 FsmState BaseApp::fsmAppMain(cMessage *msg) {
   // do nothing
   EV_WARN << "BaseApp has no AppMain. Implement for active message generate. App will still receive messages!"
@@ -291,23 +231,18 @@ FsmState BaseApp::fsmAppMain(cMessage *msg) {
 
 FsmState BaseApp::fsmTeardown(cMessage *msg) {
     socketProvider->close();
-//  delayActiveOperationFinish(par("stopOperationTimeout"));    // todo: correctly  implement ILifecycle ...
   cancelAndDelete(appLifeTime);
   appLifeTime = nullptr;
-  cancelAndDelete(appMainTimer);
-  appMainTimer = nullptr;
 
   return FsmRootStates::WAIT_INACTIVE;
 }
 
 FsmState BaseApp::fsmDestroy(cMessage *msg) {
-    socketProvider->destroy();
+  socketProvider->destroy();
   // TODO  in real operating systems, program crash detected
   // by OS and OS closes sockets of crashed programs.
   cancelAndDelete(appLifeTime);
   appLifeTime = nullptr;
-  cancelAndDelete(appMainTimer);
-  appMainTimer = nullptr;
 
   return FsmRootStates::WAIT_INACTIVE;
 }

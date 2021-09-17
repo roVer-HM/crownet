@@ -13,7 +13,7 @@ namespace crownet {
 Define_Module(BeaconDynamic);
 
 BeaconDynamic::~BeaconDynamic() {
-    // TODO Auto-generated destructor stub
+
 }
 
 // cSimpleModule
@@ -29,15 +29,8 @@ void BeaconDynamic::initialize(int stage) {
     }
 }
 
-void BeaconDynamic::scheduleNextAppMainEvent(simtime_t time){
-    // todo: use dynamic interval alg based on number of participants.
-    BaseApp::scheduleNextAppMainEvent(time);
-}
 
-
-// FSM
-FsmState BeaconDynamic::fsmAppMain(cMessage *msg) {
-
+Packet *BeaconDynamic::createPacket() {
     const auto& header = makeShared<DynamicBeaconHeader>();
     header->setSequencenumber(localInfo->nextSequenceNumber());
     header->setSourceId(getHostId());
@@ -49,21 +42,13 @@ FsmState BeaconDynamic::fsmAppMain(cMessage *msg) {
     const auto &beacon = makeShared<DynamicBeaconPacket>();
     beacon->setPos(mobility->getCurrentPosition());
     beacon->setEpsilon({0.0, 0.0});
-    // assume position measurement time is same as packet creation.
+    // measurement time is same as packet creation.
     beacon->setPosTimestamp(time);
-    // todo access neighbourhood table.
     beacon->setNumberOfNeighbours(nTable->getNeighbourCount());
-    beacon->addTag<CreationTimeTag>()->setCreationTime(simTime());
 
-    Packet *pk = new Packet(localInfo->packetName(packetName).c_str());
-    pk->insertAtBack(header);
-    pk->insertAtBack(beacon);
-
-    sendPayload(pk);
-
-    scheduleNextAppMainEvent();
-    return FsmRootStates::WAIT_ACTIVE;
+    return buildPacket(beacon, header);
 }
+
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
 
