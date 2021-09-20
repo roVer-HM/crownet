@@ -37,7 +37,7 @@ void VruSimple::initialize(int stage) {
 Packet *VruSimple::createPacket(){
     const auto& payload = makeShared<ApplicationPacket>();
     payload->setSequenceNumber(localInfo->nextSequenceNumber());
-    payload->setChunkLength(B(par("messageLength")));
+    payload->setChunkLength(b(par("packetLength").intValue()));
     payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
     payload->addTag<CurrentLocationTag>()->setLocation(getCurrentLocation());
 

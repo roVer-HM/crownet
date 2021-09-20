@@ -38,7 +38,7 @@ void VruEtsiSimple::initialize(int stage) {
 
 //CrownetPacketSourceBase
 Packet *VruEtsiSimple::createPacket(){
-    const auto& vam = createPayload<ItsVam>(B(par("messageLength")));  // todo calc?
+    const auto& vam = createPayload<ItsVam>(b(par("packetLength").intValue()));  // todo calc?
      vam->setGenerationDeltaTime(simTime());
      // VAM Header
      ItsPduHeader itsHeader{};

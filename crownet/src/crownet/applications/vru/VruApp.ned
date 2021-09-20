@@ -1,4 +1,4 @@
-//
+
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,7 @@ moduleinterface IVRU extends IBaseApp {
 simple VruEtsiSimple extends BaseApp like IVRU {
     parameters:
         @class(crownet::VruEtsiSimple);
-	    packetLength @unit(B) = default(1000B); // length of messages to generate, in bytes
+	    packetLength = default(1000B); // length of messages to generate, in bytes
 	    packetName = default("VRU_AID");
 	    double minRate = default(1); // Hz
 	    double maxRate = default(10); // Hz
