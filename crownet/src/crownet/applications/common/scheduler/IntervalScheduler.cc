@@ -34,7 +34,7 @@ void IntervalScheduler::initialize(int stage)
         amoutOfData = &par("maxData");
 
         maxNumberPackets = par("maxNumberPackets").intValue();
-        maxData = B(par("maxData").doubleValue());
+        maxData = b(par("maxData").intValue());
 
         generationIntervalParameter = &par("generationInterval");
         generationTimer = new ClockEvent("GenerationTimer");
@@ -71,7 +71,7 @@ void IntervalScheduler::handleMessage(cMessage *message)
 void IntervalScheduler::scheduleApp(cMessage *message){
     Enter_Method("scheduleApp");
     auto numPacket = numberPackets->intValue();
-    auto data = B(amoutOfData->doubleValue());
+    auto data = b(amoutOfData->intValue());
     if (numPacket > 0){
 
         if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){
@@ -81,11 +81,12 @@ void IntervalScheduler::scheduleApp(cMessage *message){
             consumer->producePackets(numPacket);
         }
 
-    } else if (data > B(0)){
-        if(maxData > B(0) && (sentData + data) > maxData ){
+    } else if (data > b(0)){
+        if(maxData > b(0) && (sentData + data) > maxData ){
             stop = true;
         } else {
             sentData += data;
+            //convert to Bytes
             consumer->producePackets(B(data));
         }
     } else {

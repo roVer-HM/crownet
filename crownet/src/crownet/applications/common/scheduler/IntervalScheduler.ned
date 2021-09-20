@@ -22,9 +22,9 @@ simple IntervalScheduler extends AppSchedulerBase {
     parameters:
     	volatile double generationInterval @unit(s); // time interval between two subsequent token generation events
 		volatile int numberPackets = default(1); // if < 0 ignore and use amoutOfData
-		volatile double amoutOfData @unit(B) = default(-1B); // if numberPackets is -1 this must be set.
+		volatile int amoutOfData @unit(b) = default(-1B); // if numberPackets is -1 this must be set.
 		
 		int maxNumberPackets = default(-1); // -1 unlmited number of packets
-		double maxData @unit(B) = default(-1B); // -1 unlimited number of data 
+		int maxData @unit(b) = default(-1B); // -1 unlimited number of data 
     	@class(crownet::IntervalScheduler);
 }
