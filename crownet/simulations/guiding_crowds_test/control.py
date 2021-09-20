@@ -39,14 +39,16 @@ class PingPong(Controller):
                 str(ped_id), self.control[self.count][1]
             )
         # read if listeners are used
-
-        self.con_manager.next_call_at(self.control[self.count][0])
         self.count += 1
 
     def handle_init(self, sim_time, sim_state):
         print("TikTokController: handle_init")
         self.con_manager.next_call_at(0.0)
         print(sim_state)
+
+    def set_next_step_time(self):
+        self.con_manager.next_call_at(self.control[self.count][0])
+        print(f"Set next call to {self.next_call}.")
 
 
 if __name__ == "__main__":
