@@ -58,7 +58,7 @@ class AppInfoReception extends AppInfoBase {
 	uint32_t packetsReceivedCount;
 	// (max_sequencenumber - initial_sequencenumber) - packets_received_count
 	// todo include sequencecycle in packet_loss_count? look at RTCP protocol!!
-	uint16_t packetsLossCount; 
+	int packetsLossCount; 
 	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
 
 

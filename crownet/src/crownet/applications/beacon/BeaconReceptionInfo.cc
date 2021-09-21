@@ -36,11 +36,13 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
         const simtime_t arrivalTime){
 
     auto header = inbound->popAtFront<DynamicBeaconHeader>();
+    // duplicates and out of order!
     ++packetsReceivedCount;
 
     // first packet. Initialize object
     if (packetsReceivedCount == 1){
         initialSequencenumber = header->getSequencenumber();
+        maxSequencenumber = initialSequencenumber;
     }
 
     bool oldPacket = false;
@@ -60,6 +62,14 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
             oldPacket = true; // ignore data due to out of date
         }
     }
+
+    if (maxSequencenumber < initialSequencenumber){
+        packetsLossCount = 0xFFFF - initialSequencenumber + maxSequencenumber + 1;
+    } else {
+        packetsLossCount = maxSequencenumber - initialSequencenumber + 1;
+    }
+    packetsLossCount = packetsLossCount + sequencecycle - packetsReceivedCount;
+
 
     // calculate interarrival jitter
     if (clockRate != 0) {
