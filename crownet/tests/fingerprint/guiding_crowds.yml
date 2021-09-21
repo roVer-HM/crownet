@@ -66,6 +66,8 @@ test_4:
     - --control-use-local
     - --with-control
     - control.py
+    - --scenario-file
+    - "vadere/scenarios/test001.scenario"
   simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
