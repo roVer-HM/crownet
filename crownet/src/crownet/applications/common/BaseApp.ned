@@ -36,6 +36,7 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
   parameters:
         @class(crownet::BaseApp);
         @display("i=block/app");
+        displayStringTextFormat = default("");
         ///* socket module (should be a sibling model)
         string socketModule = default("^.socket");
         string schedulerModule = default("^.scheduler");

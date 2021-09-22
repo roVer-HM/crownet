@@ -75,7 +75,6 @@ class BaseApp : //public ApplicationBase,
   virtual void handleMessage(cMessage *message) override;
   virtual void initialize(int stage) override;
   virtual void finish() override;
-  virtual void refreshDisplay() const override;
 
   // omnetpp based id as unique and constant identifier.
   int getHostId() const {return hostId;}

@@ -62,17 +62,7 @@ void BaseApp::initLocalAppInfo(){
 void BaseApp::setFsmResult(const FsmState &state) { socketFsmResult = state; }
 
 void BaseApp::finish() {
-  recordScalar("packets sent", localInfo->getPacketsSentCount());
-  recordScalar("packets received", localInfo->getPacketsReceivedCount());
   crownet::queueing::CrownetActivePacketSourceBase::finish();
-}
-
-void BaseApp::refreshDisplay() const {
-    crownet::queueing::CrownetActivePacketSourceBase::refreshDisplay();
-
-  char buf[100];
-  sprintf(buf, "rcvd: %d pks\nsent: %d pks", localInfo->getPacketsReceivedCount(), localInfo->getPacketsSentCount());
-  getDisplayString().setTagArg("t", 0, buf);
 }
 
 void BaseApp::scheduleNextAppMainEvent(simtime_t time) {
@@ -208,7 +198,6 @@ FsmState BaseApp::fsmSetup(cMessage *msg) {
 }
 
 FsmState BaseApp::fsmDataArrived(cMessage *msg){
-    localInfo->incrReceivd();
     Packet* pk = check_and_cast<Packet *>(msg);
     emit(packetReceivedSignal, pk);
     FsmState next = handleDataArrived(pk);

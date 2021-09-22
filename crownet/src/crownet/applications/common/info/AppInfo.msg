@@ -19,15 +19,20 @@
 
 import inet.common.INETDefs;
 import inet.networklayer.contract.ipv4.Ipv4Address;
+import inet.common.Units;
 
 namespace crownet;
 
 
+cplusplus {{
+using namespace inet;
+}}
 
 
 class AppInfoBase  extends cOwnedObject {
     uint32_t nodeId;
 };
+
 
 class AppInfoLocal extends AppInfoBase {    
     @customize(true);
@@ -36,10 +41,8 @@ class AppInfoLocal extends AppInfoBase {
     uint32_t baseTimestamp;
     uint16_t sequencenumber;
     uint16_t sequencecycle;
-    int packetsSentCount;
-    int packetsReceivedCount;
-    double receivedBandwith;
 };
+
 
 
 enum PktType

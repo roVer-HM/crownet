@@ -23,8 +23,6 @@ public:
 
 
     const uint16_t nextSequenceNumber();
-    void incrSent(){ ++packetsSentCount; }
-    void incrReceivd() {++packetsReceivedCount; }
 
 };
 
