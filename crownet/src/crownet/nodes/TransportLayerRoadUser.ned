@@ -3,7 +3,7 @@ package crownet.nodes;
 import crownet.artery.PedestrianMiddleware;
 import crownet.artery.IDispatchRadioDriver;
 import crownet.aid.IAidLayer;
-import crownet.common.INeighborhoodTable;
+import crownet.neighbourhood.INeighborhoodTable;
 import artery.networking.Vanetza;
 import artery.networking.IVanetza;
 import artery.inet.PlainVehicle;

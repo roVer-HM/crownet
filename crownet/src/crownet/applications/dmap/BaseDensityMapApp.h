@@ -54,6 +54,9 @@ protected:
 
  virtual FsmState handleDataArrived(Packet *packet) override;
 
+ //
+ virtual Packet *createPacket() override;
+
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
  virtual FsmState fsmAppMain(cMessage *msg) override;
@@ -61,7 +64,6 @@ protected:
  // App logic
  virtual void initDcdMap();
  virtual void initWriter();
- virtual void sendMapMap();
  virtual bool mergeReceivedMap(Packet *packet);
 
  // IDensityMapHandler
@@ -73,7 +75,6 @@ protected:
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
 
 protected:
- int hostId;
 
  std::shared_ptr<OsgCoordinateConverter> converter;
  std::shared_ptr<RegularDcdMap> dcdMap;
@@ -85,6 +86,8 @@ protected:
  std::string mapTypeLog;
 
  RegularDcdMapWatcher* watcher;
+ cMessage *localMapTimer;
+ cPar *localMapUpdateInterval;
 
 };
 

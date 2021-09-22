@@ -1,4 +1,4 @@
-//
+
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -15,10 +15,10 @@
 
 package crownet.applications.vru;
 import crownet.applications.common.BaseApp;
-import inet.applications.contract.IApp;
+import crownet.applications.common.IBaseApp;
 
 // Marker Interface for Vulnerable Road User app.
-moduleinterface IVRU extends IApp {
+moduleinterface IVRU extends IBaseApp {
 
 }
 
@@ -26,8 +26,7 @@ moduleinterface IVRU extends IApp {
 simple VruEtsiSimple extends BaseApp like IVRU {
     parameters:
         @class(crownet::VruEtsiSimple);
-	    mainInterval =  default(0.1s);
-	    messageLength @unit(B) = default(1000B); // length of messages to generate, in bytes
+	    packetLength = default(1000B); // length of messages to generate, in bytes
 	    packetName = default("VRU_AID");
 	    double minRate = default(1); // Hz
 	    double maxRate = default(10); // Hz
@@ -39,7 +38,6 @@ simple VruEtsiSimple extends BaseApp like IVRU {
 simple VruSimple extends BaseApp like IVRU {
     parameters:
         @class(crownet::VruSimple);
-	    mainInterval =  default(0.1s);
-	    messageLength = default(1000B);
+	    packetLength = default(1000B);
 	    packetName = default("VRU_AID");
 }

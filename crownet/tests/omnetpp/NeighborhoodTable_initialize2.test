@@ -3,10 +3,10 @@ Test the NeighborhoodTable
 
 %includes:
 #include <stdio.h>
-#include "crownet/common/NeighborhoodTable.h"
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
 %file: test.ned
-import crownet.common.NeighborhoodTable;
+import crownet.neighbourhood.NeighborhoodTable;
 
 network test {
   submodules:
@@ -14,7 +14,7 @@ network test {
 }
 
 %file: NeighborhoodTableTest.ned
-import crownet.common.NeighborhoodTable;
+import crownet.neighbourhood.NeighborhoodTable;
 
 simple NeighborhoodTableTest extends NeighborhoodTable{
     
@@ -25,7 +25,7 @@ simple NeighborhoodTableTest extends NeighborhoodTable{
 %file: Test.cc
 #include "inet/queueing/function/PacketFilterFunction.h"
 #include "inet/common/packet/Packet.h"
-#include "crownet/common/NeighborhoodTable.h"
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
 namespace NeighborhoodTable_initialize2{
     class NeighborhoodTableTest : public ::crownet::NeighborhoodTable {
@@ -41,8 +41,8 @@ namespace NeighborhoodTable_initialize2{
         for(auto it = this->_table.cbegin(); it != _table.cend(); ++it)
         {
             std::cout << "nTable[" << it->first << "]" <<
-                    " -- nodeId: " << it->second.getNodeId() <<
-                    " -- timeSend: " << it->second.getTimeSend() << "\n";
+                    " -- nodeId: " << it->second->getNodeId() <<
+                    " -- timeSend: " << it->second->getSentTimePrio() << "\n";
         }
         }
     };

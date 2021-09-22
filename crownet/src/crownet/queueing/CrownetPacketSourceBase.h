@@ -13,19 +13,32 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.common;
+#ifndef CROWNET_QUEUEING_CROWNETPACKETSOURCEBASE_H_
+#define CROWNET_QUEUEING_CROWNETPACKETSOURCEBASE_H_
+
+#include "inet/queueing/base/PacketSourceBase.h"
+
+using namespace inet;
+
+namespace crownet{
+namespace queueing{
+
+class CrownetPacketSourceBase : public inet::queueing::PacketSourceBase {
+
+protected:
+    const char *packetName = nullptr;
+
+protected:
+    virtual void initialize(int stage) override;
+
+    virtual const char *createPacketName(const Ptr<const Chunk>& data) const override;
+    virtual void applyContentTags(Ptr<Chunk> content);
+    virtual void applyPacketTags( Packet *);
+};
 
 
-moduleinterface INeighborhoodTable
-{
-    
+}
 }
 
-simple NeighborhoodTable like INeighborhoodTable{
-    
-    parameters:
-        @class(crownet::NeighborhoodTable);
-        double maxAge @unit(s) = default (3s);
-        
-    
-}
+
+#endif /* CROWNET_QUEUEING_CROWNETPACKETSOURCEBASE_H_ */

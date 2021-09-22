@@ -1,84 +1,69 @@
+
+#include "crownet/applications/beacon/BeaconReceptionInfo.h"
 #include "main_test.h"
-#include "crownet/common/NeighborhoodTableEntry.h"
 
 using namespace crownet;
 
-class NeighborhoodTableEntryTest : public BaseOppTest {
+class BeaconReceptionInfoTest : public BaseOppTest {
  public:
-    NeighborhoodTableEntryTest() {}
+    BeaconReceptionInfoTest() {}
+
+    BeaconReceptionInfo build(int id, int t1, int t2, inet::Coord c1, inet::Coord c2){
+
+        BeaconReceptionInfo info;
+        info.setNodeId(id);
+        info.setSentTimePrio(t1);
+        info.setReceivedTimePrio(t2);
+        info.setPos(c1);
+        info.setEpsilon(c2);
+        return info;
+    }
 };
 
-TEST_F(NeighborhoodTableEntryTest, constructor) {
+
+
+TEST_F(BeaconReceptionInfoTest, constructor) {
     int expectedId = 1;
     int expectedTimeSend = 1;
     int expectedTimeReceived = 1;
     inet::Coord expectedPos = inet::Coord(1.0,1.0);
     inet::Coord expectedEpsilon = inet::Coord(1.0,1.0);
 
-    NeighborhoodTableEntry e0;
-    EXPECT_TRUE(e0.getTimeSend() == 0);
-    EXPECT_TRUE(e0.getTimeReceived() == 0);
+    BeaconReceptionInfo e0;
+    EXPECT_TRUE(e0.getSentTimePrio() == 0);
+    EXPECT_TRUE(e0.getReceivedTimePrio() == 0);
     EXPECT_TRUE(e0.getPos() == inet::Coord(0.0,0.0));
     EXPECT_TRUE(e0.getEpsilon() == inet::Coord(0.0,0.0));
 
-    NeighborhoodTableEntry e1{expectedId,expectedTimeSend,expectedTimeReceived,expectedPos,expectedEpsilon};
+    BeaconReceptionInfo e1 = build(expectedId,expectedTimeSend,expectedTimeReceived,expectedPos,expectedEpsilon);
     EXPECT_TRUE(e1.getNodeId() == expectedId);
-    EXPECT_TRUE(e1.getTimeSend() == expectedTimeSend);
-    EXPECT_TRUE(e1.getTimeReceived() == expectedTimeReceived);
+    EXPECT_TRUE(e1.getSentTimePrio() == expectedTimeSend);
+    EXPECT_TRUE(e1.getReceivedTimePrio() == expectedTimeReceived);
     EXPECT_TRUE(e1.getPos() == expectedPos);
     EXPECT_TRUE(e1.getEpsilon() == expectedEpsilon);
-
-    NeighborhoodTableEntry e2{expectedId,expectedTimeSend,expectedPos,expectedEpsilon};
-    EXPECT_TRUE(e2.getNodeId() == expectedId);
-    EXPECT_TRUE(e2.getTimeSend() == expectedTimeSend);
-    EXPECT_TRUE(e2.getTimeReceived() == 0);
-    EXPECT_TRUE(e2.getPos() == expectedPos);
-    EXPECT_TRUE(e2.getEpsilon() == expectedEpsilon);
-
-    NeighborhoodTableEntry e3{expectedId,expectedTimeSend,expectedTimeReceived,expectedPos};
-    EXPECT_TRUE(e3.getNodeId() == expectedId);
-    EXPECT_TRUE(e3.getTimeSend() == expectedTimeSend);
-    EXPECT_TRUE(e3.getTimeReceived() == expectedTimeReceived);
-    EXPECT_TRUE(e3.getPos() == expectedPos);
-    EXPECT_TRUE(e3.getEpsilon() == inet::Coord(0.0,0.0));
-
-    NeighborhoodTableEntry e4{expectedId,expectedTimeSend,expectedPos};
-    EXPECT_TRUE(e4.getNodeId() == expectedId);
-    EXPECT_TRUE(e4.getTimeSend() == expectedTimeSend);
-    EXPECT_TRUE(e4.getTimeReceived() == 0);
-    EXPECT_TRUE(e4.getPos() == expectedPos);
-    EXPECT_TRUE(e4.getEpsilon() == inet::Coord(0.0,0.0));
 }
 
-TEST_F(NeighborhoodTableEntryTest, print) {
-    NeighborhoodTableEntry e0{0, 1, 1, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
-    std::stringstream ss;
-    ss << e0;
-    std::string result = ss.str();
-    std::string expected = "{id: 0 tSend: 1 tReceived: 1 pos: (0, 0, 0) m epsilon: (0, 0, 0) m";
-    EXPECT_TRUE(result.compare(expected) == 0);
-}
 
-TEST_F(NeighborhoodTableEntryTest, equals) {
+TEST_F(BeaconReceptionInfoTest, equals) {
     // also test private function copy()
     int nodeId = 0;
-    NeighborhoodTableEntry e0{nodeId, 0, 0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
-    NeighborhoodTableEntry e1{1, 2, 2, inet::Coord(1.0,1.0), inet::Coord(1.0,1.0)};
+    BeaconReceptionInfo e0 = build (nodeId, 0, 0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
+    BeaconReceptionInfo e1 = build (1, 2, 2, inet::Coord(1.0,1.0), inet::Coord(1.0,1.0));
 
-    e0 = e0;
     EXPECT_TRUE(e0.getNodeId() == nodeId);
 
-    e0 = e1;
-    EXPECT_TRUE(e0.getNodeId() == e1.getNodeId());
-    EXPECT_TRUE(e0.getTimeSend() == e1.getTimeSend());
-    EXPECT_TRUE(e0.getTimeReceived() == e1.getTimeReceived());
-    EXPECT_TRUE(e0.getPos() == e1.getPos());
-    EXPECT_TRUE(e0.getEpsilon() == e1.getEpsilon());
+    EXPECT_FALSE(e0.getNodeId() == e1.getNodeId());
+    EXPECT_FALSE(e0.getSentTimePrio() == e1.getSentTimePrio());
+    EXPECT_FALSE(e0.getReceivedTimePrio() == e1.getReceivedTimePrio());
+    EXPECT_FALSE(e0.getPos() == e1.getPos());
+    EXPECT_FALSE(e0.getEpsilon() == e1.getEpsilon());
 }
 
-TEST_F(NeighborhoodTableEntryTest, string) {
-    NeighborhoodTableEntry e0{0, 1, 1, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
-    std::string expected = "{id: 0 tSend: 1 tReceived: 1 pos: (0, 0, 0) m epsilon: (0, 0, 0) m";
+TEST_F(BeaconReceptionInfoTest, string) {
+    setSimTime(1.0);
+
+    BeaconReceptionInfo e0 = build(0, 5, 1, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
+    std::string expected = "{id: 0 a_t:1s age:0s}";
     std::string result = e0.str();
-    EXPECT_TRUE(result.compare(expected) == 0);
+    EXPECT_EQ(result, expected);
 }

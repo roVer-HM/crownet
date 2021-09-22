@@ -22,13 +22,49 @@ import inet.common.packet.chunk.Chunk;
 import inet.applications.base.ApplicationPacket;
 import inet.common.geometry.Geometry;
 
+import crownet.applications.common.info.AppInfo;
+
+cplusplus {{
+#include "crownet/applications/common/info/AppInfoReception.h"
+}}
+
+
+
 
 namespace crownet;
 
-class BeaconPacket extends inet::ApplicationPacket
+
+
+class BeaconPacketSimple extends inet::ApplicationPacket
 {
     int nodeId;
     simtime_t time;
     inet::Coord pos;
     inet::Coord epsilon;
+};
+
+class DynamicBeaconPacket extends inet::ApplicationPacket
+{
+    chunkLength = b(4*64 + 32 + 16);
+    
+    inet::Coord pos;
+    inet::Coord epsilon;
+    uint32_t posTimestamp;
+    uint16_t numberOfNeighbours;    
 }
+
+class DynamicBeaconHeader extends inet::FieldsChunk {
+    
+    chunkLength = b(16+32+32); // fixed
+    
+ 	uint16_t sequencenumber;
+ 	uint32_t sourceId;
+ 	uint32_t timestamp;
+}
+
+class BeaconReceptionInfo extends AppInfoReception {
+    @customize(true);
+    inet::Coord pos;
+    inet::Coord epsilon;   
+    uint16_t numberOfNeighbours; 
+};

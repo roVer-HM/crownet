@@ -35,15 +35,18 @@ void BaseBroadcast::initialize(int stage){
     }
 }
 
-FsmState BaseBroadcast::fsmAppMain(cMessage *msg){
-    auto payload = createPacket<ApplicationPacket>(B(par("messageLength")));
+Packet *BaseBroadcast::createPacket() {
 
+    // use configured packet size
+    auto payload = createPayload<ApplicationPacket>();
     payload->addTagIfAbsent<HopCount>()->setHops(initialHopCount);
-    sendPayload(payload);
-    return FsmRootStates::WAIT_ACTIVE;
+
+    return buildPacket(payload);
 }
 
+
 FsmState BaseBroadcast::handlePayload(const Ptr<const ApplicationPacket> pkt){
+    // no logic in BaseBroadcast
     return FsmRootStates::WAIT_ACTIVE;
 }
 
@@ -55,8 +58,10 @@ FsmState BaseBroadcast::handleDataArrived(Packet *packet){
         int hops = payload->getTag<HopCount>()->getHops() -1;
         if (hops > 0){
             auto newPayload = Ptr<ApplicationPacket>(payload->dup());
-            newPayload->addTagIfAbsent<HopCount>()->setHops(hops);
-            BaseApp::sendPayload(newPayload, addressInd->getDestAddress(), portInd->getDestPort());
+            newPayload->removeTag<HopCount>(b(0), b(-1));
+            auto tag = newPayload->addTagIfAbsent<HopCount>();
+            tag->setHops(hops);
+            scheduler->schedulePacket(buildPacket(newPayload));
         }
     }
     return handlePayload(payload);

@@ -1,6 +1,6 @@
-#include "main_test.h"
-#include "crownet/common/NeighborhoodTable.h"
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
+#include "main_test.h"
 #include "gmock/gmock.h"
 
 using namespace crownet;
@@ -11,6 +11,19 @@ class MockNeighborhoodTable : public NeighborhoodTable{
   public:
     MOCK_METHOD2(scheduleAt, void(simtime_t t, cMessage* msg));
     MOCK_METHOD0(checkTimeToLive, void());
+
+    MockNeighborhoodTable(){}
+
+    BeaconReceptionInfo build(int id, int t1, int t2, inet::Coord c1, inet::Coord c2){
+
+        BeaconReceptionInfo info;
+        info.setNodeId(id);
+        info.setSentTimePrio(t1);
+        info.setReceivedTimePrio(t2);
+        info.setPos(c1);
+        info.setEpsilon(c2);
+        return info;
+    }
 };
 
 TEST(NeighborhoodTableBase, Test_constructor) {
@@ -23,6 +36,24 @@ TEST(NeighborhoodTableBase, Test_constructor) {
 class NeighborhoodTableTest : public BaseOppTest {
  public:
     NeighborhoodTableTest() {}
+    BeaconReceptionInfo build(int id, int t1, int t2, inet::Coord c1, inet::Coord c2){
+
+        BeaconReceptionInfo info;
+        info.setNodeId(id);
+        info.setSentTimePrio(t1);
+        info.setReceivedTimePrio(t2);
+        info.setPos(c1);
+        info.setEpsilon(c2);
+        return info;
+    }
+
+    BeaconReceptionInfo*  apply(BeaconReceptionInfo* info, simtime_t t1, simtime_t t2, inet::Coord c1, inet::Coord c2){
+        info->setSentTimePrio((uint32_t)t1.inUnit(SimTimeUnit::SIMTIME_MS));
+        info->setReceivedTimePrio(t2);
+        info->setPos(c1);
+        info->setEpsilon(c2);
+        return info;
+    }
 };
 
 TEST_F(NeighborhoodTableTest, checkTimeToLive) {
@@ -33,56 +64,45 @@ TEST_F(NeighborhoodTableTest, checkTimeToLive) {
   nTable.setMaxAge(maxAge);
 
   //valid, must be present after checkTimeToLive() call
-  NeighborhoodTableEntry e0{0, now - maxAge + 2, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e1{1, now - maxAge + 1, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e2{2, now - maxAge + 0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
+  apply(nTable.getOrCreateEntry(0), now - maxAge + 2, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
+  apply(nTable.getOrCreateEntry(1), now - maxAge + 1, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0));
+  apply(nTable.getOrCreateEntry(2), now - maxAge + 0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0));
 
   //invalid, must be removed by checkTimeToLive() call
-  NeighborhoodTableEntry e3{3, now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0)};
-  NeighborhoodTableEntry e4{4, now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
-  std::map<int, NeighborhoodTableEntry> internalTable = {{0,e0}, {1,e1}, {2,e2}, {3,e3}, {4,e4}};
-  nTable.setTable(internalTable);
+  apply(nTable.getOrCreateEntry(3), now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0));
+  apply(nTable.getOrCreateEntry(4), now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
 
   nTable.checkTimeToLive();
-  EXPECT_TRUE(internalTable.size() > nTable.getTable().size());
+  EXPECT_TRUE(5 > nTable.getTable().size());
 
   // check table entries
   EXPECT_EQ(nTable.getTable().count(0), 1);
   EXPECT_EQ(nTable.getTable().count(1), 1);
   EXPECT_EQ(nTable.getTable().count(2), 1);
-  EXPECT_EQ(nTable.getTable().count(3), 0);
-  EXPECT_EQ(nTable.getTable().count(4), 0);
+  EXPECT_EQ(nTable.getTable().count(3), 0); // invalid not found
+  EXPECT_EQ(nTable.getTable().count(4), 0); // invlaid not found
 }
 
 TEST_F(NeighborhoodTableTest, handleBeacon) {
   NeighborhoodTable nTable;
 
   // add new entry
-  NeighborhoodTableEntry b0{0, 1.0, 2.0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0)};
-  nTable.handleBeacon(std::move(b0));
+  BeaconReceptionInfo* b0 = apply(nTable.getOrCreateEntry(0), 1.0, 2.0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
   EXPECT_EQ(nTable.getTable().size(), 1);
-  EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b0.getTimeSend().dbl());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getSentTimePrio(), b0->getSentTimePrio());
 
   // add new entry
-  NeighborhoodTableEntry b1{1, 1.0, 3.0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0)};
-  nTable.handleBeacon(std::move(b1));
+  BeaconReceptionInfo* b1  = apply(nTable.getOrCreateEntry(1), 1.0, 3.0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0));
   EXPECT_EQ(nTable.getTable().size(), 2);
-  EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b0.getTimeSend().dbl());
-  EXPECT_EQ(nTable.getTable().find(1)->second.getTimeSend().dbl(), b1.getTimeSend().dbl());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getSentTimePrio(), b0->getSentTimePrio());
+  EXPECT_EQ(nTable.getTable().find(1)->second->getSentTimePrio(), b1->getSentTimePrio());
 
   // add entry from existing node id (override old value because new value is younger)
-  NeighborhoodTableEntry b2{0, 2.0, 4.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
-  nTable.handleBeacon(std::move(b2));
+  BeaconReceptionInfo* b2 = apply(nTable.getOrCreateEntry(0), 2.0, 4.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
   EXPECT_EQ(nTable.getTable().size(), 2); // size must not increase
-  EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b2.getTimeSend().dbl());
-  EXPECT_EQ(nTable.getTable().find(1)->second.getTimeSend().dbl(), b1.getTimeSend().dbl());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getSentTimePrio(), b2->getSentTimePrio());
+  EXPECT_EQ(nTable.getTable().find(1)->second->getSentTimePrio(), b1->getSentTimePrio());
 
-  // add entry from existing node id (keep old value because new value is to old)
-  NeighborhoodTableEntry b3{0, 1.0, 5.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0)};
-  nTable.handleBeacon(std::move(b3));
-  EXPECT_EQ(nTable.getTable().size(), 2);
-  EXPECT_EQ(nTable.getTable().find(0)->second.getTimeSend().dbl(), b2.getTimeSend().dbl());
-  EXPECT_EQ(nTable.getTable().find(1)->second.getTimeSend().dbl(), b1.getTimeSend().dbl());
 }
 
 TEST_F(NeighborhoodTableTest, handleMessage) {

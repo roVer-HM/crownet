@@ -11,30 +11,43 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
-
-//
-// TODO generated message class
 //
 
 import inet.common.INETDefs;
-import inet.common.packet.chunk.Chunk;
-import inet.applications.base.ApplicationPacket;
-import inet.common.geometry.Geometry;
-
-
-cplusplus{{
-#include "crownet/common/NeighborhoodTableEntry.h"
-}}
+import inet.common.Units;
+import inet.common.packet.Packet;
 
 namespace crownet;
 
-class NeighborhoodTableEntry 
-{
-    @existingClass;
-    int nodeId;
-    simtime_t timeSend;
-    simtime_t timeReceived;
-    inet::Coord pos;
-    inet::Coord epsilon;   
+
+cplusplus {{
+using namespace inet;
+}}
+
+class PacketFlowStats extends cOwnedObject {
+    int packetCount;
+    inet::b totalData = inet::b(-1);
+    inet::bps dataRate = inet::bps(0);
+    double packetRate;
+}
+
+cplusplus(PacketFlowStats){{
+  public:
+  	void incrData(b data){totalData += data;}
+  	void incrPacket(int p=1){packetCount +=p;}
+}}
+
+class PackerMeterBase extends cOwnedObject {
+    PacketFlowStats stats;   
+}
+
+cplusplus(PackerMeterBase){{
+    public:
+      virtual void meterPacket(Packet *packet) {cRuntimeError("Implement");}
+}}
+
+class EmaPacketMeter extends PackerMeterBase {
+    @customize(true);
+    double alpha;
+ 
 }

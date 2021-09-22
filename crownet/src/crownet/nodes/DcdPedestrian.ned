@@ -39,11 +39,11 @@ module DcdPedestrian extends TransportLayerRoadUser
             @display("p=346.528,54.88,row,140");
         }
 
-        densityMap: <default(crownetAppType)> like IBaseApp if typename!="" {
+        densityMap: <default(crownetAppType)> like IApp if typename!="" {
             parameters:
                 @display("p=605.248,54.88;i=block/users;is=s");
         }
-        beacon: <default(crownetAppType)> like IBaseApp if typename!="" {
+        beacon: <default(crownetAppType)> like IApp if typename!="" {
             parameters:
                 @display("p=771.456,54.88;i=block/broadcast;is=s");
         }

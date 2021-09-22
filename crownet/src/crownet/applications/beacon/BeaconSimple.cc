@@ -21,29 +21,28 @@ void BeaconSimple::initialize(int stage) {
     if (stage == INITSTAGE_LOCAL){
         mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
-        hostId = getContainingNode(this)->getId();
-        WATCH(hostId);
     }
 }
 
-// FSM
-FsmState BeaconSimple::fsmAppMain(cMessage *msg) {
+Packet *BeaconSimple::createPacket() {
 
-    const auto &beacon = createPacket<BeaconPacket>(B(224)); //64+64+64+32
+    auto beacon = createPayload<BeaconPacketSimple>();
     beacon->setTime(simTime());
     beacon->setPos(mobility->getCurrentPosition());
-    beacon->setNodeId(hostId);
+    beacon->setNodeId(getHostId());
 
-    sendPayload(beacon);
-    scheduleNextAppMainEvent();
-    return FsmRootStates::WAIT_ACTIVE;
+    return buildPacket(beacon);
 }
 
 FsmState BeaconSimple::handleDataArrived(Packet *packet){
-    auto p = packet->popAtFront<BeaconPacket>();
+    auto p = packet->popAtFront<BeaconPacketSimple>();
 
-    NeighborhoodTableEntry b{p->getNodeId(), p->getTime(), simTime(), p->getPos(), p->getEpsilon()};
-    nTable->handleBeacon(std::move(b));
+    auto info = nTable->getOrCreateEntry(p->getNodeId());
+    info->setSentTimePrio(p->getTime());
+    info->setReceivedTimePrio(simTime());
+    info->setPos(p->getPos());
+    info->setEpsilon(p->getEpsilon());
+
     return FsmRootStates::WAIT_ACTIVE;
 }
 

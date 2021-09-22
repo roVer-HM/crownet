@@ -31,6 +31,7 @@ Define_Module(BaseDensityMapApp);
 BaseDensityMapApp::~BaseDensityMapApp(){
     if(watcher)
         delete watcher;
+    cancelAndDelete(localMapTimer);
 }
 
 void BaseDensityMapApp::initialize(int stage) {
@@ -39,6 +40,11 @@ void BaseDensityMapApp::initialize(int stage) {
       mapType = par("mapType").stdstringValue();
       mapTypeLog = par("mapTypeLog").stdstringValue();
       hostId = getContainingNode(this)->getId();
+
+      localMapUpdateInterval = &par("localMapUpdateInterval");
+      localMapTimer = new cMessage("localMapTimer");
+      localMapTimer->setKind(FsmRootStates::APP_MAIN);
+      scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
       WATCH(hostId);
     } else if (stage == INITSTAGE_LAST){
 
@@ -80,10 +86,10 @@ FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
 }
 
 FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
-  // send Message
+  // update density map state.
   updateLocalMap();
-  sendMapMap();
-  scheduleNextAppMainEvent();
+  localMapTimer->setKind(FsmRootStates::APP_MAIN);
+  scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
   return FsmRootStates::WAIT_ACTIVE;
 }
 
@@ -128,37 +134,38 @@ void BaseDensityMapApp::initWriter(){
     }
 }
 
-void BaseDensityMapApp::sendMapMap() {
+Packet *BaseDensityMapApp::createPacket() {
+    // todo split packet
 
-  // todo calc: 24 * currCell Fragmentation!
-  // FIXME: real size!!!
-  const auto &payload = createPacket<PositionMapPacket>(B(1000));
+    // todo calc: 24 * currCell Fragmentation!
+    // FIXME: real size!!!
+    const auto &payload = createPayload<PositionMapPacket>(B(1000));
 
-  computeValues();
-  int numValidCells = dcdMap->valid().distance();
+    computeValues(); // update values
+    int numValidCells = dcdMap->valid().distance();
 
-  payload->setNodeId(dcdMap->getOwnerId().value());
-  payload->setCellId(0, dcdMap->getOwnerCell().val().first);
-  payload->setCellId(1, dcdMap->getOwnerCell().val().second);
+    payload->setNodeId(dcdMap->getOwnerId().value());
+    payload->setCellId(0, dcdMap->getOwnerCell().val().first);
+    payload->setCellId(1, dcdMap->getOwnerCell().val().second);
 
-  payload->setNumCells(numValidCells);
-  payload->setCellCountArraySize(numValidCells);
-  payload->setCellXArraySize(numValidCells);
-  payload->setCellYArraySize(numValidCells);
-  payload->setMTimeArraySize(numValidCells);
-  int currCell = 0;
+    payload->setNumCells(numValidCells);
+    payload->setCellCountArraySize(numValidCells);
+    payload->setCellXArraySize(numValidCells);
+    payload->setCellYArraySize(numValidCells);
+    payload->setMTimeArraySize(numValidCells);
+    int currCell = 0;
 
-  for (auto iter = dcdMap->valid(); iter != iter.end(); ++iter) {
-    const auto &cell = (*iter).first;
-    const auto &measure = (*iter).second.val();
-    payload->setCellX(currCell, cell.val().first);
-    payload->setCellY(currCell, cell.val().second);
-    payload->setCellCount(currCell, measure->getCount());
-    payload->setMTime(currCell, measure->getMeasureTime());
-    currCell++;
-  }
+    for (auto iter = dcdMap->valid(); iter != iter.end(); ++iter) {
+      const auto &cell = (*iter).first;
+      const auto &measure = (*iter).second.val();
+      payload->setCellX(currCell, cell.val().first);
+      payload->setCellY(currCell, cell.val().second);
+      payload->setCellCount(currCell, measure->getCount());
+      payload->setMTime(currCell, measure->getMeasureTime());
+      currCell++;
+    }
 
-  sendPayload(payload);
+    return buildPacket(payload);
 }
 
 bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
@@ -186,14 +193,9 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
   // 3) check local map for _nodeId and compare if the local and packet
   //    place the _nodeId in the same cell.
   dcdMap->addToNeighborhood(sourceNodeId, sourceCellId);
-  //  using namespace omnetpp;
-  //  EV_DEBUG << dMap->getView(mapType)->str();
-  //  EV_DEBUG << dMap->getView("local")->str();
 
   return true;
 }
-
-//
 
 void BaseDensityMapApp::updateLocalMap() {
     throw omnetpp::cRuntimeError("Not Implemented in Base* class. Use child class");

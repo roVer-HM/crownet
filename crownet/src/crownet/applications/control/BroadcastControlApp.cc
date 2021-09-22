@@ -24,14 +24,9 @@ namespace crownet {
 
 Define_Module(BroadcastControlApp);
 
-BroadcastControlApp::BroadcastControlApp() {
-    // TODO Auto-generated constructor stub
+BroadcastControlApp::BroadcastControlApp() {}
 
-}
-
-BroadcastControlApp::~BroadcastControlApp() {
-    // TODO Auto-generated destructor stub
-}
+BroadcastControlApp::~BroadcastControlApp() {}
 
 void BroadcastControlApp::initialize(int stage) {
     BaseBroadcast::initialize(stage);
@@ -47,6 +42,7 @@ void BroadcastControlApp::initialize(int stage) {
 
 
 FsmState BroadcastControlApp::handlePayload(const Ptr<const ApplicationPacket> pkt){
+    // Possible rebroadcast handled in BaseBroadcast::handleDataArrived
     if (isControlled()){
             auto ctrlTag = pkt->getTag<SimpleControlCfg>();
             ctrl->send_control(ctrlTag->getModelString(), ctrlTag->getModelData());
@@ -54,39 +50,33 @@ FsmState BroadcastControlApp::handlePayload(const Ptr<const ApplicationPacket> p
     return FsmRootStates::WAIT_ACTIVE;
 }
 
+Packet *BroadcastControlApp::createPacket() {
 
-FsmState BroadcastControlApp::fsmAppMain(cMessage *msg){
-    auto payload = createPacket<ApplicationPacket>(B(par("messageLength")));
-
+    // use configured packet size.
+    auto payload = createPayload<ApplicationPacket>();
     payload->addTagIfAbsent<HopCount>()->setHops(initialHopCount);
+
     auto meta = payload->addTagIfAbsent<SimpleControlCfg>();
     meta->setModelString(modelString.c_str());
     meta->setModelData(modelData.c_str());
 
-    sendPayload(payload);
-    scheduleNextAppMainEvent();
-    return FsmRootStates::WAIT_ACTIVE;
+    return buildPacket(payload);
 }
-
-void BroadcastControlApp::setupTimers(){
-    // do not start main loop. This will be done over HandleSubState
-}
-
-
 
 FsmState BroadcastControlApp::fsmHandleSubState(cMessage *msg){
+    // called by scheduler using the BaseApp FSM. Just create and send control message
+
     auto cfgMsg = check_and_cast<Message*>(msg);
     auto controlCfg = cfgMsg->getTag<SimpleControlCfg>();
 
+    // save last received data to possible retransmissions.
     modelString = controlCfg->getModelString();
     modelData = controlCfg->getModelData();
+    modelAge = simTime();
 
-    // reset sendLimit
-    sendLimit = par("mainMsgLimit").intValue();
+    auto packet = createPacket();
 
-    // cancel main app loop and reset with received  configuration.
-    cancelAppMainEvent();
-    scheduleNextAppMainEvent(simTime() + appMainIntervalOffset); //TODO: 0.4?
+    pushOrSendPacket(packet, outputGate, consumer);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

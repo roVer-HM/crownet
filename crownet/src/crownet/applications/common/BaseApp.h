@@ -38,11 +38,17 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 
+#include "crownet/applications/common/info/AppInfoLocal.h"
+#include "crownet/queueing/CrownetActivePacketSourceBase.h"
+#include "crownet/applications/common/scheduler/IAppScheduler.h"
+
 using namespace inet;
 
 namespace crownet {
 
-class BaseApp : public ApplicationBase, public DataArrivedHandler {
+class BaseApp : //public ApplicationBase,
+                public DataArrivedHandler,
+                public crownet::queueing::CrownetActivePacketSourceBase {
  public:
   BaseApp(){};
   virtual ~BaseApp();
@@ -52,41 +58,54 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   // parameters
   simtime_t startTime;
   simtime_t stopTime;
-  simtime_t appMainIntervalOffset;
-  int sendLimit;
-
-  const char *packetName = nullptr;
 
   // state
   cMessage *appLifeTime = nullptr;
   cMessage *appMainTimer = nullptr;
 
-  // statistics
-  int numSent = 0;
-  int numReceived = 0;
-
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
-  SocketProvider* socketProvider;
+  SocketProvider* socketProvider = nullptr;
+  IAppScheduler* scheduler = nullptr;
+  AppInfoLocal* localInfo = nullptr;
+  int hostId;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
-  virtual void handleMessageWhenUp(cMessage *msg) override;
+  virtual void handleMessage(cMessage *message) override;
   virtual void initialize(int stage) override;
   virtual void finish() override;
-  virtual void refreshDisplay() const override;
+
+  // omnetpp based id as unique and constant identifier.
+  int getHostId() const {return hostId;}
+
   /**
    * schedule selfMsgSendTimer with base + par("sendInterval").
    * base = -1 defaults to the current time.
    * negative par("sendInterval") will cause errors.
    */
   virtual void scheduleNextAppMainEvent(simtime_t time = -1);
-  virtual void cancelAppMainEvent();
-  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload);
-  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port);
+
+
+
+  virtual void overrideSocketDest(Packet *packet, L3Address addr, int port);
+
+  // use simple ApplicationPacket based application.
+  // No separate header, footer
+//  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload);
+//  virtual void sendPayload(IntrusivePtr<ApplicationPacket> payload, L3Address addr, int port);
+  // let application create complex packet structure. BaseApp child classes must ensure correct
+  // sequence number and tags.
+//  virtual void sendPayload(Packet *packet);
+//  virtual void sendPayload(Packet *packet,  L3Address addr, int port);
+
+  virtual void initLocalAppInfo();
 
   template <typename T>
-  IntrusivePtr<T> createPacket(b length = b(-1));
+  IntrusivePtr<T> createPayload(b packetLength = b(-1));
+
+  virtual Packet *buildPacket(Ptr<Chunk> content, Ptr<Chunk> header = nullptr);
+
 
   // fsmRoot actions
 
@@ -97,27 +116,31 @@ class BaseApp : public ApplicationBase, public DataArrivedHandler {
   // setup socket, endTime and selfMsgSendTimer
   virtual FsmState fsmSetup(cMessage *msg);
   virtual FsmState fsmDataArrived(cMessage *msg);
-  virtual FsmState fsmAppMain(cMessage *msg) = 0;
+  virtual FsmState fsmAppMain(cMessage *msg);
   virtual FsmState fsmTeardown(cMessage *msg);
   virtual FsmState fsmDestroy(cMessage *msg);
+  // if scheduler directly sends a *Packet used forward it.
+  virtual FsmState fsmSendPacket(Packet *pkt);
 
 
   virtual void setupTimers();  // called in fsmSetup
-  simtime_t getInitialMainAppTime();
+  virtual void handlePacketProcessed(Packet *packet) override;
 
   // Lifecycle management
   virtual void handleStartOperation(
-      LifecycleOperation *operation) override;  // trigger fsmSetup
-  virtual void handleStopOperation(LifecycleOperation *operation) override;
-  virtual void handleCrashOperation(LifecycleOperation *operation) override;
+      LifecycleOperation *operation); //override;  // trigger fsmSetup
 };
 
 template <typename T>
-inline IntrusivePtr<T> BaseApp::createPacket(b length) {
+inline IntrusivePtr<T> BaseApp::createPayload(b packetLength) {
   auto payload = makeShared<T>();
-  payload->setChunkLength(length);
-  payload->setSequenceNumber(numSent);
-  payload->template addTag<CreationTimeTag>()->setCreationTime(simTime());
+  if (packetLength < b(0)){
+      // use configured packetLength
+      payload->setChunkLength(B(b(packetLengthParameter->intValue())));
+  } else {
+      payload->setChunkLength(B(packetLength));
+  }
+  payload->setSequenceNumber(localInfo->nextSequenceNumber());
   return payload;
 }
 
