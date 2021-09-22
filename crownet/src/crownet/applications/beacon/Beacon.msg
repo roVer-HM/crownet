@@ -45,7 +45,7 @@ class BeaconPacketSimple extends inet::ApplicationPacket
 
 class DynamicBeaconPacket extends inet::ApplicationPacket
 {
-    chunkLength = B(4*64 + 32 + 16);
+    chunkLength = b(4*64 + 32 + 16);
     
     inet::Coord pos;
     inet::Coord epsilon;
@@ -55,7 +55,7 @@ class DynamicBeaconPacket extends inet::ApplicationPacket
 
 class DynamicBeaconHeader extends inet::FieldsChunk {
     
-    chunkLength = B(16+32+32); // fixed
+    chunkLength = b(16+32+32); // fixed
     
  	uint16_t sequencenumber;
  	uint32_t sourceId;
