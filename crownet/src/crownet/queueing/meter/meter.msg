@@ -26,7 +26,7 @@ using namespace inet;
 
 class PacketFlowStats extends cOwnedObject {
     int packetCount;
-    inet::b totalData = inet::b(-1);
+    inet::b totalData = inet::b(0);
     inet::bps dataRate = inet::bps(0);
     double packetRate;
 }

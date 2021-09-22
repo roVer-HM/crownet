@@ -25,14 +25,12 @@ namespace crownet {
 class EmaPacketMeter : public EmaPacketMeter_Base {
 
 protected:
-    simtime_t lastUpdate;
-    int currentNumPackets;
-    b currentTotalPacketLength;
-
-protected:
-    virtual void meterPacket(Packet *packet) override;
+    simtime_t lastUpdate = simtime_t::ZERO;
+    int currentNumPackets = 0;
+    b currentTotalPacketLength = b(0);
 
 public:
+    virtual void meterPacket(Packet *packet) override;
     virtual EmaPacketMeter *dup() const override {
         return new EmaPacketMeter(*this);
     }

@@ -9,7 +9,11 @@
 
 #include <gtest/gtest.h>
 #include <omnetpp.h>
+#include "inet/common/packet/Packet.h"
+#include "inet/common/Units.h"
+#include "inet/applications/base/ApplicationPacket_m.h"
 
+using namespace inet;
 using namespace omnetpp;
 
 class EmptyConfig : public cConfiguration {
@@ -66,4 +70,19 @@ class BaseOppTest : public ::testing::Test {
     auto sim = cSimulation::getActiveSimulation();
     sim->setSimTime(t);
   }
+
+  Packet* build(Ptr<Chunk> content){
+      auto pkt = new Packet();
+      pkt->insertAtFront(content);
+      return pkt;
+  }
+
+  Packet* build(b dataLength ){
+      auto pkt = new Packet();
+      auto content = makeShared<ApplicationPacket>();
+      content->setChunkLength(dataLength);
+      pkt->insertAtFront(content);
+      return pkt;
+  }
+
 };
