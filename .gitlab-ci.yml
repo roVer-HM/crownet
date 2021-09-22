@@ -7,7 +7,7 @@ variables:
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
- DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
+ DOCKER_CLIENT_TIMEOUT: '400'         # timeout for docker client (needs to be higher than default)
 
 
 stages:
