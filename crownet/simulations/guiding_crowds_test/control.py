@@ -15,8 +15,8 @@ class PingPong(Controller):
     def __init__(self):
         super().__init__()
         self.control = [
-            (0, ["2"]),
-            (5.0, ["3"]),
+            (0, ["2"]), # first call (in omnetpp simulation time), first target
+            (5.0, ["3"]), # second call, second target
             (10, ["2"]),
             (15, ["3"]),
             (20, ["2"]),
@@ -29,24 +29,29 @@ class PingPong(Controller):
         self.con_manager = con_manager
 
     def handle_sim_step(self, sim_time, sim_state):
-        if self.count >= len(self.control):
-            return
-        print(f"TikTokController: {sim_time} handle_sim_step evaluate control...")
+        if self.count < len(self.control):
+            print(f"TikTokController: apply control action ")
+            for ped_id in ["1", "2", "3", "4"]:
+                self.con_manager.domains.v_person.set_target_list(
+                    str(ped_id), self.control[self.count][1]
+                )
+        else:
+            print(f"TikTokController: handle_sim_step evaluate control...")
 
-        print(f"TikTokController: {sim_time} apply control action ")
-        for ped_id in ["1", "2", "3", "4"]:
-            self.con_manager.domains.v_person.set_target_list(
-                str(ped_id), self.control[self.count][1]
-            )
-        # read if listeners are used
-
-        self.con_manager.next_call_at(self.control[self.count][0])
-        self.count += 1
 
     def handle_init(self, sim_time, sim_state):
         print("TikTokController: handle_init")
-        self.con_manager.next_call_at(0.0)
         print(sim_state)
+
+    def set_next_step_time(self):
+        self.count += 1
+        if self.count < len(self.control):
+            self.next_call = self.control[self.count][0]
+            self.con_manager.next_call_at(self.next_call)
+            print(f"Set next call to {self.next_call}.")
+        else:
+            self.con_manager.next_call_at(100)
+            print(f"TikTokController will not be called any more (set next call to 100s := after simulation end).")
 
 
 if __name__ == "__main__":
@@ -75,7 +80,7 @@ if __name__ == "__main__":
             "--port",
             "9997",
             "--host-name",
-            "localhost",
+            "0.0.0.0",
         ]
 
 

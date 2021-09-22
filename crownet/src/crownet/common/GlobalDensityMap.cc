@@ -135,6 +135,9 @@ void GlobalDensityMap::initialize(int stage) {
     if (updateInterval > 0) {
       scheduleAt(simTime() + updateInterval, updateTimer);
     }
+
+    // todo may be set via ini file
+    valueVisitor = std::make_shared<LocalSelector>(simTime());
   }
 }
 
@@ -180,6 +183,8 @@ void GlobalDensityMap::updateMaps() {
   dcdMapGlobal->visitCells(ResetVisitor{lastUpdate});
   dcdMapGlobal->clearNeighborhood();
   nodeManager->visit(this);
+  valueVisitor->setTime(simTime());
+  dcdMapGlobal->computeValues(valueVisitor);
 
   // update each decentralized map
   for (auto &handler : dezentralMaps) {
