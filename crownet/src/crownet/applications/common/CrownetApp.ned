@@ -23,7 +23,6 @@ import inet.queueing.contract.ITrafficConditioner;
 import inet.queueing.contract.IPacketMeter;
 import crownet.applications.common.scheduler.IAppScheduler;
 
-
 module CrownetApp like IApp, IAppConfig
 {
     parameters:
@@ -38,10 +37,16 @@ module CrownetApp like IApp, IAppConfig
             @display("p=142,208,row,140");
         }
 
-        packetMeter: <default("RateMeter")> like IPacketMeter {
+        packetMeterOut: <default("GenericPacketMeter")> like IPacketMeter {
 
-            @display("p=252,85");
+            @display("p=243,85");
         }
+
+        packetMeterIn: <default("GenericPacketMeter")> like IPacketMeter {
+
+            @display("p=243,208");
+        }
+
 
         socket: <> like ISocketManager {
             @display("p=407,208");
@@ -58,11 +63,12 @@ module CrownetApp like IApp, IAppConfig
 
 
     connections:
-        app.out --> packetMeter.in;
-        packetMeter.out --> shaper.in;
+        app.out --> packetMeterOut.in;
+        packetMeterOut.out --> shaper.in;
         shaper.out --> socket.in;
 
-        app.in <-- socket.toApp;
+		socket.toApp --> packetMeterIn.in;
+		packetMeterIn.out --> app.in;
 
         scheduler.out --> app.scheduleIn;
 
