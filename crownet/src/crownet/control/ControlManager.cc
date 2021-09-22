@@ -81,7 +81,8 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
         boost::property_tree::ptree pt;
         boost::property_tree::read_json(ss, pt);
 
-        data->setAppTTL(pt.get<double>("time"));
+        //TODO: discuss what to do with the time attribute
+        //data->setAppTTL(pt.get<double>("time"));
 
 
     }
@@ -97,8 +98,8 @@ std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd&
     Enter_Method_Silent();
 
     auto node_module = this->findModuleByPath(cmd.nodeId.c_str());
-    IDensityMapHandler<RegularDcdMap>* map_handler =
-            check_and_cast<IDensityMapHandler<RegularDcdMap>*>(node_module);
+    IDensityMapHandlerBase<RegularDcdMap>* map_handler =
+            check_and_cast<IDensityMapHandlerBase<RegularDcdMap>*>(node_module);
 
     std::vector<double> density_vals;
     auto map = map_handler->getMap();

@@ -21,7 +21,7 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> gridSize,
     visitor_dispatcher["mean"] = [this](){return std::make_shared<MeanVisitor>(timeProvider->now());};
     visitor_dispatcher["median"] = [this](){return std::make_shared<MedianVisitor>(timeProvider->now());};
     visitor_dispatcher["invSourceDist"] = [this](){return std::make_shared<InvSourceDistVisitor>(timeProvider->now());};
-
+    visitor_dispatcher["local"] = [this](){return std::make_shared<LocalSelector>(timeProvider->now());};
 }
 
 

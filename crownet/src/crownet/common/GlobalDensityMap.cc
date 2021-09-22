@@ -96,7 +96,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     simBoundWidth = converter->getBoundaryWidth();
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
-    gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
+    gridDim.second = floor(converter->getBoundaryHeight() / gridSize);
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
@@ -135,6 +135,9 @@ void GlobalDensityMap::initialize(int stage) {
     if (updateInterval > 0) {
       scheduleAt(simTime() + updateInterval, updateTimer);
     }
+
+    // todo may be set via ini file
+    valueVisitor = std::make_shared<LocalSelector>(simTime());
   }
 }
 
@@ -180,6 +183,8 @@ void GlobalDensityMap::updateMaps() {
   dcdMapGlobal->visitCells(ResetVisitor{lastUpdate});
   dcdMapGlobal->clearNeighborhood();
   nodeManager->visit(this);
+  valueVisitor->setTime(simTime());
+  dcdMapGlobal->computeValues(valueVisitor);
 
   // update each decentralized map
   for (auto &handler : dezentralMaps) {

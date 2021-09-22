@@ -26,6 +26,12 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
   return ret;
 }
 
+RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
+    // to check local exists.... raise error.....
+    auto val = cell.getLocal();
+    return val;
+}
+
 
 RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell) const {
   double sum = 0;
