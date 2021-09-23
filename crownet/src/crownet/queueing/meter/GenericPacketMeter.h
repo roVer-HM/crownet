@@ -16,6 +16,7 @@
 #ifndef CROWNET_QUEUEING_METER_GENERICPACKETMETER_H_
 #define CROWNET_QUEUEING_METER_GENERICPACKETMETER_H_
 
+#include "crownet/crownet.h"
 #include "inet/queueing/base/PacketMeterBase.h"
 #include "inet/queueing/contract/IActivePacketSource.h"
 #include "inet/queueing/contract/IPacketMeter.h"

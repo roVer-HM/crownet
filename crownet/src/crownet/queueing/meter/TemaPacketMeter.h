@@ -13,22 +13,29 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.queueing.meter;
-
-import inet.queueing.base.PacketMeterBase;
-import inet.queueing.contract.IPacketMeter;
-import inet.queueing.meter.RateMeter;
+#ifndef CROWNET_QUEUEING_METER_TEMAPACKETMETER_H_
+#define CROWNET_QUEUEING_METER_TEMAPACKETMETER_H_
 
 
-simple GenericPacketMeter extends PacketMeterBase like IPacketMeter 
-{
- 	parameters:
- 	    @display("i=block/star");
-        @class(crownet::GenericPacketMeter);
-        // %p packet count; %l bit count;  %r packet rate; %R data rate
-        displayStringTextFormat = default("%r | %R");
-        object meter = default(crownet::EmaPacketMeter{alpha: 1/16});
-//		object meter = default(crownet::TemaPacketMeter{beta: 15/16});
-        bool markPackets = default(false);
-          
+#include "inet/queueing/contract/IPacketMeter.h"
+#include "crownet/queueing/meter/meter_m.h"
+
+namespace crownet {
+
+
+class TemaPacketMeter : public TemaPacketMeter_Base {
+
+protected:
+    simtime_t lastUpdate = simtime_t::ZERO;
+    bool t_0 = true;
+
+public:
+    virtual void meterPacket(Packet *packet) override;
+    virtual TemaPacketMeter *dup() const override {
+        return new TemaPacketMeter(*this);
+    }
+
+};
 }
+
+#endif /* CROWNET_QUEUEING_METER_TEMAPACKETMETER_H_ */
