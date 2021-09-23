@@ -1,9 +1,6 @@
 [submodule "inet"]
 	path = inet4
 	url = ../inet.git
-[submodule "simulte"]
-	path = simulte
-	url = ../simulte.git
 [submodule "veins"]
 	path = veins
 	url = ../veins.git
@@ -22,3 +19,6 @@
 [submodule "analysis/suq-controller"]
 	path = analysis/suq-controller
 	url = https://gitlab.lrz.de/vadere/suq-controller.git
+[submodule "Simu5G"]
+	path = simu5g
+	url = ../Simu5G.git

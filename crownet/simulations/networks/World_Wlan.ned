@@ -27,8 +27,8 @@ network World_Wlan extends World
         int numStationary = default(0);
         bool hasStationary = default(numStationary != 0);
 
-        hasLte = false;
-        hasLteCoreNetwork = false;
+        hasCellular = false;
+        hasCellularCoreNetwork = false;
         hasWlan = true;
         hasStoryboard = false;
 

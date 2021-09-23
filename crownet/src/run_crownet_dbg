@@ -2,11 +2,11 @@
 DIR=`dirname $0`
 DIR=`(cd $DIR ; pwd)`
 INET_DIR=`(cd $DIR/../../inet4/src ; pwd)`
-SIMULTE_DIR=`(cd $DIR/../../simulte/src ; pwd)`
+SIMU5G_DIR=`(cd $DIR/../../simu5g/src ; pwd)`
 VEINS_DIR=`(cd $DIR/../../veins/src/veins ; pwd)`
 VEINS_INET_DIR=`(cd $DIR/../../veins/subprojects/veins_inet/src/veins_inet ; pwd)`
 ARTERY_DIR=`(cd $DIR/../../artery/src; pwd)`
-COMMAND_LINE_OPTIONS="-n $DIR/../simulations:$DIR:$INET_DIR:$SIMULTE_DIR:$ARTERY_DIR:$VEINS_DIR:$VEINS_INET_DIR"
+COMMAND_LINE_OPTIONS="-n $DIR/../simulations:$DIR:$INET_DIR:$SIMU5G_DIR:$ARTERY_DIR:$VEINS_DIR:$VEINS_INET_DIR"
 
 if [ -f $DIR/libCROWNET.so -o -f $DIR/libCROWNET.dll -o -f $DIR/libCROWNET.dylib ]; then
   opp_run_dbg -l $DIR/CROWNET $COMMAND_LINE_OPTIONS $*

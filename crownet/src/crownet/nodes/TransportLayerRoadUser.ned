@@ -23,7 +23,7 @@ import inet.transportlayer.contract.ITcp;
 import inet.transportlayer.contract.IUdp;
 import inet.transportlayer.contract.ISctp;
 import inet.common.MessageDispatcher;
-import lte.stack.ILteNic;
+import simu5g.stack.ICellularNic;
 
 module TransportLayerRoadUser like INetworkNode
 {
@@ -75,7 +75,7 @@ module TransportLayerRoadUser like INetworkNode
         bool hasIpv6 = default(false);
 
         //# Link Layer specs
-        bool hasLte = default(true);
+        bool hasCellular = default(true);
         bool hasWlan = default(false);
         int numWlanNic = default(0);
 
@@ -146,9 +146,9 @@ module TransportLayerRoadUser like INetworkNode
             parameters:
                 @display("p=681.312,526.688;q=queue");
         }
-        lteNic: <nicType> like ILteNic if hasLte {
+        cellularNic: <nicType> like ICellularNic if hasCellular {
             nodeType = nodeType;
-            ip2lte.typename = "Geo2Lte";
+            ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;
             @display("p=710.304,672.672");
         }
@@ -173,10 +173,10 @@ module TransportLayerRoadUser like INetworkNode
 
     connections allowunconnected:
         //# LTE Nic
-        lteNic.radioIn <-- lteRadioIn if exists(lteNic);
+        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic);
 
-        lteNic.upperLayerOut --> nl.in++ if exists(lteNic);
-        lteNic.upperLayerIn <-- nl.out++ if exists(lteNic);
+        cellularNic.upperLayerOut --> nl.in++ if exists(cellularNic);
+        cellularNic.upperLayerIn <-- nl.out++ if exists(cellularNic);
 
         //# Wlan Nic
         for i=0..sizeof(radioIn)-1 {
