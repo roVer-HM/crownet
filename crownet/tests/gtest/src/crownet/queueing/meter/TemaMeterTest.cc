@@ -13,21 +13,21 @@
 #include "crownet/applications/beacon/Beacon_m.h"
 #include "main_test.h"
 
-#include "crownet/queueing/meter/EmaPacketMeter.h"
+#include "crownet/queueing/meter/TemaPacketMeter.h"
 
 using namespace crownet;
 
 
-class EmaMeterTest : public BaseOppTest {
+class TemaMeterTest : public BaseOppTest {
  public:
-    EmaMeterTest() {}
+    TemaMeterTest() {}
 };
 
 
-TEST_F(EmaMeterTest, ConstTimeInterval){
+TEST_F(TemaMeterTest, ConstTimeInterval){
 
-    EmaPacketMeter m;
-    m.setAlpha(1./16.);
+    TemaPacketMeter m;
+    m.setBeta(1- 1./16.);
 
     Packet* pkt;
     for(int i=0; i < 100; i++){

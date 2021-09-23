@@ -13,41 +13,45 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "EmaPacketMeter.h"
+#include "TemaPacketMeter.h"
+#include <math.h>
 
 namespace crownet {
 
-Register_Class(EmaPacketMeter);
+Register_Class(TemaPacketMeter);
 
-void EmaPacketMeter::meterPacket(Packet *packet){
+void TemaPacketMeter::meterPacket(Packet *packet){
 
     auto now = simTime();
     stats.incrData(packet->getTotalLength());
     stats.incrPacket();
     auto elapsedTime = (now - lastUpdate).dbl();
-    if (stats.getPacketCount() == 1) {
+
+    if (stats.getPacketCount() == 1){
         // first call
         if (elapsedTime <= 0.0){
             stats.setPacketRate(1.0);
-            stats.setDataRate(bps(packet->getDataLength()/ s(1)));
+            stats.setDataRate(bps(packet->getDataLength()/ s(1.0)));
         } else {
             stats.setPacketRate(1.0 / elapsedTime);
             stats.setDataRate(bps(packet->getDataLength()/ s(elapsedTime)));
         }
-    } else if( now != lastUpdate ) {
-        auto packetrateChange = (1 / elapsedTime) - stats.getPacketRate();
-        stats.setPacketRate(stats.getPacketRate() + packetrateChange * alpha);
+    } else if (now != lastUpdate) {
+        double f = exp(-1 * getBeta() * elapsedTime);
+        double ff = 1 - f;
 
-        double datarateChange = (double)(packet->getTotalLength().get() / elapsedTime) - (double)stats.getDataRate().get();
-        double dRate = stats.getDataRate().get() + alpha* datarateChange;
+        double pRate = f * stats.getPacketRate() + ff * 1/elapsedTime; // packet rate
+        stats.setPacketRate(pRate);
+
+        double dRate;
+        dRate = f * stats.getDataRate().get() + ff * packet->getTotalLength().get()/elapsedTime;
         stats.setDataRate(bps(dRate));
-
         lastUpdate = now;
-
     } else {
         throw cRuntimeError("multiple packets at the same time not supported");
     }
-}
+
 
 }
 
+}

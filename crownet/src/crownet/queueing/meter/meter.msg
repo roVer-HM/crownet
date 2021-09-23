@@ -49,5 +49,10 @@ cplusplus(PackerMeterBase){{
 class EmaPacketMeter extends PackerMeterBase {
     @customize(true);
     double alpha;
- 
+}
+
+
+class TemaPacketMeter extends PackerMeterBase {
+ 	@customize(true);
+ 	double beta;   
 }

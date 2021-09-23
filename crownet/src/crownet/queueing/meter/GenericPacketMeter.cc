@@ -40,6 +40,7 @@ void GenericPacketMeter::initialize(int stage)
 
 void GenericPacketMeter::meterPacket(Packet *packet)
 {
+
     meter->meterPacket(packet);
     if (markPackets){
         auto rateTag = packet->addTagIfAbsent<RateTag>();
