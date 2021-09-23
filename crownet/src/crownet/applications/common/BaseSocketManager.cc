@@ -25,14 +25,9 @@ namespace crownet {
 
 
 
-BaseSocketManager::BaseSocketManager() {
-    // TODO Auto-generated constructor stub
+BaseSocketManager::BaseSocketManager() {}
 
-}
-
-BaseSocketManager::~BaseSocketManager() {
-    // TODO Auto-generated destructor stub
-}
+BaseSocketManager::~BaseSocketManager() {}
 
 void BaseSocketManager::initialize(int stage) {
     OperationalBase::initialize(stage);
@@ -63,6 +58,12 @@ void BaseSocketManager::setupSocket(){
 
 }
 
+void BaseSocketManager::pushPacket(Packet *packet, cGate *gate) {
+    // called by application (using some shaper)
+    take(packet);
+    sendTo(packet);
+}
+
 void BaseSocketManager::sendTo(Packet *pk){
     if (dontFragment) pk->addTag<FragmentationReq>()->setDontFragment(true);
     if(!pk->findTag<L3AddressReq>()){
@@ -81,7 +82,7 @@ void BaseSocketManager::handleMessageWhenUp(cMessage *msg){
     if (msg->arrivedOn("fromStack")){
        getSocket().processMessage(msg);
     }
-     else if (msg->arrivedOn("fromApp")) {
+     else if (msg->arrivedOn("in")) {
        // app may already set L3Address and port. If missing SocketManager will add them.
        sendTo(check_and_cast<Packet *>(msg));
     } else if (msg->isSelfMessage()){

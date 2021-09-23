@@ -27,10 +27,18 @@ struct ControlCmd {
     std::string message;
 };
 
+
+struct DensityMapCmd {
+    std::string nodeId;
+};
+
 class ControlHandler {
 public:
     virtual ~ControlHandler() = default;
-    virtual void handleCommand(const ControlCmd& cmd) = 0;
+    virtual void handleActionCommand(const ControlCmd& cmd) = 0;
+    virtual std::vector<double> handleDensityMapCommand(const DensityMapCmd& cmd) = 0;
+
+    //todo: (CM) add handle method for sensor command here
 
 };
 

@@ -142,7 +142,7 @@ network World
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
 
-            @display("p=308.14874,406.35;is=s");
+            @display("p=308.14874,406.35;is=vs");
         }
 
 

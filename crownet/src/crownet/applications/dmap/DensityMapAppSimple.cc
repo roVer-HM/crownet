@@ -50,9 +50,7 @@ void DensityMapAppSimple::updateLocalMap() {
 
   for (const auto& entry: *nTable){
       int _id = entry.first;
-      auto pos = converter->position_cast_traci(entry.second.getPos());
-      // increment density map
-//      dcdMap->incrementLocal(pos, _id, entry.second.getTimeReceived());
+      auto pos = converter->position_cast_traci(entry.second->getPos());
       dcdMap->incrementLocal(pos, _id, measureTime);
   }
 

@@ -24,11 +24,9 @@ namespace crownet {
 Define_Module(VruEtsiSimple);
 
 VruEtsiSimple::VruEtsiSimple() {
-  // TODO Auto-generated constructor stub
 }
 
 VruEtsiSimple::~VruEtsiSimple() {
-  // TODO Auto-generated destructor stub
 }
 
 void VruEtsiSimple::initialize(int stage) {
@@ -38,38 +36,37 @@ void VruEtsiSimple::initialize(int stage) {
   }
 }
 
-FsmState VruEtsiSimple::fsmAppMain(cMessage* msg) {
-  const auto& vam = createPacket<ItsVam>(B(par("messageLength")));  // todo calc?
-  vam->setGenerationDeltaTime(simTime());
-  // VAM Header
-  ItsPduHeader itsHeader{};
-  itsHeader.setMessageId(ItsMessageId::VAM);
-  itsHeader.setProtocolVersion(1);
-  itsHeader.setStationId(getId());  // componentId
-  vam->setItsHeader(itsHeader);
-  //
-  ItsVamBasicContainer basicContainer{};
-  basicContainer.setRole(ItsVehicleRole::DEFAULT);
-  // todo Mixup CAM/VAM
-  basicContainer.setStationType(ItsStationType::PEDSTRIAN);
-  basicContainer.setVruDeviceType(ItsVruDeviceType::VRU_ST);
-  basicContainer.setVruProfile(ItsVruProfile::PEDESTRIAN);
-  basicContainer.setVruType(ItsVruType::ADULT);
-  ReferencePosition ref{};
-  ref.setHeadingValue(mobilityModule->getCurrentVelocity().getNormalized());
-  ref.setReferencePosition(mobilityModule->getCurrentPosition());
-  ref.setSemiMajorConf(0.3);
-  ref.setSemiMajorConf(0.3);
-  basicContainer.setReferencePosition(ref);
-  int k = 0;
-  for (const auto& p : mobilityModule->getDeltaPositionHistory()) {
-    basicContainer.setPathHistory(k, p);
-  }
-  vam->setBasicContainer(basicContainer);
+//CrownetPacketSourceBase
+Packet *VruEtsiSimple::createPacket(){
+    const auto& vam = createPayload<ItsVam>(b(par("packetLength").intValue()));  // todo calc?
+     vam->setGenerationDeltaTime(simTime());
+     // VAM Header
+     ItsPduHeader itsHeader{};
+     itsHeader.setMessageId(ItsMessageId::VAM);
+     itsHeader.setProtocolVersion(1);
+     itsHeader.setStationId(getId());  // componentId
+     vam->setItsHeader(itsHeader);
+     //
+     ItsVamBasicContainer basicContainer{};
+     basicContainer.setRole(ItsVehicleRole::DEFAULT);
+     // todo Mixup CAM/VAM
+     basicContainer.setStationType(ItsStationType::PEDSTRIAN);
+     basicContainer.setVruDeviceType(ItsVruDeviceType::VRU_ST);
+     basicContainer.setVruProfile(ItsVruProfile::PEDESTRIAN);
+     basicContainer.setVruType(ItsVruType::ADULT);
+     ReferencePosition ref{};
+     ref.setHeadingValue(mobilityModule->getCurrentVelocity().getNormalized());
+     ref.setReferencePosition(mobilityModule->getCurrentPosition());
+     ref.setSemiMajorConf(0.3);
+     ref.setSemiMajorConf(0.3);
+     basicContainer.setReferencePosition(ref);
+     int k = 0;
+     for (const auto& p : mobilityModule->getDeltaPositionHistory()) {
+       basicContainer.setPathHistory(k, p);
+     }
+     vam->setBasicContainer(basicContainer);
 
-  sendPayload(vam);
-  scheduleNextAppMainEvent();
-  return FsmRootStates::WAIT_ACTIVE;
+    return buildPacket(vam);
 }
 
 FsmState VruEtsiSimple::handleDataArrived(Packet *packet){

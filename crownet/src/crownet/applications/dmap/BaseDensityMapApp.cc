@@ -31,6 +31,7 @@ Define_Module(BaseDensityMapApp);
 BaseDensityMapApp::~BaseDensityMapApp(){
     if(watcher)
         delete watcher;
+    cancelAndDelete(localMapTimer);
 }
 
 void BaseDensityMapApp::initialize(int stage) {
@@ -39,15 +40,14 @@ void BaseDensityMapApp::initialize(int stage) {
       mapType = par("mapType").stdstringValue();
       mapTypeLog = par("mapTypeLog").stdstringValue();
       hostId = getContainingNode(this)->getId();
-      WATCH(hostId);
 
-    } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-      converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
-                      par("coordConverterModule"), this)
-                      ->getConverter();
+      localMapUpdateInterval = &par("localMapUpdateInterval");
+      localMapTimer = new cMessage("localMapTimer");
+      localMapTimer->setKind(FsmRootStates::APP_MAIN);
+      scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
+      WATCH(hostId);
     } else if (stage == INITSTAGE_LAST){
-        initDcdMap();
-        initWriter();
+
         WATCH_MAP(dcdMap->getNeighborhood());
         watcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
     }
@@ -69,32 +69,50 @@ FsmState BaseDensityMapApp::handleDataArrived(Packet *packet){
 }
 
 FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
-  if (dcdMap == nullptr){
-      throw omnetpp::cRuntimeError(
-          "Density Grid map not initialized.");
-  }
+
+  // allow GlobalDensityMap context to set shared objects like the converter or distProvider.
+  // If GlobalDensityMap is not present initDcdMap will initialize these objects
+  // manually for each node. Important: This will be create multiple distProviders
+  // which will affect performance.
+  emit(GlobalDensityMap::initMap, this);
+
+  initDcdMap();
+  initWriter();
+
+  // register map to GlobalDensityMap to allow synchronized logging.
+  emit(GlobalDensityMap::registerMap, this);
+
   return BaseApp::fsmSetup(msg);
 }
 
 FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
-  // send Message
+  // update density map state.
   updateLocalMap();
-  sendMapMap();
-  scheduleNextAppMainEvent();
+  localMapTimer->setKind(FsmRootStates::APP_MAIN);
+  scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
   return FsmRootStates::WAIT_ACTIVE;
 }
 
 // App logic
 void BaseDensityMapApp::initDcdMap(){
+    // check if set by globalDensityMap (shared between all nodes)
+    if (!converter){
+        setCoordinateConverter(inet::getModuleFromPar<OsgCoordConverterProvider>(
+                        par("coordConverterModule"), this)->getConverter());
+    }
+
     std::pair<int, int> gridDim;
     double gridSize = par("gridSize").doubleValue();
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
-    gridDim.second = floor(converter->getBoundaryWidth() / gridSize);
+    gridDim.second = floor(converter->getBoundaryHeight() / gridSize);
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
-    // if global is present will be overwritten to share one provider between all maps
-    distProvider = f.createDistanceProvider();
+    // check if set by globalDensityMap (shared between all nodes)
+    if(!distProvider) {
+        distProvider = f.createDistanceProvider();
+    }
+    // do not share valueVisitor between nodes.
     valueVisitor = f.createValueVisitor(mapType);
 }
 void BaseDensityMapApp::initWriter(){
@@ -114,42 +132,40 @@ void BaseDensityMapApp::initWriter(){
               dcdMap.get(), par("mapTypeLog").stdstringValue()));
       fileWriter->writeHeader();
     }
-
-    // register density map for use in GlobalDensityMap context.
-    emit(GlobalDensityMap::registerMap, this);
 }
 
-void BaseDensityMapApp::sendMapMap() {
+Packet *BaseDensityMapApp::createPacket() {
+    // todo split packet
 
-  // todo calc: 24 * currCell Fragmentation!
-  // FIXME: real size!!!
-  const auto &payload = createPacket<PositionMapPacket>(B(1000));
+    // todo calc: 24 * currCell Fragmentation!
+    // FIXME: real size!!!
+    const auto &payload = createPayload<PositionMapPacket>(B(1000));
 
-  computeValues();
-  int numValidCells = dcdMap->valid().distance();
+    computeValues(); // update values
+    int numValidCells = dcdMap->valid().distance();
 
-  payload->setNodeId(dcdMap->getOwnerId().value());
-  payload->setCellId(0, dcdMap->getOwnerCell().val().first);
-  payload->setCellId(1, dcdMap->getOwnerCell().val().second);
+    payload->setNodeId(dcdMap->getOwnerId().value());
+    payload->setCellId(0, dcdMap->getOwnerCell().val().first);
+    payload->setCellId(1, dcdMap->getOwnerCell().val().second);
 
-  payload->setNumCells(numValidCells);
-  payload->setCellCountArraySize(numValidCells);
-  payload->setCellXArraySize(numValidCells);
-  payload->setCellYArraySize(numValidCells);
-  payload->setMTimeArraySize(numValidCells);
-  int currCell = 0;
+    payload->setNumCells(numValidCells);
+    payload->setCellCountArraySize(numValidCells);
+    payload->setCellXArraySize(numValidCells);
+    payload->setCellYArraySize(numValidCells);
+    payload->setMTimeArraySize(numValidCells);
+    int currCell = 0;
 
-  for (auto iter = dcdMap->valid(); iter != iter.end(); ++iter) {
-    const auto &cell = (*iter).first;
-    const auto &measure = (*iter).second.val();
-    payload->setCellX(currCell, cell.val().first);
-    payload->setCellY(currCell, cell.val().second);
-    payload->setCellCount(currCell, measure->getCount());
-    payload->setMTime(currCell, measure->getMeasureTime());
-    currCell++;
-  }
+    for (auto iter = dcdMap->valid(); iter != iter.end(); ++iter) {
+      const auto &cell = (*iter).first;
+      const auto &measure = (*iter).second.val();
+      payload->setCellX(currCell, cell.val().first);
+      payload->setCellY(currCell, cell.val().second);
+      payload->setCellCount(currCell, measure->getCount());
+      payload->setMTime(currCell, measure->getMeasureTime());
+      currCell++;
+    }
 
-  sendPayload(payload);
+    return buildPacket(payload);
 }
 
 bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
@@ -177,14 +193,9 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
   // 3) check local map for _nodeId and compare if the local and packet
   //    place the _nodeId in the same cell.
   dcdMap->addToNeighborhood(sourceNodeId, sourceCellId);
-  //  using namespace omnetpp;
-  //  EV_DEBUG << dMap->getView(mapType)->str();
-  //  EV_DEBUG << dMap->getView("local")->str();
 
   return true;
 }
-
-//
 
 void BaseDensityMapApp::updateLocalMap() {
     throw omnetpp::cRuntimeError("Not Implemented in Base* class. Use child class");
@@ -198,6 +209,10 @@ std::shared_ptr<RegularDcdMap> BaseDensityMapApp::getMap() { return dcdMap; }
 
 void BaseDensityMapApp::setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider){
     this->distProvider = distProvider;
+}
+
+void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter){
+    this->converter = converter;
 }
 
 

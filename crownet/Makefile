@@ -10,11 +10,18 @@ MAKEMAKE=opp_makemake $(MMOPT)
 GOOGLE_TEST_LIB = gtest
 GOOGLE_MOCK_LIB = gmock
 GOOGLE_TEST_INCLUDE = /usr/local/include
+GOOLGE_ARGS = ""
 
 TARGT_NAME := CROWNET
 
 ifeq ("$(MODE)","debug")
 	_D=_dbg
+endif
+
+ifeq ("$(GFILTER)", "")
+
+else
+	GOOGLE_ARGS := $(GOOGLE_ARGS) --gtest_filter=$(GFILTER)
 endif
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
@@ -129,7 +136,7 @@ build-lib: src/libCROWNET$(_D)
 build-exec: src/CROWNET$(_D)
 
 test: make-test
-	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg; else cd tests/gtest/src && ./rTests;fi
+	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg $(GOOGLE_ARGS); else cd tests/gtest/src && ./rTests $(GOOGLE_ARGS) ;fi
 
 clean-test:
 	cd tests/gtest/src && $(MAKE) MODE=release clean

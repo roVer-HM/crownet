@@ -27,9 +27,9 @@ public:
     virtual ~BaseBroadcast();
 
     virtual FsmState handleDataArrived(Packet *packet) override;
-    virtual FsmState fsmAppMain(cMessage *msg) override;
     virtual FsmState handlePayload(const Ptr<const ApplicationPacket> pkt);
 
+    virtual Packet *createPacket() override;
 protected:
     // cSimpleModule
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }

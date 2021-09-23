@@ -20,6 +20,7 @@
 #include "inet/common/INETDefs.h"
 #include "inet/common/socket/ISocket.h"
 #include "inet/networklayer/common/L3Address.h"
+#include "inet/queueing/contract/IPassivePacketSink.h"
 
 #include "crownet/applications/common/AppFsm.h"
 
@@ -32,7 +33,10 @@ namespace crownet {
 #ifndef CROWNET_APPLICATIONS_COMMON_BASESOCKETMANAGER_H_
 #define CROWNET_APPLICATIONS_COMMON_BASESOCKETMANAGER_H_
 
-class BaseSocketManager: public OperationalBase, public SocketProvider {
+class BaseSocketManager:
+        public OperationalBase,
+        public SocketProvider,
+        public virtual inet::queueing::IPassivePacketSink {
 public:
   BaseSocketManager();
   virtual ~BaseSocketManager();
@@ -51,6 +55,17 @@ public:
   virtual void close() override;
   virtual void destroy() override;
   virtual bool isOpen() override;
+
+  // inet::queueing::IPassivePacketSink
+  // input from (application using some shaper)
+  virtual bool canPushSomePacket(cGate *gate) const override { return true;}
+  virtual bool canPushPacket(Packet *packet, cGate *gate) const override {return true;}
+  // redirect to sendTo(...)
+  // throw cRuntimeError("Invalid operation");
+  virtual void pushPacket(Packet *packet, cGate *gate) override;
+  virtual void pushPacketStart(Packet *packet, cGate *gate, bps datarate) override { throw cRuntimeError("Invalid operation"); }
+  virtual void pushPacketEnd(Packet *packet, cGate *gate) override { throw cRuntimeError("Invalid operation"); }
+  virtual void pushPacketProgress(Packet *packet, cGate *gate, bps datarate, b position, b extraProcessableLength = b(0)) override { throw cRuntimeError("Invalid operation"); }
 
 protected:
   virtual bool isInitializeStage(int stage) override { return stage == INITSTAGE_TRANSPORT_LAYER; }

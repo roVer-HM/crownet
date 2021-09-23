@@ -24,6 +24,7 @@
 #include "crownet/artery/traci/VadereCore.h"
 #include "crownet/crownet.h"
 #include "crownet/applications/control/control_m.h"
+#include "crownet/dcd/identifier/CellKeyProvider.h"
 
 namespace crownet {
 
@@ -39,10 +40,13 @@ void ControlManager::initialize(int stage)
 {
     if (stage == INITSTAGE_APPLICATION_LAYER){
         // register TraCiForwardProvider in controller api and set controller as listener
-
         VadereCore* core =
             inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
         subscribeTraCI(core);
+        //todo: (CM) save pointer DensityMap in proteced or private field use getModuleFromPar like with core
+        //todo: (CM) check if parameter is empty first! if (par("globalDcdModule).stdstringValue().empty()){...}
+//        GlobalDensityMap* globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
+//        globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
 
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
@@ -58,7 +62,7 @@ void ControlManager::handleMessage(cMessage *msg)
     throw cRuntimeError("Module does not handle messages");
 }
 
-void ControlManager::handleCommand(const ControlCmd& cmd){
+void ControlManager::handleActionCommand(const ControlCmd& cmd){
     Enter_Method_Silent();
     cModule* sendingApp = this->findModuleByPath(cmd.sendingNode.c_str());
     if (!sendingApp){
@@ -77,7 +81,8 @@ void ControlManager::handleCommand(const ControlCmd& cmd){
         boost::property_tree::ptree pt;
         boost::property_tree::read_json(ss, pt);
 
-        data->setAppTTL(pt.get<double>("time"));
+        //TODO: discuss what to do with the time attribute
+        //data->setAppTTL(pt.get<double>("time"));
 
 
     }
@@ -87,6 +92,40 @@ void ControlManager::handleCommand(const ControlCmd& cmd){
     }
     this->sendDirect(msg, sendingApp, controlGate.c_str());
 
+}
+
+std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
+    Enter_Method_Silent();
+
+    auto node_module = this->findModuleByPath(cmd.nodeId.c_str());
+    IDensityMapHandlerBase<RegularDcdMap>* map_handler =
+            check_and_cast<IDensityMapHandlerBase<RegularDcdMap>*>(node_module);
+
+    std::vector<double> density_vals;
+    auto map = map_handler->getMap();
+    auto cellProvider = std::dynamic_pointer_cast<GridCellIDKeyProvider>(map->getCellKeyProvider());
+
+    density_vals.push_back(cellProvider->getGridDim().first);
+    density_vals.push_back(cellProvider->getGridDim().second);
+    density_vals.push_back(cellProvider->getGridSize().first);
+    density_vals.push_back(cellProvider->getGridSize().second);
+    auto iter = map->valid();
+     for( auto item: iter){
+         const auto cell = item.first.val();
+         const auto measure = item.second.val();
+         if(measure){
+             auto x = item.first.val().first;
+             auto y = item.first.val().second;
+             auto count = item.second.val()->getCount();
+             density_vals.push_back(x);
+             density_vals.push_back(y);
+             density_vals.push_back(count);
+             std::cout << "x-y-count: " <<
+                     x << "-" << y <<"-"<< count << std::endl;
+         }
+    }
+
+     return density_vals;
 }
 
 void ControlManager::finish() {

@@ -29,15 +29,16 @@ public:
 protected:
     virtual void initialize(int stage) override;
 
+    virtual Packet *createPacket() override;
+
     virtual FsmState fsmHandleSubState(cMessage *msg) override;
     virtual FsmState handlePayload(const Ptr<const ApplicationPacket> pkt) override;
-    virtual FsmState fsmAppMain(cMessage *msg) override;
-    virtual void setupTimers() override;  // called in fsmSetup
     bool isControlled() const { return ctrl != nullptr; }
 
 
     std::string modelString = "";
     std::string modelData = "";
+    simtime_t modelAge;
 
     VaderePersonController* ctrl = nullptr;
 };

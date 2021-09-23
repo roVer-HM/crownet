@@ -29,7 +29,7 @@ class ChangeTarget(Controller):
         
         sending_node = "node[0].app[0]"
         model = "RouteChoice"
-        command = {"targetIds" : [3] , "probability" : [1.0]}
+        command = {"targetIds" : [3] , "probability" : [1.0], "reactionProbability" : [1.0]}
         action = { "time" : sim_time+0.4, 
                   "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
                   "command" : command,
@@ -42,9 +42,7 @@ class ChangeTarget(Controller):
         if len(self.next_time) < self.count:
             self.con_manager.next_call_at(self.next_time[self.count])
 
-    def handle_init(self, sim_time, sim_state):
-        # call first at time 1.0 s
-        self.con_manager.next_call_at(1.0)
+
 
 
 if __name__ == "__main__":
@@ -75,5 +73,5 @@ if __name__ == "__main__":
 
     controller.register_state_listener("default", sub, set_default=True) 
     print("start ...")
-    controller.start_controller(**kwargs)
+    controller.start_controller()
 

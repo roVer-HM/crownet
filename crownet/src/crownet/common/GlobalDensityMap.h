@@ -26,6 +26,7 @@
 #include "crownet/common/util/FileWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "traci/NodeManager.h"
+#include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 
 using namespace omnetpp;
 using namespace inet;
@@ -34,12 +35,15 @@ namespace crownet {
 
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
-                         public traci::ITraciNodeVisitor {
+                         public traci::ITraciNodeVisitor,
+                         public IDensityMapHandlerBase<RegularDcdMap>{
+    // 4. Inteface das nur getMap implementiert woe OTraceNodeVisitor
  public:
   //  using Grid = RegularGridMap<std::string>;
   using GridHandler = IDensityMapHandler<RegularDcdMap>;
   using gridMap_t = std::map<RegularDcdMap::node_key_t, GridHandler *>;
 
+  static const omnetpp::simsignal_t initMap;
   static const omnetpp::simsignal_t registerMap;
   static const omnetpp::simsignal_t removeMap;
 
@@ -62,6 +66,16 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual void visitNode(const std::string &traciNodeId,
                          omnetpp::cModule *mod) override;
 
+  virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal(){
+      return dcdMapGlobal;
+  }
+
+  virtual std::shared_ptr<RegularDcdMap> getMap() override {
+      return getDcdMapGlobal();
+  }
+
+
+
  protected:
   virtual void handleMessage(cMessage *msg) override;
 
@@ -79,6 +93,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
   std::shared_ptr<GridCellDistance> distProvider;
+  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
   std::string m_mobilityModule;
   std::unique_ptr<FileWriter> fileWriter;

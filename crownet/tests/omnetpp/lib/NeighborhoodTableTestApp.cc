@@ -1,6 +1,5 @@
-#include "crownet/common/NeighborhoodTable.h"
-#include "crownet/common/NeighborhoodTableEntry.h"
 #include <stdio.h>
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
 namespace crownet{
     class NeighborhoodTableTestApp : public NeighborhoodTable {
@@ -8,8 +7,8 @@ namespace crownet{
             for(auto it = this->_table.cbegin(); it != _table.cend(); ++it)
             {
                 std::cout << "nTable[" << it->first << "]" <<
-                        " -- nodeId: " << it->second.getNodeId() <<
-                        " -- timeSend: " << it->second.getTimeSend() << "\n";
+                        " -- nodeId: " << it->second->getNodeId() <<
+                        " -- timeSend: " << it->second->getSentTimePrio() << "\n";
             }
         }
 

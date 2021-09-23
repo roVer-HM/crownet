@@ -19,45 +19,78 @@ package crownet.applications.common;
 import inet.applications.contract.IApp;
 import crownet.applications.common.ISocketManager;
 import crownet.applications.common.IBaseApp;
+import inet.queueing.contract.ITrafficConditioner;
+import inet.queueing.contract.IPacketMeter;
+import crownet.applications.common.scheduler.IAppScheduler;
 
-
-
-module CrownetApp like IBaseApp
+module CrownetApp like IApp, IAppConfig
 {
     parameters:
-        @display("bgb=500,225");
+        @display("bgb=500,283");
     gates:
-        output socketOut;
         input socketIn;
+        output socketOut;
         input configIn;
 
     submodules:
         app: <> like IBaseApp {
-            @display("p=95,115,row,140");
+            @display("p=142,208,row,140");
         }
+
+        packetMeterOut: <default("GenericPacketMeter")> like IPacketMeter {
+
+            @display("p=243,85");
+        }
+
+        packetMeterIn: <default("GenericPacketMeter")> like IPacketMeter {
+
+            @display("p=243,208");
+        }
+
 
         socket: <> like ISocketManager {
-            @display("p=255,115");
+            @display("p=407,208");
         }
 
+        shaper: <default("EmptyTrafficConditioner")> like ITrafficConditioner {
+
+            @display("p=348,85");
+        }
+        scheduler: <> like IAppScheduler {
+
+            @display("p=65,64");
+        }
+
+
     connections:
-        app.socketOut --> socket.fromApp;
-        app.socketIn <-- socket.toApp;
+        app.out --> packetMeterOut.in;
+        packetMeterOut.out --> shaper.in;
+        shaper.out --> socket.in;
 
-        socket.toStack --> socketOut;
-        socket.fromStack <-- socketIn;
-        
-        app.configIn <-- configIn;
+		socket.toApp --> packetMeterIn.in;
+		packetMeterIn.out --> app.in;
+
+        scheduler.out --> app.scheduleIn;
+
+        socket.toStack --> { @display("m=s"); } --> socketOut;
+        socket.fromStack <-- { @display("m=s"); } <-- socketIn;
+
+        configIn --> { @display("m=w"); } --> scheduler.schedulerIn;
 }
 
-module CrownetUdpApp extends CrownetApp {
+
+
+module CrownetUdpApp extends CrownetApp
+{
     parameters:
-        socket.typename = default("UdpSocketManager");   
+        socket.typename = default("UdpSocketManager");
 }
 
-module CrownetAidApp extends CrownetApp {
+
+module CrownetAidApp extends CrownetApp
+{
     parameters:
-        socket.typename = default("AidSocketManager");   
-}
+        socket.typename = default("AidSocketManager");
 
+}
 

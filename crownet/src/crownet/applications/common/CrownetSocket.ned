@@ -15,15 +15,15 @@
 
 package crownet.applications.common;
 
+import inet.queueing.contract.IPassivePacketSink;
 
-moduleinterface ISocketManager
+moduleinterface ISocketManager extends IPassivePacketSink
 {
     parameters:
          @display("i=block/app");
          int localPort;
          int destPort;
     gates:
-        input fromApp;
         output toApp;
         input fromStack;
         output toStack;
@@ -42,9 +42,8 @@ simple BaseSocketManager like ISocketManager {
         
         string appModule = "^.app";
         
-        
     gates:
-        input fromApp;
+        input in @labels(push); // fromApp
         output toApp;
         input fromStack;
         output toStack;

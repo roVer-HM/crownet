@@ -9,10 +9,11 @@
 
 #include "inet/common/InitStages.h"
 #include "inet/mobility/contract/IMobility.h"
-#include "crownet/common/NeighborhoodTable.h"
 #include "crownet/applications/common/BaseApp.h"
 
 #include "artery/utility/IdentityRegistry.h"
+
+#include "crownet/neighbourhood/NeighborhoodTable.h"
 
 namespace crownet {
 
@@ -25,17 +26,16 @@ public:
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;
 
-    // FSM
-    virtual FsmState fsmAppMain(cMessage *msg) override;
+    //CrownetPacketSourceBase
+    virtual Packet *createPacket() override;
 
-    // Aid Socket
+    // FSM
     virtual FsmState handleDataArrived(Packet *packet) override;
 
 
 private:
     inet::IMobility *mobility = nullptr;
     NeighborhoodTable *nTable  = nullptr;
-    int hostId;
 };
 
 } /* namespace crownet */
