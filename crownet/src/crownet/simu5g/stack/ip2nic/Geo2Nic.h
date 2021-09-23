@@ -1,5 +1,5 @@
 /*
- * Geo2Lte.h
+ * Geo2Nic.h
  *
  *  Created on: Aug 17, 2020
  *      Author: sts
@@ -7,21 +7,22 @@
 
 #pragma once
 
+#include "inet/networklayer/common/NetworkInterface.h"
 #include "artery/inet/InetRadioDriver.h"
-#include "corenetwork/lteip/IP2lte.h"
+#include "stack/ip2nic/IP2Nic.h"
 
 namespace crownet {
 
-class Geo2Lte : public ::IP2lte {
+class Geo2Nic : public ::IP2Nic {
  public:
-  virtual ~Geo2Lte() = default;
+  virtual ~Geo2Nic() = default;
 
  protected:
   void toStackUe(inet::Packet* datagram) override;
   void toIpUe(inet::Packet* datagram) override;
 
-  void toStackEnb(inet::Packet* datagram) override;
-  void toIpEnb(inet::Packet* datagram) override;
+  void toStackBs(inet::Packet* datagram) override;
+  void toIpBs(inet::Packet* datagram) override;
 
   virtual void initialize(int stage) override;
 
