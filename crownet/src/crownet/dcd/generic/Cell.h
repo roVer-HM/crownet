@@ -81,6 +81,7 @@ class Cell {
   const cell_key_t& getCellId() const { return cell_id; }
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
+  const time_t lastSent(){ return last_sent; }
 
   // setter
   void put(entry_t_ptr&& m);
@@ -88,6 +89,8 @@ class Cell {
   void setCellId(cell_key_t _cell_id) { cell_id = _cell_id; }
   void setOwnerId(node_key_t _owner_id) { owner_id = _owner_id; }
   void incrementLocal(const node_key_t& countedNodeId, const time_t& time);
+  void sentAt(const time_t& time);
+
 
   /**
    *  A Cell<C, N, T> object acts as an iterator for its data items.
@@ -148,6 +151,7 @@ class Cell {
   node_key_t owner_id;
   entry_ctor_t entryCtor;
   entry_t_ptr cell_value;  //  selected or calculated value.
+  time_t last_sent; // time at which the cell_value was last broadcasted.
 };
 
 #include "Cell.tcc"

@@ -223,3 +223,8 @@ typename Cell<C, N, T>::entry_t_ptr  Cell<C, N, T>::createEntry(const double cou
     e->setCount(count);
     return e;
 }
+
+template <typename C, typename N, typename T>
+void Cell<C, N, T>::sentAt(const time_t& time){
+    this->last_sent = time;
+}
