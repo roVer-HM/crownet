@@ -55,6 +55,7 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         ///* Set to true if app only passivly receives messages or has other means 
         ///* to find a valid destination address.
         bool allEmptyDestAddress = default(true);
+        int packetDataUnit @unit(b) = default(1000B);
 
        
         @lifecycleSupport;
