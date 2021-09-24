@@ -12,6 +12,7 @@
 #include "crownet/dcd/generic/iterator/DcDMapIterator.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/identifier/TimeProvider.h"
+#include "crownet/dcd/generic/ICellIdStream.h"
 
 namespace crownet {
 
@@ -32,10 +33,12 @@ class DcDMap {
   DcDMap() {}
   DcDMap(node_key_t owner_id,
          std::shared_ptr<CellKeyProvider<C>> cellKeyProvider,
-         std::shared_ptr<TimeProvider<T>> timeProvider)
+         std::shared_ptr<TimeProvider<T>> timeProvider,
+         std::shared_ptr<ICellIdStream<C, T>> cellKeyStream)
       : owner_id(owner_id),
         cellKeyProvider(cellKeyProvider),
-        timeProvider(timeProvider) {}
+        timeProvider(timeProvider),
+        cellKeyStream(cellKeyStream){}
 
   // getter
   const node_key_t& getOwnerId() const { return owner_id; }
@@ -95,6 +98,7 @@ class DcDMap {
   void applyVisitorTo(const cell_key_t& cell_id, Fn visitor);
 
   std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() {return cellKeyProvider;}
+  std::shared_ptr<ICellIdStream<C, T>> getCellKeyStream() {return cellKeyStream; }
 
  private:
   map_t cells;
@@ -103,7 +107,8 @@ class DcDMap {
   time_t lastComputedAt; // Zeitpunkt an dem der Wert berechnet wird
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
   std::shared_ptr<TimeProvider<T>> timeProvider;
-  std::map<node_key_t, cell_key_t> neighborhood;
+  std::shared_ptr<ICellIdStream<C, T>> cellKeyStream;
+  std::map<N, C> neighborhood;
 };
 #include "DcdMap.tcc"
 

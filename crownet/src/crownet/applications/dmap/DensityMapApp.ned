@@ -42,6 +42,12 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         // its basic configuration. 
         double localMapUpdateInterval @unit(s) = default(1.0s); 
         
+        object mapCfg = default(crownet::MapCfg{
+            writeDensityLog: true,
+            mapType: "ymf",
+            mapTypeLog: "all",
+            idStreamType: "insertionOrder"
+        });
         bool writeDensityLog = default(true);
         string mapType = default("ymf"); // select map algorithm to calculate cell values
         string mapTypeLog = default("all"); // if writeDensityLog is true log this map algorithm. If "all" just

@@ -22,20 +22,23 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> gridSize,
     visitor_dispatcher["median"] = [this](){return std::make_shared<MedianVisitor>(timeProvider->now());};
     visitor_dispatcher["invSourceDist"] = [this](){return std::make_shared<InvSourceDistVisitor>(timeProvider->now());};
     visitor_dispatcher["local"] = [this](){return std::make_shared<LocalSelector>(timeProvider->now());};
+
+    cellIdStream_dispatcher["default"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, omnetpp::simtime_t>>();};
+    cellIdStream_dispatcher["insertionOrder"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, omnetpp::simtime_t>>();};
 }
 
 
-RegularDcdMap RegularDcdMapFactory::create(const IntIdentifer& ownerID) {
-  std::shared_ptr<GridCellIDKeyProvider> provider =
-      std::make_shared<GridCellIDKeyProvider>(gridSize, gridDim);
-  return RegularDcdMap(ownerID, provider, timeProvider);
+RegularDcdMap RegularDcdMapFactory::create(const IntIdentifer& ownerID, const std::string& idStreamType) {
+  auto provider = std::make_shared<GridCellIDKeyProvider>(gridSize, gridDim);
+  auto streamer = createCellIdStream(idStreamType);
+  return RegularDcdMap(ownerID, provider, timeProvider, streamer);
 }
 
 std::shared_ptr<RegularDcdMap> RegularDcdMapFactory::create_shared_ptr(
-    const IntIdentifer& ownerID) {
-  std::shared_ptr<GridCellIDKeyProvider> provider =
-      std::make_shared<GridCellIDKeyProvider>(gridSize, gridDim);
-  return std::make_shared<RegularDcdMap>(ownerID, provider, timeProvider);
+    const IntIdentifer& ownerID, const std::string& idStreamType) {
+  auto provider = std::make_shared<GridCellIDKeyProvider>(gridSize, gridDim);
+  auto streamer = createCellIdStream(idStreamType);
+  return std::make_shared<RegularDcdMap>(ownerID, provider, timeProvider, streamer);
 }
 
 std::shared_ptr<GridCellDistance> RegularDcdMapFactory::createDistanceProvider(){
@@ -47,6 +50,13 @@ std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::c
         throw cRuntimeError("No visitor defined for mapType %s", mapType.c_str());
     }
     return visitor_dispatcher[mapType]();
+}
+
+std::shared_ptr<ICellIdStream<GridCellID, omnetpp::simtime_t>> RegularDcdMapFactory::createCellIdStream(const std::string& typeName){
+    if (cellIdStream_dispatcher.find(typeName) == cellIdStream_dispatcher.end()){
+        throw cRuntimeError("No CellIdStream defined for type %s", typeName.c_str());
+    }
+    return cellIdStream_dispatcher[typeName]();
 }
 
 }  // namespace crownet

@@ -37,8 +37,8 @@ BaseDensityMapApp::~BaseDensityMapApp(){
 void BaseDensityMapApp::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-      mapType = par("mapType").stdstringValue();
-      mapTypeLog = par("mapTypeLog").stdstringValue();
+      mapCfg = (MapCfg*)(par("mapCfg").objectValue()->dup());
+      take(mapCfg);
       hostId = getContainingNode(this)->getId();
       WATCH(hostId);
 
@@ -103,8 +103,8 @@ void BaseDensityMapApp::initDcdMap(){
     gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
     gridDim.second = floor(converter->getBoundaryHeight() / gridSize);
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
-
-    dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
+    
+    dcdMap = f.create_shared_ptr(IntIdentifer(hostId), mapCfg->getIdStreamType());
     dcdMapWatcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
     WATCH_MAP(dcdMap->getNeighborhood());
     // check if set by globalDensityMap (shared between all nodes)
@@ -112,16 +112,16 @@ void BaseDensityMapApp::initDcdMap(){
         distProvider = f.createDistanceProvider();
     }
     // do not share valueVisitor between nodes.
-    valueVisitor = f.createValueVisitor(mapType);
+    valueVisitor = f.createValueVisitor(mapCfg->getMapType());
 }
 void BaseDensityMapApp::initWriter(){
-    if (par("writeDensityLog").boolValue()) {
+    if (mapCfg->getWriteDensityLog()) {
       FileWriterBuilder fBuilder{};
       fBuilder.addMetadata("IDXCOL", 3);
       fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
       fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
       fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
-      fBuilder.addMetadata("MAP_TYPE", mapTypeLog);
+      fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
       fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
       std::stringstream s;
       s << "dcdMap_" << hostId;

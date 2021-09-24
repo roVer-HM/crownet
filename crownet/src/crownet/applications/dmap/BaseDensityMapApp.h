@@ -21,6 +21,7 @@
 
 #include "crownet/applications/common/AppFsm.h"
 #include "crownet/applications/common/BaseApp.h"
+#include "crownet/applications/dmap/dmap_m.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/util/FileWriter.h"
@@ -82,8 +83,8 @@ protected:
  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
  std::shared_ptr<GridCellDistance> distProvider;
  simtime_t lastUpdate = -1.0;
- std::string mapType;
- std::string mapTypeLog;
+ MapCfg *mapCfg;
+
 
  RegularDcdMapWatcher* dcdMapWatcher;
  cMessage *localMapTimer;
