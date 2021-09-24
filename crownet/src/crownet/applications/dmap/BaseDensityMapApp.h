@@ -85,7 +85,7 @@ protected:
  std::string mapType;
  std::string mapTypeLog;
 
- RegularDcdMapWatcher* watcher;
+ RegularDcdMapWatcher* dcdMapWatcher;
  cMessage *localMapTimer;
  cPar *localMapUpdateInterval;
 

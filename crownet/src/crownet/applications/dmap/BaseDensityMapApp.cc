@@ -29,9 +29,9 @@ namespace crownet {
 Define_Module(BaseDensityMapApp);
 
 BaseDensityMapApp::~BaseDensityMapApp(){
-    if(watcher)
-        delete watcher;
     cancelAndDelete(localMapTimer);
+    delete dcdMapWatcher;
+    delete mapCfg;
 }
 
 void BaseDensityMapApp::initialize(int stage) {
@@ -40,17 +40,14 @@ void BaseDensityMapApp::initialize(int stage) {
       mapType = par("mapType").stdstringValue();
       mapTypeLog = par("mapTypeLog").stdstringValue();
       hostId = getContainingNode(this)->getId();
+      WATCH(hostId);
 
       localMapUpdateInterval = &par("localMapUpdateInterval");
       localMapTimer = new cMessage("localMapTimer");
       localMapTimer->setKind(FsmRootStates::APP_MAIN);
       scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
-      WATCH(hostId);
-    } else if (stage == INITSTAGE_LAST){
 
-        WATCH_MAP(dcdMap->getNeighborhood());
-        watcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
-    }
+    } else if (stage == INITSTAGE_LAST){ }
 }
 
 void BaseDensityMapApp::finish() {
@@ -108,6 +105,8 @@ void BaseDensityMapApp::initDcdMap(){
     RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
 
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId));
+    dcdMapWatcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
+    WATCH_MAP(dcdMap->getNeighborhood());
     // check if set by globalDensityMap (shared between all nodes)
     if(!distProvider) {
         distProvider = f.createDistanceProvider();
