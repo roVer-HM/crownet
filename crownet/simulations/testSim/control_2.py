@@ -33,7 +33,9 @@ class ChangeTarget(Controller):
         action = { "time" : sim_time+0.4, 
                   "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
                   "command" : command,
-                  "commandId": self.nextCmdId}
+                  "commandId": self.nextCmdId,
+                   "stimulusId": 201,
+                   }
         self.nextCmdId =+ 1 
         action = json.dumps(action)
         

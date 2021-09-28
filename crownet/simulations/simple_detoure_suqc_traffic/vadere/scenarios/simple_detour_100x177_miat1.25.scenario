@@ -1,7 +1,7 @@
 {
   "name" : "simple_detour_100x177_miat1.25",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -146,10 +146,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
@@ -419,7 +415,7 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-	"interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
         "distributionParameters" : [ 0.0375 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -491,6 +487,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }
