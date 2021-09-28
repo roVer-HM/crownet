@@ -31,7 +31,7 @@ void IntervalScheduler::initialize(int stage)
     AppSchedulerBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         numberPackets = &par("numberPackets");
-        amoutOfData = &par("maxData");
+        amoutOfData = &par("amoutOfData");
 
         maxNumberPackets = par("maxNumberPackets").intValue();
         maxData = b(par("maxData").intValue());
