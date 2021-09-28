@@ -1,7 +1,7 @@
 {
   "name" : "mf_klein_initial_peds",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -893,11 +893,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -944,11 +946,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -995,11 +999,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1046,11 +1052,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1097,11 +1105,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1148,11 +1158,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1199,11 +1211,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1250,11 +1264,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1301,11 +1317,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1352,11 +1370,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1403,11 +1423,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1454,11 +1476,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1505,11 +1529,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1540,8 +1566,13 @@
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "Wait"
+        "type" : "Wait",
+        "id" : -1
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

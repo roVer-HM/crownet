@@ -1,7 +1,7 @@
 {
   "name" : "route_choice_real_world",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -1126,6 +1126,10 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
+    } ]
   }
 }
