@@ -212,6 +212,7 @@ template <typename K, typename T>
 void IEntry<K, T>::touch(const time_type& t) {
   measurement_time = t;
   received_time = t;
+  _valid = true;
 }
 
 template <typename K, typename T>
