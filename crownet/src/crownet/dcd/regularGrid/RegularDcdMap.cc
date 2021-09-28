@@ -23,8 +23,8 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> gridSize,
     visitor_dispatcher["invSourceDist"] = [this](){return std::make_shared<InvSourceDistVisitor>(timeProvider->now());};
     visitor_dispatcher["local"] = [this](){return std::make_shared<LocalSelector>(timeProvider->now());};
 
-    cellIdStream_dispatcher["default"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, omnetpp::simtime_t>>();};
-    cellIdStream_dispatcher["insertionOrder"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, omnetpp::simtime_t>>();};
+    cellIdStream_dispatcher["default"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>();};
+    cellIdStream_dispatcher["insertionOrder"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>();};
 }
 
 
@@ -52,7 +52,7 @@ std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::c
     return visitor_dispatcher[mapType]();
 }
 
-std::shared_ptr<ICellIdStream<GridCellID, omnetpp::simtime_t>> RegularDcdMapFactory::createCellIdStream(const std::string& typeName){
+std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> RegularDcdMapFactory::createCellIdStream(const std::string& typeName){
     if (cellIdStream_dispatcher.find(typeName) == cellIdStream_dispatcher.end()){
         throw cRuntimeError("No CellIdStream defined for type %s", typeName.c_str());
     }

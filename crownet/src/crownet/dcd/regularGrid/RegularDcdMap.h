@@ -20,7 +20,7 @@ namespace crownet {
 using RegularDcdMap = DcDMap<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 using RegularDcdMapWatcher = DcdMapWatcher<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 using VisitorCreator = std::function<std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>>()>;
-using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCellID, omnetpp::simtime_t>>()>;
+using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>()>;
 
 
 class RegularDcdMapFactory {
@@ -35,7 +35,7 @@ class RegularDcdMapFactory {
   std::shared_ptr<RegularDcdMap> create_shared_ptr(const IntIdentifer& ownerID, const std::string& idStreamType = "default");
   std::shared_ptr<GridCellDistance> createDistanceProvider();
   std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> createValueVisitor(const std::string& mapType);
-  std::shared_ptr<ICellIdStream<GridCellID, omnetpp::simtime_t>> createCellIdStream(const std::string& typeName);
+  std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> createCellIdStream(const std::string& typeName);
 
  private:
   std::pair<double, double> gridSize;

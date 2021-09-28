@@ -34,11 +34,13 @@ class DcDMap {
   DcDMap(node_key_t owner_id,
          std::shared_ptr<CellKeyProvider<C>> cellKeyProvider,
          std::shared_ptr<TimeProvider<T>> timeProvider,
-         std::shared_ptr<ICellIdStream<C, T>> cellKeyStream)
+         std::shared_ptr<ICellIdStream<C, N, T>> cellKeyStream)
       : owner_id(owner_id),
         cellKeyProvider(cellKeyProvider),
         timeProvider(timeProvider),
-        cellKeyStream(cellKeyStream){}
+        cellKeyStream(cellKeyStream){
+      this->cellKeyStream->setMap(this);
+  }
 
   // getter
   const node_key_t& getOwnerId() const { return owner_id; }
@@ -98,7 +100,7 @@ class DcDMap {
   void applyVisitorTo(const cell_key_t& cell_id, Fn visitor);
 
   std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() {return cellKeyProvider;}
-  std::shared_ptr<ICellIdStream<C, T>> getCellKeyStream() {return cellKeyStream; }
+  std::shared_ptr<ICellIdStream<C, N, T>> getCellKeyStream() {return cellKeyStream; }
 
  private:
   map_t cells;
@@ -107,7 +109,7 @@ class DcDMap {
   time_t lastComputedAt; // Zeitpunkt an dem der Wert berechnet wird
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
   std::shared_ptr<TimeProvider<T>> timeProvider;
-  std::shared_ptr<ICellIdStream<C, T>> cellKeyStream;
+  std::shared_ptr<ICellIdStream<C, N, T>> cellKeyStream;
   std::map<N, C> neighborhood;
 };
 #include "DcdMap.tcc"
