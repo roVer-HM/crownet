@@ -24,7 +24,6 @@ Define_Module(DensityMapAppSimple);
 void DensityMapAppSimple::initialize(int stage) {
     BaseDensityMapApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-        mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
     }
 }
@@ -42,8 +41,7 @@ void DensityMapAppSimple::updateLocalMap() {
   dcdMap->clearNeighborhood();
 
   // add yourself to the map.
-  const auto &pos = mobility->getCurrentPosition();
-  const auto &posInet = converter->position_cast_traci(pos);
+  const auto &posInet = converter->position_cast_traci(nTable->getPosition());
 
   dcdMap->setOwnerCell(posInet);
   dcdMap->incrementLocal(posInet, dcdMap->getOwnerId(), measureTime);

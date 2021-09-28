@@ -33,8 +33,7 @@ simple BeaconSimple extends BaseApp like IBeaconApp {
 		allEmptyDestAddress = false;
         
         // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;
+        string neighborhoodTableMobdule =  default("mobility");
 }
 
 simple BeaconDynamic extends BaseApp like IBeaconApp {
@@ -52,7 +51,6 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         double maxBandwith @unit(Bytes) = default(2000B);
         
         // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;   
+        string neighborhoodTableMobdule  = default("mobility");
 }
 

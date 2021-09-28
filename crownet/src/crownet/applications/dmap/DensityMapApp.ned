@@ -68,8 +68,6 @@ simple DensityMapAppSimple  extends BaseDensityMapApp  {
 
     parameters:
         @class(crownet::DensityMapAppSimple);
-
-         string mobilityModule;
-         string neighborhoodTableMobdule;
+         string neighborhoodTableMobdule = default("nTable");
 }
 

@@ -20,7 +20,6 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
 
         minSentFrequency = par("minSentFrequency");
@@ -40,8 +39,8 @@ Packet *BeaconDynamic::createPacket() {
 
 
     const auto &beacon = makeShared<DynamicBeaconPacket>();
-    beacon->setPos(mobility->getCurrentPosition());
-    beacon->setEpsilon({0.0, 0.0});
+    beacon->setPos(nTable->getPosition());
+    beacon->setEpsilon(nTable->getEpsilon());
     // measurement time is same as packet creation.
     beacon->setPosTimestamp(time);
     beacon->setNumberOfNeighbours(nTable->getNeighbourCount());

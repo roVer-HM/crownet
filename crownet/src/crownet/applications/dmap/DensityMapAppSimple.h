@@ -38,7 +38,6 @@ protected:
 
 private:
   // application
- inet::IMobility *mobility = nullptr;
  NeighborhoodTable *nTable  = nullptr;
 
 };

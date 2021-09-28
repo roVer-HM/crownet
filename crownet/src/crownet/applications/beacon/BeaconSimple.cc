@@ -19,7 +19,6 @@ BeaconSimple::BeaconSimple() {}
 void BeaconSimple::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
     }
 }
@@ -28,7 +27,7 @@ Packet *BeaconSimple::createPacket() {
 
     auto beacon = createPayload<BeaconPacketSimple>();
     beacon->setTime(simTime());
-    beacon->setPos(mobility->getCurrentPosition());
+    beacon->setPos(nTable->getPosition());
     beacon->setNodeId(getHostId());
 
     return buildPacket(beacon);
