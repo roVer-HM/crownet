@@ -17,6 +17,7 @@ import inet.common.INETDefs;
 import inet.common.packet.chunk.Chunk;
 import inet.common.geometry.Geometry;
 import inet.common.TagBase;
+import inet.common.Units;
 
 cplusplus{{
   using namespace inet;  
@@ -33,19 +34,35 @@ class MapCfg extends cOwnedObject {
 
 
 class DcDCell {
-	uint16_t count;      // pedestrian count
-	uint16_t variation;  //   
+	uint16_t count;         // 2B pedestrian count
+	uint16_t variation;     // 2B   
+	uint16_t deltaCreation; // 2B delte to packet creation time in 1/10 seconds
 }
 
 cplusplus(DcDCell){{
   public:
       DcDCell(uint16_t count, uint16_t variation):
       	count(count), variation(variation){}
+      void setDeltaCreation(const simtime_t& delta);
+      simtime_t getCreationTime(const simtime_t& base) const;
 }}
 
+cplusplus(cc){{
+  void DcDCell::setDeltaCreation(const simtime_t& delta){
+    deltaCreation = (uint16_t)(delta.inUnit(SimTimeUnit::SIMTIME_MS) / 10);
+  }
+  
+  simtime_t DcDCell::getCreationTime(const simtime_t& base) const{
+      return base + SimTime(deltaCreation*10, SimTimeUnit::SIMTIME_MS);
+  }
+}}
+
+
+
+
 class LocatedDcDCell extends DcDCell {
-    uint16_t idOffsetX;
-    uint16_t idOffsetY;
+    uint16_t idOffsetX;   // 2B
+    uint16_t idOffsetY;   // 2B
 }
 
 cplusplus(LocatedDcDCell){{
@@ -54,30 +71,44 @@ cplusplus(LocatedDcDCell){{
       	DcDCell(count, variation), idOffsetX(idOffsetX), idOffsetY(idOffsetY) {}
 }}
 
-class BaseMapPacket extends inet::FieldsChunk {
+enum MapType {
+    DENSE = 0x10;   
+ 	SPARSE = 0x20;
+}
+
+class MapHeader extends inet::FieldsChunk {
     uint16_t sequenceNumber;
- 	uint32_t sourceId;
- 	uint32_t timestamp; 
- 	uint8_t  version = 0;
+ 	uint32_t sourceId; 
+ 	uint32_t timestamp;  // in ms
+ 	MapType  version = MapType::SPARSE;	 // DenseCells 0x10 | SparseCells 0x20
  	uint8_t	 reserverd = 0;
  	uint32_t refCoordLon; // X in microdegree
  	uint32_t refCoordLat; // Y in microdegree
  	uint16_t refIdOffsetX;
 	uint16_t refIdOffsetY;
 	
-	chunkLength = B(24);
+ 	uint16_t sourceCellIdX; // 4B
+	uint16_t sourceCellIdY; // 4B
+    uint16_t numberOfNeighbours; // 4B
+    
+	chunkLength = B(24 + 12);
 }
 
-class DenseMapPacket extends BaseMapPacket {
-    version = 0x10;    
-    chunkLength = getChunkLength() + B(2);
+class MapPacketBase extends inet::FieldsChunk {
+    chunkLength = B(0); // base length
+ 	inet::b cellSize;   
+}
+
+class DenseMapPacket extends MapPacketBase {   
+    chunkLength = B(2); // base length
+    cellSize = B(6);
     uint8_t cellCountX;
     uint8_t cellCountY;
     DcDCell cells[];
 }
 
-class SparseMapPacket extends BaseMapPacket {
-    version = 0x20;
+class SparseMapPacket extends MapPacketBase {
+    cellSize = B(10);
 	LocatedDcDCell cells[];
 }
 

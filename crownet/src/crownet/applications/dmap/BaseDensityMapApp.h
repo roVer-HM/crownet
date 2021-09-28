@@ -68,6 +68,7 @@ protected:
  virtual bool mergeReceivedMap(Packet *packet);
 
  // IDensityMapHandler
+ // update map with data from neighborhood table
  virtual void updateLocalMap() override;
  virtual void computeValues() override;
  virtual void writeMap() override;
@@ -75,6 +76,8 @@ protected:
  virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
 
+ //
+ virtual bool canProducePacket() override;
 protected:
 
  std::shared_ptr<OsgCoordinateConverter> converter;

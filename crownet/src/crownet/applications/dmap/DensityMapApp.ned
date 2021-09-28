@@ -31,7 +31,6 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         
         // Aid app override defaults
         packetName = default("DcDMap");
-        packetLength = default(1kB);
         allEmptyDestAddress = false;
         
         // App logic

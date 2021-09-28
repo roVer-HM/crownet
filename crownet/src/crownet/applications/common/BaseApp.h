@@ -63,10 +63,17 @@ class BaseApp : //public ApplicationBase,
   cMessage *appLifeTime = nullptr;
   cMessage *appMainTimer = nullptr;
 
+  // packet creation / scheduling
+  inet::b maxPduLength = b(0);
+  inet::b scheduledData = b(-1);
+  inet::b minPacketLength = b(0);
+  IAppScheduler* scheduler = nullptr;
+
+
+
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
   SocketProvider* socketProvider = nullptr;
-  IAppScheduler* scheduler = nullptr;
   AppInfoLocal* localInfo = nullptr;
   int hostId;
 
@@ -124,11 +131,20 @@ class BaseApp : //public ApplicationBase,
 
 
   virtual void setupTimers();  // called in fsmSetup
+  // PacketProcessorBase
   virtual void handlePacketProcessed(Packet *packet) override;
 
-  // Lifecycle management
-  virtual void handleStartOperation(
-      LifecycleOperation *operation); //override;  // trigger fsmSetup
+  // Lifecycle management. Will trigger fsmSetup
+  virtual void handleStartOperation(LifecycleOperation *operation);
+
+  virtual const inet::b getAvailablePduLenght();
+  // ensure packet can be crated due to enough scheduled data or enough 'new' data to transmitt
+  virtual bool canProducePacket(){return true;};
+public:
+  // ICrownetActivePacketSource
+  virtual void producePackets(inet::B maxData) override;
+  virtual void handleCanPushPacketChanged(cGate *gate) override { throw cRuntimeError("Packet generation managed by scheduler");}
+
 };
 
 template <typename T>
