@@ -56,12 +56,6 @@ void BaseDensityMapApp::finish() {
   emit(GlobalDensityMap::removeMap, this);
 }
 
-void BaseDensityMapApp::receiveSignal(cComponent *source,
-                                        simsignal_t signalID, cObject *obj,
-                                        cObject *details) {
-    // do nothing
-}
-
 FsmState BaseDensityMapApp::handleDataArrived(Packet *packet){
     return mergeReceivedMap(packet) ? FsmRootStates::WAIT_ACTIVE  : FsmRootStates::ERR;
 }

@@ -35,8 +35,8 @@ using namespace inet;
 
 namespace crownet {
 class BaseDensityMapApp : public BaseApp,
-                          public IDensityMapHandler<RegularDcdMap>,
-                          public omnetpp::cListener {
+                          public IDensityMapHandler<RegularDcdMap>
+                          {
 public:
     virtual ~BaseDensityMapApp();
     BaseDensityMapApp(){};
@@ -46,12 +46,9 @@ protected:
  // cSimpleModule
  virtual int numInitStages() const override { return NUM_INIT_STAGES; }
  virtual void initialize(int stage) override;
- using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
+
  virtual void finish() override;
 
- // cListener
- void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj,
-                    cObject *details) override;
 
  virtual FsmState handleDataArrived(Packet *packet) override;
 
