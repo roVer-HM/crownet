@@ -94,3 +94,23 @@ module CrownetAidApp extends CrownetApp
 
 }
 
+
+module BeaconApp extends CrownetApp {
+ 	parameters:
+ 		@display("i=block/broadcast;is=s");
+ 		app.typename = default("BeaconDynamic");
+ 		socket.typename = default("UdpSocketManager");
+ 		socket.destPort = default(30001);
+        socket.localPort = default(30001);	
+}		
+
+
+module DensityMapApp extends CrownetApp {
+ 	parameters:
+ 		@display("i=block/users;is=s"); 
+ 		app.typename = default("DensityMapAppSimple");
+ 		socket.typename = default("UdpSocketManager");
+        socket.destPort = default(30002);
+        socket.localPort = default(30002);
+}
+
