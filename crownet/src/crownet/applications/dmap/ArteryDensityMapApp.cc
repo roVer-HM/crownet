@@ -45,6 +45,7 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
         .getConst<artery::Identity>()
         .host->getId();
     if (_hostId != hostId){
+        // todo handle id update for density map
         throw omnetpp::cRuntimeError("hostId mismatch.");
     }
   }
@@ -52,12 +53,7 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
 
 
 FsmState ArteryDensityMapApp::fsmSetup(cMessage *msg) {
-  // ensure Density Grid map was initialized by event
-  if (dcdMap == nullptr)
-    throw omnetpp::cRuntimeError(
-        "Density Grid map not initialized. Was the "
-        "artery::IdentityRegistry::updateSignal event fired? ");
-  return BaseApp::fsmSetup(msg);
+  return BaseDensityMapApp::fsmSetup(msg);
 }
 
 void ArteryDensityMapApp::updateLocalMap() {
