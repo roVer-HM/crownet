@@ -122,11 +122,10 @@ class OpenLoop(NoController, Controller):
 
         command = {"targetIds": self.target_ids,
                    "probability": probabilities,
-                   "reactionProbability": list(
-                       np.ones(len(self.target_ids)) * self.reaction_model['BernoulliParameter'])
                    }
         action = {
             "commandId": self.commandID,
+            "stimulusId": -400,
             "command": command,
             "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information directly after spawning process
         }
@@ -196,7 +195,7 @@ class ClosedLoop(OpenLoop, Controller):
 
 if __name__ == "__main__":
 
-    isUseOmnet = True
+    isUseOmnet = False
     isRunInDockerContainer = True
     settings = ["--controller-type", "OpenLoop"]
 
