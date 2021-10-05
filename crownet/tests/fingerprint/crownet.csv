@@ -2,8 +2,8 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              d3db-0ebe/tplx, PASS, vadere:latest;omnetpp:latest
-/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              9816-bbec/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              6fea-e750/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              22fe-d559/tplx, PASS, vadere:latest;omnetpp:latest
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              0932-9592/tplx, PASS, sumo:latest;omnetpp:latest
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              05ca-51fd/tplx, PASS, sumo:latest;omnetpp:latest
 /simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              abcf-1a75/tplx, PASS, vadere:latest;omnetpp:latest
