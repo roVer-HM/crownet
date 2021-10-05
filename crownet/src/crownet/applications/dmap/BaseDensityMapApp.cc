@@ -130,6 +130,7 @@ void BaseDensityMapApp::initWriter(){
 
 const bool BaseDensityMapApp::canProducePacket(){
     // todo still produce packet (header only if no data availabel?)
+    computeValues(); // Idempotent. Will only be executed once
     bool hasData = dcdMap->getCellKeyStream()->hasNext(simTime());
     if (scheduledData.get() > 0){
         // if application is scheduled based on data size
@@ -162,6 +163,7 @@ Packet *BaseDensityMapApp::createPacket() {
     header->setNumberOfNeighbours(dcdMap->getNeighborhood().size());
     maxData -= header->getChunkLength();
 
+    // todo check map capacity and switch to DENSE Packet if needed.
     auto payload =  makeShared<SparseMapPacket>();
     maxData -= payload->getChunkLength();
 
@@ -264,6 +266,7 @@ void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConv
 
 void BaseDensityMapApp::computeValues() {
   valueVisitor->setTime(simTime());
+  // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
 }
 
