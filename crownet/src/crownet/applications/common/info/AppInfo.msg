@@ -36,7 +36,7 @@ class AppInfoBase  extends cOwnedObject {
 
 class AppInfoLocal extends AppInfoBase {    
     @customize(true);
-    simtime_t walltimeStart;
+    simtime_t walltimeStart @editable; // editable needed for ned object paramters. Fix in 6-pre13
 	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
     uint32_t baseTimestamp;
     uint16_t sequencenumber;
