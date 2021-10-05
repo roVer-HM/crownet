@@ -43,6 +43,9 @@ class Timestamped{
     void setTime(const typename C::time_t& t){
         this->time = t;
     }
+    const typename C::time_t& getTime() const {
+        return this->time;
+    }
 
  protected:
   typename C::time_t time;
