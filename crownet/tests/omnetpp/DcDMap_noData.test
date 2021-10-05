@@ -1,0 +1,37 @@
+%description:
+DcDMap do not sent packet if no data is present. (Before local update)
+
+%file: package.ned 
+// 
+// empty: no namespace
+//
+
+%inifile: omnetpp.ini
+[General]
+network = crownet.test.omnetpp.lib.TestStationaryWorld
+sim-time-limit= 500ms
+ned-path = ../../lib
+include ../lib/default_testConfig.ini
+**.vector-recording = false
+**.scalar-recording = false
+**.routingRecorder.enabled = false
+
+[Config final]
+extends = _default, D2D_General, DcDMap, stationary_n1
+
+*.misc[*].app[1].scheduler.numberPackets = -1
+*.misc[*].app[1].scheduler.amoutOfData = 1000B
+# update interval bigger than sim time. Do not sent data in this case
+*.misc[*].app[1].app.localMapUpdateInterval = 1s
+
+%postrun-command: grep -E "^0.*TestStationaryWorld\.misc\[0\].app\[1\].(scheduler)" test.out > test1.out
+
+
+%contains: test1.out
+0.1 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
+0.2 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
+0.3 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
+0.4 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
+0.5 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
+%contains: stdout
+<!> Simulation time limit reached -- at t=0.5s

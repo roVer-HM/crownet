@@ -16,6 +16,7 @@
 #include "crownet/applications/dmap/DensityMapAppSimple.h"
 
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/crownet.h"
 
 namespace crownet {
 
@@ -34,6 +35,7 @@ void DensityMapAppSimple::updateLocalMap() {
     return;
   }
   lastUpdate = measureTime;
+  EV_INFO << LOG_MOD << " Update local map[" << dcdMap->getOwnerId() <<"]:" << endl;
 
   // set count of all cells in local map to zero.
   // do not change the valid state.
@@ -45,6 +47,8 @@ void DensityMapAppSimple::updateLocalMap() {
 
   dcdMap->setOwnerCell(posInet);
   dcdMap->incrementLocal(posInet, dcdMap->getOwnerId(), measureTime);
+  EV_INFO << LOG_MOD << "   ownPosition: [" << posInet.x << "," << posInet.y << "]" << endl;
+
 
   for (const auto& entry: *nTable){
       int _id = entry.first;
