@@ -30,6 +30,13 @@ void AppSchedulerBase::initialize(int stage)
         outputGate = gate("out");
         schedulerIn = gate("schedulerIn");
         consumer = findConnectedModule<ICrownetActivePacketSource>(outputGate);
+        app = findConnectedModule<AppStatusInfo>(outputGate);
+    }
+}
+
+void AppSchedulerBase::assertAppRunning() const{
+    if (app->isStopped()){
+        throw cRuntimeError("Connected up is not running");
     }
 }
 

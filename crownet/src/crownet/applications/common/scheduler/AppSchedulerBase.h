@@ -22,6 +22,7 @@
 
 #include "crownet/queueing/ICrownetActivePacketSource.h"
 #include "crownet/applications/common/scheduler/IAppScheduler.h"
+#include "crownet/applications/common/AppFsm.h"
 
 using namespace inet;
 using namespace crownet::queueing;
@@ -35,12 +36,13 @@ protected:
     cGate *outputGate = nullptr;
     cGate *schedulerIn = nullptr;
     ICrownetActivePacketSource *consumer = nullptr;
+    AppStatusInfo *app = nullptr;
 
 protected:
     virtual void initialize(int stage) override;
     // handle IAppScheduler without any additional logic
     virtual void handleMessage(cMessage *message) override;
-
+    void assertAppRunning() const;
 
 public:
     virtual bool supportsPacketPushing(cGate *gate) const override { return true; }

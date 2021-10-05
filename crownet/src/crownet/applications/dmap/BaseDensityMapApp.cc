@@ -128,7 +128,7 @@ void BaseDensityMapApp::initWriter(){
     }
 }
 
-bool BaseDensityMapApp::canProducePacket(){
+const bool BaseDensityMapApp::canProducePacket(){
     // todo still produce packet (header only if no data availabel?)
     bool hasData = dcdMap->getCellKeyStream()->hasNext(simTime());
     if (scheduledData.get() > 0){

@@ -14,8 +14,8 @@
 // 
 
 #include "crownet/applications/common/scheduler/IntervalScheduler.h"
-
 #include "inet/common/ModuleAccess.h"
+#include "crownet/crownet.h"
 
 using namespace inet;
 
@@ -45,22 +45,35 @@ void IntervalScheduler::initialize(int stage)
 
 void IntervalScheduler::scheduleGenerationTimer()
 {
+    simtime_t now  = simTime();
     auto delay = generationIntervalParameter->doubleValue();
     if (delay < 0){
-        EV_INFO << "generationIntervalParameter < 0. Deactivate AppScheduler" << endl;
+        EV_INFO << LOG_MOD << " generationIntervalParameter < 0. Deactivate AppScheduler" << endl;
+        stopScheduling = true;
+    } else if ((app->getStopTime() > simtime_t::ZERO) && (simTime() > app->getStopTime())) {
+        EV_INFO << LOG_MOD << " App stop time reached. Do not schedule any more data" << endl;
+        stopScheduling = true;
+        // todo emit signal
     } else {
-        scheduleClockEventAfter(delay, generationTimer);
+        auto scheduleAt = std::max(now, app->getStartTime()) + delay;
+        EV_INFO << simTime().ustr() << " schedule application" << endl;
+        scheduleClockEventAt(scheduleAt, generationTimer);
     }
 }
 
 void IntervalScheduler::handleMessage(cMessage *message)
 {
     if (message == generationTimer) {
-        scheduleApp(message);
-        if (stop){
-          EV << "Limit reached" << endl;
+        if ((app->getStopTime() > simtime_t::ZERO) && (simTime() > app->getStopTime())){
+            EV_INFO << LOG_MOD << " App stop time reached. Do not schedule any more data" << endl;
+            // todo emit signal
         } else {
-            scheduleGenerationTimer();
+            scheduleApp(message);
+            if (stopScheduling){
+              EV << LOG_MOD << "Scheduler limit reached" << endl;
+            } else {
+                scheduleGenerationTimer();
+            }
         }
         updateDisplayString();
     } else{
@@ -75,7 +88,7 @@ void IntervalScheduler::scheduleApp(cMessage *message){
     if (numPacket > 0){
 
         if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){
-            stop = true;
+            stopScheduling = true;
         } else {
             sentPackets += numPacket;
             consumer->producePackets(numPacket);
@@ -83,7 +96,7 @@ void IntervalScheduler::scheduleApp(cMessage *message){
 
     } else if (data > b(0)){
         if(maxData > b(0) && (sentData + data) > maxData ){
-            stop = true;
+            stopScheduling = true;
         } else {
             sentData += data;
             //convert to Bytes

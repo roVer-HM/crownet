@@ -200,6 +200,20 @@ const inet::b BaseApp::getAvailablePduLenght() {
     return std::min(scheduledData, maxPduLength);
 }
 
+const bool BaseApp::isRunning(){
+    return fsmRoot.getState() == FsmRootStates::WAIT_ACTIVE;
+}
+
+const bool BaseApp::isStopped(){
+    return !isRunning();
+}
+
+const FsmState BaseApp::getState() {
+    return fsmRoot.getState();
+}
+
+
+
 // FSM
 FsmState BaseApp::fsmHandleSubState(cMessage *msg) {
     throw cRuntimeError("No Substate on BaseApp");

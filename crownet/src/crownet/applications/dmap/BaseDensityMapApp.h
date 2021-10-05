@@ -74,7 +74,7 @@ protected:
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
 
  //
- virtual bool canProducePacket() override;
+ virtual const bool canProducePacket() override;
 protected:
 
  std::shared_ptr<OsgCoordinateConverter> converter;

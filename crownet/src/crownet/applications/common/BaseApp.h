@@ -48,6 +48,7 @@ namespace crownet {
 
 class BaseApp : //public ApplicationBase,
                 public DataArrivedHandler,
+                public AppStatusInfo,
                 public crownet::queueing::CrownetActivePacketSourceBase {
  public:
   BaseApp(){};
@@ -137,9 +138,14 @@ class BaseApp : //public ApplicationBase,
   // Lifecycle management. Will trigger fsmSetup
   virtual void handleStartOperation(LifecycleOperation *operation);
 
-  virtual const inet::b getAvailablePduLenght();
-  // ensure packet can be crated due to enough scheduled data or enough 'new' data to transmitt
-  virtual bool canProducePacket(){return true;};
+  // AppStatusInfo interface
+  virtual const bool isRunning() override;
+  virtual const bool isStopped() override;
+  virtual const FsmState getState() override;
+  virtual const bool canProducePacket() override {return true;}
+  virtual const inet::b getAvailablePduLenght() override;
+  virtual const simtime_t getStartTime() override {return startTime;}
+  virtual const simtime_t getStopTime() override {return stopTime;}
 public:
   // ICrownetActivePacketSource
   virtual void producePackets(inet::B maxData) override;

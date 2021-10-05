@@ -40,9 +40,7 @@ protected:
    int sentPackets = 0;
    B maxData = B(-1);
    B sentData = B(0);
-
-   bool stop = false;
-
+   bool stopScheduling = false;
 
  protected:
    virtual void initialize(int stage) override;

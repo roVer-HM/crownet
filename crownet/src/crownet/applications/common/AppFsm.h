@@ -32,6 +32,20 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) = 0;
 };
 
+class AppStatusInfo {
+public:
+    virtual ~AppStatusInfo() = default;
+    virtual const bool isRunning() = 0;
+    virtual const bool isStopped() = 0;
+    virtual const FsmState getState() = 0;
+    // ensure packet can be created due to enough scheduled data or enough
+    // 'new' data redy for transition
+    virtual const bool canProducePacket() = 0;
+    virtual const inet::b getAvailablePduLenght() = 0;
+    virtual const simtime_t getStartTime() = 0;
+    virtual const simtime_t getStopTime() = 0;
+};
+
 class SocketProvider{
 public:
     virtual ~SocketProvider() = default;
