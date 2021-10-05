@@ -75,10 +75,10 @@ OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zoneOriginOffset,
   zoneOffsetProjection.setTranslation(inet::Coord(zoneOriginOffset.x, zoneOriginOffset.y, zoneOriginOffset.z));
 
   std::vector<traci::TraCIPosition> vec;
-  traci::TraCIPosition upperRight;
+  traci::TraCIPosition upperRight{0.0, 0.0, 0.0};
   upperRight.x = _simBound.x;
   upperRight.y = _simBound.y;
-  vec.push_back(traci::TraCIPosition{});
+  vec.push_back(traci::TraCIPosition{0.0, 0.0, 0.0});
   vec.push_back(upperRight);
   simBound = traci::Boundary(vec);
 

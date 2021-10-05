@@ -24,7 +24,7 @@ moduleinterface ICoordConverter {
 // locally defined converter. Use configuration of parameters
 simple OsgCoordConverterLocal like ICoordConverter {
     parameters:
-        @class(crownet::OsgCoordConverterLocal);
+        @class(::crownet::OsgCoordConverterLocal);
         string srs_code = default("EPSG:32632");
         double offset_x = default(0.0);
         double offset_y = default(0.0);
