@@ -90,13 +90,16 @@ void IntervalScheduler::scheduleApp(cMessage *message){
         if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){
             stopScheduling = true;
         } else {
+            app->setScheduleData(b(-1)); // just produce packets regardless of size
             if (app->canProducePacket()){
                 // can produce at least one packet
+                EV_INFO << LOG_MOD << " schedule packet quota" << numPacket << "packet(s)" << endl;
                 consumer->producePackets(numPacket);
                 sentPackets += numPacket;
             } else {
                 EV_INFO << LOG_MOD << "No data in application. Scheduled data dropped" << endl;
             }
+            app->setScheduleData(b(0));
         }
     } else if (data > b(0)){
         // schedule amount based
@@ -105,7 +108,7 @@ void IntervalScheduler::scheduleApp(cMessage *message){
         } else {
             app->setScheduleData(data);
             if (app->canProducePacket()){
-                EV_INFO << LOG_MOD << " schedule " << data.str() << endl;
+                EV_INFO << LOG_MOD << " schedule data quota " << data.str() << endl;
                 consumer->producePackets(data);
                 // only decrease sentData of the amount actually transmitted.
                 auto consumedData = data - app->getScheduleData();

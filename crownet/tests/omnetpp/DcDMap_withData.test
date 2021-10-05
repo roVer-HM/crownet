@@ -31,11 +31,11 @@ extends = _default, D2D_General, DcDMap, stationary_n1
 0.2 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
 0.3 TestStationaryWorld.misc[0].app[1].app Update local map[14]:
 0.3 TestStationaryWorld.misc[0].app[1].app   ownPosition: [5,48]
-0.3 TestStationaryWorld.misc[0].app[1].scheduler schedule 1000 B
+0.3 TestStationaryWorld.misc[0].app[1].scheduler schedule data quota 1000 B
 0.3 TestStationaryWorld.misc[0].app[1].scheduler consumed 40 B from 1000 B scheduled
-0.4 TestStationaryWorld.misc[0].app[1].scheduler schedule 1000 B
+0.4 TestStationaryWorld.misc[0].app[1].scheduler schedule data quota 1000 B
 0.4 TestStationaryWorld.misc[0].app[1].scheduler consumed 40 B from 1000 B scheduled
-0.5 TestStationaryWorld.misc[0].app[1].scheduler schedule 1000 B
+0.5 TestStationaryWorld.misc[0].app[1].scheduler schedule data quota 1000 B
 0.5 TestStationaryWorld.misc[0].app[1].scheduler consumed 40 B from 1000 B scheduled
 
 %contains: stdout
