@@ -135,10 +135,21 @@ build-lib: src/libCROWNET$(_D)
 
 build-exec: src/CROWNET$(_D)
 
-test: make-test
+
+opp-test: opp-test-make
+	cd tests/omnetpp && ./runtest *.test
+
+opp-test-make: build-lib
+	cd tests/omnetpp && ./gentest *.test 
+
+opp-test-clean:
+	rm -rf tests/omnetpp/work
+
+# fingerprint tests
+test: build-lib
 	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg $(GOOGLE_ARGS); else cd tests/gtest/src && ./rTests $(GOOGLE_ARGS) ;fi
 
-clean-test:
+clean-fingerprint-test:
 	cd tests/gtest/src && $(MAKE) MODE=release clean
 	cd tests/gtest/src && $(MAKE) MODE=debug clean
 	rm -f tests/gtest/src/Makefile

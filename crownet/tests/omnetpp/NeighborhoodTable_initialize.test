@@ -5,15 +5,16 @@ Test the NeighborhoodTable
 %inifile: omnetpp.ini
 [General]
 network = crownet.test.omnetpp.lib.NeighborhoodTableTestNetwork
-sim-time-limit=2s
 ned-path = ../../lib
-sim-time-limit=2s
-*.foo.maxAge = 7s
+
+[Config final]
+sim-time-limit=10ms
+*.foo.table.maxAge = 7s
 
 %#--------------------------------------------------------------------------------------------------------------
 %contains: stdout
 maxAge: 7
 %contains: stdout
-finished: simtime: 2
+finished: simtime: 0.01
 %not-contains-regex: stdout
 nTable\[\d\]

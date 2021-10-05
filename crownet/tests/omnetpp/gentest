@@ -9,6 +9,9 @@ MAKE="make MODE=release"
 
 TESTFILES=$*
 if [ "x$TESTFILES" = "x" ]; then TESTFILES='*.test'; fi
+if [ ! -d work ];  then mkdir work; fi
+rm -rf work/lib
+cp -pPR lib work/
 export NEDPATH="$(exec ../../../scripts/nedpath)"
 
 CROWNET_PATH="../../../src/"
@@ -20,8 +23,7 @@ INET_INCLUDE="-I$INET_PATH -L$INET_PATH"
 #EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET_dbg -lCROWNET_dbg"
 EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET -lCROWNET"
 
-echo "opp_test run $OPT -p work_dbg -v $TESTFILES"
-# opp_test run $OPT -p work_dbg -v $TESTFILES || exit 1
-opp_test run $OPT -p work -v $TESTFILES -a "-c final" || exit 1
+opp_test gen $OPT -v $TESTFILES || exit 1
 echo
-echo Results can be found in ./work
+(cd work; opp_makemake -f --deep --no-deep-includes -I./lib -o work -i ../makefrag $EXTRA_INCLUDES; $MAKE) || exit 1
+echo
