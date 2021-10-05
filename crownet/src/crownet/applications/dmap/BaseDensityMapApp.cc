@@ -133,10 +133,15 @@ const bool BaseDensityMapApp::canProducePacket(){
     bool hasData = dcdMap->getCellKeyStream()->hasNext(simTime());
     if (scheduledData.get() > 0){
         // if application is scheduled based on data size
-        return hasData && (scheduledData  >= minPacketLength);
+        return hasData && (scheduledData  >= minPduLength);
     } else {
         return hasData;
     }
+}
+
+const inet::b BaseDensityMapApp::getMinPdu(){
+    // todo check number of occupied cells and select the corresponding header type
+    return b(8*(24 + 6)); // SparseMapPacket header
 }
 
 Packet *BaseDensityMapApp::createPacket() {

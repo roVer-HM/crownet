@@ -73,8 +73,9 @@ protected:
  virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
 
- //
+ // AppStatusInfo
  virtual const bool canProducePacket() override;
+ virtual const inet::b getMinPdu() override;
 protected:
 
  std::shared_ptr<OsgCoordinateConverter> converter;

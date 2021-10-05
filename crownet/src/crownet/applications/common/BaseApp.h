@@ -66,8 +66,8 @@ class BaseApp : //public ApplicationBase,
 
   // packet creation / scheduling
   inet::b maxPduLength = b(0);
-  inet::b scheduledData = b(-1);
-  inet::b minPacketLength = b(0);
+  inet::b minPduLength = b(0);
+  inet::b scheduledData = b(0);
   IAppScheduler* scheduler = nullptr;
 
 
@@ -142,10 +142,15 @@ class BaseApp : //public ApplicationBase,
   virtual const bool isRunning() override;
   virtual const bool isStopped() override;
   virtual const FsmState getState() override;
+  // default to true irrespective of scheduled data provided (-1b one packet)
   virtual const bool canProducePacket() override {return true;}
   virtual const inet::b getAvailablePduLenght() override;
   virtual const simtime_t getStartTime() override {return startTime;}
   virtual const simtime_t getStopTime() override {return stopTime;}
+  virtual void setScheduleData(inet::b data) override {scheduledData = data;}
+  virtual const inet::b getScheduleData() override {return scheduledData;}
+  virtual const inet::b getMinPdu() override;
+  virtual const inet::b getMaxPdu() override;
 public:
   // ICrownetActivePacketSource
   virtual void producePackets(inet::B maxData) override;

@@ -49,15 +49,18 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         ///* Time after which no packet will be send or received.
         ///* stopTime = 0.0s means app will run forever
         double stopTime @unit(s) = default(0.0s); 
+        // Max size of application packet containing application headers
+        int maxPduLength @unit(b) = default(1400B);
+        // Minimum size of application packet. 
+        // If -1B application must provide a minmum value programmatically, otherwise an error is thrown
+        int minPduLength @unit(b) = default(-1B);  
         
 
         ///* Socket: If true app will not throw an error if destiantion address is empty.
         ///* Set to true if app only passivly receives messages or has other means 
         ///* to find a valid destination address.
         bool allEmptyDestAddress = default(true);
-        int maxPduLength @unit(b) = default(1500B);
-        // Used to check if enough data is scheduled to crate a packet. 
-        int minPacketLength @unit(b) = default(30B);  
+        
         
 
        

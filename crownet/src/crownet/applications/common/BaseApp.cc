@@ -49,7 +49,7 @@ void BaseApp::initialize(int stage) {
     socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
     scheduler = inet::getModuleFromPar<IAppScheduler>(par("schedulerModule"), this);
     maxPduLength = b(par("maxPduLength"));
-    minPacketLength = b(par("minPacketLength"));
+    minPduLength = b(par("minPduLength"));
   } else if (stage == INITSTAGE_APPLICATION_LAYER){
       handleStartOperation(nullptr);
   }
@@ -195,9 +195,9 @@ void BaseApp::producePackets(inet::B maxData){
 const inet::b BaseApp::getAvailablePduLenght() {
     if (scheduledData.get() < 0){
         // application works in packet mode provide maxPduLength
-        return maxPduLength;
+        return getMaxPdu();
     }
-    return std::min(scheduledData, maxPduLength);
+    return std::min(scheduledData, getMaxPdu());
 }
 
 const bool BaseApp::isRunning(){
@@ -212,6 +212,15 @@ const FsmState BaseApp::getState() {
     return fsmRoot.getState();
 }
 
+const inet::b BaseApp::getMaxPdu(){
+    return maxPduLength;
+}
+const inet::b BaseApp::getMinPdu(){
+    if (minPduLength.get() <=  0.0){
+        throw cRuntimeError("Provide minimum  Pdu size > 0 in configuration or override method.");
+    }
+    return minPduLength;
+}
 
 
 // FSM
