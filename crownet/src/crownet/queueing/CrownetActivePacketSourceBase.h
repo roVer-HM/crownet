@@ -48,7 +48,7 @@ public:
   virtual void producePacket() override;
   virtual void producePackets(int number) override;
   // produce number of packet(s) without exceeding maxData
-  virtual void producePackets(inet::B maxData) override { throw cRuntimeError("Not Implemented here");};
+  virtual void producePackets(inet::b maxData) override { throw cRuntimeError("Not Implemented here");};
 
 
   virtual bool supportsPacketPushing(cGate *gate) const override { return outputGate == gate; }

@@ -178,7 +178,7 @@ Packet *BaseApp::buildPacket(Ptr<Chunk> content, Ptr<Chunk> header){
     return packet;
 }
 
-void BaseApp::producePackets(inet::B maxData){
+void BaseApp::producePackets(inet::b maxData){
     Enter_Method("producePacket");
 
     scheduledData = maxData;

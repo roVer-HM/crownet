@@ -70,7 +70,7 @@ void IntervalScheduler::handleMessage(cMessage *message)
         } else {
             scheduleApp(message);
             if (stopScheduling){
-              EV << LOG_MOD << "Scheduler limit reached" << endl;
+              EV_INFO << LOG_MOD << "Scheduler limit reached" << endl;
             } else {
                 scheduleGenerationTimer();
             }
@@ -86,21 +86,35 @@ void IntervalScheduler::scheduleApp(cMessage *message){
     auto numPacket = numberPackets->intValue();
     auto data = b(amoutOfData->intValue());
     if (numPacket > 0){
-
+        // schedule packet based
         if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){
             stopScheduling = true;
         } else {
-            sentPackets += numPacket;
-            consumer->producePackets(numPacket);
+            if (app->canProducePacket()){
+                // can produce at least one packet
+                consumer->producePackets(numPacket);
+                sentPackets += numPacket;
+            } else {
+                EV_INFO << LOG_MOD << "No data in application. Scheduled data dropped" << endl;
+            }
         }
-
     } else if (data > b(0)){
+        // schedule amount based
         if(maxData > b(0) && (sentData + data) > maxData ){
             stopScheduling = true;
         } else {
-            sentData += data;
-            //convert to Bytes
-            consumer->producePackets(B(data));
+            app->setScheduleData(data);
+            if (app->canProducePacket()){
+                EV_INFO << LOG_MOD << " schedule " << data.str() << endl;
+                consumer->producePackets(data);
+                // only decrease sentData of the amount actually transmitted.
+                auto consumedData = data - app->getScheduleData();
+                EV_INFO << LOG_MOD << " consumed " << consumedData.str() << " from " << data << " scheduled" << endl;
+                sentData = sentData - consumedData;
+            } else {
+                EV_INFO << LOG_MOD << " No data in application. Scheduled budget dropped" << endl;
+            }
+            app->setScheduleData(b(0)); // reset scheduledData
         }
     } else {
         throw cRuntimeError("Either number of packer or max data in Byte must be set");

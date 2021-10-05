@@ -153,7 +153,7 @@ class BaseApp : //public ApplicationBase,
   virtual const inet::b getMaxPdu() override;
 public:
   // ICrownetActivePacketSource
-  virtual void producePackets(inet::B maxData) override;
+  virtual void producePackets(inet::b maxData) override;
   virtual void handleCanPushPacketChanged(cGate *gate) override { throw cRuntimeError("Packet generation managed by scheduler");}
 
 };
