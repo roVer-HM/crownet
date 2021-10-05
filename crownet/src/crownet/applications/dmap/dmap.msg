@@ -87,11 +87,12 @@ class MapHeader extends inet::FieldsChunk {
  	uint16_t refIdOffsetX;
 	uint16_t refIdOffsetY;
 	
- 	uint16_t sourceCellIdX; // 4B
-	uint16_t sourceCellIdY; // 4B
-    uint16_t numberOfNeighbours; // 4B
+	// todo check
+ 	uint16_t sourceCellIdX; // 2B
+	uint16_t sourceCellIdY; // 2B
+    uint16_t numberOfNeighbours; // 2B
     
-	chunkLength = B(24 + 12);
+	chunkLength = B(24 + 6);
 }
 
 class MapPacketBase extends inet::FieldsChunk {
