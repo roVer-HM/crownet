@@ -164,8 +164,8 @@ Packet *BaseApp::buildPacket(Ptr<Chunk> content, Ptr<Chunk> header){
     applyContentTags(content);
 
     auto packetName = createPacketName(content);
-    auto packet = new Packet(packetName, content);
-
+    auto packet = new Packet(packetName);
+    packet->insertAtFront(content);
 
     if (header != nullptr){
         packet->insertAtFront(header);
