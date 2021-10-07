@@ -14,6 +14,8 @@ compile_commands.json
 **/*.csv.FAILED
 **/*.csv.UPDATED
 **/results
+docker/**/ide/*.tar.gz
+docker/**/ide/*.tgz
 
 # ignore gitlab-runner local test directory
 /builds
