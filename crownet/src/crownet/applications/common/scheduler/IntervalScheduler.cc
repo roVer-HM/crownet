@@ -93,7 +93,7 @@ void IntervalScheduler::scheduleApp(cMessage *message){
             app->setScheduleData(b(-1)); // just produce packets regardless of size
             if (app->canProducePacket()){
                 // can produce at least one packet
-                EV_INFO << LOG_MOD << " schedule packet quota" << numPacket << "packet(s)" << endl;
+                EV_INFO << LOG_MOD << " schedule packet quota " << numPacket << "packet(s)" << endl;
                 consumer->producePackets(numPacket);
                 sentPackets += numPacket;
             } else {
