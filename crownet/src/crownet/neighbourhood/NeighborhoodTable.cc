@@ -7,9 +7,6 @@
 
 #include "crownet/neighbourhood/NeighborhoodTable.h"
 
-#include "inet/common/ModuleAccess.h"
-
-
 #include <omnetpp/simtime_t.h>
 #include <omnetpp/cstlwatch.h>
 #include <omnetpp/cwatch.h>
@@ -32,11 +29,10 @@ NeighborhoodTable::~NeighborhoodTable(){
 
 // cSimpleModule
 void NeighborhoodTable::initialize(int stage){
-    cSimpleModule::initialize(stage);
+    MobilityProviderMixin<cSimpleModule>::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
         maxAge = par("maxAge");
         ttl_msg = new cMessage("NeighborhoodTable_ttl");
-        mobility = getModuleFromPar<IMobility>(par("mobilityModule"), this);
         scheduleAt(simTime() + maxAge, ttl_msg);
         WATCH_PTRMAP(_table);
         WATCH(maxAge);

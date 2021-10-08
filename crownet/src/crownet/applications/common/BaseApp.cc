@@ -27,7 +27,7 @@ BaseApp::~BaseApp() {
 }
 
 void BaseApp::initialize(int stage) {
-  crownet::queueing::CrownetActivePacketSourceBase::initialize(stage);
+  MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase>::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
 
     startTime = par("startTime").doubleValue();

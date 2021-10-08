@@ -30,7 +30,6 @@ simple VruEtsiSimple extends BaseApp like IVRU {
 	    packetName = default("VRU_AID");
 	    double minRate = default(1); // Hz
 	    double maxRate = default(10); // Hz
-	    string mobilityModule = default("^.mobility");
 
 
 }

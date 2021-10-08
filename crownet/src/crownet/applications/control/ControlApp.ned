@@ -64,8 +64,6 @@ simple BroadcastControlApp extends BaseBroadcast
 parameters:
     @class(crownet::BroadcastControlApp);
     @display("i=block/app");
-	
-	string mobilityModule;
 	// equiped node is controlled by Vadere. Send received message to Vadere over TraCI
 	bool isControlled = default(true);
     

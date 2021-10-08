@@ -11,15 +11,16 @@
 
 #include "crownet/applications/beacon/BeaconReceptionInfo.h"
 #include "inet/common/InitStages.h"
-#include "inet/mobility/contract/IMobility.h"
-
+#include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+#include "crownet/common/MobilityProviderMixin.h"
 
 using namespace omnetpp;
 using namespace inet;
 
 namespace crownet {
 
-class NeighborhoodTable : public omnetpp::cSimpleModule {
+class NeighborhoodTable : public MobilityProviderMixin<cSimpleModule>
+{
 public:
     using nTable = std::map<int, BeaconReceptionInfo*>;
     virtual ~NeighborhoodTable();
@@ -37,9 +38,6 @@ public:
     const simtime_t& getMaxAge() const { return maxAge; }
     const nTable& getTable() const { return _table; }
     const cMessage* getTitleMessage() const { return ttl_msg;}
-    const IMobility *getMobility() { return mobility;}
-    const Coord getPosition() {return mobility->getCurrentPosition();}
-    const Coord getEpsilon() {return {0.0, 0.0};}
 
     //setter
     void setMaxAge(const simtime_t& _maxAge) { maxAge = _maxAge; }
@@ -58,7 +56,6 @@ protected:
     nTable _table;
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;
-    IMobility *mobility = nullptr;
     simtime_t lastCheck;
 };
 

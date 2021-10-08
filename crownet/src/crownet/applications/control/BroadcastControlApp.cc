@@ -32,8 +32,7 @@ void BroadcastControlApp::initialize(int stage) {
     BaseBroadcast::initialize(stage);
     if (stage == INITSTAGE_APPLICATION_LAYER) {
         if (par("isControlled").boolValue()){
-            auto mobility = inet::getModuleFromPar<ControllableObject>(
-                par("mobilityModule"), inet::getContainingNode(this));
+            auto mobility = castMobility<ControllableObject>();
             ctrl = mobility->getController<VaderePersonController>();
         }
 

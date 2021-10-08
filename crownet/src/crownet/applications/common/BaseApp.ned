@@ -42,6 +42,9 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         string schedulerModule = default("^.scheduler");
         object localInfo = default(crownet::AppInfoLocal{});
         
+        // assume BaseApp is part of some crownet app
+        string mobilityModule = default("^.^.mobility");
+        
         // Application runtime settings
         ///* Start time of application at which message will be received. 
         ///* Negative values raises cRuntimeError.

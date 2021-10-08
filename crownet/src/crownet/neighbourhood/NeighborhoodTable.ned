@@ -26,7 +26,6 @@ simple NeighborhoodTable like INeighborhoodTable{
     parameters:
         @class(crownet::NeighborhoodTable);
         double maxAge @unit(s) = default (3s);
+        string mobilityModule = default("^.mobility"); //asume sibling
         
-        string mobilityModule = default("^.mobility"); // default to sibling node
-    
 }

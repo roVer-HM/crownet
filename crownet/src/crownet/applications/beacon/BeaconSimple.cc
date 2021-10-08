@@ -27,7 +27,7 @@ Packet *BeaconSimple::createPacket() {
 
     auto beacon = createPayload<BeaconPacketSimple>();
     beacon->setTime(simTime());
-    beacon->setPos(nTable->getPosition());
+    beacon->setPos(getPosition());
     beacon->setNodeId(getHostId());
 
     return buildPacket(beacon);

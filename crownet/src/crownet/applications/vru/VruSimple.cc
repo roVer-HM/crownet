@@ -28,8 +28,7 @@ VruSimple::~VruSimple() {}
 void VruSimple::initialize(int stage) {
   BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
-    mobilityModule = check_and_cast<MobilityBase*>(
-        getParentModule()->getSubmodule("mobility"));
+    mobilityModule = castMobility<MobilityBase>();
   }
 }
 

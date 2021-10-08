@@ -41,15 +41,15 @@
 #include "crownet/applications/common/info/AppInfoLocal.h"
 #include "crownet/queueing/CrownetActivePacketSourceBase.h"
 #include "crownet/applications/common/scheduler/IAppScheduler.h"
+#include "crownet/common/MobilityProviderMixin.h"
 
 using namespace inet;
 
 namespace crownet {
 
-class BaseApp : //public ApplicationBase,
-                public DataArrivedHandler,
+class BaseApp : public DataArrivedHandler,
                 public AppStatusInfo,
-                public crownet::queueing::CrownetActivePacketSourceBase {
+                public MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase> {
  public:
   BaseApp(){};
   virtual ~BaseApp();

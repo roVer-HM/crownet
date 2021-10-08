@@ -39,8 +39,8 @@ Packet *BeaconDynamic::createPacket() {
 
 
     const auto &beacon = makeShared<DynamicBeaconPacket>();
-    beacon->setPos(nTable->getPosition());
-    beacon->setEpsilon(nTable->getEpsilon());
+    beacon->setPos(getPosition());
+    beacon->setEpsilon({0.0, 0.0, 0.0});
     // measurement time is same as packet creation.
     beacon->setPosTimestamp(time);
     beacon->setNumberOfNeighbours(nTable->getNeighbourCount());
