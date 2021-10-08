@@ -49,9 +49,6 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
             idStreamType: "insertionOrder"
         });
         bool writeDensityLog = default(true);
-        string mapType = default("ymf"); // select map algorithm to calculate cell values
-        string mapTypeLog = default("all"); // if writeDensityLog is true log this map algorithm. If "all" just
-        									// dump raw data currently present.
 }
 
 simple ArteryDensityMapApp  extends BaseDensityMapApp  {
