@@ -38,7 +38,6 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
                          public traci::ITraciNodeVisitor,
                          public IDensityMapHandlerBase<RegularDcdMap>{
-    // 4. Inteface das nur getMap implementiert woe OTraceNodeVisitor
  public:
   //  using Grid = RegularGridMap<std::string>;
   using GridHandler = IDensityMapHandler<RegularDcdMap>;
@@ -80,7 +79,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
  protected:
   virtual void handleMessage(cMessage *msg) override;
 
-  void updateMaps();
+  virtual void updateMaps();
   void writeMaps();
 
  protected:

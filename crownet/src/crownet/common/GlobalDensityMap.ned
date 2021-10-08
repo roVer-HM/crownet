@@ -14,6 +14,7 @@
 //
 
 package crownet.common;
+import crownet.neighbourhood.INeighborhoodTable;
 
 //
 // TODO auto-generated type
@@ -29,6 +30,14 @@ simple GlobalDensityMap like IGlobalDensityMap
         string coordConverterModule = default("coordConverter");
         double gridSize = default(3.0) @units(m);
 
-        double updateInterval = default(2.0s) @unit(s);
-
+        double updateInterval @unit(s) = default(2.0s) ;
 }
+
+
+
+simple GlobalEntropyMap extends GlobalDensityMap like INeighborhoodTable 
+{
+  parameters:
+    	@class(crownet::GlobalEntropyMap);
+}
+

@@ -1,0 +1,60 @@
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see http://www.gnu.org/licenses/.
+// 
+
+#include "crownet/neighbourhood/EntropyNeigborhoodTableClient.h"
+
+#include "inet/common/ModuleAccess.h"
+
+using namespace omnetpp;
+using namespace inet;
+
+
+
+namespace crownet {
+
+Define_Module(EntropyNeigborhoodTableClient);
+
+
+void EntropyNeigborhoodTableClient::initialize(int stage) {
+    MobilityProviderMixin<cSimpleModule>::initialize(stage);
+    if (stage == INITSTAGE_LOCAL){
+        globalTable = getModuleFromPar<IBaseNeighborhoodTable>(par("globalTable"), this);
+        dist = par("distance");
+    }
+}
+
+void EntropyNeigborhoodTableClient::handleMessage(cMessage *msg) {
+    throw cRuntimeError("EntropyNeigborhoodTableClient does not hanlde messages");
+}
+
+BeaconReceptionInfo* EntropyNeigborhoodTableClient::getOrCreateEntry(const int sourceId)
+{
+    throw cRuntimeError("Not implemented in EntropyNeigborhoodTableClient");
+}
+
+// iterator default to all elements in map
+NeighborhoodTableIter_t
+EntropyNeigborhoodTableClient::iter() {
+    auto pred = INeighborhoodTable::inRadius_pred(getPosition(), dist);
+    return globalTable->iter(pred);
+}
+
+NeighborhoodTableIter_t
+EntropyNeigborhoodTableClient::iter(NeighborhoodTablePred_t predicate){
+    return globalTable->iter(predicate);
+}
+
+
+}

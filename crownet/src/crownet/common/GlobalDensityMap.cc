@@ -18,7 +18,6 @@
 #include <inet/common/ModuleAccess.h>
 #include <inet/mobility/contract/IMobility.h>
 #include <omnetpp/checkandcast.h>
-#include <memory>
 #include "artery/application/MiddlewareBase.h"
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/utility/Identity.h"
@@ -186,7 +185,7 @@ void GlobalDensityMap::updateMaps() {
   valueVisitor->setTime(simTime());
   dcdMapGlobal->computeValues(valueVisitor);
 
-  // update each decentralized map
+  // update decentralized map
   for (auto &handler : dezentralMaps) {
     handler.second->updateLocalMap();
     handler.second->computeValues();
