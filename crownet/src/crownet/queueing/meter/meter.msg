@@ -38,12 +38,17 @@ cplusplus(PacketFlowStats){{
 }}
 
 class PackerMeterBase extends cOwnedObject {
-    PacketFlowStats stats;   
+    PacketFlowStats stats;  
+    int currentNumPackets = 0; // cummulate packets with the same timestamp
+    inet::b  currentTotalPacketLength = inet::b(0); // cummulate packets with the same timestamp
+    simtime_t lastUpdate = -1.0 @editable; 
 }
 
 cplusplus(PackerMeterBase){{
     public:
       virtual void meterPacket(Packet *packet) {cRuntimeError("Implement");}
+      virtual void incrCurrentPacketCount(int numPackets = 1) { currentNumPackets += numPackets;}
+      virtual void incrCurrentPacketLength(inet::b packetLength = inet::b(1)) { currentTotalPacketLength += packetLength;}
 }}
 
 class EmaPacketMeter extends PackerMeterBase {
