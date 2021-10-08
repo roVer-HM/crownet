@@ -98,6 +98,8 @@ void ArteryDensityMapApp::updateLocalMap() {
             entry.get_position_vector().position();
         auto cartPos = converter->convertToCartTraCIPosition(geoPos);
 
+        // todo access time stamp of of position vector and to not use time stamp of methdo call.
+        // todo translate time stamp into simulation time.
         // increment density map
         dcdMap->incrementLocal(cartPos, _id, measureTime);
       };

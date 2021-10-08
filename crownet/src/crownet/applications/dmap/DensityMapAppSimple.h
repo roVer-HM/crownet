@@ -15,7 +15,8 @@
 
 #pragma once
 
-#include "crownet/neighbourhood/NeighborhoodTable.h"
+#include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+
 #include "inet/mobility/contract/IMobility.h"
 #include "crownet/applications/dmap/BaseDensityMapApp.h"
 
@@ -38,7 +39,7 @@ protected:
 
 private:
   // application
- NeighborhoodTable *nTable  = nullptr;
+ INeighborhoodTable *nTable  = nullptr;
 
 };
 

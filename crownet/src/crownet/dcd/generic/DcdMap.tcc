@@ -49,6 +49,37 @@ DcDMapIterator<DcDMap<C, N, T>> DcDMap<C, N, T>::valid() const {
 }
 
 template <typename C, typename N, typename T>
+const int DcDMap<C, N, T>::validCellCount() const{
+    auto iter = valid();
+    int i=0;
+    for(const auto& e: iter){++i;}
+    return i;
+}
+
+template <typename C, typename N, typename T>
+const int DcDMap<C, N, T>::validLocalCellCount() const{
+    auto iter = validLocal();
+    int i=0;
+    while(iter != iter.end()){
+        ++i;
+        ++iter;
+    }
+    return i;
+}
+
+template <typename C, typename N, typename T>
+const int DcDMap<C, N, T>::allLocalCellCount() const{
+    auto iter = allLocal();
+    int i=0;
+    while(iter != iter.end()){
+        ++i;
+        ++iter;
+    }
+    return i;
+}
+
+
+template <typename C, typename N, typename T>
 const typename DcDMap<C, N, T>::map_t* DcDMap<C, N, T>::getCells() const {
   return const_cast<DcDMap<C, N, T>*>(this)->getCells();
 }
@@ -112,7 +143,8 @@ template <typename C, typename N, typename T>
 std::string DcDMap<C, N, T>::str() const {
   std::stringstream os;
   os << "{map_owner: " << this->owner_id
-     << " cell_count: " << this->cells.size() << "}";
+     << " cell_count: " << this->cells.size()
+     << " local_cell_count: " << this->allLocalCellCount() << "}";
   return os.str();
 }
 

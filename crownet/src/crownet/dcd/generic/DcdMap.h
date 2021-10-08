@@ -91,6 +91,10 @@ class DcDMap {
   DcDMapIterator<DcDMap<C, N, T>> allLocal() const;
   DcDMapIterator<DcDMap<C, N, T>> valid();
   DcDMapIterator<DcDMap<C, N, T>> valid() const;
+  const int validCellCount() const;
+  const int validLocalCellCount() const;
+  const int allLocalCellCount() const;
+
 
   template <typename Fn>
   void visitCells(Fn visitor);

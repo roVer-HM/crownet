@@ -64,6 +64,11 @@ void NeighborhoodTable::checkTimeToLive(){
     Enter_Method_Silent();
     simtime_t now = simTime();
     if (now >lastCheck){
+        // update local entry
+        auto local = getOrCreateEntry(ownerId);
+        local->setReceivedTimePrio(now);
+        local->setPos(getPosition());
+        // remove old entries
         for( auto it=_table.cbegin(); it !=_table.cend();){
             // Received + maxAge := time at which entry must be removed.
             if ((it->second->getReceivedTimePrio() + maxAge) < now){

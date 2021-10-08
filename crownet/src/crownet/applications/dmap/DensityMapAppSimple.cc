@@ -25,36 +25,37 @@ Define_Module(DensityMapAppSimple);
 void DensityMapAppSimple::initialize(int stage) {
     BaseDensityMapApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-        nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        nTable->setOwnerId(hostId);
     }
 }
 
 void DensityMapAppSimple::updateLocalMap() {
-  simtime_t measureTime = simTime();
+  simtime_t now = simTime();
   if (lastUpdate >= simTime()) {
     return;
   }
-  lastUpdate = measureTime;
-  EV_INFO << LOG_MOD << " Update local map[" << dcdMap->getOwnerId() <<"]:" << endl;
+  lastUpdate = now;
+  EV_INFO << LOG_MOD << "Update local map[" << dcdMap->getOwnerId() <<"]:" << endl;
 
   // set count of all cells in local map to zero.
   // do not change the valid state.
   dcdMap->visitCells(ClearLocalVisitor{simTime()});
   dcdMap->clearNeighborhood();
 
-  // add yourself to the map.
-  const auto &posInet = converter->position_cast_traci(nTable->getPosition());
-
-  dcdMap->setOwnerCell(posInet);
-  dcdMap->incrementLocal(posInet, dcdMap->getOwnerId(), measureTime);
-  EV_INFO << LOG_MOD << "   ownPosition: [" << posInet.x << "," << posInet.y << "]" << endl;
-
-
-  for (const auto& entry: *nTable){
+  // update neighborhood table before access.
+  int nTableCount = 0;
+  nTable->checkTimeToLive();
+  auto iter = nTable->iter();
+  for (const auto& entry: iter){
       int _id = entry.first;
-      auto pos = converter->position_cast_traci(entry.second->getPos());
-      dcdMap->incrementLocal(pos, _id, measureTime);
+      auto info = entry.second;
+      auto pos = converter->position_cast_traci(info->getPos());
+      dcdMap->incrementLocal(pos, _id, info->getReceivedTimePrio());
+      ++nTableCount;
   }
+  EV_INFO << LOG_MOD2 << "Found " << nTableCount << " entries in neighborhood table" << endl;
+  EV_INFO << LOG_MOD2 << dcdMap->str();
 
   using namespace omnetpp;
   EV_DEBUG << dcdMap->strFull() << std::endl;
