@@ -34,7 +34,7 @@ network = crownet.test.omnetpp.lib.TestStationaryWorld
 sim-time-limit= 1.0s
 
 %contains: stdout
-0.50952167965 TestStationaryWorld.misc[0].app[0].scheduler App stop time reached. Do not schedule any more data
+0.50952167965 TestStationaryWorld.misc[0].app[0].scheduler :  App stop time reached. Do not schedule any more data
 %not-contains: stdout 
 TestStationaryWorld.misc[1].app[0].scheduler App stop time reached. Do not schedule any more data
 %not-contains: stdout 

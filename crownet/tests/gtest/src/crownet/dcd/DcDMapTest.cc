@@ -143,9 +143,9 @@ TEST_F(RegularDcDMapTest, hasDataFrom_SuccessMultiple) {
 }
 
 TEST_F(RegularDcDMapTest, str) {
-  EXPECT_STREQ("{map_owner: 1 cell_count: 0}", mapEmpty.str().c_str());
-  EXPECT_STREQ("{map_owner: 2 cell_count: 3}", mapLocal.str().c_str());
-  EXPECT_STREQ("{map_owner: 3 cell_count: 4}", mapFull.str().c_str());
+  EXPECT_STREQ("{map_owner: 1 cell_count: 0 local_cell_count: 0}", mapEmpty.str().c_str());
+  EXPECT_STREQ("{map_owner: 2 cell_count: 3 local_cell_count: 3}", mapLocal.str().c_str());
+  EXPECT_STREQ("{map_owner: 3 cell_count: 4 local_cell_count: 3}", mapFull.str().c_str());
 }
 
 TEST_F(RegularDcDMapTest, getMissingCell) {
@@ -183,11 +183,11 @@ TEST_F(RegularDcDMapTest, setOwnerId) {
 
 // update / incrementLocal  correct in Setup compare string
 TEST_F(RegularDcDMapTest, strFull) {
-  std::string s1 = "{map_owner: 1 cell_count: 0}\n";
+  std::string s1 = "{map_owner: 1 cell_count: 0 local_cell_count: 0}\n";
   EXPECT_STREQ(s1.c_str(), mapEmpty.strFull().c_str());
 
   std::string s2 =
-      "{map_owner: 2 cell_count: 3}\n"
+      "{map_owner: 2 cell_count: 3 local_cell_count: 3}\n"
       "  {cell_id: [1,1] owner_id: 2}\n"
       "    2 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1| node_ids: {100, "
       "101}\n"
@@ -199,7 +199,7 @@ TEST_F(RegularDcDMapTest, strFull) {
   EXPECT_STREQ(s2.c_str(), mapLocal.strFull().c_str());
 
   std::string s3 =
-      "{map_owner: 3 cell_count: 4}\n"
+      "{map_owner: 3 cell_count: 4 local_cell_count: 3}\n"
       "  {cell_id: [1,1] owner_id: 3}\n"
       "    3 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1| node_ids: "
       "{100, 101}\n"

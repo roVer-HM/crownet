@@ -106,8 +106,8 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
 
 TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap1) {
     // 0xFFFD -> 0xFFFE -> 0xFFFF --cycle+1--> 0x0000 -> 0x0001 -> ...
+    BeaconReceptionInfo info {}; //
     uint16_t start = 0xFFFC; // 0xFFFF-3
-    BeaconReceptionInfo info;
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 0);
     EXPECT_EQ(info.getMaxSequencenumber(), 0);

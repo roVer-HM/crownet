@@ -28,10 +28,10 @@ extends = _default, D2D_General, DcDMap, stationary_n1
 
 
 %contains: test1.out
-0.1 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
-0.2 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
-0.3 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
-0.4 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
-0.5 TestStationaryWorld.misc[0].app[1].scheduler No data in application. Scheduled budget dropped
+0.1 TestStationaryWorld.misc[0].app[1].scheduler :  No data in application. Scheduled budget dropped
+0.2 TestStationaryWorld.misc[0].app[1].scheduler :  No data in application. Scheduled budget dropped
+0.3 TestStationaryWorld.misc[0].app[1].scheduler :  No data in application. Scheduled budget dropped
+0.4 TestStationaryWorld.misc[0].app[1].scheduler :  No data in application. Scheduled budget dropped
+0.5 TestStationaryWorld.misc[0].app[1].scheduler :  No data in application. Scheduled budget dropped
 %contains: stdout
 <!> Simulation time limit reached -- at t=0.5s

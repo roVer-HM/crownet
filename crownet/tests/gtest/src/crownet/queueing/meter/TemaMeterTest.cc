@@ -37,8 +37,8 @@ TEST_F(TemaMeterTest, ConstTimeInterval){
         delete pkt;
     }
     auto stats = m.getStats();
-    EXPECT_EQ(stats.getPacketCount(), 100);
-    EXPECT_EQ(stats.getTotalData().get(), 100*300);
+    EXPECT_EQ(stats.getPacketCount(), 100-1);
+    EXPECT_EQ(stats.getTotalData().get(), 100*300-300); // offset of 300b due to possibility of multiple packet per time point
     // PacketMeter does not count the first packet correctly.
     // Compare with 99 values instead of 100 values
     EXPECT_NEAR(stats.getDataRate().get(), 300.0, 0.001);

@@ -146,8 +146,12 @@ opp-test-clean:
 	rm -rf tests/omnetpp/work
 
 # fingerprint tests
-test: build-lib
+test: make-test
 	if [ "$(MODE)" = "debug" ]; then cd tests/gtest/src && ./rTests_dbg $(GOOGLE_ARGS); else cd tests/gtest/src && ./rTests $(GOOGLE_ARGS) ;fi
+
+test-clean: 
+	rm -f tests/gtest/src/rTests
+	rm -f tests/gtest/src/rTests_dbg
 
 clean-fingerprint-test:
 	cd tests/gtest/src && $(MAKE) MODE=release clean
