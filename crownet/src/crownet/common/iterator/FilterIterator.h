@@ -48,6 +48,6 @@ class FilterIterator : public std::iterator<std::output_iterator_tag, IterVal> {
   iter_t iter;
   iter_t _begin;
 };
-#include "crownet/dcd/generic/iterator/FilterIterator.tcc"
+#include "crownet/common/iterator/FilterIterator.tcc"
 
 }  // namespace crownet

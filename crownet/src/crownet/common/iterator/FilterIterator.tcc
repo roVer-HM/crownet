@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "crownet/dcd/generic/iterator/FilterIterator.h"
+#include "crownet/common/iterator/FilterIterator.h"
 
 template <typename T, typename Iter, typename IterVal, typename Pred>
 FilterIterator<T, Iter, IterVal, Pred>::FilterIterator(iterable_t* data,
