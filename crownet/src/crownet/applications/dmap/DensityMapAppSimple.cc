@@ -51,7 +51,11 @@ void DensityMapAppSimple::updateLocalMap() {
       int _id = entry.first;
       auto info = entry.second;
       auto pos = converter->position_cast_traci(info->getPos());
-      dcdMap->incrementLocal(pos, _id, info->getReceivedTimePrio());
+      dcdMap->incrementLocal(
+              pos,
+              _id,
+              now, // use time of measurement not time of beacon creation
+              info->getBeaconValue());
       ++nTableCount;
   }
   EV_INFO << LOG_MOD2 << "Found " << nTableCount << " entries in neighborhood table" << endl;

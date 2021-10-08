@@ -68,7 +68,9 @@ class DcDMap {
   void update(const cell_key_t& cell_id, typename cell_t::entry_t_ptr&& m_data);
   void update(const cell_key_t& cell_id, typename cell_t::entry_t_ptr& m_data);
   void incrementLocal(const traci::TraCIPosition& pos,
-                      const node_key_t sourceNodeId, const time_t time);
+                      const node_key_t& sourceNodeId,
+                      const time_t& time,
+                      const double& value = 1.0);
 
   // manage neighborhood in local area. Map node_key_t to cell_key_t
   bool isInNeighborhood(const node_key_t& neigbourId) const;

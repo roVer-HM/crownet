@@ -88,7 +88,9 @@ class Cell {
   void put(entry_t_ptr& m);
   void setCellId(cell_key_t _cell_id) { cell_id = _cell_id; }
   void setOwnerId(node_key_t _owner_id) { owner_id = _owner_id; }
-  void incrementLocal(const node_key_t& countedNodeId, const time_t& time);
+  void incrementLocal(const node_key_t& countedNodeId,
+                      const time_t& time,
+                      const double& value = 1.0);
   void sentAt(const time_t& time);
 
 

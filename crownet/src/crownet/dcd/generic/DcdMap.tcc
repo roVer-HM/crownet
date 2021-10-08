@@ -194,8 +194,9 @@ void DcDMap<C, N, T>::update(const cell_key_t& cell_id,
 
 template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::incrementLocal(const traci::TraCIPosition& pos,
-                                     const node_key_t sourceNodeId,
-                                     const time_t time) {
+                                     const node_key_t& sourceNodeId,
+                                     const time_t& time,
+                                     const double& value) {
   auto cellId = this->cellKeyProvider->getCellKey(pos);
   auto& cell = this->getCell(cellId);
 
@@ -208,7 +209,7 @@ void DcDMap<C, N, T>::incrementLocal(const traci::TraCIPosition& pos,
 
   // 1) increment local count in cell [in Cell]
   // 2) add nodeId into nodeId set [in Cell]
-  cell.incrementLocal(sourceNodeId, time);
+  cell.incrementLocal(sourceNodeId, time, value);
 
   // 3) add mapping nodeId->cellId into updateNeighbourCell [in Map]
   this->addToNeighborhood(sourceNodeId, cellId);

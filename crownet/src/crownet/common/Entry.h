@@ -52,7 +52,7 @@ class IEntry : public crownet::FilePrinter {
   }
   const bool empty() const;
   virtual const bool valid() const { return _valid; }
-  virtual void incrementCount(const time_type& t);
+  virtual void incrementCount(const time_type& t, const double& value = 1.0);
   virtual void decrementCount(const time_type& t);
   virtual void touch(const time_type& t);  // update time only
 
@@ -190,8 +190,8 @@ inline const bool IEntry<K, T>::empty() const {
 }
 
 template <typename K, typename T>
-inline void IEntry<K, T>::incrementCount(const time_type& t) {
-  count++;
+inline void IEntry<K, T>::incrementCount(const time_type& t, const double& value) {
+  count += value;
   measurement_time = t;
   received_time = t;
   _valid = true;

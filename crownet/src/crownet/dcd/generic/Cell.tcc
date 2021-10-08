@@ -182,14 +182,14 @@ std::string Cell<C, N, T>::infoCompact() const{
     if (this->hasLocal()){
         const auto l = this->getLocal();
         std::string valid = l->valid() ? "" : "-";
-        os << "] -> [L" << l->getSource() << ":" << valid << l->getCount() << "|" << l->getMeasureTime() << "]";
+        os << "] -> [L" << l->getSource() << ":" << valid << l->getCount() << "|" << l->getMeasureTime().ustr() << "]";
     } else {
         os << "] -> ";
     }
     for(auto const& e : this->data){
         if(e.first != this->owner_id){
             std::string valid2 = e.second->valid() ? "" : "-";
-            os << "[" << e.second->getSource() << ":" << valid2 << e.second->getCount() << "|" << e.second->getMeasureTime() << "]";
+            os << "[" << e.second->getSource() << ":" << valid2 << e.second->getCount() << "|" << e.second->getMeasureTime().ustr() << "]";
         }
     }
 
@@ -198,7 +198,8 @@ std::string Cell<C, N, T>::infoCompact() const{
 
 template <typename C, typename N, typename T>
 void Cell<C, N, T>::incrementLocal(const node_key_t& countedNodeId,
-                                   const time_t& time) {
+                                   const time_t& time,
+                                   const double& value) {
   if (!hasData(this->owner_id)) {
     // create local entry and set cell owner as source.
     auto e = this->entryCtor.localEntry();
@@ -210,7 +211,7 @@ void Cell<C, N, T>::incrementLocal(const node_key_t& countedNodeId,
   auto ret = lEntry->nodeIds.insert(countedNodeId);
   if (ret.second) {
     // new node inserted
-    lEntry->incrementCount(time);
+    lEntry->incrementCount(time, value);
   } else {
     // node already exists just update time.
     lEntry->touch(time);

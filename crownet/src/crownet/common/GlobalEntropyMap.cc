@@ -55,8 +55,13 @@ void GlobalEntropyMap::updateMaps() {
     dcdMapGlobal->clearNeighborhood();
 
     for(const auto& e: _table){
-        const auto &posTraci = converter->position_cast_traci(e.second->getPos());
-        dcdMapGlobal->incrementLocal(posTraci, e.second->getNodeId(), now);
+        const auto info = e.second;
+        const auto &posTraci = converter->position_cast_traci(info->getPos());
+        dcdMapGlobal->incrementLocal(
+                posTraci,
+                (int)info->getNodeId(),
+                now, // use time of measurement not time of beacon creation
+                info->getBeaconValue());
     }
 
     // global map: local selector
@@ -71,7 +76,7 @@ void GlobalEntropyMap::updateMaps() {
 }
 
 void GlobalEntropyMap::updateEntropy(){
-    int numberOfEntries = 1000;
+    int numberOfEntries = 100;
     auto now = simTime();
     auto prevUpdate = lastEntropyUpdate;
     if (now > lastEntropyUpdate){
@@ -87,6 +92,8 @@ void GlobalEntropyMap::updateEntropy(){
             _table[sourceId]->setPos({uniform(0.0, simBoundWidth), uniform(0.0, simBoundHeight)});
             // set some creation time stamp between last update and now
             _table[sourceId]->setReceivedTimePrio(uniform(prevUpdate.dbl(), now.dbl()));
+            _table[sourceId]->setBeaconValue(uniform(1.0, 30.0));
+
         }
         // remove old values
         for( auto it=_table.cbegin(); it !=_table.cend();){
