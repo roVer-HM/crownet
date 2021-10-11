@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "inet/common/geometry/Geometry_m.h"
 #include "crownet/dcd/generic/Cell.h"
 #include "traci/Position.h"
 
@@ -22,18 +23,18 @@ class CellKeyProvider {
 
 class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
  public:
-  GridCellIDKeyProvider(std::pair<double, double> cellSize,
-                        std::pair<int, int> gridDim)
-      : cellSize(cellSize), gridDim(gridDim) {}
+  GridCellIDKeyProvider(const inet::Coord& cellSize,
+                        const inet::Coord& gridSize)
+      : cellSize(cellSize), gridSize(gridSize) {}
 
   virtual GridCellID getCellKey(const traci::TraCIPosition& pos) override;
 
-  std::pair<double, double> getcellSize() const { return cellSize; }
-  std::pair<int, int> getGridDim() const { return gridDim; }
+  inet::Coord  getCellSize() const { return cellSize; }
+  inet::Coord  getGridSize() const { return gridSize; }
 
  private:
-  std::pair<double, double> cellSize;
-  std::pair<int, int> gridDim;
+  inet::Coord cellSize;
+  inet::Coord gridSize;
 };
 
 }  // namespace crownet

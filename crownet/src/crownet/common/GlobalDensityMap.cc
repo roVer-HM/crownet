@@ -90,13 +90,8 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     nodeManager = inet::getModuleFromPar<traci::NodeManager>(
         par("traciNodeManager"), this);
 
-    std::pair<int, int> gridDim;
-    simBoundHeight = converter->getBoundaryHeight();
-    simBoundWidth = converter->getBoundaryWidth();
-    double cellSize = par("cellSize").doubleValue();
-    gridDim.first = floor(converter->getBoundaryWidth() / cellSize);
-    gridDim.second = floor(converter->getBoundaryHeight() / cellSize);
-    RegularDcdMapFactory f{std::make_pair(cellSize, cellSize), gridDim};
+    grid = converter->getGridDescription(par("cellSize").doubleValue());
+    RegularDcdMapFactory f{grid};
 
     dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
     distProvider = f.createDistanceProvider();
@@ -104,9 +99,10 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     // 2) setup writer.
     FileWriterBuilder fBuilder{};
     fBuilder.addMetadata("IDXCOL", 3);
-    fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
-    fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
-    fBuilder.addMetadata("CELLSIZE", par("cellSize").doubleValue());
+    fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
+    fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
+    // todo cellsize in x and y
+    fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
     fBuilder.addMetadata<std::string>(
         "MAP_TYPE",
         "global");  // The global density map is the ground
@@ -125,8 +121,6 @@ void GlobalDensityMap::initialize(int stage) {
   if (stage == INITSTAGE_LOCAL) {
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
-    WATCH(simBoundWidth);
-    WATCH(simBoundHeight);
 
 
     updateTimer = new cMessage("GlobalDensityMapTimer");

@@ -89,7 +89,7 @@ void GlobalEntropyMap::updateEntropy(){
                 _table[sourceId] = info;
             }
             // set some coordiante in the given bound
-            _table[sourceId]->setPos({uniform(0.0, simBoundWidth), uniform(0.0, simBoundHeight)});
+            _table[sourceId]->setPos({uniform(0.0, grid.getGridSize().x), uniform(0.0, grid.getGridSize().y)});
             // set some creation time stamp between last update and now
             _table[sourceId]->setReceivedTimePrio(uniform(prevUpdate.dbl(), now.dbl()));
             _table[sourceId]->setBeaconValue(uniform(1.0, 30.0));

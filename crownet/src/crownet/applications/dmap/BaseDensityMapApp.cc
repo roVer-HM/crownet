@@ -93,11 +93,8 @@ void BaseDensityMapApp::initDcdMap(){
                         par("coordConverterModule"), this)->getConverter());
     }
 
-    std::pair<int, int> gridDim;
-    double cellSize = par("cellSize").doubleValue();
-    gridDim.first = floor(converter->getBoundaryWidth() / cellSize);
-    gridDim.second = floor(converter->getBoundaryHeight() / cellSize);
-    RegularDcdMapFactory f{std::make_pair(cellSize, cellSize), gridDim};
+    grid = converter->getGridDescription(par("cellSize").doubleValue());
+    RegularDcdMapFactory f{grid};
     
     dcdMap = f.create_shared_ptr(IntIdentifer(hostId), mapCfg->getIdStreamType());
     dcdMapWatcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
@@ -113,9 +110,10 @@ void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
       FileWriterBuilder fBuilder{};
       fBuilder.addMetadata("IDXCOL", 3);
-      fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
-      fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
-      fBuilder.addMetadata("CELLSIZE", par("cellSize").doubleValue());
+      fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
+      fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
+      // todo cellsize in x and y
+      fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
       fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
       fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
       std::stringstream s;

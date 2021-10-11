@@ -87,8 +87,6 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   simtime_t updateInterval;
   simtime_t lastUpdate;
 
-  double simBoundWidth = 0;
-  double simBoundHeight = 0;
   traci::NodeManager *nodeManager = nullptr;
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
@@ -97,6 +95,8 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   gridMap_t dezentralMaps;
   std::string m_mobilityModule;
   std::unique_ptr<FileWriter> fileWriter;
+  RegularGridInfo grid;
+
 };
 
 }  // namespace crownet

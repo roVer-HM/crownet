@@ -105,10 +105,10 @@ std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd&
     auto map = map_handler->getMap();
     auto cellProvider = std::dynamic_pointer_cast<GridCellIDKeyProvider>(map->getCellKeyProvider());
 
-    density_vals.push_back(cellProvider->getGridDim().first);
-    density_vals.push_back(cellProvider->getGridDim().second);
-    density_vals.push_back(cellProvider->getcellSize().first);
-    density_vals.push_back(cellProvider->getcellSize().second);
+    density_vals.push_back(cellProvider->getGridSize().x);
+    density_vals.push_back(cellProvider->getGridSize().y);
+    density_vals.push_back(cellProvider->getCellSize().x);
+    density_vals.push_back(cellProvider->getCellSize().y);
     auto iter = map->valid();
      for( auto item: iter){
          const auto cell = item.first.val();

@@ -10,8 +10,6 @@
 
 namespace crownet {
 
-GridCellDistance::GridCellDistance(const std::pair<double, double>& gridDim)
-        : xDim(gridDim.first), yDim(gridDim.second){}
 GridCellDistance::GridCellDistance(const double xDim, const double yDim)
     : xDim(xDim), yDim(yDim){}
 

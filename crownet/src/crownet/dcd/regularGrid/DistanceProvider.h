@@ -21,7 +21,6 @@ class GridCellDistance {
 public:
     using CellPair = std::pair<const GridCellID, const GridCellID>;
     virtual ~GridCellDistance() = default;
-    GridCellDistance(const std::pair<double, double>& gridDim);
     GridCellDistance(const double xDim, const double yDim);
     double dist(const GridCellID& a, const GridCellID& b);
     EntryDist getEntryDist(const GridCellID& source, const GridCellID& owner, const GridCellID& entry);

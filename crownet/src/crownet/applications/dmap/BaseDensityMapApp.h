@@ -85,6 +85,7 @@ protected:
  std::shared_ptr<GridCellDistance> distProvider;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
+ RegularGridInfo grid;
 
 
  RegularDcdMapWatcher* dcdMapWatcher;

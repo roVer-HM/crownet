@@ -13,6 +13,8 @@
 #include "crownet/dcd/regularGrid/DistanceProvider.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/generic/CellIdStream.h"
+#include "crownet/common/crownet_m.h"
+
 #include <functional>
 
 namespace crownet {
@@ -25,8 +27,7 @@ using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCell
 
 class RegularDcdMapFactory {
  public:
-  RegularDcdMapFactory(std::pair<double, double> cellSize,
-                       std::pair<int, int> gridDim);
+  RegularDcdMapFactory(RegularGridInfo grid);
 
   std::map<std::string, VisitorCreator>visitor_dispatcher;
   std::map<std::string, CellIdStreamCreator>cellIdStream_dispatcher;
@@ -38,8 +39,7 @@ class RegularDcdMapFactory {
   std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> createCellIdStream(const std::string& typeName);
 
  private:
-  std::pair<double, double> cellSize;
-  std::pair<int, int> gridDim;
+  RegularGridInfo grid;
   std::shared_ptr<SimTimeProvider> timeProvider;
 
 };
