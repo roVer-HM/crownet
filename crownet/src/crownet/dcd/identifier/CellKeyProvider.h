@@ -22,17 +22,17 @@ class CellKeyProvider {
 
 class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
  public:
-  GridCellIDKeyProvider(std::pair<double, double> gridSize,
+  GridCellIDKeyProvider(std::pair<double, double> cellSize,
                         std::pair<int, int> gridDim)
-      : gridSize(gridSize), gridDim(gridDim) {}
+      : cellSize(cellSize), gridDim(gridDim) {}
 
   virtual GridCellID getCellKey(const traci::TraCIPosition& pos) override;
 
-  std::pair<double, double> getGridSize() const { return gridSize; }
+  std::pair<double, double> getcellSize() const { return cellSize; }
   std::pair<int, int> getGridDim() const { return gridDim; }
 
  private:
-  std::pair<double, double> gridSize;
+  std::pair<double, double> cellSize;
   std::pair<int, int> gridDim;
 };
 

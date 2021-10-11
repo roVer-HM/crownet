@@ -107,8 +107,8 @@ std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd&
 
     density_vals.push_back(cellProvider->getGridDim().first);
     density_vals.push_back(cellProvider->getGridDim().second);
-    density_vals.push_back(cellProvider->getGridSize().first);
-    density_vals.push_back(cellProvider->getGridSize().second);
+    density_vals.push_back(cellProvider->getcellSize().first);
+    density_vals.push_back(cellProvider->getcellSize().second);
     auto iter = map->valid();
      for( auto item: iter){
          const auto cell = item.first.val();

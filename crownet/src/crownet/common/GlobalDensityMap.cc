@@ -93,10 +93,10 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     std::pair<int, int> gridDim;
     simBoundHeight = converter->getBoundaryHeight();
     simBoundWidth = converter->getBoundaryWidth();
-    double gridSize = par("gridSize").doubleValue();
-    gridDim.first = floor(converter->getBoundaryWidth() / gridSize);
-    gridDim.second = floor(converter->getBoundaryHeight() / gridSize);
-    RegularDcdMapFactory f{std::make_pair(gridSize, gridSize), gridDim};
+    double cellSize = par("cellSize").doubleValue();
+    gridDim.first = floor(converter->getBoundaryWidth() / cellSize);
+    gridDim.second = floor(converter->getBoundaryHeight() / cellSize);
+    RegularDcdMapFactory f{std::make_pair(cellSize, cellSize), gridDim};
 
     dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
     distProvider = f.createDistanceProvider();
@@ -106,7 +106,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     fBuilder.addMetadata("IDXCOL", 3);
     fBuilder.addMetadata("XSIZE", converter->getBoundaryWidth());
     fBuilder.addMetadata("YSIZE", converter->getBoundaryHeight());
-    fBuilder.addMetadata("CELLSIZE", par("gridSize").doubleValue());
+    fBuilder.addMetadata("CELLSIZE", par("cellSize").doubleValue());
     fBuilder.addMetadata<std::string>(
         "MAP_TYPE",
         "global");  // The global density map is the ground

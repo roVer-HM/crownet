@@ -12,8 +12,8 @@
 namespace crownet {
 
 GridCellID GridCellIDKeyProvider::getCellKey(const traci::TraCIPosition& pos) {
-  int x_id = floor(pos.x / gridSize.first);
-  int y_id = floor(pos.y / gridSize.second);
+  int x_id = floor(pos.x / cellSize.first);
+  int y_id = floor(pos.y / cellSize.second);
   return GridCellID(x_id, y_id);
 }
 

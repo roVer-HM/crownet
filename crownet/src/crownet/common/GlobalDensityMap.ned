@@ -28,7 +28,7 @@ simple GlobalDensityMap like IGlobalDensityMap
         string traciNodeManager = default("traci.nodes");
         string mobilityModule = default (".mobility");
         string coordConverterModule = default("coordConverter");
-        double gridSize = default(3.0) @units(m);
+        double cellSize = default(3.0) @units(m);
 
         double updateInterval @unit(s) = default(2.0s) ;
 }

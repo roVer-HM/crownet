@@ -11,9 +11,9 @@
 
 namespace crownet {
 
-RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> gridSize,
+RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> cellSize,
                                              std::pair<int, int> gridDim)
-        : gridSize(gridSize),
+        : cellSize(cellSize),
           gridDim(gridDim),
           timeProvider(std::make_shared<SimTimeProvider>()) {
 
@@ -29,14 +29,14 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::pair<double, double> gridSize,
 
 
 RegularDcdMap RegularDcdMapFactory::create(const IntIdentifer& ownerID, const std::string& idStreamType) {
-  auto provider = std::make_shared<GridCellIDKeyProvider>(gridSize, gridDim);
+  auto provider = std::make_shared<GridCellIDKeyProvider>(cellSize, gridDim);
   auto streamer = createCellIdStream(idStreamType);
   return RegularDcdMap(ownerID, provider, timeProvider, streamer);
 }
 
 std::shared_ptr<RegularDcdMap> RegularDcdMapFactory::create_shared_ptr(
     const IntIdentifer& ownerID, const std::string& idStreamType) {
-  auto provider = std::make_shared<GridCellIDKeyProvider>(gridSize, gridDim);
+  auto provider = std::make_shared<GridCellIDKeyProvider>(cellSize, gridDim);
   auto streamer = createCellIdStream(idStreamType);
   return std::make_shared<RegularDcdMap>(ownerID, provider, timeProvider, streamer);
 }

@@ -25,7 +25,7 @@ using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCell
 
 class RegularDcdMapFactory {
  public:
-  RegularDcdMapFactory(std::pair<double, double> gridSize,
+  RegularDcdMapFactory(std::pair<double, double> cellSize,
                        std::pair<int, int> gridDim);
 
   std::map<std::string, VisitorCreator>visitor_dispatcher;
@@ -38,7 +38,7 @@ class RegularDcdMapFactory {
   std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> createCellIdStream(const std::string& typeName);
 
  private:
-  std::pair<double, double> gridSize;
+  std::pair<double, double> cellSize;
   std::pair<int, int> gridDim;
   std::shared_ptr<SimTimeProvider> timeProvider;
 
