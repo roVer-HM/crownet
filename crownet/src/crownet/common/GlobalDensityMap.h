@@ -83,8 +83,8 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   void writeMaps();
 
  protected:
-  cMessage *updateTimer = nullptr;
-  simtime_t updateInterval;
+  cMessage *writeMapTimer = nullptr;
+  simtime_t writeMapInterval;
   simtime_t lastUpdate;
 
   traci::NodeManager *nodeManager = nullptr;

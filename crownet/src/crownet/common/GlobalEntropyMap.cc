@@ -24,19 +24,27 @@ namespace crownet {
 
 Define_Module(GlobalEntropyMap);
 
+
+GlobalEntropyMap::~GlobalEntropyMap(){
+    if (entropyTimer) cancelAndDelete(entropyTimer);
+}
+
+
 void GlobalEntropyMap::initialize(int stage) {
     GlobalDensityMap::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
       // setup entropy
+      entropyTimer = new cMessage("entropyInterval");
   }
 }
 
 void GlobalEntropyMap::handleMessage(cMessage *msg){
-    if (msg == updateTimer){
+    if (msg == entropyTimer){
         // update nTable
         updateEntropy();
+    } else {
+        GlobalDensityMap::handleMessage(msg);
     }
-    GlobalDensityMap::handleMessage(msg);
 }
 
 void GlobalEntropyMap::updateMaps() {

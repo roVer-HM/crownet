@@ -30,7 +30,7 @@ class GlobalEntropyMap : public GlobalDensityMap ,
 
 public:
 
-    virtual ~GlobalEntropyMap()  = default;
+    virtual ~GlobalEntropyMap();
 
     // cSimpleModule
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -48,7 +48,7 @@ protected:
 
 protected:
  NeighborhoodTable_t _table;
- cMessage *ttl_msg = nullptr;
+ cMessage *entropyTimer = nullptr;
  simtime_t lastEntropyUpdate;
 
 };

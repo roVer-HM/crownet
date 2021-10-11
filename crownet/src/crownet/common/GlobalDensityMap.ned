@@ -30,7 +30,7 @@ simple GlobalDensityMap like IGlobalDensityMap
         string coordConverterModule = default("coordConverter");
         double cellSize = default(3.0) @units(m);
 
-        double updateInterval @unit(s) = default(2.0s) ;
+        double writeMapInterval @unit(s) = default(2.0s) ;
 }
 
 
@@ -39,5 +39,6 @@ simple GlobalEntropyMap extends GlobalDensityMap like INeighborhoodTable
 {
   parameters:
     	@class(crownet::GlobalEntropyMap);
+    	double entropyInterval @unit(s) = default(8.0s);
 }
 

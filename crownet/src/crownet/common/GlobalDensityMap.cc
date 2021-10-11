@@ -40,7 +40,7 @@ const simsignal_t GlobalDensityMap::removeMap =
     cComponent::registerSignal("RemoveDensityMap");
 
 GlobalDensityMap::~GlobalDensityMap() {
-  if (updateTimer) cancelAndDelete(updateTimer);
+  if (writeMapTimer) cancelAndDelete(writeMapTimer);
 }
 
 void GlobalDensityMap::initialize() {
@@ -123,10 +123,10 @@ void GlobalDensityMap::initialize(int stage) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
 
 
-    updateTimer = new cMessage("GlobalDensityMapTimer");
-    updateInterval = par("updateInterval").doubleValue();
-    if (updateInterval > 0) {
-      scheduleAt(simTime() + updateInterval, updateTimer);
+    writeMapTimer = new cMessage("GlobalDensityMapTimer");
+    writeMapInterval = par("writeMapInterval").doubleValue();
+    if (writeMapInterval > 0) {
+      scheduleAt(simTime() + writeMapInterval, writeMapTimer);
     }
 
     // todo may be set via ini file
@@ -135,7 +135,7 @@ void GlobalDensityMap::initialize(int stage) {
 }
 
 void GlobalDensityMap::handleMessage(cMessage *msg) {
-  if (msg->isSelfMessage()) {
+  if (msg == writeMapTimer) {
     // 1) update maps
     updateMaps();
 
@@ -143,7 +143,7 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
     writeMaps();
 
     // 3) reschedule
-    scheduleAt(simTime() + updateInterval, msg);
+    scheduleAt(simTime() + writeMapInterval, msg);
   } else {
     delete msg;
   }
