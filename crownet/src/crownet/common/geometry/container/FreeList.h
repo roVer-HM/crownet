@@ -76,12 +76,14 @@ public:
 
     // Read only element wise access
     const T& operator[](int n) const;
+    T& operator[](int n);
+
 
     // Number of valid entries
     int size() const;
 
-    // Lenght of underling data structure
-    int length() const;
+    // Capacity of underling data structure
+    int capacity() const;
 
     // Returns elements in memory order NOT insertion order.
     // Iterator will skip empty / invalid entries.
@@ -151,12 +153,21 @@ const T& FreeList<T>::operator[](int n) const{
 }
 
 template <class T>
+T& FreeList<T>::operator[](int n){
+
+    if (data[n].next != VALID){
+        throw omnetpp::cRuntimeError("Access invalid index %d in FreeList", n);
+    }
+    return data[n].element;
+}
+
+template <class T>
 int FreeList<T>::size() const{
     return static_cast<int>(data.size()) - free_count;
 }
 
 template <class T>
-int FreeList<T>::length() const{
+int FreeList<T>::capacity() const{
     return static_cast<int>(data.size());
 }
 

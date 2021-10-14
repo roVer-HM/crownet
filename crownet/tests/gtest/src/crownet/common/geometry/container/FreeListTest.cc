@@ -79,7 +79,7 @@ TEST_F(FreeListTestF, multiInsertErease){
     EXPECT_DOUBLE_EQ(dList[20], -3.0);
     EXPECT_DOUBLE_EQ(dList[17], -2.0);
     EXPECT_DOUBLE_EQ(dList[13], -1.0);
-    EXPECT_DOUBLE_EQ(dList[dList.length()-1], -5.0);
+    EXPECT_DOUBLE_EQ(dList[dList.capacity()-1], -5.0);
 
 }
 
