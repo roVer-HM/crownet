@@ -10,9 +10,58 @@
 #include <vector>
 #include <omnetpp/cexception.h>
 
+
+
+
+/**
+ *  Random access container with reusing holes created by deleting elements.
+ *  Based on: https://stackoverflow.com/a/48330314 (CC BY-SA 3.0, user4842163)
+ */
 template<class T>
 class FreeList
 {
+public:
+    struct Iterator {
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+       Iterator(FreeList* list, int index = 0): freeList(list) {
+           if (index > freeList->data.size()){
+               index = freeList->data.size(); // invalid
+           } else {
+               while(index < freeList->data.size() && freeList->data[index].next != VALID){
+                   ++index;
+               }
+               this->index = index;
+           }
+       }
+
+       reference operator*() const  { return freeList->data[index].element;}
+       pointer operator->() {return &freeList->data[index].element;}
+
+       Iterator& operator++() {
+           while(index < freeList->data.size() && freeList->data[index].next != VALID){
+               ++index;
+           }
+       }
+       Iterator operator++(int) {Iterator tmp = *this; ++(*this); return tmp;}
+
+       friend bool operator==(const Iterator& a, const Iterator& b){
+           return a.freeList == b.freeList && a.index == b.index;
+       }
+
+       friend bool operator!=(const Iterator& a, const Iterator& b){
+           return a.freeList != b.freeList && a.index != b.index;
+       }
+
+    private:
+       FreeList* freeList;
+       int index;
+    };
+
 public:
     FreeList();
 
@@ -33,6 +82,12 @@ public:
 
     // Lenght of underling data structure
     int length() const;
+
+    // Returns elements in memory order NOT insertion order.
+    // Iterator will skip empty / invalid entries.
+    Iterator begin() { return Iterator(this); }
+    Iterator end() {return Iterator(this, data.size()); }
+
 
 private:
     static const int VALID = -2;

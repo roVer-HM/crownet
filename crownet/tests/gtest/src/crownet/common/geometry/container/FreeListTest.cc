@@ -94,5 +94,30 @@ TEST_F(FreeListTestF, accessInvalid){
     } catch (omnetpp::cRuntimeError e) {
 
     }
+}
 
+TEST_F(FreeListTestF, iterator1){
+    for (int i=0; i < 30; i++){
+        dList.insert(i * 1.0);
+    }
+    int j = 0;
+    for(const auto& item : dList){
+        EXPECT_DOUBLE_EQ(item, j*1.0);
+    }
+}
+
+TEST_F(FreeListTestF, iterator2){
+    for (int i=0; i < 10; i++){
+        dList.insert(i * 1.0);
+    }
+    dList.erase(3);
+    dList.erase(7);
+    dList.erase(6);
+    dList.erase(5);
+    dList.erase(0);
+    int i = 0;
+    std::vector<double> val = {1.0, 2.0, 4.0, 8.0, 9.0};
+    for(const auto& item : dList){
+        EXPECT_DOUBLE_EQ(item,val[i++]);
+    }
 }
