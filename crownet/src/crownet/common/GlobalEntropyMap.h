@@ -15,9 +15,9 @@
 
 #pragma once
 
-#include "../neighbourhood/EntropyNeigborhoodTableClient.h"
+#include "crownet/neighbourhood/EntropyNeigborhoodTableClient.h"
 #include "crownet/common/GlobalDensityMap.h"
-
+#include "crownet/common/entropy/EntropyProvider.h"
 
 using namespace omnetpp;
 using namespace inet;
@@ -49,7 +49,9 @@ protected:
 protected:
  NeighborhoodTable_t _table;
  cMessage *entropyTimer = nullptr;
+ simtime_t entropyTimerInterval;
  simtime_t lastEntropyUpdate;
+ EntropyProvider *entropyProvider = nullptr;
 
 };
 

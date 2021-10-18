@@ -28,6 +28,7 @@
 #include "traci/NodeManager.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/applications/dmap/dmap_m.h"
+#include "crownet/common/RegularGridInfo.h"
 
 using namespace omnetpp;
 using namespace inet;

@@ -11,22 +11,30 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
+// 
 
-import inet.common.geometry.Geometry;
+#include "UniformEntropy.h"
+#include <omnetpp/regmacros.h>
 
-cplusplus{{
-  #include "crownet/common/RegularGridInfo.h"  
-  #include "inet/common/geometry/common/Coord.h"
-}}
+namespace crownet {
 
-namespace crownet;
+Register_Class(UniformEntropy);
 
-class RegularGridInfo {
-    @existingClass;
-    inet::Coord gridSize;
-    inet::Coord cellSize;
-    inet::Coord cellCount;
+void UniformEntropy::initialize(cRNG* rng) {
+    rnd =  std::make_shared<cUniform>(rng, getMinValue(), getMaxValue());
 }
 
+double UniformEntropy::getValue(inet::Coord position, simtime_t time){
+    return rnd->draw();
+}
 
+bool UniformEntropy::selectCell(const int x, const int y, simtime_t time){
+    // doubleRand() [0, 1)
+    return rnd->getRNG()->doubleRand() < getCellSelectionPropability() ;
+}
+
+void UniformEntropy::copy(const UniformEntropy& other){
+    this->rnd = other.rnd;
+}
+
+}

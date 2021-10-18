@@ -40,7 +40,7 @@ std::shared_ptr<RegularDcdMap> RegularDcdMapFactory::create_shared_ptr(
 }
 
 std::shared_ptr<GridCellDistance> RegularDcdMapFactory::createDistanceProvider(){
-    return std::make_shared<GridCellDistance>(grid.getGridSize().x, grid.getGridSize().y);
+    return std::make_shared<GridCellDistance>(grid.getCellSize().x, grid.getCellSize().y);
 }
 
 std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::createValueVisitor(const std::string& mapType){

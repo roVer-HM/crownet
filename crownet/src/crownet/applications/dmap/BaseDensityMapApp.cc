@@ -25,6 +25,7 @@
 #include "crownet/common/GlobalDensityMap.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
+#include "crownet/crownet.h"
 
 namespace crownet {
 
@@ -158,6 +159,7 @@ Packet *BaseDensityMapApp::createPacket() {
     header->setVersion(MapType::SPARSE);
     header->setSourceCellIdX(dcdMap->getOwnerCell().x());
     header->setSourceCellIdY(dcdMap->getOwnerCell().y());
+    header->setSourceId(hostId);
     header->setNumberOfNeighbours(dcdMap->getNeighborhood().size());
     maxData -= header->getChunkLength();
 
@@ -176,7 +178,9 @@ Packet *BaseDensityMapApp::createPacket() {
         if(stream->hasNext(now)){
             auto& cell = stream->nextCell(now);
             cell.sentAt(now);
-            LocatedDcDCell c {(uint16_t)cell.val()->getCount(), (uint16_t)0, (uint16_t)cell.getCellId().x(), (uint16_t)cell.getCellId().y()};
+            // todo uint_16_t(cell.val() * 100) to get 1/100 count precision + check overflow!!!
+            auto count_100 = cell.val()->getCount()*100;
+            LocatedDcDCell c {(uint16_t)count_100, (uint16_t)0, (uint16_t)cell.getCellId().x(), (uint16_t)cell.getCellId().y()};
             c.setDeltaCreation(now-cell.val()->getMeasureTime());
             payload->setCells(usedSpace, c);
         } else {
@@ -194,6 +198,7 @@ Packet *BaseDensityMapApp::createPacket() {
 
 bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
 
+  simtime_t _received = simTime();
   auto header = packet->popAtFront<MapHeader>();
   if (header->getVersion() == MapType::SPARSE){
       auto p = packet->popAtFront<SparseMapPacket>();
@@ -206,7 +211,6 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
               header->getSourceCellIdX(),
               header->getSourceCellIdY());
 
-      simtime_t _received = simTime();
       // 1) set count of all cells previously received from sourceNodeId to zero.
       // do not change the valid state.
       dcdMap->visitCells(ClearCellIdVisitor{sourceNodeId, simTime()});
@@ -225,7 +229,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
           EntryDist entryDist = distProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
           simtime_t _measured = cell.getCreationTime(packetCreationTime);
           auto _m = std::make_shared<RegularCell::entry_t>(
-            cell.getCount(),
+            // todo (double)(cell.getCount())/ 100 to get 1/100 count precision! assume max value at 0xFFFF
+            ((double)cell.getCount()/100.0),
             _measured,
             _received,
             std::move(sourceNodeId),

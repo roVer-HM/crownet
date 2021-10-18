@@ -19,8 +19,8 @@
 using namespace crownet;
 
 namespace {
-RegularDcdMapFactory dcdFactory{std::make_pair(1.0, 1.0),
-                                std::make_pair(10, 10)};
+RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
+RegularDcdMapFactory dcdFactory{grid};
 }
 
 class DcDMapIteraotrTest : public BaseOppTest {

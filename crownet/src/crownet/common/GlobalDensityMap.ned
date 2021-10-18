@@ -40,5 +40,7 @@ simple GlobalEntropyMap extends GlobalDensityMap like INeighborhoodTable
   parameters:
     	@class(crownet::GlobalEntropyMap);
     	double entropyInterval @unit(s) = default(8.0s);
+    	int entropyRngGenerator = 1; // default 0 used by all modules 
+    	object entropyProvider;
 }
 

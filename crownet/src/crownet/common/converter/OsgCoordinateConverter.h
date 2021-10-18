@@ -30,7 +30,7 @@
 #include "traci/GeoPosition.h"
 #include "traci/Position.h"
 #include "inet/common/geometry/common/RotationMatrix.h"
-#include "crownet/common/crownet_m.h"
+#include "crownet/common/RegularGridInfo.h"
 
 
 namespace crownet {

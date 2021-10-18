@@ -88,11 +88,11 @@ class IEntry : public crownet::FilePrinter {
   bool operator==(const IEntry<K, T>& rhs) const;
 
  protected:
-  double count;
+  double count = 0;
   time_type measurement_time;
   time_type received_time;
   bool _valid;
-  key_type source;
+  key_type source = 0;
   EntryDist entryDist;
   std::string selected_in;
 };

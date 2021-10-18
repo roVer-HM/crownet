@@ -13,7 +13,8 @@
 #include "crownet/dcd/regularGrid/DistanceProvider.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/generic/CellIdStream.h"
-#include "crownet/common/crownet_m.h"
+#include "crownet/common/RegularGridInfo.h"
+
 
 #include <functional>
 

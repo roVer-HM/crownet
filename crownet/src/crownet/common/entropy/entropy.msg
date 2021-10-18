@@ -13,20 +13,21 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-import inet.common.geometry.Geometry;
 
 cplusplus{{
-  #include "crownet/common/RegularGridInfo.h"  
-  #include "inet/common/geometry/common/Coord.h"
+  #include "crownet/common/entropy/EntropyProvider.h"  
 }}
 
 namespace crownet;
 
-class RegularGridInfo {
-    @existingClass;
-    inet::Coord gridSize;
-    inet::Coord cellSize;
-    inet::Coord cellCount;
+
+class EntropyProvider extends cOwnedObject{
+ @existingClass;   
 }
 
-
+class UniformEntropy extends EntropyProvider {
+    @customize(true);
+    double minValue;
+    double maxValue;
+    double cellSelectionPropability; 
+}
