@@ -64,7 +64,7 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
                                      omnetpp::cObject *details) {
   if (signalId == initMap){
       auto mapHandler = check_and_cast<GridHandler *>(obj);
-      mapHandler->setDistanceProvider(distProvider);
+      mapHandler->setMapFactory(dcdMapFactory);
       mapHandler->setCoordinateConverter(converter);
   }
   else if (signalId == registerMap) {
@@ -91,10 +91,10 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
         par("traciNodeManager"), this);
 
     grid = converter->getGridDescription(par("cellSize").doubleValue());
-    RegularDcdMapFactory f{grid};
+    dcdMapFactory = std::make_shared<RegularDcdMapFactory>(grid);
 
-    dcdMapGlobal = f.create_shared_ptr(IntIdentifer(-1));  // global
-    distProvider = f.createDistanceProvider();
+    dcdMapGlobal = dcdMapFactory->create_shared_ptr(IntIdentifer(-1));  // global
+    cellKeyProvider = dcdMapFactory->getCellKeyProvider();
 
     // 2) setup writer.
     FileWriterBuilder fBuilder{};

@@ -94,18 +94,20 @@ void BaseDensityMapApp::initDcdMap(){
                         par("coordConverterModule"), this)->getConverter());
     }
 
-    grid = converter->getGridDescription(par("cellSize").doubleValue());
-    RegularDcdMapFactory f{grid};
+    if (!dcdMapFactory){
+        EV_WARN << "Density map factory not set. This will impact the performance because each map has a separate distance cache!" << endl;
+        grid = converter->getGridDescription(par("cellSize").doubleValue());
+        dcdMapFactory = std::make_shared<RegularDcdMapFactory>(grid);
+    } else {
+        grid = dcdMapFactory->getGrid();
+    }
     
-    dcdMap = f.create_shared_ptr(IntIdentifer(hostId), mapCfg->getIdStreamType());
+    dcdMap = dcdMapFactory->create_shared_ptr(IntIdentifer(hostId), mapCfg->getIdStreamType());
     dcdMapWatcher = new RegularDcdMapWatcher("dcdMap", dcdMap);
     WATCH_MAP(dcdMap->getNeighborhood());
-    // check if set by globalDensityMap (shared between all nodes)
-    if(!distProvider) {
-        distProvider = f.createDistanceProvider();
-    }
+    cellProvider = dcdMapFactory->getCellKeyProvider();
     // do not share valueVisitor between nodes.
-    valueVisitor = f.createValueVisitor(mapCfg->getMapType());
+    valueVisitor = dcdMapFactory->createValueVisitor(mapCfg->getMapType());
 }
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
@@ -226,7 +228,7 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
           GridCellID entryCellId{
               baseX + cell.getIdOffsetX(),
               baseY + cell.getIdOffsetY()};
-          EntryDist entryDist = distProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
+          EntryDist entryDist = cellProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
           simtime_t _measured = cell.getCreationTime(packetCreationTime);
           auto _m = std::make_shared<RegularCell::entry_t>(
             // todo (double)(cell.getCount())/ 100 to get 1/100 count precision! assume max value at 0xFFFF
@@ -258,9 +260,10 @@ void BaseDensityMapApp::writeMap() {
 
 std::shared_ptr<RegularDcdMap> BaseDensityMapApp::getMap() { return dcdMap; }
 
-void BaseDensityMapApp::setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider){
-    this->distProvider = distProvider;
+void BaseDensityMapApp::setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory){
+    this->dcdMapFactory = factory;
 }
+
 
 void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter){
     this->converter = converter;

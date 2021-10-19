@@ -11,8 +11,9 @@
 
 namespace crownet {
 
-RegularDcdMapFactory::RegularDcdMapFactory(RegularGridInfo grid)
+RegularDcdMapFactory::RegularDcdMapFactory(const RegularGridInfo& grid)
         : grid(grid),
+          cellKeyProvider(std::make_shared<GridCellIDKeyProvider>(grid)),
           timeProvider(std::make_shared<SimTimeProvider>()) {
 
     visitor_dispatcher["ymf"] = [this](){return std::make_shared<YmfVisitor>(timeProvider->now());};
@@ -27,20 +28,14 @@ RegularDcdMapFactory::RegularDcdMapFactory(RegularGridInfo grid)
 
 
 RegularDcdMap RegularDcdMapFactory::create(const IntIdentifer& ownerID, const std::string& idStreamType) {
-  auto provider = std::make_shared<GridCellIDKeyProvider>(grid.getCellSize(), grid.getGridSize());
-  auto streamer = createCellIdStream(idStreamType);
-  return RegularDcdMap(ownerID, provider, timeProvider, streamer);
+  auto streamer = createCellIdStream(idStreamType); // create new one do not share
+  return RegularDcdMap(ownerID, cellKeyProvider, timeProvider, streamer);
 }
 
 std::shared_ptr<RegularDcdMap> RegularDcdMapFactory::create_shared_ptr(
     const IntIdentifer& ownerID, const std::string& idStreamType) {
-  auto provider = std::make_shared<GridCellIDKeyProvider>(grid.getCellSize(), grid.getGridSize());
-  auto streamer = createCellIdStream(idStreamType);
-  return std::make_shared<RegularDcdMap>(ownerID, provider, timeProvider, streamer);
-}
-
-std::shared_ptr<GridCellDistance> RegularDcdMapFactory::createDistanceProvider(){
-    return std::make_shared<GridCellDistance>(grid.getCellSize().x, grid.getCellSize().y);
+  auto streamer = createCellIdStream(idStreamType); // create new one do not share
+  return std::make_shared<RegularDcdMap>(ownerID, cellKeyProvider, timeProvider, streamer);
 }
 
 std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::createValueVisitor(const std::string& mapType){

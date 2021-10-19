@@ -44,4 +44,19 @@ const int RegularGridInfo::getCellId(inet::Coord position) const{
     return getCellId((int)position.x, (int)position.y);
 }
 
+double RegularGridInfo::cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2) const {
+    inet::Coord c1 {cell1.x()*cellSize.x + cellSize.x/2, cell1.y()*cellSize.y + cellSize.y/2};
+    inet::Coord c2 {cell2.x()*cellSize.x + cellSize.x/2, cell2.y()*cellSize.y + cellSize.y/2};
+    return c1.distance(c2);
+}
+
+double RegularGridInfo::maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const {
+    return std::max(std::abs(cell1.x() - cell2.x()) * cellSize.x, std::abs(cell1.y() - cell2.y()) * cellSize.y);
+}
+
+int RegularGridInfo::maxIdCellDist(const GridCellID& cell1, const GridCellID&  cell2) const {
+    return std::max(std::abs(cell1.x() - cell2.x()), std::abs(cell1.y() - cell2.y()));
+}
+
+
 }

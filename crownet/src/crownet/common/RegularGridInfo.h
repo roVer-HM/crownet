@@ -16,7 +16,7 @@
 #pragma once
 
 #include "inet/common/geometry/Geometry_m.h"
-
+#include "crownet/dcd/identifier/Identifiers.h"
 
 namespace crownet {
 
@@ -38,6 +38,9 @@ public:
     const int getCellId(const int x, const int y)const;
     const int getCellId(inet::Coord position) const;
 
+    double cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2)const;
+    double maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;
+    int maxIdCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;
 
 private:
     inet::Coord gridSize;

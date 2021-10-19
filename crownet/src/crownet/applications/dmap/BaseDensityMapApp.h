@@ -70,19 +70,21 @@ protected:
  virtual void computeValues() override;
  virtual void writeMap() override;
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
- virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
+ virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory>) override;
 
  // AppStatusInfo
  virtual const bool canProducePacket() override;
  virtual const inet::b getMinPdu() override;
 protected:
 
+ std::shared_ptr<GridCellIDKeyProvider> cellProvider;
  std::shared_ptr<OsgCoordinateConverter> converter;
+ std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
+
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::unique_ptr<FileWriter> fileWriter;
  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
- std::shared_ptr<GridCellDistance> distProvider;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
  RegularGridInfo grid;
