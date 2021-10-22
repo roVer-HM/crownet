@@ -65,8 +65,8 @@ class DcDMap {
   void setCellKeyProvider(std::shared_ptr<CellKeyProvider<C>> provider);
 
   // map update methods
-  void update(const cell_key_t& cell_id, typename cell_t::entry_t_ptr&& m_data);
-  void update(const cell_key_t& cell_id, typename cell_t::entry_t_ptr& m_data);
+  void setEntry(const cell_key_t& cell_id, typename cell_t::entry_t_ptr&& m_data);
+  void setEntry(const cell_key_t& cell_id, typename cell_t::entry_t_ptr& m_data);
   void incrementLocal(const traci::TraCIPosition& pos,
                       const node_key_t& sourceNodeId,
                       const time_t& time,

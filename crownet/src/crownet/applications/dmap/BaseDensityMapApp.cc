@@ -237,7 +237,7 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
             _received,
             std::move(sourceNodeId),
             std::move(entryDist));
-        dcdMap->update(entryCellId, std::move(_m));
+        dcdMap->setEntry(entryCellId, std::move(_m)); // override value
       }
 
 

@@ -179,14 +179,14 @@ typename DcDMap<C, N, T>::cell_t& DcDMap<C, N, T>::createCell(
 }
 
 template <typename C, typename N, typename T>
-void DcDMap<C, N, T>::update(const cell_key_t& cell_id,
+void DcDMap<C, N, T>::setEntry(const cell_key_t& cell_id,
                              typename cell_t::entry_t_ptr&& m_data) {
   auto& cell = this->getCell(cell_id);
   cell.put(std::move(m_data));
 }
 
 template <typename C, typename N, typename T>
-void DcDMap<C, N, T>::update(const cell_key_t& cell_id,
+void DcDMap<C, N, T>::setEntry(const cell_key_t& cell_id,
                              typename cell_t::entry_t_ptr& m_data) {
   auto& cell = this->getCell(cell_id);
   cell.put(m_data);
