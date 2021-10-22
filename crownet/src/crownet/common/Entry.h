@@ -53,7 +53,7 @@ class IEntry : public crownet::FilePrinter {
   const bool empty() const;
   virtual const bool valid() const { return _valid; }
   virtual void incrementCount(const time_type& t, const double& value = 1.0);
-  virtual void decrementCount(const time_type& t);
+  virtual void decrementCount(const time_type& t, const double& value = 1.0);
   virtual void touch(const time_type& t);  // update time only
 
   virtual const time_type& getMeasureTime() const;
@@ -198,11 +198,11 @@ inline void IEntry<K, T>::incrementCount(const time_type& t, const double& value
 }
 
 template <typename K, typename T>
-inline void IEntry<K, T>::decrementCount(const time_type& t) {
+inline void IEntry<K, T>::decrementCount(const time_type& t, const double& value) {
+  count = count - value;
   if (count <= 0) {
     throw omnetpp::cRuntimeError("Cell count decrement below 0.");
   }
-  count--;
   _valid = true;
   measurement_time = t;
   received_time = t;
