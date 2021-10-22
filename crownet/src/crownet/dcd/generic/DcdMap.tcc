@@ -193,6 +193,38 @@ void DcDMap<C, N, T>::setEntry(const cell_key_t& cell_id,
 }
 
 template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> DcDMap<C, N, T>::getEntry(const traci::TraCIPosition& pos){
+    return getEntry<E>(pos, owner_id);
+}
+
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> DcDMap<C, N, T>::getEntry(const traci::TraCIPosition& pos, const node_key_t& source){
+    auto cell_id = this->cellKeyProvider->getCellKey(pos);
+    return getEntry<E>(cell_id, source);
+}
+
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> DcDMap<C, N, T>::getEntry(const cell_key_t& cell_id){
+    return getEntry<E>(cell_id, owner_id);
+}
+
+
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> DcDMap<C, N, T>::getEntry(const cell_key_t& cell_id, const node_key_t& source){
+    auto& cell = this->getCell(cell_id);
+    auto entry = cell.getOrCreate(source);
+    return std::dynamic_pointer_cast<E>(entry);
+}
+
+
+template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::incrementLocal(const traci::TraCIPosition& pos,
                                      const node_key_t& sourceNodeId,
                                      const time_t& time,

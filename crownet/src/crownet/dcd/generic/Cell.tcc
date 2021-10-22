@@ -98,6 +98,18 @@ typename Cell<C, N, T>::entry_t_ptr const Cell<C, N, T>::get(
 }
 
 template <typename C, typename N, typename T>
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getOrCreate(const node_key_t node_id){
+    if (!hasData(node_id)){
+        if(owner_id == node_id){
+            this->data[node_id] = this->entryCtor.localEntry();
+        } else {
+            this->data[node_id] = this->entryCtor.entry();
+        }
+    }
+    return this->data[node_id];
+}
+
+template <typename C, typename N, typename T>
 const typename Cell<C, N, T>::map_t::iterator Cell<C, N, T>::begin() const {
   return const_cast<Cell<C, N, T>*>(this)->data.begin();
 }

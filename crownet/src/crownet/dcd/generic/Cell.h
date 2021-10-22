@@ -78,6 +78,7 @@ class Cell {
   localEntry_t_ptr getLocal() const;
   entry_t_ptr get(const node_key_t node_id);
   entry_t_ptr const get(const node_key_t node_id) const;
+  entry_t_ptr getOrCreate(const node_key_t node_id);
   const cell_key_t& getCellId() const { return cell_id; }
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
