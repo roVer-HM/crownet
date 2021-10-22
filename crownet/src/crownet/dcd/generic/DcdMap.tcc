@@ -284,6 +284,13 @@ void DcDMap<C, N, T>::addToNeighborhood(const node_key_t& neigborId,
 }
 
 template <typename C, typename N, typename T>
+void DcDMap<C, N, T>::addToNeighborhood(const node_key_t& neigborId,
+                                        const traci::TraCIPosition& pos) {
+  auto cellId = this->cellKeyProvider->getCellKey(pos);
+  addToNeighborhood(neigborId, cellId);
+}
+
+template <typename C, typename N, typename T>
 typename DcDMap<C, N, T>::cell_key_t DcDMap<C, N, T>::getNeighborCell(
     const node_key_t& neigborId) {
   if (!this->isInNeighborhood(neigborId)) {

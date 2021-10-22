@@ -92,8 +92,9 @@ class DcDMap {
   void removeFromNeighborhood(const node_key_t& neigborId);
   cell_key_t getNeighborCell(const node_key_t& neigborId);
   void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
-  void addToNeighborhood(const node_key_t& neigbourId,
-                         const cell_key_t& cellId);
+  void addToNeighborhood(const node_key_t& neigbourId, const cell_key_t& cellId);
+  void addToNeighborhood(const node_key_t& neigbourId, const traci::TraCIPosition& pos);
+
 
   // iterators and visitors
   typename map_t::iterator begin() { return cells.begin(); }
