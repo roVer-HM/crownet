@@ -36,7 +36,7 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         
         // App logic
         string coordConverterModule;
-        double cellSize = default(3.0) @units(m);
+        double cellSize @unit(m) = default(3.0m);
         // update interval of local maps with neighborhood table 
         // This interval is independent of the sent interval of the application in 
         // its basic configuration. 

@@ -26,10 +26,10 @@ simple OsgCoordConverterLocal like ICoordConverter {
     parameters:
         @class(::crownet::OsgCoordConverterLocal);
         string srs_code = default("EPSG:32632");
-        double offset_x = default(0.0);
-        double offset_y = default(0.0);
-        double xBound;
-        double yBound;
+        double offset_x @unit(m) = default(0.0m);
+        double offset_y   @unit(m) = default(0.0m);
+        double xBound @unit(m);
+        double yBound @unit(m);
 }
 
 
