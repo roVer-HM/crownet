@@ -31,7 +31,7 @@ class GridCellID : public CellIdentifiere {
   std::string str() const override;
   bool operator<(const GridCellID& rhs) const;
   bool operator==(const GridCellID& rhs) const;
-  int columns() const override;
+  virtual int columns() const override;
   virtual void writeTo(std::ostream& out,
                        const std::string& sep) const override;
   virtual void writeHeaderTo(std::ostream& out,
