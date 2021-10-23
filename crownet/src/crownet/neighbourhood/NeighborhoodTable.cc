@@ -10,6 +10,7 @@
 #include <omnetpp/simtime_t.h>
 #include <omnetpp/cstlwatch.h>
 #include <omnetpp/cwatch.h>
+#include "crownet/crownet.h"
 
 
 using namespace omnetpp;
@@ -55,8 +56,11 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
         info->setNodeId(sourceId);
         take(info);
         _table[sourceId] = info;
+        return info;
+    } else {
+        emitPreChanged(_table[sourceId]);
+        return _table[sourceId];
     }
-    return _table[sourceId];
 }
 
 
@@ -64,14 +68,11 @@ void NeighborhoodTable::checkTimeToLive(){
     Enter_Method_Silent();
     simtime_t now = simTime();
     if (now >lastCheck){
-        // update local entry
-        auto local = getOrCreateEntry(ownerId);
-        local->setReceivedTimePrio(now);
-        local->setPos(getPosition());
         // remove old entries
         for( auto it=_table.cbegin(); it !=_table.cend();){
             // Received + maxAge := time at which entry must be removed.
             if ((it->second->getReceivedTimePrio() + maxAge) < now){
+                emitRemoved(it->second);
                 delete it->second;
                 it = _table.erase(it);
             } else {

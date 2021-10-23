@@ -213,16 +213,12 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
               header->getSourceCellIdX(),
               header->getSourceCellIdY());
 
-      // 1) set count of all cells previously received from sourceNodeId to zero.
-      // do not change the valid state.
-      dcdMap->visitCells(ClearCellIdVisitor{sourceNodeId, simTime()});
-
-      // 2) check local map for _nodeId and compare if the local and packet
-      //    place the _nodeId in the same cell.
+      //  check local map for _nodeId and compare if the local and packet
+      //  place the _nodeId in the same cell.
       dcdMap->addToNeighborhood(sourceNodeId, sourceCellId);
 
 
-      // 3) update new measurements
+      // update new measurements
       for (int i = 0; i < numCells; i++) {
           const LocatedDcDCell &cell = p->getCells(i);
           GridCellID entryCellId{
@@ -230,14 +226,13 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
               baseY + cell.getIdOffsetY()};
           EntryDist entryDist = cellProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
           simtime_t _measured = cell.getCreationTime(packetCreationTime);
-          auto _m = std::make_shared<RegularCell::entry_t>(
-            // todo (double)(cell.getCount())/ 100 to get 1/100 count precision! assume max value at 0xFFFF
-            ((double)cell.getCount()/100.0),
-            _measured,
-            _received,
-            std::move(sourceNodeId),
-            std::move(entryDist));
-        dcdMap->setEntry(entryCellId, std::move(_m)); // override value
+          // get or create entry shared pointer
+          auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
+          _entry->setCount((double)cell.getCount()/100.0);
+          _entry->setMeasureTime(_measured);
+          _entry->setReceivedTime(_received);
+          _entry->setEntryDist(std::move(entryDist));
+          _entry->setSource(sourceNodeId);
       }
 
 
