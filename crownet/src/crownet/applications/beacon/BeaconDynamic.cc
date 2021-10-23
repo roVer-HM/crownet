@@ -45,7 +45,14 @@ Packet *BeaconDynamic::createPacket() {
     beacon->setPosTimestamp(time);
     beacon->setNumberOfNeighbours(nTable->getNeighbourCount());
 
-    return buildPacket(beacon, header);
+    auto packet = buildPacket(beacon, header);
+
+    // process local for own location entry in neighborhood table.
+    auto tmp = packet->dup();
+    handleDataArrived(tmp);
+    delete tmp;
+
+    return packet;
 }
 
 
@@ -54,6 +61,7 @@ FsmState BeaconDynamic::handleDataArrived(Packet *packet){
     auto info = nTable->getOrCreateEntry(packet->peekAtFront<DynamicBeaconHeader>()->getSourceId());
 
     info->processInbound(packet, hostId, simTime());
+    nTable->emitPostChanged(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

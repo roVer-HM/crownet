@@ -237,6 +237,10 @@ std::shared_ptr<E> DcDMap<C, N, T>::getEntry(const cell_key_t& cell_id, const no
     return std::dynamic_pointer_cast<E>(entry);
 }
 
+template <typename C, typename N, typename T>
+typename DcDMap<C, N, T>::cell_key_t DcDMap<C, N, T>::getCellId(const traci::TraCIPosition& pos) const {
+    return this->cellKeyProvider->getCellKey(pos);
+}
 
 template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::incrementLocal(const traci::TraCIPosition& pos,
@@ -261,6 +265,26 @@ void DcDMap<C, N, T>::incrementLocal(const traci::TraCIPosition& pos,
   this->addToNeighborhood(sourceNodeId, cellId);
 }
 
+template <typename C, typename N, typename T>
+bool DcDMap<C, N, T>::hasEntry(const cell_key_t& cell_id, const node_key_t& source){
+    auto& cell = this->getCell(cell_id);
+    return cell.hasData(source);
+}
+
+template <typename C, typename N, typename T>
+bool DcDMap<C, N, T>::hasEntry(const cell_key_t& cell_id) {
+    return hasEntry(cell_id, owner_id);
+}
+
+template <typename C, typename N, typename T>
+bool DcDMap<C, N, T>::hasEntry(const traci::TraCIPosition& pos, const node_key_t& source) {
+    return hasEntry(cellKeyProvider->getCellKey(pos), source);
+}
+
+template <typename C, typename N, typename T>
+bool DcDMap<C, N, T>::hasEntry(const traci::TraCIPosition& pos){
+    return hasEntry(pos, owner_id);
+}
 template <typename C, typename N, typename T>
 bool DcDMap<C, N, T>::isInNeighborhood(const node_key_t& neigbourId) const {
   return this->neighborhood.find(neigbourId) != this->neighborhood.end();

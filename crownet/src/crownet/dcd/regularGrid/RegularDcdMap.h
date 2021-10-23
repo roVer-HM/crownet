@@ -23,7 +23,8 @@ using RegularDcdMap = DcDMap<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 using RegularDcdMapWatcher = DcdMapWatcher<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 using VisitorCreator = std::function<std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>>()>;
 using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>()>;
-
+using GridEntry = IEntry<IntIdentifer, omnetpp::simtime_t>;
+using GridLocalEntry = ILocalEntry<IntIdentifer, omnetpp::simtime_t>;
 
 class RegularDcdMapFactory {
  public:

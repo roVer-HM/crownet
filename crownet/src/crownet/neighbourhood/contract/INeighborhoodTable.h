@@ -10,14 +10,17 @@
 #include "inet/common/geometry/common/Coord.h"
 #include "crownet/applications/beacon/BeaconReceptionInfo.h"
 #include "crownet/common/iterator/FilterIterator.h"
+#include <list>
 
 namespace crownet {
+
 
 
 using NeighborhoodTable_t = std::map<int, BeaconReceptionInfo*>;
 using NeighborhoodTablePred_t = std::function<bool(const NeighborhoodTable_t::value_type&)>;
 using NeighborhoodTableValue_t = NeighborhoodTable_t::value_type;
 using NeighborhoodTableIter_t = FilterIterator<NeighborhoodTable_t, NeighborhoodTable_t::iterator, NeighborhoodTableValue_t, NeighborhoodTablePred_t>;
+class NeighborhoodEntryListner;
 
 class IBaseNeighborhoodTable{
 public:
@@ -60,6 +63,24 @@ public:
     virtual void setOwnerId(int ownerId) = 0;
     virtual const int getOwnerId() const = 0;
 
+    void registerEntryListner(NeighborhoodEntryListner* listener);
+    void removeEntryListener(NeighborhoodEntryListner* listener);
+    void emitPreChanged(BeaconReceptionInfo* oldInfo);
+    void emitPostChanged(BeaconReceptionInfo* newInfo);
+    void emitRemoved(BeaconReceptionInfo* info);
+
+
+protected:
+    std::list<NeighborhoodEntryListner*> listeners;
+};
+
+
+class NeighborhoodEntryListner {
+public:
+    virtual ~NeighborhoodEntryListner() = default;
+    virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo)=0;
+    virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
+    virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
 };
 
 

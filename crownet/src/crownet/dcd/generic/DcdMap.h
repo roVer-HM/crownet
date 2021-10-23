@@ -70,15 +70,17 @@ class DcDMap {
 
   template <typename E>
   std::shared_ptr<E> getEntry(const cell_key_t& cell_id, const node_key_t& source);
-
   template <typename E>
   std::shared_ptr<E> getEntry(const cell_key_t& cell_id);
-
   template <typename E>
   std::shared_ptr<E> getEntry(const traci::TraCIPosition& pos);
   template <typename E>
   std::shared_ptr<E> getEntry(const traci::TraCIPosition& pos, const node_key_t& source);
 
+  bool hasEntry(const cell_key_t& cell_id, const node_key_t& source);
+  bool hasEntry(const cell_key_t& cell_id);
+  bool hasEntry(const traci::TraCIPosition& pos, const node_key_t& source);
+  bool hasEntry(const traci::TraCIPosition& pos);
 
   void incrementLocal(const traci::TraCIPosition& pos,
                       const node_key_t& sourceNodeId,
@@ -94,7 +96,7 @@ class DcDMap {
   void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
   void addToNeighborhood(const node_key_t& neigbourId, const cell_key_t& cellId);
   void addToNeighborhood(const node_key_t& neigbourId, const traci::TraCIPosition& pos);
-
+  cell_key_t getCellId(const traci::TraCIPosition& pos) const;
 
   // iterators and visitors
   typename map_t::iterator begin() { return cells.begin(); }

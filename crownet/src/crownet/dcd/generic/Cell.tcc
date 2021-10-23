@@ -101,9 +101,15 @@ template <typename C, typename N, typename T>
 typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getOrCreate(const node_key_t node_id){
     if (!hasData(node_id)){
         if(owner_id == node_id){
-            this->data[node_id] = this->entryCtor.localEntry();
+//            EV_DEBUG << "create entry for: " << node_id << " owner: " << owner_id << "cell:" << cell_id << std::endl;
+            auto e = this->entryCtor.localEntry();
+            e->setSource(node_id);
+            this->data[node_id] = e;
         } else {
-            this->data[node_id] = this->entryCtor.entry();
+//            EV_DEBUG << "create entry for: " << node_id << " owner: " << owner_id << "cell:" << cell_id << std::endl;
+            auto e = this->entryCtor.entry();
+            e->setSource(node_id);
+            this->data[node_id] = e;
         }
     }
     return this->data[node_id];

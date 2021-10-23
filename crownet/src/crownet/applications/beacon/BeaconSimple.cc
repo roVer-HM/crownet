@@ -30,7 +30,15 @@ Packet *BeaconSimple::createPacket() {
     beacon->setPos(getPosition());
     beacon->setNodeId(getHostId());
 
-    return buildPacket(beacon);
+    auto packet = buildPacket(beacon);
+
+    // process local for own location entry in neighborhood table.
+    auto tmp = packet->dup();
+    handleDataArrived(tmp);
+    delete tmp;
+
+
+    return packet;
 }
 
 FsmState BeaconSimple::handleDataArrived(Packet *packet){
@@ -41,6 +49,7 @@ FsmState BeaconSimple::handleDataArrived(Packet *packet){
     info->setReceivedTimePrio(simTime());
     info->setPos(p->getPos());
     info->setEpsilon(p->getEpsilon());
+    nTable->emitPostChanged(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }
