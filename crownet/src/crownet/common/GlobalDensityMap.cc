@@ -83,12 +83,15 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
 void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
                                      const SimTime &t, cObject *details) {
   if (signalID == traciConnected) {
+      initializeMap();
+  }
+}
+
+void GlobalDensityMap::initializeMap(){
     // 1) setup map
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
                     ->getConverter();
-    nodeManager = inet::getModuleFromPar<traci::NodeManager>(
-        par("traciNodeManager"), this);
 
     grid = converter->getGridDescription(par("cellSize").doubleValue());
     dcdMapFactory = std::make_shared<RegularDcdMapFactory>(grid);
@@ -113,15 +116,18 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     fileWriter.reset(fBuilder.build(
         std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
     fileWriter->writeHeader();
-  }
 }
+
 
 void GlobalDensityMap::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
+      cStringTokenizer t(par("vectorNodeModules").stringValue(), ";");
+      vectorNodeModules = t.asVector();
+      cStringTokenizer tt(par("nodeModules").stringValue(), ";");
+      singleNodeModules = tt.asVector();
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
-
 
     writeMapTimer = new cMessage("GlobalDensityMapTimer");
     writeMapInterval = par("writeMapInterval").doubleValue();
@@ -131,8 +137,36 @@ void GlobalDensityMap::initialize(int stage) {
 
     // todo may be set via ini file
     valueVisitor = std::make_shared<LocalSelector>(simTime());
+  } else if ( stage == INITSTAGE_LAST){
+      if (!par("useSignalMapInit").boolValue()){
+          initializeMap();
+      }
   }
 }
+
+void GlobalDensityMap::acceptNodeVisitor(INodeVisitor* visitor){
+    cModule* root = findModuleByPath("<root>");
+    for(const auto& path: vectorNodeModules){
+        cModule* m = root->getSubmodule(path.c_str(), 0);
+        if (m){
+            if (m->isVector()){
+               for(int i = 0; i < m->getVectorSize(); i++){
+                   cModule* mm = root->getSubmodule(path.c_str(), i);
+                   visitor->visitNode(mm);
+               }
+            } else {
+                throw cRuntimeError("expected vector node with name %s", path.c_str());
+            }
+        }
+    }
+    for(const auto& path: singleNodeModules){
+        cModule* m = findModuleByPath(path.c_str());
+        if (m){
+            visitor->visitNode(m);
+        }
+    }
+}
+
 
 void GlobalDensityMap::handleMessage(cMessage *msg) {
   if (msg == writeMapTimer) {
@@ -149,8 +183,7 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
   }
 }
 
-void GlobalDensityMap::visitNode(const std::string &traciNodeId,
-                                 omnetpp::cModule *mod) {
+void GlobalDensityMap::visitNode(omnetpp::cModule *mod) {
   const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));
   // convert to traci 2D position
   const auto &pos = mobility->getCurrentPosition();
@@ -175,7 +208,7 @@ void GlobalDensityMap::updateMaps() {
   // global map needs reset (not clear)
   dcdMapGlobal->visitCells(ResetVisitor{lastUpdate});
   dcdMapGlobal->clearNeighborhood();
-  nodeManager->visit(this);
+  acceptNodeVisitor(this);
   valueVisitor->setTime(simTime());
   dcdMapGlobal->computeValues(valueVisitor);
 

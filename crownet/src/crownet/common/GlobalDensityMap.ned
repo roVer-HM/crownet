@@ -25,10 +25,14 @@ simple GlobalDensityMap like IGlobalDensityMap
 {
     parameters:
         @class(crownet::GlobalDensityMap);
-        string traciNodeManager = default("traci.nodes");
         string mobilityModule = default (".mobility");
         string coordConverterModule = default("coordConverter");
         double cellSize @unit(m) = default(3.0m);
+        // search these nodes for the ground truth setup. 
+        string vectorNodeModules= default("misc;pNode;vNode");
+        string nodeModules= default("");
+        // if true use "traci.connected" to trigger density map setup. Otherwise use stage 13
+        bool useSignalMapInit = default(true); 
 
         double writeMapInterval @unit(s) = default(2.0s) ;
 }
