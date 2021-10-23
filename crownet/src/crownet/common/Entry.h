@@ -57,13 +57,18 @@ class IEntry : public crownet::FilePrinter {
   virtual void touch(const time_type& t);  // update time only
 
   virtual const time_type& getMeasureTime() const;
+  virtual void setMeasureTime(const time_type& time);
+
   virtual const time_type& getReceivedTime() const;
+  virtual void setReceivedTime(const time_type& time);
 
   virtual const double getCount() const;
   virtual void setCount(double count);
 
   virtual const EntryDist getEntryDist() const;
   virtual void setEntryDist(const EntryDist&);
+  virtual void setEntryDist(EntryDist&& dist);
+
 
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
@@ -73,6 +78,7 @@ class IEntry : public crownet::FilePrinter {
 
   virtual void setSelectedIn(std::string viewName);
   virtual std::string getSelectedIn() const;
+
 
   virtual std::string csv(std::string delimiter) const;
   virtual std::string str() const;
@@ -143,7 +149,7 @@ class EntryDefaultCtorImpl : public EntryCtor<K, T> {
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry()
-    : count(0), measurement_time(), received_time(), _valid(true), source() {}
+    : count(0), measurement_time(), received_time(), _valid(true), source(0) {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(double count)
@@ -151,7 +157,7 @@ inline IEntry<K, T>::IEntry(double count)
       measurement_time(),
       received_time(),
       _valid(count >= 0),
-      source() {}
+      source(0) {}
 
 template <typename K, typename T>
 inline IEntry<K, T>::IEntry(const double count, const time_type& m_t,
@@ -160,7 +166,7 @@ inline IEntry<K, T>::IEntry(const double count, const time_type& m_t,
       measurement_time(m_t),
       received_time(r_t),
       _valid(true),
-      source(),
+      source(0),
       entryDist(){}
 
 template <typename K, typename T>
@@ -200,7 +206,7 @@ inline void IEntry<K, T>::incrementCount(const time_type& t, const double& value
 template <typename K, typename T>
 inline void IEntry<K, T>::decrementCount(const time_type& t, const double& value) {
   count = count - value;
-  if (count <= 0) {
+  if (count < 0) {
     throw omnetpp::cRuntimeError("Cell count decrement below 0.");
   }
   _valid = true;
@@ -222,10 +228,22 @@ inline const typename IEntry<K, T>::time_type& IEntry<K, T>::getMeasureTime()
 }
 
 template <typename K, typename T>
+inline void IEntry<K, T>::setMeasureTime(const time_type& time){
+    this->measurement_time = time;
+}
+
+
+template <typename K, typename T>
 inline const typename IEntry<K, T>::time_type& IEntry<K, T>::getReceivedTime()
     const {
   return received_time;
 }
+
+template <typename K, typename T>
+inline void IEntry<K, T>::setReceivedTime(const time_type& time){
+    this->received_time = time;
+}
+
 
 template <typename K, typename T>
 inline const double IEntry<K, T>::getCount() const {
@@ -244,6 +262,11 @@ inline const EntryDist IEntry<K, T>::getEntryDist() const{
 template <typename K, typename T>
 void IEntry<K, T>::setEntryDist(const EntryDist& dist){
     this->entryDist = dist;
+}
+
+template <typename K, typename T>
+void IEntry<K, T>::setEntryDist(EntryDist&& dist){
+    this->entryDist = std::move(dist);
 }
 
 template <typename K, typename T>
