@@ -54,8 +54,8 @@ network TestStationaryWorld
         bool hasCellularCoreNetwork = default(hasCellular);
         int numMisc = default(0);
         int numEnb = default(1);
-        coordConverter.xBound = default(50);
-        coordConverter.yBound = default(50);
+        coordConverter.xBound = default(50m);
+        coordConverter.yBound = default(50m);
 
     submodules:
 

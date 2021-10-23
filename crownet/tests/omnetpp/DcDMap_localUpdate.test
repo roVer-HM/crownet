@@ -1,0 +1,44 @@
+%description:
+Local DcDMap updates based on the neighborhood table must have aging zero values.
+
+%file: package.ned 
+// 
+// empty: no namespace
+//
+
+%inifile: omnetpp.ini
+[General]
+network = crownet.test.omnetpp.lib.TestStationaryWorld
+sim-time-limit= 5s
+ned-path = ../../lib
+include ../lib/default_testConfig.ini
+**.vector-recording = false
+**.scalar-recording = false
+**.routingRecorder.enabled = false
+
+[Config final]
+extends = _default, D2D_General, DcDMap, stationary_n5
+*.coordConverter.typename = "OsgCoordConverterLocal"
+*.coordConverter.xBound = 30.0m
+*.coordConverter.yBound = 30.0m
+**.cellSize = 3.0m
+*.gloablDensityMap.typename = "GlobalDensityMap"
+*.gloablDensityMap.writeMapInterval = 1s
+*.gloablDensityMap.useSignalMapInit = false
+*.misc[*].nTable.maxAge = 1s
+
+*.misc[*].app[0].app.startTime = 1ms # Beacon
+*.misc[*].app[1].app.startTime = 5ms # DensityMap
+
+*.misc[*].app[*].scheduler.generationInterval = 100ms
+*.misc[*].app[1].scheduler.numberPackets = 1
+*.misc[*].app[1].app.localMapUpdateInterval = 100ms
+*.misc[*].app[1].app.mapCfg = crownet::MapCfg{ \
+            writeDensityLog: true, \
+            mapType: "mean", \
+            mapTypeLog: "all", \
+            idStreamType: "insertionOrder"}
+*.misc[0].app[0].app.stopTime = 2s # Stop Beacon App of first node
+
+%contains: stdout
+<!> Simulation time limit reached -- at t=0.5s
