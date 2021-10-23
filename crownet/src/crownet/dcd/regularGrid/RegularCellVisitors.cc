@@ -9,8 +9,68 @@
 #include <math.h>
 #include <algorithm>
 #include <vector>
+#include <omnetpp.h>
 
 namespace crownet {
+
+
+void IncrementerVisitor::applyTo(RegularCell& cell) {
+  for (auto e : cell) {
+    e.second->incrementCount(time);
+  }
+}
+
+
+void ResetVisitor::applyTo(RegularCell& cell) {
+  for (auto e : cell) {
+    e.second->reset(time);
+  }
+}
+
+
+void ClearVisitor::applyTo(RegularCell& cell) {
+  for (auto e : cell) {
+    e.second->clear(time);
+  }
+}
+
+void ClearSelection::applyTo(RegularCell& cell) {
+  for (auto e : cell) {
+    e.second->setSelectedIn("");
+  }
+}
+
+
+void ClearLocalVisitor::applyTo(RegularCell& cell) {
+  if (cell.hasLocal()) {
+    cell.getLocal()->clear(getTime());
+  }
+}
+
+void TtlClearLocalVisitor::applyTo(RegularCell& cell){
+    auto ownerCell = getMap()->getOwnerCell();
+    if (cell.hasLocal()) {
+        auto e = cell.getLocal();
+        if (e->getCount() > 0.0){
+            // set entry to zero and update time (keep entry valid)
+            cell.getLocal()->clear(getTime());
+        } else {
+            if (getTime() > (e->getMeasureTime() + getZeroTtl())){
+                if (getKeepZeroDistance() > 0.0){
+                    double dist = getMap()->getCellKeyProvider()->maxCellDist(ownerCell, cell.getCellId());
+                    if (dist < getKeepZeroDistance()){
+                        // keep  zero value because cell is very close to owner location
+                        // so we can still assume that no one is in this cell
+                        cell.getLocal()->touch(getTime());
+                        return;
+                    }
+                }
+                //invalidate entry
+                e->reset(getTime());
+            }
+        }
+    }
+}
 
 RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
   RegularCell::entry_t_ptr ret = nullptr;

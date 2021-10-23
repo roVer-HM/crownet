@@ -102,7 +102,21 @@ void DcDMap<C, N, T>::setCellKeyProvider(
 
 template <typename C, typename N, typename T>
 template <typename Fn>
-void DcDMap<C, N, T>::visitCells(Fn visitor) {
+void DcDMap<C, N, T>::visitCells(Fn* visitor) {
+  for (auto& entry : this->cells) {
+    entry.second.acceptSet(visitor);
+  }
+}
+template <typename C, typename N, typename T>
+template <typename Fn>
+void DcDMap<C, N, T>::visitCells(Fn& visitor) {
+  for (auto& entry : this->cells) {
+    entry.second.acceptSet(visitor);
+  }
+}
+template <typename C, typename N, typename T>
+template <typename Fn>
+void DcDMap<C, N, T>::visitCells(Fn&& visitor) {
   for (auto& entry : this->cells) {
     entry.second.acceptSet(visitor);
   }

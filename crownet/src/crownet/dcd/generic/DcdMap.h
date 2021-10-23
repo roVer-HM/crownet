@@ -113,7 +113,16 @@ class DcDMap {
 
 
   template <typename Fn>
-  void visitCells(Fn visitor);
+  void visitCells(Fn* visitor);
+
+
+  template <typename Fn>
+  void visitCells(Fn& visitor);
+
+  template <typename Fn>
+  void visitCells(Fn&& visitor);
+
+
   template <typename Fn>
   void computeValues(Fn visitor);
   template <typename Fn>

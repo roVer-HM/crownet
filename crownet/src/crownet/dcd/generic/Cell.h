@@ -126,6 +126,8 @@ class Cell {
   Ret accept(const Fn visitor) const;
   // common specialized visitors (cleaner calls without to many <...> )
   template <typename Fn>
+  void acceptSet(Fn* visitor);
+  template <typename Fn>
   void acceptSet(Fn visitor);
   template <typename Fn>
   entry_t_ptr acceptGetEntry(const Fn visitor) const;

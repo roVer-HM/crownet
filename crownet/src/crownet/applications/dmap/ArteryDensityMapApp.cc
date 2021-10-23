@@ -65,7 +65,9 @@ void ArteryDensityMapApp::updateLocalMap() {
 
   // set count of all cells in local map to zero.
   // do not change the valid state.
-  dcdMap->visitCells(ClearLocalVisitor{simTime()});
+  ClearLocalVisitor v;
+  v.setTime(simTime());
+  dcdMap->visitCells(std::move(v));
   dcdMap->clearNeighborhood();
 
   // add yourself to the map.

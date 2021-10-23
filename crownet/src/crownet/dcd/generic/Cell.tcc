@@ -131,6 +131,12 @@ CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() const {
 
 template <typename C, typename N, typename T>
 template <typename Fn>
+void Cell<C, N, T>::acceptSet(Fn* visitor) {
+  visitor->operator()(*this);
+}
+
+template <typename C, typename N, typename T>
+template <typename Fn>
 void Cell<C, N, T>::acceptSet(Fn visitor) {
   visitor(*this);
 }
@@ -152,7 +158,7 @@ void Cell<C, N, T>::computeValue(const Fn computeAlg) {
   // 2 apply computeAlg to select or compute value which represents this cell.
   this->cell_value = computeAlg->operator()(*this);  // may set empty shared_ptr
   // 3 set selection flag
-  if (this->cell_value) this->cell_value->setSelectedIn(computeAlg->getName());
+  if (this->cell_value) this->cell_value->setSelectedIn(computeAlg->getVisitorName());
   // todo: if computeAlg creates a new entry (i.e compute not select) this->data
   // does not contain the selected value!
 }
