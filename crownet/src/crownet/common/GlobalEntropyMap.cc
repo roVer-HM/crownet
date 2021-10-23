@@ -72,17 +72,19 @@ void GlobalEntropyMap::updateMaps() {
     lastUpdate = now;
 
     // global map: needs reset (not clear)
+    // The reset is correct for the global view because the new state is
+    // loaded completely!
     dcdMapGlobal->visitCells(ResetVisitor{lastUpdate});
     dcdMapGlobal->clearNeighborhood();
 
     for(const auto& e: _table){
         const auto info = e.second;
         const auto &posTraci = converter->position_cast_traci(info->getPos());
-        dcdMapGlobal->incrementLocal(
-                posTraci,
-                (int)info->getNodeId(),
-                now, // use time of measurement not time of beacon creation
-                info->getBeaconValue());
+        // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
+        //            for each cell so the additive setup works here!
+        auto ee = dcdMapGlobal->getEntry<GridGlobalEntry>(posTraci);
+        ee->incrementCount(simTime(), info->getBeaconValue()); // increment by value.
+        ee->nodeIds.insert((int)info->getNodeId());
     }
 
     // global map: local selector

@@ -21,8 +21,8 @@ class IEntryTest : public ::testing::Test {
     e1_int_empty = IEntry<int, int>();
     e2_dbl_with_count = IEntry<int, double>(3, TIME1, TIME2);
 
-    e3_int_empty_loc = ILocalEntry<int, int>();
-    e4_dbl_with_count_loc = ILocalEntry<int, double>(3, TIME1, TIME2);
+    e3_int_empty_loc = IGlobalEntry<int, int>();
+    e4_dbl_with_count_loc = IGlobalEntry<int, double>(3, TIME1, TIME2);
     e4_dbl_with_count_loc.nodeIds.insert(11);
     e4_dbl_with_count_loc.nodeIds.insert(22);
     e4_dbl_with_count_loc.nodeIds.insert(33);
@@ -32,8 +32,8 @@ class IEntryTest : public ::testing::Test {
 
   IEntry<int, int> e1_int_empty;
   IEntry<int, double> e2_dbl_with_count;
-  ILocalEntry<int, int> e3_int_empty_loc;
-  ILocalEntry<int, double> e4_dbl_with_count_loc;
+  IGlobalEntry<int, int> e3_int_empty_loc;
+  IGlobalEntry<int, double> e4_dbl_with_count_loc;
 
   int t1{1};
   int t2{2};
@@ -143,7 +143,7 @@ TEST_F(IEntryTest, XXXX) {
   //            this->getCellEntry(cellId).getLocal());
 
   using OppEntry = IEntry<std::string, omnetpp::simtime_t>;
-  using OppLocEntry = ILocalEntry<std::string, omnetpp::simtime_t>;
+  using OppLocEntry = IGlobalEntry<std::string, omnetpp::simtime_t>;
 
   std::shared_ptr<OppEntry> e1 = std::make_shared<OppEntry>(1, 1.1, 2.2);
   std::shared_ptr<OppEntry> e2 = std::make_shared<OppLocEntry>(1, 1.1, 2.2);

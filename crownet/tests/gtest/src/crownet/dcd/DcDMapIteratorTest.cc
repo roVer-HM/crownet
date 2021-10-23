@@ -32,11 +32,12 @@ class DcDMapIteraotrTest : public BaseOppTest {
         mapFull(dcdFactory.create(3)) {}
 
   void incr(RegularDcdMap& map, double x, double y, int i, double t) {
-    map.incrementLocal(traci::TraCIPosition(x, y), IntIdentifer(i), t);
+    //local entry does not need i (Identifier of node counted)
+    map.getEntry<>(traci::TraCIPosition(x, y))->incrementCount(t);
   }
   void update(RegularDcdMap& map, int x, int y, int id, int count, double t) {
     auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
-    map.update(GridCellID(x, y), std::move(e));
+    map.setEntry(GridCellID(x, y), std::move(e));
   }
 
   void SetUp() override {

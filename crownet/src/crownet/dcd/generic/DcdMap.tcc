@@ -233,36 +233,14 @@ template <typename C, typename N, typename T>
 template <typename E>
 std::shared_ptr<E> DcDMap<C, N, T>::getEntry(const cell_key_t& cell_id, const node_key_t& source){
     auto& cell = this->getCell(cell_id);
-    auto entry = cell.getOrCreate(source);
-    return std::dynamic_pointer_cast<E>(entry);
+//    auto entry = cell.template getOrCreate<E>(source);
+//    return std::dynamic_pointer_cast<E>(entry);
+    return cell.template getOrCreate<E>(source);
 }
 
 template <typename C, typename N, typename T>
 typename DcDMap<C, N, T>::cell_key_t DcDMap<C, N, T>::getCellId(const traci::TraCIPosition& pos) const {
     return this->cellKeyProvider->getCellKey(pos);
-}
-
-template <typename C, typename N, typename T>
-void DcDMap<C, N, T>::incrementLocal(const traci::TraCIPosition& pos,
-                                     const node_key_t& sourceNodeId,
-                                     const time_t& time,
-                                     const double& value) {
-  auto cellId = this->cellKeyProvider->getCellKey(pos);
-  auto& cell = this->getCell(cellId);
-
-  // 0) each node must be added only once to the local map
-  if (this->isInNeighborhood(sourceNodeId)) {
-    throw omnetpp::cRuntimeError(
-        "duplicate nodeId [%s] in neighbourhood found.",
-        sourceNodeId.str().c_str());
-  }
-
-  // 1) increment local count in cell [in Cell]
-  // 2) add nodeId into nodeId set [in Cell]
-  cell.incrementLocal(sourceNodeId, time, value);
-
-  // 3) add mapping nodeId->cellId into updateNeighbourCell [in Map]
-  this->addToNeighborhood(sourceNodeId, cellId);
 }
 
 template <typename C, typename N, typename T>

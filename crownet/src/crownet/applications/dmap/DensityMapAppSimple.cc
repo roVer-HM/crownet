@@ -39,58 +39,7 @@ void DensityMapAppSimple::computeValues() {
     BaseDensityMapApp::computeValues();
 }
 
-void DensityMapAppSimple::updateLocalMap() {
-//  simtime_t now = simTime();
-//  if (lastUpdate >= simTime()) {
-//    return;
-//  }
-//  lastUpdate = now;
-//  EV_INFO << LOG_MOD << "Update local map[" << dcdMap->getOwnerId() <<"]:" << endl;
-//  if (hostId == 231){
-//      std::cout << "" << endl;
-//  }
-//
-//  // set count of all cells in local map to zero.
-//  // do not change the valid state.
-//  clearLocal->setTime(simTime());
-////  dcdMap->visitCells(ClearLocalVisitor{simTime()});
-//  dcdMap->visitCells(clearLocal);
-//  dcdMap->clearNeighborhood();
-//
-//  // update own cell
-//  dcdMap->setOwnerCell(converter->position_cast_traci(getPosition()));
-//
-//  // update neighborhood table before access.
-//  int nTableCount = 0;
-//  nTable->checkTimeToLive();
-//  auto iter = nTable->iter();
-//  for (const auto& entry: iter){
-//      int _id = entry.first;
-//      auto info = entry.second;
-//      auto pos = converter->position_cast_traci(info->getPos());
-//      dcdMap->incrementLocal(
-//              pos,
-//              _id,
-//              now, // use time of measurement not time of beacon creation
-//              info->getBeaconValue());
-//      ++nTableCount;
-//      auto d =  info->getPos().distance(getPosition());
-//      if (hostId == 231){
-//          std::cout << LOG_MOD2 << "   " << nTableCount << " id: " << _id << "  pos: " << info->getPos() << " dist: "  << d << endl;
-//      }
-//      GridCellID id{1,1};
-//      auto foo = dcdMap->getEntry<GridLocalEntry>(id);
-//
-//  }
-////  std::cout << LOG_MOD2 << "Found " << nTableCount << " entries in neighborhood table" << endl;
-////  std::cout << LOG_MOD2 << dcdMap->str() << endl;
-//  if (hostId == 231){
-//      std::cout << "" << endl;
-//  }
-//
-//  using namespace omnetpp;
-//  EV_DEBUG << dcdMap->strFull() << std::endl;
-}
+void DensityMapAppSimple::updateLocalMap() { /* do nothing see NeighborhoodEntryListner */}
 
 
 void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) {
@@ -106,7 +55,7 @@ void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table,
             auto oldCell = dcdMap->getNeighborCell((int)oldInfo->getNodeId());
             if (dcdMap->hasEntry(oldCell)){
                 // if DcdMap contains a (local) entry for the cell decrement.
-                dcdMap->getEntry<GridLocalEntry>(oldCell)->decrementCount(simTime(), oldInfo->getBeaconValue());
+                dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), oldInfo->getBeaconValue());
             }
         }
     }
@@ -124,7 +73,7 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
         EV_TRACE << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
         auto pos = converter->position_cast_traci(newInfo->getPos());
         auto cellId = dcdMap->getCellId(pos);
-        dcdMap->getEntry<GridLocalEntry>(cellId)->incrementCount(simTime(), newInfo->getBeaconValue());
+        dcdMap->getEntry<GridEntry>(cellId)->incrementCount(simTime(), newInfo->getBeaconValue());
         // update position of beacon source in neighborhood table.
         dcdMap->addToNeighborhood((int)newInfo->getNodeId(), pos);
         if (dcdMap->getOwnerId().value() == (int)newInfo->getNodeId()){
@@ -144,7 +93,7 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     if (isRunning()){
         EV_TRACE << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         auto oldCell = dcdMap->getNeighborCell((int)info->getNodeId());
-        dcdMap->getEntry<GridLocalEntry>(oldCell)->decrementCount(simTime(), info->getBeaconValue());
+        dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), info->getBeaconValue());
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
     }
 }

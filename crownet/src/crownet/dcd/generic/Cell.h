@@ -53,8 +53,8 @@ class Cell {
   using entry_t_ptr = std::shared_ptr<entry_t>;
   using entry_ctor_t = EntryDefaultCtorImpl<node_key_t, time_t>;
 
-  using localEntry_t = ILocalEntry<node_key_t, time_t>; // the measurement created by the owner itself
-  using localEntry_t_ptr = std::shared_ptr<localEntry_t>;
+//  using localEntry_t = ILocalEntry<node_key_t, time_t>; // the measurement created by the owner itself
+//  using localEntry_t_ptr = std::shared_ptr<localEntry_t>;
 
   using map_t = std::map<node_key_t, entry_t_ptr>;
   using value_type_const = typename map_t::value_type;
@@ -74,11 +74,24 @@ class Cell {
   bool hasLocal() const;
   bool hasValid() const;
   bool hasValidLocal() const;
-  localEntry_t_ptr getLocal();
-  localEntry_t_ptr getLocal() const;
-  entry_t_ptr get(const node_key_t node_id);
-  entry_t_ptr const get(const node_key_t node_id) const;
-  entry_t_ptr getOrCreate(const node_key_t node_id);
+  entry_t_ptr getLocal();
+  entry_t_ptr getLocal() const;
+
+  template <typename E = entry_t>
+  std::shared_ptr<E> get(const node_key_t node_id);
+  template <typename E = entry_t>
+  std::shared_ptr<E> const get(const node_key_t node_id) const;
+  template <typename E = entry_t>
+  std::shared_ptr<E> get(); // node_id == owner_id
+  template <typename E = entry_t>
+  std::shared_ptr<E> const get() const; // node_id == owner_id
+
+
+  template <typename E = entry_t>
+  std::shared_ptr<E> getOrCreate(const node_key_t node_id);
+  template <typename E = entry_t>
+  std::shared_ptr<E> getOrCreate();
+
   const cell_key_t& getCellId() const { return cell_id; }
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
@@ -89,9 +102,6 @@ class Cell {
   void put(entry_t_ptr& m);
   void setCellId(cell_key_t _cell_id) { cell_id = _cell_id; }
   void setOwnerId(node_key_t _owner_id) { owner_id = _owner_id; }
-  void incrementLocal(const node_key_t& countedNodeId,
-                      const time_t& time,
-                      const double& value = 1.0);
   void sentAt(const time_t& time);
 
 

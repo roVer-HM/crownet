@@ -68,24 +68,19 @@ class DcDMap {
   void setEntry(const cell_key_t& cell_id, typename cell_t::entry_t_ptr&& m_data);
   void setEntry(const cell_key_t& cell_id, typename cell_t::entry_t_ptr& m_data);
 
-  template <typename E>
+  template <typename E = typename cell_t::entry_t>
   std::shared_ptr<E> getEntry(const cell_key_t& cell_id, const node_key_t& source);
-  template <typename E>
+  template <typename E = typename cell_t::entry_t>
   std::shared_ptr<E> getEntry(const cell_key_t& cell_id);
-  template <typename E>
+  template <typename E = typename cell_t::entry_t>
   std::shared_ptr<E> getEntry(const traci::TraCIPosition& pos);
-  template <typename E>
+  template <typename E = typename cell_t::entry_t>
   std::shared_ptr<E> getEntry(const traci::TraCIPosition& pos, const node_key_t& source);
 
   bool hasEntry(const cell_key_t& cell_id, const node_key_t& source);
   bool hasEntry(const cell_key_t& cell_id);
   bool hasEntry(const traci::TraCIPosition& pos, const node_key_t& source);
   bool hasEntry(const traci::TraCIPosition& pos);
-
-  void incrementLocal(const traci::TraCIPosition& pos,
-                      const node_key_t& sourceNodeId,
-                      const time_t& time,
-                      const double& value = 1.0);
 
   // manage neighborhood in local area. Map node_key_t to cell_key_t
   bool isInNeighborhood(const node_key_t& neigbourId) const;

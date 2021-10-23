@@ -191,7 +191,9 @@ void GlobalDensityMap::visitNode(omnetpp::cModule *mod) {
 
   // visitNode is called for *all* nodes thus this 'local' map of the global
   // module represents the global (ground truth) of the simulation.
-  dcdMapGlobal->incrementLocal(posInet, mod->getId(), simTime());
+  auto e = dcdMapGlobal->getEntry<GridGlobalEntry>(posInet);
+  e->incrementCount(simTime()); // increment by 1
+  e->nodeIds.insert(mod->getId());
 }
 
 /**

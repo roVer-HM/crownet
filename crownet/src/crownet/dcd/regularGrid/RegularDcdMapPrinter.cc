@@ -73,7 +73,7 @@ void RegularDcdMapGlobalPrinter::writeTo(std::ostream& out,
   for (auto it = map->validLocal(); it != it.end(); ++it) {
     auto val = *it;
     int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
-    const auto lEntry = val.second.getLocal();
+    const auto lEntry = val.second.get<GridGlobalEntry>();
 
     out << omnetpp::simTime().dbl() << sep;
     val.first.writeTo(out, sep);  // GridCellID (x, y)

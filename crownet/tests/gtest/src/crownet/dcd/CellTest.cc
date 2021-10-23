@@ -63,18 +63,18 @@ class RegularCellTest : public BaseOppTest {
 
 
 
-    auto lentry = ctor.localEntry();
-    m[IntIdentifer(42)] = lentry;  // count 4
-    lentry->incrementCount(1);
-    lentry->nodeIds.insert(5);
-    lentry->incrementCount(1);
-    lentry->nodeIds.insert(9);
-    lentry->incrementCount(1);
-    lentry->nodeIds.insert(3);
-    lentry->incrementCount(1);
-    lentry->nodeIds.insert(19);
-    lentry->setSource(42);
-    lentry->setEntryDist(EntryDist{}); // {0, 0, 0}  w=0.0 -> 1.0/1.0 (same cell)
+    auto gentry = ctor.globalEntry();
+    m[IntIdentifer(42)] = gentry;  // count 4
+    gentry->incrementCount(1);
+    gentry->nodeIds.insert(5);
+    gentry->incrementCount(1);
+    gentry->nodeIds.insert(9);
+    gentry->incrementCount(1);
+    gentry->nodeIds.insert(3);
+    gentry->incrementCount(1);
+    gentry->nodeIds.insert(19);
+    gentry->setSource(42);
+    gentry->setEntryDist(EntryDist{}); // {0, 0, 0}  w=0.0 -> 1.0/1.0 (same cell)
   }
 
  protected:
@@ -214,45 +214,22 @@ TEST_F(RegularCellTest, put_override_move) {
   EXPECT_TRUE(entry == nullptr);
 }
 
-TEST_F(RegularCellTest, incrementLocal_onEmpty) {
-  cellEmpty.incrementLocal(100, 10.0);
+TEST_F(RegularCellTest, increment_onEmptyEntry) {
+  cellEmpty.getOrCreate()->incrementCount(10.0); //empty must create
   EXPECT_TRUE(cellEmpty.hasLocal());
   auto lEntry = cellEmpty.getLocal();
   EXPECT_EQ(1, lEntry->getCount());
-  EXPECT_EQ(1, lEntry->nodeIds.size());
   EXPECT_DOUBLE_EQ(10.0, lEntry->getMeasureTime().dbl());
   EXPECT_DOUBLE_EQ(10.0, lEntry->getReceivedTime().dbl());
-  EXPECT_TRUE(lEntry->nodeIds.find(100) != lEntry->nodeIds.end());
 }
 
-TEST_F(RegularCellTest, incrementLocal_withData) {
-  auto lEntry = cell.getLocal();
+TEST_F(RegularCellTest, increment_withDataInEntry) {
+  auto lEntry = cell.get(); // local (must exist)
   EXPECT_EQ(4, lEntry->getCount());
-  EXPECT_EQ(4, lEntry->nodeIds.size());
-  cell.incrementLocal(100, 10.0);
+  cell.get()->incrementCount(10.0); // time
   EXPECT_EQ(5, lEntry->getCount());
-  EXPECT_EQ(5, lEntry->nodeIds.size());
-}
-
-/**
- * incrementLocal must be idempotent for count and
- * number of node_id in the set. Only the time
- * should be updated.
- */
-TEST_F(RegularCellTest, incrementLocal_isIdempotent) {
-  auto lEntry = cell.getLocal();
-  EXPECT_EQ(4, lEntry->getCount());
-  EXPECT_EQ(4, lEntry->nodeIds.size());
-  // multiple calls with the same identifier only
-  // updates the time.
-  cell.incrementLocal(100, 10.0);
-  cell.incrementLocal(100, 12.0);
-  cell.incrementLocal(100, 13.0);
-  EXPECT_EQ(5, lEntry->getCount());
-  EXPECT_EQ(5, lEntry->nodeIds.size());
-
-  EXPECT_DOUBLE_EQ(13.0, lEntry->getMeasureTime().dbl());
-  EXPECT_DOUBLE_EQ(13.0, lEntry->getReceivedTime().dbl());
+  EXPECT_DOUBLE_EQ(10.0, lEntry->getMeasureTime().dbl());
+  EXPECT_DOUBLE_EQ(10.0, lEntry->getReceivedTime().dbl());
 }
 
 class RegularCellComparisonTest : public BaseOppTest {
@@ -396,20 +373,22 @@ TEST_F(RegularCellTest, meanVisitor_1) {
     std::shared_ptr<MeanVisitor> visitor = std::make_shared<MeanVisitor>(simTime());
     // calculate mean count of all valid measurements in the given cell.
     // cell mean: (2 + 1 + 2 + 1 + 4)/5
+    // time mean: (3 + 1 + 1 + 2 + 1)/5 = 1.6
     cell.computeValue(visitor);
     EXPECT_EQ(cell.val()->getCount(), 10/5);
-    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 112.0);
-    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 112.0);
+    EXPECT_DOUBLE_EQ(cell.val()->getMeasureTime().dbl(), (3 + 1 + 1 + 2 + 1)/5.);
+    EXPECT_DOUBLE_EQ(cell.val()->getReceivedTime().dbl(), (3 + 1 + 1 + 2 + 1)/5.);
 
     auto& m = cell.getData();
-    m[IntIdentifer(17)]->incrementCount(2);
+    m[IntIdentifer(17)]->incrementCount(10);
     visitor->setTime(115.0);
     // increment count and time. -> must change calcualted value
-    // cell mean: (2 + 1 + 2 + 2 + 4)/5
+    // cell mean: (2 + 1 + 2 + >2< + 4)/5
+    // time mean: (3 + 1 + 1 + >10< + 1)/5
     cell.computeValue(visitor);
     EXPECT_EQ(cell.val()->getCount(), (double)11/5);
-    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 115.0);
-    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 115.0);
+    EXPECT_DOUBLE_EQ(cell.val()->getMeasureTime().dbl(), (3 + 1 + 1 + 10 + 1)/5.);
+    EXPECT_DOUBLE_EQ(cell.val()->getReceivedTime().dbl(), (3 + 1 + 1 + 10 + 1)/5.);
 }
 
 TEST_F(RegularCellTest, meanVisitor_2) {
@@ -417,13 +396,14 @@ TEST_F(RegularCellTest, meanVisitor_2) {
     std::shared_ptr<MeanVisitor> visitor = std::make_shared<MeanVisitor>(simTime());
     // calculate mean count of all valid measurements in the given cell.
     // cell mean: (2 + 1 + 2 + 1)/4
+    // time mean: (3 + 1 + 1 + 2)/4 = 1.75
     auto& m = cell.getData();
     // invalidate entry which thus must not be part of the average
     m[IntIdentifer(42)]->reset();
     cell.computeValue(visitor);
     EXPECT_EQ(cell.val()->getCount(), (double)(2+1+2+1)/4);
-    EXPECT_EQ(cell.val()->getMeasureTime().dbl(), 112.0);
-    EXPECT_EQ(cell.val()->getReceivedTime().dbl(), 112.0);
+    EXPECT_DOUBLE_EQ(cell.val()->getMeasureTime().dbl(), (3 + 1 + 1 + 2)/4.);
+    EXPECT_DOUBLE_EQ(cell.val()->getReceivedTime().dbl(), (3 + 1 + 1 + 2)/4.);
 
 }
 

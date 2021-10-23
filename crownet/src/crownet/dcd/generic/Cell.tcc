@@ -71,48 +71,61 @@ void Cell<C, N, T>::put(entry_t_ptr& m) {
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::localEntry_t_ptr Cell<C, N, T>::getLocal() {
-  auto entry = this->get(this->owner_id);
-  return std::static_pointer_cast<ILocalEntry<N, T>>(entry);
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getLocal() {
+  return this->get(this->owner_id);
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::localEntry_t_ptr Cell<C, N, T>::getLocal() const {
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getLocal() const {
   return const_cast<Cell<C, N, T>*>(this)->getLocal();
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::get(
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::get(
     const node_key_t node_id) {
   if (!hasData(node_id))
     throw omnetpp::cRuntimeError("node_id %s not found in cell %s",
                                  node_id.str().c_str(),
                                  this->cell_id.str().c_str());
-  return this->data[node_id];
+  return std::dynamic_pointer_cast<E>(this->data[node_id]);
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::entry_t_ptr const Cell<C, N, T>::get(
+template <typename E>
+std::shared_ptr<E> const Cell<C, N, T>::get(
     const node_key_t node_id) const {
-  return const_cast<Cell<C, N, T>*>(this)->get(node_id);
+  return const_cast<Cell<C, N, T>*>(this)->get<E>(node_id);
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getOrCreate(const node_key_t node_id){
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::get() {
+    return get<E>(owner_id);
+}
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> const Cell<C, N, T>::get() const {
+  return const_cast<Cell<C, N, T>*>(this)->get<E>(owner_id);
+}
+
+
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::getOrCreate(const node_key_t node_id){
     if (!hasData(node_id)){
-        if(owner_id == node_id){
-//            EV_DEBUG << "create entry for: " << node_id << " owner: " << owner_id << "cell:" << cell_id << std::endl;
-            auto e = this->entryCtor.localEntry();
-            e->setSource(node_id);
-            this->data[node_id] = e;
-        } else {
-//            EV_DEBUG << "create entry for: " << node_id << " owner: " << owner_id << "cell:" << cell_id << std::endl;
-            auto e = this->entryCtor.entry();
-            e->setSource(node_id);
-            this->data[node_id] = e;
-        }
+        auto e = std::make_shared<E>();
+        e->setSource(node_id);
+        this->data[node_id] = e;
     }
-    return this->data[node_id];
+    return get<E>(node_id);
+}
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::getOrCreate(){
+    return getOrCreate<E>(owner_id);
 }
 
 template <typename C, typename N, typename T>
@@ -221,30 +234,8 @@ std::string Cell<C, N, T>::infoCompact() const{
 }
 
 template <typename C, typename N, typename T>
-void Cell<C, N, T>::incrementLocal(const node_key_t& countedNodeId,
-                                   const time_t& time,
-                                   const double& value) {
-  if (!hasData(this->owner_id)) {
-    // create local entry and set cell owner as source.
-    auto e = this->entryCtor.localEntry();
-    e->setSource(this->owner_id);
-    this->data[this->owner_id] = e;
-  }
-  std::shared_ptr<ILocalEntry<N, T>> lEntry =
-      std::static_pointer_cast<ILocalEntry<N, T>>(this->data[this->owner_id]);
-  auto ret = lEntry->nodeIds.insert(countedNodeId);
-  if (ret.second) {
-    // new node inserted
-    lEntry->incrementCount(time, value);
-  } else {
-    // node already exists just update time.
-    lEntry->touch(time);
-  }
-}
-
-template <typename C, typename N, typename T>
 typename Cell<C, N, T>::entry_t_ptr  Cell<C, N, T>::createEntry(const double count) const{
-    auto e = this->entryCtor.localEntry();
+    auto e = this->entryCtor.entry();
     e->setCount(count);
     return e;
 }

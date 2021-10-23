@@ -103,13 +103,15 @@ class IEntry : public crownet::FilePrinter {
   std::string selected_in;
 };
 
+
+
 template <typename K, typename T>
-class ILocalEntry : public IEntry<K, T> {
+class IGlobalEntry : public IEntry<K, T> {
  public:
-  virtual ~ILocalEntry() = default;
-  ILocalEntry();
-  ILocalEntry(const int, const T&, const T&);
-  ILocalEntry(const int);
+  virtual ~IGlobalEntry() = default;
+  IGlobalEntry();
+  IGlobalEntry(const int, const T&, const T&);
+  IGlobalEntry(const int);
 
   virtual void reset(const T& t) override;
   virtual void clear(const T& t) override;
@@ -125,7 +127,7 @@ class EntryCtor {
  public:
   virtual ~EntryCtor() = default;
   virtual std::shared_ptr<IEntry<K, T>> entry() const = 0;
-  virtual std::shared_ptr<ILocalEntry<K, T>> localEntry() const = 0;
+  virtual std::shared_ptr<IGlobalEntry<K, T>> globalEntry() const = 0;
   virtual std::shared_ptr<IEntry<K, T>> empty() const = 0;
 };
 
@@ -136,8 +138,8 @@ class EntryDefaultCtorImpl : public EntryCtor<K, T> {
     return std::make_shared<IEntry<K, T>>();
   }
 
-  std::shared_ptr<ILocalEntry<K, T>> localEntry() const override {
-    return std::make_shared<ILocalEntry<K, T>>();
+  std::shared_ptr<IGlobalEntry<K, T>> globalEntry() const override {
+    return std::make_shared<IGlobalEntry<K, T>>();
   }
 
   std::shared_ptr<IEntry<K, T>> empty() const override {
@@ -356,30 +358,30 @@ bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
 ///////////////////////////////////////////////////
 
 template <typename K, typename T>
-inline ILocalEntry<K, T>::ILocalEntry() : IEntry<K, T>() {}
+inline IGlobalEntry<K, T>::IGlobalEntry() : IEntry<K, T>() {}
 
 template <typename K, typename T>
-inline ILocalEntry<K, T>::ILocalEntry(const int count, const T& m_t,
+inline IGlobalEntry<K, T>::IGlobalEntry(const int count, const T& m_t,
                                       const T& r_t)
     : IEntry<K, T>(count, m_t, r_t) {}
 
 template <typename K, typename T>
-inline ILocalEntry<K, T>::ILocalEntry(const int count) : IEntry<K, T>(count) {}
+inline IGlobalEntry<K, T>::IGlobalEntry(const int count) : IEntry<K, T>(count) {}
 
 template <typename K, typename T>
-inline void ILocalEntry<K, T>::reset(const T& t) {
+inline void IGlobalEntry<K, T>::reset(const T& t) {
   IEntry<K, T>::reset(t);
   this->nodeIds.clear();
 }
 
 template <typename K, typename T>
-inline void ILocalEntry<K, T>::clear(const T& t) {
+inline void IGlobalEntry<K, T>::clear(const T& t) {
   IEntry<K, T>::clear(t);
   this->nodeIds.clear();
 }
 
 template <typename K, typename T>
-inline std::string ILocalEntry<K, T>::str() const {
+inline std::string IGlobalEntry<K, T>::str() const {
   std::stringstream os;
   os << IEntry<K, T>::str() << "| node_ids: {";
   int nCount = this->nodeIds.size() - 1;
@@ -395,7 +397,7 @@ inline std::string ILocalEntry<K, T>::str() const {
 }
 
 template <typename K, typename T>
-std::string ILocalEntry<K, T>::nodeString(const std::string& sep) const {
+std::string IGlobalEntry<K, T>::nodeString(const std::string& sep) const {
   std::stringstream os;
   int nCount = this->nodeIds.size() - 1;
   for (const auto& e : this->nodeIds) {

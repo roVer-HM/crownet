@@ -26,16 +26,18 @@ class DcDMapFileWriterTest : public BaseOppTest {
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   DcDMapFileWriterTest()
-      : mapEmpty(dcdFactory.create(1)),
-        mapLocal(dcdFactory.create(2)),
-        mapFull(dcdFactory.create(3)) {}
+      : mapEmpty(dcdFactory.create_shared_ptr(1)),
+        mapLocal(dcdFactory.create_shared_ptr(2)),
+        mapFull(dcdFactory.create_shared_ptr(3)) {}
 
-  void incr(RegularDcdMap& map, double x, double y, int i, double t) {
-    map.incrementLocal(traci::TraCIPosition(x, y), IntIdentifer(i), t);
+  void incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int i, double t) {
+    auto e = map->getEntry<GridGlobalEntry>(traci::TraCIPosition(x, y));
+    e->incrementCount(t);
+    e->nodeIds.insert(IntIdentifer(i));
   }
-  void update(RegularDcdMap& map, int x, int y, int id, int count, double t) {
+  void update(std::shared_ptr<RegularDcdMap> map, int x, int y, int id, int count, double t) {
     auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
-    map.update(GridCellID(x, y), std::move(e));
+    map->setEntry(GridCellID(x, y), std::move(e));
   }
 
   void SetUp() override {
@@ -69,16 +71,16 @@ class DcDMapFileWriterTest : public BaseOppTest {
   }
 
  protected:
-  RegularDcdMap mapEmpty;
-  RegularDcdMap mapLocal;
-  RegularDcdMap mapFull;
+  std::shared_ptr<RegularDcdMap> mapEmpty;
+  std::shared_ptr<RegularDcdMap> mapLocal;
+  std::shared_ptr<RegularDcdMap> mapFull;
 };
 
 // todo WriterTest csv <<<
 
 TEST_F(DcDMapFileWriterTest, print_header) {
   std::stringstream out;
-  RegularDcdMapValuePrinter p(&mapFull);
+  RegularDcdMapValuePrinter p(mapFull);
   p.writeHeaderTo(out, "; ");
   std::string header =
       "simtime; x; y; count; measured_t; received_t; source; selection; "
@@ -89,36 +91,36 @@ TEST_F(DcDMapFileWriterTest, print_header) {
 TEST_F(DcDMapFileWriterTest, print_all_valid) {
   std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
   std::stringstream out;
-  RegularDcdMapValuePrinter p(&mapFull);
-  mapFull.setOwnerCell(GridCellID(3, 3));
+  RegularDcdMapValuePrinter p(mapFull);
+  mapFull->setOwnerCell(GridCellID(3, 3));
 
   setSimTime(1.4);
-  mapFull.computeValues(ymf_v);
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(10.4);
   // must use different measure
-  mapFull.getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
-  mapFull.computeValues(ymf_v);
+  mapFull->getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(20.4);
   // will not change anything because '3' is not ymf there is a
-  mapFull.getCell(GridCellID(1, 1)).get(3)->reset(omnetpp::simTime());
-  mapFull.computeValues(ymf_v);
+  mapFull->getCell(GridCellID(1, 1)).get(3)->reset(omnetpp::simTime());
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(30.4);
   // new cell should show up
   update(mapFull, 5, 5, 333, 3, 30.4);
-  mapFull.computeValues(ymf_v);
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(40.4);
   // reseting all must not add new lines
   ResetVisitor r(simTime());
-  mapFull.visitCells(r);
-  mapFull.computeValues(ymf_v);
+  mapFull->visitCells(r);
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   std::string ret =
@@ -146,23 +148,23 @@ TEST_F(DcDMapFileWriterTest, print_all_valid) {
 
 TEST_F(DcDMapFileWriterTest, computeValues_idenpotent) {
   std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
-  mapFull.setOwnerCell(GridCellID(3, 3));
+  mapFull->setOwnerCell(GridCellID(3, 3));
 
   setSimTime(1.4);
-  mapFull.computeValues(ymf_v);
-  auto sourceOfSelected = mapFull.getCell(GridCellID(6, 3)).val()->getSource();
+  mapFull->computeValues(ymf_v);
+  auto sourceOfSelected = mapFull->getCell(GridCellID(6, 3)).val()->getSource();
   EXPECT_EQ(sourceOfSelected.value(), 803);
 
   setSimTime(10.4);
-  mapFull.getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
-  mapFull.computeValues(ymf_v);
-  sourceOfSelected = mapFull.getCell(GridCellID(6, 3)).val()->getSource();
+  mapFull->getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
+  mapFull->computeValues(ymf_v);
+  sourceOfSelected = mapFull->getCell(GridCellID(6, 3)).val()->getSource();
   EXPECT_EQ(sourceOfSelected.value(), 805);
 
   // resetting 805 but no time increment must not change the selected value
-  mapFull.getCell(GridCellID(6, 3)).get(805)->reset(omnetpp::simTime());
-  mapFull.computeValues(ymf_v);
-  sourceOfSelected = mapFull.getCell(GridCellID(6, 3)).val()->getSource();
+  mapFull->getCell(GridCellID(6, 3)).get(805)->reset(omnetpp::simTime());
+  mapFull->computeValues(ymf_v);
+  sourceOfSelected = mapFull->getCell(GridCellID(6, 3)).val()->getSource();
   EXPECT_EQ(sourceOfSelected.value(), 805);
 }
 
@@ -175,13 +177,13 @@ TEST_F(DcDMapFileWriterTest, print_duplicate_selections) {
      */
     std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
     std::stringstream out;
-    RegularDcdMapAllPrinter p(&mapFull);
-    mapFull.setOwnerCell(GridCellID(3, 3));
+    RegularDcdMapAllPrinter p(mapFull);
+    mapFull->setOwnerCell(GridCellID(3, 3));
 
     setSimTime(1.4);
-    mapFull.computeValues(ymf_v);
+    mapFull->computeValues(ymf_v);
     //source of Cell[3,3] must be id=3
-    auto sourceOfSelected = mapFull.getCell(GridCellID(3,3)).val()->getSource();
+    auto sourceOfSelected = mapFull->getCell(GridCellID(3,3)).val()->getSource();
     EXPECT_EQ(sourceOfSelected.value(), 3);
     p.writeTo(out, "; ");
 
@@ -190,8 +192,8 @@ TEST_F(DcDMapFileWriterTest, print_duplicate_selections) {
     // set time to t=33 previous time for [3,3] was 32
     // this should now be the selected value
     update(mapFull, 3, 3, 555, 10, 33.3); // x,y,id,count,time
-    mapFull.computeValues(ymf_v);
-    sourceOfSelected = mapFull.getCell(GridCellID(3,3)).val()->getSource();
+    mapFull->computeValues(ymf_v);
+    sourceOfSelected = mapFull->getCell(GridCellID(3,3)).val()->getSource();
     EXPECT_EQ(sourceOfSelected.value(), 555);
     p.writeTo(out, "; ");
 
@@ -221,37 +223,37 @@ TEST_F(DcDMapFileWriterTest, print_duplicate_selections) {
 TEST_F(DcDMapFileWriterTest, printall_all_valid) {
   std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
   std::stringstream out;
-  RegularDcdMapAllPrinter p(&mapFull);
-  mapFull.setOwnerCell(GridCellID(3, 3));
+  RegularDcdMapAllPrinter p(mapFull);
+  mapFull->setOwnerCell(GridCellID(3, 3));
 
   setSimTime(1.4);
-  mapFull.computeValues(ymf_v);
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(10.4);
   // must use different ymf measure and is not in print out because
   // it is invalid.
-  mapFull.getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
-  mapFull.computeValues(ymf_v);
+  mapFull->getCell(GridCellID(6, 3)).get(803)->reset(omnetpp::simTime());
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(20.4);
   // will not change anything because '3' is not ymf there is a
-  mapFull.getCell(GridCellID(1, 1)).get(3)->reset(omnetpp::simTime());
-  mapFull.computeValues(ymf_v);
+  mapFull->getCell(GridCellID(1, 1)).get(3)->reset(omnetpp::simTime());
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(30.4);
   // new cell should show up
   update(mapFull, 5, 5, 333, 3, 30.4);
-  mapFull.computeValues(ymf_v);
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   setSimTime(40.4);
   // reseting all must not add new lines
   ResetVisitor r(simTime());
-  mapFull.visitCells(r);
-  mapFull.computeValues(ymf_v);
+  mapFull->visitCells(r);
+  mapFull->computeValues(ymf_v);
   p.writeTo(out, "; ");
 
   std::string ret =
@@ -289,19 +291,21 @@ TEST_F(DcDMapFileWriterTest, printall_all_valid) {
 
 TEST_F(DcDMapFileWriterTest, printglobal) {
   std::stringstream out;
-  RegularDcdMapGlobalPrinter p(&mapLocal);
-  mapLocal.setOwnerCell(GridCellID(3, 3));
+  RegularDcdMapGlobalPrinter p(mapLocal);
+  mapLocal->setOwnerCell(GridCellID(3, 3));
 
   setSimTime(1.4);
   p.writeTo(out, "; ");
 
   setSimTime(10.4);
-  mapLocal.incrementLocal(traci::TraCIPosition(4.3, 4.1), 301, simTime());
+  mapLocal->getEntry<GridGlobalEntry>(traci::TraCIPosition(4.3, 4.1))->incrementCount(simTime());
+  mapLocal->getEntry<GridGlobalEntry>(traci::TraCIPosition(4.3, 4.1))->nodeIds.insert(301);
   p.writeTo(out, "; ");
 
   setSimTime(20.4);
-  mapLocal.incrementLocal(traci::TraCIPosition(4.3, 4.1), 302, simTime());
-  mapLocal.getCell(GridCellID(1, 1)).getLocal()->reset(simTime());
+  mapLocal->getEntry<>(traci::TraCIPosition(4.3, 4.1))->incrementCount(simTime());
+  mapLocal->getEntry<GridGlobalEntry>(traci::TraCIPosition(4.3, 4.1))->nodeIds.insert(302);
+  mapLocal->getCell(GridCellID(1, 1)).getLocal()->reset(simTime());
   p.writeTo(out, "; ");
 
   std::string ret =

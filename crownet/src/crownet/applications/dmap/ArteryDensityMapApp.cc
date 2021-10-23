@@ -76,7 +76,7 @@ void ArteryDensityMapApp::updateLocalMap() {
                         .position();
   const auto &posInet = converter->position_cast_traci(pos);
   dcdMap->setOwnerCell(posInet);
-  dcdMap->incrementLocal(posInet, dcdMap->getOwnerId(), measureTime);
+  dcdMap->getEntry<GridEntry>(posInet)->incrementCount(measureTime, 1.0);
 
   // visitor for artery location table
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
@@ -100,16 +100,15 @@ void ArteryDensityMapApp::updateLocalMap() {
             entry.get_position_vector().position();
         auto cartPos = converter->convertToCartTraCIPosition(geoPos);
 
-        // dcdMap->incrementLocal(cartPos, _id, measureTime);
         // Update cell entries in dcdMap:
         // Assume all beacons carry '1' as value (1 beacon == 1 count)
         // Pedestrian count beacons are additive thus incremnt is possible.
         if (dcdMap->isInNeighborhood(_id)){
             auto oldCell = dcdMap->getNeighborCell(_id);
-            dcdMap->getEntry<GridLocalEntry>(oldCell)->decrementCount(measureTime, 1.0);
+            dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(measureTime, 1.0);
         }
         dcdMap->addToNeighborhood(_id, cartPos);
-        dcdMap->getEntry<GridLocalEntry>(cartPos)->incrementCount(measureTime, 1.0);
+        dcdMap->getEntry<GridEntry>(cartPos)->incrementCount(measureTime, 1.0);
       };
 
   // visit

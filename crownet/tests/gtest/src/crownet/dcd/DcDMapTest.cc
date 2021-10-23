@@ -31,11 +31,13 @@ class RegularDcDMapTest : public BaseOppTest {
         mapFull(dcdFactory.create(3)) {}
 
   void incr(RegularDcdMap& map, double x, double y, int i, double t) {
-    map.incrementLocal(traci::TraCIPosition(x, y), IntIdentifer(i), t);
+    // local entry!
+    map.getEntry<>(traci::TraCIPosition(x, y))->incrementCount(t);
+    map.addToNeighborhood(IntIdentifer(i), traci::TraCIPosition(x, y));
   }
   void update(RegularDcdMap& map, int x, int y, int id, int count, double t) {
     auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
-    map.update(GridCellID(x, y), std::move(e));
+    map.setEntry(GridCellID(x, y), std::move(e));
   }
 
   void SetUp() override {
@@ -181,7 +183,7 @@ TEST_F(RegularDcDMapTest, setOwnerId) {
   EXPECT_EQ(IntIdentifer(11), mapEmpty.getOwnerId());
 }
 
-// update / incrementLocal  correct in Setup compare string
+// update / incremen  correct in Setup compare string
 TEST_F(RegularDcDMapTest, strFull) {
   std::string s1 = "{map_owner: 1 cell_count: 0 local_cell_count: 0}\n";
   EXPECT_STREQ(s1.c_str(), mapEmpty.strFull().c_str());
@@ -332,9 +334,9 @@ TEST(RegularMap, update_move) {
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
-  map.update(cellId1, std::move(m1));
-  map.update(cellId1, std::move(m2));
-  map.update(cellId1, m3);
+  map.setEntry(cellId1, std::move(m1));
+  map.setEntry(cellId1, std::move(m2));
+  map.setEntry(cellId1, m3);
   EXPECT_TRUE(map.hasCell(cellId1));
 
   auto mCount = map.getCell(cellId1).getData().size();
@@ -356,13 +358,13 @@ TEST(RegularMap, update1) {
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
-  map.update(cellId1, m1);
+  map.setEntry(cellId1, m1);
   EXPECT_TRUE(map.hasCell(cellId1));
   auto m_ = map.getCell(cellId1).get(IntIdentifer(40));
   EXPECT_EQ(*m_, *m1);
 
   // update same cell with new value.
-  map.update(cellId1, m2);
+  map.setEntry(cellId1, m2);
   m_ = map.getCell(cellId1).get(IntIdentifer(40));
   EXPECT_EQ(*m_, *m2);
 
@@ -387,11 +389,11 @@ TEST(RegularMap, update2) {
   EXPECT_FALSE(map.hasCell(cellId1));
   EXPECT_FALSE(map.hasCell(cellId2));
 
-  map.update(cellId1, m1);
-  map.update(cellId1, m2);
-  map.update(cellId2, m3);
-  map.update(cellId2, m4);
-  map.update(cellId2, m5);
+  map.setEntry(cellId1, m1);
+  map.setEntry(cellId1, m2);
+  map.setEntry(cellId2, m3);
+  map.setEntry(cellId2, m4);
+  map.setEntry(cellId2, m5);
 
   // only one measurement (same node_id/cell_id)
   auto mCount1 = map.getCell(cellId1).getData().size();
