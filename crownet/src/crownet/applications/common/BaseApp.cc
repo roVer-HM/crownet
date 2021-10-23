@@ -96,7 +96,11 @@ void BaseApp::handleMessage(cMessage *msg) {
   FSM_Switch(fsmRoot) {
     // Init state ...
     case FSM_Exit(FsmRootStates::INIT):
-      FSM_Goto(fsmRoot, FsmRootStates::SETUP);
+      if (msg->getKind() == FsmRootStates::SETUP){
+          FSM_Goto(fsmRoot, FsmRootStates::SETUP);
+      } else {
+          FSM_Goto(fsmRoot, FsmRootStates::ERR);
+      }
       break;
     //
     // FSM_Steady
