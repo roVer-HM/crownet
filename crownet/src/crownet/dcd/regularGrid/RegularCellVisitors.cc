@@ -96,27 +96,36 @@ RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
 RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell) const {
   double sum = 0;
   double num = 0;
+  double time = 0;
   for (const auto& e : cell.validIter()) {
       ++num;
       sum += e.second->getCount();
+      time  += e.second->getMeasureTime().dbl(); // todo
   }
   auto entry = cell.createEntry(sum/num);
-  entry->touch(this->time);
+  entry->setMeasureTime(time/num);
+  entry->setReceivedTime(time/num);
   return entry;
 }
 
 RegularCell::entry_t_ptr MedianVisitor::applyTo(const RegularCell& cell) const {
   std::vector<double> count;
+  std::vector<double> time;
   for (const auto& e : cell.validIter()) {
       count.push_back(e.second->getCount());
+      time.push_back(e.second->getMeasureTime().dbl());
   }
   auto m  = count.begin() + count.size()/2;
   int left = (int)(count.size()-1)/2; // lower-right
   int right = (int)count.size()/2;    // upper-left
   std::nth_element(count.begin(), m, count.end()); // only sort half of the data
+  std::nth_element(time.begin(), m, time.end()); // only sort half of the data
+
 
   auto entry = cell.createEntry((double)(count[left] + count[right])/2);
-  entry->touch(this->time);
+  entry->setMeasureTime((double)(count[left] + count[right])/2);
+  entry->setReceivedTime((double)(time[left] + time[right])/2);
+
   return entry;
 }
 
@@ -135,14 +144,15 @@ RegularCell::entry_t_ptr InvSourceDistVisitor::applyTo(const RegularCell& cell) 
 }
 
 RegularCell::entry_t_ptr MaxCountVisitor::applyTo(const RegularCell& cell) const {
-  double count = 0.0;
+  double count = -1.0;
+  RegularCell::entry_t_ptr p;
   for (const auto& e : cell) {
-    count = std::max(count, e.second->getCount());
+      if (e.second->getCount() > count){
+          p = e.second;
+          count = p->getCount();
+      }
   }
-
-  auto entry = cell.createEntry(count);
-  entry->touch(this->time);
-  return entry;
+  return p;
 }
 
 RegularCell::entry_t_ptr AlgSmall::applyTo(const RegularCell& cell) const {
