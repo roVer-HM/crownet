@@ -9,16 +9,18 @@
 #pragma once
 
 #include "crownet/applications/beacon/Beacon_m.h"
+#include "crownet/common/util/FilePrinter.h"
 
 
 namespace crownet {
 
 class BeaconReceptionInfo :
-        public BeaconReceptionInfo_Base {
+        public FilePrinterMixin<BeaconReceptionInfo_Base>
+        {
 public:
     virtual ~BeaconReceptionInfo();
     BeaconReceptionInfo(const char *name=nullptr)
-    : BeaconReceptionInfo_Base(name){}
+        : FilePrinterMixin<BeaconReceptionInfo_Base>(name){}
 
 
     // override for granular handling of packet types

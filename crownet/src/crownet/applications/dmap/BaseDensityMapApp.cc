@@ -124,7 +124,7 @@ void BaseDensityMapApp::initWriter(){
       fBuilder.addPath(s.str());
 
       fileWriter.reset(fBuilder.build<RegularDcdMap>(
-              dcdMap.get(), mapCfg->getMapTypeLog()));
+              dcdMap, mapCfg->getMapTypeLog()));
       fileWriter->writeHeader();
     }
 }

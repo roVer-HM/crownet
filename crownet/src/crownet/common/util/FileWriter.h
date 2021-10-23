@@ -16,6 +16,7 @@
 
 namespace crownet {
 
+
 class FileWriter {
  public:
   virtual ~FileWriter();
@@ -58,7 +59,7 @@ class FileWriterBuilder {
 
   FileWriter *build(std::shared_ptr<FilePrinter> printer);
   template <typename M>
-  FileWriter *build(M* map, const std::string &mapType);
+  FileWriter *build(std::shared_ptr<M> map, const std::string &mapType);
 
  private:
   using metadata_t = std::map<std::string, std::string>;

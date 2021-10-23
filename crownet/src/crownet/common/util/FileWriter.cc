@@ -30,7 +30,7 @@ FileWriterBuilder &FileWriterBuilder::addPath(const std::string &path) {
 
 
 template <>
-FileWriter *FileWriterBuilder::build(RegularDcdMap* map, const std::string &mapType){
+FileWriter *FileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const std::string &mapType){
     FileWriter *obj = nullptr;
     if (mapType == "all"){
         obj = new FileWriter(std::make_shared<RegularDcdMapAllPrinter>(map));

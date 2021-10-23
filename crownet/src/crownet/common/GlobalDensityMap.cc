@@ -111,7 +111,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
     fBuilder.addPath("global");
 
     fileWriter.reset(fBuilder.build(
-        std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal.get())));
+        std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
     fileWriter->writeHeader();
   }
 }
