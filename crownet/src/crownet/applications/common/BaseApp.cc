@@ -33,9 +33,6 @@ void BaseApp::initialize(int stage) {
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
 
-    hostId = getContainingNode(this)->getId();
-    WATCH(hostId);
-
     localInfo = (AppInfoLocal*)(par("localInfo").objectValue()->dup());
     take(localInfo);
     initLocalAppInfo();

@@ -21,6 +21,7 @@
 #include "inet/common/IdentityTag_m.h"
 #include "inet/common/Simsignals.h"
 #include "inet/common/TimeTag_m.h"
+#include "inet/common/ModuleAccess.h"
 
 using namespace inet;
 
@@ -32,6 +33,8 @@ void CrownetPacketSourceBase::initialize(int stage)
     inet::queueing::PacketSourceBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         packetName = par("packetName");
+        hostId = getContainingNode(this)->getId();
+        WATCH(hostId);
     }
 }
 
@@ -66,6 +69,9 @@ const char *CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& da
                 break;
             case 'e':
                 result = std::to_string(getSimulation()->getEventNumber());
+                break;
+            case 'i':
+                result = std::to_string(hostId);
                 break;
             default:
                 throw cRuntimeError("Unknown directive: %c", directive);

@@ -27,6 +27,10 @@ class CrownetPacketSourceBase : public inet::queueing::PacketSourceBase {
 
 protected:
     const char *packetName = nullptr;
+    int hostId = -1;
+public:
+    // omnetpp based id as unique and constant identifier.
+    int getHostId() const {return hostId;}
 
 protected:
     virtual void initialize(int stage) override;

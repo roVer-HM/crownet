@@ -21,7 +21,7 @@ simple CrownetActivePacketSourceBase extends ActivePacketSourceBase
 {
     parameters:
         string packetName = default("packet");
-        packetNameFormat = default("%N-%c"); // %N packetName %n module name, %c packet number, %l packet length, %d packet data, %t simulation time, %e event number
+        packetNameFormat = default("%N-%i-%c"); // %N packetName %n module name, %c packet number, %l packet length, %d packet data, %t simulation time, %e event number
         displayStringTextFormat = default("created %p pk (%l)");
         packetLength = default(-1b); // packet length is defined programmatically by application.
         packetRepresentation = default("applicationPacket");
