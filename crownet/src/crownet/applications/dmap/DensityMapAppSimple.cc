@@ -15,7 +15,6 @@
 
 #include "crownet/applications/dmap/DensityMapAppSimple.h"
 
-#include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/crownet.h"
 
 namespace crownet {
@@ -32,6 +31,9 @@ void DensityMapAppSimple::initialize(int stage) {
         nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         nTable->setOwnerId(hostId);
         nTable->registerEntryListner(this);
+    }
+}
+
 void DensityMapAppSimple::computeValues() {
     nTable->checkTimeToLive();
     BaseDensityMapApp::computeValues();

@@ -31,7 +31,7 @@ class DensityMapAppSimple : public BaseDensityMapApp
 {
 public:
     DensityMapAppSimple(){};
-    virtual ~DensityMapAppSimple();
+    virtual ~DensityMapAppSimple() = default;
 
 protected:
  // cSimpleModule
