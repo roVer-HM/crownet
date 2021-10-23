@@ -47,9 +47,11 @@ void BaseDensityMapApp::initialize(int stage) {
       localMapUpdateInterval = &par("localMapUpdateInterval");
       localMapTimer = new cMessage("localMapTimer");
       localMapTimer->setKind(FsmRootStates::APP_MAIN);
-      scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
 
-    } else if (stage == INITSTAGE_LAST){ }
+    } else if (stage == INITSTAGE_APPLICATION_LAYER){
+        // BaseApp schedules start operation first (see BaseApp::initialize(stage))
+        scheduleAfter(startTime, localMapTimer);
+    }
 }
 
 void BaseDensityMapApp::finish() {
