@@ -111,6 +111,7 @@ class IGlobalEntry : public IEntry<K, T> {
   virtual ~IGlobalEntry() = default;
   IGlobalEntry();
   IGlobalEntry(const int, const T&, const T&);
+  IGlobalEntry(const double, const T&, const T&, const K& source, const EntryDist& entryDist = EntryDist{});
   IGlobalEntry(const int);
 
   virtual void reset(const T& t) override;
@@ -364,6 +365,11 @@ template <typename K, typename T>
 inline IGlobalEntry<K, T>::IGlobalEntry(const int count, const T& m_t,
                                       const T& r_t)
     : IEntry<K, T>(count, m_t, r_t) {}
+
+template <typename K, typename T>
+inline IGlobalEntry<K, T>::IGlobalEntry(const double count, const T& m_t, const T& r_t,
+                                        const K& source, const EntryDist& entryDist)
+    : IEntry<K, T>(count, m_t, r_t, source, entryDist){}
 
 template <typename K, typename T>
 inline IGlobalEntry<K, T>::IGlobalEntry(const int count) : IEntry<K, T>(count) {}

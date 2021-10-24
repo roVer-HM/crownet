@@ -16,6 +16,7 @@
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/generic/iterator/CellDataIterator.h"
 #include "crownet/dcd/identifier/Identifiers.h"
+#include "crownet/dcd/identifier/TimeProvider.h"
 
 namespace crownet {
 
@@ -64,8 +65,8 @@ class Cell {
  public:
   virtual ~Cell() = default;
   Cell() {}
-  Cell(cell_key_t cell_id, node_key_t owner_id)
-      : cell_id(cell_id), owner_id(owner_id) {}
+  Cell(std::shared_ptr<TimeProvider<T>> timeProvider, cell_key_t cell_id, node_key_t owner_id)
+      : timeProvider(timeProvider), cell_id(cell_id), owner_id(owner_id) {}
 
   // getter
   map_t& getData() { return data; }
@@ -161,6 +162,7 @@ class Cell {
   bool operator==(const Cell<C, N, T>& rhs) const;
 
  private:
+  std::shared_ptr<TimeProvider<T>> timeProvider;
   map_t data;
   cell_key_t cell_id;
   node_key_t owner_id;

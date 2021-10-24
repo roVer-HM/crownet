@@ -116,8 +116,11 @@ template <typename C, typename N, typename T>
 template <typename E>
 std::shared_ptr<E> Cell<C, N, T>::getOrCreate(const node_key_t node_id){
     if (!hasData(node_id)){
-        auto e = std::make_shared<E>();
-        e->setSource(node_id);
+        auto e = std::make_shared<E>(0.0,
+                timeProvider->now(),
+                timeProvider->now(),
+                node_id
+                );
         this->data[node_id] = e;
     }
     return get<E>(node_id);
