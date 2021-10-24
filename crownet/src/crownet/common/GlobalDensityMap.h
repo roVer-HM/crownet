@@ -106,7 +106,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
   std::string m_mobilityModule;
-  std::unique_ptr<FileWriter> fileWriter;
+  std::unique_ptr<ActiveFileWriter> fileWriter;
   RegularGridInfo grid;
 
 };

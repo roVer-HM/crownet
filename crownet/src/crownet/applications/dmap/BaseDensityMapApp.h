@@ -83,7 +83,7 @@ protected:
  std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
 
  std::shared_ptr<RegularDcdMap> dcdMap;
- std::unique_ptr<FileWriter> fileWriter;
+ std::unique_ptr<ActiveFileWriter> fileWriter;
  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;

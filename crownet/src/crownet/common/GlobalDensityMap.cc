@@ -100,7 +100,7 @@ void GlobalDensityMap::initializeMap(){
     cellKeyProvider = dcdMapFactory->getCellKeyProvider();
 
     // 2) setup writer.
-    FileWriterBuilder fBuilder{};
+    ActiveFileWriterBuilder fBuilder{};
     fBuilder.addMetadata("IDXCOL", 3);
     fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
     fBuilder.addMetadata("YSIZE", grid.getGridSize().y);

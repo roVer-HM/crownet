@@ -48,12 +48,11 @@ inline std::ostream &operator<<(BaseFileWriter &output, const T &_t) {
   return output.write();
 }
 
-class FileWriter : public BaseFileWriter{
+class ActiveFileWriter : public BaseFileWriter{
 
  public:
-  virtual ~FileWriter()=default;
-  FileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep=";", long bufferSize=8192);
-//  FileWriter(FileWriter &&other);
+  virtual ~ActiveFileWriter()=default;
+  ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep=";", long bufferSize=8192);
 
 
   void writeHeader();
@@ -78,11 +77,8 @@ class FileWriterBuilder {
   }
   FileWriterBuilder &addPath(const std::string &path);
 
-  FileWriter *build(std::shared_ptr<FilePrinter> printer);
-  template <typename M>
-  FileWriter *build(std::shared_ptr<M> map, const std::string &mapType);
 
- private:
+ protected:
   using metadata_t = std::map<std::string, std::string>;
   metadata_t metadata;
   std::string path;
@@ -94,5 +90,14 @@ inline FileWriterBuilder &FileWriterBuilder::addMetadata(std::string key,
   metadata[key] = value;
   return *this;
 }
+
+class ActiveFileWriterBuilder : public FileWriterBuilder {
+public:
+
+    ActiveFileWriter *build(std::shared_ptr<FilePrinter> printer);
+    template <typename M>
+    ActiveFileWriter *build(std::shared_ptr<M> map, const std::string &mapType);
+
+};
 
 } /* namespace crownet */

@@ -113,7 +113,7 @@ void BaseDensityMapApp::initDcdMap(){
 }
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
-      FileWriterBuilder fBuilder{};
+        ActiveFileWriterBuilder fBuilder{};
       fBuilder.addMetadata("IDXCOL", 3);
       fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
       fBuilder.addMetadata("YSIZE", grid.getGridSize().y);

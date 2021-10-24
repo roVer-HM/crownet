@@ -97,14 +97,14 @@ FileWriterBuilder &FileWriterBuilder::addPath(const std::string &path) {
 
 
 template <>
-FileWriter *FileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const std::string &mapType){
-    FileWriter *obj = nullptr;
+ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const std::string &mapType){
+    ActiveFileWriter *obj = nullptr;
     if (mapType == "all"){
-        obj = new FileWriter(
+        obj = new ActiveFileWriter(
                 BaseFileWriter::getAbsOutputPath(path),
                 std::make_shared<RegularDcdMapAllPrinter>(map));
     } else {
-        obj = new FileWriter(
+        obj = new ActiveFileWriter(
                 BaseFileWriter::getAbsOutputPath(path),
                 std::make_shared<RegularDcdMapValuePrinter>(map));
     }
@@ -112,8 +112,8 @@ FileWriter *FileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const s
     return obj;
 }
 
-FileWriter *FileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
-  FileWriter *obj = new FileWriter(
+ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
+  ActiveFileWriter *obj = new ActiveFileWriter(
           BaseFileWriter::getAbsOutputPath(path),
           std::move(printer));
   obj->writeMetaData(metadata);
@@ -123,12 +123,12 @@ FileWriter *FileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
 //FileWriter::FileWriter(FileWriter &&other)
 //    : s(std::move(other.s)), sep(other.sep), printer(other.printer) {}
 
-FileWriter::FileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep, long bufferSize)
+ActiveFileWriter::ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep, long bufferSize)
     : BaseFileWriter(filePath, sep, bufferSize), printer(std::move(printer)) {}
 
-void FileWriter::writeHeader() { printer->writeHeaderTo(write(), sep); }
+void ActiveFileWriter::writeHeader() { printer->writeHeaderTo(write(), sep); }
 
-void FileWriter::writeData() { printer->writeTo(write(), sep); }
+void ActiveFileWriter::writeData() { printer->writeTo(write(), sep); }
 
 
 
