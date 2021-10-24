@@ -8,6 +8,7 @@
 #pragma once
 
 #include <fstream>
+#include <sstream>
 #include <map>
 #include <memory>
 #include <vector>
@@ -17,33 +18,53 @@
 namespace crownet {
 
 
-class FileWriter {
- public:
-  virtual ~FileWriter();
-  FileWriter(std::shared_ptr<FilePrinter> printer);
-  FileWriter(FileWriter &&other);
+class BaseFileWriter {
+public:
+    static std::string getAbsOutputPath(std::string fileName);
 
-  void initialize(std::string absPath, std::string delim = ";");
-  std::string del() const;
+public:
+    BaseFileWriter(std::string filePath, std::string sep=";", long bufferSize=8192);
+    ~BaseFileWriter();
+    void flush();
+    void close();
+    void writeMetaData(std::map<std::string, std::string>& mData);
+    std::ostream &write();
 
-  std::ostream &write();
-  void writeHeader();
-  void writeData();
+    template <typename T>
+    friend std::ostream &operator<<(BaseFileWriter &output, const T &_t);
 
-  template <typename T>
-  friend std::ostream &operator<<(FileWriter &output, const T &_t);
+protected:
+    std::string sep;
 
- private:
-  std::ofstream s;
-  std::string sep;
-  std::shared_ptr<FilePrinter> printer;
+private:
+    std::ofstream file;
+    long bufferSize;
+    std::ostringstream buffer;
 };
 
 template <typename T>
-inline std::ostream &operator<<(FileWriter &output, const T &_t) {
-  output.s << _t;
-  return output.s;
+inline std::ostream &operator<<(BaseFileWriter &output, const T &_t) {
+  output.write() << _t;
+  return output.write();
 }
+
+class FileWriter : public BaseFileWriter{
+
+ public:
+  virtual ~FileWriter()=default;
+  FileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep=";", long bufferSize=8192);
+//  FileWriter(FileWriter &&other);
+
+
+  void writeHeader();
+  void writeData();
+
+
+ private:
+  std::shared_ptr<FilePrinter> printer;
+};
+
+
 
 class FileWriterBuilder {
  public:
