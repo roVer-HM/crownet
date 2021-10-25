@@ -1,11 +1,8 @@
 ## Requirements
 
 * crownet with all sub-projects is installed (DEBUG|RELEASE mode)
-  * [getting started](todo: link to main readme.md)
-  * [build-python-simulation-environment](todo: link to main readme.md)
-  * https://sam-dev.cs.hm.edu/rover/crownet#getting-started
-* crownet python virtual environments are available
-  * https://sam-dev.cs.hm.edu/rover/crownet#build-python-simulation-environment
+  * [getting started](../../README.md#getting-started)
+  * [build python simulation environment](../../README.md#build-python-simulation-environment)
 
 ## Configuration files
 
