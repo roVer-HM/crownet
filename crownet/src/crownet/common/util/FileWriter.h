@@ -58,6 +58,7 @@ private:
     long bufferSize;
     std::ostringstream buffer;
     bool init = false;
+    bool closed = true;
 };
 
 template <typename T>

@@ -76,8 +76,11 @@ void BaseFileWriter::flush(){
     file.flush();
 }
 void BaseFileWriter::close(){
-    flush();
-    file.close();
+    if (!closed){
+        flush();
+        file.close();
+        closed = true;
+    }
 }
 
 void BaseFileWriter::writeMetaData(std::map<std::string, std::string>& mData){

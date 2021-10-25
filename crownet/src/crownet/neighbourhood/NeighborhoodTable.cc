@@ -45,7 +45,7 @@ void NeighborhoodTable::initialize(int stage){
         cStringTokenizer t(par("fileWriterRegister").stringValue(), ";");
         auto t_value = t.asVector();
         if (t_value.size() == 2){
-            auto fRegister = (IFileWriterRegister*)findModuleByPath(t_value[0].c_str());
+            auto fRegister = dynamic_cast<IFileWriterRegister*>(findModuleByPath(t_value[0].c_str()));
             if (fRegister) {
                 auto l = fRegister->getWriterAs<NeighborhoodEntryListner>(t_value[1]);
                 registerEntryListner(l);

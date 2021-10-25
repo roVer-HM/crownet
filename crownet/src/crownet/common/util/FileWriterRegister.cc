@@ -24,14 +24,7 @@ namespace crownet {
 
 Define_Module(FileWriterRegister);
 
-FileWriterRegister::~FileWriterRegister(){
-    for(auto e : writerRegister->getFields()){
-        auto w = dynamic_cast<BaseFileWriter*>(e.second.objectValue());
-        if (w){
-            w->close();
-        }
-    }
-}
+FileWriterRegister::~FileWriterRegister(){}
 
 
 
