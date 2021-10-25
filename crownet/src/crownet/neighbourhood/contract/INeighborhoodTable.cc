@@ -14,6 +14,13 @@ void INeighborhoodTable::registerEntryListner(NeighborhoodEntryListner* listener
     this->removeEntryListener(listener);
     this->listeners.push_back(listener);
 }
+
+void INeighborhoodTable::registerFirst(NeighborhoodEntryListner* listener){
+    this->removeEntryListener(listener);
+    this->listeners.push_back(listener);
+}
+
+
 void INeighborhoodTable::removeEntryListener(NeighborhoodEntryListner* listener){
     auto iter = this->listeners.begin();
     auto end = this->listeners.end();

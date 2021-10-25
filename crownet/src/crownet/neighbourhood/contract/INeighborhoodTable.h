@@ -64,6 +64,7 @@ public:
     virtual const int getOwnerId() const = 0;
 
     void registerEntryListner(NeighborhoodEntryListner* listener);
+    void registerFirst(NeighborhoodEntryListner* listener);
     void removeEntryListener(NeighborhoodEntryListner* listener);
     void emitPreChanged(BeaconReceptionInfo* oldInfo);
     void emitPostChanged(BeaconReceptionInfo* newInfo);
