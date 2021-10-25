@@ -38,4 +38,10 @@ class IDensityMapHandler : public IDensityMapHandlerBase<GRID> {
   virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) = 0;
 };
 
+template <typename GRID>
+class IGlobalDensityMapHandler : public IDensityMapHandlerBase<GRID> {
+public:
+    virtual ~IGlobalDensityMapHandler() = default;
+};
+
 }  // namespace crownet

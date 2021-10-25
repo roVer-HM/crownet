@@ -45,7 +45,7 @@ public:
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
                          public INodeVisitor,
-                         public IDensityMapHandlerBase<RegularDcdMap>{
+                         public IGlobalDensityMapHandler<RegularDcdMap>{
  public:
   //  using Grid = RegularGridMap<std::string>;
   using GridHandler = IDensityMapHandler<RegularDcdMap>;
