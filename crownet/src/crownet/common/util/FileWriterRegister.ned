@@ -13,20 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.neighbourhood;
+package crownet.common.util;
 
+moduleinterface IFileWriterRegister {}
 
-moduleinterface INeighborhoodTable
+simple FileWriterRegister like IFileWriterRegister
 {
-    
-}
-
-simple NeighborhoodTable like INeighborhoodTable{
-    
     parameters:
-        @class(crownet::NeighborhoodTable);
-        double maxAge @unit(s) = default (3s);
-        string mobilityModule = default("^.mobility"); //asume sibling
-        string fileWriterRegister = default("fileWriterRegister;neighborhoodWriter");
-        
+    	@class(crownet::FileWriterRegister);
+       	object register = default({neighborhoodWriter: crownet::NeighborhoodEventWriter{filePath: "beacons.csv"}});
 }

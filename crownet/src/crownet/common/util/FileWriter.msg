@@ -11,22 +11,30 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
-
-package crownet.neighbourhood;
+//
 
 
-moduleinterface INeighborhoodTable
-{
-    
+cplusplus{{
+ #include "crownet/common/util/FileWriter.h"
+ #include "crownet/common/util/NeighborhoodEventWriter.h"
+}}
+
+namespace crownet;
+
+
+
+cplusplus(cc){{
+    Register_Class(NeighborhoodEventWriter);
+}}
+
+class BaseFileWriter extends cObject{
+     @existingClass;
+     string sep = ";";
+     string filePath = "";
+     long bufferSize = 8192;
 }
 
-simple NeighborhoodTable like INeighborhoodTable{
-    
-    parameters:
-        @class(crownet::NeighborhoodTable);
-        double maxAge @unit(s) = default (3s);
-        string mobilityModule = default("^.mobility"); //asume sibling
-        string fileWriterRegister = default("fileWriterRegister;neighborhoodWriter");
-        
+class NeighborhoodEventWriter extends BaseFileWriter {
+	@existingClass;
+ 	filePath = "beacons.csv";
 }

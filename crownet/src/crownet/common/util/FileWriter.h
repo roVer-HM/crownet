@@ -12,34 +12,52 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <omnetpp.h>
 
 #include "FilePrinter.h"
 
 namespace crownet {
 
 
-class BaseFileWriter {
+class BaseFileWriter : public omnetpp::cObject {
 public:
     static std::string getAbsOutputPath(std::string fileName);
 
 public:
-    BaseFileWriter(std::string filePath, std::string sep=";", long bufferSize=8192);
+    BaseFileWriter(std::string filePath="", std::string sep=";", long bufferSize=8192);
     ~BaseFileWriter();
     void flush();
     void close();
     void writeMetaData(std::map<std::string, std::string>& mData);
     std::ostream &write();
 
+    virtual void initialize();
+
+    const char * getFilePath() const { return filePath.c_str();}
+    void setFilePath(const char * path){ this->filePath = std::string(path);}
+    const char * getSep() const { return sep.c_str();}
+    void setSep(const char * sep) { this->sep = std::string(sep); }
+    long getBufferSize() const { return bufferSize; }
+    void setBufferSize(long bufferSize) { this->bufferSize = bufferSize; }
+
+
+    bool isInitialized() const {return  init;}
+    virtual void onInit() {/* do nothing */}
+
     template <typename T>
     friend std::ostream &operator<<(BaseFileWriter &output, const T &_t);
+private:
+    void writeBuffer();
 
 protected:
     std::string sep;
 
 private:
+    std::string filePath;
     std::ofstream file;
     long bufferSize;
     std::ostringstream buffer;
+    bool init = false;
 };
 
 template <typename T>

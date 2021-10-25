@@ -11,7 +11,11 @@
 #include <omnetpp/cstlwatch.h>
 #include <omnetpp/cwatch.h>
 #include "crownet/crownet.h"
-
+#include "crownet/common/GlobalDensityMap.h"
+#include "crownet/common/util/FileWriterRegister.h"
+#include "inet/common/ModuleAccess.h"
+#include "crownet/common/IDensityMapHandler.h"
+#include "crownet/dcd/regularGrid/RegularDcdMap.h"
 
 using namespace omnetpp;
 using namespace inet;
@@ -37,6 +41,16 @@ void NeighborhoodTable::initialize(int stage){
         scheduleAt(simTime() + maxAge, ttl_msg);
         WATCH_PTRMAP(_table);
         WATCH(maxAge);
+    } else if (stage == INITSTAGE_APPLICATION_LAYER){
+        cStringTokenizer t(par("fileWriterRegister").stringValue(), ";");
+        auto t_value = t.asVector();
+        if (t_value.size() == 2){
+            auto fRegister = (IFileWriterRegister*)findModuleByPath(t_value[0].c_str());
+            if (fRegister) {
+                auto l = fRegister->getWriterAs<NeighborhoodEntryListner>(t_value[1]);
+                registerEntryListner(l);
+            }
+        }
     }
 }
 

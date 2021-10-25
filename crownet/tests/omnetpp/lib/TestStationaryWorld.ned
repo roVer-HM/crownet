@@ -41,7 +41,7 @@ import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
 import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
-
+import crownet.common.util.IFileWriterRegister;
 
 
 network TestStationaryWorld
@@ -103,6 +103,9 @@ network TestStationaryWorld
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
 
             @display("p=308.14874,406.35;is=vs");
+        }
+        fileWriterRegister: <default("")> like IFileWriterRegister {
+           @display("p=308.14874,506.35;is=vs");
         }
 
 

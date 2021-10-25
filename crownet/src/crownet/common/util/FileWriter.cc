@@ -18,6 +18,11 @@
 namespace crownet {
 
 std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
+
+    boost::filesystem::path pp{fileName};
+    if (pp.is_absolute()){
+        return fileName;
+    }
     cConfigOption *scaObj = cConfigOption::find("output-scalar-file");
     if (scaObj) {
       std::string outputScalarFile = cSimulation::getActiveSimulation()
@@ -26,12 +31,14 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
                                          ->getAsFilename(scaObj);
 
       boost::filesystem::path p{outputScalarFile};
+      boost::filesystem::absolute(p);
       std::string _path;
       if (0 == fileName.compare(fileName.size() - 4, fileName.size(), ".csv")){
           _path = p.parent_path().string() + "/" + fileName;
       } else {
           _path = p.parent_path().string() + "/" + fileName + ".csv";
       }
+      std::cout << _path << endl;
       return _path;
     } else {
       throw cRuntimeError("output-scalar-file not found");
@@ -40,20 +47,36 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
 };
 
 BaseFileWriter::BaseFileWriter(std::string filePath, std::string sep, long bufferSize)
-        : file(filePath), sep(sep), bufferSize(bufferSize) {}
+        :filePath(filePath),  sep(sep), bufferSize(bufferSize){}
+
+void BaseFileWriter::initialize(){
+    if (isInitialized()){
+        return; // only once
+    }
+    if (filePath == ""){
+        throw cRuntimeError("Path is not set");
+    }
+    filePath = getAbsOutputPath(filePath);
+    file = std::ofstream(filePath);
+    init = true;
+    onInit();
+}
 
 BaseFileWriter::~BaseFileWriter(){
     close();
 }
-void BaseFileWriter::flush(){
+
+void BaseFileWriter::writeBuffer(){
     file << buffer.str();
+    buffer.str(std::string());
     buffer.clear();
+}
+void BaseFileWriter::flush(){
+    writeBuffer();
     file.flush();
 }
 void BaseFileWriter::close(){
-    file << buffer.str();
-    buffer.clear();
-    file.flush();
+    flush();
     file.close();
 }
 
@@ -75,8 +98,7 @@ std::ostream &BaseFileWriter::write(){
     long pos = buffer.tellp();
     if (pos > bufferSize){
         // write buffer to field
-        file << buffer.str();
-        buffer.clear();
+        writeBuffer();
     }
     return buffer;
 }
@@ -101,27 +123,28 @@ ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> 
     ActiveFileWriter *obj = nullptr;
     if (mapType == "all"){
         obj = new ActiveFileWriter(
-                BaseFileWriter::getAbsOutputPath(path),
+                path,
                 std::make_shared<RegularDcdMapAllPrinter>(map));
     } else {
         obj = new ActiveFileWriter(
-                BaseFileWriter::getAbsOutputPath(path),
+                path,
                 std::make_shared<RegularDcdMapValuePrinter>(map));
     }
+    obj->initialize();
     obj->writeMetaData(metadata);
+    obj->flush();
     return obj;
 }
 
 ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
   ActiveFileWriter *obj = new ActiveFileWriter(
-          BaseFileWriter::getAbsOutputPath(path),
+          path,
           std::move(printer));
+  obj->initialize();
   obj->writeMetaData(metadata);
+  obj->flush();
   return obj;
 }
-
-//FileWriter::FileWriter(FileWriter &&other)
-//    : s(std::move(other.s)), sep(other.sep), printer(other.printer) {}
 
 ActiveFileWriter::ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep, long bufferSize)
     : BaseFileWriter(filePath, sep, bufferSize), printer(std::move(printer)) {}
