@@ -245,8 +245,8 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "ProbabilisticPerceptionModel",
-        "cognition" : "CooperativeAndOtherBehaviorsModel"
+        "perception" : "MultiPerceptionModel",
+        "cognition" : "ProbabilisticCognitionModel"
       }
     },
     "topography" : {
