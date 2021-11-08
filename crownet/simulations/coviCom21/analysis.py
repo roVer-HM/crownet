@@ -252,7 +252,7 @@ if __name__ == "__main__":
     hdf_builder = DcdHdfBuilder.get("dcd_map.h5", sim_path)
     hdf_builder.single_df_filters.append(DcdHdfBuilder.F_selected_only)
     # get dcd object (all data)
-    dcd = hdf_builder.build_dcd_map(
+    dcd = hdf_builder.build(
         # x_slice=slice(1702., 3008.),
         # y_slice=slice(1027., 2588.)
     )
