@@ -105,7 +105,7 @@ network TestStationaryWorld
 
             @display("p=308.14874,406.35;is=vs");
         }
-        fileWriterRegister: <default("")> like IFileWriterRegister {
+        fileWriterRegister: <default("")> like IFileWriterRegister if typename != "" {
            @display("p=308.14874,506.35;is=vs");
         }
 

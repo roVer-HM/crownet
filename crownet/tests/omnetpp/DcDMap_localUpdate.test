@@ -55,9 +55,9 @@ extends = _default, D2D_General, DcDMap, stationary_n5
 
 *.misc[0].app[0].app.stopTime = 5s # Stop Beacon App of first node
 
-%postrun-command: python3 15 ../lib/dcdMap_localUpdate.py
+%postrun-command: ../lib/run_with_venv.sh ../lib/dcdMap_localUpdate.py 15 ./results
 
-%contains: test1.csv
+%contains: results/test1.csv
 ,simtime,"[0.0, 27.0]","[3.0, 27.0]","[27.0, 0.0]"
 0,2.5,1.0,1.0,3.0
 1,3.0,1.0,1.0,3.0
@@ -78,5 +78,5 @@ extends = _default, D2D_General, DcDMap, stationary_n5
 
 
 %contains: stdout
-<!> Simulation time limit reached -- at t=0.5s
+<!> Simulation time limit reached -- at t=10s
 

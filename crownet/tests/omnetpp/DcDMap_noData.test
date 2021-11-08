@@ -22,7 +22,8 @@ extends = _default, D2D_General, DcDMap, stationary_n1
 *.misc[*].app[1].scheduler.numberPackets = -1
 *.misc[*].app[1].scheduler.amoutOfData = 1000B
 # update interval bigger than sim time. Do not sent data in this case
-*.misc[*].app[1].app.localMapUpdateInterval = 1s
+*.misc[*].app[1].app.localMapUpdateInterval = 1000s
+*.misc[*].app[0].scheduler.generationInterval = 1000s
 
 %postrun-command: grep -E "^0.*TestStationaryWorld\.misc\[0\].app\[1\].(scheduler)" test.out > test1.out
 
