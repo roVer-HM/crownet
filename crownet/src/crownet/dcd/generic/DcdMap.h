@@ -82,17 +82,6 @@ class DcDMap {
   bool hasEntry(const traci::TraCIPosition& pos, const node_key_t& source);
   bool hasEntry(const traci::TraCIPosition& pos);
 
-  // manage neighborhood in local area. Map node_key_t to cell_key_t
-  bool isInNeighborhood(const node_key_t& neigbourId) const;
-  int sizeOfNeighborhood() const;
-  void clearNeighborhood();
-  void removeFromNeighborhood(const node_key_t& neigborId);
-  cell_key_t getNeighborCell(const node_key_t& neigborId);
-  void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
-  void addToNeighborhood(const node_key_t& neigbourId, const cell_key_t& cellId);
-  void addToNeighborhood(const node_key_t& neigbourId, const traci::TraCIPosition& pos);
-  cell_key_t getCellId(const traci::TraCIPosition& pos) const;
-
   // iterators and visitors
   typename map_t::iterator begin() { return cells.begin(); }
   typename map_t::iterator end() { return cells.end(); }
@@ -136,6 +125,24 @@ class DcDMap {
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
   std::shared_ptr<TimeProvider<T>> timeProvider;
   std::shared_ptr<ICellIdStream<C, N, T>> cellKeyStream;
+
+ public:
+
+  /*
+   *  Manage neighborhood in local area.
+   */
+  bool isInNeighborhood(const node_key_t& neigbourId) const;
+  int sizeOfNeighborhood() const;
+  void clearNeighborhood();
+  void removeFromNeighborhood(const node_key_t& neigborId);
+  cell_key_t getNeighborCell(const node_key_t& neigborId);
+  void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
+  void addToNeighborhood(const node_key_t& neigbourId, const cell_key_t& cellId);
+  void addToNeighborhood(const node_key_t& neigbourId, const traci::TraCIPosition& pos);
+  cell_key_t getCellId(const traci::TraCIPosition& pos) const;
+
+ private:
+  // Map node_key_t to cell_key_t to track if a node moved between cells.
   std::map<N, C> neighborhood;
 };
 #include "DcdMap.tcc"

@@ -263,6 +263,10 @@ template <typename C, typename N, typename T>
 bool DcDMap<C, N, T>::hasEntry(const traci::TraCIPosition& pos){
     return hasEntry(pos, owner_id);
 }
+
+/*
+ *  Manage neighborhood in local area.
+ */
 template <typename C, typename N, typename T>
 bool DcDMap<C, N, T>::isInNeighborhood(const node_key_t& neigbourId) const {
   return this->neighborhood.find(neigbourId) != this->neighborhood.end();
@@ -286,11 +290,16 @@ void DcDMap<C, N, T>::removeFromNeighborhood(const node_key_t& neigborId) {
 template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::moveNeighborTo(const node_key_t& neigborId,
                                      const cell_key_t& cellId) {
-  if (!this->isInNeighborhood(neigborId)) {
-    throw omnetpp::cRuntimeError("Expected node_id: [%s] in neighbourhood",
-                                 neigborId.str().c_str());
+
+  if (this->isInNeighborhood(neigborId)) {
+      // found neigborId in map. Decrement previous position
+      auto oldCellId = this->neighborhood[neigborId];
+      this->getEntry<>(oldCellId)->decrementCount(timeProvider->now());
   }
+  // increment new location
+  this->getEntry<>(cellId)->incrementCount(timeProvider->now());
   this->neighborhood[neigborId] = cellId;
+
 }
 
 template <typename C, typename N, typename T>
