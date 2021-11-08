@@ -30,7 +30,7 @@ using namespace inet;
 
 
 class AppInfoBase  extends cOwnedObject {
-    uint32_t nodeId;
+    uint32_t nodeId = 0;
 };
 
 
@@ -38,9 +38,9 @@ class AppInfoLocal extends AppInfoBase {
     @customize(true);
     simtime_t walltimeStart @editable; // editable needed for ned object paramters. Fix in 6-pre13
 	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
-    uint32_t baseTimestamp;
-    uint16_t sequencenumber;
-    uint16_t sequencecycle;
+    uint32_t baseTimestamp = 0;
+    uint16_t sequencenumber = 0;
+    uint16_t sequencecycle = 0;
 };
 
 
@@ -55,21 +55,21 @@ enum PktType
 class AppInfoReception extends AppInfoBase {
  	@customize(true);
 
- 	uint16_t initialSequencenumber;
-    uint16_t maxSequencenumber;
-    uint32_t sequencecycle;
-	uint32_t packetsReceivedCount;
+ 	uint16_t initialSequencenumber= 0;
+    uint16_t maxSequencenumber= 0;
+    uint32_t sequencecycle= 0;
+	uint32_t packetsReceivedCount= 0;
 	// (max_sequencenumber - initial_sequencenumber) - packets_received_count
 	// todo include sequencecycle in packet_loss_count? look at RTCP protocol!!
-	int packetsLossCount; 
+	int packetsLossCount = 0; 
 	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
 
 
-	simtime_t jitter;
-	simtime_t receivedTimePrio;
-	uint32_t  sentTimePrio; 
-	uint16_t  maxSequencenumberPrio;
-	uint16_t  packetsReceivedCountPrio;
+	simtime_t jitter = 0.0;
+	simtime_t receivedTimePrio = 0.0;
+	uint32_t  sentTimePrio = 0; 
+	uint16_t  maxSequencenumberPrio = 0;
+	uint16_t  packetsReceivedCountPrio = 0;
 };
 
 
