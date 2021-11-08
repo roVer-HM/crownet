@@ -49,11 +49,18 @@ cplusplus(DcDCell){{
 
 cplusplus(cc){{
   void DcDCell::setDeltaCreation(const simtime_t& delta){
-    deltaCreation = (uint16_t)(delta.inUnit(SimTimeUnit::SIMTIME_MS) / 10);
+      if (delta < 0){
+          throw cRuntimeError("delta_t cannot be negative got %s", delta.ustr().c_str());
+      }
+      int64_t raw_ms = (int64_t)(delta.inUnit(SimTimeUnit::SIMTIME_MS) / 10);
+      if (raw_ms > 0xFFFF){
+          raw_ms = 0xFFFF; // set to undefined.
+      }
+    deltaCreation = (uint16_t)(raw_ms);
   }
   
   simtime_t DcDCell::getCreationTime(const simtime_t& base) const{
-      return base + SimTime(deltaCreation*10, SimTimeUnit::SIMTIME_MS);
+      return base - SimTime(deltaCreation*10, SimTimeUnit::SIMTIME_MS);
   }
 }}
 
@@ -70,6 +77,10 @@ cplusplus(LocatedDcDCell){{
       LocatedDcDCell(uint16_t count, uint16_t variation, uint16_t idOffsetX, uint16_t idOffsetY):
       	DcDCell(count, variation), idOffsetX(idOffsetX), idOffsetY(idOffsetY) {}
 }}
+
+class EntropyMap extends inet::TagBase
+{}
+
 
 enum MapType {
     DENSE = 0x10;   
