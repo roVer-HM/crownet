@@ -41,6 +41,12 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         // This interval is independent of the sent interval of the application in 
         // its basic configuration. 
         double localMapUpdateInterval @unit(s) = default(1.0s); 
+        // If density map is used with entropy generated data the movement of the sending node
+        // does not change the data in the old or new cell. In contrast, the for the pedestrian 
+        // density map the movement does influnce the denstiy (count) in the old and new cell. 
+        // The EntropyTag is used to switch the processing of received map packets to correct
+        // this behavior. Default false. (-> pedestrian density map is the default behavior)
+        bool attachEntropyTag = default(false);
         
         object mapCfg = default(crownet::MapCfg{
             writeDensityLog: true,

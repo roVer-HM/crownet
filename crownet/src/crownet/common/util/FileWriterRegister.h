@@ -31,6 +31,7 @@ public:
     T* getWriterAs(std::string writerKey){
         return dynamic_cast<T*>(getWriter(writerKey));
     }
+    virtual bool hasWriter(std::string writerKey) = 0;
 
 private:
     virtual BaseFileWriter* getWriter(std::string writerKey) = 0;
@@ -50,7 +51,7 @@ public:
     virtual void handleMessage(cMessage *msg) override { throw omnetpp::cRuntimeError("not supported"); }
     virtual void finish() override;
 
-//    virtual void registerDataSource(INeighborhoodTable* source, std::string writerKey) override;
+    virtual bool hasWriter(std::string writerKey) override;
     virtual BaseFileWriter* getWriter(std::string writerKey) override;
 
 private:

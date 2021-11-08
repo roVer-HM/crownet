@@ -38,6 +38,10 @@ protected:
     virtual const char *createPacketName(const Ptr<const Chunk>& data) const override;
     virtual void applyContentTags(Ptr<Chunk> content);
     virtual void applyPacketTags( Packet *);
+
+private:
+    bool attachHostIdTag = false;
+    bool attachSequenceIdTag = false;
 };
 
 

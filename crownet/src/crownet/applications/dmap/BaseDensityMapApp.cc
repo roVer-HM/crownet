@@ -148,6 +148,14 @@ const inet::b BaseDensityMapApp::getMinPdu(){
     return b(8*(24 + 6)); // SparseMapPacket header
 }
 
+void BaseDensityMapApp::applyContentTags(Ptr<Chunk> content){
+    BaseApp::applyContentTags(content);
+    if (par("attachEntropyTag")){
+        // mark packet as Entropy Packet and not pedestrian count
+        content->addTag<EntropyMap>();
+    }
+}
+
 Packet *BaseDensityMapApp::createPacket() {
 
     // Idempotent. Will only be executed once
@@ -185,7 +193,8 @@ Packet *BaseDensityMapApp::createPacket() {
             // todo uint_16_t(cell.val() * 100) to get 1/100 count precision + check overflow!!!
             auto count_100 = cell.val()->getCount()*100;
             LocatedDcDCell c {(uint16_t)count_100, (uint16_t)0, (uint16_t)cell.getCellId().x(), (uint16_t)cell.getCellId().y()};
-            c.setDeltaCreation(now-cell.val()->getMeasureTime());
+            auto delta_t = now-cell.val()->getMeasureTime();
+            c.setDeltaCreation(delta_t);
             payload->setCells(usedSpace, c);
         } else {
             break; // no more data present for transmission.
@@ -207,6 +216,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
   if (header->getVersion() == MapType::SPARSE){
       auto p = packet->popAtFront<SparseMapPacket>();
       auto packetCreationTime = p->getTag<CreationTimeTag>()->getCreationTime();
+
+
       int numCells = p->getCellsArraySize();
       int sourceNodeId = (int)header->getSourceId();
       auto baseX = header->getRefIdOffsetX();
@@ -215,9 +226,13 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
               header->getSourceCellIdX(),
               header->getSourceCellIdY());
 
-      //  check local map for _nodeId and compare if the local and packet
-      //  place the _nodeId in the same cell.
-      dcdMap->addToNeighborhood(sourceNodeId, sourceCellId);
+      if (p->findTag<EntropyMap>() == nullptr){
+          // check local map for _nodeId and compare if the local and packet
+          // place the _nodeId in the same cell. For entropy maps this is not
+          // applied. Because the received value does not 'move' with the sending
+          // node like in the pedestrian count setup.
+          dcdMap->moveNeighborTo(sourceNodeId, sourceCellId);
+      }
 
 
       // update new measurements
@@ -228,6 +243,9 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
               baseY + cell.getIdOffsetY()};
           EntryDist entryDist = cellProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
           simtime_t _measured = cell.getCreationTime(packetCreationTime);
+          if (_measured > simTime()){
+              throw cRuntimeError("!!");
+          }
           // get or create entry shared pointer
           auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
           _entry->setCount((double)cell.getCount()/100.0);

@@ -71,13 +71,17 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
 
+		// send stats
         @signal[packetSent](type=inet::Packet);
-        @signal[packetReceived](type=inet::Packet);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        // received stats
+        @signal[packetReceived](type=inet::Packet);
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
         @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
-        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="appPkSeqNo(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPkHostId](title="received host id"; source="rcvdHostId(packetReceived)"; record=vector; interpolationmode=none);
+        
         
         // queueing statitics
         @signal[packetPulled](type=inet::Packet);

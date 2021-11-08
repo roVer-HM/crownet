@@ -43,6 +43,10 @@ void FileWriterRegister::finish() {
         }
     }
 }
+bool FileWriterRegister::hasWriter(std::string writerKey) {
+    return writerRegister->containsKey(writerKey.c_str());
+}
+
 
 BaseFileWriter* FileWriterRegister::getWriter(std::string writerKey) {
     if (writerKey == "neighborhoodWriter" && writerRegister->containsKey(writerKey.c_str())) {

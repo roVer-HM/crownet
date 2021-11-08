@@ -54,6 +54,7 @@ protected:
 
  //
  virtual Packet *createPacket() override;
+ virtual void applyContentTags(Ptr<Chunk> content) override;
 
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
