@@ -51,7 +51,7 @@ void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table,
     // decrement count in old entry. Do not remove source from neighborhood. This will be done in the PostChange listener.
     if (isRunning()){
         if (dcdMap->isInNeighborhood((int)oldInfo->getNodeId())){
-            EV_TRACE << LOG_MOD << hostId << " preChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(oldInfo) << endl;
+            EV_INFO << LOG_MOD << hostId << " preChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(oldInfo) << endl;
             auto oldCell = dcdMap->getNeighborCell((int)oldInfo->getNodeId());
             if (dcdMap->hasEntry(oldCell)){
                 // if DcdMap contains a (local) entry for the cell decrement.
@@ -70,7 +70,7 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
     //
     // increment/update entry based on new beacon informationgetCellId
     if (isRunning()){
-        EV_TRACE << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
+        EV_INFO << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
         auto pos = converter->position_cast_traci(newInfo->getPos());
         auto cellId = dcdMap->getCellId(pos);
         dcdMap->getEntry<GridEntry>(cellId)->incrementCount(simTime(), newInfo->getBeaconValue());
@@ -91,7 +91,7 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     //
     // remove beacon value from cell entry and remove source (nodeId) from neighborhood
     if (isRunning()){
-        EV_TRACE << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
+        EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         auto oldCell = dcdMap->getNeighborCell((int)info->getNodeId());
         dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), info->getBeaconValue());
         dcdMap->removeFromNeighborhood((int)info->getNodeId());

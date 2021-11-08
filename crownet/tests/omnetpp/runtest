@@ -1,27 +1,30 @@
-#! /bin/sh
+#! /bin/bash
 #
 # usage: runtest [<testfile>...]
 # without args, runs all *.test files in the current directory
 #
 
-#MAKE="make MODE=debug"
-MAKE="make MODE=release"
+if [[ "$1" == "release" || "$1" == "debug" ]]; then
+    _MODE="$1"
+    shift
+else 
+    _MODE="release"
+fi
+
+if [[ "$_MODE" == "release" ]]; then
+    _Dbg=""
+else
+    _Dbg="_dbg"
+fi
+
+# echo "MODE: $_MODE /  $_Dbg" 
+MAKE="make MODE=${_MODE}"
 
 TESTFILES=$*
 if [ "x$TESTFILES" = "x" ]; then TESTFILES='*.test'; fi
 export NEDPATH="$(exec ../../../scripts/nedpath)"
 
-CROWNET_PATH="../../../src/"
-CROWNET_INCLUDE="-I$CROWNET_PATH -L$CROWNET_PATH"
-
-INET_PATH="../../../../inet4/src/"
-INET_INCLUDE="-I$INET_PATH -L$INET_PATH"
-
-#EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET_dbg -lCROWNET_dbg"
-EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET -lCROWNET"
-
-echo "opp_test run $OPT -p work_dbg -v $TESTFILES"
-# opp_test run $OPT -p work_dbg -v $TESTFILES || exit 1
-opp_test run $OPT -p work -v $TESTFILES -a "-c final" || exit 1
+echo "opp_test run $OPT work${_Dgb} -v $TESTFILES -a -c final"
+opp_test run $OPT -p "work${_Dbg}" -v $TESTFILES -a "-c final" || exit 1
 echo
 echo Results can be found in ./work

@@ -137,10 +137,10 @@ build-exec: src/CROWNET$(_D)
 
 
 opp-test: opp-test-make
-	cd tests/omnetpp && ./runtest *.test
+	cd tests/omnetpp && ./runtest $(MODE) *.test
 
 opp-test-make: build-lib
-	cd tests/omnetpp && ./gentest *.test 
+	cd tests/omnetpp && ./gentest $(MODE) *.test 
 
 opp-test-clean:
 	rm -rf tests/omnetpp/work

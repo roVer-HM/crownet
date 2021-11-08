@@ -1,11 +1,25 @@
-#! /bin/sh
+#! /bin/bash
 #
 # usage: runtest [<testfile>...]
 # without args, runs all *.test files in the current directory
 #
 
-#MAKE="make MODE=debug"
-MAKE="make MODE=release"
+
+if [[ "$1" == "release" || "$1" == "debug" ]]; then
+    _MODE="$1"
+    shift
+else 
+    _MODE="release"
+fi
+
+if [[ "$_MODE" == "release" ]]; then
+    _Dbg=""
+else
+    _Dbg="_dbg"
+fi
+
+# echo "MODE: $_MODE /  $_Dbg" 
+MAKE="make MODE=${_MODE}"
 
 TESTFILES=$*
 if [ "x$TESTFILES" = "x" ]; then TESTFILES='*.test'; fi
@@ -20,8 +34,7 @@ CROWNET_INCLUDE="-I$CROWNET_PATH -L$CROWNET_PATH"
 INET_PATH="../../../../inet4/src/"
 INET_INCLUDE="-I$INET_PATH -L$INET_PATH"
 
-#EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET_dbg -lCROWNET_dbg"
-EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET -lCROWNET"
+EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET${_Dbg} -lCROWNET${_Dbg}"
 
 opp_test gen $OPT -v $TESTFILES || exit 1
 echo
