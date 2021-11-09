@@ -41,7 +41,7 @@ CrowNet is based on a number of other software components which are developed by
 We would like to thank all organizations and individuals involved for making these great projects publicly available. Without these, CrowNet could not be implemented.
 
 ### Documentation
-The documentation can be found in our [Github project](https://sam-dev.cs.hm.edu/rover/crownet/-/tree/master/doc/README.md)
+The documentation can be found in our [Github project](https://github.com/marioweid/crownet/blob/master/doc/README.md)
 
 ### Contributions
 
