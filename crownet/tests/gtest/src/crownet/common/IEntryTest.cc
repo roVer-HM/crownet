@@ -137,25 +137,6 @@ TEST_F(IEntryTest, compareMeasureTime) {
   ASSERT_EQ(e2_dbl_with_count.compareMeasureTime(other4), 0);
 }
 
-TEST_F(IEntryTest, XXXX) {
-  //   std::shared_ptr<LocalDensityMeasure<NODE_ID>> locMeasure =
-  //        std::static_pointer_cast<LocalDensityMeasure<NODE_ID>>(
-  //            this->getCellEntry(cellId).getLocal());
-
-  using OppEntry = IEntry<std::string, omnetpp::simtime_t>;
-  using OppLocEntry = IGlobalEntry<std::string, omnetpp::simtime_t>;
-
-  std::shared_ptr<OppEntry> e1 = std::make_shared<OppEntry>(1, 1.1, 2.2);
-  std::shared_ptr<OppEntry> e2 = std::make_shared<OppLocEntry>(1, 1.1, 2.2);
-
-  IEntry<std::string, omnetpp::simtime_t> other1{1, 1.1, 2.2};
-  other1.reset(t1);
-  e1->reset(t1);
-  e2->reset(t1);  // print
-  std::shared_ptr<OppLocEntry> e2Cast =
-      std::static_pointer_cast<OppLocEntry>(e2);
-  e2Cast->reset(t1);  // print
-}
 
 TEST_F(IEntryTest, toCsv) {
   const char* expectVal = "3,1.34,4.42,0,someViewName";

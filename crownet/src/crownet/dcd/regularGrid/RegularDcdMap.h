@@ -39,6 +39,7 @@ class RegularDcdMapFactory {
   std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> createCellIdStream(const std::string& typeName);
   std::shared_ptr<GridCellIDKeyProvider> getCellKeyProvider() { return cellKeyProvider; }
   RegularGridInfo getGrid() const {return grid;}
+  std::shared_ptr<SimTimeProvider> getTimeProvider() { return timeProvider; }
 
  private:
   RegularGridInfo grid;

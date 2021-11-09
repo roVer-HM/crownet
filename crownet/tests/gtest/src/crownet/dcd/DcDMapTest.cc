@@ -191,27 +191,22 @@ TEST_F(RegularDcDMapTest, strFull) {
   std::string s2 =
       "{map_owner: 2 cell_count: 3 local_cell_count: 3}\n"
       "  {cell_id: [1,1] owner_id: 2}\n"
-      "    2 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1| node_ids: {100, "
-      "101}\n"
+      "    2 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1\n"
       "  {cell_id: [3,3] owner_id: 2}\n"
-      "    2 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1| node_ids: {200, "
-      "201, 202}\n"
+      "    2 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1\n"
       "  {cell_id: [4,4] owner_id: 2}\n"
-      "    2 --> Count: 1| meas_t: 34| recv_t: 34| valid: 1| node_ids: {300}\n";
+      "    2 --> Count: 1| meas_t: 34| recv_t: 34| valid: 1\n";
   EXPECT_STREQ(s2.c_str(), mapLocal.strFull().c_str());
 
   std::string s3 =
       "{map_owner: 3 cell_count: 4 local_cell_count: 3}\n"
       "  {cell_id: [1,1] owner_id: 3}\n"
-      "    3 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1| node_ids: "
-      "{100, 101}\n"
+      "    3 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1\n"
       "    800 --> Count: 4| meas_t: 31| recv_t: 31| valid: 1\n"
       "  {cell_id: [3,3] owner_id: 3}\n"
-      "    3 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1| node_ids: "
-      "{200, 201, 202}\n"
+      "    3 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1\n"
       "  {cell_id: [4,4] owner_id: 3}\n"
-      "    3 --> Count: 2| meas_t: 34| recv_t: 34| valid: 1| node_ids: "
-      "{300, 301}\n"
+      "    3 --> Count: 2| meas_t: 34| recv_t: 34| valid: 1\n"
       "    801 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1\n"
       "  {cell_id: [6,3] owner_id: 3}\n"
       "    803 --> Count: 5| meas_t: 33| recv_t: 33| valid: 1\n"
@@ -298,13 +293,8 @@ TEST_F(RegularDcDMapTest, moveNeigborTo_existing) {
 }
 
 TEST_F(RegularDcDMapTest, moveNeigborTo_notExisting) {
-  try {
     mapLocal.moveNeighborTo(999, GridCellID(4, 9));
-    FAIL() << "omnetpp::cRuntimeError expected" << std::endl;
-  } catch (omnetpp::cRuntimeError e) {
-  } catch (...) {
-    FAIL() << "unexpected throw" << std::endl;
-  }
+    EXPECT_EQ(GridCellID(4, 9), mapLocal.getNeighborCell(999));
 }
 
 TEST_F(RegularDcDMapTest, addToNeighborhood_existing) {
