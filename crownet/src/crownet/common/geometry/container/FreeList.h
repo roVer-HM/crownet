@@ -46,6 +46,7 @@ public:
            while(index < freeList->data.size() && freeList->data[index].next != VALID){
                ++index;
            }
+           return *this;
        }
        Iterator operator++(int) {Iterator tmp = *this; ++(*this); return tmp;}
 
