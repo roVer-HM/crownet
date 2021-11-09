@@ -46,7 +46,7 @@ from roveranalyzer.entrypoint.parser import ArgList
 from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
-from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse, stop_containers
+from roveranalyzer.dockerrunner.dockerrunner import DockerClient, DockerCleanup, DockerReuse, stop_containers
 from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv, create_dir_diff, compare_diff
 import docker
 from requests.exceptions import ReadTimeout
@@ -811,7 +811,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         # if omnetpp not present assume latest
         self.tags = sim_wrapper.get_copy("tags")
         self.tags.setdefault("omnetpp", "latest")
-        self.docker_client = docker.from_env()
+        self.docker_client = DockerClient.get()  # increased timeout
 
         if "vadere" in self.tags:
             self.mobility_runner = self.build_vadere_runner()
@@ -1299,7 +1299,7 @@ def crownet_main(args):
     generator.writeUpdatedFiles()
     generator.writeErrorFiles()
     generator.writeFailedFiles()
-    print("Log has been saved to %s" % TestGlobal.logFile)
+    print("Log has been saved to %s" % TestGlob/cpial.logFile)
 
     # FIXME: do not use global exit code
     return TestGlobal.exitCode
@@ -1379,9 +1379,8 @@ def crownet_argparser(parser: argparse.ArgumentParser):
 
 def parse_arguments(_args=None):
     defaultNumThreads = multiprocessing.cpu_count()
-    if defaultNumThreads >= 6:
-        defaultNumThreads = defaultNumThreads - 1
-
+    if defaultNumThreads > 2:
+        defaultNumThreads -= 2
     main = argparse.ArgumentParser(
         prog="Fingerprint Testrunner",
         description="Run the fingerprint tests specified as OMNeT++ or CrowNet fingerprint files."
