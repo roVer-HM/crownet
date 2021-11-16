@@ -23,12 +23,14 @@ void EventTriggerdSchedulerSimple::scheduleEvent(cMessage *message){
     Enter_Method("scheduleEvent");
     take(message);
     // just sent event message to application.
+    assertAppRunning();
     send(message, outputGate);
 }
 
 void EventTriggerdSchedulerSimple::schedulePacket(Packet *packet){
     Enter_Method("schedulePacket");
     take(packet);
+    assertAppRunning();
     send(packet, outputGate);
 }
 

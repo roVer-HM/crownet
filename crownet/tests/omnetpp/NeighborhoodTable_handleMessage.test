@@ -18,6 +18,9 @@ void test()
     // getTtlMessage() 
 }
 
+%inifile: omnetpp.ini
+[Config final]
+
 %activity:
 
 test();

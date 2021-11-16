@@ -17,6 +17,98 @@
 
 namespace crownet {
 
+std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
+
+    boost::filesystem::path pp{fileName};
+    if (pp.is_absolute()){
+        return fileName;
+    }
+    cConfigOption *scaObj = cConfigOption::find("output-scalar-file");
+    if (scaObj) {
+      std::string outputScalarFile = cSimulation::getActiveSimulation()
+                                         ->getEnvir()
+                                         ->getConfig()
+                                         ->getAsFilename(scaObj);
+
+      boost::filesystem::path p{outputScalarFile};
+      boost::filesystem::absolute(p);
+      std::string _path;
+      if (0 == fileName.compare(fileName.size() - 4, fileName.size(), ".csv")){
+          _path = p.parent_path().string() + "/" + fileName;
+      } else {
+          _path = p.parent_path().string() + "/" + fileName + ".csv";
+      }
+      std::cout << _path << endl;
+      return _path;
+    } else {
+      throw cRuntimeError("output-scalar-file not found");
+    }
+
+};
+
+BaseFileWriter::BaseFileWriter(std::string filePath, std::string sep, long bufferSize)
+        :filePath(filePath),  sep(sep), bufferSize(bufferSize){}
+
+void BaseFileWriter::initialize(){
+    if (isInitialized()){
+        return; // only once
+    }
+    if (filePath == ""){
+        throw cRuntimeError("Path is not set");
+    }
+    filePath = getAbsOutputPath(filePath);
+    file = std::ofstream(filePath);
+    init = true;
+    onInit();
+}
+
+BaseFileWriter::~BaseFileWriter(){
+    close();
+}
+
+void BaseFileWriter::writeBuffer(){
+    file << buffer.str();
+    buffer.str(std::string());
+    buffer.clear();
+}
+void BaseFileWriter::flush(){
+    writeBuffer();
+    file.flush();
+}
+void BaseFileWriter::close(){
+    if (!closed){
+        flush();
+        file.close();
+        closed = true;
+    }
+}
+
+void BaseFileWriter::writeMetaData(std::map<std::string, std::string>& mData){
+    int n = mData.size();
+    write() << "#";
+    for (const auto &e : mData) {
+      write() << e.first << "=" << e.second;
+      if (n > 1) {
+        write() << ",";
+      }
+      n--;
+    }
+    write() << std::endl;
+
+}
+
+std::ostream &BaseFileWriter::write(){
+    long pos = buffer.tellp();
+    if (pos > bufferSize){
+        // write buffer to field
+        writeBuffer();
+    }
+    return buffer;
+}
+
+
+
+
 FileWriterBuilder::FileWriterBuilder(std::string sep) {
   metadata["IDXCOL"] = "1";
   metadata["DATACOL"] = "-1";
@@ -30,83 +122,40 @@ FileWriterBuilder &FileWriterBuilder::addPath(const std::string &path) {
 
 
 template <>
-FileWriter *FileWriterBuilder::build(RegularDcdMap* map, const std::string &mapType){
-    FileWriter *obj = nullptr;
+ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const std::string &mapType){
+    ActiveFileWriter *obj = nullptr;
     if (mapType == "all"){
-        obj = new FileWriter(std::make_shared<RegularDcdMapAllPrinter>(map));
+        obj = new ActiveFileWriter(
+                path,
+                std::make_shared<RegularDcdMapAllPrinter>(map));
     } else {
-        obj = new FileWriter(std::make_shared<RegularDcdMapValuePrinter>(map));
+        obj = new ActiveFileWriter(
+                path,
+                std::make_shared<RegularDcdMapValuePrinter>(map));
     }
-    obj->initialize(path, metadata["SEP"]);
-    // write metadata
-    int n = metadata.size();
-    obj->write() << "#";
-    for (const auto &e : metadata) {
-      obj->write() << e.first << "=" << e.second;
-      if (n > 1) {
-        obj->write() << ",";
-      }
-      n--;
-    }
-    obj->write() << "\n";
-
-
+    obj->initialize();
+    obj->writeMetaData(metadata);
+    obj->flush();
     return obj;
 }
 
-FileWriter *FileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
-  FileWriter *obj = new FileWriter(std::move(printer));
-  obj->initialize(path, metadata["SEP"]);
-  // write metadata
-  int n = metadata.size();
-  obj->write() << "#";
-  for (const auto &e : metadata) {
-    obj->write() << e.first << "=" << e.second;
-    if (n > 1) {
-      obj->write() << ",";
-    }
-    n--;
-  }
-  obj->write() << "\n";
-
+ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
+  ActiveFileWriter *obj = new ActiveFileWriter(
+          path,
+          std::move(printer));
+  obj->initialize();
+  obj->writeMetaData(metadata);
+  obj->flush();
   return obj;
 }
 
-FileWriter::~FileWriter() {
-  s.flush();
-  s.close();
-}
+ActiveFileWriter::ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep, long bufferSize)
+    : BaseFileWriter(filePath, sep, bufferSize), printer(std::move(printer)) {}
 
-FileWriter::FileWriter(FileWriter &&other)
-    : s(std::move(other.s)), sep(other.sep), printer(other.printer) {}
+void ActiveFileWriter::writeHeader() { printer->writeHeaderTo(write(), sep); }
 
-FileWriter::FileWriter(std::shared_ptr<FilePrinter> printer)
-    : s(), sep(";"), printer(std::move(printer)) {}
+void ActiveFileWriter::writeData() { printer->writeTo(write(), sep); }
 
-void FileWriter::writeHeader() { printer->writeHeaderTo(s, sep); }
 
-void FileWriter::writeData() { printer->writeTo(s, sep); }
-
-void FileWriter::initialize(std::string fileName, std::string _delim) {
-  using namespace omnetpp;
-  cConfigOption *scaObj = cConfigOption::find("output-scalar-file");
-  if (scaObj) {
-    std::string outputScalarFile = cSimulation::getActiveSimulation()
-                                       ->getEnvir()
-                                       ->getConfig()
-                                       ->getAsFilename(scaObj);
-
-    boost::filesystem::path p{outputScalarFile};
-    std::string _path = p.parent_path().string() + "/" + fileName + ".csv";
-    s = std::ofstream(_path);
-    sep = _delim;
-  } else {
-    throw cRuntimeError("output-scalar-file not found");
-  }
-}
-
-std::string FileWriter::del() const { return sep; }
-
-std::ostream &FileWriter::write() { return s; }
 
 } /* namespace crownet */

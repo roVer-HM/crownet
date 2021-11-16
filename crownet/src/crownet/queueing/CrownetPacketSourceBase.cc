@@ -21,6 +21,8 @@
 #include "inet/common/IdentityTag_m.h"
 #include "inet/common/Simsignals.h"
 #include "inet/common/TimeTag_m.h"
+#include "inet/common/ModuleAccess.h"
+#include "crownet/applications/common/AppCommon_m.h"
 
 using namespace inet;
 
@@ -32,6 +34,10 @@ void CrownetPacketSourceBase::initialize(int stage)
     inet::queueing::PacketSourceBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         packetName = par("packetName");
+        attachHostIdTag = par("attachHostIdTag").boolValue();
+        attachSequenceIdTag = par("attachSequenceIdTag").boolValue();
+        hostId = getContainingNode(this)->getId();
+        WATCH(hostId);
     }
 }
 
@@ -67,6 +73,9 @@ const char *CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& da
             case 'e':
                 result = std::to_string(getSimulation()->getEventNumber());
                 break;
+            case 'i':
+                result = std::to_string(hostId);
+                break;
             default:
                 throw cRuntimeError("Unknown directive: %c", directive);
         }
@@ -80,6 +89,12 @@ void CrownetPacketSourceBase::applyContentTags(Ptr<Chunk> content){
     if (attachIdentityTag) {
         auto identityStart = IdentityTag::getNextIdentityStart(content->getChunkLength());
         content->addTag<IdentityTag>()->setIdentityStart(identityStart);
+    }
+    if (attachHostIdTag){
+        content->addTag<HostIdTag>()->setHostId(hostId);
+    }
+    if (attachSequenceIdTag){
+        content->addTag<SequenceIdTag>()->setSequenceNumber(numProcessedPackets);
     }
 }
 void CrownetPacketSourceBase::applyPacketTags(Packet *packet){

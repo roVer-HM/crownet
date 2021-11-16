@@ -40,7 +40,7 @@ def main(path):
     # use the given slices on ALL providers as necessary
     # count_map data frame is still lacy loaded. The slicers are passed
     # to the DcdMap2D
-    dcd = hdf_builder.build_dcd_map(time_slice=slice(2.0, 10.0),
+    dcd = hdf_builder.build(time_slice=slice(2.0, 10.0),
                                     id_slice=slice(None),
                                     x_slice=slice(800.0, 1000.0))
     print(dcd.map.index.get_level_values("simtime").unique())

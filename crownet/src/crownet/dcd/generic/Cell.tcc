@@ -71,30 +71,64 @@ void Cell<C, N, T>::put(entry_t_ptr& m) {
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::localEntry_t_ptr Cell<C, N, T>::getLocal() {
-  auto entry = this->get(this->owner_id);
-  return std::static_pointer_cast<ILocalEntry<N, T>>(entry);
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getLocal() {
+  return this->get(this->owner_id);
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::localEntry_t_ptr Cell<C, N, T>::getLocal() const {
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::getLocal() const {
   return const_cast<Cell<C, N, T>*>(this)->getLocal();
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::get(
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::get(
     const node_key_t node_id) {
   if (!hasData(node_id))
     throw omnetpp::cRuntimeError("node_id %s not found in cell %s",
                                  node_id.str().c_str(),
                                  this->cell_id.str().c_str());
-  return this->data[node_id];
+  return std::dynamic_pointer_cast<E>(this->data[node_id]);
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::entry_t_ptr const Cell<C, N, T>::get(
+template <typename E>
+std::shared_ptr<E> const Cell<C, N, T>::get(
     const node_key_t node_id) const {
-  return const_cast<Cell<C, N, T>*>(this)->get(node_id);
+  return const_cast<Cell<C, N, T>*>(this)->get<E>(node_id);
+}
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::get() {
+    return get<E>(owner_id);
+}
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> const Cell<C, N, T>::get() const {
+  return const_cast<Cell<C, N, T>*>(this)->get<E>(owner_id);
+}
+
+
+
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::getOrCreate(const node_key_t node_id){
+    if (!hasData(node_id)){
+        auto e = std::make_shared<E>(0.0,
+                timeProvider->now(),
+                timeProvider->now(),
+                node_id
+                );
+        this->data[node_id] = e;
+    }
+    return get<E>(node_id);
+}
+template <typename C, typename N, typename T>
+template <typename E>
+std::shared_ptr<E> Cell<C, N, T>::getOrCreate(){
+    return getOrCreate<E>(owner_id);
 }
 
 template <typename C, typename N, typename T>
@@ -115,6 +149,12 @@ CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() {
 template <typename C, typename N, typename T>
 CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() const {
   return const_cast<Cell<C, N, T>*>(this)->validIter();
+}
+
+template <typename C, typename N, typename T>
+template <typename Fn>
+void Cell<C, N, T>::acceptSet(Fn* visitor) {
+  visitor->operator()(*this);
 }
 
 template <typename C, typename N, typename T>
@@ -140,7 +180,7 @@ void Cell<C, N, T>::computeValue(const Fn computeAlg) {
   // 2 apply computeAlg to select or compute value which represents this cell.
   this->cell_value = computeAlg->operator()(*this);  // may set empty shared_ptr
   // 3 set selection flag
-  if (this->cell_value) this->cell_value->setSelectedIn(computeAlg->getName());
+  if (this->cell_value) this->cell_value->setSelectedIn(computeAlg->getVisitorName());
   // todo: if computeAlg creates a new entry (i.e compute not select) this->data
   // does not contain the selected value!
 }
@@ -182,14 +222,14 @@ std::string Cell<C, N, T>::infoCompact() const{
     if (this->hasLocal()){
         const auto l = this->getLocal();
         std::string valid = l->valid() ? "" : "-";
-        os << "] -> [L" << l->getSource() << ":" << valid << l->getCount() << "|" << l->getMeasureTime() << "]";
+        os << "] -> [L" << l->getSource() << ":" << valid << l->getCount() << "|" << l->getMeasureTime().ustr() << "]";
     } else {
         os << "] -> ";
     }
     for(auto const& e : this->data){
         if(e.first != this->owner_id){
             std::string valid2 = e.second->valid() ? "" : "-";
-            os << "[" << e.second->getSource() << ":" << valid2 << e.second->getCount() << "|" << e.second->getMeasureTime() << "]";
+            os << "[" << e.second->getSource() << ":" << valid2 << e.second->getCount() << "|" << e.second->getMeasureTime().ustr() << "]";
         }
     }
 
@@ -197,29 +237,13 @@ std::string Cell<C, N, T>::infoCompact() const{
 }
 
 template <typename C, typename N, typename T>
-void Cell<C, N, T>::incrementLocal(const node_key_t& countedNodeId,
-                                   const time_t& time) {
-  if (!hasData(this->owner_id)) {
-    // create local entry and set cell owner as source.
-    auto e = this->entryCtor.localEntry();
-    e->setSource(this->owner_id);
-    this->data[this->owner_id] = e;
-  }
-  std::shared_ptr<ILocalEntry<N, T>> lEntry =
-      std::static_pointer_cast<ILocalEntry<N, T>>(this->data[this->owner_id]);
-  auto ret = lEntry->nodeIds.insert(countedNodeId);
-  if (ret.second) {
-    // new node inserted
-    lEntry->incrementCount(time);
-  } else {
-    // node already exists just update time.
-    lEntry->touch(time);
-  }
+typename Cell<C, N, T>::entry_t_ptr  Cell<C, N, T>::createEntry(const double count) const{
+    auto e = this->entryCtor.entry();
+    e->setCount(count);
+    return e;
 }
 
 template <typename C, typename N, typename T>
-typename Cell<C, N, T>::entry_t_ptr  Cell<C, N, T>::createEntry(const double count) const{
-    auto e = this->entryCtor.localEntry();
-    e->setCount(count);
-    return e;
+void Cell<C, N, T>::sentAt(const time_t& time){
+    this->last_sent = time;
 }

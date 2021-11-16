@@ -17,7 +17,7 @@ namespace crownet {
 // todo integrate with crownet/common/util/FileWriter.h
 class RegularDcdMapValuePrinter : public FilePrinter {
  public:
-  RegularDcdMapValuePrinter(RegularDcdMap* map) : map(map){};
+  RegularDcdMapValuePrinter(std::shared_ptr<RegularDcdMap> map) : map(map){};
 
   virtual int columns() const override;
   virtual void writeTo(std::ostream& out,
@@ -27,13 +27,13 @@ class RegularDcdMapValuePrinter : public FilePrinter {
 
 
  protected:
-  RegularDcdMap* map;
+  std::shared_ptr<RegularDcdMap> map;
 };
 
 // todo print all cell values  not only the 'selected' one
 class RegularDcdMapAllPrinter : public RegularDcdMapValuePrinter {
  public:
-  RegularDcdMapAllPrinter(RegularDcdMap* map)
+  RegularDcdMapAllPrinter(std::shared_ptr<RegularDcdMap> map)
       : RegularDcdMapValuePrinter(map){};
   virtual void writeTo(std::ostream& out,
                        const std::string& sep) const override;
@@ -42,7 +42,7 @@ class RegularDcdMapAllPrinter : public RegularDcdMapValuePrinter {
 // todo print global map
 class RegularDcdMapGlobalPrinter : public RegularDcdMapValuePrinter {
  public:
-  RegularDcdMapGlobalPrinter(RegularDcdMap* map)
+  RegularDcdMapGlobalPrinter(std::shared_ptr<RegularDcdMap> map)
       : RegularDcdMapValuePrinter(map){};
   virtual void writeTo(std::ostream& out,
                        const std::string& sep) const override;

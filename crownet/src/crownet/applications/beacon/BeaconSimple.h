@@ -34,7 +34,6 @@ public:
 
 
 private:
-    inet::IMobility *mobility = nullptr;
     NeighborhoodTable *nTable  = nullptr;
 };
 

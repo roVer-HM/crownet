@@ -46,8 +46,9 @@ from roveranalyzer.entrypoint.parser import ArgList
 from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
-from roveranalyzer.dockerrunner.dockerrunner import DockerCleanup, DockerReuse, stop_containers
+from roveranalyzer.dockerrunner.dockerrunner import DockerClient, DockerCleanup, DockerReuse, stop_containers
 from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv, create_dir_diff, compare_diff
+from roveranalyzer.utils import levels, logger, set_format, set_level
 import docker
 from requests.exceptions import ReadTimeout
 
@@ -348,9 +349,10 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
 
             # --fingerprint=
             arg_list = ArgList.from_flat_list(sim["args"])
-
             # set debug logging for test
-            arg_list.add_if_missing("-vvv")
+            if (self.args.verbose > 0):
+                _v = "v"*self.args.verbose
+                arg_list.add_if_missing(f"-{_v}")
 
             # check if `args` contains executable and tags contains exec. Update `args` accordingly
             if arg_list.to_list()[0].startswith("-"):
@@ -811,7 +813,7 @@ class FingerprintContainerTestCase(FingerprintTestCase):
         # if omnetpp not present assume latest
         self.tags = sim_wrapper.get_copy("tags")
         self.tags.setdefault("omnetpp", "latest")
-        self.docker_client = docker.from_env()
+        self.docker_client = DockerClient.get()  # increased timeout
 
         if "vadere" in self.tags:
             self.mobility_runner = self.build_vadere_runner()
@@ -1379,9 +1381,8 @@ def crownet_argparser(parser: argparse.ArgumentParser):
 
 def parse_arguments(_args=None):
     defaultNumThreads = multiprocessing.cpu_count()
-    if defaultNumThreads >= 6:
-        defaultNumThreads = defaultNumThreads - 1
-
+    if defaultNumThreads > 2:
+        defaultNumThreads -= 2
     main = argparse.ArgumentParser(
         prog="Fingerprint Testrunner",
         description="Run the fingerprint tests specified as OMNeT++ or CrowNet fingerprint files."
@@ -1452,6 +1453,11 @@ if __name__ == "__main__":
             level=levels[level_idx],
             format="%(asctime)s:%(module)s:%(levelname)s> %(message)s",
         )
+
+    # roveranalyzer logging 
+    level_idx = args.verbose
+    set_level(levels[level_idx])
+    set_format("%(asctime)s:%(module)s:%(levelname)s> %(message)s")
 
     # FIXME refactor global object
     # Set global object

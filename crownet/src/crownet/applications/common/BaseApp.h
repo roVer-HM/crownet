@@ -41,14 +41,15 @@
 #include "crownet/applications/common/info/AppInfoLocal.h"
 #include "crownet/queueing/CrownetActivePacketSourceBase.h"
 #include "crownet/applications/common/scheduler/IAppScheduler.h"
+#include "crownet/common/MobilityProviderMixin.h"
 
 using namespace inet;
 
 namespace crownet {
 
-class BaseApp : //public ApplicationBase,
-                public DataArrivedHandler,
-                public crownet::queueing::CrownetActivePacketSourceBase {
+class BaseApp : public DataArrivedHandler,
+                public AppStatusInfo,
+                public MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase> {
  public:
   BaseApp(){};
   virtual ~BaseApp();
@@ -63,12 +64,18 @@ class BaseApp : //public ApplicationBase,
   cMessage *appLifeTime = nullptr;
   cMessage *appMainTimer = nullptr;
 
+  // packet creation / scheduling
+  inet::b maxPduLength = b(0);
+  inet::b minPduLength = b(0);
+  inet::b scheduledData = b(0);
+  IAppScheduler* scheduler = nullptr;
+
+
+
   omnetpp::cFSM fsmRoot;
   FsmState socketFsmResult = FsmRootStates::ERR;
   SocketProvider* socketProvider = nullptr;
-  IAppScheduler* scheduler = nullptr;
   AppInfoLocal* localInfo = nullptr;
-  int hostId;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -76,8 +83,6 @@ class BaseApp : //public ApplicationBase,
   virtual void initialize(int stage) override;
   virtual void finish() override;
 
-  // omnetpp based id as unique and constant identifier.
-  int getHostId() const {return hostId;}
 
   /**
    * schedule selfMsgSendTimer with base + par("sendInterval").
@@ -124,11 +129,30 @@ class BaseApp : //public ApplicationBase,
 
 
   virtual void setupTimers();  // called in fsmSetup
+  // PacketProcessorBase
   virtual void handlePacketProcessed(Packet *packet) override;
 
-  // Lifecycle management
-  virtual void handleStartOperation(
-      LifecycleOperation *operation); //override;  // trigger fsmSetup
+  // Lifecycle management. Will trigger fsmSetup
+  virtual void handleStartOperation(LifecycleOperation *operation);
+
+  // AppStatusInfo interface
+  virtual const bool isRunning() override;
+  virtual const bool isStopped() override;
+  virtual const FsmState getState() override;
+  // default to true irrespective of scheduled data provided (-1b one packet)
+  virtual const bool canProducePacket() override {return true;}
+  virtual const inet::b getAvailablePduLenght() override;
+  virtual const simtime_t getStartTime() override {return startTime;}
+  virtual const simtime_t getStopTime() override {return stopTime;}
+  virtual void setScheduleData(inet::b data) override {scheduledData = data;}
+  virtual const inet::b getScheduleData() override {return scheduledData;}
+  virtual const inet::b getMinPdu() override;
+  virtual const inet::b getMaxPdu() override;
+public:
+  // ICrownetActivePacketSource
+  virtual void producePackets(inet::b maxData) override;
+  virtual void handleCanPushPacketChanged(cGate *gate) override { throw cRuntimeError("Packet generation managed by scheduler");}
+
 };
 
 template <typename T>

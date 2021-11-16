@@ -21,6 +21,7 @@
 
 #include "crownet/applications/common/AppFsm.h"
 #include "crownet/applications/common/BaseApp.h"
+#include "crownet/applications/dmap/dmap_m.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/util/FileWriter.h"
@@ -34,8 +35,8 @@ using namespace inet;
 
 namespace crownet {
 class BaseDensityMapApp : public BaseApp,
-                          public IDensityMapHandler<RegularDcdMap>,
-                          public omnetpp::cListener {
+                          public IDensityMapHandler<RegularDcdMap>
+                          {
 public:
     virtual ~BaseDensityMapApp();
     BaseDensityMapApp(){};
@@ -45,17 +46,15 @@ protected:
  // cSimpleModule
  virtual int numInitStages() const override { return NUM_INIT_STAGES; }
  virtual void initialize(int stage) override;
- using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
+
  virtual void finish() override;
 
- // cListener
- void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj,
-                    cObject *details) override;
 
  virtual FsmState handleDataArrived(Packet *packet) override;
 
  //
  virtual Packet *createPacket() override;
+ virtual void applyContentTags(Ptr<Chunk> content) override;
 
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
@@ -67,25 +66,32 @@ protected:
  virtual bool mergeReceivedMap(Packet *packet);
 
  // IDensityMapHandler
+ // update map with data from neighborhood table
  virtual void updateLocalMap() override;
  virtual void computeValues() override;
  virtual void writeMap() override;
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
- virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
+ virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory>) override;
 
+ // AppStatusInfo
+ virtual const bool canProducePacket() override;
+ virtual const inet::b getMinPdu() override;
 protected:
 
+ std::shared_ptr<GridCellIDKeyProvider> cellProvider;
  std::shared_ptr<OsgCoordinateConverter> converter;
- std::shared_ptr<RegularDcdMap> dcdMap;
- std::unique_ptr<FileWriter> fileWriter;
- std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
- std::shared_ptr<GridCellDistance> distProvider;
- simtime_t lastUpdate = -1.0;
- std::string mapType;
- std::string mapTypeLog;
+ std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
 
- RegularDcdMapWatcher* watcher;
+ std::shared_ptr<RegularDcdMap> dcdMap;
+ std::unique_ptr<ActiveFileWriter> fileWriter;
+ std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
+ simtime_t lastUpdate = -1.0;
+ MapCfg *mapCfg;
+ RegularGridInfo grid;
+
+
+ RegularDcdMapWatcher* dcdMapWatcher;
  cMessage *localMapTimer;
  cPar *localMapUpdateInterval;
 

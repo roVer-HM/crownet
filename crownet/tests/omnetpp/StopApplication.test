@@ -1,0 +1,43 @@
+%description:
+Stop application of one node but let other nodes continue sending data
+
+%file: package.ned 
+// 
+// empty: no namespace
+//
+
+%inifile: omnetpp.ini
+[General]
+ned-path = ../../lib
+include ../lib/default_testConfig.ini
+**.vector-recording = false
+**.scalar-recording = false
+**.routingRecorder.enabled = false
+
+[Config final]
+extends = _default, D2D_General, stationary_n3
+network = crownet.test.omnetpp.lib.TestStationaryWorld
+
+*.misc[*].numApps = 1
+*.misc[*].app[0].socket.typename = "UdpSocketManager"
+# Beacon Application
+*.misc[*].app[0].typename = "BeaconApp"
+*.misc[*].app[0].app.typename = "BeaconSimple"
+*.misc[*].app[0].app.startTime = uniform(0s,0.02s)
+*.misc[*].app[0].scheduler.typename = "IntervalScheduler"
+*.misc[*].app[0].scheduler.generationInterval = 50ms
+# NeighborhoodTable
+*.misc[*].nTable.typename = "crownet.neighbourhood.NeighborhoodTable"
+*.misc[*].nTable.maxAge = 7s
+
+*.misc[0].app[*].app.stopTime = 500ms
+sim-time-limit= 1.0s
+
+%contains: stdout
+0.50952167965 TestStationaryWorld.misc[0].app[0].scheduler :  App stop time reached. Do not schedule any more data
+%not-contains: stdout 
+TestStationaryWorld.misc[1].app[0].scheduler App stop time reached. Do not schedule any more data
+%not-contains: stdout 
+TestStationaryWorld.misc[2].app[0].scheduler App stop time reached. Do not schedule any more data
+%contains: stdout
+<!> Simulation time limit reached -- at t=1s

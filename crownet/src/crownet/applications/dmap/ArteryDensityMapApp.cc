@@ -45,6 +45,7 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
         .getConst<artery::Identity>()
         .host->getId();
     if (_hostId != hostId){
+        // todo handle id update for density map
         throw omnetpp::cRuntimeError("hostId mismatch.");
     }
   }
@@ -52,12 +53,7 @@ void ArteryDensityMapApp::receiveSignal(cComponent *source,
 
 
 FsmState ArteryDensityMapApp::fsmSetup(cMessage *msg) {
-  // ensure Density Grid map was initialized by event
-  if (dcdMap == nullptr)
-    throw omnetpp::cRuntimeError(
-        "Density Grid map not initialized. Was the "
-        "artery::IdentityRegistry::updateSignal event fired? ");
-  return BaseApp::fsmSetup(msg);
+  return BaseDensityMapApp::fsmSetup(msg);
 }
 
 void ArteryDensityMapApp::updateLocalMap() {
@@ -69,7 +65,9 @@ void ArteryDensityMapApp::updateLocalMap() {
 
   // set count of all cells in local map to zero.
   // do not change the valid state.
-  dcdMap->visitCells(ClearLocalVisitor{simTime()});
+  ClearLocalVisitor v;
+  v.setTime(simTime());
+  dcdMap->visitCells(std::move(v));
   dcdMap->clearNeighborhood();
 
   // add yourself to the map.
@@ -78,7 +76,7 @@ void ArteryDensityMapApp::updateLocalMap() {
                         .position();
   const auto &posInet = converter->position_cast_traci(pos);
   dcdMap->setOwnerCell(posInet);
-  dcdMap->incrementLocal(posInet, dcdMap->getOwnerId(), measureTime);
+  dcdMap->getEntry<GridEntry>(posInet)->incrementCount(measureTime, 1.0);
 
   // visitor for artery location table
   vanetza::geonet::LocationTable::entry_visitor eVisitor =
@@ -102,8 +100,15 @@ void ArteryDensityMapApp::updateLocalMap() {
             entry.get_position_vector().position();
         auto cartPos = converter->convertToCartTraCIPosition(geoPos);
 
-        // increment density map
-        dcdMap->incrementLocal(cartPos, _id, measureTime);
+        // Update cell entries in dcdMap:
+        // Assume all beacons carry '1' as value (1 beacon == 1 count)
+        // Pedestrian count beacons are additive thus incremnt is possible.
+        if (dcdMap->isInNeighborhood(_id)){
+            auto oldCell = dcdMap->getNeighborCell(_id);
+            dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(measureTime, 1.0);
+        }
+        dcdMap->addToNeighborhood(_id, cartPos);
+        dcdMap->getEntry<GridEntry>(cartPos)->incrementCount(measureTime, 1.0);
       };
 
   // visit

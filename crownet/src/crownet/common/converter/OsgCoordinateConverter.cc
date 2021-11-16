@@ -75,10 +75,10 @@ OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zoneOriginOffset,
   zoneOffsetProjection.setTranslation(inet::Coord(zoneOriginOffset.x, zoneOriginOffset.y, zoneOriginOffset.z));
 
   std::vector<traci::TraCIPosition> vec;
-  traci::TraCIPosition upperRight;
+  traci::TraCIPosition upperRight{0.0, 0.0, 0.0};
   upperRight.x = _simBound.x;
   upperRight.y = _simBound.y;
-  vec.push_back(traci::TraCIPosition{});
+  vec.push_back(traci::TraCIPosition{0.0, 0.0, 0.0});
   vec.push_back(upperRight);
   simBound = traci::Boundary(vec);
 
@@ -93,6 +93,24 @@ double OsgCoordinateConverter::getBoundaryHeight() const {
   return std::abs(simBound.upperRightPosition().y -
                   simBound.lowerLeftPosition().y);
 }
+
+inet::Coord OsgCoordinateConverter::getBoundary() const{
+    return inet::Coord{getBoundaryWidth(), getBoundaryHeight(), 0.0};
+}
+
+RegularGridInfo OsgCoordinateConverter::getGridDescription(const inet::Coord& cellSize) const {
+    auto gridSize = getBoundary();
+    RegularGridInfo info;
+    info.setGridSize(gridSize);
+    info.setCellSize(cellSize);
+    info.setCellCount(inet::Coord{std::floor(gridSize.x / cellSize.x), std::floor(gridSize.y / cellSize.y), 0.0});
+    return info;
+}
+
+RegularGridInfo OsgCoordinateConverter::getGridDescription(const double cellSize) const{
+    return getGridDescription({cellSize, cellSize, 0.0});
+}
+
 
 
 osgEarth::GeoPoint OsgCoordinateConverter::addZoneOriginOffset(

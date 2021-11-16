@@ -41,10 +41,12 @@ import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
 import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
+import crownet.common.util.IFileWriterRegister;
 
 import artery.storyboard.IStoryboard;
 import artery.utility.IdentityRegistry;
 import traci.Manager;
+import traci.TraCiManager;
 
 
 network World
@@ -121,7 +123,7 @@ network World
                 @display("p=410.865,267.51373;is=s");
         }
         // TraCI
-        traci: Manager {
+        traci: <default("Manager")> like TraCiManager if typename != "" {
             parameters:
                 @display("p=523.74,31.605");
         }
@@ -143,6 +145,9 @@ network World
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
 
             @display("p=308.14874,406.35;is=vs");
+        }
+        fileWriterRegister: <default("")> like IFileWriterRegister if typename != "" {
+           @display("p=308.14874,506.35;is=vs");
         }
 
 

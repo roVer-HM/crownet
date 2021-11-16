@@ -20,7 +20,6 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
 
         minSentFrequency = par("minSentFrequency");
@@ -40,13 +39,20 @@ Packet *BeaconDynamic::createPacket() {
 
 
     const auto &beacon = makeShared<DynamicBeaconPacket>();
-    beacon->setPos(mobility->getCurrentPosition());
-    beacon->setEpsilon({0.0, 0.0});
+    beacon->setPos(getPosition());
+    beacon->setEpsilon({0.0, 0.0, 0.0});
     // measurement time is same as packet creation.
     beacon->setPosTimestamp(time);
     beacon->setNumberOfNeighbours(nTable->getNeighbourCount());
 
-    return buildPacket(beacon, header);
+    auto packet = buildPacket(beacon, header);
+
+    // process local for own location entry in neighborhood table.
+    auto tmp = packet->dup();
+    handleDataArrived(tmp);
+    delete tmp;
+
+    return packet;
 }
 
 
@@ -55,6 +61,7 @@ FsmState BeaconDynamic::handleDataArrived(Packet *packet){
     auto info = nTable->getOrCreateEntry(packet->peekAtFront<DynamicBeaconHeader>()->getSourceId());
 
     info->processInbound(packet, hostId, simTime());
+    nTable->emitPostChanged(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

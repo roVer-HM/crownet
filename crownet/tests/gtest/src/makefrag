@@ -1,0 +1,10 @@
+#
+MSGC:=$(MSGC) --msg6
+
+#
+# compiler warning for c-style cast
+#
+#CFLAGS += -Wold-style-cast
+#CFLAGS += -save-temps
+CXXFLAGS += -Wno-format-security
+

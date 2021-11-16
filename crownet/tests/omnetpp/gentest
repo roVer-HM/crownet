@@ -1,0 +1,42 @@
+#! /bin/bash
+#
+# usage: runtest [<testfile>...]
+# without args, runs all *.test files in the current directory
+#
+
+
+if [[ "$1" == "release" || "$1" == "debug" ]]; then
+    _MODE="$1"
+    shift
+else 
+    _MODE="release"
+fi
+
+if [[ "$_MODE" == "release" ]]; then
+    _Dbg=""
+else
+    _Dbg="_dbg"
+fi
+
+# echo "MODE: $_MODE /  $_Dbg" 
+MAKE="make MODE=${_MODE}"
+
+TESTFILES=$*
+if [ "x$TESTFILES" = "x" ]; then TESTFILES='*.test'; fi
+if [ ! -d work ];  then mkdir work; fi
+rm -rf work/lib
+cp -pPR lib work/
+export NEDPATH="$(exec ../../../scripts/nedpath)"
+
+CROWNET_PATH="../../../src/"
+CROWNET_INCLUDE="-I$CROWNET_PATH -L$CROWNET_PATH"
+
+INET_PATH="../../../../inet4/src/"
+INET_INCLUDE="-I$INET_PATH -L$INET_PATH"
+
+EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET${_Dbg} -lCROWNET${_Dbg}"
+
+opp_test gen $OPT -v $TESTFILES || exit 1
+echo
+(cd work; opp_makemake -f --deep --no-deep-includes -I./lib -o work -i ../makefrag $EXTRA_INCLUDES; $MAKE) || exit 1
+echo

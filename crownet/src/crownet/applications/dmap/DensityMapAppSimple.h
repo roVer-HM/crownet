@@ -15,7 +15,8 @@
 
 #pragma once
 
-#include "crownet/neighbourhood/NeighborhoodTable.h"
+#include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+
 #include "inet/mobility/contract/IMobility.h"
 #include "crownet/applications/dmap/BaseDensityMapApp.h"
 
@@ -24,22 +25,32 @@ using namespace inet;
 
 namespace crownet {
 
-class DensityMapAppSimple : public BaseDensityMapApp {
+class DensityMapAppSimple : public BaseDensityMapApp
+                            , public NeighborhoodEntryListner
+
+{
 public:
     DensityMapAppSimple(){};
-    virtual ~DensityMapAppSimple()=default;
+    virtual ~DensityMapAppSimple() = default;
 
 protected:
  // cSimpleModule
  virtual void initialize(int stage) override;
+ virtual void finish() override;
 
  // IDensityMapHandler
  virtual void updateLocalMap() override;
+ virtual void computeValues() override;
+
+ //NeighborhoodEntryListner
+ virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo)override;
+ virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* newInfo) override;
+ virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
+
 
 private:
   // application
- inet::IMobility *mobility = nullptr;
- NeighborhoodTable *nTable  = nullptr;
+ INeighborhoodTable *nTable  = nullptr;
 
 };
 

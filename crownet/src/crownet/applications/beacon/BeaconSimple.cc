@@ -19,7 +19,6 @@ BeaconSimple::BeaconSimple() {}
 void BeaconSimple::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        mobility = inet::getModuleFromPar<inet::IMobility>(par("mobilityModule"), inet::getContainingNode(this));
         nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
     }
 }
@@ -28,10 +27,18 @@ Packet *BeaconSimple::createPacket() {
 
     auto beacon = createPayload<BeaconPacketSimple>();
     beacon->setTime(simTime());
-    beacon->setPos(mobility->getCurrentPosition());
+    beacon->setPos(getPosition());
     beacon->setNodeId(getHostId());
 
-    return buildPacket(beacon);
+    auto packet = buildPacket(beacon);
+
+    // process local for own location entry in neighborhood table.
+    auto tmp = packet->dup();
+    handleDataArrived(tmp);
+    delete tmp;
+
+
+    return packet;
 }
 
 FsmState BeaconSimple::handleDataArrived(Packet *packet){
@@ -42,6 +49,7 @@ FsmState BeaconSimple::handleDataArrived(Packet *packet){
     info->setReceivedTimePrio(simTime());
     info->setPos(p->getPos());
     info->setEpsilon(p->getEpsilon());
+    nTable->emitPostChanged(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

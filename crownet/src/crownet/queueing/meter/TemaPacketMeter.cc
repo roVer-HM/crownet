@@ -22,13 +22,11 @@ Register_Class(TemaPacketMeter);
 
 void TemaPacketMeter::meterPacket(Packet *packet){
 
-    auto now = simTime();
-    stats.incrData(packet->getTotalLength());
-    stats.incrPacket();
-    auto elapsedTime = (now - lastUpdate).dbl();
 
-    if (stats.getPacketCount() == 1){
-        // first call
+    auto now = simTime();
+    if (lastUpdate < simtime_t::ZERO){
+        // first call: assume elapsedTime (now - 0.0) = now
+        auto elapsedTime = now.dbl();
         if (elapsedTime <= 0.0){
             stats.setPacketRate(1.0);
             stats.setDataRate(bps(packet->getDataLength()/ s(1.0)));
@@ -36,22 +34,32 @@ void TemaPacketMeter::meterPacket(Packet *packet){
             stats.setPacketRate(1.0 / elapsedTime);
             stats.setDataRate(bps(packet->getDataLength()/ s(elapsedTime)));
         }
-    } else if (now != lastUpdate) {
+        // reset count for packets that arrive at the same time
+        setCurrentNumPackets(0);
+        setCurrentTotalPacketLength(b(0));
+        setLastUpdate(now);
+    } else if (now > lastUpdate){
+        auto elapsedTime = (now - lastUpdate).dbl();
+        stats.incrPacket(getCurrentNumPackets());
+        stats.incrData(getCurrentTotalPacketLength());
+
         double f = exp(-1 * getBeta() * elapsedTime);
         double ff = 1 - f;
+
 
         double pRate = f * stats.getPacketRate() + ff * 1/elapsedTime; // packet rate
         stats.setPacketRate(pRate);
 
         double dRate;
         dRate = f * stats.getDataRate().get() + ff * packet->getTotalLength().get()/elapsedTime;
-        stats.setDataRate(bps(dRate));
-        lastUpdate = now;
-    } else {
-        throw cRuntimeError("multiple packets at the same time not supported");
+
+        // reset count for packets that arrive at the same time
+        setCurrentNumPackets(0);
+        setCurrentTotalPacketLength(b(0));
+        setLastUpdate(now);
     }
-
-
+    incrCurrentPacketCount();
+    incrCurrentPacketLength(packet->getTotalLength());
 }
 
-}
+} // namespace

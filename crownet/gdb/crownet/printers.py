@@ -77,7 +77,8 @@ class SimTimePrinter:
             return "0s"
         s = Decimal(str(self.val['t']) + 'E' + str(self.val['scaleexp']))
         s = s.normalize()
-        return f"{s.to_eng_string()} s"
+        return str(s) + "s"
+
 
 
 class NodeIdentifierInt:
@@ -224,11 +225,11 @@ class OppPrinter(object):
 
     def __call__(self, val):
         typename = self.get_basic_type(val.type)
-        debug("BASIC TYPE OF '%s' type IS '%s'" % (val.type, typename))
+        # debug("BASIC TYPE OF '%s' type IS '%s'" % (val.type, typename))
         if not typename:
             return None
 
-        debug(" lookup printer for '%s' type" % (typename))
+        # debug(" lookup printer for '%s' type" % (typename))
         if typename in self.lookup:
             if val.type.code == gdb.TYPE_CODE_REF or val.type.code == gdb.TYPE_CODE_PTR:
                 debug("---pointer--- %d" % long(val))
@@ -239,7 +240,7 @@ class OppPrinter(object):
             return self.lookup[typename].invoke(val)
 
         # Cannot find a pretty printer.  Return None.
-        debug(" -printer not found for '%s' type" % (typename))
+        # debug(" -printer not found for '%s' type" % (typename))
         return None
 
 
@@ -263,6 +264,7 @@ def register_crownet_printers(obj):
 def build_crownet_dictionary():
     global crownet_printer
 
+    debug("build_crownet_dictionary")
     crownet_printer = OppPrinter("crownet")
 
     crownet_printer.add('omnetpp::SimTime', SimTimePrinter)

@@ -26,6 +26,12 @@ simple NeighborhoodTable like INeighborhoodTable{
     parameters:
         @class(crownet::NeighborhoodTable);
         double maxAge @unit(s) = default (3s);
+        string mobilityModule = default("^.mobility"); //asume sibling
+        string fileWriterRegister = default("fileWriterRegister;neighborhoodWriter");
         
-    
+        @signal[neighborhoodTableChanged](type=crownet::NeighborhoodTable);
+        @signal[neighborhoodTableBeacon.preChanged](type=crownet::BeaconReceptionInfo);
+        @signal[neighborhoodTableBeacon.postChanged](type=crownet::BeaconReceptionInfo);
+        @signal[neighborhoodTableBeacon.removed](type=crownet::BeaconReceptionInfo);
+        @statistic[tableSize](source="tableSize(neighborhoodTableChanged)"; record=vector);
 }

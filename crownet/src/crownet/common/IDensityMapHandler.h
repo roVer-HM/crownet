@@ -14,6 +14,7 @@ namespace crownet {
 
 class GridCellDistance;
 class OsgCoordinateConverter;
+class RegularDcdMapFactory;
 
 
 template <typename GRID>
@@ -33,9 +34,14 @@ class IDensityMapHandler : public IDensityMapHandlerBase<GRID> {
   // FIXME: allow global fileWriter object to pass in.
   virtual void writeMap() = 0;
   //  FIXME: make mergeMap independent from Packet (see ArteryDensityMapApp.cc)
-  //  virtual void mergeMap(const GRID map) = 0;
-  virtual void setDistanceProvider(std::shared_ptr<GridCellDistance> distProvider) = 0;
+  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory>) = 0;
   virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) = 0;
+};
+
+template <typename GRID>
+class IGlobalDensityMapHandler : public IDensityMapHandlerBase<GRID> {
+public:
+    virtual ~IGlobalDensityMapHandler() = default;
 };
 
 }  // namespace crownet

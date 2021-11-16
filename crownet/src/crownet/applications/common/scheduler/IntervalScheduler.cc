@@ -14,8 +14,8 @@
 // 
 
 #include "crownet/applications/common/scheduler/IntervalScheduler.h"
-
 #include "inet/common/ModuleAccess.h"
+#include "crownet/crownet.h"
 
 using namespace inet;
 
@@ -31,10 +31,11 @@ void IntervalScheduler::initialize(int stage)
     AppSchedulerBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         numberPackets = &par("numberPackets");
-        amoutOfData = &par("maxData");
+        amoutOfData = &par("amoutOfData");
 
         maxNumberPackets = par("maxNumberPackets").intValue();
         maxData = b(par("maxData").intValue());
+        startOffset = par("startOffset");
 
         generationIntervalParameter = &par("generationInterval");
         generationTimer = new ClockEvent("GenerationTimer");
@@ -45,22 +46,39 @@ void IntervalScheduler::initialize(int stage)
 
 void IntervalScheduler::scheduleGenerationTimer()
 {
+    simtime_t now  = simTime();
     auto delay = generationIntervalParameter->doubleValue();
     if (delay < 0){
-        EV_INFO << "generationIntervalParameter < 0. Deactivate AppScheduler" << endl;
+        EV_INFO << LOG_MOD << " generationIntervalParameter < 0. Deactivate AppScheduler" << endl;
+        stopScheduling = true;
+    } else if ((app->getStopTime() > simtime_t::ZERO) && (simTime() > app->getStopTime())) {
+        EV_INFO << LOG_MOD << " App stop time reached. Do not schedule any more data" << endl;
+        stopScheduling = true;
+        // todo emit signal
     } else {
-        scheduleClockEventAfter(delay, generationTimer);
+        auto scheduleAt = std::max(now, app->getStartTime()) + delay;
+        if (startOffset > simtime_t::ZERO){
+            scheduleAt += startOffset;
+            startOffset = 0.0;
+        }
+        EV_INFO << simTime().ustr() << " schedule application" << endl;
+        scheduleClockEventAt(scheduleAt, generationTimer);
     }
 }
 
 void IntervalScheduler::handleMessage(cMessage *message)
 {
     if (message == generationTimer) {
-        scheduleApp(message);
-        if (stop){
-          EV << "Limit reached" << endl;
+        if ((app->getStopTime() > simtime_t::ZERO) && (simTime() > app->getStopTime())){
+            EV_INFO << LOG_MOD << " App stop time reached. Do not schedule any more data" << endl;
+            // todo emit signal
         } else {
-            scheduleGenerationTimer();
+            scheduleApp(message);
+            if (stopScheduling){
+              EV_INFO << LOG_MOD << "Scheduler limit reached" << endl;
+            } else {
+                scheduleGenerationTimer();
+            }
         }
         updateDisplayString();
     } else{
@@ -73,21 +91,38 @@ void IntervalScheduler::scheduleApp(cMessage *message){
     auto numPacket = numberPackets->intValue();
     auto data = b(amoutOfData->intValue());
     if (numPacket > 0){
-
+        // schedule packet based
         if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){
-            stop = true;
+            stopScheduling = true;
         } else {
-            sentPackets += numPacket;
-            consumer->producePackets(numPacket);
+            app->setScheduleData(b(-1)); // just produce packets regardless of size
+            if (app->canProducePacket()){
+                // can produce at least one packet
+                EV_INFO << LOG_MOD << " schedule packet quota " << numPacket << "packet(s)" << endl;
+                consumer->producePackets(numPacket);
+                sentPackets += numPacket;
+            } else {
+                EV_INFO << LOG_MOD << "No data in application. Scheduled data dropped" << endl;
+            }
+            app->setScheduleData(b(0));
         }
-
     } else if (data > b(0)){
+        // schedule amount based
         if(maxData > b(0) && (sentData + data) > maxData ){
-            stop = true;
+            stopScheduling = true;
         } else {
-            sentData += data;
-            //convert to Bytes
-            consumer->producePackets(B(data));
+            app->setScheduleData(data);
+            if (app->canProducePacket()){
+                EV_INFO << LOG_MOD << " schedule data quota " << data.str() << endl;
+                consumer->producePackets(data);
+                // only decrease sentData of the amount actually transmitted.
+                auto consumedData = data - app->getScheduleData();
+                EV_INFO << LOG_MOD << " consumed " << consumedData.str() << " from " << data << " scheduled" << endl;
+                sentData = sentData - consumedData;
+            } else {
+                EV_INFO << LOG_MOD << " No data in application. Scheduled budget dropped" << endl;
+            }
+            app->setScheduleData(b(0)); // reset scheduledData
         }
     } else {
         throw cRuntimeError("Either number of packer or max data in Byte must be set");

@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 DIR=`dirname $0`
 DIR=`(cd $DIR ; pwd)`
 INET_DIR=`(cd $DIR/../../inet4/src ; pwd)`
@@ -21,4 +21,7 @@ elif [ -f $DIR/libCROWNET.so -o -f $DIR/libCROWNET.dll -o -f $DIR/libCROWNET.dyl
 elif [ -f $DIR/libCROWNET_dbg.so -o -f $DIR/libCROWNET_dbg.dll -o -f $DIR/libCROWNET_dbg.dylib ]; then
   echo "C"
   exec opp_run -l $DIR/CROWNET_dbg $COMMAND_LINE_OPTIONS $*
+else
+  echo "no executbale found!"
+  exit -1
 fi

@@ -27,14 +27,11 @@ BaseApp::~BaseApp() {
 }
 
 void BaseApp::initialize(int stage) {
-  crownet::queueing::CrownetActivePacketSourceBase::initialize(stage);
+  MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase>::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
 
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
-
-    hostId = getContainingNode(this)->getId();
-    WATCH(hostId);
 
     localInfo = (AppInfoLocal*)(par("localInfo").objectValue()->dup());
     take(localInfo);
@@ -48,6 +45,8 @@ void BaseApp::initialize(int stage) {
 
     socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
     scheduler = inet::getModuleFromPar<IAppScheduler>(par("schedulerModule"), this);
+    maxPduLength = b(par("maxPduLength"));
+    minPduLength = b(par("minPduLength"));
   } else if (stage == INITSTAGE_APPLICATION_LAYER){
       handleStartOperation(nullptr);
   }
@@ -97,7 +96,11 @@ void BaseApp::handleMessage(cMessage *msg) {
   FSM_Switch(fsmRoot) {
     // Init state ...
     case FSM_Exit(FsmRootStates::INIT):
-      FSM_Goto(fsmRoot, FsmRootStates::SETUP);
+      if (msg->getKind() == FsmRootStates::SETUP){
+          FSM_Goto(fsmRoot, FsmRootStates::SETUP);
+      } else {
+          FSM_Goto(fsmRoot, FsmRootStates::ERR);
+      }
       break;
     //
     // FSM_Steady
@@ -162,8 +165,8 @@ Packet *BaseApp::buildPacket(Ptr<Chunk> content, Ptr<Chunk> header){
     applyContentTags(content);
 
     auto packetName = createPacketName(content);
-    auto packet = new Packet(packetName, content);
-
+    auto packet = new Packet(packetName);
+    packet->insertAtFront(content);
 
     if (header != nullptr){
         packet->insertAtFront(header);
@@ -175,6 +178,51 @@ Packet *BaseApp::buildPacket(Ptr<Chunk> content, Ptr<Chunk> header){
     emit(packetCreatedSignal, packet);
     return packet;
 }
+
+void BaseApp::producePackets(inet::b maxData){
+    Enter_Method("producePacket");
+
+    scheduledData = maxData;
+    while(canProducePacket() && scheduledData.get() > 0){
+        auto packet = createPacket();
+        scheduledData -= packet->getDataLength();
+        EV_INFO << "Producing packet" << EV_FIELD(packet) << EV_ENDL;
+        handlePacketProcessed(packet);
+        pushOrSendPacket(packet, outputGate, consumer);
+        updateDisplayString();
+    }
+}
+
+const inet::b BaseApp::getAvailablePduLenght() {
+    if (scheduledData.get() < 0){
+        // application works in packet mode provide maxPduLength
+        return getMaxPdu();
+    }
+    return std::min(scheduledData, getMaxPdu());
+}
+
+const bool BaseApp::isRunning(){
+    return fsmRoot.getState() == FsmRootStates::WAIT_ACTIVE;
+}
+
+const bool BaseApp::isStopped(){
+    return !isRunning();
+}
+
+const FsmState BaseApp::getState() {
+    return fsmRoot.getState();
+}
+
+const inet::b BaseApp::getMaxPdu(){
+    return maxPduLength;
+}
+const inet::b BaseApp::getMinPdu(){
+    if (minPduLength.get() <=  0.0){
+        throw cRuntimeError("Provide minimum  Pdu size > 0 in configuration or override method.");
+    }
+    return minPduLength;
+}
+
 
 // FSM
 FsmState BaseApp::fsmHandleSubState(cMessage *msg) {

@@ -42,6 +42,9 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         string schedulerModule = default("^.scheduler");
         object localInfo = default(crownet::AppInfoLocal{});
         
+        // assume BaseApp is part of some crownet app
+        string mobilityModule = default("^.^.mobility");
+        
         // Application runtime settings
         ///* Start time of application at which message will be received. 
         ///* Negative values raises cRuntimeError.
@@ -49,25 +52,36 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         ///* Time after which no packet will be send or received.
         ///* stopTime = 0.0s means app will run forever
         double stopTime @unit(s) = default(0.0s); 
+        // Max size of application packet containing application headers
+        int maxPduLength @unit(b) = default(1400B);
+        // Minimum size of application packet. 
+        // If -1B application must provide a minmum value programmatically, otherwise an error is thrown
+        int minPduLength @unit(b) = default(-1B);  
         
 
         ///* Socket: If true app will not throw an error if destiantion address is empty.
         ///* Set to true if app only passivly receives messages or has other means 
         ///* to find a valid destination address.
         bool allEmptyDestAddress = default(true);
+        
+        
 
        
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
 
+		// send stats
         @signal[packetSent](type=inet::Packet);
-        @signal[packetReceived](type=inet::Packet);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        // received stats
+        @signal[packetReceived](type=inet::Packet);
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
         @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
-        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="appPkSeqNo(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPkHostId](title="received host id"; source="rcvdHostId(packetReceived)"; record=vector; interpolationmode=none);
+        
         
         // queueing statitics
         @signal[packetPulled](type=inet::Packet);

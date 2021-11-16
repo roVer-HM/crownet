@@ -154,13 +154,11 @@ opp-tests:
     - crownet-sim
   script:
     - "cd ${CROWNET_HOME}/crownet"
-    - "${OPP} make build-lib"
-    - "cd ${CROWNET_HOME}/crownet/tests/omnetpp"
-    - "${OPP} ./runtest"
+    - "${OPP} make opp-test"
   artifacts:
     when: always
     paths:
-    - ${CROWNET_HOME}/crownet/tests/omnetpp
+    - ${CROWNET_HOME}/crownet/tests/omnetpp/work
     expire_in: 8 weeks
 
 # run uq simulation studies

@@ -10,12 +10,12 @@
 #include <functional>
 
 namespace crownet {
-
-template <typename C, typename N, typename T>
-class Cell;
-
-template <typename C, typename N, typename T>
-class DcDMap;
+//
+//template <typename C, typename N, typename T>
+//class Cell;
+//
+//template <typename C, typename N, typename T>
+//class DcDMap;
 
 /**
  * todo comment
@@ -24,8 +24,8 @@ template <typename T, typename Iter, typename IterVal, typename Pred>
 class FilterIterator : public std::iterator<std::output_iterator_tag, IterVal> {
  public:
   using iterable_t = T;
-  using iter_value_t = IterVal;
   using iter_t = Iter;
+  using iter_value_t = IterVal;
   using pred_t = Pred;
 
   FilterIterator(iterable_t* data, pred_t predicate);
@@ -48,6 +48,6 @@ class FilterIterator : public std::iterator<std::output_iterator_tag, IterVal> {
   iter_t iter;
   iter_t _begin;
 };
-#include "crownet/dcd/generic/iterator/FilterIterator.tcc"
+#include "crownet/common/iterator/FilterIterator.tcc"
 
 }  // namespace crownet

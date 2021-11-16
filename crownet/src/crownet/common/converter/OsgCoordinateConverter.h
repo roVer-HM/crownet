@@ -30,6 +30,7 @@
 #include "traci/GeoPosition.h"
 #include "traci/Position.h"
 #include "inet/common/geometry/common/RotationMatrix.h"
+#include "crownet/common/RegularGridInfo.h"
 
 
 namespace crownet {
@@ -90,6 +91,14 @@ class OsgCoordinateConverter {
   inet::Coord moveCoordinateSystemOpp_TraCi(const inet::Coord& c) const;
 
   inet::GeoCoord getScenePosition() const;
+
+  double getBoundaryWidth() const;
+  double getBoundaryHeight() const;
+  inet::Coord getBoundary() const;
+  RegularGridInfo getGridDescription(const inet::Coord& cellSize) const;
+  RegularGridInfo getGridDescription(const double cellSize) const;
+
+
 
   // always apply TCS->OCS
   const omnetpp::cFigure::Point toCanvas(double x, double y, const bool isGeo=false);
@@ -176,8 +185,6 @@ class OsgCoordinateConverter {
     return position_cast_artery(output);
   }
 
-  double getBoundaryWidth() const;
-  double getBoundaryHeight() const;
 
  private:
   osgEarth::GeoPoint addZoneOriginOffset(const traci::TraCIPosition& pos) const;

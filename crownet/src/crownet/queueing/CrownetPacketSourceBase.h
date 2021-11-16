@@ -27,6 +27,10 @@ class CrownetPacketSourceBase : public inet::queueing::PacketSourceBase {
 
 protected:
     const char *packetName = nullptr;
+    int hostId = -1;
+public:
+    // omnetpp based id as unique and constant identifier.
+    int getHostId() const {return hostId;}
 
 protected:
     virtual void initialize(int stage) override;
@@ -34,6 +38,10 @@ protected:
     virtual const char *createPacketName(const Ptr<const Chunk>& data) const override;
     virtual void applyContentTags(Ptr<Chunk> content);
     virtual void applyPacketTags( Packet *);
+
+private:
+    bool attachHostIdTag = false;
+    bool attachSequenceIdTag = false;
 };
 
 

@@ -16,6 +16,7 @@
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/generic/iterator/CellDataIterator.h"
 #include "crownet/dcd/identifier/Identifiers.h"
+#include "crownet/dcd/identifier/TimeProvider.h"
 
 namespace crownet {
 
@@ -53,8 +54,8 @@ class Cell {
   using entry_t_ptr = std::shared_ptr<entry_t>;
   using entry_ctor_t = EntryDefaultCtorImpl<node_key_t, time_t>;
 
-  using localEntry_t = ILocalEntry<node_key_t, time_t>; // the measurement created by the owner itself
-  using localEntry_t_ptr = std::shared_ptr<localEntry_t>;
+//  using localEntry_t = ILocalEntry<node_key_t, time_t>; // the measurement created by the owner itself
+//  using localEntry_t_ptr = std::shared_ptr<localEntry_t>;
 
   using map_t = std::map<node_key_t, entry_t_ptr>;
   using value_type_const = typename map_t::value_type;
@@ -64,8 +65,8 @@ class Cell {
  public:
   virtual ~Cell() = default;
   Cell() {}
-  Cell(cell_key_t cell_id, node_key_t owner_id)
-      : cell_id(cell_id), owner_id(owner_id) {}
+  Cell(std::shared_ptr<TimeProvider<T>> timeProvider, cell_key_t cell_id, node_key_t owner_id)
+      : timeProvider(timeProvider), cell_id(cell_id), owner_id(owner_id) {}
 
   // getter
   map_t& getData() { return data; }
@@ -74,20 +75,36 @@ class Cell {
   bool hasLocal() const;
   bool hasValid() const;
   bool hasValidLocal() const;
-  localEntry_t_ptr getLocal();
-  localEntry_t_ptr getLocal() const;
-  entry_t_ptr get(const node_key_t node_id);
-  entry_t_ptr const get(const node_key_t node_id) const;
+  entry_t_ptr getLocal();
+  entry_t_ptr getLocal() const;
+
+  template <typename E = entry_t>
+  std::shared_ptr<E> get(const node_key_t node_id);
+  template <typename E = entry_t>
+  std::shared_ptr<E> const get(const node_key_t node_id) const;
+  template <typename E = entry_t>
+  std::shared_ptr<E> get(); // node_id == owner_id
+  template <typename E = entry_t>
+  std::shared_ptr<E> const get() const; // node_id == owner_id
+
+
+  template <typename E = entry_t>
+  std::shared_ptr<E> getOrCreate(const node_key_t node_id);
+  template <typename E = entry_t>
+  std::shared_ptr<E> getOrCreate();
+
   const cell_key_t& getCellId() const { return cell_id; }
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
+  const time_t lastSent(){ return last_sent; }
 
   // setter
   void put(entry_t_ptr&& m);
   void put(entry_t_ptr& m);
   void setCellId(cell_key_t _cell_id) { cell_id = _cell_id; }
   void setOwnerId(node_key_t _owner_id) { owner_id = _owner_id; }
-  void incrementLocal(const node_key_t& countedNodeId, const time_t& time);
+  void sentAt(const time_t& time);
+
 
   /**
    *  A Cell<C, N, T> object acts as an iterator for its data items.
@@ -120,6 +137,8 @@ class Cell {
   Ret accept(const Fn visitor) const;
   // common specialized visitors (cleaner calls without to many <...> )
   template <typename Fn>
+  void acceptSet(Fn* visitor);
+  template <typename Fn>
   void acceptSet(Fn visitor);
   template <typename Fn>
   entry_t_ptr acceptGetEntry(const Fn visitor) const;
@@ -143,11 +162,13 @@ class Cell {
   bool operator==(const Cell<C, N, T>& rhs) const;
 
  private:
+  std::shared_ptr<TimeProvider<T>> timeProvider;
   map_t data;
   cell_key_t cell_id;
   node_key_t owner_id;
   entry_ctor_t entryCtor;
   entry_t_ptr cell_value;  //  selected or calculated value.
+  time_t last_sent; // time at which the cell_value was last broadcasted.
 };
 
 #include "Cell.tcc"

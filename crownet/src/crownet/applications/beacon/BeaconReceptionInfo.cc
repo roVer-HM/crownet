@@ -86,7 +86,7 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
 
 
 
-    if (!oldPacket){
+    if (!oldPacket || packetsReceivedCount == 1){
         // only update beacon data if the packet is the news received. Do not
         // use data from old out of order packets.
         auto beacon = inbound->popAtFront<DynamicBeaconPacket>();

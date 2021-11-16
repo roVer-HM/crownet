@@ -31,7 +31,7 @@ void OsgCoordConverterLocal::initialize(int stage) {
           inet::Coord{par("offset_x").doubleValue(),
                       par("offset_y").doubleValue()},
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
-                      par("epsg_code").stdstringValue());
+                      par("srs_code").stdstringValue());
       sceneOrientation = inet::Quaternion::NIL;
       scenePosition = _converter->getScenePosition();
     }

@@ -26,7 +26,6 @@ namespace crownet {
 class TemaPacketMeter : public TemaPacketMeter_Base {
 
 protected:
-    simtime_t lastUpdate = simtime_t::ZERO;
     bool t_0 = true;
 
 public:

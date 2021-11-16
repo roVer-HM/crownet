@@ -31,12 +31,13 @@ class GridCellID : public CellIdentifiere {
   std::string str() const override;
   bool operator<(const GridCellID& rhs) const;
   bool operator==(const GridCellID& rhs) const;
-  int columns() const override;
+  virtual int columns() const override;
   virtual void writeTo(std::ostream& out,
                        const std::string& sep) const override;
   virtual void writeHeaderTo(std::ostream& out,
                              const std::string& sep) const override;
   virtual std::pair<int, int> val() const { return id; }
+  virtual std::pair<int, int> value() const { return id; }
   virtual int x() const {return id.first;}
   virtual int y() const {return id.second;}
 

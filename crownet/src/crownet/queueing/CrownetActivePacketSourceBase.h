@@ -44,9 +44,12 @@ protected:
 public:
   virtual inet::queueing::IPassivePacketSink *getConsumer(cGate *gate) override { return consumer; }
 
+  // ICrownetActivePacketSource
   virtual void producePacket() override;
   virtual void producePackets(int number) override;
-  virtual void producePackets(B maxData) override { throw cRuntimeError("not supported");}
+  // produce number of packet(s) without exceeding maxData
+  virtual void producePackets(inet::b maxData) override { throw cRuntimeError("Not Implemented here");};
+
 
   virtual bool supportsPacketPushing(cGate *gate) const override { return outputGate == gate; }
   virtual bool supportsPacketPulling(cGate *gate) const override { return false; }

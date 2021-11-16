@@ -30,7 +30,6 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) override;
 
 private:
-    inet::IMobility *mobility = nullptr;
     NeighborhoodTable* nTable = nullptr;
     double minSentFrequency;
     double maxSentFrequyncy;

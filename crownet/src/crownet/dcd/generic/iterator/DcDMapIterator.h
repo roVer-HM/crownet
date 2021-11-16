@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "crownet/dcd/generic/iterator/FilterIterator.h"
+#include "crownet/common/iterator/FilterIterator.h"
 
 namespace crownet {
 

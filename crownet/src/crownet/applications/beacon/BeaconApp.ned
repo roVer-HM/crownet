@@ -26,6 +26,7 @@ moduleinterface IBeaconApp extends IBaseApp {
 simple BeaconSimple extends BaseApp like IBeaconApp {
     
     parameters:
+        @display("i=block/broadcast");
         @class(crownet::BeaconSimple);       
         // Aid app override defaults
         packetName = default("BeaconSimple");
@@ -33,14 +34,14 @@ simple BeaconSimple extends BaseApp like IBeaconApp {
 		allEmptyDestAddress = false;
         
         // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;
+        string neighborhoodTableMobdule =  default("mobility");
 }
 
 simple BeaconDynamic extends BaseApp like IBeaconApp {
     
     parameters:
-        @class(crownet::BeaconDynamic);       
+        @display("i=block/broadcast");  
+        @class(crownet::BeaconDynamic);   
         // Aid app override defaults
         packetName = default("BeaconDynamic");
 		packetLength = default(300B);
@@ -52,7 +53,6 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         double maxBandwith @unit(Bytes) = default(2000B);
         
         // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;   
+        string neighborhoodTableMobdule  = default("mobility");
 }
 
