@@ -272,6 +272,17 @@ with id_rsa as your private key.
 To ensure a standardized code style, we use the Google C++ Style Guide.
 CppStyle is our recommended Eclipse Plugin. It uses the Formatter [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint).
 
+## Setup pre-commit
+
+See documentation of [pre-commit](https://pre-commit.com/) first for reference.
+Install pre-commit if missing locally
+
+```
+pip3 install pre-commit
+```
+
+Configure pre-commit to activate all git-hooks defined in `pre-commit-config.yaml`. From now on all commit will be checked before the commit takes place.
+
 ## C++
 
 ### Installation
