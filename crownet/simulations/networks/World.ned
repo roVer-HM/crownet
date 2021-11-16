@@ -45,6 +45,7 @@ import crownet.control.IControlManager;
 import artery.storyboard.IStoryboard;
 import artery.utility.IdentityRegistry;
 import traci.Manager;
+import traci.TraCiManager;
 
 
 network World
@@ -121,7 +122,7 @@ network World
                 @display("p=410.865,267.51373;is=s");
         }
         // TraCI
-        traci: Manager {
+        traci: <default("Manager")> like TraCiManager if typename != "" {
             parameters:
                 @display("p=523.74,31.605");
         }
