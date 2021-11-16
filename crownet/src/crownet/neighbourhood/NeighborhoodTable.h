@@ -17,10 +17,15 @@ using namespace inet;
 
 namespace crownet {
 
+class NeighborhoodTableSizeFilter;
+
 class NeighborhoodTable : public MobilityProviderMixin<cSimpleModule>
                           , public INeighborhoodTable
 {
 public:
+
+    friend NeighborhoodTableSizeFilter;
+
     virtual ~NeighborhoodTable();
 
     // cSimpleModule
@@ -59,10 +64,18 @@ public:
 
 protected:
     int ownerId;
+    int tableSize;
     NeighborhoodTable_t _table;
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;
     simtime_t lastCheck;
+};
+
+
+class NeighborhoodTableSizeFilter : public cObjectResultFilter {
+public:
+ virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                            cObject *object, cObject *details) override;
 };
 
 } /* namespace crownet */
