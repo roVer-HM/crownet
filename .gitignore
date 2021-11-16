@@ -27,6 +27,7 @@ simulation-campaigns/*results*
 
 .idea
 .venv
+.DS_Store
 
 # python analysis
 

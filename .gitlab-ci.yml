@@ -167,9 +167,10 @@ uq-test:
   tags:
     - crownet-sim
   variables:
-    ANALYSIS_UQ_M: '${CI_PROJECT_DIR}/analysis/uq'
+    ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
     - "source ./out/crownet_user/bin/activate"
+    - "cd ${CROWNET_HOME}/analysis/uq"
     - "python3 -m unittest discover -v"
 
 # run given simulation-campaign
