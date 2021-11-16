@@ -39,11 +39,14 @@ extends = _default, D2D_General, DcDMap, stationary_n5
 *.fileWriterRegister.typename = "FileWriterRegister"
 *.misc[*].nTable.maxAge = 3s
 
-*.misc[*].app[0].app.startTime = uniform(0s,50ms) #0s # Beacon
+*.misc[*].app[0].app.startTime = uniform(0s,50ms) # Beacon
+#*.misc[*].app[0].app.startTime = 0s # Beacon
 *.misc[*].app[0].scheduler.generationInterval = 150ms + uniform(0ms, 10ms)
+#*.misc[*].app[0].scheduler.generationInterval = 150ms 
 *.misc[*].app[0].app.typename = "BeaconDynamic"
 
 *.misc[*].app[1].app.startTime = 2001ms + uniform(0s, 50ms) # DensityMap
+#*.misc[*].app[1].app.startTime = 2001ms # DensityMap
 *.misc[*].app[1].app.localMapUpdateInterval = 500ms
 *.misc[*].app[1].app.mapCfg = crownet::MapCfg{ \
             writeDensityLog: true, \
@@ -51,6 +54,7 @@ extends = _default, D2D_General, DcDMap, stationary_n5
             mapTypeLog: "all", \
             idStreamType: "insertionOrder"}
 *.misc[*].app[1].scheduler.generationInterval = 500ms + uniform(-20ms, 20ms)
+#*.misc[*].app[1].scheduler.generationInterval = 500ms 
 *.misc[*].app[1].scheduler.numberPackets = 1
 
 *.misc[0].app[0].app.stopTime = 5s # Stop Beacon App of first node
