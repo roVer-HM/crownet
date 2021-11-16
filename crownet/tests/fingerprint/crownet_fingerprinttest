@@ -48,6 +48,7 @@ from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
 from roveranalyzer.dockerrunner.dockerrunner import DockerClient, DockerCleanup, DockerReuse, stop_containers
 from roveranalyzer.utils.dirdiff import csv_to_diffdict, diffdict_to_csv, create_dir_diff, compare_diff
+from roveranalyzer.utils import levels, logger, set_format, set_level
 import docker
 from requests.exceptions import ReadTimeout
 
@@ -348,9 +349,10 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
 
             # --fingerprint=
             arg_list = ArgList.from_flat_list(sim["args"])
-
             # set debug logging for test
-            arg_list.add_if_missing("-vvv")
+            if (self.args.verbose > 0):
+                _v = "v"*self.args.verbose
+                arg_list.add_if_missing(f"-{_v}")
 
             # check if `args` contains executable and tags contains exec. Update `args` accordingly
             if arg_list.to_list()[0].startswith("-"):
@@ -1299,7 +1301,7 @@ def crownet_main(args):
     generator.writeUpdatedFiles()
     generator.writeErrorFiles()
     generator.writeFailedFiles()
-    print("Log has been saved to %s" % TestGlob/cpial.logFile)
+    print("Log has been saved to %s" % TestGlobal.logFile)
 
     # FIXME: do not use global exit code
     return TestGlobal.exitCode
@@ -1451,6 +1453,11 @@ if __name__ == "__main__":
             level=levels[level_idx],
             format="%(asctime)s:%(module)s:%(levelname)s> %(message)s",
         )
+
+    # roveranalyzer logging 
+    level_idx = args.verbose
+    set_level(levels[level_idx])
+    set_format("%(asctime)s:%(module)s:%(levelname)s> %(message)s")
 
     # FIXME refactor global object
     # Set global object
