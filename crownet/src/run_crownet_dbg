@@ -14,4 +14,7 @@ elif [ -f $DIR/libCROWNET_dbg.so -o -f $DIR/libCROWNET_dbg.dll -o -f $DIR/libCRO
   exec opp_run_dbg -l $DIR/CROWNET $COMMAND_LINE_OPTIONS $*
 elif [ -x $DIR/CROWNET_dbg -o -x $DIR/CROWNET_dbg.exe ]; then
   $DIR/CROWNET_dbg $COMMAND_LINE_OPTIONS $*
+else
+  echo "no executbale found!"
+  exit -1
 fi
