@@ -20,6 +20,7 @@ import crownet.applications.common.scheduler.AppSchedulerBase;
 
 simple IntervalScheduler extends AppSchedulerBase {
     parameters:
+        double startOffset @unit(s) = default(0s); 
     	volatile double generationInterval @unit(s); // time interval between two subsequent token generation events
 		volatile int numberPackets = default(1); // if < 0 ignore and use amoutOfData
 		volatile int amoutOfData @unit(b) = default(-1B); // if numberPackets is -1 this must be set.

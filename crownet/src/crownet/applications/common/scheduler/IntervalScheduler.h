@@ -41,6 +41,7 @@ protected:
    B maxData = B(-1);
    B sentData = B(0);
    bool stopScheduling = false;
+   simtime_t startOffset;
 
  protected:
    virtual void initialize(int stage) override;

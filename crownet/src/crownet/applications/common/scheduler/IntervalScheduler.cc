@@ -35,6 +35,7 @@ void IntervalScheduler::initialize(int stage)
 
         maxNumberPackets = par("maxNumberPackets").intValue();
         maxData = b(par("maxData").intValue());
+        startOffset = par("startOffset");
 
         generationIntervalParameter = &par("generationInterval");
         generationTimer = new ClockEvent("GenerationTimer");
@@ -56,6 +57,10 @@ void IntervalScheduler::scheduleGenerationTimer()
         // todo emit signal
     } else {
         auto scheduleAt = std::max(now, app->getStartTime()) + delay;
+        if (startOffset > simtime_t::ZERO){
+            scheduleAt += startOffset;
+            startOffset = 0.0;
+        }
         EV_INFO << simTime().ustr() << " schedule application" << endl;
         scheduleClockEventAt(scheduleAt, generationTimer);
     }
