@@ -23,10 +23,9 @@ mod_suqc          := analysis/suq-controller
 # Level 2: These models depend on Level 1 models, e.g. inet.
 # Level 3: These models depend on Level 2 models, e.g. Simu5G.
 models_l1 := $(mod_inet) $(mod_veins)
-models_l2 := $(mod_veins_inet)
-models_l3 := $(mod_simu5g)
-models_l4 := $(mod_crownet)
-models := $(models_l4) $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
+models_l2 := $(mod_simu5g) $(mod_veins_inet)
+models_l3 := $(mod_crownet)
+models := $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
 PYTHON := python3.8
