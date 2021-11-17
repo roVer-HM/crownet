@@ -91,7 +91,6 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
 void NeighborhoodTable::checkTimeToLive(){
     Enter_Method_Silent();
     simtime_t now = simTime();
-    bool changed = false;
     if (now >lastCheck){
         // remove old entries
         for( auto it=_table.cbegin(); it !=_table.cend();){
@@ -100,15 +99,12 @@ void NeighborhoodTable::checkTimeToLive(){
                 emitRemoved(it->second);
                 delete it->second;
                 it = _table.erase(it);
-                changed = true;
             } else {
                 ++it;
             }
         }
         lastCheck = now;
         tableSize = _table.size();
-    }
-    if (changed){
         emit(neighborhoodTableChangedSignal, this);
     }
 }
