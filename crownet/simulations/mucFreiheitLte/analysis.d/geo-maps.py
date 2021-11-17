@@ -8,9 +8,11 @@ import pandas as pd
 import contextily  as ctx
 from shapely.geometry import Polygon, box, Point
 from matplotlib import pyplot as plt
+from matplotlib.patches import Patch
 import numpy as np
 import math
 import random
+import roveranalyzer.utils as RoverUtils
 
 WGS84_lat_lon = 4326
 WGS84_pseudo_m = 3857 
@@ -81,6 +83,9 @@ offset = np.array([1.289e+06, 6.133e+06])
 c_muc_f = np.array([780, 845]) + offset # center point of crossing at Müncher Freiheit in EPSG:3857 (cartesian)
 # bounding box to work with
 bound = [c_muc_f[0] - 50, c_muc_f[1] - 50, c_muc_f[0]+150, c_muc_f[1] + 200]
+
+# base frame containing only the bound
+base_df = g.GeoDataFrame([["bound", None, None, box(*bound)]], columns=["name", "facecolor", "edgecolor", "geometry"], crs=f"EPSG:{WGS84_pseudo_m}")
 
 # create regular grid inside bound
 grid_df =  create_grid(*bound)
@@ -158,14 +163,19 @@ peds.append([33, '#187EAA', '#187EAA', Point([741.43, 839.97] + offset)])
 peds.append([34, '#187EAA', '#187EAA', Point([742.53, 841.29] + offset)])
 peds.append([35, '#187EAA', '#187EAA', Point([744.95, 838.21] + offset)])
 peds.append([36, '#187EAA', '#187EAA', Point([746.92, 840.41] + offset)])
+peds.append([37, '#D0302C', '#D0302C', Point([806.56, 850.54] + offset)])
 peds = g.GeoDataFrame(peds, columns = ["name", "facecolor", "edgecolor", "geometry"], crs="EPSG:3857")
 
 
 lines = export_geo_opp(peds, bound)
 [print(l) for l in lines]
 
-ax = grid_df.plot(figsize=(16, 10), alpha=1.0,  edgecolor=grid_df.edgecolor, facecolor=grid_df.facecolor)
-ctx.add_basemap(ax, zoom=18)
+
+ax = base_df.plot(figsize=(16,10), alpha=0.0, edgecolor=None, facecolor=None)
+ctx.add_basemap(ax=ax, zoom=18)
+
+# ax = grid_df.plot(figsize=(16, 10), alpha=1.0,  edgecolor=grid_df.edgecolor, facecolor='none')
+# ctx.add_basemap(ax, zoom=18)
 peds.plot(ax=ax, edgecolor=peds.edgecolor, facecolor=peds.facecolor, markersize=5)
 ax.set_xlabel("Easting [meters]")
 ax.set_ylabel("Northing [meters]")
@@ -174,11 +184,14 @@ ax.set_title("WSG 84 Pseudo-Mercator EPSG:3857")
 # add labels 
 for x, y, label in zip(peds.geometry.x, peds.geometry.y, peds.name):
     angle = random.random() * 2*math.pi
-
-    ax.annotate(str(label), xy=(x, y), xytext=(3*np.cos(angle), 3*np.sin(angle)), textcoords="offset points")
+    # ax.annotate(str(label), xy=(x, y), xytext=(3*np.cos(angle), 3*np.sin(angle)), textcoords="offset points")
 
 hdl = ClickHandler(offset)
 # ax.get_figure().canvas.mpl_connect('button_press_event', hdl.on_click)
 ax.get_figure().canvas.mpl_connect('button_press_event', hdl.on_click_geo)
+ax.legend(handles=[Patch(color='#187EAA', label='peds'), Patch(color='#D0302C', label="eNB")])
+
+x = RoverUtils.Project.fromLatLon().to_osm().transfrom(Point(48.16201340579552, 11.586529435099541))
+print(x)
 
 plt.show()
