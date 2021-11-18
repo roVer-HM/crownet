@@ -52,4 +52,16 @@ class RcvdSequenceIdFilter : public cObjectResultFilter {
                              cObject *object, cObject *details) override;
 };
 
+class SimBoundFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
+class SimOffsetFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
 }  // namespace crownet
