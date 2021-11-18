@@ -95,6 +95,7 @@ class OsgCoordinateConverter {
   double getBoundaryWidth() const;
   double getBoundaryHeight() const;
   inet::Coord getBoundary() const;
+  inet::Coord getOffset() const;
   RegularGridInfo getGridDescription(const inet::Coord& cellSize) const;
   RegularGridInfo getGridDescription(const double cellSize) const;
 
