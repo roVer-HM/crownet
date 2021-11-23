@@ -104,6 +104,8 @@ void GlobalDensityMap::initializeMap(){
     fBuilder.addMetadata("IDXCOL", 3);
     fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
     fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
+    fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+    fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
     // todo cellsize in x and y
     fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
     fBuilder.addMetadata<std::string>(
