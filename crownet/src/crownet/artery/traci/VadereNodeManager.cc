@@ -235,4 +235,9 @@ VaderePersonSink* VadereNodeManager::getObjectSink(const std::string& id) {
   return found != m_persons.end() ? found->second : nullptr;
 }
 
+void VadereNodeManager::visit(ITraciNodeVisitor *visitor) const{
+    for (const auto& entry : m_nodes) {
+        visitor->visitNode(entry.first, entry.second);
+    }
+}
 }  // namespace crownet
