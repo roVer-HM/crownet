@@ -120,9 +120,6 @@ Register_ResultFilter("tableSize", NeighborhoodTableSizeFilter);
 void NeighborhoodTableSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                             cObject *object, cObject *details) {
     if (auto table = dynamic_cast<NeighborhoodTable*>(object)){
-        if (table->_table.size() > 36){
-            std::cout << "err" << endl;
-        }
         fire(this, t, (double)table->_table.size(), details);
     }
 };
