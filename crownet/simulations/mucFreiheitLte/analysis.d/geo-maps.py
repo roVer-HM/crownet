@@ -82,7 +82,7 @@ class ClickHandler:
 offset = np.array([1.289e+06, 6.133e+06])
 c_muc_f = np.array([780, 845]) + offset # center point of crossing at Müncher Freiheit in EPSG:3857 (cartesian)
 # bounding box to work with
-bound = [c_muc_f[0] - 50, c_muc_f[1] - 50, c_muc_f[0]+150, c_muc_f[1] + 200]
+bound = [c_muc_f[0] - 150, c_muc_f[1] - 150, c_muc_f[0]+250, c_muc_f[1] + 300]
 
 # base frame containing only the bound
 base_df = g.GeoDataFrame([["bound", None, None, box(*bound)]], columns=["name", "facecolor", "edgecolor", "geometry"], crs=f"EPSG:{WGS84_pseudo_m}")
