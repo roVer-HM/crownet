@@ -23,6 +23,7 @@ Define_Module(DensityMapAppSimple);
 
 void DensityMapAppSimple::finish(){
     nTable->removeEntryListener(this);
+    BaseDensityMapApp::finish();
 }
 
 void DensityMapAppSimple::initialize(int stage) {
