@@ -8,8 +8,9 @@
     <pedestrians value="True"/>
     <remove-loops value="True"/>
     <trip-attributes value="type=&quot;pedType1&quot;"/>
-    <output-trip-file value="munich_ped120_small.trips.xml"/>
-    <route-file value="munich_ped120_small.rou.xml"/>
+    <output-trip-file value="$NAME.trips.xml"/>
+    <route-file value="$NAME.rou.xml"/>
     <verbose value="True"/>
-    <bound-box value="1638.,1218,2876.,2330.0"/>
+    <!-- $BoundComment -->
+    <bound-box value="$BOUND"/> 
 </configuration>
