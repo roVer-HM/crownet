@@ -44,6 +44,7 @@ simple OsgCoordConverterVadere extends CoordConverterBase {
     parameters:
         @class(crownet::OsgCoordConverterVadere);
         string coreModule = default("traci.core");
+        string vadereScenarioPath;
 }
 
 // provide network xml to parse needed location information from the location element.
