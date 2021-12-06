@@ -156,7 +156,7 @@
         <request index="0" response="0" foes="0" cont="0"/>
     </junction>
     <junction id="6" type="dead_end" x="180.00" y="268.80" incLanes="gneE35_0" intLanes="" shape="177.50,268.80 180.00,268.80"/>
-    <junction id="gneJ1" type="dead_end" x="180.00" y="270.00" incLanes=" :gneJ1_w2_0 :gneJ1_w3_0 :gneJ1_w4_0 :gneJ1_w5_0 :gneJ1_w1_0" intLanes="" shape="182.98,264.64 181.75,263.96 181.34,263.81 179.97,263.51 179.30,263.39 177.91,263.54 177.51,263.59 176.20,264.10 175.87,264.28 174.73,265.10 176.22,266.82 177.66,267.83 179.05,268.11 180.40,267.67 181.71,266.52"/>
+    <junction id="gneJ1" type="dead_end" x="180.00" y="270.00" incLanes=":gneJ1_w2_0 :gneJ1_w3_0 :gneJ1_w4_0 :gneJ1_w5_0 :gneJ1_w1_0" intLanes="" shape="182.98,264.64 181.75,263.96 181.34,263.81 179.97,263.51 179.30,263.39 177.91,263.54 177.51,263.59 176.20,264.10 175.87,264.28 174.73,265.10 176.22,266.82 177.66,267.83 179.05,268.11 180.40,267.67 181.71,266.52"/>
     <junction id="gneJ10" type="dead_end" x="161.00" y="88.00" incLanes="gneE38_0" intLanes="" shape="157.80,88.00 161.00,88.00"/>
     <junction id="gneJ11" type="dead_end" x="219.00" y="88.00" incLanes="gneE39_0" intLanes="" shape="215.80,88.00 219.00,88.00"/>
     <junction id="gneJ12" type="dead_end" x="280.00" y="88.00" incLanes="gneE40_0" intLanes="" shape="276.80,88.00 280.00,88.00"/>
