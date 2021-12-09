@@ -3,11 +3,7 @@ from pandas import IndexSlice as I
 import os
 import sys
 
-# from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdBuilder
-
-import roveranalyzer.simulators.opp as opp
 import roveranalyzer.simulators.crownet.dcd as Dmap
-from roveranalyzer.simulators.crownet.dcd.util import remove_not_selected_cells
 from roveranalyzer.simulators.opp.provider.hdf.DcdMapProvider import DcdMapProvider
 
 def dcd_map_localUpdate(hostId, data_root):
