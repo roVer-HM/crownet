@@ -5,17 +5,15 @@ import sys
 
 # from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdBuilder
 
-import roveranalyzer.simulators.opp as opp
-import roveranalyzer.simulators.crownet.dcd as Dmap
-from roveranalyzer.simulators.crownet.dcd.util import remove_not_selected_cells
+import roveranalyzer.simulators.crownet.dcd.dcd_builder as Builders
 from roveranalyzer.simulators.opp.provider.hdf.DcdMapProvider import DcdMapProvider
 
 def dcd_map_localUpdate(hostId, data_root):
     print(data_root)
     data_root = os.path.abspath(data_root)
     print(data_root)
-    builder = Dmap.DcdHdfBuilder.get("data.h5", data_root)
-    map: DcdMapProvider = builder.build()["map_p"]
+    builder = Builders.DcdHdfBuilder.get("data.h5", data_root)
+    map: DcdMapProvider = builder.build().map_p
     
     host_df = map[I[:, :, :, :, hostId], ["count", "selection"]]
     host_df = host_df[host_df["selection"] != 0].copy(deep=True)
