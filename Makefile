@@ -95,6 +95,8 @@ analysis-build: $(python_dists)
 
 analysis-clean:
 	rm -f $(python_dists)
+	rm -rf out/$(venv_user)
+	rm -rf out/$(venv_dev)
 
 venv-build: $(python_venvs)
 
