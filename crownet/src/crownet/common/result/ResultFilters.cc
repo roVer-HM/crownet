@@ -14,10 +14,12 @@
 //
 
 #include "crownet/common/result/ResultFilters.h"
+#include "inet/common/ResultFilters.h"
 
 #include "inet/common/packet/Packet.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
 
 using namespace inet;
 
@@ -74,5 +76,29 @@ void RcvdSequenceIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
       }
   }
 }
+
+Register_ResultFilter("simBound", SimBoundFilter);
+void SimBoundFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details){
+    OsgCoordConverterLocal *module = dynamic_cast<OsgCoordConverterLocal *>(object);
+     if (module) {
+         Coord coord = module->getConverter()->getBoundary();
+         inet::utils::filters::VoidPtrWrapper wrapper(&coord);
+         fire(this, t, &wrapper, details);
+     }
+}
+
+
+Register_ResultFilter("simOffset", SimOffsetFilter);
+void SimOffsetFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details){
+    OsgCoordConverterLocal *module = dynamic_cast<OsgCoordConverterLocal *>(object);
+     if (module) {
+         Coord coord = module->getConverter()->getOffset();
+         inet::utils::filters::VoidPtrWrapper wrapper(&coord);
+         fire(this, t, &wrapper, details);
+     }
+}
+
 
 }  // namespace crownet

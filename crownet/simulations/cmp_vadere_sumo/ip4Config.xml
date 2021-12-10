@@ -9,4 +9,5 @@
     <!-- all D2D-capable UEs participate in the multicast group -->
     <multicast-group hosts="ueD2D[*]" interfaces="cellular" address="224.0.0.10"/>
     <multicast-group hosts="ueCell[*]" interfaces="cellular" address="224.0.0.10"/>
+    <multicast-group hosts="misc[*]" interfaces="cellular" address="224.0.0.10"/>
 </config>

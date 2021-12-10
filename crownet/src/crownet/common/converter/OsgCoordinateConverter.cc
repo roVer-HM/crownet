@@ -98,6 +98,11 @@ inet::Coord OsgCoordinateConverter::getBoundary() const{
     return inet::Coord{getBoundaryWidth(), getBoundaryHeight(), 0.0};
 }
 
+inet::Coord OsgCoordinateConverter::getOffset() const {
+    return inet::Coord{this->zoneOriginOffset.x, this->zoneOriginOffset.y};
+}
+
+
 RegularGridInfo OsgCoordinateConverter::getGridDescription(const inet::Coord& cellSize) const {
     auto gridSize = getBoundary();
     RegularGridInfo info;

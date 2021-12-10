@@ -17,6 +17,14 @@
 #include "inet/common/geometry/common/Coord.h"
 #include "crownet/artery/traci/VadereApi.h"
 #include "crownet/artery/traci/VadereCore.h"
+#include "crownet/common/util/crownet_util.h"
+
+namespace {
+
+const simsignal_t simBoundSignal = cComponent::registerSignal("simBoundSig");
+const simsignal_t simOffsetSignal = cComponent::registerSignal("simOffsetSig");
+
+}
 
 namespace crownet {
 
@@ -34,6 +42,8 @@ void OsgCoordConverterLocal::initialize(int stage) {
                       par("srs_code").stdstringValue());
       sceneOrientation = inet::Quaternion::NIL;
       scenePosition = _converter->getScenePosition();
+      emit(simBoundSignal, this);
+      emit(simOffsetSignal, this);
     }
 }
 
@@ -72,6 +82,8 @@ void OsgCoordConverterVadere::traciConnected(){
     _converter = std::make_shared<OsgCoordinateConverter>(
               ref.offset, netBound, ref.epsg_code);
     m_api->setConverter(_converter);
+    emit(simBoundSignal, this);
+    emit(simOffsetSignal, this);
 
 }
 
@@ -108,6 +120,8 @@ void OsgCoordConverterSumo::initialize(int stage) {
       offset = traci::TraCIPosition(netOffset[0], netOffset[1]);
 
       _converter = std::make_shared<OsgCoordinateConverter>(offset, netBoundary, projParameter);
+      emit(simBoundSignal, this);
+      emit(simOffsetSignal, this);
   }
 }
 
