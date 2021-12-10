@@ -11,6 +11,7 @@ GOOGLE_TEST_LIB = gtest
 GOOGLE_MOCK_LIB = gmock
 GOOGLE_TEST_INCLUDE = /usr/local/include
 
+
 TARGT_NAME := CROWNET
 
 ifeq ("$(MODE)","debug")
@@ -18,9 +19,10 @@ ifeq ("$(MODE)","debug")
 endif
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
+ADD_CXXFLAGS := CXXFLAGS+='-std=c++17'
 
 all: checkmakefiles
-	cd src && $(MAKE) -j $(NUM_CPUS)
+	cd src && $(MAKE) $(ADD_CXXFLAGS) -j $(NUM_CPUS)
 
 .PHONY: build-lib build-exec
 
@@ -40,7 +42,8 @@ cleanall: checkmakefiles
 PROJECTS_VARS := -KARTERY_PROJ=../../artery \
 				 -KINET_PROJ=../../inet4 \
 			 	 -KLTE_PROJ=../../simulte \
-				 -KVEINS_PROJ=../../veins
+				 -KVEINS_PROJ=../../veins  \
+				 -KCXXFLAGS=-std=c++17
 				 -KVEINS_INET_PROJ=../../veins/subprojects/veins_inet
 
 ARTERY_ := 	-I$$\(ARTERY_PROJ\)/src \
