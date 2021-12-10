@@ -93,6 +93,8 @@ void OsgCoordConverterVadere::initialize(int stage) {
 
       _converter = std::make_shared<OsgCoordinateConverter>(
                 ref.offset, netBound, ref.epsg_code);
+      emit(simBoundSignal, this);
+      emit(simOffsetSignal, this);
   } else if (stage == inet::INITSTAGE_LAST){
       VadereCore* core = inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
       subscribeTraCI(core);

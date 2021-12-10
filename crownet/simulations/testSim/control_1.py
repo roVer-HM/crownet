@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys, os
 import json
 
@@ -34,14 +35,14 @@ class ChangeTarget(Controller):
     def handle_sim_step(self, sim_time, sim_state):
         sending_node = "misc[0].app[0]"
         model = "RouteChoice"
-        command = {"targetIds" : [3] , "probability" : [1.0], "reactionProbability" : [1.0]}
-        action = { "time" : 50.0, 
-                  "space" : {"x" : 0.0, "y" : 0.0, "radius": 100}, 
-                  "command" : command, 
+        command = {"targetIds" : [3] , "probability" : [1.0]}
+        action = { "time" : 50.0,
+                  "space" : {"x" : 0.0, "y" : 0.0, "radius": 100},
+                  "command" : command,
                   "commandId": self.nextCmdId,
                   "stimulusId": 201,
                 }
-        self.nextCmdId =+ 1 
+        self.nextCmdId =+ 1
         action = json.dumps(action)
 
         self.con_manager.domains.v_sim.send_control(message=action, model=model, sending_node_id=sending_node)
@@ -67,7 +68,7 @@ if __name__ == "__main__":
             "--host-name",
             "0.0.0.0",
         ]
-
+        print(settings)
         controller = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
     else:
         controller = get_controller_from_args(

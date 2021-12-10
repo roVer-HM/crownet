@@ -195,9 +195,9 @@ class ClosedLoop(OpenLoop, Controller):
 
 if __name__ == "__main__":
 
-    isUseOmnet = False
+    isUseOmnet = True
     isRunInDockerContainer = True
-    settings = ["--controller-type", "OpenLoop"]
+    settings = ["--controller-type", "ClosedLoop"]
 
     _settings = list()
     if len(sys.argv) == 1:
