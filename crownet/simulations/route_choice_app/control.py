@@ -195,58 +195,28 @@ class ClosedLoop(OpenLoop, Controller):
 
 if __name__ == "__main__":
 
-    isUseOmnet = True
-    isRunInDockerContainer = True
-    settings = ["--controller-type", "ClosedLoop"]
-
-    _settings = list()
     if len(sys.argv) == 1:
-        if isUseOmnet:
-            _settings = [
-                "--port",
-                "9997",
-                "--host-name",
-                "0.0.0.0",
-            ]
-        else:
-            scenario_file = "simplified_default_sequential.scenario"
-            settings.extend(["--scenario-file", scenario_file ,
-                "--experiment-label", f"no_disturbance_openControl_{time.time()}"]) #TODO change this)
-
-            if isRunInDockerContainer:
-                _settings = [
+        # default settings for control-vadere (no Omnetpp!)
+        settings = ["--controller-type",
+                    "OpenLoop", #
+                    "--scenario-file",
+                    "simplified_default_sequential.scenario",
+                    "--experiment-label",
+                    f"no_disturbance_openControl",
                     "--port",
                     "9999",
                     "--host-name",
                     "vadere",
                     "--client-mode",
-                ]
-            else:
-                _settings = [
-                    "--port",
-                    "9999",  # 9999
-                    "--host-name",
-                    "localhost",
-                    "--client-mode",
-                    "--start-server",
-                    "--gui-mode",
-                    "--path-to-vadere-repo",
-                    os.path.abspath("../../../vadere"),
-                    "--suppress-prompts",
-                ]
-            _settings.extend(["--output-dir", os.path.join(os.path.abspath(os.path.dirname(__file__)), "results")])
-
+                    ]
     else:
-        settings_ = sys.argv[1:]
-
-    settings.extend(_settings)
+        settings = sys.argv[1:]
 
     sub = VadereDefaultStateListener.with_vars(
         "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
     )
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings)
     controller.register_state_listener("default", sub, set_default=True)
-    controller.set_reaction_model_parameters(reaction_probability=1.0)
     controller.start_controller()
 
 

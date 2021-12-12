@@ -3,7 +3,6 @@ import sys, os
 
 sys.path.append(os.path.abspath(".."))
 
-
 from roveranalyzer.simulators.crownet.runner import BaseRunner
 
 
@@ -14,6 +13,11 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
+    #TODO: discss Setting up network "crownet.simulations.networks.World"...
+#Initializing...
+#<!> Error: check_and_cast(): Cannot cast 'AmcPilot*' to type 'AmcPilotD2D *' -- in module (LteMacEnbD2D) World.eNB[0].cellularNic.mac (id=68), during network initialization
+#/home/christina/repos/crownet/crownet/src/run_crownet: line 27:    23 Segmentation fault      (core dumped) $DIR/CROWNET $COMMAND_LINE_OPTIONS $*
+#Container terminated (ERROR: 139).
 
     settings = [
         "vadere-opp-control",
@@ -21,10 +25,12 @@ if __name__ == "__main__":
         "--override-host-config",
         "--experiment-label",
         "output",
-        "--opp.-c",
-        "test_control001_udp_only", # test_control001_udp_only OR test_control001_aid
         "--with-control",
-        "control_1.py"
+        "control.py",
+        "--ctrl.controller-type",
+        "OpenLoop",
+        "--opp.-c",
+        "final",
     ]
 
     if len(sys.argv) == 1:
