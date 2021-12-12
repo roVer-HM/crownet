@@ -16,7 +16,18 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
-    settings = [ ]
+
+    settings = [
+        "vadere-opp-control",
+        "--create-vadere-container",
+        "--override-host-config",
+        "--experiment-label",
+        "output",
+        "--opp.-c",
+        "test_control001_aid",
+        "--with-control",
+        "control_1.py"
+    ]
 
     if len(sys.argv) == 1:
         # default behavior of script

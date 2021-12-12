@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-import sys, os
 import json
-
+import os
+import sys
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
@@ -27,36 +26,42 @@ class ChangeTarget(Controller):
 
     def __init__(self):
         super().__init__()
-        self.nextCmdId = 1
+        self.time_step = 0
+        self.time_step_interval = 0.4
+        self.controlModelName = "RouteChoice1"
+        self.controlModelType = "RouteChoice"
+        self.sending_node = "misc[0].app[0]"
 
-    def initialize_connection(self, con_manager):
-        self.con_manager = con_manager
 
     def handle_sim_step(self, sim_time, sim_state):
-        sending_node = "misc[0].app[0]"
-        model = "RouteChoice"
-        command = {"targetIds" : [3] , "probability" : [1.0]}
-        action = { "time" : 50.0,
-                  "space" : {"x" : 0.0, "y" : 0.0, "radius": 100},
-                  "command" : command,
-                  "commandId": self.nextCmdId,
-                  "stimulusId": 201,
-                }
-        self.nextCmdId =+ 1
-        action = json.dumps(action)
 
-        self.con_manager.domains.v_sim.send_control(message=action, model=model, sending_node_id=sending_node)
-        print("send RouteChoice")
-        self.con_manager.next_call_at(500.0)  # do not call again (simualtion only taks ~50 seconds(
+        if sim_time == 4.0:
+            p1 = [0.0, 1.0]
+            print("Use target [2]")
 
+            command = {"targetIds": [2, 3], "probability": p1}
+            action = {
+                "space": {"x": 0.0, "y": 0.0, "radius": 100},
+                "commandId": self.commandID,
+                "stimulusId": -400,
+                "command": command,
+            }
+            action = json.dumps(action)
 
+            print(f"TikTokController: {sim_time} apply control action ")
+            self.con_manager.domains.v_sim.send_control(message=action,
+                                                        model=self.controlModelName,
+                                                        sending_node_id=self.sending_node)
+            self.commandID += 1
+
+    def handle_init(self, sim_time, sim_state):
+        super().handle_init(sim_time, sim_state)
+        #TODO remove reaction model from python code and vadere code!
+        self.con_manager.domains.v_sim.init_control(
+            self.controlModelName, self.controlModelType, json.dumps({})
+        )
 
 if __name__ == "__main__":
-    sub = VadereDefaultStateListener.with_vars(
-        "persons",
-        {"pos": tc.VAR_POSITION, "speed": tc.VAR_SPEED, "angle": tc.VAR_ANGLE},
-        init_sub=True,
-    )
 
     controller = ChangeTarget()
 
@@ -75,7 +80,12 @@ if __name__ == "__main__":
             working_dir=os.path.dirname(os.path.abspath(__file__)),
             controller=controller, )
 
+
+    sub = VadereDefaultStateListener.with_vars(
+        "persons",
+        {"pos": tc.VAR_POSITION, "speed": tc.VAR_SPEED, "angle": tc.VAR_ANGLE},
+        init_sub=True,
+    )
+
     controller.register_state_listener("default", sub, set_default=True)
-    print("start...")
     controller.start_controller()
-    print("start_2...")
