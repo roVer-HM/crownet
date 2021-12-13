@@ -1,5 +1,5 @@
 /*
- * VadereLauchner.h
+ * VadereLauncher.h
  *
  *  Created on: Aug 6, 2020
  *      Author: sts
@@ -16,7 +16,7 @@ using namespace traci;
 
 namespace crownet {
 
-class VadereLauchner : public traci::ConnectLauncher {
+class VadereLauncher : public traci::ConnectLauncher {
  public:
   void initialize() override;
   virtual std::shared_ptr<API> createAPI() override;

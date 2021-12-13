@@ -1,11 +1,12 @@
 /*
- * VadereLauchner.cc
+ * VadereLauncher.cc
  *
  *  Created on: Aug 6, 2020
  *      Author: sts
  */
 
-#include "crownet/artery/traci/SumoLauchner.h"
+#include "SumoLauncher.h"
+
 #include "crownet/crownet.h"
 
 namespace fs = boost::filesystem;
@@ -16,9 +17,9 @@ using namespace omnetpp;
 namespace crownet {
 
 
-Define_Module(SumoLauchner);
+Define_Module(SumoLauncher);
 
-void SumoLauchner::initialize()
+void SumoLauncher::initialize()
 {
     traci::ConnectLauncher::initialize();
     // check config override if simulation is run in parallel and container names must be set central
@@ -36,7 +37,7 @@ void SumoLauchner::initialize()
     }
 }
 
-void SumoLauchner::initializeServer(std::shared_ptr<API> api){
+void SumoLauncher::initializeServer(std::shared_ptr<API> api){
     int seed = par("seed").intValue();
     if (seed == -1) {
         seed = uniform(0, std::numeric_limits<int>::max()); //

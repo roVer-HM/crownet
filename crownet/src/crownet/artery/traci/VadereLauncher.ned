@@ -2,10 +2,10 @@ package crownet.artery.traci;
 
 import traci.ConnectLauncher;
 
-simple VadereLauchner extends ConnectLauncher
+simple VadereLauncher extends ConnectLauncher
 {
     parameters:
-        @class(crownet::VadereLauchner);
+        @class(crownet::VadereLauncher);
         string vadereScenarioPath;
         string vadereCachePath = default("");
         int seed = default(-1);
