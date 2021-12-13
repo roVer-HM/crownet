@@ -1,9 +1,9 @@
 from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdHdfBuilder
 from roveranalyzer.simulators.crownet.dcd.util import owner_dist_feature, create_error_df
-from roveranalyzer.simulators.opp.provider.hdf.DcDGlobalPosition import DcDGlobalPosition, \
-    DcDGlobalDensity, pos_density_from_csv
+from roveranalyzer.simulators.opp.provider.hdf.DcDGlobalPosition import DcdGlobalPosition, \
+    DcdGlobalDensity, pos_density_from_csv
 from roveranalyzer.simulators.opp.provider.hdf.DcdMapProvider import DcdMapProvider
-from roveranalyzer.simulators.opp.provider.hdf.CountMapProvider import CountMapProvider
+from roveranalyzer.simulators.opp.provider.hdf.DcdMapCountProvider import DcdMapCount
 
 import os
 import glob
@@ -11,14 +11,14 @@ import glob
 
 def create_error_df_hdf(hdf_path):
     _maps = DcdMapProvider(hdf_path)
-    _global = DcDGlobalDensity(hdf_path)
+    _global = DcdGlobalDensity(hdf_path)
     error_df = create_error_df(_maps.get_dataframe(), _global.get_dataframe())
     print("foo")
 
 
 def from_csv(path):
     dcd_provider = DcdMapProvider(os.path.join(path, "06_map.h5"))
-    # count_provider = CountMapProvider(os.path.join(path, "00_map.h5"))
+    # count_provider = DcdMapCountProvider(os.path.join(path, "00_map.h5"))
     map_paths = glob.glob(os.path.join(path, "dcdMap_*.csv"))
     if not dcd_provider.contains_group(dcd_provider.group):
         print("read from csv")
@@ -45,7 +45,7 @@ def main(path):
                                     x_slice=slice(800.0, 1000.0))
     print(dcd.map.index.get_level_values("simtime").unique())
     print(dcd.map.index.get_level_values("x").unique())
-    print(dcd.location_df.index.get_level_values("simtime").unique())
+    print(dcd.position_df.index.get_level_values("simtime").unique())
     print(dcd.count_map.head(3))
 
     print("done")

@@ -29,8 +29,9 @@ simple GlobalDensityMap like IGlobalDensityMap
         string coordConverterModule = default("coordConverter");
         double cellSize @unit(m) = default(3.0m);
         // search these nodes for the ground truth setup. 
-        string vectorNodeModules= default("misc;pNode;vNode");
+        string vectorNodeModules= default("misc"); // does not work with Traci managed vectors! Use traciModuleListener
         string nodeModules= default("");
+        string traciModuleListener = default("traci.nodes"); // if missing it will be ignored.
         // if true use "traci.connected" to trigger density map setup. Otherwise use stage 13
         bool useSignalMapInit = default(true); 
 

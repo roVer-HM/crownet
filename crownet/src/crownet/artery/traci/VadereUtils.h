@@ -112,6 +112,13 @@ std::vector<VadereCache> getCachePaths(const std::string vadereCachePath,
 // read scenarioPath->scenarioContent from configuration xml.
 VadereScenario getScenarioContent(const std::string vadereScenarioPath);
 
+struct CoordianteSystemSettings{
+    std::vector<double> bound;
+    std::string epsg;
+    double offsetX, offsetY;
+};
+
+CoordianteSystemSettings getCoordianteSystemSettings(const std::string vadereScenarioPath);
 
 
 }  // namespace vadere

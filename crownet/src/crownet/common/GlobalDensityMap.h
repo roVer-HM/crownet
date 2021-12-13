@@ -29,22 +29,16 @@
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/applications/dmap/dmap_m.h"
 #include "crownet/common/RegularGridInfo.h"
+#include "crownet/artery/traci/TraCiNodeVisitorAcceptor.h"
 
 using namespace omnetpp;
 using namespace inet;
 
 namespace crownet {
 
-class INodeVisitor {
-public:
-    virtual ~INodeVisitor() = default;
-    virtual void visitNode(omnetpp::cModule* mod) = 0;
-};
-
-
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
-                         public INodeVisitor,
+                         public traci::ITraciNodeVisitor,
                          public IGlobalDensityMapHandler<RegularDcdMap>{
  public:
   //  using Grid = RegularGridMap<std::string>;
@@ -73,7 +67,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual void initializeMap();
 
   // ITraciNodeVisitor
-  virtual void visitNode(omnetpp::cModule *mod) override;
+  virtual void visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) override;
 
   virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal(){
       return dcdMapGlobal;
@@ -83,7 +77,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
       return getDcdMapGlobal();
   }
 
-  virtual void acceptNodeVisitor(INodeVisitor* visitor);
+  virtual void acceptNodeVisitor(traci::ITraciNodeVisitor* visitor);
 
 
  protected:
@@ -98,6 +92,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   simtime_t lastUpdate;
   std::vector<std::string> vectorNodeModules;
   std::vector<std::string> singleNodeModules;
+  ITraCiNodeVisitorAcceptor* traciModuleListener = nullptr;
 
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;

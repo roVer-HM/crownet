@@ -6,6 +6,7 @@ VadereTestingSuite.preferences.xml
 **/vadere-server-output
 **/.directory
 **/*.legacy
+**/analysis.d/**/*.html
 tags
 tags*
 compile_commands.json

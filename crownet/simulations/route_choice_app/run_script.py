@@ -3,9 +3,6 @@ import sys, os
 
 sys.path.append(os.path.abspath(".."))
 
-
-from datetime import datetime
-
 from roveranalyzer.simulators.crownet.runner import BaseRunner
 
 
@@ -16,10 +13,21 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
+    settings = [
+        "vadere-control",
+        "--create-vadere-container",
+        "--override-host-config",
+        "--experiment-label",
+        "output",
+        "--with-control",
+        "control.py",
+        "--scenario-file",
+        "vadere/scenarios/simplified_default_sequential.scenario",
+        "--ctrl.controller-type",
+        "OpenLoop",
+    ]
 
     if len(sys.argv) == 1:
-        settings = [ ]
-
         # default behavior of script
         runner = SimulationRun(os.getcwd(), settings)
     else:

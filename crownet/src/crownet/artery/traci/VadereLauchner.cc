@@ -7,7 +7,7 @@
 
 #include "crownet/artery/traci/VadereLauchner.h"
 
-#include "../../common/converter/OsgCoordConverter.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
 #include "inet/common/ModuleAccess.h"
 #include "crownet/artery/traci/VadereApi.h"
 #include "crownet/artery/traci/VadereUtils.h"

@@ -260,7 +260,7 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : {
-          "epsgCode" : "EPSG:32632",
+          "epsgCode" : "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
           "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
           "translation" : {
             "x" : 692152.0894735109,
@@ -1559,6 +1559,8 @@
         "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 39,
         "shape" : {

@@ -134,7 +134,7 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : {
-          "epsgCode" : "EPSG:32632",
+          "epsgCode" : "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
           "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
           "translation" : {
             "x" : 692298.893546436,
@@ -674,6 +674,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 1004,
         "shape" : {
@@ -895,7 +897,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -948,7 +966,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1001,7 +1035,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1054,7 +1104,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1107,7 +1173,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1160,7 +1242,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1213,7 +1311,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1266,7 +1380,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1319,7 +1449,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1372,7 +1518,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1425,7 +1587,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1478,7 +1656,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1531,7 +1725,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
