@@ -1,11 +1,11 @@
 /*
- * VadereLauchner.cc
+ * VadereLauncher.cc
  *
  *  Created on: Aug 6, 2020
  *      Author: sts
  */
 
-#include "crownet/artery/traci/VadereLauchner.h"
+#include "VadereLauncher.h"
 
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "inet/common/ModuleAccess.h"
@@ -24,9 +24,9 @@ namespace crownet {
 
 
 
-Define_Module(VadereLauchner);
+Define_Module(VadereLauncher);
 
-void VadereLauchner::initialize()
+void VadereLauncher::initialize()
 {
     traci::ConnectLauncher::initialize();
     // check config override if simulation is run in parallel and container names must be set central
@@ -44,12 +44,12 @@ void VadereLauchner::initialize()
     }
 }
 
-std::shared_ptr<API> VadereLauchner::createAPI() {
+std::shared_ptr<API> VadereLauncher::createAPI() {
   return std::make_shared<VadereApi>();
 }
 
 
-void VadereLauchner::initializeServer(std::shared_ptr<API> api) {
+void VadereLauncher::initializeServer(std::shared_ptr<API> api) {
   auto vApi = std::dynamic_pointer_cast<VadereApi>(api);
 
   // use current directory as fallback to create absolute paths for Vadere.
