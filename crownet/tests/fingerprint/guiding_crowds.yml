@@ -68,8 +68,6 @@ test_4:
     - --override-host-config
     - --with-control
     - control.py
-    - --experiment-label
-    - output
     - --scenario-file
     - "vadere/scenarios/test001.scenario"
   simtimelimit: 100s
