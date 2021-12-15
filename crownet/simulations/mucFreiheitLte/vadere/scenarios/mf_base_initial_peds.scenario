@@ -1,7 +1,7 @@
 {
   "name" : "mf_base_initial_peds",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -3194,8 +3194,10 @@
             "y" : 158.59125952143222
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3225,8 +3227,10 @@
             "y" : 225.09726159647107
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3256,8 +3260,10 @@
             "y" : 125.56888923142105
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3287,8 +3293,10 @@
             "y" : 104.61519689764827
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3318,8 +3326,10 @@
             "y" : 134.85620195046067
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3349,8 +3359,10 @@
             "y" : 147.5738470396027
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3380,8 +3392,10 @@
             "y" : 221.6611376684159
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3411,8 +3425,10 @@
             "y" : 363.0436927303672
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3442,8 +3458,10 @@
             "y" : 171.5487187989056
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3473,8 +3491,10 @@
             "y" : 88.29599837306887
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3504,8 +3524,10 @@
             "y" : 18.918302612379193
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3535,8 +3557,10 @@
             "y" : 21.872196461074054
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3566,8 +3590,10 @@
             "y" : 264.80283942911774
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,

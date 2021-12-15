@@ -369,10 +369,10 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # ensure write-container-log is set
             arg_list.add_override(f"--write-container-log", value=None)
             timestamp = datetime.datetime.now().isoformat().replace('-', "").replace(":", "")
-            arg_list.add_override(f"--experiment-label", timestamp)
+            arg_list.add_if_missing(f"--experiment-label", timestamp)
 
             # Crownet test can run without OMNeT++
-            # todo change to parse run_script.py <subcommand> and check <sub> contains "vadere-only" or "vadere-control"
+            # todo change to parse run_script.py <subcommand> and check <sub> contains "vadere-only"
             #  * check each key to contain it "vadere-only" or "vadere-control"
             if not any([arg_list.contains_key(k) for k in ['vadere', 'vadere-control']]):
                 # get OMNeT++ fingerprint hashes (if missing add dummy value)

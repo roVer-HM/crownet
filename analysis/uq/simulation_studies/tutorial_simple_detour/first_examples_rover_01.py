@@ -48,24 +48,24 @@ def main(parameter="default", quantity_of_interest="default"):
 
     dependent_parameters = [
         DependentParameter(
-            name="sources.[id==1].distributionParameters",
+            name="sources.[id==1].distributionParameters.numberPedsPerSecond",
             simulator="vadere",
-            equation=lambda args: [(args["number_of_agents_mean"] * 0.01 / 4)],
+            equation=lambda args: (args["number_of_agents_mean"] * 0.01 / 4),
         ),
         DependentParameter(
-            name="sources.[id==2].distributionParameters",
+            name="sources.[id==2].distributionParameters.numberPedsPerSecond",
             simulator="vadere",
-            equation=lambda args: [(args["number_of_agents_mean"] * 0.01 / 4)],
+            equation=lambda args: (args["number_of_agents_mean"] * 0.01 / 4),
         ),
         DependentParameter(
-            name="sources.[id==5].distributionParameters",
+            name="sources.[id==5].distributionParameters.numberPedsPerSecond",
             simulator="vadere",
-            equation=lambda args: [(args["number_of_agents_mean"] * 0.01 / 4)],
+            equation=lambda args: (args["number_of_agents_mean"] * 0.01 / 4),
         ),
         DependentParameter(
-            name="sources.[id==6].distributionParameters",
+            name="sources.[id==6].distributionParameters.numberPedsPerSecond",
             simulator="vadere",
-            equation=lambda args: [(args["number_of_agents_mean"] * 0.01 / 4)],
+            equation=lambda args: (args["number_of_agents_mean"] * 0.01 / 4),
         ),
         DependentParameter(name="sim-time-limit", simulator="omnet", equation="180s"),
         DependentParameter(
@@ -143,3 +143,4 @@ def main(parameter="default", quantity_of_interest="default"):
 if __name__ == "__main__":
 
     main()
+

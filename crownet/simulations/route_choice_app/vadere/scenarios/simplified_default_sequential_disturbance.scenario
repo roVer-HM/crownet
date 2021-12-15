@@ -1,7 +1,7 @@
 {
   "name" : "simplified_default_sequential_disturbance",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -681,6 +681,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 39,
         "shape" : {
@@ -690,8 +692,10 @@
           "height" : 7.5,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 6,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -712,8 +716,10 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -763,7 +769,7 @@
       }
     },
     "stimulusInfos" : [ ],
-        "reactionProbabilities" : [ {
+    "reactionProbabilities" : [ {
       "stimulusId" : -1,
       "reactionProbability" : 1.0
     } ]
