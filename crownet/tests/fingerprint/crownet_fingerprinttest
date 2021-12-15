@@ -43,6 +43,7 @@ import yaml
 from io import StringIO
 
 from roveranalyzer.entrypoint.parser import ArgList
+from roveranalyzer.simulators.controller.controllerrunner import ControlRunner
 from roveranalyzer.simulators.sumo.runner import SumoRunner
 from roveranalyzer.simulators.vadere.runner import VadereRunner
 from roveranalyzer.simulators.opp.runner import OppRunner
@@ -351,7 +352,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             arg_list = ArgList.from_flat_list(sim["args"])
             # set debug logging for test
             if (self.args.verbose > 0):
-                _v = "v"*self.args.verbose
+                _v = "v" * self.args.verbose
                 arg_list.add_if_missing(f"-{_v}")
 
             # check if `args` contains executable and tags contains exec. Update `args` accordingly
@@ -369,7 +370,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # ensure write-container-log is set
             arg_list.add_override(f"--write-container-log", value=None)
             timestamp = datetime.datetime.now().isoformat().replace('-', "").replace(":", "")
-            arg_list.add_if_missing(f"--experiment-label", timestamp)
+            arg_list.add_override(f"--experiment-label", timestamp)
 
             # Crownet test can run without OMNeT++
             # todo change to parse run_script.py <subcommand> and check <sub> contains "vadere-only"
@@ -383,6 +384,8 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
                 # FIXME: Workaround due to results are saved based on config-name and experiment-label.
                 # The extra directory is created based on the settings in the omnetpp.ini file
                 sim["data_dir"] = f"{arg_list.get_value('--opp.-c', default='final')}_{timestamp}"
+            elif arg_list.contains_key("vadere-control"):
+                sim["data_dir"] = f"_{ControlRunner.OUTPUT_DEFAULT}_{timestamp}"
             else:
                 sim["data_dir"] = ""
 
@@ -462,7 +465,6 @@ class SimulationResultFactory:
 
 
 class SimulationResult:
-
     ignore_err = [
         "<!> TraCI server reported Simulation end reached.",
         "<!> Simulation time limit reached"
@@ -502,21 +504,21 @@ class SimulationResult:
         if run_log is not None:
             run_log = os.path.join(run_log, "test.out")
             if not os.path.exists(os.path.split(run_log)[0]):
-                raise RuntimeError("Result dir not found. Did you use ${resultdir}/${configname}_${experiment} as the result base directory in the omnetpp.ini?")
+                raise RuntimeError(
+                    "Result dir not found. Did you use ${resultdir}/${configname}_${experiment} as the result base directory in the omnetpp.ini?")
             with open(run_log, "w") as fd:
                 fd.write("------------------------------------------------------\n"
-                           + "Running: " + title + "\n\n"
-                           + "$ cd " + self.workingdir + "\n"
-                           + "$ " + self.command + "\n\n"
-                           + self.out.strip() + "\n\n"
-                           + "Exit code: " + str(self.exitcode) + "\n"
-                           + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
+                         + "Running: " + title + "\n\n"
+                         + "$ cd " + self.workingdir + "\n"
+                         + "$ " + self.command + "\n\n"
+                         + self.out.strip() + "\n\n"
+                         + "Exit code: " + str(self.exitcode) + "\n"
+                         + "Elapsed time:  " + str(round(self.elapsedTime, 2)) + "s\n\n")
         else:
             logging.error(f"Output directory not found for.\n  "
                           f"resultdir:{self.resultdir}\n  "
                           f"config:{config}\n  "
                           f"experiment_label:{experiment_label}")
-
 
     def parse_result(self):
         errorLines = re.findall("<!>.*", self.out, re.M)
@@ -634,7 +636,7 @@ class SimulationTestCase(unittest.TestCase):
     def runSimulation(self, title, command, workingdir, resultdir):
         # run the program and log the output
         t0 = time.time()
-        
+
         (exitcode, out) = self.runProgram(command, workingdir, resultdir)
 
         elapsedTime = time.time() - t0
@@ -676,7 +678,6 @@ class FingerprintTestCase(SimulationTestCase):
 
         timestamp = datetime.datetime.now().isoformat().replace('-', "").replace(":", "")
         self.arg_list.add_override(f"--experiment-label={timestamp}")
-
 
     def build_command(self):
         # Check if the command line does not contain executable name (starts with an option i.e. - char)
@@ -1211,7 +1212,7 @@ def sim_dir(config_name, experiment=None):
     return f"{config_name}_{exp}"
 
 
-def check_sim_dir(base_dir, config_name,  experiment=None):
+def check_sim_dir(base_dir, config_name, experiment=None):
     """
     In the omnetpp.ini file the use may define multiple ways to save resutl data.
     1) ${resultdir}/${configname}_${experiment}/....
@@ -1454,7 +1455,7 @@ if __name__ == "__main__":
             format="%(asctime)s:%(module)s:%(levelname)s> %(message)s",
         )
 
-    # roveranalyzer logging 
+    # roveranalyzer logging
     level_idx = args.verbose
     set_level(levels[level_idx])
     set_format("%(asctime)s:%(module)s:%(levelname)s> %(message)s")
