@@ -1,0 +1,4 @@
+scipy>=1.7.3
+SALib>=1.4.5
+pykrige>=1.6.1
+chaospy
