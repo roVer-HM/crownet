@@ -23,6 +23,14 @@ simple LteRadioDriver like IDispatchRadioDriver
  	parameters:
  	    @class(crownet::LteRadioDriver);
  	    @signal[ChannelLoad](type=double);
+ 	    @signal[packetSent](type=inet::Packet);
+        @signal[packetReceived](type=inet::Packet);
+		@statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
+        @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
+        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="appPkSeqNo(packetReceived)"; record=vector; interpolationmode=none);
+ 	    
  	    string dispatchInterfaceName = default("cellular"); //todo make this configuratabel
  	    string interfaceTableModule;
  	    // CCH=180 (default) see  TS 102 965 V1.3.1 Annex A,
