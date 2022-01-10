@@ -1,3 +1,4 @@
+.vscode/**
 **/core
 log.out
 VadereTestingSuite.preferences.xml
