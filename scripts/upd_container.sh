@@ -28,6 +28,9 @@ fi
 
 TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG"
 
+echo "Adding ssh key(s) to ssh agent (might be required for access to private repos)..."
+ssh-add
+
 echo "Building $IMAGE_SHORT ..."
 docker build $TAG_OPTIONS --ssh default --build-arg NOCACHE_PULL=$RANDOM ${@:3:${#@}+1-3} .
 

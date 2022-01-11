@@ -10,8 +10,8 @@
 #include <omnetpp/checkandcast.h>
 #include <traci/SubscriptionManager.h>
 
-#include "crownet/artery/traci/VadereLauchner.h"
 #include "crownet/artery/traci/VadereSubscriptionManager.h"
+#include "VadereLauncher.h"
 
 using namespace traci;
 using namespace omnetpp;

@@ -8,6 +8,8 @@ VadereTestingSuite.preferences.xml
 **/.directory
 **/*.legacy
 **/analysis.d/**/*.html
+**/simulations/*/suqc
+.vscode
 tags
 tags*
 compile_commands.json

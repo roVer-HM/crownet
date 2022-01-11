@@ -20,6 +20,10 @@
 #include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
+#include "inet/common/ModuleAccess.h"
+#include "crownet/applications/common/AppCommon_m.h"
+
+
 
 using namespace inet;
 using omnetpp::cStringTokenizer;
@@ -58,6 +62,7 @@ void UdpDetourApp::initialize(int stage) {
     repeatTime = par("repeatTime").doubleValue();
     notifyMobilityProvider = par("notifyMobilityProvider").boolValue();
     cStringTokenizer tokenizer(par("alternativeRoute").stringValue(), ",");
+    hostId = getContainingNode(this)->getId();
     const char *token;
     while ((token = tokenizer.nextToken()) != nullptr) {
       try {
@@ -260,12 +265,18 @@ void UdpDetourApp::sendPayload(IntrusivePtr<const DetourAppPacket> payload) {
   std::ostringstream str;
   str << payload->getIncidentReason() << "_" << getId() << "#" << numSent;
   Packet *packet = new Packet(str.str().c_str());
+
+
+
   if (dontFragment) packet->addTag<FragmentationReq>()->setDontFragment(true);
   packet->insertAtBack(payload);
   L3Address destAddr = destAddresses[0];
   emit(packetSentSignal, packet);
   socket.sendTo(packet, destAddr, destPort);
   numSent++;
+
+
+
 }
 
 // FSM
@@ -336,6 +347,8 @@ UdpDetourApp::FsmStates UdpDetourApp::fsmIncidentTxExit(cMessage *msg) {
     payload->setAlternativeRoute(i, alternativeRoute.at(i).c_str());
   }
   payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
+  payload->addTag<HostIdTag>()->setHostId(hostId);
+  payload->addTag<SequenceIdTag>()->setSequenceNumber(numSent);
 
   sendPayload(payload);
 

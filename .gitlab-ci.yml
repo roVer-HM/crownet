@@ -171,6 +171,7 @@ uq-test:
   script:
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq"
+    - "pip install -r requirements.txt"
     - "python3 -m unittest discover -v"
 
 # run given simulation-campaign
