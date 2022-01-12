@@ -16,11 +16,15 @@ RegularDcdMapFactory::RegularDcdMapFactory(const RegularGridInfo& grid)
           cellKeyProvider(std::make_shared<GridCellIDKeyProvider>(grid)),
           timeProvider(std::make_shared<SimTimeProvider>()) {
 
-    visitor_dispatcher["ymf"] = [this](){return std::make_shared<YmfVisitor>(timeProvider->now());};
-    visitor_dispatcher["mean"] = [this](){return std::make_shared<MeanVisitor>(timeProvider->now());};
-    visitor_dispatcher["median"] = [this](){return std::make_shared<MedianVisitor>(timeProvider->now());};
-    visitor_dispatcher["invSourceDist"] = [this](){return std::make_shared<InvSourceDistVisitor>(timeProvider->now());};
-    visitor_dispatcher["local"] = [this](){return std::make_shared<LocalSelector>(timeProvider->now());};
+    visitor_dispatcher["ymf"] = [this](MapCfg* mapCfg){return std::make_shared<YmfVisitor>(timeProvider->now());};
+    visitor_dispatcher["ymfPlusDist"] = [this](MapCfg* mapCfg){
+        double alpha = check_and_cast<MapCfgYmfPlusDist*>(mapCfg)->getAlpha();
+        return std::make_shared<YmfPlusDistVisitor>(alpha, timeProvider->now());
+    };
+    visitor_dispatcher["mean"] = [this](MapCfg* mapCfg){return std::make_shared<MeanVisitor>(timeProvider->now());};
+    visitor_dispatcher["median"] = [this](MapCfg* mapCfg){return std::make_shared<MedianVisitor>(timeProvider->now());};
+    visitor_dispatcher["invSourceDist"] = [this](MapCfg* mapCfg){return std::make_shared<InvSourceDistVisitor>(timeProvider->now());};
+    visitor_dispatcher["local"] = [this](MapCfg* mapCfg){return std::make_shared<LocalSelector>(timeProvider->now());};
 
     cellIdStream_dispatcher["default"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>();};
     cellIdStream_dispatcher["insertionOrder"] = [](){return std::make_shared<InsertionOrderedCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>();};
@@ -38,11 +42,13 @@ std::shared_ptr<RegularDcdMap> RegularDcdMapFactory::create_shared_ptr(
   return std::make_shared<RegularDcdMap>(ownerID, cellKeyProvider, timeProvider, streamer);
 }
 
-std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::createValueVisitor(const std::string& mapType){
+std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::createValueVisitor(MapCfg* mapCfg){
+
+    auto mapType = mapCfg->getMapType();
     if (visitor_dispatcher.find(mapType) == visitor_dispatcher.end()){
-        throw cRuntimeError("No visitor defined for mapType %s", mapType.c_str());
+        throw cRuntimeError("No visitor defined for mapType %s", mapType);
     }
-    return visitor_dispatcher[mapType]();
+    return visitor_dispatcher[mapType](mapCfg);
 }
 
 std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> RegularDcdMapFactory::createCellIdStream(const std::string& typeName){

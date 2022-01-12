@@ -32,6 +32,10 @@ class MapCfg extends cOwnedObject {
      string idStreamType;   
 }
 
+class MapCfgYmfPlusDist extends MapCfg {
+ 	mapType = "ymfPlusDist";
+ 	double alpha;   
+}
 
 class DcDCell {
 	uint16_t count;         // 2B pedestrian count

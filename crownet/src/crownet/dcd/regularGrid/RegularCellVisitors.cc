@@ -86,6 +86,41 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
   return ret;
 }
 
+RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) const {
+    double age_sum = 0.0;
+    double distance_sum = 0.0;
+    double now = this->time.dbl(); // current time the visitor is called.
+
+
+    for (const auto& e : cell.validIter()) {
+        age_sum += (now - e.second->getMeasureTime().dbl());
+        /*
+         * In the case of a local entry the 'sourceEntry' and 'ownerEntry'
+         * values must be the same. Thus the sum of all sourceEntry values
+         * is correct.
+         * TODO EntryDist for localEntry is ZERO {0, 0, 0}
+         */
+        distance_sum += e.second->getEntryDist().sourceEntry;
+    }
+    RegularCell::entry_t_ptr ret = nullptr;
+    double ret_ymfPlusDist = 0.0;
+    double ymfPlusDist = 0.0;
+    for (const auto& e : cell.validIter()) {
+      ymfPlusDist = alpha * (now -e.second->getMeasureTime().dbl())/age_sum + (1-alpha) * e.second->getEntryDist().sourceEntry/distance_sum;
+      if (ret == nullptr) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+        continue;
+      }
+
+      if (ymfPlusDist < ret_ymfPlusDist) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+      }
+    }
+    return ret;
+}
+
 RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
     // to check local exists.... raise error.....
     auto val = cell.getLocal();

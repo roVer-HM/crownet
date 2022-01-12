@@ -109,7 +109,7 @@ void BaseDensityMapApp::initDcdMap(){
     WATCH_MAP(dcdMap->getNeighborhood());
     cellProvider = dcdMapFactory->getCellKeyProvider();
     // do not share valueVisitor between nodes.
-    valueVisitor = dcdMapFactory->createValueVisitor(mapCfg->getMapType());
+    valueVisitor = dcdMapFactory->createValueVisitor(mapCfg);
 }
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
@@ -279,6 +279,11 @@ std::shared_ptr<RegularDcdMap> BaseDensityMapApp::getMap() { return dcdMap; }
 
 void BaseDensityMapApp::setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory){
     this->dcdMapFactory = factory;
+}
+
+void BaseDensityMapApp::updateOwnLocationInMap(){
+    auto ownerPosition = converter->position_cast_traci(getMobility()->getCurrentPosition());
+    dcdMap->setOwnerCell(ownerPosition);
 }
 
 

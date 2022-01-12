@@ -16,9 +16,9 @@
 #include "crownet/common/util/FilePrinter.h"
 
 struct EntryDist{
-    double sourceOwner;
-    double sourceEntry;
-    double ownerEntry;
+    double sourceOwner;     /* distance between the node which conducted the measurement and the current node */
+    double sourceEntry;     /* distance between the node which conducted the measurement and the point/cell of interest */
+    double ownerEntry;      /* distance the current node and the point/cell of interest */
 };
 
 template <typename K, typename T>

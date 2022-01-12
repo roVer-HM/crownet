@@ -73,6 +73,7 @@ protected:
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory>) override;
+ virtual void updateOwnLocationInMap();
 
  // AppStatusInfo
  virtual const bool canProducePacket() override;

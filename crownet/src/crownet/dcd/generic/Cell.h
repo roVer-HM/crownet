@@ -65,8 +65,10 @@ class Cell {
  public:
   virtual ~Cell() = default;
   Cell() {}
-  Cell(std::shared_ptr<TimeProvider<T>> timeProvider, cell_key_t cell_id, node_key_t owner_id)
-      : timeProvider(timeProvider), cell_id(cell_id), owner_id(owner_id) {}
+  Cell(std::shared_ptr<TimeProvider<T>> timeProvider,
+       cell_key_t cell_id,
+       node_key_t owner_id)
+      : timeProvider(timeProvider),cell_id(cell_id), owner_id(owner_id) {}
 
   // getter
   map_t& getData() { return data; }
