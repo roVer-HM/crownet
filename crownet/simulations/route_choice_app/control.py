@@ -23,7 +23,6 @@ class NoController(Controller):
         super().__init__()
         self.time_step_size = 10.0
         self.densityMapper = None
-        self.counter = 0
         self.density_over_time = list()
 
     def handle_sim_step(self, sim_time, sim_state):
@@ -79,7 +78,7 @@ class NoController(Controller):
         pass
 
     def handle_init(self, sim_time, sim_state):
-        self.counter = 0
+        self.counter = -1
         self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer(os.path.join(self.output_dir, "commandIds.txt"))))
 
     def compute_next_corridor_choice(self, sim_time):
@@ -186,7 +185,7 @@ class ClosedLoop(OpenLoop, Controller):
         ).mean(axis=0)
         # set old corridor to inf to avoid congestion:
         densities[self.counter] = np.inf
-        self.counter = np.argwhere(densities == densities.min()).ravel()[-1]
+        self.counter = np.argwhere(densities == densities.min()).ravel()[0] # recommend shortest corridor
 
         print(
             f"The densities are: {densities.round(3)}. Minimum: index = {self.counter}."

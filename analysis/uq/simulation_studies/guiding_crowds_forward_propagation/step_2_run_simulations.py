@@ -4,8 +4,8 @@
 import sys
 
 from suqc.CommandBuilder.VadereControlCommand import VadereControlCommand
-from tutorial.imports import *
 from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
+from tutorial.imports import *
 
 # This is just to make sure that the systems path is set up correctly, to have correct imports, it can be ignored:
 
@@ -35,7 +35,9 @@ if __name__ == "__main__":
     par_var = VadereSeedManager(par_variations=par_var, rep_count=2, vadere_fixed=False).get_new_seed_variation()
     qoi = ["densities.txt", "fundamentalDiagramm.txt"]
 
-    for controller in ["ClosedLoop","OpenLoop","NoController"]:
+    for controller in ["ClosedLoop", "OpenLoop", "NoController"]:
+
+        print(f"Simulation runs for controller-type = {controller} started.")
 
         output_folder = os.path.join(os.getcwd(), controller)
 
@@ -44,8 +46,8 @@ if __name__ == "__main__":
             .experiment_label("output") \
             .with_control("control.py") \
             .scenario_file("vadere/scenarios/simplified_default_sequential.scenario") \
-            .control_argument("controller-type", controller)\
-            .vadere_tag("211214-1621")\
+            .control_argument("controller-type", controller) \
+            .vadere_tag("211214-1621") \
             .control_tag("211210-1432")
 
         setup = CoupledDictVariation(
@@ -64,6 +66,8 @@ if __name__ == "__main__":
 
         par.to_csv(os.path.join(os.getcwd(), f"{controller}_parameters.csv"))
         for qoi_, vals_ in data.items():
-            vals_.to_csv(os.path.join(os.getcwd(), f"{controller}_{qoi_.replace('.txt', '.csv')}"))
+            file_path = os.path.join(os.getcwd(), f"{controller}_{qoi_.replace('.txt', '.csv')}")
+            print(f"Export result {qoi_} to {file_path}.")
+            vals_.to_csv(file_path)
 
         print(f"Simulation runs for controller-type = {controller} completed.")
