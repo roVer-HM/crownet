@@ -2,14 +2,13 @@
 # !/usr/bin/python3
 
 import sys
+import os
 
 from suqc.CommandBuilder.VadereControlCommand import VadereControlCommand
 from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
-from tutorial.imports import *
-
+from suqc.request import CoupledDictVariation
 # This is just to make sure that the systems path is set up correctly, to have correct imports, it can be ignored:
 
-sys.path.append(os.path.abspath("first_examples_rover_05"))
 sys.path.append(os.path.abspath(""))
 
 run_local = True
@@ -57,7 +56,7 @@ if __name__ == "__main__":
             qoi=qoi,
             model=model,
             post_changes=None,
-            output_path=path2tutorial,
+            output_path=os.path.dirname(output_folder),
             output_folder=output_folder,
             remove_output=False,
         )
