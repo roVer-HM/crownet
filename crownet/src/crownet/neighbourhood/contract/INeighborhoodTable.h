@@ -50,6 +50,14 @@ public:
     static NeighborhoodTableIter_t inRadius(NeighborhoodTable_t* data, const inet::Coord& pos, const double dist){
         return NeighborhoodTableIter_t(data, inRadius_pred(pos, dist));
     }
+
+    const simtime_t getLastUpdatedAt() const { return lastUpdated; }
+protected:
+    void setLastUpdatedAt(const simtime_t t) { lastUpdated = t;}
+
+private:
+    simtime_t lastUpdated = -1.0;
+
 };
 
 

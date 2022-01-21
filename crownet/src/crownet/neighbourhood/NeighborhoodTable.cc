@@ -79,6 +79,7 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
         take(info);
         _table[sourceId] = info;
         tableSize = _table.size();
+        setLastUpdatedAt(simTime());
         emit(neighborhoodTableChangedSignal, this);
         return info;
     } else {
@@ -99,6 +100,7 @@ void NeighborhoodTable::checkTimeToLive(){
                 emitRemoved(it->second);
                 delete it->second;
                 it = _table.erase(it);
+                setLastUpdatedAt(now);
             } else {
                 ++it;
             }

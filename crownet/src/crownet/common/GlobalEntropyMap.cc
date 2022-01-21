@@ -100,8 +100,8 @@ void GlobalEntropyMap::updateMaps() {
 
 void GlobalEntropyMap::updateEntropy(){
     auto now = simTime();
-    auto prevUpdate = lastEntropyUpdate;
-    if (now > lastEntropyUpdate){
+    auto prevUpdate = getLastUpdatedAt();
+    if (now > prevUpdate){
         for(int x = 0; x < grid.getCellCount().x ; x++) {
             for(int y = 0; y < grid.getCellCount().y; y++){
                 if (entropyProvider->selectCell(x, y, now)){
@@ -136,7 +136,7 @@ void GlobalEntropyMap::updateEntropy(){
         }
     }
     std::cout << LOG_MOD2 << _table.size() << " entries in Entropy table." << endl;
-    lastEntropyUpdate = now;
+    setLastUpdatedAt(now);
 }
 
 
