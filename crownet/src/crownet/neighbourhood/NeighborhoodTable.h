@@ -35,7 +35,7 @@ public:
 
     virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
     virtual void checkTimeToLive() override;
-    const int getNeighbourCount();
+    virtual const int getSize() override;
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }

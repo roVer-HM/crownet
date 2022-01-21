@@ -40,6 +40,8 @@ public:
     virtual void checkTimeToLive() override {}; // do nothing as client
     virtual void setOwnerId(int ownerId) override {this->ownerId = ownerId;}
     virtual const int getOwnerId() const override {return ownerId;}
+    virtual const int getSize() override;
+
 
     // default to distance based iterator because this class accesses the global table.
     virtual NeighborhoodTableIter_t iter() override;

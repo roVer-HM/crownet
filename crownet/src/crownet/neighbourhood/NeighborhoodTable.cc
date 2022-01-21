@@ -109,7 +109,7 @@ void NeighborhoodTable::checkTimeToLive(){
     }
 }
 
-const int NeighborhoodTable::getNeighbourCount(){
+const int NeighborhoodTable::getSize(){
     Enter_Method_Silent();
     checkTimeToLive();
     return _table.size();

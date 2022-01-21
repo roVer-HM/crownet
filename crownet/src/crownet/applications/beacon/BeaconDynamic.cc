@@ -43,7 +43,7 @@ Packet *BeaconDynamic::createPacket() {
     beacon->setEpsilon({0.0, 0.0, 0.0});
     // measurement time is same as packet creation.
     beacon->setPosTimestamp(time);
-    beacon->setNumberOfNeighbours(nTable->getNeighbourCount());
+    beacon->setNumberOfNeighbours(nTable->getSize());
 
     auto packet = buildPacket(beacon, header);
 

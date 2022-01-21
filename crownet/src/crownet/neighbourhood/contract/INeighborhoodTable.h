@@ -62,6 +62,8 @@ public:
     virtual void checkTimeToLive() = 0;
     virtual void setOwnerId(int ownerId) = 0;
     virtual const int getOwnerId() const = 0;
+    virtual const int getSize() = 0;
+
 
     void registerEntryListner(NeighborhoodEntryListner* listener);
     void registerFirst(NeighborhoodEntryListner* listener);
