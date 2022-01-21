@@ -261,7 +261,7 @@ FsmState BaseApp::fsmSendPacket(Packet *pkt){
 
 FsmState BaseApp::fsmAppMain(cMessage *msg) {
   // do nothing
-  EV_WARN << "BaseApp has no AppMain. Implement for active message generate. App will still receive messages!"
+  EV_WARN << "BaseApp has no AppMain logic. Implement in child classes if needed. App will still receive messages!"
           << std::endl;
   return FsmRootStates::WAIT_ACTIVE;
 }
