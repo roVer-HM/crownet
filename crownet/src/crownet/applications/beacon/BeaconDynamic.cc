@@ -20,7 +20,7 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        nTable = inet::getModuleFromPar<NeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
 
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
@@ -57,6 +57,7 @@ Packet *BeaconDynamic::createPacket() {
 
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
+
 
     auto info = nTable->getOrCreateEntry(packet->peekAtFront<DynamicBeaconHeader>()->getSourceId());
 
