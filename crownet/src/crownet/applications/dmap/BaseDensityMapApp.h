@@ -54,7 +54,6 @@ protected:
 
  //
  virtual Packet *createPacket() override;
- virtual void applyContentTags(Ptr<Chunk> content) override;
 
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
@@ -93,8 +92,8 @@ protected:
 
 
  RegularDcdMapWatcher* dcdMapWatcher;
- cMessage *localMapTimer;
- cPar *localMapUpdateInterval;
+ cMessage *mainAppTimer;
+ cPar *mainAppInterval;
 
 };
 

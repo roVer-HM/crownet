@@ -40,8 +40,12 @@ void DensityMapAppSimple::computeValues() {
     BaseDensityMapApp::computeValues();
 }
 
-void DensityMapAppSimple::updateLocalMap() { /* do nothing see NeighborhoodEntryListner */}
-
+void DensityMapAppSimple::updateLocalMap() {
+    /*
+     * do nothing here. Local map is updated using
+     * NeighborhoodEntryListners below
+     */
+}
 
 void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) {
     // Note: Implementation assumes additive cell entry values. Each beacon provides an additive portion of the

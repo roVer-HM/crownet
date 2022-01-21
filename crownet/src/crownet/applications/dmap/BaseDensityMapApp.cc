@@ -31,7 +31,7 @@ namespace crownet {
 
 
 BaseDensityMapApp::~BaseDensityMapApp(){
-    cancelAndDelete(localMapTimer);
+    cancelAndDelete(mainAppTimer);
     delete dcdMapWatcher;
     delete mapCfg;
 }
@@ -44,13 +44,18 @@ void BaseDensityMapApp::initialize(int stage) {
       hostId = getContainingNode(this)->getId();
       WATCH(hostId);
 
-      localMapUpdateInterval = &par("localMapUpdateInterval");
-      localMapTimer = new cMessage("localMapTimer");
-      localMapTimer->setKind(FsmRootStates::APP_MAIN);
+      mainAppInterval = &par("mainAppInterval");
+      mainAppTimer = new cMessage("mainAppTimer");
+      mainAppTimer->setKind(FsmRootStates::APP_MAIN);
+
 
     } else if (stage == INITSTAGE_APPLICATION_LAYER){
         // BaseApp schedules start operation first (see BaseApp::initialize(stage))
-        scheduleAfter(startTime, localMapTimer);
+        if (mainAppInterval->doubleValue() > 0.){
+            scheduleAfter(startTime, mainAppTimer);
+        } else {
+            EV << "mainAppTimer deactivated." << endl;
+        }
     }
 }
 
@@ -81,10 +86,9 @@ FsmState BaseDensityMapApp::fsmSetup(cMessage *msg) {
 }
 
 FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
-  // update density map state.
-  updateLocalMap();
-  localMapTimer->setKind(FsmRootStates::APP_MAIN);
-  scheduleAfter(localMapUpdateInterval->doubleValue(), localMapTimer);
+  EV << "BaseDensityMapApp::fsmAppMain - do nothing" << endl;
+  mainAppTimer->setKind(FsmRootStates::APP_MAIN);
+  scheduleAfter(mainAppInterval->doubleValue(), mainAppTimer);
   return FsmRootStates::WAIT_ACTIVE;
 }
 
@@ -150,13 +154,7 @@ const inet::b BaseDensityMapApp::getMinPdu(){
     return b(8*(24 + 6)); // SparseMapPacket header
 }
 
-void BaseDensityMapApp::applyContentTags(Ptr<Chunk> content){
-    BaseApp::applyContentTags(content);
-    if (par("attachEntropyTag")){
-        // mark packet as Entropy Packet and not pedestrian count
-        content->addTag<EntropyMap>();
-    }
-}
+
 
 Packet *BaseDensityMapApp::createPacket() {
 
