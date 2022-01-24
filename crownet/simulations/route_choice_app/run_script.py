@@ -35,4 +35,3 @@ if __name__ == "__main__":
         runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
-    time.sleep(60)

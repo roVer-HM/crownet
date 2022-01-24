@@ -3,6 +3,7 @@
 
 import sys
 import os
+import time
 
 from suqc.CommandBuilder.VadereControlCommand import VadereControlCommand
 from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
@@ -31,10 +32,10 @@ if __name__ == "__main__":
                {'vadere': {reaction_probability_key: 0.5}}]
 
     # sampling
-    par_var = VadereSeedManager(par_variations=par_var, rep_count=2, vadere_fixed=False).get_new_seed_variation()
+    par_var = VadereSeedManager(par_variations=par_var, rep_count=100, vadere_fixed=False).get_new_seed_variation()
     qoi = ["densities.txt", "fundamentalDiagramm.txt"]
 
-    for controller in ["ClosedLoop", "OpenLoop", "NoController"]:
+    for controller in ["ClosedLoop","OpenLoop", "NoController"]:
 
         print(f"Simulation runs for controller-type = {controller} started.")
 
@@ -61,7 +62,7 @@ if __name__ == "__main__":
             remove_output=False,
         )
 
-        par, data = setup.run(10)
+        par, data = setup.run(12)
 
         par.to_csv(os.path.join(os.getcwd(), f"{controller}_parameters.csv"))
         for qoi_, vals_ in data.items():
