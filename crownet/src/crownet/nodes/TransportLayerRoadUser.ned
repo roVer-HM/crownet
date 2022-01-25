@@ -41,9 +41,10 @@ module TransportLayerRoadUser like INetworkNode
         @figure[linkLayer.title](type=text; pos=845,611; anchor=ne; text="link layer");
         @figure[submodules];
 
-        @statistic[posX](source="xCoord(mobilityPos(mobilityStateChanged))"; record=vector?);
-        @statistic[posY](source="yCoord(mobilityPos(mobilityStateChanged))"; record=vector?);
+        @statistic[posX](source="xCoord(mobilityPos(simTimeIntervalFilter(mobilityStateChanged)))"; interval_par="positionStatInterval"; record=vector?);
+        @statistic[posY](source="yCoord(mobilityPos(simTimeIntervalFilter(mobilityStateChanged)))"; interval_par="positionStatInterval"; record=vector?);
         @statistic[hostId](source="hostId(POST_MODEL_CHANGE)"; record=last);
+        double positionStatInterval = default(0.4); //only log position at 400ms intervals (See @statistic[posX/posY]
         string osgModel = default(""); // 3D model for OSG visualization, no 3D model by default
         string osgModelColor = default(""); // tint color, no colorization by default
         string canvasImage = default(""); // image for canvas visualization, no image by default
