@@ -117,7 +117,9 @@ void BaseDensityMapApp::initDcdMap(){
 }
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
-        ActiveFileWriterBuilder fBuilder{};
+        // todo mw
+//      if (sqlApi == nullptr){ // use csv
+      ActiveFileWriterBuilder fBuilder{};
       fBuilder.addMetadata("IDXCOL", 3);
       fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
       fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
@@ -133,8 +135,18 @@ void BaseDensityMapApp::initWriter(){
 
       fileWriter.reset(fBuilder.build<RegularDcdMap>(
               dcdMap, mapCfg->getMapTypeLog()));
-      fileWriter->writeHeader();
+      fileWriter->initWriter();
+//      } else {
+//          todo mw setup SqlLiteWriter
+//          auto sqlWriter = std::make_shared<SqlLiteWriter>();
+//          auto sqlPrinter = std::make_shared<RegularDcdMapSqlValuePrinter>(dcdMap);
+//            sqlWriter->setSqlApi(sqlApi);
+//              sqlWriter->setPrinter(sqlPrinter);
+//            filewriter = sqlWriter;
+//
+//      }
     }
+
 }
 
 const bool BaseDensityMapApp::canProducePacket(){

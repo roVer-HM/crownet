@@ -35,6 +35,7 @@ simple GlobalDensityMap like IGlobalDensityMap
         // if true use "traci.connected" to trigger density map setup. Otherwise use stage 13
         bool useSignalMapInit = default(true); 
 
+		string writerType = default("csv"); // or sql
         double writeMapInterval @unit(s) = default(2.0s) ;
 }
 

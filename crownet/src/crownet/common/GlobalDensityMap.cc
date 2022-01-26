@@ -56,7 +56,7 @@ void GlobalDensityMap::finish() {
   getSystemModule()->unsubscribe(registerMap, this);
   getSystemModule()->unsubscribe(removeMap, this);
   getSystemModule()->unsubscribe(traciConnected, this);
-  fileWriter->close();
+  fileWriter->finish();
 }
 
 void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
@@ -67,6 +67,12 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
       auto mapHandler = check_and_cast<GridHandler *>(obj);
       mapHandler->setMapFactory(dcdMapFactory);
       mapHandler->setCoordinateConverter(converter);
+
+      if (par("writerType").stdstringValue() == "sql"){
+          // only share the sql writer between maps
+          // todo mw
+          // mapHandler->setSqlApi(api);
+      }
   }
   else if (signalId == registerMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
@@ -101,24 +107,39 @@ void GlobalDensityMap::initializeMap(){
     cellKeyProvider = dcdMapFactory->getCellKeyProvider();
 
     // 2) setup writer.
-    ActiveFileWriterBuilder fBuilder{};
-    fBuilder.addMetadata("IDXCOL", 3);
-    fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
-    fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
-    fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
-    fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
-    // todo cellsize in x and y
-    fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
-    fBuilder.addMetadata<std::string>(
-        "MAP_TYPE",
-        "global");  // The global density map is the ground
-                    // truth. No algorihm needed.
-    fBuilder.addMetadata<int>("NODE_ID", -1);
-    fBuilder.addPath("global");
+    if (par("writerType").stdstringValue() == "csv"){
+        ActiveFileWriterBuilder fBuilder{};
+        fBuilder.addMetadata("IDXCOL", 3);
+        fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
+        fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
+        fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+        fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+        // todo cellsize in x and y
+        fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
+        fBuilder.addMetadata<std::string>(
+            "MAP_TYPE",
+            "global");  // The global density map is the ground
+                        // truth. No algorihm needed.
+        fBuilder.addMetadata<int>("NODE_ID", -1);
+        fBuilder.addPath("global");
 
-    fileWriter.reset(fBuilder.build(
-        std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
-    fileWriter->writeHeader();
+        fileWriter.reset(fBuilder.build(
+            std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
+    } else if (par("writerType").stdstringValue() == "sql"){
+//      todo mw
+//
+//      create sqlApi <--- will be shared
+//      create sqlWriter/Printer for global map
+//          todo mw setup SqlLiteWriter
+//          auto sqlWriter = std::make_shared<SqlLiteWriter>();
+//          auto sqlPrinter = std::make_shared<RegularDcdMapSqlValuePrinter>(dcdMapGlobal);
+//          sqlWriter->setSqlApi(sqlApi);
+//          sqlWriter->setPrinter(sqlPrinter);
+//          filewriter = sqlWriter;
+    } else {
+        throw cRuntimeError("expected sql or csv as writer type got '%s'", par("writerType").stringValue());
+    }
+    fileWriter->initWriter();
 }
 
 

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <memory>
-#include "crownet/common/util/FileWriter.h"
+#include "crownet/common/util/Writer.h"
 
 namespace crownet {
 
@@ -34,8 +34,10 @@ class IDensityMapHandler : public IDensityMapHandlerBase<GRID> {
   // FIXME: allow global fileWriter object to pass in.
   virtual void writeMap() = 0;
   //  FIXME: make mergeMap independent from Packet (see ArteryDensityMapApp.cc)
-  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory>) = 0;
+  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) = 0;
   virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) = 0;
+  // todo mw
+  //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) = 0;
 };
 
 template <typename GRID>

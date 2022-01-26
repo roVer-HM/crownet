@@ -9,6 +9,21 @@
 
 namespace crownet {
 
+void RegularDcdMapSqlValuePrinter::writeSqlStatement(std::ostream& out){
+    //todo mw write dcdMap State to sql buffer (out)
+    // out << "insert ..."
+}
+
+void RegularDcdMapSqlValuePrinter::createSchema(std::ostream& out){
+    //todo mw
+    // out << "insert ..."
+}
+
+void RegularDcdMapSqlValuePrinter::writeInitSqlStatement(std::ostream& out) {
+    //todo mw write metadata for given map
+    // out << "insert ..."
+}
+
 int RegularDcdMapValuePrinter::columns() const { return 9; }
 
 void RegularDcdMapValuePrinter::writeTo(std::ostream& out,
