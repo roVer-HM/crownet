@@ -183,7 +183,7 @@
       "id" : 24,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
       "attributes" : {
-        "interpolate" : false
+        "interpolate" : true
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
