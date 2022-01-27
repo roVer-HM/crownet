@@ -3,6 +3,7 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import os
+from statsmodels.multivariate.manova import MANOVA
 
 reaction_prob_key = "('Parameter', 'vadere', 'reactionProbabilities.[stimulusId==-400].reactionProbability')"
 time_step_key = "timeStep"
@@ -79,12 +80,13 @@ def get_densities(controller_type):
 
 
 def plot_density_distribution(densities, controller):
-    densities_closed_loop_mean = densities.groupby(by=[reaction_prob_key_short, simulation_time]).mean()
+    densities_closed_loop_mean = densities.groupby(by=[reaction_prob_key_short, simulation_time]).min()
     densities_closed_loop_std = densities.groupby(by=[reaction_prob_key_short, simulation_time]).std()
 
 
     for reaction_prob, data in densities_closed_loop_mean.groupby(by=reaction_prob_key_short):
         data.boxplot(showmeans=True, rot=45, fontsize=10)
+        #data.plot()
         title = f"Controller type: {controller}. Reaction probability: {reaction_prob}"
         plt.title(title)
         plt.ylabel("Density [ped/m^2] (mean)")
@@ -120,18 +122,23 @@ if __name__ == "__main__":
     velocities = pd.concat([velocities_default, velocities_open_loop])
     velocities = pd.concat([velocities, velocities_closed_loop])
 
-    vvv = velocities[velocities[simulation_time] >= 117.5 ]
-    vvv = vvv[vvv[simulation_time] <=117.7 ]
-    vvv = vvv[vvv["Controller"] == "OpenLoop"]
-    vvv = vvv[vvv[reaction_prob_key_short] == 1.0]
-    vvv["Corridor1"].plot()
+    # vvv = velocities[velocities[simulation_time] >= 117.5 ]
+    # vvv = vvv[vvv[simulation_time] <=117.7 ]
+    # vvv = vvv[vvv["Controller"] == "OpenLoop"]
+    # vvv = vvv[vvv[reaction_prob_key_short] == 1.0]
+    # vvv["Corridor1"].plot()
+    #
+    # ddd = densities[densities[simulation_time] >= 117.5]
+    # ddd = ddd[ddd[simulation_time] <= 117.7]
+    # ddd = ddd[ddd["Controller"] == "OpenLoop"]
+    # ddd = ddd[ddd[reaction_prob_key_short] == 1.0]
+    # ddd["Corridor1"].plot()
+    # plt.show()
+    #
+    # plt.scatter(x=ddd["Corridor1"], y=vvv["Corridor1"])
+    # plt.show()
 
-    vvv = densities[densities[simulation_time] >= 117.5]
-    vvv = vvv[vvv[simulation_time] <= 117.7]
-    vvv = vvv[vvv["Controller"] == "OpenLoop"]
-    vvv = vvv[vvv[reaction_prob_key_short] == 1.0]
-    vvv["Corridor1"].plot()
-    plt.show()
+
 
 
 
@@ -150,37 +157,27 @@ if __name__ == "__main__":
             v__ = v_[v_[reaction_prob_key_short] == reactionProb]
             d__ = d_[d_[reaction_prob_key_short] == reactionProb]
 
+            fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(15,2))
+            title_ = f'Controller = {controller}. Reaction prob = {reactionProb}'
+            fig.suptitle(title_)
+            iii = 0
             for c in list(corridors.values()):
-                d___ = d__[c]
-                v___ = v__[c]
-                plt.scatter(x=d___, y=v___, label=c)
+                flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
+                flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
+                ax[iii].hist(flux)
+                ax[iii].set_xlabel("Flux [ped/(m*s)]")
+                ax[iii].set_title(c)
+                ax[iii].set_xlim(0,1)
+                iii+=1
+            fig.tight_layout()
+            plt.savefig(f"figs/{title_}.png")
+            plt.show()
 
 
-                #plt.xlim(0,1)
-                #plt.ylim(0,1)
-                plt.xlabel("Density [ped/m^2]")
-                plt.ylabel("Velocity [m/s]")
-                plt.title(f"Controller = {controller}. Reaction prob = {reactionProb}.")
-                plt.legend()
-                plt.show()
-
-                df = pd.concat([d___, v___], axis=1)
-                #df.plot()
-                #plt.show()
-
-                if controller == "NoController":
-                    break
-
-            print()
-
-            if controller == "NoController":
-                break
-
-
-
+    #MANOVA.from_formula('Height + Width + Weight ~ Treatment', data)
 
 
 
     # perform two-way ANOVA -https://www.statology.org/two-way-anova-python/
-    model = ols('Corridor1 ~ C(reactionProbability) + C(Controller) + C(reactionProbability):C(Controller)', data=densities).fit()
-    print(sm.stats.anova_lm(model, typ=2))
+    #model = ols('Corridor1 ~ C(reactionProbability) + C(Controller) + C(reactionProbability):C(Controller)', data=densities).fit()
+    #print(sm.stats.anova_lm(model, typ=2))
