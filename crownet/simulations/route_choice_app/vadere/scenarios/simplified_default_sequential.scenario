@@ -349,24 +349,6 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 20.0,
-            "y" : 131.0
-          }, {
-            "x" : 16.5,
-            "y" : 131.0
-          }, {
-            "x" : 16.5,
-            "y" : 25.0
-          }, {
-            "x" : 20.0,
-            "y" : 25.0
-          } ]
-        },
-        "id" : 24
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
             "x" : 5.5,
             "y" : 0.5
           }, {
@@ -477,6 +459,42 @@
           "type" : "RECTANGLE"
         },
         "id" : 8
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 20.0,
+            "y" : 131.0
+          }, {
+            "x" : 16.5,
+            "y" : 131.0
+          }, {
+            "x" : 16.5,
+            "y" : 25.0
+          }, {
+            "x" : 20.0,
+            "y" : 25.0
+          } ]
+        },
+        "id" : 24
+      }, {
+        "shape" : {
+          "x" : 6.6,
+          "y" : 25.1,
+          "width" : 4.5,
+          "height" : 3.4,
+          "type" : "RECTANGLE"
+        },
+        "id" : 9
+      }, {
+        "shape" : {
+          "x" : 18.7,
+          "y" : 25.1,
+          "width" : 5.4,
+          "height" : 2.9,
+          "type" : "RECTANGLE"
+        },
+        "id" : 10
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -496,24 +514,6 @@
           "type" : "RECTANGLE"
         },
         "id" : 5
-      }, {
-        "shape" : {
-          "x" : 20.0,
-          "y" : 25.0,
-          "width" : 2.5,
-          "height" : 106.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 4
-      }, {
-        "shape" : {
-          "x" : 8.0,
-          "y" : 25.0,
-          "width" : 2.5,
-          "height" : 46.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 2
       }, {
         "shape" : {
           "x" : 14.0,
@@ -574,6 +574,24 @@
           "type" : "RECTANGLE"
         },
         "id" : 99
+      }, {
+        "shape" : {
+          "x" : 4.7,
+          "y" : 76.6,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 4
+      }, {
+        "shape" : {
+          "x" : 3.1,
+          "y" : 74.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -594,45 +612,11 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 21,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 8.0,
-          "y" : 69.0,
-          "width" : 2.5,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 31,
         "absorbing" : true,
         "shape" : {
           "x" : 14.0,
           "y" : 109.0,
-          "width" : 2.5,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 41,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 20.0,
-          "y" : 129.0,
           "width" : 2.5,
           "height" : 2.0,
           "type" : "RECTANGLE"
@@ -694,7 +678,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 10.0
+          "updateFrequency" : 5.0
         },
         "spawnNumber" : 6,
         "maxSpawnNumberTotal" : -1,

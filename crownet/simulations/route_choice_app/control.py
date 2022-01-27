@@ -21,7 +21,7 @@ PRECISION = 8
 class NoController(Controller):
     def __init__(self):
         super().__init__()
-        self.time_step_size = 10.0
+        self.time_step_size = 5.0
         self.densityMapper = None
         self.density_over_time = list()
 
@@ -42,7 +42,7 @@ class NoController(Controller):
             densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
         elif isinstance(self.con_manager, ClientModeConnection):
             densities = list()
-            for a in [6, 7, 8, 9, 10]:
+            for a in [6, 8, 10]:
                 __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
                 densities.append(density)
         else:
@@ -94,7 +94,7 @@ class NoController(Controller):
 class OpenLoop(NoController, Controller):
     def __init__(self):
         super().__init__()
-        self.target_ids = [11, 21, 31, 41, 51]
+        self.target_ids = [11, 31, 51]
         self.redirected_agents = list()
         self.controlModelType = "RouteChoice"
         self.controlModelName = "distributePeds"
@@ -116,7 +116,7 @@ class OpenLoop(NoController, Controller):
         super().write_data()
 
     def apply_redirection_measure(self):
-        probabilities = [0, 0, 0, 0, 0]
+        probabilities = [0 for x in self.target_ids]
         probabilities[self.counter] = 1.0  # all of the agents should use one specific corridor
 
         command = {"targetIds": self.target_ids,
@@ -176,6 +176,7 @@ class ClosedLoop(OpenLoop, Controller):
         super().__init__()
 
     def choose_corridor(self):
+
         number_of_time_steps_for_measurement = int(
             np.round(self.time_step_size / self.sensor_time_step_size, 0)
         )
@@ -184,7 +185,7 @@ class ClosedLoop(OpenLoop, Controller):
             self.density_over_time[-number_of_time_steps_for_measurement:]
         ).mean(axis=0)
         # set old corridor to inf to avoid congestion:
-        densities[self.counter] = np.inf
+        #densities[self.counter] = np.inf
         self.counter = np.argwhere(densities == densities.min()).ravel()[0] # recommend shortest corridor
 
         print(

@@ -24,7 +24,7 @@ if __name__ == "__main__":
         "--scenario-file",
         "vadere/scenarios/simplified_default_sequential.scenario",
         "--ctrl.controller-type",
-        "OpenLoop",
+        "ClosedLoop",
     ]
 
     if len(sys.argv) == 1:

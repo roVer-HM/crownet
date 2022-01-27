@@ -105,16 +105,9 @@ def plot_density_distribution(densities, controller):
 
 if __name__ == "__main__":
     densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
-    #plot_density_distribution(densities_closed_loop, controller="ClosedLoop")
-
     densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
-    #plot_density_distribution(densities_open_loop,controller="OpenLoop")
-
     densities_default, velocities_default = get_fundamental_diagrams(controller_type="NoController")
-    #plot_density_distribution(densities_default,controller="NoController")
 
-    #densities_default.groupby(by=[reaction_prob_key_short, simulation_time]).mean().plot()
-    #plt.show()
 
     densities = pd.concat([densities_default, densities_open_loop])
     densities = pd.concat([densities, densities_closed_loop])
@@ -122,34 +115,14 @@ if __name__ == "__main__":
     velocities = pd.concat([velocities_default, velocities_open_loop])
     velocities = pd.concat([velocities, velocities_closed_loop])
 
-    # vvv = velocities[velocities[simulation_time] >= 117.5 ]
-    # vvv = vvv[vvv[simulation_time] <=117.7 ]
-    # vvv = vvv[vvv["Controller"] == "OpenLoop"]
-    # vvv = vvv[vvv[reaction_prob_key_short] == 1.0]
-    # vvv["Corridor1"].plot()
-    #
-    # ddd = densities[densities[simulation_time] >= 117.5]
-    # ddd = ddd[ddd[simulation_time] <= 117.7]
-    # ddd = ddd[ddd["Controller"] == "OpenLoop"]
-    # ddd = ddd[ddd[reaction_prob_key_short] == 1.0]
-    # ddd["Corridor1"].plot()
-    # plt.show()
-    #
-    # plt.scatter(x=ddd["Corridor1"], y=vvv["Corridor1"])
-    # plt.show()
 
-
-
-
-
-
-    densities_mean = densities.groupby(by=["Controller", reaction_prob_key_short, simulation_time]).mean().reset_index()
-    velocities_mean = velocities.groupby(by=["Controller", reaction_prob_key_short, simulation_time]) .mean().reset_index()
     densities_mean = densities
     velocities_mean = velocities
 
-
+    fig, ax = plt.subplots(nrows=5, ncols=5, figsize=(15, 15))
+    ii = 0
     for controller in ["OpenLoop","ClosedLoop","NoController"]:
+
         v_ = velocities_mean[velocities_mean["Controller"] == controller]
         d_ = densities_mean[densities_mean["Controller"] == controller]
 
@@ -157,27 +130,121 @@ if __name__ == "__main__":
             v__ = v_[v_[reaction_prob_key_short] == reactionProb]
             d__ = d_[d_[reaction_prob_key_short] == reactionProb]
 
-            fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(15,2))
+            title_ = f'{controller}, r={reactionProb}'
+
+            iii = 0
+            for c in list(corridors.values()):
+                print(ii,iii)
+                flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
+                flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
+                ax[ii,iii].hist(flux, range=(0,1), label=c)
+                ax[ii,iii].set_xlabel("Flux [ped/(m*s)]")
+                ax[ii,iii].set_title(title_)
+                ax[ii, iii].legend()
+                iii+=1
+            if ii%2==0:
+                ii += 1
+            if ii >= 5:
+                break
+        ii+=1
+        if ii >= 5:
+            print('Loop exited')
+            break
+
+    fig.tight_layout()
+    plt.savefig(f"figs/flux.png")
+    plt.show()
+
+
+    fig, ax = plt.subplots(nrows=5, ncols=5, figsize=(15, 15))
+    ii = 0
+    for controller in ["OpenLoop","ClosedLoop","NoController"]:
+
+        v_ = velocities_mean[velocities_mean["Controller"] == controller]
+        d_ = densities_mean[densities_mean["Controller"] == controller]
+
+        for reactionProb in [1.0, 0.5]:
+            v__ = v_[v_[reaction_prob_key_short] == reactionProb]
+            d__ = d_[d_[reaction_prob_key_short] == reactionProb]
+
+            title_ = f'{controller}, r={reactionProb}'
+
+            iii = 0
+            for c in list(corridors.values()):
+                print(ii,iii)
+                ax[ii,iii].hist(d__[c], range=(0,2.5), label=c)
+                ax[ii,iii].set_xlabel("Densities [ped/m**2]")
+                ax[ii,iii].set_title(title_)
+                ax[ii, iii].legend()
+                iii+=1
+            if ii%2==0:
+                ii += 1
+            if ii >= 5:
+                break
+        ii+=1
+        if ii >= 5:
+            print('Loop exited')
+            break
+
+    fig.tight_layout()
+    plt.savefig(f"figs/densities.png")
+    plt.show()
+
+    for controller in ["OpenLoop", "ClosedLoop", "NoController"]:
+        v_ = velocities_mean[velocities_mean["Controller"] == controller]
+        d_ = densities_mean[densities_mean["Controller"] == controller]
+
+        for reactionProb in [1.0, 0.5]:
+            v__ = v_[v_[reaction_prob_key_short] == reactionProb]
+            d__ = d_[d_[reaction_prob_key_short] == reactionProb]
+
+            fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(15, 3))
+            title_ = f'{controller}, r={reactionProb}'
+            fig.suptitle(title_)
+            iii = 0
+            for c in list(corridors.values()):
+                flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
+                flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
+
+                ax[iii].scatter(d__[c],flux)
+                ax[iii].set_xlim(-0.1,2.5)
+                ax[iii].set_ylim(-0.1, 1.5)
+
+
+                ax[iii].set_xlabel("Density [ped/m**2]")
+                ax[iii].set_ylabel("Flux [ped/(m*s)]")
+                ax[iii].set_title(c)
+                iii += 1
+            fig.tight_layout()
+            plt.savefig(f"figs/{title_}_fundamental.png")
+            plt.show()
+
+    for controller in ["OpenLoop", "ClosedLoop", "NoController"]:
+        v_ = velocities_mean[velocities_mean["Controller"] == controller]
+        d_ = densities_mean[densities_mean["Controller"] == controller]
+
+        for reactionProb in [1.0, 0.5]:
+            v__ = v_[v_[reaction_prob_key_short] == reactionProb]
+            d__ = d_[d_[reaction_prob_key_short] == reactionProb]
+
+            fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(15, 3))
             title_ = f'Controller = {controller}. Reaction prob = {reactionProb}'
             fig.suptitle(title_)
             iii = 0
             for c in list(corridors.values()):
                 flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
                 flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
-                ax[iii].hist(flux)
-                ax[iii].set_xlabel("Flux [ped/(m*s)]")
+
+                ax[iii].hist(d__[c], range=(0,2.5))
+                ax[iii].set_xlabel("Density [ped/m**2]")
                 ax[iii].set_title(c)
-                ax[iii].set_xlim(0,1)
-                iii+=1
+                iii += 1
             fig.tight_layout()
-            plt.savefig(f"figs/{title_}.png")
+            plt.savefig(f"figs/{title_}_density.png")
             plt.show()
 
 
     #MANOVA.from_formula('Height + Width + Weight ~ Treatment', data)
-
-
-
     # perform two-way ANOVA -https://www.statology.org/two-way-anova-python/
     #model = ols('Corridor1 ~ C(reactionProbability) + C(Controller) + C(reactionProbability):C(Controller)', data=densities).fit()
     #print(sm.stats.anova_lm(model, typ=2))
