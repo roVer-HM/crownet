@@ -19,6 +19,9 @@ run_local = True
 
 
 if __name__ == "__main__":
+    # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
+    simulation_dir = "/mnt/data/guiding_crowds_study"
+    qoi = ["densities.txt", "fundamentalDiagramm.txt"] # collect these quantities of interest
 
     if os.environ["CROWNET_HOME"] is None:
         raise SystemError(
@@ -28,18 +31,22 @@ if __name__ == "__main__":
     path2ini = os.path.join(os.environ["CROWNET_HOME"], "crownet/simulations/route_choice_app/omnetpp.ini")
 
     reaction_probability_key = 'reactionProbabilities.[stimulusId==-400].reactionProbability'
-    par_var = [{'vadere': {reaction_probability_key: 1.0}},
+    par_var_ = [{'vadere': {reaction_probability_key: 1.0}},
                {'vadere': {reaction_probability_key: 0.5}}]
 
     # sampling
-    par_var = VadereSeedManager(par_variations=par_var, rep_count=100, vadere_fixed=False).get_new_seed_variation()
-    qoi = ["densities.txt", "fundamentalDiagramm.txt"]
+    reps = 5
+    par_var_ = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     for controller in ["ClosedLoop","OpenLoop", "NoController"]:
 
         print(f"Simulation runs for controller-type = {controller} started.")
+        if controller == "NoController":
+            par_var = par_var_[:reps]
+        else:
+            par_var = par_var_
 
-        output_folder = os.path.join(os.getcwd(), controller)
+        output_folder = os.path.join(simulation_dir, controller)
 
         model = VadereControlCommand() \
             .create_vadere_container() \

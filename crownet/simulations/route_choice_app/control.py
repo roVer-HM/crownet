@@ -176,18 +176,8 @@ class ClosedLoop(OpenLoop, Controller):
         super().__init__()
 
     def choose_corridor(self):
-
-        number_of_time_steps_for_measurement = int(
-            np.round(self.time_step_size / self.sensor_time_step_size, 0)
-        )
-
-        densities = np.array(
-            self.density_over_time[-number_of_time_steps_for_measurement:]
-        ).mean(axis=0)
-        # set old corridor to inf to avoid congestion:
-        #densities[self.counter] = np.inf
+        densities = np.array(self.density_over_time[-1:]).mean(axis=0)
         self.counter = np.argwhere(densities == densities.min()).ravel()[0] # recommend shortest corridor
-
         print(
             f"The densities are: {densities.round(3)}. Minimum: index = {self.counter}."
         )
