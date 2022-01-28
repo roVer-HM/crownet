@@ -32,7 +32,7 @@ if __name__ == "__main__":
                {'vadere': {reaction_probability_key: 0.5}}]
 
     # sampling
-    par_var = VadereSeedManager(par_variations=par_var, rep_count=3, vadere_fixed=False).get_new_seed_variation()
+    par_var = VadereSeedManager(par_variations=par_var, rep_count=100, vadere_fixed=False).get_new_seed_variation()
     qoi = ["densities.txt", "fundamentalDiagramm.txt"]
 
     for controller in ["ClosedLoop","OpenLoop", "NoController"]:
