@@ -129,7 +129,13 @@ if __name__ == "__main__":
                 print(ii,iii)
                 flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
                 flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
-                ax[ii,iii].hist(flux, range=(0,1), label=c)
+                ax[ii,iii].hist(flux, range=(0,2), label=c, bins=20)
+
+                m = flux.mean()[0]
+                ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
+                min_ylim, max_ylim = ax[ii, iii].get_ylim()
+                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
+
                 ax[ii,iii].set_xlabel("Flux [ped/(m*s)]")
                 ax[ii,iii].set_title(title_)
                 ax[ii, iii].legend()
@@ -163,7 +169,14 @@ if __name__ == "__main__":
             iii = 0
             for c in list(corridors.values()):
                 print(ii,iii)
-                ax[ii,iii].hist(d__[c], range=(0,3.0), label=c)
+                ax[ii,iii].hist(d__[c], range=(0,2.5), label=c, bins=20)
+
+                m = d__[c].mean()
+                ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
+                min_ylim, max_ylim = ax[ii, iii].get_ylim()
+                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
+
+
                 ax[ii,iii].set_xlabel("Densities [ped/m**2]")
                 ax[ii,iii].set_title(title_)
                 ax[ii, iii].legend()

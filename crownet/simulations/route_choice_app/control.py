@@ -21,7 +21,7 @@ PRECISION = 8
 class NoController(Controller):
     def __init__(self):
         super().__init__()
-        self.time_step_size = 5.0
+        self.time_step_size = 10.0
         self.densityMapper = None
         self.density_over_time = list()
 
@@ -53,7 +53,7 @@ class NoController(Controller):
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
             obs = self._get_obstacles_as_polygons()
-            measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
+            measurement_areas = self._get_measurement_areas([1, 3, 5])
             self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size,
                                                measurement_areas=measurement_areas, obstacles=obs)
         if result is not None:
@@ -126,7 +126,7 @@ class OpenLoop(NoController, Controller):
             "commandId": self.commandID,
             "stimulusId": -400,
             "command": command,
-            "space": {"x": 0.0, "y": 0.0, "width": 25, "height": 15},  # get information directly after spawning process
+            "space": {"x": 0.0, "y": 0.0, "width": 25, "height": 25},  # get information directly after spawning process
         }
         action = json.dumps(action)
 

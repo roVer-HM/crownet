@@ -4,6 +4,7 @@
 import sys
 import os
 import time
+from datetime import timedelta
 
 from suqc.CommandBuilder.VadereControlCommand import VadereControlCommand
 from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
@@ -20,6 +21,8 @@ run_local = True
 
 if __name__ == "__main__":
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
+    start_time = time.time()
+
     simulation_dir = "/mnt/data/guiding_crowds_study"
     qoi = ["densities.txt", "fundamentalDiagramm.txt"] # collect these quantities of interest
 
@@ -38,9 +41,9 @@ if __name__ == "__main__":
     reps = 5
     par_var_ = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
-    for controller in ["NoController"]: #"ClosedLoop", "OpenLoop",
+    for controller in ["NoController", "ClosedLoop", "OpenLoop"]:
 
-        print(f"Simulation runs for controller-type = {controller} started.")
+        print(f"\n\n\nSimulation runs for controller-type = {controller} started.")
         if controller == "NoController":
             par_var = par_var_[:reps]
         else:
@@ -77,4 +80,6 @@ if __name__ == "__main__":
             print(f"Export result {qoi_} to {file_path}.")
             vals_.to_csv(file_path)
 
-        print(f"Simulation runs for controller-type = {controller} completed.")
+        print(f"Simulation runs for controller-type = {controller} completed.\n\n\n")
+
+    print(f"Time to run {reps} repetitions: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
