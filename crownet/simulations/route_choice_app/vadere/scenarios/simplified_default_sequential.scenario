@@ -22,7 +22,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "counts.txt",
-      "processors" : [ 6, 7, 8, 9, 10 ]
+      "processors" : [ 6, 8, 10 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "checkSources.txt",
@@ -38,7 +38,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "densities.txt",
-      "processors" : [ 16, 17, 18, 14, 15 ]
+      "processors" : [ 16, 18, 14 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "targetIds.txt",
@@ -54,7 +54,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "fundamentalDiagramm.txt",
-      "processors" : [ 25, 26, 27, 28, 29 ]
+      "processors" : [ 25, 27, 29 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -84,24 +84,10 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 7,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 2
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 8,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 9,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 4
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
@@ -128,24 +114,10 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 15,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 2
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 16,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 17,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 4
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
@@ -195,26 +167,10 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 26,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 2,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
       "id" : 27,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
         "measurementAreaId" : 3,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 28,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 4,
         "pedestrianVelocityProcessorId" : 23
       }
     }, {
@@ -484,24 +440,6 @@
           "type" : "RECTANGLE"
         },
         "id" : 99
-      }, {
-        "shape" : {
-          "x" : 32.5,
-          "y" : 90.0,
-          "width" : 2.0,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 4
-      }, {
-        "shape" : {
-          "x" : 32.5,
-          "y" : 100.0,
-          "width" : 2.0,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 2
       } ],
       "stairs" : [ ],
       "targets" : [ {

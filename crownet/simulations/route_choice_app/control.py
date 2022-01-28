@@ -126,7 +126,7 @@ class OpenLoop(NoController, Controller):
             "commandId": self.commandID,
             "stimulusId": -400,
             "command": command,
-            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information directly after spawning process
+            "space": {"x": 0.0, "y": 0.0, "width": 25, "height": 15},  # get information directly after spawning process
         }
         action = json.dumps(action)
 

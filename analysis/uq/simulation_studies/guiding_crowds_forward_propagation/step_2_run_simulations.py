@@ -38,7 +38,7 @@ if __name__ == "__main__":
     reps = 5
     par_var_ = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
-    for controller in ["ClosedLoop","OpenLoop", "NoController"]:
+    for controller in ["NoController"]: #"ClosedLoop", "OpenLoop",
 
         print(f"Simulation runs for controller-type = {controller} started.")
         if controller == "NoController":
