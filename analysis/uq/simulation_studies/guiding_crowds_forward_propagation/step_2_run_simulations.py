@@ -24,7 +24,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     simulation_dir = "/mnt/data/guiding_crowds_study"
-    qoi = ["densities.txt", "fundamentalDiagramm.txt"] # collect these quantities of interest
+    qoi_ = ["densities.txt", "fundamentalDiagramm.txt", "path_choice.txt"] # collect these quantities of interest
 
     if os.environ["CROWNET_HOME"] is None:
         raise SystemError(
@@ -38,7 +38,7 @@ if __name__ == "__main__":
                {'vadere': {reaction_probability_key: 0.5}}]
 
     # sampling
-    reps = 5
+    reps = 2
     par_var_ = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     for controller in ["NoController", "ClosedLoop", "OpenLoop"]:
@@ -46,8 +46,10 @@ if __name__ == "__main__":
         print(f"\n\n\nSimulation runs for controller-type = {controller} started.")
         if controller == "NoController":
             par_var = par_var_[:reps]
+            qoi = qoi_[:-1]
         else:
             par_var = par_var_
+            qoi = qoi_
 
         output_folder = os.path.join(simulation_dir, controller)
 
@@ -76,7 +78,7 @@ if __name__ == "__main__":
 
         par.to_csv(os.path.join(os.getcwd(), f"{controller}_parameters.csv"))
         for qoi_, vals_ in data.items():
-            file_path = os.path.join(os.getcwd(), f"{controller}_{qoi_.replace('.txt', '.csv')}")
+            file_path = os.path.join(os.getcwd(), f"xxx{controller}_{qoi_.replace('.txt', '.csv')}")
             print(f"Export result {qoi_} to {file_path}.")
             vals_.to_csv(file_path)
 
