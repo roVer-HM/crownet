@@ -73,7 +73,7 @@ if __name__ == "__main__":
     reaction_probability_key = 'reactionProbabilities.[stimulusId==-400].reactionProbability'
     par_var_ = [{'vadere': {reaction_probability_key: 1.0}},
                 {'vadere': {reaction_probability_key: 0.5}}]
-    reps = 2
+    reps = 100
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     qoi1 = "densities.txt"
@@ -83,6 +83,5 @@ if __name__ == "__main__":
     run_controller(controller="NoController", par_var= par_var[:reps] , qoi= [qoi1, qoi2] )
     run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3] )
     run_controller(controller="OpenLoop", par_var=par_var, qoi=[qoi1, qoi2, qoi3])
-
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
