@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 from scipy import stats
+import numpy as np
 
 from statsmodels.formula.api import ols
 import os
@@ -98,9 +99,40 @@ def plot_density_distribution(densities, controller):
         plt.savefig(os.path.join("figs", f"{title}.png"))
         plt.show()
 
+def get_time_controller_wise(controller_type):
+    c1 = pd.read_csv(f"{controller_type}_startTime.csv", index_col=[0, 1, 2])
+    c2 = pd.read_csv(f"{controller_type}_targetReachTime.csv", index_col=[0, 1, 2])
+    times = c1.join(c2)
+    travel_times = pd.DataFrame(times["reachTime-PID12"].sub(times["startTime-PID13"]),
+                                columns=["travel_time"])
+    travel_times["Controller"] = controller_type
+
+    travel_times.reset_index(level="pedestrianId", inplace=True, drop=True)
+
+    param = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
+    travel_times = travel_times.join(param[reaction_prob_key])
+
+    travel_times.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+
+    return travel_times
+
+def get_travel_times():
+
+    c1 = get_time_controller_wise(controller_type="NoController")
+    c2 = get_time_controller_wise(controller_type="OpenLoop")
+    c3 = get_time_controller_wise(controller_type="ClosedLoop")
+
+
+    travel_times = pd.concat([c1, c2])
+    travel_times = pd.concat([travel_times, c3])
+
+    return travel_times
 
 
 if __name__ == "__main__":
+
+
+
     densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
     densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
     densities_default, velocities_default = get_fundamental_diagrams(controller_type="NoController")
@@ -108,7 +140,6 @@ if __name__ == "__main__":
 
     densities = pd.concat([densities_default, densities_open_loop])
     densities = pd.concat([densities, densities_closed_loop])
-
 
 
     densities_mean = densities.groupby(["Controller", reaction_prob_key_short]).mean()
@@ -127,15 +158,54 @@ if __name__ == "__main__":
     flux = velocities
     flux[list(corridors.values())] = velocities[list(corridors.values())].multiply(densities[list(corridors.values())])
 
+    densities_normed = densities.copy()
+    densities_normed[list(corridors.values())] = (densities[list(corridors.values())] - 0.31) / (5.4-0.31)
 
-
-
+    for col in list(corridors.values()):
+        densities_normed[col][densities_normed[col] < 0] = 0
 
     # OpenLoop , p = 1:
     var_1 = velocities_open_loop[velocities_open_loop[reaction_prob_key_short]==1.0]
     var_1 = flux[ (flux[reaction_prob_key_short] == 1.0) & (flux["Controller"] == "NoController")]
     print(stats.kruskal(var_1["Corridor1"],var_1["Corridor2"],var_1["Corridor3"]))
 
+    fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
+    ii = 0
+    for controller in ["OpenLoop","ClosedLoop","NoController"]:
+
+        v_ = velocities[velocities["Controller"] == controller]
+        d_ = densities_normed[densities_normed["Controller"] == controller]
+
+        for reactionProb in [1.0, 0.5]:
+            v__ = v_[v_[reaction_prob_key_short] == reactionProb]
+            d__ = d_[d_[reaction_prob_key_short] == reactionProb]
+
+            title_ = f'{controller}, r={reactionProb}'
+
+            iii = 0
+            for c in list(corridors.values()):
+                ax[ii, iii].hist(d__[c], label=c, bins=20, range = (0, 0.5))
+
+                m = d__[c].mean()
+                ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
+                min_ylim, max_ylim = ax[ii, iii].get_ylim()
+                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
+
+                ax[ii, iii].set_xlabel("Densities normed")
+                ax[ii, iii].set_title(title_)
+                ax[ii, iii].legend()
+                iii += 1
+            if ii%2==0:
+                ii += 1
+            if ii >= 5:
+                break
+        ii+=1
+        if ii >= 5:
+            break
+
+    fig.tight_layout()
+    plt.savefig(f"figs/densitiy_measure.png")
+    plt.show()
 
 
     fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
@@ -261,5 +331,30 @@ if __name__ == "__main__":
     fig.tight_layout()
     plt.savefig(f"figs/fundamentalDiagram.png")
     plt.show()
+
+    travel_time = get_travel_times()
+
+    for (c, p), data in travel_time.groupby(by=["Controller", reaction_prob_key_short]):
+        times = data[data["travel_time"] != np.inf]
+        stucked = data[data["travel_time"] == np.inf]
+        plt.hist(times["travel_time"], range=(0, 400), bins=20)
+        title = f"Travel times {c}, {p}"
+
+        m = times["travel_time"].median()
+        plt.axvline(m, color='k', linestyle='dashed', linewidth=1)
+        min_ylim, max_ylim = plt.ylim()
+        plt.text(m * 1.1, max_ylim * 0.9, 'Median: {:.2f}'.format(m))
+
+        plt.title(title)
+        plt.savefig(f"figs/{title}.png")
+        plt.show()
+
+        s = stucked.groupby(by=["run_id", "id"]).count()
+        plt.hist(s["travel_time"])
+        plt.title(f"Number agents stuck {c}, {p}.")
+        plt.show()
+
+        print()
+
 
 
