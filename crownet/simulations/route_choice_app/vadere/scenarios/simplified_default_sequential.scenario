@@ -29,11 +29,11 @@
       "processors" : [ 11 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "startTime.txt",
+      "filename" : "targetReachTime.txt",
       "processors" : [ 12 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "targetReachTimeVariation.txt",
+      "filename" : "startTime.txt",
       "processors" : [ 13 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",

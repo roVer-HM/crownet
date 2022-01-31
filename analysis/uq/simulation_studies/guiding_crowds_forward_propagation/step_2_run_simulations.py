@@ -78,10 +78,12 @@ if __name__ == "__main__":
 
     qoi1 = "densities.txt"
     qoi2 = "fundamentalDiagramm.txt"
-    qoi3 = "path_choice.txt" # collect these quantities of interest
+    qoi3 = "startTime.txt"
+    qoi4 = "targetReachTime.txt"
+    qoi5 = "path_choice.txt" # collect these quantities of interest
 
-    run_controller(controller="NoController", par_var= par_var[:reps] , qoi= [qoi1, qoi2] )
-    run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3] )
-    run_controller(controller="OpenLoop", par_var=par_var, qoi=[qoi1, qoi2, qoi3])
+    run_controller(controller="NoController", par_var= par_var[:reps] , qoi= [qoi1, qoi2, qoi3, qoi4] )
+    run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3, qoi4, qoi5] )
+    run_controller(controller="OpenLoop", par_var=par_var, qoi=[qoi1, qoi2, qoi3, qoi4, qoi5])
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")

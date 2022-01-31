@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
+from scipy import stats
+
 from statsmodels.formula.api import ols
 import os
 from statsmodels.multivariate.manova import MANOVA
@@ -107,8 +109,33 @@ if __name__ == "__main__":
     densities = pd.concat([densities_default, densities_open_loop])
     densities = pd.concat([densities, densities_closed_loop])
 
+
+
+    densities_mean = densities.groupby(["Controller", reaction_prob_key_short]).mean()
+    densities_mean.drop(columns=[simulation_time], inplace=True)
+    densities_std = densities.groupby(["Controller", reaction_prob_key_short]).std()
+    densities_std.drop(columns=[simulation_time], inplace=True)
+
     velocities = pd.concat([velocities_default, velocities_open_loop])
     velocities = pd.concat([velocities, velocities_closed_loop])
+
+    velocities_mean = velocities.groupby(["Controller", reaction_prob_key_short]).mean()
+    velocities_mean.drop(columns=[simulation_time], inplace=True)
+    velocities_std = velocities.groupby(["Controller", reaction_prob_key_short]).std()
+    velocities_std.drop(columns=[simulation_time], inplace=True)
+
+    flux = velocities
+    flux[list(corridors.values())] = velocities[list(corridors.values())].multiply(densities[list(corridors.values())])
+
+
+
+
+
+    # OpenLoop , p = 1:
+    var_1 = velocities_open_loop[velocities_open_loop[reaction_prob_key_short]==1.0]
+    var_1 = flux[ (flux[reaction_prob_key_short] == 1.0) & (flux["Controller"] == "NoController")]
+    print(stats.kruskal(var_1["Corridor1"],var_1["Corridor2"],var_1["Corridor3"]))
+
 
 
     fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
@@ -176,7 +203,6 @@ if __name__ == "__main__":
                 min_ylim, max_ylim = ax[ii, iii].get_ylim()
                 ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
 
-
                 ax[ii,iii].set_xlabel("Densities [ped/m**2]")
                 ax[ii,iii].set_title(title_)
                 ax[ii, iii].legend()
@@ -194,7 +220,46 @@ if __name__ == "__main__":
     plt.savefig(f"figs/densities.png")
     plt.show()
 
-    #MANOVA.from_formula('Height + Width + Weight ~ Treatment', data)
-    # perform two-way ANOVA -https://www.statology.org/two-way-anova-python/
-    #model = ols('Corridor1 ~ C(reactionProbability) + C(Controller) + C(reactionProbability):C(Controller)', data=densities).fit()
-    #print(sm.stats.anova_lm(model, typ=2))
+    fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
+    ii = 0
+    for controller in ["OpenLoop", "ClosedLoop", "NoController"]:
+
+        v_ = velocities[velocities["Controller"] == controller]
+        d_ = densities[densities["Controller"] == controller]
+
+        for reactionProb in [1.0, 0.5]:
+            v__ = v_[v_[reaction_prob_key_short] == reactionProb]
+            d__ = d_[d_[reaction_prob_key_short] == reactionProb]
+
+            title_ = f'{controller}, r={reactionProb}'
+
+            iii = 0
+            for c in list(corridors.values()):
+                print(ii, iii)
+                flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
+                flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
+
+                ax[ii, iii].scatter(x=d__[c], y=flux, label=c)
+
+                ax[ii, iii].set_xlabel("Densities [ped/m**2]")
+                ax[ii, iii].set_ylabel("Flux [ped/(m*s)]")
+                ax[ii, iii].set_xlim(0,2.2)
+                ax[ii, iii].set_ylim(0,1.6)
+
+                ax[ii, iii].set_title(title_)
+                ax[ii, iii].legend()
+                iii += 1
+            if ii % 2 == 0:
+                ii += 1
+            if ii >= 5:
+                break
+        ii += 1
+        if ii >= 5:
+            print('Loop exited')
+            break
+
+    fig.tight_layout()
+    plt.savefig(f"figs/fundamentalDiagram.png")
+    plt.show()
+
+
