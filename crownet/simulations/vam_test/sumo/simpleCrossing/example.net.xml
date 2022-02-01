@@ -38,8 +38,11 @@
 
 <net version="1.9" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
 
-    <location netOffset="0.00,0.00" convBoundary="0.00,0.00,150.00,70.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
-
+    <!--   <location netOffset="0.00,0.00" convBoundary="0.00,0.00,150.00,70.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/> -->
+	
+	<location netOffset="-689401.52,-5336004.59" convBoundary="0.00,0.00,150.00,70.00" origBoundary="11.537957,48.148799,11.539957,48.149400" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+	
+	
     <edge id=":C_0" function="internal">
         <lane id=":C_0_0" index="0" speed="13.89" length="9.00" width="6.00" shape="104.50,59.00 95.50,59.00"/>
         <lane id=":C_0_1" index="1" speed="13.89" length="9.00" width="6.00" shape="104.50,53.00 95.50,53.00"/>
