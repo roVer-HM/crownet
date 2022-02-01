@@ -129,10 +129,7 @@ def get_travel_times():
 
     return travel_times
 
-
-if __name__ == "__main__":
-
-    travel_time = get_travel_times()
+def plot_travel_time(travel_time):
 
     fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(6, 15))
     counter = 0
@@ -171,43 +168,37 @@ if __name__ == "__main__":
     plt.savefig(f"figs/travel_times.png")
     plt.show()
 
+def get_densities_velocities():
     densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
     densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
     densities_default, velocities_default = get_fundamental_diagrams(controller_type="NoController")
 
-
     densities = pd.concat([densities_default, densities_open_loop])
     densities = pd.concat([densities, densities_closed_loop])
-
-
-    densities_mean = densities.groupby(["Controller", reaction_prob_key_short]).mean()
-    densities_mean.drop(columns=[simulation_time], inplace=True)
-    densities_std = densities.groupby(["Controller", reaction_prob_key_short]).std()
-    densities_std.drop(columns=[simulation_time], inplace=True)
 
     velocities = pd.concat([velocities_default, velocities_open_loop])
     velocities = pd.concat([velocities, velocities_closed_loop])
 
-    velocities_mean = velocities.groupby(["Controller", reaction_prob_key_short]).mean()
-    velocities_mean.drop(columns=[simulation_time], inplace=True)
-    velocities_std = velocities.groupby(["Controller", reaction_prob_key_short]).std()
-    velocities_std.drop(columns=[simulation_time], inplace=True)
+    return densities, velocities
 
-    flux = velocities
-    flux[list(corridors.values())] = velocities[list(corridors.values())].multiply(densities[list(corridors.values())])
-
+def get_densities_normed(densities):
     densities_normed = densities.copy()
-    densities_normed[list(corridors.values())] = (densities[list(corridors.values())] - 0.31) / (5.4-0.31)
+    densities_normed[list(corridors.values())] = (densities[list(corridors.values())] - 0.31) / (5.4 - 0.31)
 
     for col in list(corridors.values()):
         densities_normed[col][densities_normed[col] < 0] = 0
+
+    return densities_normed
+
+
+def get_safety_values(densities_normed):
 
     medians_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).median()
     medians_.drop(columns=[simulation_time], inplace=True)
     variances_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).mad()**2
     variances_.drop(columns=[simulation_time], inplace=True)
 
-    gammas = np.linspace(0,100)
+    gammas = np.arange(0,100)
     df = pd.DataFrame()
     df2 = pd.DataFrame()
     for gamma in gammas:
@@ -219,21 +210,49 @@ if __name__ == "__main__":
         df2 = pd.concat([df2, x_std], axis=1)
     df = df.transpose()
     df2 = df2.transpose()
+    df.index.name = "gamma"
+    df2.index.name = "gamma"
+    return df, df2
 
-    df.plot()
-    plt.ylim(-50,0)
-    plt.xlabel("Weighting parameter gamma")
-    plt.ylabel("Safety value (mean)")
-    plt.show()
+def get_flux(velocities, densities):
+    flux = velocities.copy()
+    flux[list(corridors.values())] = velocities[list(corridors.values())].multiply(densities[list(corridors.values())])
+    return flux
 
-    df2.plot()
+if __name__ == "__main__":
+
+    travel_time = get_travel_times()
+    plot_travel_time(travel_time)
+
+    densities, velocities = get_densities_velocities()
+    flux = get_flux(velocities, densities)
+    densities_normed = get_densities_normed(densities)
+    __, safety_values_min = get_safety_values(densities_normed)
+
+
+    # write data
+    output_dir = os.path.abspath("tables")
+    safety_values_min.iloc[1,:].to_csv(os.path.join((output_dir), "safety_value_gamma_1.0.csv"))
+    #densities_mean = densities.groupby(["Controller", reaction_prob_key_short]).median()
+    #densities_mean.drop(columns=[simulation_time], inplace=True)
+    #densities_std = densities.groupby(["Controller", reaction_prob_key_short]).mad()
+    #densities_std.drop(columns=[simulation_time], inplace=True)
+
+    #velocities_mean = velocities.groupby(["Controller", reaction_prob_key_short]).mean()
+    #velocities_mean.drop(columns=[simulation_time], inplace=True)
+    #velocities_std = velocities.groupby(["Controller", reaction_prob_key_short]).std()
+    #velocities_std.drop(columns=[simulation_time], inplace=True)
+
+
+    # generate plots
+
+    safety_values_min.plot()
     plt.ylim(-50, 0)
-    plt.xlabel("Weighting parameter gamma")
-    title= "Safety value (minimum)"
+    plt.xlabel("Weighting parameter gamma xx")
+    title = "Safety value (minimum)"
     plt.ylabel(title)
     plt.savefig(f"figs/{title}.png")
     plt.show()
-
 
     fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
     ii = 0
@@ -290,7 +309,7 @@ if __name__ == "__main__":
 
             iii = 0
             for c in list(corridors.values()):
-                print(ii,iii)
+
                 flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
                 flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
                 ax[ii,iii].hist(flux, range=(0,2), label=c, bins=20)
@@ -311,7 +330,6 @@ if __name__ == "__main__":
                 break
         ii+=1
         if ii >= 5:
-            print('Loop exited')
             break
 
     fig.tight_layout()
@@ -333,7 +351,6 @@ if __name__ == "__main__":
 
             iii = 0
             for c in list(corridors.values()):
-                print(ii,iii)
                 ax[ii,iii].hist(d__[c], range=(0,2.5), label=c, bins=20)
 
                 m = d__[c].median()
@@ -352,7 +369,6 @@ if __name__ == "__main__":
                 break
         ii+=1
         if ii >= 5:
-            print('Loop exited')
             break
 
     fig.tight_layout()
@@ -374,7 +390,6 @@ if __name__ == "__main__":
 
             iii = 0
             for c in list(corridors.values()):
-                print(ii, iii)
                 flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
                 flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
 
@@ -382,8 +397,8 @@ if __name__ == "__main__":
 
                 ax[ii, iii].set_xlabel("Densities [ped/m**2]")
                 ax[ii, iii].set_ylabel("Flux [ped/(m*s)]")
-                #ax[ii, iii].set_xlim(0,2.2)
-                #ax[ii, iii].set_ylim(0,1.6)
+                ax[ii, iii].set_xlim(0,2.3)
+                ax[ii, iii].set_ylim(0,1.7)
 
                 ax[ii, iii].set_title(title_)
                 ax[ii, iii].legend()
@@ -394,12 +409,12 @@ if __name__ == "__main__":
                 break
         ii += 1
         if ii >= 5:
-            print('Loop exited')
             break
 
     fig.tight_layout()
     plt.savefig(f"figs/fundamentalDiagram.png")
     plt.show()
+    print("Finished plotting.")
 
 
 

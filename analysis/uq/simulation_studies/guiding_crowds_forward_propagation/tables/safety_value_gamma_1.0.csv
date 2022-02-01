@@ -1,0 +1,6 @@
+Controller,reactionProbability,1
+ClosedLoop,0.5,-9.937772285711375
+ClosedLoop,1.0,-5.765970599611548
+NoController,1.0,-32.63848298311602
+OpenLoop,0.5,-18.958336943827874
+OpenLoop,1.0,-3.3246934859301205
