@@ -106,6 +106,7 @@ def get_time_controller_wise(controller_type):
     travel_times = pd.DataFrame(times["reachTime-PID12"].sub(times["startTime-PID13"]),
                                 columns=["travel_time"])
     travel_times["Controller"] = controller_type
+    travel_times = travel_times[times["startTime-PID13"] >= sim_time_steady_flow_start]
 
     travel_times.reset_index(level="pedestrianId", inplace=True, drop=True)
 
@@ -131,7 +132,44 @@ def get_travel_times():
 
 if __name__ == "__main__":
 
+    travel_time = get_travel_times()
 
+    fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(6, 15))
+    counter = 0
+
+    for c in ["OpenLoop","ClosedLoop","NoController"]:
+        t_ = travel_time[travel_time["Controller"] == c]
+
+        for reactionProb in [1.0, 0.5]:
+            data = t_[t_[reaction_prob_key_short] == reactionProb]
+
+            times = data[data["travel_time"] != np.inf]
+            stucked = data[data["travel_time"] == np.inf]
+            if len(data) != 172000:
+                raise ValueError(c)
+            ax[counter].hist(times["travel_time"], range=(0, 400), bins=20)
+
+            finished = len(times)
+            unfinished = len(stucked)
+            p__ = unfinished/len(data)
+
+            title = f"{c}, {reactionProb}. Not finished at simulation end: {p__*100:.2f}%."
+
+            m = times["travel_time"].median()
+            mad = times["travel_time"].mad()
+
+            ax[counter].axvline(m, color='k', linestyle='dashed', linewidth=1)
+            min_ylim, max_ylim = ax[counter].get_ylim()
+            ax[counter].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
+
+            ax[counter].set_title(title)
+            counter +=1
+            if counter >= 5:
+                break
+
+    fig.tight_layout()
+    plt.savefig(f"figs/travel_times.png")
+    plt.show()
 
     densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
     densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
@@ -164,10 +202,38 @@ if __name__ == "__main__":
     for col in list(corridors.values()):
         densities_normed[col][densities_normed[col] < 0] = 0
 
-    # OpenLoop , p = 1:
-    var_1 = velocities_open_loop[velocities_open_loop[reaction_prob_key_short]==1.0]
-    var_1 = flux[ (flux[reaction_prob_key_short] == 1.0) & (flux["Controller"] == "NoController")]
-    print(stats.kruskal(var_1["Corridor1"],var_1["Corridor2"],var_1["Corridor3"]))
+    medians_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).median()
+    medians_.drop(columns=[simulation_time], inplace=True)
+    variances_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).mad()**2
+    variances_.drop(columns=[simulation_time], inplace=True)
+
+    gammas = np.linspace(0,100)
+    df = pd.DataFrame()
+    df2 = pd.DataFrame()
+    for gamma in gammas:
+        x = (-medians_ - gamma*variances_)*100
+        x = x.transpose()
+        x_mean = pd.DataFrame(x.mean(axis=0), columns=[gamma])
+        x_std = pd.DataFrame(x.min(axis=0), columns=[gamma])
+        df = pd.concat([df, x_mean], axis=1)
+        df2 = pd.concat([df2, x_std], axis=1)
+    df = df.transpose()
+    df2 = df2.transpose()
+
+    df.plot()
+    plt.ylim(-50,0)
+    plt.xlabel("Weighting parameter gamma")
+    plt.ylabel("Safety value (mean)")
+    plt.show()
+
+    df2.plot()
+    plt.ylim(-50, 0)
+    plt.xlabel("Weighting parameter gamma")
+    title= "Safety value (minimum)"
+    plt.ylabel(title)
+    plt.savefig(f"figs/{title}.png")
+    plt.show()
+
 
     fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
     ii = 0
@@ -186,10 +252,11 @@ if __name__ == "__main__":
             for c in list(corridors.values()):
                 ax[ii, iii].hist(d__[c], label=c, bins=20, range = (0, 0.5))
 
-                m = d__[c].mean()
+                m = d__[c].median()
+                mad = d__[c].mad()
                 ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
                 min_ylim, max_ylim = ax[ii, iii].get_ylim()
-                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
+                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
 
                 ax[ii, iii].set_xlabel("Densities normed")
                 ax[ii, iii].set_title(title_)
@@ -228,10 +295,11 @@ if __name__ == "__main__":
                 flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
                 ax[ii,iii].hist(flux, range=(0,2), label=c, bins=20)
 
-                m = flux.mean()[0]
+                m = flux.median()[0]
+                mad = flux.mad()[0]
                 ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
                 min_ylim, max_ylim = ax[ii, iii].get_ylim()
-                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
+                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
 
                 ax[ii,iii].set_xlabel("Flux [ped/(m*s)]")
                 ax[ii,iii].set_title(title_)
@@ -268,10 +336,11 @@ if __name__ == "__main__":
                 print(ii,iii)
                 ax[ii,iii].hist(d__[c], range=(0,2.5), label=c, bins=20)
 
-                m = d__[c].mean()
+                m = d__[c].median()
+                mad = d__[c].mad()
                 ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
                 min_ylim, max_ylim = ax[ii, iii].get_ylim()
-                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, 'Mean: {:.2f}'.format(m))
+                ax[ii, iii].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
 
                 ax[ii,iii].set_xlabel("Densities [ped/m**2]")
                 ax[ii,iii].set_title(title_)
@@ -313,8 +382,8 @@ if __name__ == "__main__":
 
                 ax[ii, iii].set_xlabel("Densities [ped/m**2]")
                 ax[ii, iii].set_ylabel("Flux [ped/(m*s)]")
-                ax[ii, iii].set_xlim(0,2.2)
-                ax[ii, iii].set_ylim(0,1.6)
+                #ax[ii, iii].set_xlim(0,2.2)
+                #ax[ii, iii].set_ylim(0,1.6)
 
                 ax[ii, iii].set_title(title_)
                 ax[ii, iii].legend()
@@ -332,29 +401,6 @@ if __name__ == "__main__":
     plt.savefig(f"figs/fundamentalDiagram.png")
     plt.show()
 
-    travel_time = get_travel_times()
-
-    for (c, p), data in travel_time.groupby(by=["Controller", reaction_prob_key_short]):
-        times = data[data["travel_time"] != np.inf]
-        stucked = data[data["travel_time"] == np.inf]
-        plt.hist(times["travel_time"], range=(0, 400), bins=20)
-        title = f"Travel times {c}, {p}"
-
-        m = times["travel_time"].median()
-        plt.axvline(m, color='k', linestyle='dashed', linewidth=1)
-        min_ylim, max_ylim = plt.ylim()
-        plt.text(m * 1.1, max_ylim * 0.9, 'Median: {:.2f}'.format(m))
-
-        plt.title(title)
-        plt.savefig(f"figs/{title}.png")
-        plt.show()
-
-        s = stucked.groupby(by=["run_id", "id"]).count()
-        plt.hist(s["travel_time"])
-        plt.title(f"Number agents stuck {c}, {p}.")
-        plt.show()
-
-        print()
 
 
 
