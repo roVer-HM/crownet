@@ -147,10 +147,8 @@ def plot_travel_time(travel_time):
             ax[counter].hist(times["travel_time"], range=(0, 400), bins=20)
 
             finished = len(times)
-            unfinished = len(stucked)
-            p__ = unfinished/len(data)
 
-            title = f"{c}, {reactionProb}. Not finished at simulation end: {p__*100:.2f}%."
+            title = f"{c}, {reactionProb}. Counts: {finished}."
 
             m = times["travel_time"].median()
             mad = times["travel_time"].mad()
@@ -158,6 +156,7 @@ def plot_travel_time(travel_time):
             ax[counter].axvline(m, color='k', linestyle='dashed', linewidth=1)
             min_ylim, max_ylim = ax[counter].get_ylim()
             ax[counter].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
+            ax[counter].set_xlabel("Travel times [s]")
 
             ax[counter].set_title(title)
             counter +=1
@@ -310,17 +309,15 @@ if __name__ == "__main__":
             iii = 0
             for c in list(corridors.values()):
 
-                flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
-                flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
-                ax[ii,iii].hist(flux, range=(0,2), label=c, bins=20)
+                ax[ii,iii].hist(v__[c], range=(0,2), label=c, bins=20)
 
-                m = flux.median()[0]
-                mad = flux.mad()[0]
+                m = v__[c].median()
+                mad = v__[c].mad()
                 ax[ii, iii].axvline(m, color='k', linestyle='dashed', linewidth=1)
                 min_ylim, max_ylim = ax[ii, iii].get_ylim()
                 ax[ii, iii].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
 
-                ax[ii,iii].set_xlabel("Flux [ped/(m*s)]")
+                ax[ii,iii].set_xlabel("Velocity [m/s]")
                 ax[ii,iii].set_title(title_)
                 ax[ii, iii].legend()
                 iii+=1
@@ -333,7 +330,7 @@ if __name__ == "__main__":
             break
 
     fig.tight_layout()
-    plt.savefig(f"figs/flux.png")
+    plt.savefig(f"figs/velocities.png")
     plt.show()
 
     fig, ax = plt.subplots(nrows=5, ncols=len(corridors.values()), figsize=(15, 15))
@@ -359,7 +356,7 @@ if __name__ == "__main__":
                 min_ylim, max_ylim = ax[ii, iii].get_ylim()
                 ax[ii, iii].text(m * 1.1, max_ylim * 0.9, f'Median: {m:.2f}. Mad: {mad:.2f}')
 
-                ax[ii,iii].set_xlabel("Densities [ped/m**2]")
+                ax[ii,iii].set_xlabel("Density [ped/m**2]")
                 ax[ii,iii].set_title(title_)
                 ax[ii, iii].legend()
                 iii+=1
@@ -390,15 +387,12 @@ if __name__ == "__main__":
 
             iii = 0
             for c in list(corridors.values()):
-                flux = pd.concat([d__[c].multiply(v__[c]), d__[simulation_time].round(2)], axis=1)
-                flux = flux.reset_index().set_index([simulation_time, "id"]).drop(columns=["run_id"])
 
-                ax[ii, iii].scatter(x=d__[c], y=flux, label=c)
-
-                ax[ii, iii].set_xlabel("Densities [ped/m**2]")
-                ax[ii, iii].set_ylabel("Flux [ped/(m*s)]")
+                ax[ii, iii].scatter(x=d__[c], y=v__[c], label=c)
+                ax[ii, iii].set_xlabel("Density [ped/m**2]")
+                ax[ii, iii].set_ylabel("Velocity [m/s]")
                 ax[ii, iii].set_xlim(0,2.3)
-                ax[ii, iii].set_ylim(0,1.7)
+                ax[ii, iii].set_ylim(0,2.2)
 
                 ax[ii, iii].set_title(title_)
                 ax[ii, iii].legend()
