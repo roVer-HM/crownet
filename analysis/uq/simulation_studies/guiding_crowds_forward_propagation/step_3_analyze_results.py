@@ -197,7 +197,7 @@ def get_safety_values(densities_normed):
     variances_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).mad()**2
     variances_.drop(columns=[simulation_time], inplace=True)
 
-    gammas = np.arange(0,100)
+    gammas = np.arange(0,10)
     df2 = pd.DataFrame()
     df = pd.DataFrame()
     for gamma in gammas:
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     safety_values_min.iloc[1,:].to_csv(file_name)
 
     file_name = os.path.join((output_dir), "safety_value_min_corridor.csv")
-    safety_values_min_corridors.apply(pd.value_counts).to_csv(file_name)
+    safety_values_min_corridors.to_csv(file_name)
     #densities_mean = densities.groupby(["Controller", reaction_prob_key_short]).median()
     #densities_mean.drop(columns=[simulation_time], inplace=True)
     #densities_std = densities.groupby(["Controller", reaction_prob_key_short]).mad()

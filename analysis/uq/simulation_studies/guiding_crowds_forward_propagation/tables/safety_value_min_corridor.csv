@@ -1,5 +1,13 @@
 Controller,ClosedLoop,ClosedLoop,NoController,OpenLoop,OpenLoop
 reactionProbability,0.5,1.0,1.0,0.5,1.0
-Corridor1,100.0,100.0,100.0,100.0,41
-Corridor2,,,,,33
-Corridor3,,,,,26
+gamma,,,,,
+0,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+1,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+2,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+3,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+4,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+5,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+6,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+7,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+8,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
+9,Corridor1,Corridor1,Corridor1,Corridor1,Corridor2
