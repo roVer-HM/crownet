@@ -224,7 +224,32 @@ def get_flux(velocities, densities):
     flux[list(corridors.values())] = velocities[list(corridors.values())].multiply(densities[list(corridors.values())])
     return flux
 
+
+def get_path_choice(controller_type):
+    c1 = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
+    c2 = pd.read_csv(f"{controller_type}_path_choice.csv", index_col=[0, 1])
+    path_choice = c1.join(c2)
+
+    path_choice[simulation_time] = path_choice[time_step_key] * time_step_size
+    path_choice = path_choice[path_choice[simulation_time] >= sim_time_steady_flow_start]
+    path_choice = path_choice[path_choice[simulation_time] < sim_time_steady_flow_end]
+    path_choice.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
+                               inplace=True)
+    path_choice.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    path_choice["Controller"] = controller_type
+    path_choice.sort_index(axis=1, inplace=True)
+
+    path_choice.reset_index(inplace=True)
+    path_choice.drop(columns=["run_id", "id"], inplace=True)
+    path_choice.set_index(simulation_time, inplace=True)
+    return path_choice
+
 if __name__ == "__main__":
+
+    path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
+
+
+
 
     travel_time = get_travel_times()
     plot_travel_time(travel_time)
@@ -254,6 +279,25 @@ if __name__ == "__main__":
 
 
     # generate plots
+
+    fig, ax = plt.subplots(nrows=1, ncols=4, figsize=(15, 5))
+    ii = 0
+    for (c,r), data in path_choice.groupby(by=["Controller", reaction_prob_key_short]):
+        sss = pd.Series({11: 0, 31: 0, 51: 0})
+        d = data["corridorRecommended"].value_counts()
+        d = sss.combine(d, max)
+        ax[ii].bar(x=d.index,height=d.values, width=15)
+        title = f"{c}, {r}"
+        ax[ii].set_title(title)
+        ax[ii].set_xticks(d.index)
+        ax[ii].set_ylim(0,2500)
+        ax[ii].set_xlabel("Recommended corridor")
+        ax[ii].set_ylabel("Counts")
+        ii+=1
+    plt.savefig(f"figs/CorridorRecommendation.png")
+    plt.show()
+    print()
+
 
     safety_values_min.plot()
     plt.ylim(-50, 0)
