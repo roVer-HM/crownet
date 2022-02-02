@@ -1,0 +1,5 @@
+Controller,ClosedLoop,ClosedLoop,NoController,OpenLoop,OpenLoop
+reactionProbability,0.5,1.0,1.0,0.5,1.0
+Corridor1,100.0,100.0,100.0,100.0,41
+Corridor2,,,,,33
+Corridor3,,,,,26

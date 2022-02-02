@@ -198,19 +198,25 @@ def get_safety_values(densities_normed):
     variances_.drop(columns=[simulation_time], inplace=True)
 
     gammas = np.arange(0,100)
-    df = pd.DataFrame()
     df2 = pd.DataFrame()
+    df = pd.DataFrame()
     for gamma in gammas:
         x = (-medians_ - gamma*variances_)*100
         x = x.transpose()
-        x_mean = pd.DataFrame(x.mean(axis=0), columns=[gamma])
-        x_std = pd.DataFrame(x.min(axis=0), columns=[gamma])
+
+        x_mean = x.idxmin()
+        x_mean.name = gamma
+        x_mean =x_mean.to_frame()
+
+        x_min = pd.DataFrame(x.min(axis=0), columns=[gamma])
         df = pd.concat([df, x_mean], axis=1)
-        df2 = pd.concat([df2, x_std], axis=1)
-    df = df.transpose()
+        df2 = pd.concat([df2, x_min], axis=1)
     df2 = df2.transpose()
-    df.index.name = "gamma"
     df2.index.name = "gamma"
+
+    df = df.transpose()
+    df.index.name = "gamma"
+
     return df, df2
 
 def get_flux(velocities, densities):
@@ -226,12 +232,16 @@ if __name__ == "__main__":
     densities, velocities = get_densities_velocities()
     flux = get_flux(velocities, densities)
     densities_normed = get_densities_normed(densities)
-    __, safety_values_min = get_safety_values(densities_normed)
+    safety_values_min_corridors, safety_values_min = get_safety_values(densities_normed)
 
 
     # write data
     output_dir = os.path.abspath("tables")
-    safety_values_min.iloc[1,:].to_csv(os.path.join((output_dir), "safety_value_gamma_1.0.csv"))
+    file_name = os.path.join((output_dir), "safety_value_gamma_1.0.csv")
+    safety_values_min.iloc[1,:].to_csv(file_name)
+
+    file_name = os.path.join((output_dir), "safety_value_min_corridor.csv")
+    safety_values_min_corridors.apply(pd.value_counts).to_csv(file_name)
     #densities_mean = densities.groupby(["Controller", reaction_prob_key_short]).median()
     #densities_mean.drop(columns=[simulation_time], inplace=True)
     #densities_std = densities.groupby(["Controller", reaction_prob_key_short]).mad()
