@@ -29,6 +29,8 @@ time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"
 
+probs= np.linspace(0, 1.0, 11)
+
 def get_fundamental_diagrams(controller_type):
     c1 = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
     c2 = pd.read_csv(f"{controller_type}_fundamentalDiagramm.csv", index_col=[0, 1])
@@ -131,19 +133,55 @@ def get_travel_times():
 
 def plot_travel_time(travel_time):
 
-    fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(6, 15))
-    counter = 0
+    travel_time = travel_time[travel_time["travel_time"] != np.inf]
 
+
+    for c, data in travel_time.groupby(by=["Controller"]): #oxplot(column="travel_time"):
+        data.drop(columns="Controller", inplace=True)
+        data.reset_index(inplace=True, drop=True,)
+        data[reaction_prob_key_short] = data[reaction_prob_key_short].round(1)
+        data = data.pivot(columns=["reactionProbability"])
+        data.columns = data.columns.droplevel()
+        data.boxplot()
+        plt.ylim()
+        plt.xlabel("Parameter c")
+        plt.ylim(0,400)
+        plt.title(f"Controller {c}")
+        plt.show()
+        print()
+
+
+
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+
+    time_25 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.25).unstack(level=0)
+    ax[0].plot(time_25, marker="o")
+    ax[0].set_title("25% Quantile")
+    ax[0].set_ylim(0, 140)
+
+    time_med = travel_time.groupby(by=["Controller",reaction_prob_key_short]).median().unstack(level=0)
+    ax[1].plot(time_med, marker= "o")
+    ax[1].set_title("Median")
+    ax[1].set_ylim(0, 140)
+
+    time_75 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.75).unstack(level=0)
+    ax[2].plot(time_75, marker="o")
+    ax[2].set_title("75% Quantile")
+    ax[2].set_ylim(0,140)
+
+    plt.show()
+
+
+    fig, ax = plt.subplots(nrows=len(probs), ncols=2, figsize=(6, int(rows*1.5)))
+    counter = 0
     for c in ["OpenLoop","ClosedLoop","NoController"]:
         t_ = travel_time[travel_time["Controller"] == c]
 
-        for reactionProb in [1.0, 0.5]:
+        for reactionProb in probs:
             data = t_[t_[reaction_prob_key_short] == reactionProb]
 
             times = data[data["travel_time"] != np.inf]
             stucked = data[data["travel_time"] == np.inf]
-            if len(data) != 172000:
-                raise ValueError(c)
             ax[counter].hist(times["travel_time"], range=(0, 400), bins=20)
 
             finished = len(times)
@@ -160,12 +198,13 @@ def plot_travel_time(travel_time):
 
             ax[counter].set_title(title)
             counter +=1
-            if counter >= 5:
-                break
+            if counter >= len(probs):
+                counter=0
 
     fig.tight_layout()
     plt.savefig(f"figs/travel_times.png")
     plt.show()
+    print()
 
 def get_densities_velocities():
     densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
@@ -194,7 +233,7 @@ def get_safety_values(densities_normed):
 
     medians_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).median()
     medians_.drop(columns=[simulation_time], inplace=True)
-    variances_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).mad()**2
+    variances_ = densities_normed.groupby(by=["Controller", reaction_prob_key_short]).mad()
     variances_.drop(columns=[simulation_time], inplace=True)
 
     gammas = np.arange(0,10)

@@ -6,6 +6,8 @@ import os
 import time
 from datetime import timedelta
 
+import numpy as np
+
 from suqc.CommandBuilder.VadereControlCommand import VadereControlCommand
 from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
 from suqc.request import CoupledDictVariation
@@ -71,9 +73,9 @@ if __name__ == "__main__":
     start_time = time.time()
 
     reaction_probability_key = 'reactionProbabilities.[stimulusId==-400].reactionProbability'
-    par_var_ = [{'vadere': {reaction_probability_key: 1.0}},
-                {'vadere': {reaction_probability_key: 0.5}}]
-    reps = 100
+    par_var_ = [{'vadere': {reaction_probability_key: p}} for p in np.linspace(0, 1.0, 11)]
+
+    reps = 5
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     qoi1 = "densities.txt"
