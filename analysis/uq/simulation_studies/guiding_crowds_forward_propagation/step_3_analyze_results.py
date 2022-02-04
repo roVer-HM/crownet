@@ -1,12 +1,6 @@
 import matplotlib.pyplot as plt
-import pandas as pd
-import statsmodels.api as sm
-from scipy import stats
 import numpy as np
-
-from statsmodels.formula.api import ols
-import os
-from statsmodels.multivariate.manova import MANOVA
+import pandas as pd
 
 reaction_prob_key = "('Parameter', 'vadere', 'reactionProbabilities.[stimulusId==-400].reactionProbability')"
 time_step_key = "timeStep"
@@ -105,8 +99,8 @@ def get_travel_times():
     c3 = get_time_controller_wise(controller_type="ClosedLoop")
 
 
-    travel_times = pd.concat([c1, c2])
-    travel_times = pd.concat([travel_times, c3])
+    travel_times = pd.concat([c2, c3])
+    #travel_times = pd.concat([travel_times, c3])
 
     return travel_times
 
@@ -125,6 +119,8 @@ def plot_travel_time(travel_time):
         plt.xlabel("Parameter c")
         plt.ylim(0,400)
         plt.title(f"Controller {c}")
+        plt.ylabel("Travel time [s]")
+        plt.xlabel("Compliance rate")
         plt.savefig(f"figs/travel_time_{c}.png")
         plt.show()
         print()
@@ -133,19 +129,37 @@ def plot_travel_time(travel_time):
     fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
 
     time_25 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.25).unstack(level=0)
-    ax[0].plot(time_25, marker="o")
-    ax[0].set_title("25% Quantile")
+    time_25.columns = time_25.columns.droplevel(0)
+    plt.sca(ax[0])
+    time_25.plot(marker="o", ax=ax[0])
+    plt.legend()
+    ax[0].set_title("25% Quartile")
     ax[0].set_ylim(0, 150)
+    ax[0].legend()
+    ax[0].set_ylabel("Travel time [s]")
+    ax[0].set_xlabel("Compliance rate")
+
 
     time_med = travel_time.groupby(by=["Controller",reaction_prob_key_short]).median().unstack(level=0)
-    ax[1].plot(time_med, marker= "o")
+    time_med.columns = time_med.columns.droplevel(0)
+    plt.sca(ax[1])
+    time_med.plot(marker="o", ax=ax[1])
     ax[1].set_title("Median")
     ax[1].set_ylim(0, 150)
+    ax[1].legend()
+    ax[1].set_ylabel("Travel time [s]")
+    ax[1].set_xlabel("Compliance rate")
 
     time_75 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.75).unstack(level=0)
-    ax[2].plot(time_75, marker="o")
-    ax[2].set_title("75% Quantile")
-    ax[2].set_ylim(0,150)
+    time_75.columns = time_75.columns.droplevel(0)
+    plt.sca(ax[2])
+    time_75.plot(marker="o", ax=ax[2])
+    ax[2].set_title("75% Quartile")
+    ax[2].set_ylim(0, 150)
+    ax[2].legend()
+    ax[2].set_ylabel("Travel time [s]")
+    ax[2].set_xlabel("Compliance rate")
+
     plt.savefig("figs/Travel_time")
     plt.show()
 
@@ -157,11 +171,8 @@ def get_densities_velocities():
     densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
     densities_default, velocities_default = get_fundamental_diagrams(controller_type="NoController")
 
-    densities = pd.concat([densities_default, densities_open_loop])
-    densities = pd.concat([densities, densities_closed_loop])
-
-    velocities = pd.concat([velocities_default, velocities_open_loop])
-    velocities = pd.concat([velocities, velocities_closed_loop])
+    densities = pd.concat([densities_closed_loop, densities_open_loop])
+    velocities = pd.concat([velocities_closed_loop, velocities_open_loop])
 
     return densities, velocities
 
@@ -199,7 +210,7 @@ def get_path_choice(controller_type):
     return path_choice
 
 def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped/m*2]"):
-    fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(15, 15))
+    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))
     i = 0
     for c, data in densities.groupby(by=["Controller"]):  # oxplot(column="travel_time"):
 
@@ -246,7 +257,7 @@ def plot_route_1_recommended(path_choice):
 if __name__ == "__main__":
 
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
-
+    plot_route_1_recommended(path_choice)
 
     travel_time = get_travel_times()
     plot_travel_time(travel_time)
@@ -257,9 +268,9 @@ if __name__ == "__main__":
     plot_quantity(velocities, "velocities", y_min=-0.1, y_max=1.8, ylabel="Velocities [m/s]")
 
     densities_normed_A = get_densities_normed(densities, density_thres=0.31,)
-    plot_quantity(densities_normed_A, "densities_LOS_A", y_min=-0.1, y_max=0.5, ylabel="Density [1]")
+    plot_quantity(densities_normed_A, "densities_LOS_A", y_min=-0.1, y_max=0.5, ylabel="Density value [1]")
 
     densities_normed_15 = get_densities_normed(densities, density_thres=0.141)
-    plot_quantity(densities_normed_15, "densities_LOS_15", y_min=-0.1, y_max=0.5, ylabel="Density [1]")
+    plot_quantity(densities_normed_15, "densities_LOS_15", y_min=-0.1, y_max=0.5, ylabel="Density value [1]")
 
 
