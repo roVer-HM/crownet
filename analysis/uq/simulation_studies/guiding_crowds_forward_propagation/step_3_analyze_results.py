@@ -174,6 +174,10 @@ def get_densities_velocities():
     densities = pd.concat([densities_closed_loop, densities_open_loop])
     velocities = pd.concat([velocities_closed_loop, velocities_open_loop])
 
+    for c in corridors.values():
+        #nan velocities in case there is no agent in the corridor
+        velocities[c][densities[c] == 0] = np.nan
+
     return densities, velocities
 
 def get_densities_normed(densities, density_thres = 0.31):
