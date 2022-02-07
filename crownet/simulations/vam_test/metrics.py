@@ -6,10 +6,10 @@ import argparse
 from datetime import datetime
 from _datetime import timedelta
 
-# Start time of the simulation
+# Start time of the simulation - taken from the simulations omnetpp.ini
 time_start = "2020-06-01 12:35:00"
 
-# Epoch start for genDeltaTime calculation
+# Epoch start for genDeltaTime calculation - taken from the simulations omnetpp.ini
 epoch_start = "2004-01-01 00:00:00"
 
 # Variable used for genDeltaTime modulo calculation
@@ -26,7 +26,7 @@ Calculates the average latency of all received VAMs in milliseconds.
     
 :return:            The average latency of all received VAMS in milliseconds.
 """
-def calc_latency_ms(db_path):
+def calc_latency(db_path):
     total_lat = 0
     count = 0
     
@@ -39,7 +39,7 @@ def calc_latency_ms(db_path):
     
     for v_id in v_ids:
         cur.row_factory = None
-        cur.execute("SELECT vd.simtimeRaw/1000000000 as simTimeMs, vd.value FROM vectorData as vd WHERE vd.vectorId = " + str(v_id))
+        cur.execute("SELECT vd.simtimeRaw/1e9 as simTimeMs, vd.value FROM vectorData as vd WHERE vd.vectorId = " + str(v_id))
         ts_tuples = cur.fetchall()
         
         for ts_tuple in ts_tuples:
@@ -59,14 +59,56 @@ def calc_latency_ms(db_path):
     
     return avg_latency
 
-def calc_datavolume():
+"""
+Calculates the average datavolume across all VAMs sent in bytes.
+
+:param: db_path:    Path to the database which stores the results of the simulation.
+    
+:return:            The average datavolume across all VAMs sent in bytes.
+"""
+def calc_datavolume(db_path):
+    total_datavolume = 0
+    count = 0
+    
+    con = sqlite3.connect(db_path)
+    cur = con.cursor()
+    
+    
     return true
 
-def get_pos_diff():
+"""
+Calculates the average deviation of a VRUs known position from its actual position in meters,
+by interpolation of the speed of a VRU and the latency of VAMs.
+
+:param: db_path:    Path to the database which stores the results of the simulation.
+    
+:return:            The average deviation of a VRUs known position from its actual position in meters.
+"""
+def calc_pos_diff(db_path): 
+    total_pos_diff = 0
+    count = 0
+    
+    con = sqlite3.connect(db_path)
+    cur = con.cursor()
+    
     return true
+
 
 def main():
-    calc_latency_ms("results/simple_cam_den_20220120-17:27:23/vars_rep_0.vec")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-path", type=str, required=True, help="Path to the databse that contains the simulation results.")
+    
+    subparsers = parser.add_subparsers()
+    parser_latency = subparsers.add_parser("lat", help="Average VAM latency across all sent VAMs.")
+    parser_latency.set_defaults(func=calc_latency)
+    parser_datavolume = subparsers.add_parser("vol", help="Average data volume of VAM related messages.")
+    parser_datavolume.set_defaults(func=calc_datavolume)
+    parser_pos_diff = subparsers.add_parser("pos", help="Average deviation of a VRUs known position from its actual position.")
+    parser_pos_diff.set_defaults(func=calc_pos_diff)
+    
+    # calc_latency("results/simple_cam_den_20220120-17:27:23/vars_rep_0.vec")
+    options = parser.parse_args()
+    options.func(options.path)
 
 if __name__ == "__main__":
     main()
