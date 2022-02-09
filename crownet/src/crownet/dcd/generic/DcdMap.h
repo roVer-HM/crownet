@@ -12,6 +12,7 @@
 #include "crownet/dcd/generic/iterator/DcDMapIterator.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/identifier/TimeProvider.h"
+#include "crownet/dcd/generic/ICellIdStream.h"
 
 namespace crownet {
 
@@ -32,10 +33,14 @@ class DcDMap {
   DcDMap() {}
   DcDMap(node_key_t owner_id,
          std::shared_ptr<CellKeyProvider<C>> cellKeyProvider,
-         std::shared_ptr<TimeProvider<T>> timeProvider)
+         std::shared_ptr<TimeProvider<T>> timeProvider,
+         std::shared_ptr<ICellIdStream<C, N, T>> cellKeyStream)
       : owner_id(owner_id),
         cellKeyProvider(cellKeyProvider),
-        timeProvider(timeProvider) {}
+        timeProvider(timeProvider),
+        cellKeyStream(cellKeyStream){
+      this->cellKeyStream->setMap(this);
+  }
 
   // getter
   const node_key_t& getOwnerId() const { return owner_id; }
@@ -60,20 +65,22 @@ class DcDMap {
   void setCellKeyProvider(std::shared_ptr<CellKeyProvider<C>> provider);
 
   // map update methods
-  void update(const cell_key_t& cell_id, typename cell_t::entry_t_ptr&& m_data);
-  void update(const cell_key_t& cell_id, typename cell_t::entry_t_ptr& m_data);
-  void incrementLocal(const traci::TraCIPosition& pos,
-                      const node_key_t sourceNodeId, const time_t time);
+  void setEntry(const cell_key_t& cell_id, typename cell_t::entry_t_ptr&& m_data);
+  void setEntry(const cell_key_t& cell_id, typename cell_t::entry_t_ptr& m_data);
 
-  // manage neighborhood in local area. Map node_key_t to cell_key_t
-  bool isInNeighborhood(const node_key_t& neigbourId) const;
-  int sizeOfNeighborhood() const;
-  void clearNeighborhood();
-  void removeFromNeighborhood(const node_key_t& neigborId);
-  cell_key_t getNeighborCell(const node_key_t& neigborId);
-  void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
-  void addToNeighborhood(const node_key_t& neigbourId,
-                         const cell_key_t& cellId);
+  template <typename E = typename cell_t::entry_t>
+  std::shared_ptr<E> getEntry(const cell_key_t& cell_id, const node_key_t& source);
+  template <typename E = typename cell_t::entry_t>
+  std::shared_ptr<E> getEntry(const cell_key_t& cell_id);
+  template <typename E = typename cell_t::entry_t>
+  std::shared_ptr<E> getEntry(const traci::TraCIPosition& pos);
+  template <typename E = typename cell_t::entry_t>
+  std::shared_ptr<E> getEntry(const traci::TraCIPosition& pos, const node_key_t& source);
+
+  bool hasEntry(const cell_key_t& cell_id, const node_key_t& source);
+  bool hasEntry(const cell_key_t& cell_id);
+  bool hasEntry(const traci::TraCIPosition& pos, const node_key_t& source);
+  bool hasEntry(const traci::TraCIPosition& pos);
 
   // iterators and visitors
   typename map_t::iterator begin() { return cells.begin(); }
@@ -86,22 +93,57 @@ class DcDMap {
   DcDMapIterator<DcDMap<C, N, T>> allLocal() const;
   DcDMapIterator<DcDMap<C, N, T>> valid();
   DcDMapIterator<DcDMap<C, N, T>> valid() const;
+  const int validCellCount() const;
+  const int validLocalCellCount() const;
+  const int allLocalCellCount() const;
+
 
   template <typename Fn>
-  void visitCells(Fn visitor);
+  void visitCells(Fn* visitor);
+
+
+  template <typename Fn>
+  void visitCells(Fn& visitor);
+
+  template <typename Fn>
+  void visitCells(Fn&& visitor);
+
+
   template <typename Fn>
   void computeValues(Fn visitor);
   template <typename Fn>
   void applyVisitorTo(const cell_key_t& cell_id, Fn visitor);
 
+  std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() {return cellKeyProvider;}
+  std::shared_ptr<ICellIdStream<C, N, T>> getCellKeyStream() {return cellKeyStream; }
+
  private:
   map_t cells;
   node_key_t owner_id;
-  cell_key_t owner_cell;
-  time_t lastComputedAt;
+  cell_key_t owner_cell; // owner position
+  time_t lastComputedAt; // Zeitpunkt an dem der Wert berechnet wird
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
   std::shared_ptr<TimeProvider<T>> timeProvider;
-  std::map<node_key_t, cell_key_t> neighborhood;
+  std::shared_ptr<ICellIdStream<C, N, T>> cellKeyStream;
+
+ public:
+
+  /*
+   *  Manage neighborhood in local area.
+   */
+  bool isInNeighborhood(const node_key_t& neigbourId) const;
+  int sizeOfNeighborhood() const;
+  void clearNeighborhood();
+  void removeFromNeighborhood(const node_key_t& neigborId);
+  cell_key_t getNeighborCell(const node_key_t& neigborId);
+  void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
+  void addToNeighborhood(const node_key_t& neigbourId, const cell_key_t& cellId);
+  void addToNeighborhood(const node_key_t& neigbourId, const traci::TraCIPosition& pos);
+  cell_key_t getCellId(const traci::TraCIPosition& pos) const;
+
+ private:
+  // Map node_key_t to cell_key_t to track if a node moved between cells.
+  std::map<N, C> neighborhood;
 };
 #include "DcdMap.tcc"
 

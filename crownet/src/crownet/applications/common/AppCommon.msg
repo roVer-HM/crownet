@@ -22,6 +22,15 @@ class CurrentLocationTag extends inet::TagBase
     inet::Coord location;
 }
 
+class SequenceIdTag extends inet::TagBase
+{
+	long sequenceNumber;    
+}
+
+class HostIdTag extends inet::TagBase
+{
+	int hostId;    
+}
 
 class HopCount extends inet::TagBase
 {

@@ -27,12 +27,15 @@ class VruSimple : public BaseApp {
 
   virtual FsmState handleDataArrived(Packet *packet) override;
 
+  //CrownetPacketSourceBase
+  virtual Packet *createPacket() override;
+
  protected:
   MobilityBase *mobilityModule = nullptr;
 
  protected:
   virtual void initialize(int stage) override;
-  virtual FsmState fsmAppMain(cMessage *msg) override;
+//  virtual FsmState fsmAppMain(cMessage *msg) override;
   virtual Coord getCurrentLocation();
 };
 }  // namespace crownet

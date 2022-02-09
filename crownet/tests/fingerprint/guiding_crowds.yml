@@ -12,10 +12,10 @@ vadere_only_test_1:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --delete-existing-containers
-    - --vadere-only
+    - vadere
+    - --override-host-config
     - --scenario-file
-    - vadere/scenarios/test001_with_signs.scenario
+    - "vadere/scenarios/test001_with_signs.scenario"
   simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
@@ -27,8 +27,9 @@ final_test_2:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere-opp
     - --create-vadere-container
+    - --override-host-config
     - --opp.-c
     - final
   simtimelimit: 100s
@@ -42,11 +43,12 @@ final_test_3:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere-opp-control
     - --create-vadere-container
     - --opp.-c
     - final_control
     - --control-use-local
+    - --override-host-config
     - --with-control
     - control.py
   simtimelimit: 100s
@@ -60,12 +62,14 @@ test_4:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere-control
     - --create-vadere-container
-    - --control-vadere-only
     - --control-use-local
+    - --override-host-config
     - --with-control
     - control.py
+    - --scenario-file
+    - "vadere/scenarios/test001.scenario"
   simtimelimit: 100s
   expectedResult: PASS
   fingerprint: "file:"
@@ -77,9 +81,9 @@ test_5:
   wd: simulations/guiding_crowds_test
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere
     - --create-vadere-container
-    - --vadere-only
+    - --override-host-config
     - --scenario-file
     - "vadere/scenarios/test001_with_signs.scenario"
   simtimelimit: 100s

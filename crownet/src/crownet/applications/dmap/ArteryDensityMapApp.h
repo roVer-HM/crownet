@@ -31,7 +31,8 @@ using namespace inet;
 namespace crownet {
 
 
-class ArteryDensityMapApp : public BaseDensityMapApp {
+class ArteryDensityMapApp : public BaseDensityMapApp,
+                            public omnetpp::cListener {
  public:
   virtual ~ArteryDensityMapApp() = default;
   ArteryDensityMapApp(){};

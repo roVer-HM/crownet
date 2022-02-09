@@ -8,6 +8,7 @@
 #pragma once
 
 #include "crownet/dcd/generic/Cell.h"
+#include <omnetpp.h>
 
 namespace crownet {
 
@@ -19,12 +20,12 @@ namespace crownet {
  * Cell<>::acceptSet(visitor) for common usages.
  */
 template <typename C, typename Ret>
-class CellVisitor {
+class CellVisitor : public omnetpp::cObject{
  public:
   virtual ~CellVisitor() = default;
   virtual Ret applyTo(C& cell) = 0;
   Ret operator()(C& cell) { return this->applyTo(cell); }
-  virtual std::string getName() const { return ""; };
+  virtual std::string getVisitorName() const { return ""; };
 };
 
 template <typename C, typename Ret>
@@ -33,15 +34,53 @@ class ConstCellVisitor {
   virtual ~ConstCellVisitor() = default;
   virtual Ret applyTo(const C& cell) const = 0;
   Ret operator()(const C& cell) const { return this->applyTo(cell); }
-  virtual std::string getName() const { return ""; };
+  virtual std::string getVisitorName() const { return ""; };
 };
+
+
+template<typename C, typename T>
+class TimestampMixin : public C {
+public:
+    TimestampMixin() : C(), time() {}
+    TimestampMixin(const TimestampMixin& other) : C(other) {this->time = other.getTime();}
+
+    void setTime(const T& t){
+        this->time = t;
+    }
+    const T& getTime() const {
+        return this->time;
+    }
+
+private:
+    T time;
+};
+
+template<typename C, typename Map>
+class MapMixin : public C {
+public:
+    MapMixin() : C() {}
+    MapMixin(const MapMixin& other): C(other) {this->map = other.getMap();}
+
+    void setMap(std::shared_ptr<Map> map) { this->map = map;}
+    std::shared_ptr<Map> getMap() { return this->map;}
+    std::shared_ptr<Map> getMap() const { return this->map;}
+
+private:
+    std::shared_ptr<Map> map;
+
+};
+
 
 template <typename C>
 class Timestamped{
  public:
+    Timestamped() : time() {}
     Timestamped(typename C::time_t time) : time(time) {}
     void setTime(const typename C::time_t& t){
         this->time = t;
+    }
+    const typename C::time_t& getTime() const {
+        return this->time;
     }
 
  protected:
@@ -69,6 +108,7 @@ template <typename C>
 class TimestampedGetEntryVisitor : public GetEntryVisitor<C>, public Timestamped<C>  {
  public:
   TimestampedGetEntryVisitor(typename C::time_t time): Timestamped<C>(time) {}
+  TimestampedGetEntryVisitor(const TimestampedGetEntryVisitor<C>& other) {this->setTime(other.getTime());}
   virtual typename C::entry_t_ptr applyTo(const C& cell) const = 0;
 };
 
@@ -87,12 +127,13 @@ class TimestampedGetEntryVisitor : public GetEntryVisitor<C>, public Timestamped
 template <typename C>
 class VoidCellVisitor : public CellVisitor<C, void> {
  public:
-  virtual void applyTo(C& cell) = 0;
+  virtual void applyTo(C& cell) {throw omnetpp::cRuntimeError("Implement me!");};
 };
 
 template <typename C>
 class TimestampedVoidCellVisitor : public VoidCellVisitor<C>, public Timestamped<C> {
  public:
+    TimestampedVoidCellVisitor() : VoidCellVisitor<C>(), Timestamped<C>() {}
     TimestampedVoidCellVisitor(typename C::time_t time) :  Timestamped<C>(time) {}
 };
 

@@ -1,0 +1,86 @@
+%description:
+Local DcDMap updates based on the neighborhood table must have aging zero values.
+
+%file: package.ned 
+// 
+// empty: no namespace
+//
+
+%inifile: omnetpp.ini
+[General]
+network = crownet.test.omnetpp.lib.TestStationaryWorld
+sim-time-limit= 10s
+ned-path = ../../lib
+include ../lib/default_testConfig.ini
+outputvectormanager-class="omnetpp::envir::SqliteOutputVectorManager"
+outputscalarmanager-class="omnetpp::envir::SqliteOutputScalarManager"
+
+*.misc[*].pos*.vector-recording = true
+*.misc[*].pos*.result-recording-modes = all
+*.misc[*].app[*].**.vector-recording = true
+**.vector-recording = false
+#**.scalar-recording = false
+
+record-eventlog = true
+#*.gloablDensityMap.**.module-eventlog-recording = true
+#*.misc[*].app[*].**.module-eventlog-recording = true
+**.module-eventlog-recording = false
+
+[Config final]
+extends = _default, D2D_General, DcDMap, stationary_n5
+*.coordConverter.typename = "OsgCoordConverterLocal"
+*.coordConverter.xBound = 30.0m
+*.coordConverter.yBound = 30.0m
+**.cellSize = 3.0m
+*.gloablDensityMap.typename = "GlobalDensityMap"
+*.gloablDensityMap.writeMapInterval = 500ms
+*.gloablDensityMap.useSignalMapInit = false
+
+*.fileWriterRegister.typename = "FileWriterRegister"
+*.misc[*].nTable.maxAge = 3s
+
+*.misc[*].app[0].app.startTime = uniform(0s,50ms) # Beacon
+#*.misc[*].app[0].app.startTime = 0s # Beacon
+*.misc[*].app[0].scheduler.generationInterval = 150ms + uniform(0ms, 10ms)
+#*.misc[*].app[0].scheduler.generationInterval = 150ms 
+*.misc[*].app[0].app.typename = "BeaconDynamic"
+
+*.misc[*].app[1].app.startTime = 2001ms + uniform(0s, 50ms) # DensityMap
+#*.misc[*].app[1].app.startTime = 2001ms # DensityMap
+*.misc[*].app[1].app.localMapUpdateInterval = 500ms
+*.misc[*].app[1].app.mapCfg = crownet::MapCfg{ \
+            writeDensityLog: true, \
+            mapType: "ymf", \
+            mapTypeLog: "all", \
+            idStreamType: "insertionOrder"}
+*.misc[*].app[1].scheduler.generationInterval = 500ms + uniform(-20ms, 20ms)
+#*.misc[*].app[1].scheduler.generationInterval = 500ms 
+*.misc[*].app[1].scheduler.numberPackets = 1
+
+*.misc[0].app[0].app.stopTime = 5s # Stop Beacon App of first node
+
+%postrun-command: ../lib/run_with_venv.sh ../lib/dcdMap_localUpdate.py 15 ./results
+
+%contains: results/test1.csv
+,simtime,"[0.0, 27.0]","[3.0, 27.0]","[27.0, 0.0]"
+0,2.5,1.0,1.0,3.0
+1,3.0,1.0,1.0,3.0
+2,3.5,1.0,1.0,3.0
+3,4.0,1.0,1.0,3.0
+4,4.5,1.0,1.0,3.0
+5,5.0,1.0,1.0,3.0
+6,5.5,1.0,1.0,3.0
+7,6.0,1.0,1.0,3.0
+8,6.5,1.0,1.0,3.0
+9,7.0,1.0,1.0,3.0
+10,7.5,1.0,1.0,3.0
+11,8.0,0.0,0.0,0.0
+12,8.5,0.0,1.0,3.0
+13,9.0,1.0,1.0,3.0
+14,9.5,1.0,1.0,3.0
+15,10.0,1.0,1.0,3.0
+
+
+%contains: stdout
+<!> Simulation time limit reached -- at t=10s
+

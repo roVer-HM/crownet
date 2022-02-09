@@ -27,16 +27,17 @@ class VruEtsiSimple : public BaseApp {
   VruEtsiSimple();
   virtual ~VruEtsiSimple();
 
+  //CrownetPacketSourceBase
+  virtual Packet *createPacket() override;
+
  protected:
   IPositionHistoryProvider* mobilityModule = nullptr;
 
  protected:
   virtual void initialize(int stage) override;
-  virtual FsmState fsmAppMain(cMessage* msg) override;
   virtual Coord getCurrentLocation();
 
   virtual FsmState handleDataArrived(Packet *packet) override;
 
-  // VAM
 };
 }  // namespace crownet

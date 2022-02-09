@@ -22,12 +22,13 @@ import inet.node.ethernet.Eth10G;
 import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
-import lte.world.radio.ChannelControl;
-import lte.corenetwork.binder.LteBinder;
-import lte.corenetwork.nodes.Ue;
-import lte.corenetwork.nodes.eNodeB;
-import lte.world.radio.LteChannelControl;
-import lte.epc.PgwStandardSimplified;
+import simu5g.world.radio.ChannelControl;
+import simu5g.common.binder.Binder;
+import simu5g.common.carrierAggregation.CarrierAggregation;
+import simu5g.nodes.Ue;
+import simu5g.nodes.eNodeB;
+import simu5g.world.radio.LteChannelControl;
+import simu5g.nodes.PgwStandard;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 
@@ -56,8 +57,11 @@ network LTE_d2d
             @display("p=357,164;is=s");
             config = xmldoc("ip4Config.xml");
         }
-        binder: LteBinder {
+        binder: Binder {
             @display("p=403,164;is=s");
+        }
+        carrierAggregation: CarrierAggregation {
+            @display("p=450.37125,163.66875;is=s");
         }
         server: StandardHost {
             @display("p=315,150;is=s;i=device/server");
@@ -65,8 +69,7 @@ network LTE_d2d
         router: Router {
             @display("p=315,110;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandardSimplified {
-            nodeType = "PGW";
+        pgw: PgwStandard {
             @display("p=314,43;is=l");
         }
         eNB: eNodeB {

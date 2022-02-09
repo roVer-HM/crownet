@@ -14,9 +14,12 @@
 //
 
 #include "crownet/common/result/ResultFilters.h"
+#include "inet/common/ResultFilters.h"
 
 #include "inet/common/packet/Packet.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
+#include "crownet/applications/common/AppCommon_m.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
 
 using namespace inet;
 
@@ -43,5 +46,59 @@ void LastHopAgeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     fire(this, t, delta, details);
   }
 }
+
+Register_ResultFilter("rcvdHostId", RcvdHostIdFilter);
+void RcvdHostIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+  if (auto packet = dynamic_cast<Packet *>(object)) {
+      for(auto& region : packet->peekData()->getAllTags<HostIdTag>()){
+          fire(this, t, (double)(region.getTag()->getHostId()), details);
+      }
+  }
+}
+
+Register_ResultFilter("hostId", HostIdFilter);
+void HostIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+  if (auto notifier = dynamic_cast<cPostModuleBuildNotification*>(object)){
+      if(notifier->module->getProperties()->getAsBool("networkNode")){
+          fire(this, t, (double)notifier->module->getId(), details);
+      }
+  }
+}
+
+Register_ResultFilter("rcvdSequenceId", RcvdSequenceIdFilter);
+void RcvdSequenceIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+  if (auto packet = dynamic_cast<Packet *>(object)) {
+      for(auto& region : packet->peekData()->getAllTags<SequenceIdTag>()){
+          fire(this, t, (double)(region.getTag()->getSequenceNumber()), details);
+      }
+  }
+}
+
+Register_ResultFilter("simBound", SimBoundFilter);
+void SimBoundFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details){
+    OsgCoordConverterLocal *module = dynamic_cast<OsgCoordConverterLocal *>(object);
+     if (module) {
+         Coord coord = module->getConverter()->getBoundary();
+         inet::utils::filters::VoidPtrWrapper wrapper(&coord);
+         fire(this, t, &wrapper, details);
+     }
+}
+
+
+Register_ResultFilter("simOffset", SimOffsetFilter);
+void SimOffsetFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details){
+    OsgCoordConverterLocal *module = dynamic_cast<OsgCoordConverterLocal *>(object);
+     if (module) {
+         Coord coord = module->getConverter()->getOffset();
+         inet::utils::filters::VoidPtrWrapper wrapper(&coord);
+         fire(this, t, &wrapper, details);
+     }
+}
+
 
 }  // namespace crownet

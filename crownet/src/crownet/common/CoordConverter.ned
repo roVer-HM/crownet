@@ -16,38 +16,48 @@
 package crownet.common;
 
 
-moduleinterface ICoordConverter {
+moduleinterface ICoordConverter {}
 
-
+simple CoordConverterBase like ICoordConverter {
+    parameters:
+        @signal[simBoundSig](type=crownet::OsgCoordConverterLocal?);
+		@signal[simOffsetSig];	
+        @statistic[simBoundX](source="xCoord(simBound(simBoundSig))"; record=last);
+        @statistic[simBoundY](source="yCoord(simBound(simBoundSig))"; record=last);
+        @statistic[simOffsetX](source="xCoord(simOffset(simOffsetSig))"; record=last);
+        @statistic[simOffsetY](source="yCoord(simOffset(simOffsetSig))"; record=last);
 }
 
 // locally defined converter. Use configuration of parameters
-simple OsgCoordConverterLocal like ICoordConverter {
+simple OsgCoordConverterLocal extends CoordConverterBase {
     parameters:
-        @class(crownet::OsgCoordConverterLocal);
+        @class(::crownet::OsgCoordConverterLocal);
         string srs_code = default("EPSG:32632");
-        double offset_x = default(0.0);
-        double offset_y = default(0.0);
-        double xBound;
-        double yBound;
+        double offset_x @unit(m) = default(0.0m);
+        double offset_y   @unit(m) = default(0.0m);
+        double xBound @unit(m);
+        double yBound @unit(m);
 }
 
 
-simple OsgCoordConverterVadere like ICoordConverter {
+simple OsgCoordConverterVadere extends CoordConverterBase {
     parameters:
         @class(crownet::OsgCoordConverterVadere);
         string coreModule = default("traci.core");
+        string vadereScenarioPath;
 }
 
 // provide network xml to parse needed location information from the location element.
-simple OsgCoordConverterSumo like ICoordConverter {
+simple OsgCoordConverterSumo extends CoordConverterBase {
     parameters:
         @class(crownet::OsgCoordConverterSumo);
         xml netFile;        
+    
+        
 }
 
 // Manually provide lcation inforation present in sumo net file.
-simple OsgCoordConverterSumoLocal like ICoordConverter {
+simple OsgCoordConverterSumoLocal extends CoordConverterBase {
     parameters:
         @class(crownet::OsgCoordConverterSumo);
         string netOffset =  default("-686820.86,-5334157.15");

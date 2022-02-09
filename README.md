@@ -18,7 +18,7 @@ The CrowNet project provides easy to install docker containers for these three. 
 ## CrowNet Communication and Information Dissemination Simulation
 The OMNeT++ simulation of communication and networking for disseminating mobility information is based on four open source simulation projects:
 * [INET](https://inet.omnetpp.org/) - The INET Framework is a widely-used open-source model suite for wireless and wired networks. It includes models for all major Internet protocols.
-* [SimuLTE](http://simulte.com/) - SimuLTE provides a LTE/LTE-A user plane simulation model for INET and OMNeT++.
+* [Simu5G](http://simu5g.org/) - Sim5G provides a 5G and LTE/LTE-A user plane simulation model for INET and OMNeT++.
 * [Artery](http://artery.v2x-research.eu/) - Artery V2X Simulation Framework
 * [VEINS](https://veins.car2x.org/) - Vehicles in Network Simulation (VEINS) is an open-source vehicular network simulation framework.
 
@@ -102,7 +102,7 @@ omnetpp-ide
 Choose File>Import>General>Existing projects> and import following folders:
 * inet4
 * crownet
-* simulte
+* simu5g
 * artery
 
 When importing the folder veins only import the modules 1 (veins) and 3 (inet).
@@ -201,9 +201,9 @@ Instead of using the top-level Makefile, the models can also be built individual
 first switch to the model subdirectory and than execute make locally.
 
 
-*Example: Building the INET and SimuLTE Frameworks*
+*Example: Building the INET and Simu5G Frameworks*
 
-Assuming that you have added the "omnetpp" script to your search path for executables and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and SimuLTE models by the following commands:
+Assuming that you have added the "omnetpp" script to your search path for executables and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and Simu5G models by the following commands:
 ```
 cd inet
 omnetpp exec make makefiles
@@ -211,7 +211,7 @@ omnetpp exec make -j4 MODE=release
 omnetpp exec make -j4 MODE=debug
 cd ..
 
-cd simulte
+cd simu5g
 omnetpp exec make makefiles
 omnetpp exec make -j4
 
@@ -271,6 +271,17 @@ with id_rsa as your private key.
 
 To ensure a standardized code style, we use the Google C++ Style Guide.
 CppStyle is our recommended Eclipse Plugin. It uses the Formatter [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint).
+
+## Setup pre-commit
+
+See documentation of [pre-commit](https://pre-commit.com/) first for reference.
+Install pre-commit if missing locally
+
+```
+pip3 install pre-commit
+```
+
+Configure pre-commit to activate all git-hooks defined in `pre-commit-config.yaml`. From now on all commit will be checked before the commit takes place.
 
 ## C++
 

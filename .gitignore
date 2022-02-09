@@ -6,6 +6,9 @@ VadereTestingSuite.preferences.xml
 **/vadere-server-output
 **/.directory
 **/*.legacy
+**/analysis.d/**/*.html
+**/simulations/*/suqc
+.vscode
 tags
 tags*
 compile_commands.json
@@ -14,6 +17,8 @@ compile_commands.json
 **/*.csv.FAILED
 **/*.csv.UPDATED
 **/results
+docker/**/ide/*.tar.gz
+docker/**/ide/*.tgz
 
 # ignore gitlab-runner local test directory
 /builds
@@ -25,6 +30,7 @@ simulation-campaigns/*results*
 
 .idea
 .venv
+.DS_Store
 
 # python analysis
 

@@ -17,12 +17,15 @@
 #include "crownet/artery/traci/VadereSubscriptionManager.h"
 #include "crownet/artery/traci/VariableCache.h"
 #include "crownet/artery/traci/VaderePersonSink.h"
+#include "crownet/artery/traci/TraCiNodeVisitorAcceptor.h"
+
 
 namespace crownet {
 
 class VadereNodeManager : public traci::NodeManager,
                           public traci::Listener,
-                          public omnetpp::cSimpleModule {
+                          public omnetpp::cSimpleModule,
+                          public ITraCiNodeVisitorAcceptor {
  public:
   static const omnetpp::simsignal_t addNodeSignal;
   static const omnetpp::simsignal_t updateNodeSignal;
@@ -41,6 +44,8 @@ class VadereNodeManager : public traci::NodeManager,
 
  public:
   virtual ~VadereNodeManager() = default;
+
+  virtual void acceptTraciVisitor(traci::ITraciNodeVisitor* v) override { visit(v); }
 
  protected:
   using NodeInitializer = std::function<void(omnetpp::cModule*)>;
@@ -61,6 +66,8 @@ class VadereNodeManager : public traci::NodeManager,
   virtual omnetpp::cModule* getNodeModule(const std::string&);
   virtual VaderePersonSink* getObjectSink(omnetpp::cModule*);
   virtual VaderePersonSink* getObjectSink(const std::string&);
+
+  virtual void visit(ITraciNodeVisitor *visitor) const override;
 
  private:
   void traciInit() override;

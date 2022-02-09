@@ -3,14 +3,15 @@ import os
 import matplotlib
 from matplotlib.lines import Line2D
 
+from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdHdfBuilder
 from roveranalyzer.simulators.crownet.dcd.interactive import InteractiveAreaPlot, InteractiveValueOverDistance
 from roveranalyzer.utils.path import get_or_create
 
 matplotlib.use('TkAgg')
 
 
-from roveranalyzer.simulators.opp.scave import ScaveTool
-from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
+from roveranalyzer.simulators.opp.scave import ScaveTool, OppSql, SqlOp
+# from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
 from roveranalyzer.utils import PathHelper, from_pickle
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2DMulti
 from itertools import product
@@ -73,7 +74,7 @@ def analyse_interactive(dcd, what):
 
         time = 2
         id = 0
-        fig, ax = dcd.area_plot(time_step=time, node_id=id,
+        fig, ax = dcd.plot_area(time_step=time, node_id=id,
                                 pcolormesh_dic=dict(vmin=0, vmax=4))
         i = InteractiveAreaPlot(dcd, ax)
     else:
@@ -89,7 +90,7 @@ def make_density_plot(path, dcd):
     time = [140]
     ids = [0]
     for time, id in list(product(time, ids)):
-        f, ax = dcd.area_plot(time_step=time, node_id=id, make_interactive=False,
+        f, ax = dcd.plot_area(time_step=time, node_id=id, make_interactive=False,
                               pcolormesh_dic=dict(vmin=0, vmax=4))
         print(f"create out/density_map_{id}_t{time}.png")
         ax.set_title("")
@@ -117,9 +118,9 @@ def make_delay_plot(dcd, para, delay, save_path):
     ax.set_title("")
     ax.set_ylabel("Pedestrian count", **font_dict["ylabel"])
 
-    df_all = delay.opp.filter().vector().normalize_vectors(axis=0)
+    # df_all = delay.opp.filter().vector().normalize_vectors(axis=0)
 
-    plots = [["packet delay", df_all]]
+    plots = [["packet delay", delay]]
     time_per_bin = 1.0  # seconds
     for n, df in plots:
         bins = int(np.floor(df["time"].max() / time_per_bin))
@@ -172,7 +173,7 @@ def make_sample_map():
     run = runs[3]
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.area_plot(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
+    fig, ax = dcd.plot_area(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
                             pcolormesh_dic=dict(vmin=0, vmax=4))
     fig.savefig(f"{ROOT}/{run['run_name']}_sample_map.pdf")
 
@@ -182,7 +183,7 @@ def make_grid_map():
     time = 96
     p, ext_root = get_env(run)
     dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.area_plot(time_step=time, node_id=0, title="Decentralized Crowed Density Map",
+    fig, ax = dcd.plot_area(time_step=time, node_id=0, title="Decentralized Crowed Density Map",
                             pcolormesh_dic=dict(vmin=0, vmax=4, edgecolors="black"))
     ax.set_title("")
     fig.delaxes(fig.axes[1])
@@ -245,4 +246,37 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+
+    sim_path = os.path.abspath("results/vadere_120_20210825-08:40:00")
+    hdf_builder = DcdHdfBuilder.get("dcd_map.h5", sim_path)
+    hdf_builder.single_df_filters.append(DcdHdfBuilder.F_selected_only)
+    # get dcd object (all data)
+    dcd = hdf_builder.build(
+        # x_slice=slice(1702., 3008.),
+        # y_slice=slice(1027., 2588.)
+    )
+    opp_vec = OppSql(vec_path=os.path.join(sim_path, "vars_rep_0.vec"))
+    delay = opp_vec.vec_data(
+        moduleName=SqlOp.OR(["World.pNode[%].densityMap.app", "World.pNode[%].beacon.app"]),
+        vectorName="rcvdPkLifetime:vector"
+    )
+    print(delay.describe())
+    print(delay.head())
+
+    # delay = read_app_data(sim_path)
+
+    make_delay_plot(dcd, None, delay, os.path.abspath("./delay_plot3.pdf"))
+
+    # f, a = plt.subplots(1, 3)
+    # a[0].scatter("time", "value", data=df, marker='.')
+    # a[1].hist(df["value"], density=False, bins=25)
+    # a[2].plot("time", "value", data=df, color='r', label="Packet delays")
+    #
+    # ff, aa = plt.subplots(1,3)
+    # aa[0].scatter("time", "value", data=delay, marker='.')
+    # aa[1].hist(delay["value"], density=False, bins=25)
+    # aa[2].plot("time", "value", data=delay, color='r', label="Packet delays")
+
+    # plt.show()
+

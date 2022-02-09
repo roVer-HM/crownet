@@ -7,23 +7,23 @@
 # make               builds all models  (optionally specify MODE=debug or MODE=release)
 # make clean         cleans all models  (optionally specify MODE=debug or MODE=release)
 
-mod_crownet    := crownet
-mod_inet       := inet4
-mod_simulte    := simulte
-mod_veins      := veins
-mod_veins_inet := veins/subprojects/veins_inet
-mod_artery     := artery
-mod_roveranalyzer   := analysis/roveranalyzer
-mod_flowcontrol		:= flowcontrol
-mod_suqc		:= analysis/suq-controller
+mod_crownet       := crownet
+mod_inet          := inet4
+mod_simu5g        := simu5g
+mod_veins         := veins
+mod_veins_inet    := veins/subprojects/veins_inet
+mod_artery        := artery
+mod_roveranalyzer := analysis/roveranalyzer
+mod_flowcontrol   := flowcontrol
+mod_suqc          := analysis/suq-controller
 
 # In order to simplify handling the dependencies between the models,
 # the models are ordered in three different levels:
 # Level 1: These models do only depend on the OMNeT++ core libraries.
 # Level 2: These models depend on Level 1 models, e.g. inet.
-# Level 3: These models depend on Level 2 models, e.g. simuLTE.
+# Level 3: These models depend on Level 2 models, e.g. Simu5G.
 models_l1 := $(mod_inet) $(mod_veins)
-models_l2 := $(mod_simulte) $(mod_veins_inet)
+models_l2 := $(mod_simu5g) $(mod_veins_inet)
 models_l3 := $(mod_crownet)
 models := $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
 
@@ -72,7 +72,7 @@ makefiles: makefiles_std configure_veins configure_veins_inet
 
 makefiles_std: oppfeatures
 	$(MAKE) --directory=$(mod_inet) makefiles
-	$(MAKE) --directory=$(mod_simulte) makefiles
+	$(MAKE) --directory=$(mod_simu5g) makefiles
 	$(MAKE) --directory=$(mod_crownet) makefiles
 
 configure_veins:
@@ -95,6 +95,8 @@ analysis-build: $(python_dists)
 
 analysis-clean:
 	rm -f $(python_dists)
+	rm -rf out/$(venv_user)
+	rm -rf out/$(venv_dev)
 
 venv-build: $(python_venvs)
 

@@ -18,8 +18,8 @@
 using namespace crownet;
 
 namespace {
-RegularDcdMapFactory dcdFactory{std::make_pair(1.0, 1.0),
-                                std::make_pair(10, 10)};
+RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
+RegularDcdMapFactory dcdFactory{grid};
 }
 
 class RegularDcDMapTest : public BaseOppTest {
@@ -31,11 +31,13 @@ class RegularDcDMapTest : public BaseOppTest {
         mapFull(dcdFactory.create(3)) {}
 
   void incr(RegularDcdMap& map, double x, double y, int i, double t) {
-    map.incrementLocal(traci::TraCIPosition(x, y), IntIdentifer(i), t);
+    // local entry!
+    map.getEntry<>(traci::TraCIPosition(x, y))->incrementCount(t);
+    map.addToNeighborhood(IntIdentifer(i), traci::TraCIPosition(x, y));
   }
   void update(RegularDcdMap& map, int x, int y, int id, int count, double t) {
     auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
-    map.update(GridCellID(x, y), std::move(e));
+    map.setEntry(GridCellID(x, y), std::move(e));
   }
 
   void SetUp() override {
@@ -143,9 +145,9 @@ TEST_F(RegularDcDMapTest, hasDataFrom_SuccessMultiple) {
 }
 
 TEST_F(RegularDcDMapTest, str) {
-  EXPECT_STREQ("{map_owner: 1 cell_count: 0}", mapEmpty.str().c_str());
-  EXPECT_STREQ("{map_owner: 2 cell_count: 3}", mapLocal.str().c_str());
-  EXPECT_STREQ("{map_owner: 3 cell_count: 4}", mapFull.str().c_str());
+  EXPECT_STREQ("{map_owner: 1 cell_count: 0 local_cell_count: 0}", mapEmpty.str().c_str());
+  EXPECT_STREQ("{map_owner: 2 cell_count: 3 local_cell_count: 3}", mapLocal.str().c_str());
+  EXPECT_STREQ("{map_owner: 3 cell_count: 4 local_cell_count: 3}", mapFull.str().c_str());
 }
 
 TEST_F(RegularDcDMapTest, getMissingCell) {
@@ -181,35 +183,30 @@ TEST_F(RegularDcDMapTest, setOwnerId) {
   EXPECT_EQ(IntIdentifer(11), mapEmpty.getOwnerId());
 }
 
-// update / incrementLocal  correct in Setup compare string
+// update / incremen  correct in Setup compare string
 TEST_F(RegularDcDMapTest, strFull) {
-  std::string s1 = "{map_owner: 1 cell_count: 0}\n";
+  std::string s1 = "{map_owner: 1 cell_count: 0 local_cell_count: 0}\n";
   EXPECT_STREQ(s1.c_str(), mapEmpty.strFull().c_str());
 
   std::string s2 =
-      "{map_owner: 2 cell_count: 3}\n"
+      "{map_owner: 2 cell_count: 3 local_cell_count: 3}\n"
       "  {cell_id: [1,1] owner_id: 2}\n"
-      "    2 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1| node_ids: {100, "
-      "101}\n"
+      "    2 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1\n"
       "  {cell_id: [3,3] owner_id: 2}\n"
-      "    2 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1| node_ids: {200, "
-      "201, 202}\n"
+      "    2 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1\n"
       "  {cell_id: [4,4] owner_id: 2}\n"
-      "    2 --> Count: 1| meas_t: 34| recv_t: 34| valid: 1| node_ids: {300}\n";
+      "    2 --> Count: 1| meas_t: 34| recv_t: 34| valid: 1\n";
   EXPECT_STREQ(s2.c_str(), mapLocal.strFull().c_str());
 
   std::string s3 =
-      "{map_owner: 3 cell_count: 4}\n"
+      "{map_owner: 3 cell_count: 4 local_cell_count: 3}\n"
       "  {cell_id: [1,1] owner_id: 3}\n"
-      "    3 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1| node_ids: "
-      "{100, 101}\n"
+      "    3 --> Count: 2| meas_t: 30| recv_t: 30| valid: 1\n"
       "    800 --> Count: 4| meas_t: 31| recv_t: 31| valid: 1\n"
       "  {cell_id: [3,3] owner_id: 3}\n"
-      "    3 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1| node_ids: "
-      "{200, 201, 202}\n"
+      "    3 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1\n"
       "  {cell_id: [4,4] owner_id: 3}\n"
-      "    3 --> Count: 2| meas_t: 34| recv_t: 34| valid: 1| node_ids: "
-      "{300, 301}\n"
+      "    3 --> Count: 2| meas_t: 34| recv_t: 34| valid: 1\n"
       "    801 --> Count: 3| meas_t: 32| recv_t: 32| valid: 1\n"
       "  {cell_id: [6,3] owner_id: 3}\n"
       "    803 --> Count: 5| meas_t: 33| recv_t: 33| valid: 1\n"
@@ -296,13 +293,8 @@ TEST_F(RegularDcDMapTest, moveNeigborTo_existing) {
 }
 
 TEST_F(RegularDcDMapTest, moveNeigborTo_notExisting) {
-  try {
     mapLocal.moveNeighborTo(999, GridCellID(4, 9));
-    FAIL() << "omnetpp::cRuntimeError expected" << std::endl;
-  } catch (omnetpp::cRuntimeError e) {
-  } catch (...) {
-    FAIL() << "unexpected throw" << std::endl;
-  }
+    EXPECT_EQ(GridCellID(4, 9), mapLocal.getNeighborCell(999));
 }
 
 TEST_F(RegularDcDMapTest, addToNeighborhood_existing) {
@@ -332,9 +324,9 @@ TEST(RegularMap, update_move) {
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
-  map.update(cellId1, std::move(m1));
-  map.update(cellId1, std::move(m2));
-  map.update(cellId1, m3);
+  map.setEntry(cellId1, std::move(m1));
+  map.setEntry(cellId1, std::move(m2));
+  map.setEntry(cellId1, m3);
   EXPECT_TRUE(map.hasCell(cellId1));
 
   auto mCount = map.getCell(cellId1).getData().size();
@@ -356,13 +348,13 @@ TEST(RegularMap, update1) {
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
-  map.update(cellId1, m1);
+  map.setEntry(cellId1, m1);
   EXPECT_TRUE(map.hasCell(cellId1));
   auto m_ = map.getCell(cellId1).get(IntIdentifer(40));
   EXPECT_EQ(*m_, *m1);
 
   // update same cell with new value.
-  map.update(cellId1, m2);
+  map.setEntry(cellId1, m2);
   m_ = map.getCell(cellId1).get(IntIdentifer(40));
   EXPECT_EQ(*m_, *m2);
 
@@ -387,11 +379,11 @@ TEST(RegularMap, update2) {
   EXPECT_FALSE(map.hasCell(cellId1));
   EXPECT_FALSE(map.hasCell(cellId2));
 
-  map.update(cellId1, m1);
-  map.update(cellId1, m2);
-  map.update(cellId2, m3);
-  map.update(cellId2, m4);
-  map.update(cellId2, m5);
+  map.setEntry(cellId1, m1);
+  map.setEntry(cellId1, m2);
+  map.setEntry(cellId2, m3);
+  map.setEntry(cellId2, m4);
+  map.setEntry(cellId2, m5);
 
   // only one measurement (same node_id/cell_id)
   auto mCount1 = map.getCell(cellId1).getData().size();

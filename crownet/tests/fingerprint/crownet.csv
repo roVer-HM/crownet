@@ -2,9 +2,9 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              a915-ea1b/tplx, PASS, vadere:latest;omnetpp:latest
-/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              2357-528f/tplx, PASS, vadere:latest;omnetpp:latest
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              960f-634c/tplx, PASS, sumo:latest;omnetpp:latest
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              f885-bf1a/tplx, PASS, sumo:latest;omnetpp:latest
-/simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              ae45-0f16/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              0155-3829/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              4f6a-24d0/tplx, PASS, vadere:latest;omnetpp:latest
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              d2bf-04db/tplx, PASS, sumo:latest;omnetpp:latest
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              490a-6873/tplx, PASS, sumo:latest;omnetpp:latest
+/simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              9523-1dce/tplx, PASS, vadere:latest;omnetpp:latest
 

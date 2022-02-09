@@ -7,6 +7,7 @@ variables:
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
+ DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
 
 
 stages:
@@ -31,7 +32,7 @@ build-for-sim:
   variables:
     ARTERY_M: '${CI_PROJECT_DIR}/artery'
     INET_M: '${CI_PROJECT_DIR}/inet4'
-    LTE_M: '${CI_PROJECT_DIR}/simulte'
+    MOBILENETWORK_M: '${CI_PROJECT_DIR}/simu5g'
     CROWNET_M: '${CI_PROJECT_DIR}/crownet'
     VEINS_M: '${CI_PROJECT_DIR}/veins'
     VEINS_INET_M: '${CI_PROJECT_DIR}/veins/subprojects/veins_inet'
@@ -70,7 +71,7 @@ build-for-sim:
   artifacts:
     paths:
     - ${CROWNET_HOME}/scripts
-    - ${CROWNET_HOME}/simulte
+    - ${CROWNET_HOME}/simu5g
     - ${CROWNET_HOME}/inet4
     - ${CROWNET_HOME}/crownet
     - ${CROWNET_HOME}/veins
@@ -113,6 +114,8 @@ fingerprints:
   script:
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
+    - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
+    - "export COMPOSE_HTTP_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
     - "./fingerprints"
   artifacts:
     when: always
@@ -133,6 +136,8 @@ fingerprints_crownet:
   script:
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
+    - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
+    - "export COMPOSE_HTTP_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
     - "./fingerprints_crownet"
   artifacts:
     when: always
@@ -149,13 +154,11 @@ opp-tests:
     - crownet-sim
   script:
     - "cd ${CROWNET_HOME}/crownet"
-    - "${OPP} make build-lib"
-    - "cd ${CROWNET_HOME}/crownet/tests/omnetpp"
-    - "${OPP} ./runtest"
+    - "${OPP} make opp-test"
   artifacts:
     when: always
     paths:
-    - ${CROWNET_HOME}/crownet/tests/omnetpp
+    - ${CROWNET_HOME}/crownet/tests/omnetpp/work
     expire_in: 8 weeks
 
 # run uq simulation studies
@@ -164,9 +167,11 @@ uq-test:
   tags:
     - crownet-sim
   variables:
-    ANALYSIS_UQ_M: '${CI_PROJECT_DIR}/analysis/uq'
+    ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
     - "source ./out/crownet_user/bin/activate"
+    - "cd ${CROWNET_HOME}/analysis/uq"
+    - "pip install -r requirements.txt"
     - "python3 -m unittest discover -v"
 
 # run given simulation-campaign
@@ -186,7 +191,7 @@ simulation-campaign:
       - ${CROWNET_HOME}/$SIM_SCRIPT
       - ${CROWNET_HOME}/$SIM_SCRIPT-results
       - ${CROWNET_HOME}/scripts
-      - ${CROWNET_HOME}/simulte/src
+      - ${CROWNET_HOME}/simu5g/src
       - ${CROWNET_HOME}/inet4/src
       - ${CROWNET_HOME}/crownet
       - ${CROWNET_HOME}/veins/src

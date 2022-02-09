@@ -16,64 +16,80 @@
 package crownet.applications.common;
 
 import inet.applications.contract.IApp;
+import crownet.queueing.CrownetActivePacketSourceBase;
 
-moduleinterface IBaseApp extends IApp {
+
+moduleinterface IAppConfig {
     gates:
-        input configIn;
+    	input configIn;
 }
 
-simple BaseApp like IBaseApp
+moduleinterface IBaseApp {
+    gates:
+        output out;
+        input in;
+        input scheduleIn;
+}
+
+simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
 {
   parameters:
         @class(crownet::BaseApp);
         @display("i=block/app");
+        displayStringTextFormat = default("");
         ///* socket module (should be a sibling model)
         string socketModule = default("^.socket");
+        string schedulerModule = default("^.scheduler");
+        object localInfo = default(crownet::AppInfoLocal{});
+        
+        // assume BaseApp is part of some crownet app
+        string mobilityModule = default("^.^.mobility");
         
         // Application runtime settings
         ///* Start time of application at which message will be received. 
         ///* Negative values raises cRuntimeError.
-        double startTime @unit(s) = uniform(0s,0.02s);
+        double startTime @unit(s) = default(uniform(0s,0.02s));
         ///* Time after which no packet will be send or received.
         ///* stopTime = 0.0s means app will run forever
         double stopTime @unit(s) = default(0.0s); 
+        // Max size of application packet containing application headers
+        int maxPduLength @unit(b) = default(1400B);
+        // Minimum size of application packet. 
+        // If -1B application must provide a minmum value programmatically, otherwise an error is thrown
+        int minPduLength @unit(b) = default(-1B);  
         
-        // Application send frequency (+ jitter)
-        ///* Additional offset from startTime before app will start sending data.
-        ///* The app will receive message form startTime. Negative values raises cRuntimeError.
-        double mainIntervalOffset @unit(s) = default(0s); 
-        ///* Intervall to enter fsmAppMain to process app logic (sending data). If 
-        ///* set to -1 fsmAppMain() will not be used and user must provide own 
-        ///* handling. fsmAppMain() does nothing on default.
-        volatile double mainInterval @unit(s) = default(-1s); 
-        ///* Additional jitter added to appMainInterval on each scheduling 
-        volatile double mainIntervalJitter @unit(s) = default(0s); 
-        ///* Number of messages to send with this app. If -1 : not limit.
-        int mainMsgLimit = default(-1);
-        ///* Application messageLength. If set to 0 app implementation must the 
-        ///* message length programmatically        
-        volatile int messageLength @unit(B);
-        string packetName = default("BasicAppData");
-        ///* If true app will not throw an error if destiantion address is empty.
+
+        ///* Socket: If true app will not throw an error if destiantion address is empty.
         ///* Set to true if app only passivly receives messages or has other means 
         ///* to find a valid destination address.
         bool allEmptyDestAddress = default(true);
+        
+        
 
        
         @lifecycleSupport;
         double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
 
+		// send stats
         @signal[packetSent](type=inet::Packet);
-        @signal[packetReceived](type=inet::Packet);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        // received stats
+        @signal[packetReceived](type=inet::Packet);
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
         @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
-        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="appPkSeqNo(packetReceived)"; record=vector; interpolationmode=none);
-
+        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPkHostId](title="received host id"; source="rcvdHostId(packetReceived)"; record=vector; interpolationmode=none);
+        
+        
+        // queueing statitics
+        @signal[packetPulled](type=inet::Packet);
+        @signal[packetCreated](type=inet::Packet);
+        @statistic[packetPulled](title="packets pulled"; record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
+        @statistic[packetCreated](title="packets created"; record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
 	 gates:
-   		input socketIn;
-        output socketOut;
-        input configIn;
+   		input in;
+        input scheduleIn;
+
 }

@@ -30,6 +30,7 @@ constexpr int CMD_FILE_SEND = 0x75;
 constexpr int VAR_ARRIVED_PEDESTRIANS_IDS = 0x7a;
 constexpr int VAR_DEPARTED_PEDESTRIANS_IDS = 0x74;
 constexpr int VAR_COORD_REF = 0x90;
+//todo: (CM) add constexpr for sensor  VAR_ID
 
 }  // namespace constants
 }  // namespace crownet
@@ -144,6 +145,7 @@ class VadereApi : public API, public TraCiForwarder {
     CoordRef getCoordRef() const;
     void sendSimulationConfig(const vadere::SimCfg& cfg) const;
     void send_control(const std::string& personID, std::string model, std::string metadata) const;
+    //todo: (CM) add method to translate a DCD map into a traci packet.
 
 
 //   private:

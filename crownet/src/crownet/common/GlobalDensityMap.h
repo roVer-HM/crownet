@@ -26,6 +26,10 @@
 #include "crownet/common/util/FileWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "traci/NodeManager.h"
+#include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/applications/dmap/dmap_m.h"
+#include "crownet/common/RegularGridInfo.h"
+#include "crownet/artery/traci/TraCiNodeVisitorAcceptor.h"
 
 using namespace omnetpp;
 using namespace inet;
@@ -34,12 +38,14 @@ namespace crownet {
 
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
-                         public traci::ITraciNodeVisitor {
+                         public traci::ITraciNodeVisitor,
+                         public IGlobalDensityMapHandler<RegularDcdMap>{
  public:
   //  using Grid = RegularGridMap<std::string>;
   using GridHandler = IDensityMapHandler<RegularDcdMap>;
   using gridMap_t = std::map<RegularDcdMap::node_key_t, GridHandler *>;
 
+  static const omnetpp::simsignal_t initMap;
   static const omnetpp::simsignal_t registerMap;
   static const omnetpp::simsignal_t removeMap;
 
@@ -58,28 +64,46 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual void receiveSignal(cComponent *source, simsignal_t signalID,
                              const SimTime &t, cObject *details) override;
 
+  virtual void initializeMap();
+
   // ITraciNodeVisitor
-  virtual void visitNode(const std::string &traciNodeId,
-                         omnetpp::cModule *mod) override;
+  virtual void visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) override;
+
+  virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal(){
+      return dcdMapGlobal;
+  }
+
+  virtual std::shared_ptr<RegularDcdMap> getMap() override {
+      return getDcdMapGlobal();
+  }
+
+  virtual void acceptNodeVisitor(traci::ITraciNodeVisitor* visitor);
+
 
  protected:
   virtual void handleMessage(cMessage *msg) override;
 
-  void updateMaps();
+  virtual void updateMaps();
   void writeMaps();
 
  protected:
-  cMessage *updateTimer = nullptr;
-  simtime_t updateInterval;
+  cMessage *writeMapTimer = nullptr;
+  simtime_t writeMapInterval;
   simtime_t lastUpdate;
+  std::vector<std::string> vectorNodeModules;
+  std::vector<std::string> singleNodeModules;
+  ITraCiNodeVisitorAcceptor* traciModuleListener = nullptr;
 
-  traci::NodeManager *nodeManager = nullptr;
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
-  std::shared_ptr<GridCellDistance> distProvider;
+  std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
+  std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
+  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
   std::string m_mobilityModule;
-  std::unique_ptr<FileWriter> fileWriter;
+  std::unique_ptr<ActiveFileWriter> fileWriter;
+  RegularGridInfo grid;
+
 };
 
 }  // namespace crownet

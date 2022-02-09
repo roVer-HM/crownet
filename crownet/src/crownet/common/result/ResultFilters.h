@@ -32,4 +32,36 @@ class LastHopAgeFilter : public cObjectResultFilter {
                              cObject *object, cObject *details) override;
 };
 
+
+class RcvdHostIdFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
+
+class HostIdFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
+class RcvdSequenceIdFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
+class SimBoundFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
+class SimOffsetFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+};
+
 }  // namespace crownet

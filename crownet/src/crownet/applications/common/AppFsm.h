@@ -32,6 +32,28 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) = 0;
 };
 
+class AppStatusInfo {
+public:
+    virtual ~AppStatusInfo() = default;
+    virtual const bool isRunning() = 0;
+    virtual const bool isStopped() = 0;
+    virtual const FsmState getState() = 0;
+    // ensure packet can be created due to enough scheduled data or enough
+    // 'new' data ready for transition
+    virtual const bool canProducePacket() = 0;
+    // set budget the application can use. -1b default to all available data.
+    virtual void setScheduleData(inet::b) = 0;
+    // get available data the application can use to create packets.
+    virtual const inet::b getScheduleData() = 0;
+    // return available length for the next packet taking into account max MTU and
+    // provided data budget.
+    virtual const inet::b getAvailablePduLenght() = 0;
+    virtual const inet::b getMinPdu() = 0;
+    virtual const inet::b getMaxPdu() = 0;
+    virtual const simtime_t getStartTime() = 0;
+    virtual const simtime_t getStopTime() = 0;
+};
+
 class SocketProvider{
 public:
     virtual ~SocketProvider() = default;

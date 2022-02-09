@@ -28,20 +28,20 @@ VruSimple::~VruSimple() {}
 void VruSimple::initialize(int stage) {
   BaseApp::initialize(stage);
   if (stage == INITSTAGE_APPLICATION_LAYER) {
-    mobilityModule = check_and_cast<MobilityBase*>(
-        getParentModule()->getSubmodule("mobility"));
+    mobilityModule = castMobility<MobilityBase>();
   }
 }
 
-FsmState VruSimple::fsmAppMain(cMessage* msg) {
-  const auto& payload = makeShared<ApplicationPacket>();
-  payload->setSequenceNumber(numSent);
-  payload->setChunkLength(B(par("messageLength")));
-  payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
-  payload->addTag<CurrentLocationTag>()->setLocation(getCurrentLocation());
-  sendPayload(payload);
-  scheduleNextAppMainEvent();
-  return FsmRootStates::WAIT_ACTIVE;
+//CrownetPacketSourceBase
+Packet *VruSimple::createPacket(){
+    const auto& payload = makeShared<ApplicationPacket>();
+    payload->setSequenceNumber(localInfo->nextSequenceNumber());
+    payload->setChunkLength(b(par("packetLength").intValue()));
+    payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
+    payload->addTag<CurrentLocationTag>()->setLocation(getCurrentLocation());
+
+
+    return buildPacket(payload);
 }
 
 FsmState VruSimple::handleDataArrived(Packet *packet){

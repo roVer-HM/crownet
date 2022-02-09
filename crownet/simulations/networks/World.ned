@@ -29,22 +29,24 @@ import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
 import inet.node.inet.INetworkNode;
 import inet.common.geometry.common.IGeographicCoordinateSystem;
-import lte.world.radio.ChannelControl;
-import lte.corenetwork.binder.LteBinder;
-import lte.corenetwork.nodes.Ue;
-import lte.corenetwork.nodes.eNodeB;
-import lte.world.radio.LteChannelControl;
-import lte.epc.PgwStandardSimplified;
-import lte.common.LteNetworkConfigurator;
+import simu5g.world.radio.ChannelControl;
+import simu5g.common.binder.Binder;
+import simu5g.common.carrierAggregation.CarrierAggregation;
+import simu5g.nodes.Ue;
+import simu5g.nodes.eNodeB;
+import simu5g.world.radio.LteChannelControl;
+import simu5g.nodes.PgwStandard;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
 import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
+import crownet.common.util.IFileWriterRegister;
 
 import artery.storyboard.IStoryboard;
 import artery.utility.IdentityRegistry;
 import traci.Manager;
+import traci.TraCiManager;
 
 
 network World
@@ -53,8 +55,8 @@ network World
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
         @display("bgb=899,473");
 
-        bool hasLte = default(true);
-        bool hasLteCoreNetwork = default(hasLte);
+        bool hasCellular = default(true);
+        bool hasCellularCoreNetwork = default(hasCellular);
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
         int numMisc = default(0);
@@ -63,7 +65,7 @@ network World
         traci.core.typename = default("VadereCore");
         traci.core.version = default(-1);
         traci.core.selfStopping = default(false);
-        traci.launcher.typename = default("VadereLauchner");
+        traci.launcher.typename = default("VadereLauncher");
         traci.launcher.hostname = default("vadere");
         traci.launcher.port = default(9998);
         traci.mapper.typename = default("VadereModuleMapper");
@@ -94,23 +96,25 @@ network World
             @display("p=523.74,207.69;is=s");
         }
         // LTE
-        channelControl: LteChannelControl if hasLte {
+        channelControl: LteChannelControl if hasCellular {
             @display("p=410.865,148.995;is=s");
         }
-        binder: LteBinder if hasLte {
+        binder: Binder if hasCellular {
             @display("p=411.99374,207.69;is=s");
         }
-        eNB[numEnb]: eNodeB if hasLte {
+        carrierAggregation: CarrierAggregation if hasCellular {
+            @display("p=411.99374,319.43625;is=s");
+        }
+        eNB[numEnb]: eNodeB if hasCellular {
             @display("p=39.50625,54.18");
         }
-        server: StandardHost if hasLteCoreNetwork {
+        server: StandardHost if hasCellularCoreNetwork {
             @display("p=308.14874,148.995;is=s;i=device/server");
         }
-        router: Router if hasLteCoreNetwork {
+        router: Router if hasCellularCoreNetwork {
             @display("p=308.14874,110.6175;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandardSimplified if hasLteCoreNetwork {
-            nodeType = "PGW";
+        pgw: PgwStandard if hasCellularCoreNetwork {
             @display("p=307.02,42.892498;is=l");
         }
         // WLAN
@@ -119,7 +123,7 @@ network World
                 @display("p=410.865,267.51373;is=s");
         }
         // TraCI
-        traci: Manager {
+        traci: <default("Manager")> like TraCiManager if typename != "" {
             parameters:
                 @display("p=523.74,31.605");
         }
@@ -140,20 +144,23 @@ network World
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
 
-            @display("p=308.14874,406.35;is=s");
+            @display("p=308.14874,406.35;is=vs");
+        }
+        fileWriterRegister: <default("")> like IFileWriterRegister if typename != "" {
+           @display("p=308.14874,506.35;is=vs");
         }
 
 
     connections:
-        server.pppg++ <--> Eth10G <--> router.pppg++ if hasLteCoreNetwork;
-        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasLteCoreNetwork;
+        server.pppg++ <--> Eth10G <--> router.pppg++ if hasCellularCoreNetwork;
+        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasCellularCoreNetwork;
         for i=0..numEnb-1 {
-            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasLteCoreNetwork;
+            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasCellularCoreNetwork;
         }
-        
+
 		//# X2 connections (full mesh)
         for i=0..numEnb-1, for j=0..numEnb-1 {
             eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j;
         }
-        
+
 }

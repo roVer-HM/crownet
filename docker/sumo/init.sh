@@ -5,8 +5,8 @@ echo "Welcome to the roVer sumo Docker Container."
 echo ""
 echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI'"
 echo ""
-echo "If you want to start sumo-gui manually, you can do this via docker exec:"
-echo "  docker exec sumo sumo-gui"
+echo "If you want to start sumo-gui manually, you can do this via:"
+echo "  sumo exec sumo-gui"
 
 export PATH=/opt/sumo/sumo/bin:$PATH
 

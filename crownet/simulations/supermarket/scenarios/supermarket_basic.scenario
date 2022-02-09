@@ -1,7 +1,7 @@
 {
   "name" : "supermarket_basic",
   "description" : "",
-  "release" : "1.14",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -124,10 +124,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
@@ -2288,6 +2284,8 @@
         "probabilityToChangeTarget" : [ 0.7, 0.7, 0.7, 0.3, 0.3, 0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 1.0, 1.0 ]
       } ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 76,
         "shape" : {
@@ -2297,8 +2295,10 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 16.0 ],
+        "interSpawnTimeDistribution" : "negativeExponential",
+        "distributionParameters" : {
+          "mean" : 16.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -2319,8 +2319,10 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 16.0 ],
+        "interSpawnTimeDistribution" : "negativeExponential",
+        "distributionParameters" : {
+          "mean" : 16.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -2378,6 +2380,7 @@
       },
       "stimuli" : [ {
         "type" : "WaitInArea",
+        "id" : -1,
         "area" : {
           "x" : 0.0,
           "y" : 0.0,
@@ -2386,6 +2389,10 @@
           "type" : "RECTANGLE"
         }
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

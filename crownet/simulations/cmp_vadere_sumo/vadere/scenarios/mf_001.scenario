@@ -1,7 +1,7 @@
 {
   "name" : "mf_001",
   "description" : "",
-  "release" : "1.15",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -676,6 +676,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 1004,
         "shape" : {
@@ -694,8 +696,10 @@
             "y" : 129.68858129810542
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
@@ -725,8 +729,10 @@
             "y" : 155.22958635091783
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
@@ -756,8 +762,10 @@
             "y" : 172.64723144005984
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
@@ -787,8 +795,10 @@
             "y" : 113.36938277352601
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
@@ -818,8 +828,10 @@
             "y" : 15.645580861531197
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
@@ -840,8 +852,10 @@
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : 30,
         "startTime" : 0.0,
@@ -879,8 +893,13 @@
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "Wait"
+        "type" : "Wait",
+        "id" : -1
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

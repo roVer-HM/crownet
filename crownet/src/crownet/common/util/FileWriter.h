@@ -8,41 +8,81 @@
 #pragma once
 
 #include <fstream>
+#include <sstream>
 #include <map>
 #include <memory>
 #include <vector>
+#include <omnetpp.h>
 
 #include "FilePrinter.h"
 
 namespace crownet {
 
-class FileWriter {
- public:
-  virtual ~FileWriter();
-  FileWriter(std::shared_ptr<FilePrinter> printer);
-  FileWriter(FileWriter &&other);
 
-  void initialize(std::string absPath, std::string delim = ";");
-  std::string del() const;
+class BaseFileWriter : public omnetpp::cObject {
+public:
+    static std::string getAbsOutputPath(std::string fileName);
 
-  std::ostream &write();
-  void writeHeader();
-  void writeData();
+public:
+    BaseFileWriter(std::string filePath="", std::string sep=";", long bufferSize=8192);
+    ~BaseFileWriter();
+    void flush();
+    void close();
+    void writeMetaData(std::map<std::string, std::string>& mData);
+    std::ostream &write();
 
-  template <typename T>
-  friend std::ostream &operator<<(FileWriter &output, const T &_t);
+    virtual void initialize();
 
- private:
-  std::ofstream s;
-  std::string sep;
-  std::shared_ptr<FilePrinter> printer;
+    const char * getFilePath() const { return filePath.c_str();}
+    void setFilePath(const char * path){ this->filePath = std::string(path);}
+    const char * getSep() const { return sep.c_str();}
+    void setSep(const char * sep) { this->sep = std::string(sep); }
+    long getBufferSize() const { return bufferSize; }
+    void setBufferSize(long bufferSize) { this->bufferSize = bufferSize; }
+
+
+    bool isInitialized() const {return  init;}
+    virtual void onInit() {/* do nothing */}
+
+    template <typename T>
+    friend std::ostream &operator<<(BaseFileWriter &output, const T &_t);
+private:
+    void writeBuffer();
+
+protected:
+    std::string sep;
+
+private:
+    std::string filePath;
+    std::ofstream file;
+    long bufferSize;
+    std::ostringstream buffer;
+    bool init = false;
+    bool closed = false;
 };
 
 template <typename T>
-inline std::ostream &operator<<(FileWriter &output, const T &_t) {
-  output.s << _t;
-  return output.s;
+inline std::ostream &operator<<(BaseFileWriter &output, const T &_t) {
+  output.write() << _t;
+  return output.write();
 }
+
+class ActiveFileWriter : public BaseFileWriter{
+
+ public:
+  virtual ~ActiveFileWriter()=default;
+  ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep=";", long bufferSize=8192);
+
+
+  void writeHeader();
+  void writeData();
+
+
+ private:
+  std::shared_ptr<FilePrinter> printer;
+};
+
+
 
 class FileWriterBuilder {
  public:
@@ -56,11 +96,8 @@ class FileWriterBuilder {
   }
   FileWriterBuilder &addPath(const std::string &path);
 
-  FileWriter *build(std::shared_ptr<FilePrinter> printer);
-  template <typename M>
-  FileWriter *build(M* map, const std::string &mapType);
 
- private:
+ protected:
   using metadata_t = std::map<std::string, std::string>;
   metadata_t metadata;
   std::string path;
@@ -72,5 +109,14 @@ inline FileWriterBuilder &FileWriterBuilder::addMetadata(std::string key,
   metadata[key] = value;
   return *this;
 }
+
+class ActiveFileWriterBuilder : public FileWriterBuilder {
+public:
+
+    ActiveFileWriter *build(std::shared_ptr<FilePrinter> printer);
+    template <typename M>
+    ActiveFileWriter *build(std::shared_ptr<M> map, const std::string &mapType);
+
+};
 
 } /* namespace crownet */

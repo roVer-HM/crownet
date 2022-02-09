@@ -15,26 +15,44 @@
 
 package crownet.applications.beacon;
 import crownet.applications.common.BaseApp;
-import inet.applications.contract.IApp;
+import crownet.applications.common.IBaseApp;
 
 
-moduleinterface IBeaconApp extends IApp {
+
+moduleinterface IBeaconApp extends IBaseApp {
     parameters:
 }
 
 simple BeaconSimple extends BaseApp like IBeaconApp {
     
     parameters:
+        @display("i=block/broadcast");
         @class(crownet::BeaconSimple);       
         // Aid app override defaults
         packetName = default("BeaconSimple");
-        mainInterval = default(1.0s);
-        mainIntervalJitter = default(0s);
-		messageLength = default(300B);
+		packetLength = default(300B);
 		allEmptyDestAddress = false;
         
         // App logic
-        string mobilityModule;
-        string neighborhoodTableMobdule;
+        string neighborhoodTableMobdule =  default("mobility");
+}
+
+simple BeaconDynamic extends BaseApp like IBeaconApp {
+    
+    parameters:
+        @display("i=block/broadcast");  
+        @class(crownet::BeaconDynamic);   
+        // Aid app override defaults
+        packetName = default("BeaconDynamic");
+		packetLength = default(300B);
+		allEmptyDestAddress = false;
+
+		
+		double minSentFrequency @unit(Hz)= default(0.5Hz);
+		double maxSentFrequency @unit(Hz)= default(10Hz);
+        double maxBandwith @unit(Bytes) = default(2000B);
+        
+        // App logic
+        string neighborhoodTableMobdule  = default("mobility");
 }
 

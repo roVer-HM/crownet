@@ -1,63 +1,53 @@
 import unittest
+import subprocess
 import os
-import shutil
-import glob
+import sys
 
-from suqc import Parameter
-from .tutorial_simple_detour import first_examples_rover_01
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
 
-class RunSimulationStudiesTests(unittest.TestCase):
+def call_script(sim_dir, script_name):
+	terminal_command = ['python3', script_name]
 
+	if os.path.isdir(sim_dir) == False:
+		raise EnvironmentError(f"Simulation dir {sim_dir} not found.")
 
-	def test_simple_detour(self):
+	print(f"Run {terminal_command} in {sim_dir}")
 
-		sim_dir = glob.glob("**/tutorial_simple_detour")
-		if len(sim_dir) == 1:
-			sim_dir = os.path.abspath(sim_dir[0])
-		else:
-			raise ValueError("Simulation directory not found.")
+	return_code = subprocess.check_call(
+		terminal_command,
+		cwd=sim_dir,
+		timeout=12000,  # stop simulation after 20min
+	)
+	return return_code
 
-		result_dir = os.path.join(sim_dir, "results")
+class SimulationStudiesTests(unittest.TestCase):
 
-		if os.path.isdir(result_dir):
-			shutil.rmtree(result_dir)
+	def setUp(self) -> None:
+		self._dir = os.path.dirname(os.path.abspath(__file__))
+		self.study_1 = os.path.join(self._dir, "forward_propagation" )
+		self.study_2 = os.path.join(self._dir, "forward_propagation_and_sensitvity_analysis")
 
-		parameter = [
-			Parameter(
-				name="number_of_agents_mean", simulator="dummy", stages=[15, 20],
-			)
-		]
-		first_examples_rover_01.main(parameter=parameter)
-
-
-		for sample in [0,1]:
-			output_sample = os.path.abspath(f"{sim_dir}/results/simulation_runs/Sample__{sample}_0/results/final_out/vadere.d")
-			dir_content = os.listdir(output_sample)
-
-			self.assertTrue("degree_informed_extract.txt" in dir_content)
-			self.assertTrue("postvis.traj" in dir_content)
-			self.assertTrue("DegreeInformed.txt" in dir_content)
-			self.assertTrue("simple_detour_100x177_miat1.25.scenario" in dir_content)
-			self.assertTrue("footsteps.csv" in dir_content)
-			self.assertTrue("startEndtime.csv" in dir_content)
-			self.assertTrue("InformationDegree.png" in dir_content)
-			self.assertTrue("targetIds.csv" in dir_content)
-
-		summary_output = os.path.abspath(f"{sim_dir}/results_summary")
-		dir_content = os.listdir(summary_output)
-		self.assertTrue("degree_informed_extract.txt" in dir_content)
-		self.assertTrue("poisson_parameter.txt" in dir_content)
-		self.assertTrue("parameters.csv" in dir_content)
-		self.assertTrue("time_95_informed.txt" in dir_content)
-
-
-
-
-
-
-
-
-
-
-
-
+	# TODO add these tests to pipeline
+	# def test_forward_propagation_step_1(self):
+	# 	ret = call_script(sim_dir=self.study_1,script_name="step1_generate_parameter_combinations.py")
+	# 	assert(ret==0)
+	#
+	# def test_forward_propagation_step_2(self):
+	# 	ret = call_script(sim_dir="forward_propagation",script_name="step2_run_simulations.py")
+	# 	assert(ret==0)
+	#
+	# def test_forward_propagation_step_3(self):
+	# 	ret = call_script(sim_dir=self.study_1,script_name="step3_forward_propagation.py")
+	# 	assert(ret==0)
+	#
+	#
+	# def test_sensitivity_analysis_step1(self):
+	# 	ret = call_script(sim_dir=self.study_2,script_name="step1_generate_parameter_combinations.py")
+	# 	assert(ret==0)
+	#
+	#
+	# def test_sensitivity_analysis_step3(self):
+	# 	ret = call_script(sim_dir=self.study_2,script_name="step3_sensitivity_analysis.py")
+	# 	assert(ret==0)

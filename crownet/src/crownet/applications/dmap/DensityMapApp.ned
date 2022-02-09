@@ -15,34 +15,46 @@
 
 package crownet.applications.dmap;
 import crownet.applications.common.BaseApp;
-import inet.applications.contract.IApp;
+import crownet.applications.common.IBaseApp;
 
-moduleinterface IDensityMapApp extends IApp {
+moduleinterface IDensityMapApp extends IBaseApp {
     parameters:
 
 }
 
 simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
 	parameters:
+	    @display("i=block/users"); 
 	    @class(crownet::ArteryDensityMapBase);
+	    @signal[InitDensityMap];
         @signal[RegisterDensityMap];
         @signal[RemoveDensityMap];
         
         // Aid app override defaults
         packetName = default("DcDMap");
-        mainInterval = default(1.0s);
-        messageLength = default(1kB);
         allEmptyDestAddress = false;
         
         // App logic
         string coordConverterModule;
+        double cellSize @unit(m) = default(3.0m);
+        // update interval of local maps with neighborhood table 
+        // This interval is independent of the sent interval of the application in 
+        // its basic configuration. 
+        double localMapUpdateInterval @unit(s) = default(1.0s); 
+        // If density map is used with entropy generated data the movement of the sending node
+        // does not change the data in the old or new cell. In contrast, the for the pedestrian 
+        // density map the movement does influnce the denstiy (count) in the old and new cell. 
+        // The EntropyTag is used to switch the processing of received map packets to correct
+        // this behavior. Default false. (-> pedestrian density map is the default behavior)
+        bool attachEntropyTag = default(false);
         
-        double gridSize = default(3.0) @units(m);
-        
+        object mapCfg = default(crownet::MapCfg{
+            writeDensityLog: true,
+            mapType: "ymf",
+            mapTypeLog: "all",
+            idStreamType: "insertionOrder"
+        });
         bool writeDensityLog = default(true);
-        string mapType = default("ymf"); // select map algorithm to calculate cell values
-        string mapTypeLog = default("all"); // if writeDensityLog is true log this map algorithm. If "all" just
-        									// dump raw data currently present.
 }
 
 simple ArteryDensityMapApp  extends BaseDensityMapApp  {
@@ -59,8 +71,6 @@ simple DensityMapAppSimple  extends BaseDensityMapApp  {
 
     parameters:
         @class(crownet::DensityMapAppSimple);
-
-         string mobilityModule;
-         string neighborhoodTableMobdule;
+         string neighborhoodTableMobdule = default("nTable");
 }
 

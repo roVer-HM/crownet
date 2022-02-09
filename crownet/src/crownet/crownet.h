@@ -4,6 +4,12 @@
 #include "inet/common/geometry/Geometry_m.h"
 #include "crownet/common/util/RingBuffer.h"
 
+
+#define DEBUG_ON_MODULE_ID(_ID) { if (getId() == _ID){DEBUG_TRAP;}}
+#define LOG_MOD   simTime() << " " << this->getFullPath() << " : "
+#define LOG_MOD2   simTime() << " " << this->getFullPath() << " :   "
+
+
 namespace std {
 std::ostream &operator<<(std::ostream &os, const std::pair<int, int> &pair);
 

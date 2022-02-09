@@ -5,7 +5,7 @@
 	<projects>
 		<project>artery</project>
 		<project>inet</project>
-		<project>lte</project>
+		<project>simu5G</project>
 		<project>veins</project>
 		<project>veins_inet</project>
 	</projects>

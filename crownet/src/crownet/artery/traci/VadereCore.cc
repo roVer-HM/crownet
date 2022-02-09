@@ -10,8 +10,8 @@
 #include <omnetpp/checkandcast.h>
 #include <traci/SubscriptionManager.h>
 
-#include "crownet/artery/traci/VadereLauchner.h"
 #include "crownet/artery/traci/VadereSubscriptionManager.h"
+#include "VadereLauncher.h"
 
 using namespace traci;
 using namespace omnetpp;
@@ -58,9 +58,12 @@ void VadereCore::handleMessage(omnetpp::cMessage* msg) {
       // send initSignal to setup subscriptions
       emit(initSignal, simTime());
       m_updateInterval = Time{m_traci->simulation.getDeltaT()};
-      scheduleAt(simTime() + m_updateInterval, m_updateEvent);
+      scheduleAt(simTime(), m_updateEvent);
   }
 }
+
+
+
 
 std::shared_ptr<TraCiForwarder> VadereCore::getTraCiForwarder(){
     return  std::dynamic_pointer_cast<VadereApi>(this->m_traci);

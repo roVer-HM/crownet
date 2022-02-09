@@ -12,8 +12,9 @@ control001_aid:
   wd: simulations/testSim
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere-opp-control
     - --create-vadere-container
+    - --override-host-config
     - --opp.-c
     - test_control001_aid
     - --control-use-local
@@ -30,8 +31,9 @@ control001_udp:
   wd: simulations/testSim
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere-opp-control
     - --create-vadere-container
+    - --override-host-config
     - --opp.-c
     - test_control001_udp
     - --control-use-local
@@ -49,8 +51,9 @@ control001_udp_only:
   wd: simulations/testSim
   args:
     - run_script.py
-    - --delete-existing-containers
+    - vadere-opp-control
     - --create-vadere-container
+    - --override-host-config
     - --opp.-c
     - test_control001_udp_only
     - --control-use-local
@@ -63,59 +66,4 @@ control001_udp_only:
     exec: python3
     type: shell
 
-
-control002_aid:
-  wd: simulations/testSim
-  args:
-    - run_script.py
-    - --delete-existing-containers
-    - --create-vadere-container
-    - --opp.-c
-    - test_control002_aid
-    - --control-use-local
-    - --with-control
-    - control_1.py
-  simtimelimit: 100s
-  expectedResult: PASS
-  fingerprint: "file:"
-  tags:
-    exec: python3
-    type: shell
-
-control002_udp:
-  wd: simulations/testSim
-  args:
-    - run_script.py
-    - --delete-existing-containers
-    - --create-vadere-container
-    - --opp.-c
-    - test_control002_udp
-    - --control-use-local
-    - --with-control
-    - control_1.py
-  simtimelimit: 100s
-  expectedResult: PASS
-  fingerprint: "file:"
-  tags:
-    exec: python3
-    type: shell
-
-
-control002_udp_only:
-  wd: simulations/testSim
-  args:
-    - run_script.py
-    - --delete-existing-containers
-    - --create-vadere-container
-    - --opp.-c
-    - test_control002_udp_only
-    - --control-use-local
-    - --with-control
-    - control_1.py
-  simtimelimit: 100s
-  expectedResult: PASS
-  fingerprint: "file:"
-  tags:
-    exec: python3
-    type: shell
 

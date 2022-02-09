@@ -26,7 +26,7 @@ module AidPedestrian extends TransportLayerRoadUser
         middleware.typename = default(ifTrueOrElse(useVadere,
             ifTrueOrElse(useArtery, "PedestrianMiddleware", "PedestrianMiddlewareEmpty"),
             ifTrueOrElse(useArtery, "PersonMiddleware", "PersonMiddlewareEmpty")));
-        mobility.typename = default(ifTrueOrElse(useVadere, "crownet.artery.traci.InetVaderePersonMobility", "artery.inet.Mobility"));
+        mobility.typename = default(ifTrueOrElse(useVadere, "crownet.artery.traci.InetVaderePersonMobility", "artery.inet.PersonMobility"));
         vanetza.position.typename = default(ifTrueOrElse(useVadere, "PedestrianPositionProvider", "PersonPositionProvider"));
         
     submodules:
