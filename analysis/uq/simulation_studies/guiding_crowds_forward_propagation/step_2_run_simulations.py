@@ -73,7 +73,8 @@ if __name__ == "__main__":
     start_time = time.time()
 
     reaction_probability_key = 'reactionProbabilities.[stimulusId==-400].reactionProbability'
-    par_var_ = [{'vadere': {reaction_probability_key: p}} for p in np.linspace(0, 1.0, 11)]
+    probs = np.linspace(0, 1.0, 41)
+    par_var_ = [{'vadere': {reaction_probability_key: p}} for p in probs]
 
     reps = 10
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
