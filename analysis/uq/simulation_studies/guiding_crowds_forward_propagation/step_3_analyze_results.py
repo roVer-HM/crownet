@@ -277,4 +277,26 @@ if __name__ == "__main__":
     densities_normed_15 = get_densities_normed(densities, density_thres=0.141)
     plot_quantity(densities_normed_15, "densities_LOS_15", y_min=-0.1, y_max=0.5, ylabel="Density value [1]")
 
+    # write table data
+
+    velocities.drop(columns=simulation_time).\
+        groupby(by=["Controller", reaction_prob_key_short]).\
+        median().\
+        to_latex("tables/velocities.tex")
+    densities.drop(columns=simulation_time).\
+        groupby(by=["Controller", reaction_prob_key_short]).\
+        median().\
+        to_latex("tables/densities.tex")
+
+    velocities.drop(columns=simulation_time).\
+        groupby(by=["Controller", reaction_prob_key_short]).\
+        mean().\
+        to_latex("tables/velocities_mean.tex")
+    densities.drop(columns=simulation_time).\
+        groupby(by=["Controller", reaction_prob_key_short]).\
+        mean().\
+        to_latex("tables/densities_mean.tex")
+
+    print()
+
 
