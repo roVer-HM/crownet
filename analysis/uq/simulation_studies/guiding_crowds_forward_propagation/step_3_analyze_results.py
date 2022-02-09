@@ -23,7 +23,8 @@ time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"
 
-probs= np.linspace(0, 1.0, 11)
+probs = np.linspace(0, 1.0, 11)
+probs = np.linspace(0, 1.0, 41)
 
 def get_fundamental_diagrams(controller_type):
     c1 = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
@@ -111,7 +112,7 @@ def plot_travel_time(travel_time):
     for c, data in travel_time.groupby(by=["Controller"]):
         data.drop(columns="Controller", inplace=True)
         data.reset_index(inplace=True, drop=True,)
-        data[reaction_prob_key_short] = data[reaction_prob_key_short].round(1)
+        data[reaction_prob_key_short] = data[reaction_prob_key_short].round(3)
         data = data.pivot(columns=["reactionProbability"])
         data.columns = data.columns.droplevel()
         data.boxplot()
@@ -210,7 +211,7 @@ def get_path_choice(controller_type):
     path_choice.reset_index(inplace=True)
     path_choice.drop(columns=["run_id", "id"], inplace=True)
     path_choice.set_index(simulation_time, inplace=True)
-    path_choice[reaction_prob_key_short] = path_choice[reaction_prob_key_short].round(1)
+    path_choice[reaction_prob_key_short] = path_choice[reaction_prob_key_short].round(3)
     return path_choice
 
 def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped/m*2]"):
@@ -219,7 +220,7 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
     for c, data in densities.groupby(by=["Controller"]):  # oxplot(column="travel_time"):
 
         densities_ = data
-        densities_[reaction_prob_key_short] = densities_[reaction_prob_key_short].round(1)
+        densities_[reaction_prob_key_short] = densities_[reaction_prob_key_short].round(3)
         densities_ = densities_.reset_index(drop=True).drop(columns=[simulation_time, "Controller"]).pivot(
             columns=[reaction_prob_key_short])
 
@@ -238,23 +239,21 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
     plt.savefig(f"figs/{file_name}.png")
     plt.show()
 
-def plot_route_1_recommended(path_choice):
+def plot_route_1_recommended(path_choice, corridor= 11):
     pp = path_choice[path_choice["Controller"] == "OpenLoop"]
-    pp = pp[pp["corridorRecommended"] == 11]
+    pp = pp[pp["corridorRecommended"] == corridor]
     ppp = pp.groupby(by=reaction_prob_key_short).count()
 
     pp = path_choice[path_choice["Controller"] == "ClosedLoop"]
-    pp = pp[pp["corridorRecommended"] == 11]
+    pp = pp[pp["corridorRecommended"] == corridor]
     pp = pp.groupby(by=reaction_prob_key_short).count()
-
-    pp["corridorRecommended"].plot(label="Minimal density strategy")
 
     ppp = pd.concat([ppp["corridorRecommended"], pp["corridorRecommended"]], axis=1).fillna(0)
     ppp.columns = ["OpenLoop", "ClosedLoop"]
     ppp.plot()
     plt.ylabel("Counts")
-    plt.title("Corridor 1 recommended")
-    plt.savefig("figs/route1recommded.png")
+    plt.title(f"Corridor {corridor} recommended")
+    plt.savefig(f"figs/route{corridor}recommded.png")
     plt.show()
 
 
@@ -262,6 +261,8 @@ if __name__ == "__main__":
 
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
     plot_route_1_recommended(path_choice)
+    plot_route_1_recommended(path_choice, 31)
+    plot_route_1_recommended(path_choice, 51)
 
     travel_time = get_travel_times()
     plot_travel_time(travel_time)
