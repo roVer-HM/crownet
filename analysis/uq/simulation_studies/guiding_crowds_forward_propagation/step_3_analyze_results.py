@@ -24,6 +24,14 @@ c__ = {11: "Short",
        'Corridor2':  "Medium",
        'Corridor3':  "Long",
        }
+
+args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', markersize=3,
+                                linestyle='none', markeredgecolor='#AAAAAA'),
+                                boxprops=dict(color ='#464646'),
+                                whiskerprops=dict(linewidth=1),
+                                medianprops=dict(linewidth=2.5, color='k'),
+                                notch=True)
+
 controller__ = {"OpenLoop": "Fixed order strategy",
                 "ClosedLoop" : "Recommend emptiest corridor strategy" }
 sim_time_steady_flow_start = 100
@@ -127,14 +135,16 @@ def plot_travel_time(travel_time):
         data[reaction_prob_key_short] = data[reaction_prob_key_short].round(3)
         data = data.pivot(columns=["reactionProbability"])
         data.columns = data.columns.droplevel()
-        data.boxplot()
+        data.rename(columns=controller__, inplace=True)
+        data.boxplot(**args_boxplot)
         plt.ylim()
         plt.xlabel("Parameter c")
         plt.ylim(0,400)
-        plt.title(f"Controller {c}")
+        plt.title(f"{controller__[c]}")
+        plt.xticks(np.arange(1, 45, 4), [f"{x:.1f}" for x in np.linspace(0, 1, 11)])
         plt.ylabel("Travel time [s]")
         plt.xlabel("Compliance rate")
-        plt.savefig(f"figs/travel_time_{c}.png")
+        plt.savefig(f"figs/travel_time_{controller__[c]}.png")
         plt.show()
         print()
 
@@ -143,6 +153,7 @@ def plot_travel_time(travel_time):
 
     time_25 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.25).unstack(level=0)
     time_25.columns = time_25.columns.droplevel(0)
+    time_25.rename(columns=controller__, inplace=True)
     plt.sca(ax[0])
     time_25.plot(marker="o", ax=ax[0])
     plt.legend()
@@ -155,6 +166,7 @@ def plot_travel_time(travel_time):
 
     time_med = travel_time.groupby(by=["Controller",reaction_prob_key_short]).median().unstack(level=0)
     time_med.columns = time_med.columns.droplevel(0)
+    time_med.rename(columns=controller__, inplace=True)
     plt.sca(ax[1])
     time_med.plot(marker="o", ax=ax[1])
     ax[1].set_title("Median")
@@ -165,6 +177,7 @@ def plot_travel_time(travel_time):
 
     time_75 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.75).unstack(level=0)
     time_75.columns = time_75.columns.droplevel(0)
+    time_75.rename(columns=controller__, inplace=True)
     plt.sca(ax[2])
     time_75.plot(marker="o", ax=ax[2])
     ax[2].set_title("75% Quartile")
@@ -282,9 +295,13 @@ def get_path_choice(controller_type):
     return path_choice
 
 def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped/m*2]"):
-    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))
+    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(10, 15))
+
     i = 0
+    c_order = list()
     for c, data in densities.groupby(by=["Controller"]):  # oxplot(column="travel_time"):
+
+        c_order.append(controller__[c])
 
         densities_ = data
         densities_[reaction_prob_key_short] = densities_[reaction_prob_key_short].round(3)
@@ -294,25 +311,19 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
         ii = 0
         for corridor_ in densities_.columns.get_level_values(0).unique():
             densities__ = densities_.xs(corridor_, axis=1)
-            flierprops = dict(marker='+', markerfacecolor='#AAAAAA', markersize=3,
-                              linestyle='none', markeredgecolor='#AAAAAA')
-            plt.sca(ax[i, ii])
-            densities__.boxplot(flierprops=flierprops,
-                                boxprops=dict(color ='#464646'),
-                                whiskerprops=dict(linewidth=1),
-                                medianprops=dict(linewidth=2.5, color='k'),
-                                notch=True
-                                )
-            ax[i, ii].set_title(f"{controller__[c]}, {c__[corridor_]} corridor.")
-            ax[i, ii].set_ylim(y_min, y_max)
-            ax[i, ii].set_xlabel("Compliance rate r [1]")
-            ax[i, ii].set_ylabel(ylabel)
-            ax[i, ii].set_xticks(np.arange(1,45,4))
-            ax[i, ii].set_xticklabels([f"{x:.1f}" for x in np.linspace(0,1,11)])
+            plt.sca(ax[ii, i])
+            densities__.boxplot(**args_boxplot)
+            ax[ii, i].set_title(f"{c__[corridor_]} corridor.")
+            ax[ii, i].set_ylim(y_min, y_max)
+            ax[ii, i].set_xlabel("Compliance rate r [1]")
+            ax[ii, i].set_ylabel(ylabel)
+            ax[ii, i].set_xticks(np.arange(1,45,4))
+            ax[ii, i].set_xticklabels([f"{x:.1f}" for x in np.linspace(0,1,11)])
 
             ii += 1
         i += 1
 
+    fig.suptitle("                  ".join(c_order), fontsize=16, x= 0.47)
     plt.savefig(f"figs/{file_name}.png")
     plt.show()
     print()
