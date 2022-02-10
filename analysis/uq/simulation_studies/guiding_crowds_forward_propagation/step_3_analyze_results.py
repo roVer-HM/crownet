@@ -17,6 +17,15 @@ velocities_dict = {'velocity-PID25': "Corridor1",
 densities_dict = {'density-PID25': "Corridor1",
              'density-PID27': "Corridor2",
              'density-PID29': "Corridor3"}
+c__ = {11: "Short",
+       31: "Medium",
+       51: "Long",
+       'Corridor1': "Short",
+       'Corridor2':  "Medium",
+       'Corridor3':  "Long",
+       }
+controller__ = {"OpenLoop": "Fixed order strategy",
+                "ClosedLoop" : "Recommend emptiest corridor strategy" }
 sim_time_steady_flow_start = 100
 sim_time_steady_flow_end = 500
 time_step_size = 0.4
@@ -26,13 +35,16 @@ reaction_prob_key_short = "reactionProbability"
 probs = np.linspace(0, 1.0, 11)
 probs = np.linspace(0, 1.0, 41)
 
-def get_fundamental_diagrams(controller_type):
+def get_fundamental_diagrams(controller_type, time_start=None):
+    if time_start is None:
+        time_start = sim_time_steady_flow_start
+
     c1 = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
     c2 = pd.read_csv(f"{controller_type}_fundamentalDiagramm.csv", index_col=[0, 1])
     densities_closed_loop = c1.join(c2)
 
     densities_closed_loop[simulation_time] = densities_closed_loop[time_step_key] * time_step_size
-    densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] >= sim_time_steady_flow_start]
+    densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] >= time_start]
     densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] < sim_time_steady_flow_end]
     densities_closed_loop.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
                                inplace=True)
@@ -164,19 +176,74 @@ def plot_travel_time(travel_time):
     plt.savefig("figs/Travel_time")
     plt.show()
 
+def get_fundamental_diagram_corridor1():
+    densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0.0)
 
+    for c in ["Corridor1"]:
+        velocities[c][densities[c] == 0] = np.nan
+        densities[c][densities[c] == 0] = np.nan
+
+    densities.dropna(inplace=True)
+    velocities.dropna(inplace=True)
+
+    flux = densities["Corridor1"]*velocities["Corridor1"]
+
+    from sklearn.preprocessing import PolynomialFeatures
+    from sklearn.pipeline import make_pipeline
+    from sklearn.linear_model import LinearRegression
+    degree=2
+    polyreg=make_pipeline(PolynomialFeatures(degree),LinearRegression())
+    polyreg.fit(densities["Corridor1"].values.reshape(-1, 1), flux.values.reshape(-1, 1))
+
+
+
+
+    plt.scatter(densities["Corridor1"], flux, label= "Simulation data" )
+    d__ = np.linspace(0,2.1)
+    flow_reg = polyreg.predict(d__.reshape(-1, 1))
+    plt.plot(d__, flow_reg.ravel(), color="black", label= "Regression (poly.)")
+
+    d___ = np.linspace(2.1, 3.2)
+    flow_reg_ = polyreg.predict(d___.reshape(-1, 1))
+    plt.plot(d___, flow_reg_.ravel(), color="black", linestyle= "--", label=None)
+
+    plt.scatter(2.1, flow_reg.max(), marker="D", c="black", label="$J_{1,max}$ (Regression)")
+    plt.text(2.1+0.1, flow_reg.max()+0.05, f'{flow_reg.max():.2f} (d = 2.1 $ped/m^{2}$)')
+
+    densitiy_max_flux = densities.iloc[np.where(flux==flux.max())[0][0], :]["Corridor1"]
+    plt.scatter(densitiy_max_flux, flux.max(), marker="s", c="black", label="$J_{1,max}$ (Data)")
+    plt.text(densitiy_max_flux+0.1, flux.max() + 0.0, f'{flux.max():.2f} (d = {densitiy_max_flux:.2f} $ped/m^{2}$)')
+
+
+
+    plt.xlabel("Density [ped/m²]")
+    plt.ylabel("Specific flow [1/(ms)]")
+    plt.xlim(-0.1,3.5)
+    plt.title(f"Fundamental diagram: short corridor")
+    plt.legend()
+    plt.savefig(f"figs/fundamentalDiagramShortCorridor1.png")
+    plt.show()
+
+    plt.scatter(densities["Corridor1"], velocities["Corridor1"], label="Simulation data")
+    plt.xlabel("Density [$ped/m^{2}$]")
+    plt.ylabel("Velocity [m/s]")
+    plt.title(f"Fundamental diagram: short corridor")
+    plt.xlim(-0.1, 3.5)
+    plt.legend()
+    plt.savefig(f"figs/fundamentalDiagramShortCorridor2.png")
+    plt.show()
+
+    return densities, velocities
 
 
 def get_densities_velocities():
     densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
     densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
-    densities_default, velocities_default = get_fundamental_diagrams(controller_type="NoController")
 
     densities = pd.concat([densities_closed_loop, densities_open_loop])
     velocities = pd.concat([velocities_closed_loop, velocities_open_loop])
 
     for c in corridors.values():
-        #nan velocities in case there is no agent in the corridor
         velocities[c][densities[c] == 0] = np.nan
 
     return densities, velocities
@@ -227,40 +294,60 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
         ii = 0
         for corridor_ in densities_.columns.get_level_values(0).unique():
             densities__ = densities_.xs(corridor_, axis=1)
+            flierprops = dict(marker='+', markerfacecolor='#AAAAAA', markersize=3,
+                              linestyle='none', markeredgecolor='#AAAAAA')
             plt.sca(ax[i, ii])
-            densities__.boxplot()
-            ax[i, ii].set_title(f"{c}, {corridor_}")
+            densities__.boxplot(flierprops=flierprops,
+                                boxprops=dict(color ='#464646'),
+                                whiskerprops=dict(linewidth=1),
+                                medianprops=dict(linewidth=2.5, color='k'),
+                                notch=True
+                                )
+            ax[i, ii].set_title(f"{controller__[c]}, {c__[corridor_]} corridor.")
             ax[i, ii].set_ylim(y_min, y_max)
-            ax[i, ii].set_xlabel("Compliance rate")
+            ax[i, ii].set_xlabel("Compliance rate r [1]")
             ax[i, ii].set_ylabel(ylabel)
+            ax[i, ii].set_xticks(np.arange(1,45,4))
+            ax[i, ii].set_xticklabels([f"{x:.1f}" for x in np.linspace(0,1,11)])
+
             ii += 1
         i += 1
 
     plt.savefig(f"figs/{file_name}.png")
     plt.show()
+    print()
 
-def plot_route_1_recommended(path_choice, corridor= 11):
+def plot_route_1_recommended(path_choice, corridor_= 11):
+
+
+    corridor = c__[corridor_]
+
     pp = path_choice[path_choice["Controller"] == "OpenLoop"]
-    pp = pp[pp["corridorRecommended"] == corridor]
+    pp = pp[pp["corridorRecommended"] == corridor_]
     ppp = pp.groupby(by=reaction_prob_key_short).count()
 
     pp = path_choice[path_choice["Controller"] == "ClosedLoop"]
-    pp = pp[pp["corridorRecommended"] == corridor]
+    pp = pp[pp["corridorRecommended"] == corridor_]
     pp = pp.groupby(by=reaction_prob_key_short).count()
 
     ppp = pd.concat([ppp["corridorRecommended"], pp["corridorRecommended"]], axis=1).fillna(0)
-    ppp.columns = ["OpenLoop", "ClosedLoop"]
-    ppp.plot()
+    ppp.columns = list(controller__.values())
+    ppp.plot(marker="o")
+    plt.ylim(-10,300)
     plt.ylabel("Counts")
-    plt.title(f"Corridor {corridor} recommended")
+    plt.xlabel("Compliance rate r [1]")
+    plt.title(f"{corridor} route recommended")
     plt.savefig(f"figs/route{corridor}recommded.png")
     plt.show()
+    print()
 
 
 if __name__ == "__main__":
 
+    a,b = get_fundamental_diagram_corridor1()
+
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
-    plot_route_1_recommended(path_choice)
+    plot_route_1_recommended(path_choice, 11)
     plot_route_1_recommended(path_choice, 31)
     plot_route_1_recommended(path_choice, 51)
 
@@ -269,14 +356,8 @@ if __name__ == "__main__":
 
     densities, velocities = get_densities_velocities()
 
-    plot_quantity(densities, "densities", y_min=-0.1, y_max=2.5, ylabel="Density [ped/m*2]")
-    plot_quantity(velocities, "velocities", y_min=-0.1, y_max=1.8, ylabel="Velocities [m/s]")
-
-    densities_normed_A = get_densities_normed(densities, density_thres=0.31,)
-    plot_quantity(densities_normed_A, "densities_LOS_A", y_min=-0.1, y_max=0.5, ylabel="Density value [1]")
-
-    densities_normed_15 = get_densities_normed(densities, density_thres=0.141)
-    plot_quantity(densities_normed_15, "densities_LOS_15", y_min=-0.1, y_max=0.5, ylabel="Density value [1]")
+    plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [ped/m*2]")
+    plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocities [m/s]")
 
     # write table data
 
@@ -297,7 +378,4 @@ if __name__ == "__main__":
         groupby(by=["Controller", reaction_prob_key_short]).\
         mean().\
         to_latex("tables/densities_mean.tex")
-
-    print()
-
 
