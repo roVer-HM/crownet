@@ -34,7 +34,7 @@ args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', marke
 
 controller__ = {"OpenLoop": "Fixed order strategy",
                 "ClosedLoop" : "Recommend emptiest corridor strategy" }
-sim_time_steady_flow_start = 100
+sim_time_steady_flow_start = 250
 sim_time_steady_flow_end = 500
 time_step_size = 0.4
 var_corridor = "Corridor"
@@ -189,6 +189,57 @@ def plot_travel_time(travel_time):
     plt.savefig("figs/Travel_time")
     plt.show()
 
+def plot_hists_corridor1():
+    densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0)
+
+    for c in ["Corridor1"]:
+        velocities[c][densities[c] == 0] = np.nan
+
+    velocities.dropna(inplace=True)
+
+    densities[simulation_time] = densities[simulation_time].round(2)
+    densities.reset_index(inplace=True)
+    densities.set_index(["id", simulation_time], inplace=True)
+
+    for ii, data in densities["Corridor1"].groupby(by=["id"]):
+        data.index = data.index.droplevel(0)
+        data.plot(label=f"Simulation run {ii+1}") # bins=20, range=(0, 0.5))
+
+    plt.legend()
+    plt.xlabel("Simulation time [s]")
+    plt.ylabel("Density $ped/m^{2}$")
+    plt.title("Short corridor (no rerouting)")
+    plt.savefig("figs/DensityOverTime.png")
+    plt.show()
+
+    velocities[simulation_time] = velocities[simulation_time].round(2)
+    velocities.reset_index(inplace=True)
+    velocities.set_index(["id", simulation_time], inplace=True)
+
+    for ii, data in velocities["Corridor1"].groupby(by=["id"]):
+        data.index = data.index.droplevel(0)
+        data.plot(label=f"Simulation run {ii+1}") # bins=20, range=(0, 0.5))
+
+    plt.legend()
+    plt.xlabel("Simulation time [s]")
+    plt.ylabel("Velocity $m/s$")
+    plt.title("Short corridor (no rerouting)")
+    plt.savefig("figs/VelocityOverTime.png")
+    plt.show()
+
+    densities, velocities = get_fundamental_diagrams(controller_type="NoController")
+
+    df = pd.concat([densities["Corridor1"].describe(), velocities["Corridor1"].describe()], axis=1)
+    df.columns = ["Density $ped/m**2$", "Velocity $m/s$"]
+    df = df.transpose()
+    df.to_latex("tables/NoControlCorridor1.tex")
+
+
+
+    print()
+
+
+
 def get_fundamental_diagram_corridor1():
     densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0.0)
 
@@ -199,6 +250,8 @@ def get_fundamental_diagram_corridor1():
     densities.dropna(inplace=True)
     velocities.dropna(inplace=True)
 
+
+
     flux = densities["Corridor1"]*velocities["Corridor1"]
 
     from sklearn.preprocessing import PolynomialFeatures
@@ -207,8 +260,6 @@ def get_fundamental_diagram_corridor1():
     degree=2
     polyreg=make_pipeline(PolynomialFeatures(degree),LinearRegression())
     polyreg.fit(densities["Corridor1"].values.reshape(-1, 1), flux.values.reshape(-1, 1))
-
-
 
 
     plt.scatter(densities["Corridor1"], flux, label= "Simulation data" )
@@ -246,7 +297,6 @@ def get_fundamental_diagram_corridor1():
     plt.savefig(f"figs/fundamentalDiagramShortCorridor2.png")
     plt.show()
 
-    return densities, velocities
 
 
 def get_densities_velocities():
@@ -354,8 +404,9 @@ def plot_route_1_recommended(path_choice, corridor_= 11):
 
 
 if __name__ == "__main__":
+    plot_hists_corridor1()
 
-    a,b = get_fundamental_diagram_corridor1()
+    get_fundamental_diagram_corridor1()
 
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
     plot_route_1_recommended(path_choice, 11)
