@@ -139,8 +139,7 @@ def plot_travel_time(travel_time):
         data.boxplot(**args_boxplot)
         plt.ylim()
         plt.xlabel("Parameter c")
-        plt.ylim(0,1500)
-        plt.yscale("log")
+        plt.ylim(0,1000)
         plt.title(f"{controller__[c]}")
         plt.xticks(np.arange(1, 45, 4), [f"{x:.1f}" for x in np.linspace(0, 1, 11)])
         plt.ylabel("Travel time [s]")
@@ -387,16 +386,18 @@ def plot_route_1_recommended(path_choice, corridor_= 11):
 
     pp = path_choice[path_choice["Controller"] == "OpenLoop"]
     pp = pp[pp["corridorRecommended"] == corridor_]
+    l1 = 1#len(pp["corridorRecommended"])
     ppp = pp.groupby(by=reaction_prob_key_short).count()
 
     pp = path_choice[path_choice["Controller"] == "ClosedLoop"]
     pp = pp[pp["corridorRecommended"] == corridor_]
+    l2 = 1# len(pp["corridorRecommended"])
     pp = pp.groupby(by=reaction_prob_key_short).count()
 
-    ppp = pd.concat([ppp["corridorRecommended"], pp["corridorRecommended"]], axis=1).fillna(0)
+    ppp = pd.concat([ppp["corridorRecommended"]/l1, pp["corridorRecommended"]/l2], axis=1).fillna(0)
     ppp.columns = list(controller__.values())
     ppp.plot(marker="o")
-    plt.ylim(-10,500)
+    plt.ylim(-10,550)
     plt.ylabel("Counts")
     plt.xlabel("Compliance rate r [1]")
     plt.title(f"{corridor} route recommended")
