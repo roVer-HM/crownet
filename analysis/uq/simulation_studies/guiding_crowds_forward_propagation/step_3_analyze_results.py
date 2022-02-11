@@ -228,15 +228,16 @@ def plot_hists_corridor1():
     plt.show()
 
     densities, velocities = get_fundamental_diagrams(controller_type="NoController")
+    times = get_time_controller_wise(controller_type="NoController")
 
     df = pd.concat([densities["Corridor1"].describe(), velocities["Corridor1"].describe()], axis=1)
-    df.columns = ["Density $ped/m**2$", "Velocity $m/s$"]
+
+    df["t"] = times[times["travel_time"] != np.inf].describe()["travel_time"]
+
+    df.columns = ["Density $ped/m**2$", "Velocity $m/s$", "Travel time [s]"]
     df = df.transpose()
-    df.to_latex("tables/NoControlCorridor1.tex")
+    df.to_latex("tables/NoControlCorridor1.tex", float_format="%.2f")
 
-
-
-    print()
 
 
 
