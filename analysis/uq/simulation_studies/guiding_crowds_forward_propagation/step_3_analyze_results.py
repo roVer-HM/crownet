@@ -35,7 +35,7 @@ args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', marke
 controller__ = {"OpenLoop": "Fixed order strategy",
                 "ClosedLoop" : "Recommend emptiest corridor strategy" }
 sim_time_steady_flow_start = 250
-sim_time_steady_flow_end = 500
+sim_time_steady_flow_end = 1250
 time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"

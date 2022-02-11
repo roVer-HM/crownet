@@ -76,7 +76,7 @@ if __name__ == "__main__":
     probs = np.linspace(0, 1.0, 41)
     par_var_ = [{'vadere': {reaction_probability_key: p}} for p in probs]
 
-    reps = 10
+    reps = 5
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     qoi1 = "densities.txt"
