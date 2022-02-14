@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
+from scipy import stats
 reaction_prob_key = "('Parameter', 'vadere', 'reactionProbabilities.[stimulusId==-400].reactionProbability')"
 time_step_key = "timeStep"
 seed_key_key = "('Parameter', 'vadere', 'fixedSeed')"
@@ -405,8 +405,69 @@ def plot_route_1_recommended(path_choice, corridor_= 11):
     plt.show()
     print()
 
+def compare_random_densitiies(dd,  travel_time, value="Median",):
+    time = travel_time
+
+    # median or mean does not make difference
+
+    dd = d_med.drop(columns=["Corridor2", "Corridor3"])
+    dd.reset_index(0, inplace=True)
+    dd = dd.pivot(columns="Controller")
+    dd.columns = dd.columns.droplevel(0)
+    dd.rename(columns=controller__,inplace=True)
+    dd.boxplot(grid=False)
+    left, right = plt.xlim()
+    los = [0.31,0.43,0.71,1.08,2.17]
+    plt.hlines(los, xmin=left, xmax=right, color='b', linestyles='--')
+    for los_, letter in zip(los, ["A", "B", "C", "D", "E", "F"]):
+        plt.text(1.5, los_-0.075, f"LOS {letter}")
+
+    plt.ylabel(f"{value} density [$ped/m^2$]")
+    plt.title("Short corridor")
+    plt.savefig(f"figs/{value}DensityDist.png")
+    plt.show()
+    # not normally distributed, if p < 0.05
+    s_1 = stats.kstest(dd.iloc[:,0], "norm")
+    s_2 = stats.kstest(dd.iloc[:,1], "norm")
+
+    # difference between medians, if p < 0.05
+    kruskal = stats.kruskal(dd.iloc[:,0], dd.iloc[:,1])
+    mannwhitneyU = stats.mannwhitneyu(dd.iloc[:, 0], dd.iloc[:, 1])
+
+    times = travel_time.groupby(by=["Controller", reaction_prob_key_short]).median()
+    times.reset_index(0, inplace=True)
+    times = times.pivot(columns="Controller")
+    times.columns = times.columns.droplevel(0)
+    times.rename(columns=controller__, inplace=True)
+    times.boxplot()
+    plt.ylabel(f"{value} travel time [s]")
+    plt.savefig(f"figs/{value}TravelDist.png")
+    plt.show()
+
+    s_1_ = stats.kstest(times.iloc[:, 0], "norm")
+    s_2_ = stats.kstest(times.iloc[:, 1], "norm")
+    kruskal_ = stats.kruskal(times.iloc[:, 0], times.iloc[:, 1])
+    mannwhitneyU_ = stats.mannwhitneyu(times.iloc[:, 0], times.iloc[:, 1])
+
+
+    with open('tables/statistical_test.txt', 'w+') as f:
+        f.write(f"{dd.columns[0]}: densities not normally distributed, since p = {s_1.pvalue} < 0.05.\n")
+        f.write(f"{dd.columns[1]}: densities not normally distributed, since p = {s_2.pvalue} < 0.05.\n")
+        f.write(f"Kruskal Wallis test: densities. no difference between groups, since  p = {kruskal.pvalue} > 0.05.\n")
+        f.write(f"mannwhitneyu test: densities. difference between groups , p = {mannwhitneyU.pvalue} < 0.05.\n")
+        f.write(f"{times.columns[0]}: densities not normally distributed, since p = {s_1_.pvalue} < 0.05.\n")
+        f.write(f"{times.columns[1]}: densities not normally distributed, since p = {s_2_.pvalue} < 0.05.\n")
+        f.write(f"Kruskal Wallis test: times. no difference between groups, since  p = {kruskal_.pvalue} > 0.05.\n")
+        f.write(f"mannwhitneyu test: times. no difference between groups , p = {mannwhitneyU_.pvalue} > 0.05.\n")
+
+
+    print()
 
 if __name__ == "__main__":
+    travel_time = get_travel_times()
+
+    plot_travel_time(travel_time)
+
     plot_hists_corridor1()
 
     get_fundamental_diagram_corridor1()
@@ -416,8 +477,7 @@ if __name__ == "__main__":
     plot_route_1_recommended(path_choice, 31)
     plot_route_1_recommended(path_choice, 51)
 
-    travel_time = get_travel_times()
-    plot_travel_time(travel_time)
+
 
     densities, velocities = get_densities_velocities()
 
@@ -430,17 +490,19 @@ if __name__ == "__main__":
         groupby(by=["Controller", reaction_prob_key_short]).\
         median().\
         to_latex("tables/velocities.tex")
-    densities.drop(columns=simulation_time).\
+    d_med = densities.drop(columns=simulation_time).\
         groupby(by=["Controller", reaction_prob_key_short]).\
-        median().\
-        to_latex("tables/densities.tex")
+        median()
+    d_med.to_latex("tables/densities.tex")
+    compare_random_densitiies(dd=d_med, value="Median", travel_time=travel_time)
+
 
     velocities.drop(columns=simulation_time).\
         groupby(by=["Controller", reaction_prob_key_short]).\
         mean().\
         to_latex("tables/velocities_mean.tex")
-    densities.drop(columns=simulation_time).\
+    d_mean = densities.drop(columns=simulation_time).\
         groupby(by=["Controller", reaction_prob_key_short]).\
-        mean().\
-        to_latex("tables/densities_mean.tex")
+        mean()
+    d_mean.to_latex("tables/densities_mean.tex")
 
