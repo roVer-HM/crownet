@@ -41,7 +41,6 @@ protected:
     bool init = false;
     bool closed = false;
 
-private:
     long bufferSize;
     std::ostringstream buffer;
 

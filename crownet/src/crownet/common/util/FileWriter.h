@@ -49,8 +49,6 @@ public:
 private:
     std::string filePath;
     std::ofstream file;
-    long bufferSize;
-    std::ostringstream buffer;
 
 protected:
     void writeBuffer() override;
