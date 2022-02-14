@@ -2,10 +2,8 @@
 # To add a new markdown cell, type '# %% [markdown]'
 # %%
 from re import I
-import folium
 from folium.plugins import MousePosition
 from pyproj.proj import Proj
-import roveranalyzer as r 
 import geopandas as g
 import os
 import pandas as pd
@@ -16,67 +14,15 @@ from shapely.geometry import Polygon, box, Point
 from matplotlib import pyplot as plt
 from matplotlib.patches import Patch
 import numpy as np
-import math
 import random
-import roveranalyzer.utils as RoverUtils
 import random
 
-WGS84_lat_lon = 4326
-WGS84_pseudo_m = 3857 
-
-def create_grid(minx, miny, maxx, maxy, x_size=10, y_size=10):
-    """
-    Create a regular grid with given size in the given bound
-    """
-    num_x = math.floor((maxx - minx) / x_size)
-    num_y = math.floor((maxy - miny) / y_size)
-    cells = []
-    _id = 0
-    for x in range(num_x):
-        x_min = minx + x_size * x 
-        for y in range(num_y):
-            y_min = miny + y_size * y 
-            cells.append([_id, 'none', '#99382C',  box(x_min, y_min, x_min + x_size, y_min + y_size)])
-            _id += 1
-    
-    return cells
-
-def to_opp_coord(x, y, bound):
-    return x, bound[3] -y
-
-def export_cart_opp(peds: g.GeoDataFrame, bound, node='misc'):
-    lines = []
-    # *.misc[0].mobility.initialX = 5m
-    # *.misc[0].mobility.initialY = 2m
-    _id = 0
-    for x, y in zip(peds.geometry.x, peds.geometry.y):
-        opp_coord = to_opp_coord(x, y , bound)
-        lines.append(f"*.{node}[{_id}].mobility.initialX = {round(opp_coord[0], 2)}m")
-        lines.append(f"*.{node}[{_id}].mobility.initialY = {round(opp_coord[1], 2)}m")
-        _id += 1
-    
-    return lines
-
-def export_geo_opp(peds: g.GeoDataFrame, bound, node='misc'):
-    lines = []
-    # *.misc[0].mobility.initialX = 5m
-    # *.misc[0].mobility.initialY = 2m
-    _peds = peds.to_crs(epsg=WGS84_lat_lon)
-    _id = 0
-    for x, y in zip(_peds.geometry.x, _peds.geometry.y):
-        opp_coord = to_opp_coord(x, y , bound)
-        lines.append(f"*.{node}[{_id}].mobility.initialLatitude = {y}deg")
-        lines.append(f"*.{node}[{_id}].mobility.initialLongitude = {x}deg")
-        _id += 1
-    
-    return lines
 
 class OppIniWriter:
 
     @classmethod
     def MF_Subway(cls):
         offset = np.array([692152.0894735109, 5337384.6661008])  # x / y (easting/  northing)
-        # offset = np.array([5337384.6661008, 692152.0894735109])  # x / y (easting/  northing)
         bound = np.array([415.0, 415.0])
         return cls(Project.UTM_32N, offset, bound)
 
@@ -146,16 +92,15 @@ class W:
     def write(self, x):
         print(x, end='')
 
-w.write_config(writer = W())
+# with open("muc_subway_100_uniform.ini", "w", encoding="utf-8") as f:
+    # f.write(f"# python seed for random placement {w.seed}\n")
+    # w.write_config(writer = f, config="[Config muc_subway_100_uniform]")
 
-df = w.to_geo_frame()
-map = df.explore(name= "Nodes")
-folium.TileLayer(
-    tiles="Stamen Toner", 
-    control="True", 
-    name="Stamen Toner", max_zoom=22
-).add_to(map)
-folium.LayerControl().add_to(map)
-MousePosition().add_to(map)
+ax = w.to_geo_frame().plot()
+ax.get_figure().show()
+
+
+print("done.")
+
 
 # %%
