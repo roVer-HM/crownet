@@ -1,5 +1,5 @@
 {
-  "name" : "mf_002_template",
+  "name" : "mf_003_template",
   "description" : "",
   "release" : "2.0",
   "processWriters" : {
@@ -454,24 +454,6 @@
           } ]
         },
         "id" : 76
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 0.4,
-            "y" : 318.6485136335627
-          }, {
-            "x" : 64.3,
-            "y" : 318.6485136335627
-          }, {
-            "x" : 64.3,
-            "y" : 393.6
-          }, {
-            "x" : 0.4,
-            "y" : 393.6
-          } ]
-        },
-        "id" : 77
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -1669,6 +1651,24 @@
           } ]
         },
         "id" : 112
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 0.4,
+            "y" : 318.6485136335627
+          }, {
+            "x" : 64.3,
+            "y" : 318.6485136335627
+          }, {
+            "x" : 64.3,
+            "y" : 393.6
+          }, {
+            "x" : 0.4,
+            "y" : 393.6
+          } ]
+        },
+        "id" : 77
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -1767,227 +1767,6 @@
             "x" : 184.4752920619212,
             "y" : 101.57735977787524
           } ]
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2101,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 64.5,
-          "y" : 383.2,
-          "width" : 6.9,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2101,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 147.3,
-          "y" : 382.5,
-          "width" : 11.7,
-          "height" : 4.4,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2103,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 183.4,
-          "y" : 381.3,
-          "width" : 88.6,
-          "height" : 4.7,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2104,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 404.9,
-          "y" : 194.2,
-          "width" : 4.1,
-          "height" : 135.9,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2105,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 404.6,
-          "y" : 114.4,
-          "width" : 3.9670401493930854,
-          "height" : 51.900000000000006,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2106,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 405.0,
-          "y" : 1.8,
-          "width" : 3.281645991729988,
-          "height" : 60.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2107,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 298.9,
-          "y" : 7.1,
-          "width" : 80.8,
-          "height" : 3.9,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2108,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 159.7,
-          "y" : 7.2,
-          "width" : 11.2,
-          "height" : 5.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2109,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 136.1,
-          "y" : 7.2,
-          "width" : 6.3,
-          "height" : 4.9,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2110,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 5.0,
-          "y" : 161.6,
-          "width" : 2.5,
-          "height" : 5.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2111,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 5.5,
-          "y" : 174.6,
-          "width" : 3.6,
-          "height" : 53.3,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2112,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 5.0,
-          "y" : 261.5,
-          "width" : 2.5,
-          "height" : 19.6,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2113,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 5.2,
-          "y" : 294.3,
-          "width" : 2.8,
-          "height" : 22.1,
-          "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
@@ -2160,8 +1939,302 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 2123,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 144.8,
+          "y" : 280.7,
+          "width" : 10.6,
+          "height" : 5.2,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2124,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 238.1,
+            "y" : 283.0
+          }, {
+            "x" : 177.89999999999998,
+            "y" : 299.40000000000003
+          }, {
+            "x" : 178.29999999999998,
+            "y" : 302.0
+          }, {
+            "x" : 238.79999999999998,
+            "y" : 287.0
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2130,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 129.2,
+            "y" : 149.6
+          }, {
+            "x" : 126.4,
+            "y" : 150.3
+          }, {
+            "x" : 127.3,
+            "y" : 156.4
+          }, {
+            "x" : 130.5,
+            "y" : 155.5
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2129,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 126.7,
+            "y" : 137.3
+          }, {
+            "x" : 124.4,
+            "y" : 138.0
+          }, {
+            "x" : 125.1,
+            "y" : 142.6
+          }, {
+            "x" : 127.6,
+            "y" : 141.7
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2126,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 239.0,
+          "y" : 113.2,
+          "width" : 2.7,
+          "height" : 13.3,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2125,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 232.9,
+          "y" : 184.6,
+          "width" : 2.7,
+          "height" : 13.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2127,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 171.7,
+          "y" : 56.1,
+          "width" : 11.5,
+          "height" : 3.1,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2128,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 137.7,
+          "y" : 54.7,
+          "width" : 8.8,
+          "height" : 3.3,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 1,
+        "shape" : {
+          "x" : 144.9,
+          "y" : 287.0,
+          "width" : 10.5,
+          "height" : 3.6,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 2122, 2121 ],
+        "probabilityToChangeTarget" : [ 0.6, 0.4 ]
+      }, {
+        "id" : 2,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 122.1,
+            "y" : 136.1
+          }, {
+            "x" : 119.3,
+            "y" : 136.8
+          }, {
+            "x" : 123.4,
+            "y" : 160.5
+          }, {
+            "x" : 126.4,
+            "y" : 160.4
+          } ]
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 2120, 2121, 2117, 2119, 2126 ],
+        "probabilityToChangeTarget" : [ ]
+      }, {
+        "id" : 3,
+        "shape" : {
+          "x" : 135.6,
+          "y" : 51.4,
+          "width" : 12.8,
+          "height" : 1.9,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 2120, 2129, 2125, 2117 ],
+        "probabilityToChangeTarget" : [ ]
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 167.1,
+          "y" : 52.6,
+          "width" : 20.6,
+          "height" : 2.9,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 2119, 2117, 2118, 2126, 2125, 2124 ],
+        "probabilityToChangeTarget" : [ ]
+      }, {
+        "id" : 5,
+        "shape" : {
+          "x" : 242.2,
+          "y" : 111.1,
+          "width" : 1.3,
+          "height" : 18.4,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 2118, 2119, 2121, 2117, 62, 2122 ],
+        "probabilityToChangeTarget" : [ ]
+      }, {
+        "id" : 6,
+        "shape" : {
+          "x" : 236.3,
+          "y" : 180.3,
+          "width" : 1.9,
+          "height" : 20.8,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 2121, 2117, 62, 2124 ],
+        "probabilityToChangeTarget" : [ ]
+      }, {
+        "id" : 7,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 249.5,
+            "y" : 283.9
+          }, {
+            "x" : 170.6,
+            "y" : 305.0
+          }, {
+            "x" : 170.3,
+            "y" : 306.9
+          }, {
+            "x" : 250.1,
+            "y" : 286.4
+          } ]
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 62, 2121, 2117, 2119, 2120 ],
+        "probabilityToChangeTarget" : [ ]
+      }, {
+        "id" : 8,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 189.4,
+            "y" : 149.5
+          }, {
+            "x" : 186.2,
+            "y" : 150.1
+          }, {
+            "x" : 186.7,
+            "y" : 151.7
+          }, {
+            "x" : 189.9,
+            "y" : 151.1
+          } ]
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 2129, 2130, 2124, 2127 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      } ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
       "droplets" : [ ],
@@ -2171,30 +2244,30 @@
           "type" : "POLYGON",
           "points" : [ {
             "x" : 143.541449190001,
-            "y" : 158.60185872297734
+            "y" : 159.00185872297735
           }, {
             "x" : 143.58886182808783,
-            "y" : 161.60627994686365
+            "y" : 162.00627994686366
           }, {
             "x" : 147.4569240217097,
-            "y" : 161.58245039545
+            "y" : 161.98245039545
           }, {
             "x" : 147.45065123669337,
-            "y" : 158.59125952143222
+            "y" : 158.99125952143223
           } ]
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 60.0
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2121 ],
+        "targetIds" : [ 2124 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -2218,16 +2291,16 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 60.0
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2122 ],
+        "targetIds" : [ 2123 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -2251,16 +2324,16 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 60.0
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2120 ],
+        "targetIds" : [ 2128 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -2284,16 +2357,16 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 60.0
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2119 ],
+        "targetIds" : [ 2127 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -2317,328 +2390,16 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 60.0
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2117 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1101,
-        "shape" : {
-          "x" : 64.5,
-          "y" : 388.1,
-          "width" : 6.9,
-          "height" : 4.7,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2101 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1102,
-        "shape" : {
-          "x" : 147.3,
-          "y" : 387.9,
-          "width" : 11.7,
-          "height" : 5.5,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2102 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1103,
-        "shape" : {
-          "x" : 183.4,
-          "y" : 387.0,
-          "width" : 89.0,
-          "height" : 5.9,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2103 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1104,
-        "shape" : {
-          "x" : 410.4,
-          "y" : 193.7,
-          "width" : 3.4,
-          "height" : 136.7,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1105,
-        "shape" : {
-          "x" : 409.9,
-          "y" : 111.5,
-          "width" : 3.6,
-          "height" : 62.4,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1106,
-        "shape" : {
-          "x" : 409.3,
-          "y" : 1.2,
-          "width" : 3.6,
-          "height" : 62.4,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1107,
-        "shape" : {
-          "x" : 295.0,
-          "y" : 0.5,
-          "width" : 99.5,
-          "height" : 4.9,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1108,
-        "shape" : {
-          "x" : 159.3,
-          "y" : 1.1,
-          "width" : 11.4,
-          "height" : 5.3,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1109,
-        "shape" : {
-          "x" : 135.9,
-          "y" : 1.3,
-          "width" : 6.5,
-          "height" : 5.1,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1110,
-        "shape" : {
-          "x" : 1.8,
-          "y" : 161.3,
-          "width" : 2.5,
-          "height" : 6.2,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1111,
-        "shape" : {
-          "x" : 1.6,
-          "y" : 173.4,
-          "width" : 3.2,
-          "height" : 58.9,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1112,
-        "shape" : {
-          "x" : 1.8,
-          "y" : 258.3,
-          "width" : 2.5,
-          "height" : 26.9,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 1113,
-        "shape" : {
-          "x" : 1.6,
-          "y" : 291.6,
-          "width" : 3.0,
-          "height" : 26.2,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
+        "targetIds" : [ 2127 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -2662,16 +2423,16 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "updateFrequency" : 20.0
         },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
+        "targetIds" : [ 2124 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -2695,16 +2456,236 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "updateFrequency" : 20.0
         },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
         "startTime" : 0.0,
-        "endTime" : 0.0,
+        "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
+        "targetIds" : [ 2126 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1123,
+        "shape" : {
+          "x" : 145.3,
+          "y" : 292.4,
+          "width" : 10.2,
+          "height" : 5.3,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 3.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1124,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 239.4,
+            "y" : 289.7
+          }, {
+            "x" : 178.8,
+            "y" : 304.9
+          }, {
+            "x" : 179.4,
+            "y" : 308.5
+          }, {
+            "x" : 240.6,
+            "y" : 294.4
+          } ]
+        },
+        "interSpawnTimeDistribution" : "timeSeries",
+        "distributionParameters" : {
+          "intervalLength" : 5.0,
+          "spawnsPerInterval" : [ 5, 0, 10, 8 ]
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 50,
+        "startTime" : 0.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1130,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 120.4,
+            "y" : 151.4
+          }, {
+            "x" : 118.10000000000001,
+            "y" : 151.7
+          }, {
+            "x" : 119.0,
+            "y" : 158.1
+          }, {
+            "x" : 121.30000000000001,
+            "y" : 157.6
+          } ]
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 10.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1129,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 118.4,
+            "y" : 139.2
+          }, {
+            "x" : 116.0,
+            "y" : 139.79999999999998
+          }, {
+            "x" : 116.80000000000001,
+            "y" : 144.4
+          }, {
+            "x" : 119.2,
+            "y" : 144.1
+          } ]
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 5.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1126,
+        "shape" : {
+          "x" : 244.5,
+          "y" : 113.0,
+          "width" : 2.2,
+          "height" : 12.8,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 0.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1125,
+        "shape" : {
+          "x" : 238.6,
+          "y" : 184.9,
+          "width" : 2.7,
+          "height" : 12.5,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 8.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1127,
+        "shape" : {
+          "x" : 169.3,
+          "y" : 48.0,
+          "width" : 11.3,
+          "height" : 3.2,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 0.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 1128,
+        "shape" : {
+          "x" : 137.9,
+          "y" : 45.5,
+          "width" : 8.0,
+          "height" : 3.1,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
+        "spawnNumber" : 4,
+        "maxSpawnNumberTotal" : 16,
+        "startTime" : 0.0,
+        "endTime" : 90.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2117 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
