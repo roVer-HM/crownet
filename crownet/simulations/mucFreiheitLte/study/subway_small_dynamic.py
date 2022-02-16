@@ -13,6 +13,7 @@ import pprint
 def main(base_path):
     reps = 3    # seed-set
     t = 200     # seconds
+    # t = 3     # seconds
     # Parameter Variations 
     par_var = [
         {"omnet": {"*.misc[*].nTable.maxAge": "5s",
@@ -64,7 +65,7 @@ def main(base_path):
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name="subwayDynamic_multiEnb_compact_density",
+        env_name="subwayDynamic_multiEnb_compact_density_002",
         opp_config="subwayDynamic_multiEnb_compact_density",
         opp_basename="omnetpp.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
@@ -85,7 +86,7 @@ def main(base_path):
         creator=coupled_creator
     )
 
-    par_var, data = setup.run(3*3)
+    par_var, data = setup.run(2*3)
 
 
 def opp_creator(env_man, parameter_variation, njobs):
