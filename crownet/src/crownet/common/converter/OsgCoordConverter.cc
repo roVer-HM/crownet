@@ -153,7 +153,7 @@ std::vector<double> OsgCoordConverterSumo::parse(const std::string& input, const
     omnetpp::cStringTokenizer tokenizer(input.c_str(), ",");
     std::vector<double> ret = tokenizer.asDoubleVector();
     if(ret.size() != count){
-        throw cRuntimeError("expected %d tokens but found %d '%s'", count, ret.size(), input.c_str());
+        throw cRuntimeError("expected %d tokens but found %zu '%s'", count, ret.size(), input.c_str());
     }
     return ret;
 }
