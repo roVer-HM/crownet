@@ -23,7 +23,6 @@
 #include "crownet/common/GlobalDensityMap.h"
 #include "crownet/applications/beacon/PositionMapPacket_m.h"
 #include "crownet/common/GlobalDensityMap.h"
-#include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 #include "crownet/crownet.h"
 
@@ -47,6 +46,7 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppInterval = &par("mainAppInterval");
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
+      cellAgeHandler = std::make_shared<TTLCellAgeHandler>(mapCfg->getCellAgeTTL(), simTime());
 
 
     } else if (stage == INITSTAGE_APPLICATION_LAYER){
@@ -303,6 +303,11 @@ void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConv
 
 
 void BaseDensityMapApp::computeValues() {
+   // cellAgeHandler is Idempotent
+  cellAgeHandler->setTime(simTime());
+  dcdMap->visitCells(*cellAgeHandler); //reference to cellAgeHandler needed
+  cellAgeHandler->setLastCall(simTime());
+
   valueVisitor->setTime(simTime());
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);

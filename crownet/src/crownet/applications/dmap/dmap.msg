@@ -29,10 +29,15 @@ class MapCfg extends cOwnedObject {
      bool writeDensityLog;
      string mapType;
      string mapTypeLog;
-     string idStreamType;   
+     simtime_t cellAgeTTL @editable;
+     string idStreamType;
 }
 
-class MapCfgYmfPlusDist extends MapCfg {
+class MapCfgYmf extends MapCfg {
+    mapType = "ymf";
+}
+
+class MapCfgYmfPlusDist extends MapCfgYmf {
  	mapType = "ymfPlusDist";
  	double alpha;   
 }

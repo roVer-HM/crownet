@@ -27,6 +27,7 @@
 #include "crownet/common/util/Writer.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "crownet/dcd/generic/CellVisitors.h"
+#include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 
 using namespace omnetpp;
@@ -90,6 +91,7 @@ protected:
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::shared_ptr<ActiveWriter> fileWriter;
  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
+ std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
  RegularGridInfo grid;
