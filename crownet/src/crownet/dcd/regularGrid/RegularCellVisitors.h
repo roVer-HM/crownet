@@ -54,6 +54,18 @@ class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
   virtual void applyTo(RegularCell& cell) override;
 };
 
+
+class TTLCellAgeHandler : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
+public:
+    TTLCellAgeHandler(RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
+     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), ttl(ttl){}
+ virtual void applyTo(RegularCell& cell) override;
+ virtual std::string getVisitorName() const override { return "silentCellAgeHandler"; }
+
+protected:
+ RegularCell::time_t ttl;
+};
+
 /**
  * Clear 'selectedIn' property of all entries in a RegularCell
  */
@@ -145,10 +157,11 @@ class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
  public:
     YmfVisitor(RegularCell::time_t t = 0.0)
-      : TimestampedGetEntryVisitor<RegularCell>(t) {}
+      : TimestampedGetEntryVisitor<RegularCell>(t){}
   virtual RegularCell::entry_t_ptr applyTo(
       const RegularCell& cell) const override;
   virtual std::string getVisitorName() const override { return "ymf"; }
+
 };
 
 
@@ -172,6 +185,7 @@ class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {
       const RegularCell& cell) const override;
   virtual std::string getVisitorName() const override { return "local"; }
 };
+
 
 
 // class LocalVisitor : public GetCellVisitor<RegularCell> {

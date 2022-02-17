@@ -40,6 +40,16 @@ void ClearVisitor::applyTo(RegularCell& cell) {
   }
 }
 
+void TTLCellAgeHandler::applyTo(RegularCell& cell) {
+    if (checkLastCall()){ // only execute once
+        for (auto e : cell) {
+            if (ttl > 0.0 && time > (ttl + e.second->getMeasureTime())){
+                e.second->reset(simtime_t::ZERO);
+            }
+        }
+    }
+}
+
 void ClearSelection::applyTo(RegularCell& cell) {
   for (auto e : cell) {
     e.second->setSelectedIn("");
@@ -91,6 +101,7 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
   }
   return ret;
 }
+
 
 RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) const {
     double age_sum = 0.0;
