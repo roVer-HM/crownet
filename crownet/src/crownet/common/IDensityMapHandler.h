@@ -15,7 +15,7 @@ namespace crownet {
 class GridCellDistance;
 class OsgCoordinateConverter;
 class RegularDcdMapFactory;
-
+class GridCellIDKeyProvider;
 
 template <typename GRID>
 class IDensityMapHandlerBase{
@@ -44,6 +44,10 @@ template <typename GRID>
 class IGlobalDensityMapHandler : public IDensityMapHandlerBase<GRID> {
 public:
     virtual ~IGlobalDensityMapHandler() = default;
+    virtual std::shared_ptr<OsgCoordinateConverter> getConverter() const = 0;
+    virtual std::shared_ptr<GridCellIDKeyProvider> getCellKeyProvider() const = 0 ;
+    virtual std::shared_ptr<RegularDcdMapFactory> getDcdMapFactory() const = 0;
+
 };
 
 }  // namespace crownet

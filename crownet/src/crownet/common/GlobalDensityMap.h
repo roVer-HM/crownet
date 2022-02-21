@@ -77,6 +77,16 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual std::shared_ptr<RegularDcdMap> getMap() override {
       return getDcdMapGlobal();
   }
+  virtual std::shared_ptr<OsgCoordinateConverter> getConverter() const override {
+      return converter;
+  }
+  virtual std::shared_ptr<GridCellIDKeyProvider> getCellKeyProvider() const override {
+      return cellKeyProvider;
+  }
+  virtual std::shared_ptr<RegularDcdMapFactory> getDcdMapFactory() const {
+      return dcdMapFactory;
+  }
+
 
   virtual void acceptNodeVisitor(traci::ITraciNodeVisitor* visitor);
 
