@@ -14,7 +14,7 @@ NeighborhoodEventWriter::NeighborhoodEventWriter(std::string filePath, std::stri
 
 
 void NeighborhoodEventWriter::onInit(){
-    write() << "table_owner" << sep << "event" << sep << "receveid_at_time" << sep \
+    write() << "table_owner" << sep << "event" << sep << "event_time" << sep << "receveid_at_time" << sep \
             << "source_node" << sep << "posX" << sep << "posY" << sep \
             << "beacon_value" << sep << "pkt_count" << sep << "pkt_loss" << endl;
 }
@@ -28,7 +28,7 @@ void NeighborhoodEventWriter::neighborhoodEntryPostChanged(INeighborhoodTable* t
 }
 
 void NeighborhoodEventWriter::writeData(INeighborhoodTable* table, BeaconReceptionInfo* info, std::string event){
-    write() << table->getOwnerId() << sep << event << sep << info->getReceivedTimePrio() << sep \
+    write() << table->getOwnerId() << sep << event << sep << simTime().dbl() << sep << info->getReceivedTimePrio() << sep \
             << info->getNodeId() << sep << info->getPos().x << sep \
             << info->getPos().y << sep << info->getBeaconValue() << sep \
             << info->getPacketsReceivedCount() << sep << info->getPacketsLossCount() << endl;
