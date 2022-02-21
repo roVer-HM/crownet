@@ -33,12 +33,13 @@ args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', marke
                                 notch=True)
 
 controller__ = {"OpenLoop": "Fixed order strategy",
-                "ClosedLoop" : "Recommend emptiest corridor strategy" }
+                "ClosedLoop" : "Minimal density strategy" }
 sim_time_steady_flow_start = 250
 sim_time_steady_flow_end = 1250
 time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"
+compliance_rate = "Compliance rate c [1]"
 
 probs = np.linspace(0, 1.0, 11)
 probs = np.linspace(0, 1.0, 41)
@@ -143,7 +144,7 @@ def plot_travel_time(travel_time):
         plt.title(f"{controller__[c]}")
         plt.xticks(np.arange(1, 45, 4), [f"{x:.1f}" for x in np.linspace(0, 1, 11)])
         plt.ylabel("Travel time [s]")
-        plt.xlabel("Compliance rate")
+        plt.xlabel(compliance_rate)
         plt.savefig(f"figs/travel_time_{controller__[c]}.png")
         plt.show()
         print()
@@ -161,7 +162,7 @@ def plot_travel_time(travel_time):
     ax[0].set_ylim(0, 250)
     ax[0].legend()
     ax[0].set_ylabel("Travel time [s]")
-    ax[0].set_xlabel("Compliance rate")
+    ax[0].set_xlabel(compliance_rate)
 
 
     time_med = travel_time.groupby(by=["Controller",reaction_prob_key_short]).median().unstack(level=0)
@@ -173,7 +174,7 @@ def plot_travel_time(travel_time):
     ax[1].set_ylim(0, 250)
     ax[1].legend()
     ax[1].set_ylabel("Travel time [s]")
-    ax[1].set_xlabel("Compliance rate")
+    ax[1].set_xlabel(compliance_rate)
 
     time_75 = travel_time.groupby(by=["Controller",reaction_prob_key_short]).quantile(0.75).unstack(level=0)
     time_75.columns = time_75.columns.droplevel(0)
@@ -184,7 +185,7 @@ def plot_travel_time(travel_time):
     ax[2].set_ylim(0, 250)
     ax[2].legend()
     ax[2].set_ylabel("Travel time [s]")
-    ax[2].set_xlabel("Compliance rate")
+    ax[2].set_xlabel(compliance_rate)
 
     plt.savefig("figs/Travel_time")
     plt.show()
@@ -366,7 +367,7 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
             densities__.boxplot(**args_boxplot)
             ax[ii, i].set_title(f"{c__[corridor_]} corridor.")
             ax[ii, i].set_ylim(y_min, y_max)
-            ax[ii, i].set_xlabel("Compliance rate r [1]")
+            ax[ii, i].set_xlabel(compliance_rate)
             ax[ii, i].set_ylabel(ylabel)
             ax[ii, i].set_xticks(np.arange(1,45,4))
             ax[ii, i].set_xticklabels([f"{x:.1f}" for x in np.linspace(0,1,11)])
@@ -399,7 +400,7 @@ def plot_route_1_recommended(path_choice, corridor_= 11):
     ppp.plot(marker="o")
     plt.ylim(-10,550)
     plt.ylabel("Counts")
-    plt.xlabel("Compliance rate r [1]")
+    plt.xlabel(compliance_rate)
     plt.title(f"{corridor} route recommended")
     plt.savefig(f"figs/route{corridor}recommded.png")
     plt.show()
