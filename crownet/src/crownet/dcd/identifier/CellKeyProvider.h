@@ -22,6 +22,8 @@ class CellKeyProvider {
   virtual ~CellKeyProvider() = default;
 
   virtual C getCellKey(const traci::TraCIPosition& pos) = 0;
+  virtual traci::TraCIPosition getCellPosition(const traci::TraCIPosition& pos) = 0;
+  virtual traci::TraCIPosition getCellPosition(const GridCellID& gridCell) = 0;
 
   virtual inet::Coord  getCellSize() const = 0;
   virtual inet::Coord  getGridSize() const = 0;
@@ -40,6 +42,8 @@ class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
       : gridInfo(gridInfo) {}
 
   virtual GridCellID getCellKey(const traci::TraCIPosition& pos) override;
+  virtual traci::TraCIPosition getCellPosition(const traci::TraCIPosition& pos) override;
+  virtual traci::TraCIPosition getCellPosition(const GridCellID& gridCell) override;
 
   virtual inet::Coord  getCellSize() const override { return gridInfo.getCellSize(); }
   virtual inet::Coord  getGridSize() const override { return gridInfo.getGridSize(); }

@@ -7,9 +7,10 @@
 
 #pragma once
 #include "crownet/common/util/FileWriter.h"
+#include "crownet/common/IDensityMapHandler.h"
 #include "crownet/neighbourhood/contract/INeighborhoodTable.h"
 #include <fstream>
-
+#include "crownet/dcd/regularGrid/RegularDcdMap.h"
 
 namespace crownet {
 
@@ -26,9 +27,13 @@ public:
     virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
     virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
 
+    void setGlobalDensityMapHandler(IGlobalDensityMapHandler<RegularDcdMap>* globalMapHandler){
+            this->globalMapHandler = globalMapHandler;
+    }
     void writeData(INeighborhoodTable* table, BeaconReceptionInfo* info, std::string event);
 
 private :
+    IGlobalDensityMapHandler<RegularDcdMap>* globalMapHandler;
 
     void init();
 };

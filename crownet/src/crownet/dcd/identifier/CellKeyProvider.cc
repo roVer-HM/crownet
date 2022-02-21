@@ -17,6 +17,15 @@ GridCellID GridCellIDKeyProvider::getCellKey(const traci::TraCIPosition& pos) {
   return GridCellID(x_id, y_id);
 }
 
+traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const traci::TraCIPosition& pos){
+    return getCellPosition(getCellKey(pos));
+}
+
+traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const GridCellID& gridCell){
+    return traci::TraCIPosition{gridCell.x()*gridInfo.getCellSize().x, gridCell.y()*gridInfo.getCellSize().y};
+}
+
+
 double GridCellIDKeyProvider::cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2) {
     if (cell1 == cell2){
         return 0.0;
