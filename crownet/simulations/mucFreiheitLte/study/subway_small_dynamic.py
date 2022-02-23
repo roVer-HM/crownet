@@ -65,7 +65,7 @@ def main(base_path):
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name="subwayDynamic_multiEnb_compact_density_002",
+        env_name="subwayDynamic_multiEnb_compact_density_003",
         opp_config="subwayDynamic_multiEnb_compact_density",
         opp_basename="omnetpp.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
@@ -86,7 +86,8 @@ def main(base_path):
         creator=coupled_creator
     )
 
-    par_var, data = setup.run(2*3)
+    # par_var, data = setup.run(2*3)
+    par_var, data = setup.run(1)
 
 
 def opp_creator(env_man, parameter_variation, njobs):
