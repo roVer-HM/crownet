@@ -1,5 +1,5 @@
 {
-  "name" : "mf_cirlce",
+  "name" : "mf_003_circle3",
   "description" : "",
   "release" : "2.0",
   "processWriters" : {
@@ -77,14 +77,14 @@
     "attributesSimulation" : {
       "finishTime" : 400.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : -7492697142818052001,
-      "simulationSeed" : -7492697142818052001
+      "simulationSeed" : 0
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
