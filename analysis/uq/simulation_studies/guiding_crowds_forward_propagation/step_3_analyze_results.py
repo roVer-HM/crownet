@@ -484,8 +484,8 @@ if __name__ == "__main__":
 
     densities, velocities = get_densities_velocities()
 
-    plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [ped/m*2]")
-    plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocities [m/s]")
+    plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [$ped/m^2$]")
+    plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocity [$m/s$]")
 
     # write table data
 
