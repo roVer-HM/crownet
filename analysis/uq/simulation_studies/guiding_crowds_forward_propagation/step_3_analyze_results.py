@@ -39,7 +39,7 @@ sim_time_steady_flow_end = 1250
 time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"
-compliance_rate = "Compliance rate c [1]"
+compliance_rate = "Compliance rate c"
 
 probs = np.linspace(0, 1.0, 11)
 probs = np.linspace(0, 1.0, 41)
@@ -208,7 +208,7 @@ def plot_hists_corridor1():
 
     plt.legend()
     plt.xlabel("Simulation time [s]")
-    plt.ylabel("Density $ped/m^{2}$")
+    plt.ylabel("Density [$ped/m^{2}$]")
     plt.title("Short corridor (no rerouting)")
     plt.savefig("figs/DensityOverTime.png")
     plt.show()
@@ -223,7 +223,7 @@ def plot_hists_corridor1():
 
     plt.legend()
     plt.xlabel("Simulation time [s]")
-    plt.ylabel("Velocity $m/s$")
+    plt.ylabel("Velocity [$m/s$]")
     plt.title("Short corridor (no rerouting)")
     plt.savefig("figs/VelocityOverTime.png")
     plt.show()
@@ -365,7 +365,7 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
             densities__ = densities_.xs(corridor_, axis=1)
             plt.sca(ax[ii, i])
             densities__.boxplot(**args_boxplot)
-            ax[ii, i].set_title(f"{c__[corridor_]} corridor.")
+            ax[ii, i].set_title(f"{c__[corridor_]} corridor")
             ax[ii, i].set_ylim(y_min, y_max)
             ax[ii, i].set_xlabel(compliance_rate)
             ax[ii, i].set_ylabel(ylabel)
@@ -399,9 +399,9 @@ def plot_route_1_recommended(path_choice, corridor_= 11):
     ppp.columns = list(controller__.values())
     ppp.plot(marker="o")
     plt.ylim(-10,550)
-    plt.ylabel("Counts")
+    plt.ylabel("Number of recommendations")
     plt.xlabel(compliance_rate)
-    plt.title(f"{corridor} route recommended")
+    plt.title(f"{corridor} route")
     plt.savefig(f"figs/route{corridor}recommded.png")
     plt.show()
     print()
