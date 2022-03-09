@@ -145,7 +145,7 @@ def plot_travel_time(travel_time):
         plt.xticks(np.arange(1, 45, 4), [f"{x:.1f}" for x in np.linspace(0, 1, 11)])
         plt.ylabel("Travel time [s]")
         plt.xlabel(compliance_rate)
-        plt.savefig(f"figs/travel_time_{controller__[c]}.png")
+        plt.savefig(f"figs/travel_time_{controller__[c]}.pdf")
         plt.show()
         print()
 
@@ -210,7 +210,7 @@ def plot_hists_corridor1():
     plt.xlabel("Simulation time [s]")
     plt.ylabel("Density [$ped/m^{2}$]")
     plt.title("Short corridor (no rerouting)")
-    plt.savefig("figs/DensityOverTime.png")
+    plt.savefig("figs/DensityOverTime.pdf")
     plt.show()
 
     velocities[simulation_time] = velocities[simulation_time].round(2)
@@ -225,7 +225,7 @@ def plot_hists_corridor1():
     plt.xlabel("Simulation time [s]")
     plt.ylabel("Velocity [$m/s$]")
     plt.title("Short corridor (no rerouting)")
-    plt.savefig("figs/VelocityOverTime.png")
+    plt.savefig("figs/VelocityOverTime.pdf")
     plt.show()
 
     densities, velocities = get_fundamental_diagrams(controller_type="NoController")
@@ -287,7 +287,7 @@ def get_fundamental_diagram_corridor1():
     plt.xlim(-0.1,3.5)
     plt.title(f"Fundamental diagram: short corridor")
     plt.legend()
-    plt.savefig(f"figs/fundamentalDiagramShortCorridor1.png")
+    plt.savefig(f"figs/fundamentalDiagramShortCorridor1.pdf")
     plt.show()
 
     plt.scatter(densities["Corridor1"], velocities["Corridor1"], label="Simulation data")
@@ -296,7 +296,7 @@ def get_fundamental_diagram_corridor1():
     plt.title(f"Fundamental diagram: short corridor")
     plt.xlim(-0.1, 3.5)
     plt.legend()
-    plt.savefig(f"figs/fundamentalDiagramShortCorridor2.png")
+    plt.savefig(f"figs/fundamentalDiagramShortCorridor2.pdf")
     plt.show()
 
 
@@ -376,7 +376,7 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
         i += 1
 
     fig.suptitle("                  ".join(c_order), fontsize=16, x= 0.47)
-    plt.savefig(f"figs/{file_name}.png")
+    plt.savefig(f"figs/{file_name}.pdf")
     plt.show()
     print()
 
@@ -402,7 +402,7 @@ def plot_route_1_recommended(path_choice, corridor_= 11):
     plt.ylabel("Number of recommendations")
     plt.xlabel(compliance_rate)
     plt.title(f"{corridor} route")
-    plt.savefig(f"figs/route{corridor}recommded.png")
+    plt.savefig(f"figs/route{corridor}recommded.pdf")
     plt.show()
     print()
 
@@ -417,6 +417,18 @@ def compare_random_densitiies(dd,  travel_time, value="Median",):
     dd = dd.drop(0.0)
     dd.columns = dd.columns.droplevel(0)
     dd.rename(columns=controller__,inplace=True)
+    a= dd.hist()
+    a[0][0].set_ylim(0, 20)
+    a[0][0].set_xlim(0.25, 2.25)
+    a[0][0].set_xlabel("Median density [$ped/m^2$]")
+    a[0][1].set_xlabel("Median density [$ped/m^2$]")
+    a[0][0].set_ylabel("Counts")
+    a[0][1].set_ylabel("Counts")
+    a[0][1].set_ylim(0, 20)
+    a[0][1].set_xlim(0.25, 2.25)
+    plt.savefig(f"figs/{value}DensityDist2.pdf")
+    plt.show()
+
     dd.boxplot(grid=False)
     left, right = plt.xlim()
     los = [0.31,0.43,0.71,1.08,2.17]
@@ -426,7 +438,7 @@ def compare_random_densitiies(dd,  travel_time, value="Median",):
 
     plt.ylabel(f"{value} density [$ped/m^2$]")
     plt.title("Short corridor")
-    plt.savefig(f"figs/{value}DensityDist.png")
+    plt.savefig(f"figs/{value}DensityDist.pdf")
     plt.show()
     # not normally distributed, if p < 0.05
     s_1 = stats.kstest(dd.iloc[:,0], "norm")
@@ -442,9 +454,25 @@ def compare_random_densitiies(dd,  travel_time, value="Median",):
     times = times.drop(0.0)
     times.columns = times.columns.droplevel(0)
     times.rename(columns=controller__, inplace=True)
+
+    a = times.hist()
+    a[0][0].set_ylim(0, 20)
+    a[0][0].set_xlim(60, 200)
+    a[0][0].set_xlabel("Median travel time [$s$]")
+    a[0][0].set_ylabel("Counts")
+
+    a[0][1].set_xlabel("Median travel time [$s$]")
+    a[0][1].set_ylabel("Counts")
+    a[0][1].set_ylim(0, 20)
+    a[0][1].set_xlim(60, 200)
+    plt.savefig(f"figs/{value}TravelDist2.pdf")
+    plt.show()
+
+
+
     times.boxplot()
     plt.ylabel(f"{value} travel time [s]")
-    plt.savefig(f"figs/{value}TravelDist.png")
+    plt.savefig(f"figs/{value}TravelDist.pdf")
     plt.show()
 
     s_1_ = stats.kstest(times.iloc[:, 0], "norm")
