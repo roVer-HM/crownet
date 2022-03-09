@@ -187,7 +187,7 @@ def plot_travel_time(travel_time):
     ax[2].set_ylabel("Travel time [s]")
     ax[2].set_xlabel(compliance_rate)
 
-    plt.savefig("figs/Travel_time")
+    plt.savefig("figs/Travel_time.pdf")
     plt.show()
 
 def plot_hists_corridor1():
