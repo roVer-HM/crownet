@@ -149,13 +149,14 @@ def plot_travel_time(travel_time):
         plt.show()
         print()
 
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(12, 5), sharey=True)
-    fig.subplots_adjust(wspace=0, hspace=0)
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
+    fig.subplots_adjust(wspace=0.1, hspace=0)
 
     time_25 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.25).unstack(level=0)
     time_25.columns = time_25.columns.droplevel(0)
     time_25.rename(columns=controller__, inplace=True)
     plt.sca(ax[0])
+    ax[0].hlines(y=time_25.max(), xmin=0, xmax=1, colors=["k"])
     time_25.plot(marker="o", ax=ax[0])
     plt.legend()
     ax[0].set_title("25% Quartile")
@@ -168,6 +169,7 @@ def plot_travel_time(travel_time):
     time_med.columns = time_med.columns.droplevel(0)
     time_med.rename(columns=controller__, inplace=True)
     plt.sca(ax[1])
+    ax[1].hlines(y=time_med.max(), xmin=0, xmax=1, colors=["k"])
     time_med.plot(marker="o", ax=ax[1])
     ax[1].set_title("Median")
     #ax[1].set_ylim(0, 250)
@@ -179,12 +181,14 @@ def plot_travel_time(travel_time):
     time_75.columns = time_75.columns.droplevel(0)
     time_75.rename(columns=controller__, inplace=True)
     plt.sca(ax[2])
+    ax[2].hlines(y=time_75.max(), xmin=0, xmax=1, colors=["k"])
     time_75.plot(marker="o", ax=ax[2])
     ax[2].set_title("75% Quartile")
     #ax[2].set_ylim(0, 250)
     ax[2].legend()
     # ax[2].set_ylabel("Travel time [s]")
     ax[2].set_xlabel(compliance_rate)
+
 
     plt.savefig("figs/Travel_time.pdf")
     plt.show()
@@ -512,8 +516,8 @@ if __name__ == "__main__":
 
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
 
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(12, 5), sharey=True)
-    fig.subplots_adjust(wspace=0, hspace=0)
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
+    fig.subplots_adjust(wspace=0.1, hspace=0)
     ax[0].set_ylim(-10, 550)
     ax[0].set_ylabel("Number of recommendations")
     plot_route_1_recommended(path_choice, 11, ax[0])
