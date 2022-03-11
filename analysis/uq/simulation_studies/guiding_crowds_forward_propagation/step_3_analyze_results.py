@@ -3,6 +3,10 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LinearRegression
+
 reaction_prob_key = "('Parameter', 'vadere', 'reactionProbabilities.[stimulusId==-400].reactionProbability')"
 time_step_key = "timeStep"
 seed_key_key = "('Parameter', 'vadere', 'fixedSeed')"
@@ -41,10 +45,7 @@ time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"
 compliance_rate = "Compliance rate c"
-
-probs = np.linspace(0, 1.0, 11)
 probs = np.linspace(0, 1.0, 41)
-
 
 def get_fundamental_diagrams(controller_type, time_start=None):
     if time_start is None:
@@ -61,7 +62,7 @@ def get_fundamental_diagrams(controller_type, time_start=None):
                                inplace=True)
     densities_closed_loop.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
 
-    velocities_ = velocities_ = densities_closed_loop.drop(columns=list(densities_dict.keys()))
+    velocities_ = densities_closed_loop.drop(columns=list(densities_dict.keys()))
     velocities_.rename(columns=velocities_dict, inplace=True)
     velocities_["Controller"] = controller_type
     velocities_.sort_index(axis=1, inplace=True)
@@ -74,8 +75,7 @@ def get_fundamental_diagrams(controller_type, time_start=None):
     if densities_.equals(get_densities(controller_type=controller_type)):
         print(f"{controller_type}: density check successful.")
     else:
-        pass
-        # raise ValueError("Fundamental diagram densities differ from measured densities.")
+        raise ValueError("Fundamental diagram densities differ from measured densities.")
 
     return densities_, velocities_
 
@@ -117,13 +117,9 @@ def get_time_controller_wise(controller_type):
 
 
 def get_travel_times():
-    c1 = get_time_controller_wise(controller_type="NoController")
     c2 = get_time_controller_wise(controller_type="OpenLoop")
     c3 = get_time_controller_wise(controller_type="ClosedLoop")
-
     travel_times = pd.concat([c2, c3])
-    # travel_times = pd.concat([travel_times, c3])
-
     return travel_times
 
 
@@ -257,9 +253,7 @@ def get_fundamental_diagram_corridor1():
 
     flux = densities["Corridor1"] * velocities["Corridor1"]
 
-    from sklearn.preprocessing import PolynomialFeatures
-    from sklearn.pipeline import make_pipeline
-    from sklearn.linear_model import LinearRegression
+
     degree = 2
     polyreg = make_pipeline(PolynomialFeatures(degree), LinearRegression())
     polyreg.fit(densities["Corridor1"].values.reshape(-1, 1), flux.values.reshape(-1, 1))
@@ -504,18 +498,7 @@ def compare_random_densitiies(dd, travel_time, value="Median", ):
 
     print()
 
-
-if __name__ == "__main__":
-    travel_time = get_travel_times()
-
-    plot_travel_time(travel_time)
-
-    plot_hists_corridor1()
-
-    get_fundamental_diagram_corridor1()
-
-    path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
-
+def plot_path_choice(path_choice):
     fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
     fig.subplots_adjust(wspace=0.1, hspace=0)
     ax[0].set_ylim(-10, 550)
@@ -526,13 +509,24 @@ if __name__ == "__main__":
     fig.savefig(f"figs/routesrecommded.pdf")
     plt.show()
 
+if __name__ == "__main__":
+
+    
+    travel_time = get_travel_times()
+    plot_travel_time(travel_time)
+    plot_hists_corridor1()
+
+    get_fundamental_diagram_corridor1()
+
+    path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
+    plot_path_choice(path_choice=path_choice)
+
     densities, velocities = get_densities_velocities()
 
     plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [$ped/m^2$]")
     plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocity [$m/s$]")
 
     # write table data
-
     velocities.drop(columns=simulation_time). \
         groupby(by=["Controller", reaction_prob_key_short]). \
         median(). \
