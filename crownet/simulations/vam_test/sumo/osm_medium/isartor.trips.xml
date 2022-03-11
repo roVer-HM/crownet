@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generated on 2022-02-22 13:01:03.722622 by randomTrips.py UNKNOWN
+  options: -n isartor.net.xml <doubleminus>vehicle-class pedType1 <doubleminus>trip-attributes=maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)" <doubleminus>pedestrians -e 60 -o isartor.trips.xml
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pedType1" maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)"/>
+    <person id="0" depart="0.00" type="pedType1">
+        <walk from="350848860#0" to="102604795#0"/>
+    </person>
+    <person id="1" depart="1.00" type="pedType1">
+        <walk from="292199760#1" to="23374338#0"/>
+    </person>
+    <person id="2" depart="2.00" type="pedType1">
+        <walk from="402461437" to="350848860#4"/>
+    </person>
+    <person id="3" depart="3.00" type="pedType1">
+        <walk from="49612670#2" to="143927075"/>
+    </person>
+    <person id="4" depart="4.00" type="pedType1">
+        <walk from="32209559" to="102604795#1"/>
+    </person>
+    <person id="5" depart="5.00" type="pedType1">
+        <walk from="23374338#0" to="333557760#0"/>
+    </person>
+    <person id="6" depart="6.00" type="pedType1">
+        <walk from="102604795#0" to="22976688"/>
+    </person>
+    <person id="7" depart="7.00" type="pedType1">
+        <walk from="350848860#1" to="333557760#4"/>
+    </person>
+    <person id="8" depart="8.00" type="pedType1">
+        <walk from="23374338#0" to="333573809"/>
+    </person>
+    <person id="9" depart="9.00" type="pedType1">
+        <walk from="436996282#0" to="-23374338#0"/>
+    </person>
+    <person id="10" depart="10.00" type="pedType1">
+        <walk from="402461453#1" to="350873890#0"/>
+    </person>
+    <person id="11" depart="11.00" type="pedType1">
+        <walk from="292199773" to="22976674#1"/>
+    </person>
+    <person id="12" depart="12.00" type="pedType1">
+        <walk from="863384658" to="292199772"/>
+    </person>
+    <person id="13" depart="13.00" type="pedType1">
+        <walk from="143927076" to="143927076"/>
+    </person>
+    <person id="14" depart="14.00" type="pedType1">
+        <walk from="49612669#2" to="336063691"/>
+    </person>
+    <person id="15" depart="15.00" type="pedType1">
+        <walk from="436996282#0" to="402461437"/>
+    </person>
+    <person id="16" depart="16.00" type="pedType1">
+        <walk from="333557760#3" to="966283235"/>
+    </person>
+    <person id="17" depart="17.00" type="pedType1">
+        <walk from="292199787" to="333557760#4"/>
+    </person>
+    <person id="18" depart="18.00" type="pedType1">
+        <walk from="49612669#0" to="336063695#0"/>
+    </person>
+    <person id="19" depart="19.00" type="pedType1">
+        <walk from="49612669#3" to="333573808"/>
+    </person>
+    <person id="20" depart="20.00" type="pedType1">
+        <walk from="399409980" to="102604795#2"/>
+    </person>
+    <person id="21" depart="21.00" type="pedType1">
+        <walk from="23374338#1" to="292199761"/>
+    </person>
+    <person id="22" depart="22.00" type="pedType1">
+        <walk from="143927075" to="23374338#1"/>
+    </person>
+    <person id="23" depart="23.00" type="pedType1">
+        <walk from="144060053#0" to="292199760#1"/>
+    </person>
+    <person id="24" depart="24.00" type="pedType1">
+        <walk from="350848860#0" to="292199781"/>
+    </person>
+    <person id="25" depart="25.00" type="pedType1">
+        <walk from="292199787" to="22976694"/>
+    </person>
+    <person id="26" depart="26.00" type="pedType1">
+        <walk from="292199760#0" to="863383155#0"/>
+    </person>
+    <person id="27" depart="27.00" type="pedType1">
+        <walk from="350848860#1" to="336063691"/>
+    </person>
+    <person id="28" depart="28.00" type="pedType1">
+        <walk from="22976676" to="402461437"/>
+    </person>
+    <person id="29" depart="29.00" type="pedType1">
+        <walk from="22976674#1" to="292199790#0"/>
+    </person>
+    <person id="30" depart="30.00" type="pedType1">
+        <walk from="966355956" to="350848860#0"/>
+    </person>
+    <person id="31" depart="31.00" type="pedType1">
+        <walk from="333557760#5" to="350848860#5"/>
+    </person>
+    <person id="32" depart="32.00" type="pedType1">
+        <walk from="49612669#1" to="402461447"/>
+    </person>
+    <person id="33" depart="33.00" type="pedType1">
+        <walk from="23374338#1" to="102604795#1"/>
+    </person>
+    <person id="34" depart="34.00" type="pedType1">
+        <walk from="292199767" to="292199760#0"/>
+    </person>
+    <person id="35" depart="35.00" type="pedType1">
+        <walk from="22976694" to="863383155#1"/>
+    </person>
+    <person id="36" depart="36.00" type="pedType1">
+        <walk from="49612670#1" to="292199767"/>
+    </person>
+    <person id="37" depart="37.00" type="pedType1">
+        <walk from="350848860#2" to="292199790#1"/>
+    </person>
+    <person id="38" depart="38.00" type="pedType1">
+        <walk from="863383154#1" to="333552121#1"/>
+    </person>
+    <person id="39" depart="39.00" type="pedType1">
+        <walk from="292199760#0" to="239585951"/>
+    </person>
+    <person id="40" depart="40.00" type="pedType1">
+        <walk from="333557760#5" to="292199760#0"/>
+    </person>
+    <person id="41" depart="41.00" type="pedType1">
+        <walk from="333573809" to="49612670#3"/>
+    </person>
+    <person id="42" depart="42.00" type="pedType1">
+        <walk from="315220257" to="23374338#0"/>
+    </person>
+    <person id="43" depart="43.00" type="pedType1">
+        <walk from="966355957" to="333557760#0"/>
+    </person>
+    <person id="44" depart="44.00" type="pedType1">
+        <walk from="143927076" to="102604795#2"/>
+    </person>
+    <person id="45" depart="45.00" type="pedType1">
+        <walk from="144060053#1" to="336063695#1"/>
+    </person>
+    <person id="46" depart="46.00" type="pedType1">
+        <walk from="402461453#0" to="32209559"/>
+    </person>
+    <person id="47" depart="47.00" type="pedType1">
+        <walk from="116691678#1" to="292199790#0"/>
+    </person>
+    <person id="48" depart="48.00" type="pedType1">
+        <walk from="966355957" to="333557760#2"/>
+    </person>
+    <person id="49" depart="49.00" type="pedType1">
+        <walk from="966283235" to="49612669#3"/>
+    </person>
+    <person id="50" depart="50.00" type="pedType1">
+        <walk from="-23374338#1" to="402461429"/>
+    </person>
+    <person id="51" depart="51.00" type="pedType1">
+        <walk from="350848860#5" to="333557760#3"/>
+    </person>
+    <person id="52" depart="52.00" type="pedType1">
+        <walk from="292199760#0" to="350848860#1"/>
+    </person>
+    <person id="53" depart="53.00" type="pedType1">
+        <walk from="144060053#1" to="333552112#0"/>
+    </person>
+    <person id="54" depart="54.00" type="pedType1">
+        <walk from="333552121#0" to="863384658"/>
+    </person>
+    <person id="55" depart="55.00" type="pedType1">
+        <walk from="49612670#1" to="292199760#0"/>
+    </person>
+    <person id="56" depart="56.00" type="pedType1">
+        <walk from="333552125" to="22976679"/>
+    </person>
+    <person id="57" depart="57.00" type="pedType1">
+        <walk from="863383154#1" to="49612670#0"/>
+    </person>
+    <person id="58" depart="58.00" type="pedType1">
+        <walk from="292199762" to="350848860#0"/>
+    </person>
+    <person id="59" depart="59.00" type="pedType1">
+        <walk from="336063691" to="22976674#0"/>
+    </person>
+</routes>

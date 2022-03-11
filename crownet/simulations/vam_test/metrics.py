@@ -72,13 +72,26 @@ def calc_datavolume(db_path):
     
     con = sqlite3.connect(db_path)
     cur = con.cursor()
+    cur.row_factory = lambda cursor, row: row[0]
     
+    cur.execute("SELECT v.vectorId FROM vector as v WHERE v.vectorName = 'packetSent:vector(packetBytes)'")
+    v_ids = cur.fetchall()
     
-    return true
+    for v_id in v_ids:
+        cur.execute("SELECT vd.value FROM vectorData as vd WHERE vd.vectorId = " + str(v_id))
+        received_packets = cur.fetchall()
+        total_datavolume += sum(received_packets)
+        count += len(received_packets)
+    
+    cur.close()
+    
+    avg_datavolume = total_datavolume/count
+    print(avg_datavolume)
+    
+    return avg_datavolume
 
 """
-Calculates the average deviation of a VRUs known position from its actual position in meters,
-by interpolation of the speed of a VRU and the latency of VAMs.
+Calculates the average deviation of a VRUs known position from its actual position in meters.
 
 :param: db_path:    Path to the database which stores the results of the simulation.
     
@@ -91,7 +104,19 @@ def calc_pos_diff(db_path):
     con = sqlite3.connect(db_path)
     cur = con.cursor()
     
-    return true
+    cur.execute("SELECT v.vectorCount as count, v.vectorSum as sum FROm vector as v where v.vectorName = 'posdiff:vector'")
+    pd_tuples = cur.fetchall()
+    
+    for pd_tuple in pd_tuples:
+        count += pd_tuple[0]
+        total_pos_diff += pd_tuple[1]
+    
+    cur.close()     
+    
+    avg_pos_diff = total_pos_diff/count
+    print(avg_pos_diff)
+    
+    return avg_pos_diff
 
 
 def main():
@@ -106,7 +131,7 @@ def main():
     parser_pos_diff = subparsers.add_parser("pos", help="Average deviation of a VRUs known position from its actual position.")
     parser_pos_diff.set_defaults(func=calc_pos_diff)
     
-    # calc_latency("results/simple_cam_den_20220120-17:27:23/vars_rep_0.vec")
+    # calc_latency("results/simple_cam_den_20220215-10:44:58/vars_rep_0.vec")
     options = parser.parse_args()
     options.func(options.path)
 
