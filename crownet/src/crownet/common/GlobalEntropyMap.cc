@@ -101,6 +101,7 @@ void GlobalEntropyMap::updateMaps() {
 void GlobalEntropyMap::updateEntropy(){
     auto now = simTime();
     auto prevUpdate = getLastUpdatedAt();
+    RegularGridInfo grid = converter->getGridDescription();
     if (now > prevUpdate){
         for(int x = 0; x < grid.getCellCount().x ; x++) {
             for(int y = 0; y < grid.getCellCount().y; y++){

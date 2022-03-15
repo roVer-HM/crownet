@@ -83,7 +83,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual std::shared_ptr<GridCellIDKeyProvider> getCellKeyProvider() const override {
       return cellKeyProvider;
   }
-  virtual std::shared_ptr<RegularDcdMapFactory> getDcdMapFactory() const {
+  virtual std::shared_ptr<RegularDcdMapFactory> getDcdMapFactory() const override {
       return dcdMapFactory;
   }
 
@@ -113,7 +113,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   gridMap_t dezentralMaps;
   std::string m_mobilityModule;
   std::shared_ptr<ActiveWriter> fileWriter;
-  RegularGridInfo grid;
+
 
 };
 

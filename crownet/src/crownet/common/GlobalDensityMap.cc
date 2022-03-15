@@ -99,9 +99,9 @@ void GlobalDensityMap::initializeMap(){
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
                     ->getConverter();
+    converter->setCellSize(par("cellSize").doubleValue());
 
-    grid = converter->getGridDescription(par("cellSize").doubleValue());
-    dcdMapFactory = std::make_shared<RegularDcdMapFactory>(grid);
+    dcdMapFactory = std::make_shared<RegularDcdMapFactory>(converter);
 
     dcdMapGlobal = dcdMapFactory->create_shared_ptr(IntIdentifer(-1));  // global
     cellKeyProvider = dcdMapFactory->getCellKeyProvider();
@@ -110,12 +110,13 @@ void GlobalDensityMap::initializeMap(){
     if (par("writerType").stdstringValue() == "csv"){
         ActiveFileWriterBuilder fBuilder{};
         fBuilder.addMetadata("IDXCOL", 3);
-        fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
-        fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
+        fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+        fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
         fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
         fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
         // todo cellsize in x and y
-        fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
+        fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+        fBuilder.addMetadata("VERSION", std::string("0.2")); // todo!!!
         fBuilder.addMetadata<std::string>(
             "MAP_TYPE",
             "global");  // The global density map is the ground

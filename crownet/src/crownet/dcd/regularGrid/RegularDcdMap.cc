@@ -11,9 +11,11 @@
 
 namespace crownet {
 
-RegularDcdMapFactory::RegularDcdMapFactory(const RegularGridInfo& grid)
-        : grid(grid),
-          cellKeyProvider(std::make_shared<GridCellIDKeyProvider>(grid)),
+//RegularDcdMapFactory::RegularDcdMapFactory(const RegularGridInfo& grid)
+RegularDcdMapFactory::RegularDcdMapFactory(std::shared_ptr<OsgCoordinateConverter> converter)
+        : grid(converter->getGridDescription()),
+          converter(converter),
+          cellKeyProvider(std::make_shared<GridCellIDKeyProvider>(converter)),
           timeProvider(std::make_shared<SimTimeProvider>()) {
 
     visitor_dispatcher["ymf"] = [this](MapCfg* mapCfg){return std::make_shared<YmfVisitor>(timeProvider->now());};

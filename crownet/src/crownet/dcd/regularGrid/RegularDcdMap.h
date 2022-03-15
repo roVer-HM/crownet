@@ -30,7 +30,8 @@ using GridGlobalEntry = IGlobalEntry<IntIdentifer, omnetpp::simtime_t>;
 
 class RegularDcdMapFactory {
  public:
-  RegularDcdMapFactory(const RegularGridInfo& grid);
+//  RegularDcdMapFactory(const RegularGridInfo& grid);
+  RegularDcdMapFactory(std::shared_ptr<OsgCoordinateConverter> converter);
 
   std::map<std::string, VisitorCreator>visitor_dispatcher;
   std::map<std::string, CellIdStreamCreator>cellIdStream_dispatcher;
@@ -45,6 +46,7 @@ class RegularDcdMapFactory {
 
  private:
   RegularGridInfo grid;
+  std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
   std::shared_ptr<SimTimeProvider> timeProvider;
 };

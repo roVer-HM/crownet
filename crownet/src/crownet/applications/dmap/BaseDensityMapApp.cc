@@ -102,10 +102,8 @@ void BaseDensityMapApp::initDcdMap(){
 
     if (!dcdMapFactory){
         EV_WARN << "Density map factory not set. This will impact the performance because each map has a separate distance cache!" << endl;
-        grid = converter->getGridDescription(par("cellSize").doubleValue());
-        dcdMapFactory = std::make_shared<RegularDcdMapFactory>(grid);
-    } else {
-        grid = dcdMapFactory->getGrid();
+//        converter->setCellSize(par("cellSize").doubleValue());
+        dcdMapFactory = std::make_shared<RegularDcdMapFactory>(converter);
     }
     
     dcdMap = dcdMapFactory->create_shared_ptr(IntIdentifer(hostId), mapCfg->getIdStreamType());
@@ -121,12 +119,13 @@ void BaseDensityMapApp::initWriter(){
 //      if (sqlApi == nullptr){ // use csv
       ActiveFileWriterBuilder fBuilder{};
       fBuilder.addMetadata("IDXCOL", 3);
-      fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
-      fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
+      fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+      fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
       fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
       fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
       // todo cellsize in x and y
-      fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
+      fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+      fBuilder.addMetadata("VERSION", std::string("0.2")); // todo!!!
       fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
       fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
       std::stringstream s;
