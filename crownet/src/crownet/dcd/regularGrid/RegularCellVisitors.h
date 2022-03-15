@@ -166,11 +166,18 @@ class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
 
 
 class YmfPlusDistVisitor : public TimestampedGetEntryVisitor<RegularCell> {
+protected:
+    struct sum_data {
+        double age_sum;
+        double age_min;
+        double dist_sum;
+    };
 public:
     YmfPlusDistVisitor(double alpha = 0.5, RegularCell::time_t t = 0.0)
         : TimestampedGetEntryVisitor<RegularCell>(t), alpha(alpha) {}
     virtual RegularCell::entry_t_ptr applyTo(
         const RegularCell& cell) const override;
+    sum_data getSums(const RegularCell& cell) const;
     virtual std::string getVisitorName() const override { return "ymfPlusDist"; }
 
 protected:

@@ -103,14 +103,28 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
 }
 
 
-RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) const {
+YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell) const {
     double age_sum = 0.0;
+    double age_min = std::numeric_limits<double>::max();
     double distance_sum = 0.0;
     double now = this->time.dbl(); // current time the visitor is called.
 
-
+    double age = .0;
+    int count = 0;
     for (const auto& e : cell.validIter()) {
-        age_sum += (now - e.second->getMeasureTime().dbl());
+        /*
+         * Collect the sum of age difference relative to the
+         * youngest measure (i.e. smallest age). For this
+         * sum up all ages and find the smallest age at the same
+         * time. Subtract count*age_min after the fact from age_sum.
+         */
+        age = now - e.second->getMeasureTime().dbl();
+        if(age < age_min){
+            age_min = age;
+        }
+        age_sum += age;
+        ++count;
+
         /*
          * In the case of a local entry the 'sourceEntry' and 'ownerEntry'
          * values must be the same. Thus the sum of all sourceEntry values
@@ -119,11 +133,22 @@ RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) co
          */
         distance_sum += e.second->getEntryDist().sourceEntry;
     }
+    age_sum = age_sum - count*age_min;
+    return sum_data{age_sum, age_min, distance_sum};
+}
+
+RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) const {
+
+    sum_data d = getSums(cell);
+    double now = this->time.dbl(); // current time the visitor is called.
+
     RegularCell::entry_t_ptr ret = nullptr;
     double ret_ymfPlusDist = 0.0;
     double ymfPlusDist = 0.0;
     for (const auto& e : cell.validIter()) {
-      ymfPlusDist = alpha * (now -e.second->getMeasureTime().dbl())/age_sum + (1-alpha) * e.second->getEntryDist().sourceEntry/distance_sum;
+      double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
+      ymfPlusDist = alpha * (age)/d.age_sum +
+              (1-alpha) * e.second->getEntryDist().sourceEntry/d.dist_sum;
       if (ret == nullptr) {
         ret = e.second;
         ret_ymfPlusDist = ymfPlusDist;
