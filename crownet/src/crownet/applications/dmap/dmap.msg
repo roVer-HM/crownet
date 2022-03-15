@@ -79,6 +79,8 @@ cplusplus(cc){{
 class LocatedDcDCell extends DcDCell {
     uint16_t idOffsetX;   // 2B
     uint16_t idOffsetY;   // 2B
+    double sourceEntryDist = 0.; // todo fix header size?
+    
 }
 
 cplusplus(LocatedDcDCell){{
@@ -106,6 +108,7 @@ class MapHeader extends inet::FieldsChunk {
  	uint32_t refCoordLat; // Y in microdegree
  	uint16_t refIdOffsetX;
 	uint16_t refIdOffsetY;
+	inet::Coord pos;
 	
 	// todo check
  	uint16_t sourceCellIdX; // 2B
