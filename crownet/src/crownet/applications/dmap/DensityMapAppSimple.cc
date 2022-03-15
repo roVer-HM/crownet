@@ -87,7 +87,8 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
         cellEntryLocal->incrementCount(simTime(), newInfo->getBeaconValue());
         // update the entry distance struct. Current node (ownerCell is both the source and owner in the entry distance struct.
         // because this node 'measures' the  value in the cell from which the beacon comes from.
-        cellEntryLocal->setEntryDist(dcdMap->getCellKeyProvider()->getEntryDist(ownerCellId, ownerCellId, beaconCellId));
+        const auto pos = getPosition();
+        cellEntryLocal->setEntryDist(dcdMap->getCellKeyProvider()->getExactDist(pos, pos, beaconCellId));
 
         // update position of beacon source in neighborhood table.
         dcdMap->addToNeighborhood((int)newInfo->getNodeId(), beaconSourcePos);
