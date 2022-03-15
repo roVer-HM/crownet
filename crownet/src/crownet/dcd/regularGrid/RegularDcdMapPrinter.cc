@@ -46,7 +46,7 @@ void RegularDcdMapValuePrinter::writeHeaderTo(std::ostream& out,
                                               const std::string& sep) const {
   out << "simtime" << sep << "x" << sep << "y" << sep << "count" << sep
       << "measured_t" << sep << "received_t" << sep << "source" << sep
-      << "selection" << sep << "own_cell" << std::endl;
+      << "selection" << sep <<  "sourceHost" << sep << "sourceEntry" << sep << "hostEntry" << sep << "own_cell" << std::endl;
 }
 
 void RegularDcdMapAllPrinter::writeTo(std::ostream& out,

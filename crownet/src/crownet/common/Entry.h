@@ -16,9 +16,9 @@
 #include "crownet/common/util/FilePrinter.h"
 
 struct EntryDist{
-    double sourceOwner;     /* distance between the node which conducted the measurement and the current node */
+    double sourceHost;     /* distance between the node which conducted the measurement and the current node */
     double sourceEntry;     /* distance between the node which conducted the measurement and the point/cell of interest */
-    double ownerEntry;      /* distance the current node and the point/cell of interest */
+    double hostEntry;      /* distance the current node and the point/cell of interest */
 };
 
 template <typename K, typename T>
@@ -118,6 +118,10 @@ class IGlobalEntry : public IEntry<K, T> {
   virtual void clear(const T& t) override;
   virtual std::string str() const override;
   virtual std::string nodeString(const std::string& sep) const;
+  virtual void writeTo(std::ostream& out,
+                       const std::string& sep) const override;
+  virtual void writeHeaderTo(std::ostream& out,
+                             const std::string& sep) const override;
 
   // STS: make protected.
   std::set<typename IEntry<K, T>::key_type> nodeIds;
@@ -337,14 +341,15 @@ int IEntry<K, T>::columns() const {
 template <typename K, typename T>
 void IEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
   out << this->count << sep << this->measurement_time << sep
-      << this->received_time << sep << this->source << sep << this->selected_in;
+      << this->received_time << sep << this->source << sep << this->selected_in  << sep
+      << this->entryDist.sourceHost << sep << this->entryDist.sourceEntry << sep << this->entryDist.hostEntry;
 }
 
 template <typename K, typename T>
 void IEntry<K, T>::writeHeaderTo(std::ostream& out,
                                  const std::string& sep) const {
   out << "count" << sep << "measured_t" << sep << "received_t" << sep
-      << "source" << sep << "selection";
+      << "source" << sep << "selection" << sep << "sourcerHost" << sep << "sourceEntry" << sep << "hostEntry" ;
 }
 
 template <typename K, typename T>
@@ -357,6 +362,19 @@ bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
 }
 
 ///////////////////////////////////////////////////
+
+template <typename K, typename T>
+void IGlobalEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
+  out << this->count << sep << this->measurement_time << sep
+      << this->received_time << sep << this->source << sep << this->selected_in;
+}
+
+template <typename K, typename T>
+void IGlobalEntry<K, T>::writeHeaderTo(std::ostream& out,
+                                 const std::string& sep) const {
+  out << "count" << sep << "measured_t" << sep << "received_t" << sep
+      << "source" << sep << "selection";
+}
 
 template <typename K, typename T>
 inline IGlobalEntry<K, T>::IGlobalEntry() : IEntry<K, T>() {}

@@ -377,6 +377,22 @@ TEST_F(RegularCellTest, ymfVisitor_2) {
   EXPECT_EQ(*(cell.val()), *data_17);
 }
 
+TEST_F(RegularCellTest, ymfPlustDist_1) {
+    auto m = cell.getData();
+    m[IntIdentifer(14)]->touch(1.0);
+    m[IntIdentifer(15)]->touch(2.0);
+    m[IntIdentifer(16)]->touch(3.0);
+    m[IntIdentifer(17)]->touch(4.0);
+    m[IntIdentifer(42)]->reset();
+    double sum = 4. + 3. + 2. + 1. - (4*1.);
+    setSimTime(5.0);
+    std::shared_ptr<YmfPlusDistVisitor> ymfP_v = std::make_shared<YmfPlusDistVisitor>();
+    ymfP_v->setTime(5.0);
+    std::pair<float, float> ret = ymfP_v->getSums(cell);
+    EXPECT_EQ(ret.first, sum);
+
+}
+
 TEST_F(RegularCellTest, meanVisitor_1) {
     setSimTime(112.0);
     std::shared_ptr<MeanVisitor> visitor = std::make_shared<MeanVisitor>(simTime());
