@@ -1,20 +1,27 @@
 # %%
+from importlib import import_module
+from itertools import groupby
+from posixpath import basename, dirname
 import folium
 from folium.plugins import TimestampedGeoJson, TimeSliderChoropleth, HeatMapWithTime
 from matplotlib import projections
 from matplotlib.backends.backend_pdf import PdfPages
 import pandas as pd
 from pyproj import Proj
+from roveranalyzer.analysis.dashapp import OppModel
 from roveranalyzer.analysis.omnetpp import PlotUtil
 from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdProviders
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D
 from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
+from roveranalyzer.simulators.vadere.plots import scenario
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from typing import Tuple
+import timeit as it
+import glob
 
 from roveranalyzer.utils import Project
 import contextily as ctx
@@ -24,43 +31,9 @@ import roveranalyzer.simulators.opp as OMNeT
 import roveranalyzer.utils.plot as Plot
 from roveranalyzer.utils.logging import logger, timing, logging
 from IPython.display import display
+from roveranalyzer.simulators.vadere.plots.scenario import Scenario 
 
 from os.path import join, abspath
-
-def run_data2(data_root, hdf_file="data.h5"):
-    builder = Dmap.DcdHdfBuilder.get(hdf_file, data_root).epsg(Project.UTM_32N)
-
-    sql = OMNeT.CrownetSql(
-            vec_path=f"{data_root}/vars_rep_0.vec",
-            sca_path=f"{data_root}/vars_rep_0.sca",
-        network="World")
-    return data_root, builder, sql
-
-
-def run_data(data_base_path, out, parameter_id, run_id=0, hdf_file="data.h5", **kwargs) -> Tuple[str, Dmap.DcdHdfBuilder, OMNeT.CrownetSql]:
-    if "data_root" in kwargs:
-        data_root = kwargs["data_root"]
-    else:
-        data_root = join(data_base_path, "simulation_runs/outputs", f"Sample_{parameter_id}_{run_id}_old", out)
-    builder = Dmap.DcdHdfBuilder.get(hdf_file, data_root).epsg(Project.UTM_32N)
-
-    sql = OMNeT.CrownetSql(
-            vec_path=f"{data_root}/vars_rep_0.vec",
-            sca_path=f"{data_root}/vars_rep_0.sca",
-        network="World")
-    return data_root, builder, sql
-
-def create_plots(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql, selection:str = "yml"):
-
-    dmap = builder.build_dcdMap(selection=selection)
-    with PdfPages(join(data_root, "common_output.pdf")) as pdf:
-        dmap.plot_count_diff(savefig=pdf)
-
-        tmin, tmax = builder.count_p.get_time_interval()
-        time = (tmax - tmin) / 4
-        intervals = [slice(time * i, time * i + time) for i in range(4)]
-        for _slice in intervals:
-            dmap.plot_error_histogram(time_slice=_slice, savefig=pdf)
 
 def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
     beacon_apps = sql.m_app0()
@@ -84,163 +57,128 @@ def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
     m = DensityMap.get_interactive(cells=cells,nodes=nodes)
     return m, cells, nodes
 
-def beacon_loss(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
-    return OppAnalysis.get_received_packet_loss(sql, sql.m_app0())
+_suqc = [os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/"]
+_repo = [os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/results/"]
+_ext = ["/mnt/data1tb/results/"]
 
-def error_cells(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
-    pass
+
+data = [
+    dict(#0
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220224-12:46:32"),
+        label="0224-12:46:32 (B) | 130.0s | single source; mf_circle; 30 ped; ymfPlusDist=0.5; logSelected",
+    ),
+    dict(#1
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220224-13:56:46"),
+        label="0224-13:56:46 (B) | 130.0s | dual source; mf_circle; 30+(30static) ped; ymfPlusDist=0.5; logSelected",
+    ),
+    dict(#2
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220224-15:50:17"),
+        label="0224-15:50:17 (B) | 250.0s | dual source; mf_circle; 30+(30quick removed) ped; ymfPlusDist=0.5; logSelected; mI=1s",
+    ),
+    dict(#2
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220225-09:06:57_ymf"),
+        label="0225-09:06:57_ymf (A) | 250.0s  | dual source; mf_circle; 30+(30quick removed) ped;  ymf; logAll"
+    ),
+    dict(#10
+        value=join(*_repo, "ymf_4s_2ttl_new_20220310T134303.326544"),
+        label="ymf_4s_new_exact_dist (TTL) | 250.0s  | triple source; mf_circle; 30+30+10 ped; ymf,ttl20s; logAll; mI=4s"
+        ),
+    dict(#4
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220225-10:57:21_ymfPlus_4s_1"),
+        label="ymfPlus_4s_1 (C) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5; logAll; mI=4s",
+    ),
+    dict(#5
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220228-09:20:17_ymfPlus_4s_2"),
+        label="ymfPlus_4s_2 (C,A) | 250.0s  | triple source; mf_circle2; 30+30+10 ped; ymfPlusDist=0.5; logAll; mI=4s !!!"),
+    dict(#6
+        value=join(*_suqc, "subwayDynamic_multiEnb_compact_density_20220228-14:56:11_ymfPlus_4s_3"),
+        label="ymfPlus_4s_3 (C,TTL) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5ttl20s; logAll; mI=4s"
+        ),
+    dict(#7
+        value=join(*_repo, "ymfPlusDist_4s_1_new_20220309T160413.482974"),
+        label="ymfPlus_4s_1_new (C) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5; logAll; mI=4s",
+    ),
+    dict(#7
+        value=join(*_repo, "ymfPlusDist_4s_1_new_20220311T113814.135169"),
+        label="ymfPlus_4s_1_new2 (C) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5; logAll; mI=4s",
+    ),
+    dict(#7
+        value=join(*_ext, "ymfPlusDist_4s_1_new_20220311T124331.584364"),
+        label="ymfPlus_4s_1_new3 (C) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5; logAll; mI=4s",
+    ),
+    dict(#8
+        value=join(*_repo, "ymfPlusDist_4s_2_new_20220309T160733.541658"),
+        label="ymfPlus_4s_2_new (C,A) | 250.0s  | triple source; mf_circle2; 30+30+10 ped; ymfPlusDist=0.5; logAll; mI=4s !!!"
+        ),
+    dict(#9
+        value=join(*_repo, "ymfPlusDist_4s_3_new_20220309T160511.882464"),
+        label="ymfPlus_4s_3_new (C,TTL) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5ttl20s; logAll; mI=4s"
+        ),
+    dict(#10
+        value=join(*_repo, "ymfPlusDist_4s_3_new_20220310T133600.160946"),
+        label="ymfPlus_4s_3_new_exact_dist (C,TTL) | 250.0s  | dual source; mf_circle; 30+(30quick removed)  ped; ymfPlusDist=0.5ttl20s; logAll; mI=4s"
+        ),
+    dict(#7
+        value=join(*_ext, "ymfD_4s_long_ttl_20220311T152956.089002"),
+        label="ymfPlus_4s_1_new long with ttl",
+    ),
+    dict(#7
+        value=join(*_ext, "ymfD_4s_long_20220311T153230.245624"),
+        label="ymfPlus_4s_1_new long without ttl",
+    ),
+]
+
+def data_dict(path, prefix=""):
+    runs = glob.glob(path)
+    ret = []
+    if prefix == "":
+        _n = lambda i, x : x
+    else:
+        _n = lambda i, x : f"{prefix}_{i}_{x}"
+
+    for i, p in enumerate(runs):
+        if os.path.isdir(p):
+            label = _n(i, basename(p))
+            ret.append(
+                {
+                    "value": abspath(p),
+                    "label": label
+                }
+            )
+    return ret
+
+
 
 if __name__ == "__main__":
-    # data_root = join(os.environ['HOME'], "repos/_sim_crownet/crownet/simulations/mucFreiheitLte/suqc/",
-    # "subwayDynamic_multiEnb_compact_density_002/simulation_runs/outputs/Sample_0_0_ymf/subwayDynamic_multiEnb_compact_density_out")
-    # data_root = join(os.environ['HOME'], "repos/_sim_crownet/crownet/simulations/mucFreiheitLte/suqc/",
-    # "subwayDynamic_multiEnb_compact_density_002/simulation_runs/outputs/Sample_0_0_old/subwayDynamic_multiEnb_compact_density_out")
-    # data_root = join(os.environ['HOME'], "repos/_sim_crownet/crownet/simulations/mucFreiheitLte/suqc/",
-    # "subwayDynamic_multiEnb_compact_density_002/simulation_runs/outputs/Sample_0_0_Sample_0_0_ymfDistTTL/subwayDynamic_multiEnb_compact_density_out")
-    # data_root = join(os.environ['HOME'], "repos/_sim_crownet/crownet/simulations/mucFreiheitLte/suqc/",
-    # "circle/simulation_runs/outputs/Sample_0_0/subwayDynamic_multiEnb_compact_density_out")
 
-    #cicle (120s)
-    # data_root = join(os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/",
-    # "subwayDynamic_multiEnb_compact_density_20220224-12:46:32")
+    # _d = data
+    # data_root, builder, sql = OppAnalysis.builder_from_output_folder(_d[-1]["value"])
+    _d = []
+    # _d = data_dict("/mnt/data1tb/results/updated_dist/*")
+    # _d.extend(data_dict("/mnt/data1tb/results/transmit_wErr_dist/*"))
+    # _d.extend(data_dict("/mnt/data1tb/results/transmit_dist/*"))
+    _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg/simulation_runs/outputs/*/final_out", prefix="step_err_ymf"))
+    _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg2/simulation_runs/outputs/*/final_out", prefix="ymfDistStep2"))
+    _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg3/simulation_runs/outputs/*/final_out", prefix="ymfDistStep3"))
+    # _d.extend(data_dict("/mnt/data1tb/results/updated_dist_long/*"))
+    _d.sort(key= lambda x: x["label"])
+    data_root, builder, sql = OppAnalysis.builder_from_output_folder(_d[1]["value"])
+    # data_root, builder, sql = OppAnalysis.builder_from_output_folder(data_root)
+    builder.only_selected_cells(False)
+    # sel = OppAnalysis.find_selection_method(builder) 
 
-    #cicle mit leuten die vorher aufhöhen(130s) <-- not absorbing (constant 60 peds)
-    # data_root = join(os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/",
-    # "subwayDynamic_multiEnb_compact_density_20220224-13:56:46")
+    print("build app")
+    m = OppModel(data_root, builder, sql)
+    # df = m.erroneous_cells() 
+    m.copy_common_pdf(_d, append_label=True)
 
-    #cicle mit leuten die vorher aufhöhen(130s) <-- *with* absorbing
-    # data_root = join(os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/",
-    # "subwayDynamic_multiEnb_compact_density_20220224-15:50:17")
-
-    #cicleSTOP mit leuten die vorher aufhöhen(130s) <-- *YMF* (all cells, not only selecetd)
-    # data_root = join(os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/",
-    # "subwayDynamic_multiEnb_compact_density_20220225-09:06:57_ymf")
-
-    #circle2 (400s)
-    data_root = join(os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle2/simulation_runs/Sample__0_0/results/",
-    "subwayDynamic_multiEnb_compact_density_20220224-12:17:55")
-
-    #circleSTOP mit leuten die vorher aufhören(400s)
-    # data_root = join(os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/",
-    # "subwayDynamic_multiEnb_compact_density_20220225-10:57:21_ymfPlus_4s")
-
-    data_root, builder, sql = run_data2(
-        data_root,
-        "data.h5"
-    )
-    # create_plots(data_root, builder, sql, selection="ymf")
-    # create_plots(data_root, builder, sql, selection="ymfPlusDist")
-    # HdfExtractor.extract_packet_loss(join(data_root, "packet_loss.h5"), "beacon", sql, app=sql.m_app0())
-    # HdfExtractor.extract_trajectories(join(data_root, "trajectories.h5"), sql)
-
-    # c = builder.count_p.get_dataframe()
-    # m = builder.map_p.get_dataframe()
-    # b = pd.read_csv(join(data_root, "beacons.csv"), delimiter=";")
-    i =pd.IndexSlice
-
-    # list of cells with *full* error (meaning the cell should have a count 0)
-    with builder.count_p.query as ctx:
-        cwerr = ctx.select(key=builder.count_p.group, where="(ID>0) & (err > 0)")
-    _mask = cwerr["count"] ==  cwerr["err"]
-    cwerr = cwerr[_mask]
-    cwerr_t = cwerr.loc[325.]
-
-    app = DashBoard.cell_err_app(data_root, builder, sql)
+    app = DashBoard.combined("Foo", "", m)
+    app.add(DashBoard.data_selector, _d)
+    app.add(DashBoard.map_view)
+    app.add(DashBoard.cell_err_app)
     app.run_app()
 
-    # livetime of a single cell
-    with builder.count_p.query as ctx:
-        ca = ctx.select(key=builder.count_p.group, where="(x == 160.0) & (y == 140.0)")
-    ca = ca.reset_index(["x", "y"]).sort_index()
-    ca_0 = ca.loc[i[:, 0], :]
-    t_min = int(ca_0.index.get_level_values("simtime").min())
-    t_max = int(ca_0.index.get_level_values("simtime").max())
-    idx_all = [(float(t), 0) for t in range(t_min, t_max+1)]
-    idx_diff = pd.Index(idx_all).difference(ca_0.index)
-    _add_zero = pd.DataFrame(index=idx_diff, columns=ca_0.columns).fillna(0)
-    ca_0 = ca_0.append(_add_zero)
 
-    ca_data = ca.loc[i[:, 1:], :]
-    ca_most_error_ids = ca_data.groupby(by=["ID"]).sum().sort_values("err", ascending=False).head()
-    #                 x        y  count    err  sqerr    owner_dist
-    # ID
-    # 1996  52320.0  45780.0  209.0  100.0  134.0  22900.636498
-    # 2476  52320.0  45780.0  178.0   69.0   87.0  22891.182098
-    # 1516  52320.0  45780.0  170.0   61.0   77.0  20927.229759
-    # 2236  52320.0  45780.0  170.0   61.0   79.0  22649.881691
-    # 1156  52320.0  45780.0  170.0   61.0   79.0  20520.389977
 
-    ax = ca_0.reset_index().plot("simtime", "count", c='red', label="true count for [160.,140.]", kind="scatter")
-    ax.scatter("simtime", "count", data = ca_data.loc[i[:, 1996], :].reset_index(),c='blue', marker=".", label="1996")
-    ax.legend()
-    # cells = builder.count_p.geo(Project.OpenStreetMaps)[i[325., :, :, 0]]
-    # nodes = sql.host_position(
-    #     epsg_code_base=Project.UTM_32N,
-    #     epsg_code_to=Project.OpenStreetMaps,
-    #     time_slice=slice(324.8),
-    # )
-    # m = DensityMap.get_interactive(cells, nodes)
     print("done")
-
-# """
-# c["err"].unique()
-# array([ 0., -3.,  3., -1.,  1., -2.,  2.,  4., -4.])
-# c["all_wrong"] = (c["count"] == c["err"]) & (c["err"] > 0)
-# c3 = c.loc[pd.IndexSlice[325., :, :, 1:]]c.loc[pd.IndexSlice[325., :, :, 0]]["count"].sum()
-
-# Cells with which are most of the time wrong! (count > 0 even if cell is empty!)
-#              count   err  sqerr  owner_dist  all_wrong
-# x     y
-# 160.0 140.0   1551  1551   1551        1551       1551
-# 185.0 130.0   1519  1519   1519        1519       1519
-# 265.0 175.0   1262  1262   1262        1262       1262
-# 260.0 185.0   1219  1219   1219        1219       1219
-
-
-#       count   err  sqerr    owner_dist
-# ID
-# 736    51.0  21.0   43.0  17151.037321
-# 796    52.0  22.0   28.0  13200.991064
-# 856    39.0   9.0   11.0  13354.193158
-# 916    40.0  10.0   28.0  17077.624291
-# 976    52.0  22.0   26.0  13200.991064
-# 1036   50.0  20.0   24.0  12850.795701
-# 1096   43.0  13.0   29.0  16703.308976
-# 1156   50.0  20.0   24.0  12850.795701
-# 1216   50.0  20.0   26.0  13725.608736
-# 1276   45.0  15.0   33.0  17353.766315
-# 1336   45.0  15.0   29.0  17077.624291
-# 1396   50.0  20.0   28.0  13507.112279
-# 1456   51.0  21.0   25.0  13208.098831
-# 1516   48.0  18.0   20.0  12367.016877
-# 1576   50.0  20.0   26.0  13698.212819
-# 1636   39.0   9.0   11.0  12475.586988
-# 1696   49.0  19.0   25.0  13479.670863
-# 1756   46.0  16.0   20.0  13725.608736
-# 1816   48.0  18.0   22.0  13231.307033
-# 1876   37.0   7.0   11.0  13574.433896
-# 1936   42.0  12.0   20.0  14863.757801
-# 1996   51.0  21.0   31.0  15050.891167
-# 2056   52.0  22.0   30.0  14144.947951
-# 2116   42.0  12.0   18.0  14221.985559
-# 2176   45.0  15.0   19.0  12650.368294
-# 2236   40.0  10.0   12.0  12839.811634
-# 2296   48.0  18.0   22.0  12651.044370
-# 2356   36.0   6.0   24.0  17031.802884
-# 2416   48.0  18.0   26.0  13788.964470
-# 2476   39.0   9.0   11.0  12876.356235
-
-# f[f["err"] > 220]
-#        count    err   sqerr     owner_dist
-# ID
-# 796   4123.0  223.0   829.0  401208.974216
-# 1216  4138.0  238.0   814.0  406977.885787
-# 1456  4138.0  238.0   772.0  410499.819022
-# 1576  4141.0  241.0   827.0  416052.238830
-# 1756  4142.0  242.0   816.0  422033.248291
-# 1816  4129.0  229.0   801.0  419543.702503
-# 1996  4124.0  224.0  1070.0  577881.216090
-# 2416  4137.0  237.0  1037.0  531973.362155
-# """
-
 # %%

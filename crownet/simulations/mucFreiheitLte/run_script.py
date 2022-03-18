@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 import sys, os
 
+from os.path import join
 from datetime import datetime
 from roveranalyzer.simulators.crownet.runner import BaseRunner, process_as, result_dir_with_opp
 import roveranalyzer.simulators.crownet.dcd as DensityMap
 import roveranalyzer.simulators.opp as OMNeT
-from roveranalyzer.analysis import OppAnalysis
+from roveranalyzer.analysis import OppAnalysis, HdfExtractor
 from roveranalyzer.utils.general import Project
+
 
 
 class SimulationRun(BaseRunner):
@@ -28,59 +30,43 @@ class SimulationRun(BaseRunner):
 
     @process_as({"prio": 999, "type": "post"})
     def build_hdf(self):
-        result_dir = self.result_base_dir()
-        builder = DensityMap.DcdHdfBuilder.get(
-            hdf_path="data.h5",
-            source_path=result_dir
-        ).epsg(Project.UTM_32N)
-        builder.build(override_hdf=True)
-        #todo delete csv files
+        _, builder, _ = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
+        builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+        builder.build(self.ns.get("hdf_override", "False"))
+
+    @process_as({"prio": 990, "type": "post"})
+    def create_common_plots(self):
+        result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
+        builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+        sel = list(OppAnalysis.find_selection_method(builder))
+        if len(sel) > 1:
+            print(f"multiple selections found: {sel}")
+        OppAnalysis.create_common_plots(result_dir, builder, sql, selection=sel[0])
+
+    @process_as({"prio": 980, "type": "post"})
+    def extract_hdf(self):
+        result_dir, _, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
+        HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "beacon", sql, app=sql.m_app0())
+        HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "map", sql, app=sql.m_app1())
+        HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
+
+    # @process_as({"prio": 970, "type": "post"})
+    # def abs_err(self):
+    #     result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
+    #     builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+    #     sel = list(OppAnalysis.find_selection_method(builder))
+    #     if len(sel) > 1:
+    #         print(f"multiple selections found: {sel}")
+    #     dcd = builder.build_dcdMap(selection=sel[0])
+    #     dcd.plot_count_diff()
+    #     print("foo")
+
+
+
+
+
         
     
-    @process_as({"prio": 100, "type": "post"})
-    def create_figures(self):
-        result_dir = self.result_base_dir() 
-        fig_dir = os.path.join(result_dir, "fig")
-        os.makedirs(fig_dir, exist_ok=True)
-        vec_name = "vars_rep_0.vec"
-        sca_name = "vars_rep_0.sca"
-        sql = OMNeT.CrownetSql(
-            vec_path=os.path.join(result_dir, vec_name),
-            sca_path=os.path.join(result_dir, sca_name),
-            network="World"
-        )
-        builder = DensityMap.DcdHdfBuilder.get(
-            hdf_path="data.h5",
-            source_path=result_dir
-        ).epsg(Project.UTM_32N)
-        dcd = builder.build_dcdMap(selection="ymfPlusDist")
-
-        # Node count over time
-        fig, ax = dcd.plot_count_diff()
-        ax.set_ylim([20, 110])
-        ax.set_xlim([0, 35])
-        fig.savefig(f"{fig_dir}/count_over_time.png")
-        fig.savefig(f"{fig_dir}/count_over_time.pdf")
-
-        # Error hist
-        fig, ax = dcd.plot_error_histogram(
-            value="sqerr",
-            stat="percent"
-        )
-        ax.set_ylim([0, 40])
-        ax.set_xlim([-1.5, 1.0])
-        fig.savefig(f"{fig_dir}/error_histogram.png")
-        fig.savefig(f"{fig_dir}/error_histogram.pdf")
-
-        # Neighborhood size over time
-        data, idx = OppAnalysis.get_neighborhood_table_size(sql)
-        fig, ax = OppAnalysis.plot_neighborhood_table_size_over_time(
-            data, idx 
-        )
-        ax.set_ylim([0, 110])
-        ax.set_xlim([0, 35])
-        fig.savefig(f"{fig_dir}/neighborhood_table_size.png")
-        fig.savefig(f"{fig_dir}/neighborhood_table_size.pdf")
 
 
 if __name__ == "__main__":
