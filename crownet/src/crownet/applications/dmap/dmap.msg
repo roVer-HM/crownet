@@ -42,6 +42,15 @@ class MapCfgYmfPlusDist extends MapCfgYmf {
  	double alpha;   
 }
 
+class MapCfgYmfPlusDistStep extends MapCfgYmfPlusDist {
+ 	mapType = "ymfPlusDistStep";
+ 	double stepDist;
+ 	bool zeroStep = true; // if true set step function to zero for dist  <= step_dist 
+ 						  // otherwise set function value to value at step_dist
+ 						  // for all dist <= step_dist
+}
+
+
 class DcDCell {
 	uint16_t count;         // 2B pedestrian count
 	uint16_t variation;     // 2B   

@@ -184,6 +184,19 @@ protected:
     double alpha;
 };
 
+class YmfPlusDistStepVisitor : public YmfPlusDistVisitor {
+public:
+    YmfPlusDistStepVisitor(double alpha, RegularCell::time_t t, double stepDist, bool zeroStep)
+        : YmfPlusDistVisitor(alpha, t), stepDist(stepDist), zeroStep(zeroStep) {}
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) const override;
+    virtual std::string getVisitorName() const override { return "ymfPlusDistStep"; }
+
+protected:
+    double stepDist;
+    bool zeroStep;
+};
+
 class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {
  public:
     LocalSelector(RegularCell::time_t t = 0.0)

@@ -262,8 +262,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
            *  Other distances (i.e. hostEntry, sourceHost) must be calculated.
            */
           // EntryDist entryDist = cellProvider->getEntryDist(sourceCellId, dcdMap->getOwnerCell(), entryCellId);
-          EntryDist entryDist = cellProvider->getExactDist(senderPosition, getPosition(), entryCellId);
-//          EntryDist entryDist = cellProvider->getExactDist(senderPosition, getPosition(), entryCellId, cell.getSourceEntryDist());
+//          EntryDist entryDist = cellProvider->getExactDist(senderPosition, getPosition(), entryCellId);
+          EntryDist entryDist = cellProvider->getExactDist(senderPosition, getPosition(), entryCellId, cell.getSourceEntryDist());
           simtime_t _measured = cell.getCreationTime(packetCreationTime);
           if (_measured > simTime()){
               throw cRuntimeError("!!");

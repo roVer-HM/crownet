@@ -163,6 +163,41 @@ RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) co
     return ret;
 }
 
+RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell) const {
+
+    sum_data d = getSums(cell);
+    double now = this->time.dbl(); // current time the visitor is called.
+
+    RegularCell::entry_t_ptr ret = nullptr;
+    double ret_ymfPlusDist = 0.0;
+    double ymfPlusDist = 0.0;
+    for (const auto& e : cell.validIter()) {
+      double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
+      double dist = e.second->getEntryDist().sourceEntry;
+      if (zeroStep){
+          // set dist to zero if distance is smaller than threshold
+          dist = (dist <= stepDist) ? 0 : dist;
+      } else {
+          // set dist to threshold if distance is smaller than threshold
+          dist = (dist <= stepDist) ? stepDist : dist;
+      }
+
+      ymfPlusDist = alpha * (age)/d.age_sum +
+              (1-alpha) * dist/d.dist_sum;
+      if (ret == nullptr) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+        continue;
+      }
+
+      if (ymfPlusDist < ret_ymfPlusDist) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+      }
+    }
+    return ret;
+}
+
 RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
     // to check local exists.... raise error.....
     auto val = cell.getLocal();
