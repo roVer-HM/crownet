@@ -170,7 +170,7 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    # par_var, data = setup.run(len(par_var))
+    par_var, data = setup.run(len(par_var))
     # par_var, data = setup.run(1)
 
 
