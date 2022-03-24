@@ -3,6 +3,7 @@ import sys, os
 
 from os.path import join
 from datetime import datetime
+from roveranalyzer.analysis.common import Simulation
 from roveranalyzer.simulators.crownet.runner import BaseRunner, process_as, result_dir_with_opp
 import roveranalyzer.simulators.crownet.dcd as DensityMap
 import roveranalyzer.simulators.opp as OMNeT
@@ -49,6 +50,11 @@ class SimulationRun(BaseRunner):
         HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "beacon", sql, app=sql.m_app0())
         HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "map", sql, app=sql.m_app1())
         HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
+
+    @process_as({"prio": 970, "type": "post"})
+    def append_hdf(self):
+        sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        OppAnalysis.append_count_diff_to_hdf(sim)
 
     # @process_as({"prio": 970, "type": "post"})
     # def abs_err(self):
