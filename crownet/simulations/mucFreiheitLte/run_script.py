@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import shutil
 import sys, os
 
 from os.path import join
@@ -55,6 +56,12 @@ class SimulationRun(BaseRunner):
     def append_hdf(self):
         sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
         OppAnalysis.append_count_diff_to_hdf(sim)
+    
+    @process_as({"prio": 960, "type": "post"})
+    def remove_denisty_map_csv(self):
+        _, builder, _ = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
+        for f in builder.map_paths:
+            os.remove(f)
 
     # @process_as({"prio": 970, "type": "post"})
     # def abs_err(self):

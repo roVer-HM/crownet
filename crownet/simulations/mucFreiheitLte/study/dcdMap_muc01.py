@@ -43,39 +43,46 @@ def main(base_path):
     par_var = [
         {
             "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
                 "sim-time-limit": t,
                 "seed-set" : seed,
                 "**.vadereScenarioPath" : scenario_muc_004,
                 "*.pNode[*].app[1].app.mapCfg": 
                     mapCfgYmfDist.copy("stepDist", 90.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE),
-                },
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                },
         },
         {
             "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
                 "sim-time-limit": t,
                 "seed-set" : seed,
                 "**.vadereScenarioPath" : scenario_muc_004,
                 "*.pNode[*].app[1].app.mapCfg": 
                     mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE),
-                },
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                },
         },
         {
             "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
                 "sim-time-limit": t,
                 "seed-set" : seed,
                 "**.vadereScenarioPath" : scenario_muc_004,
                 "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmf
+                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.5, "zeroStep", BoolValue.FALSE, "mapTypeLog", QString("ymfPlusDistStep")),
+                "*.pNode[*].app[1].scheduler.generationInterval": "2000ms + uniform(0s, 50ms)",
+                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
+        },
+        {
+            "omnet": {  
+                "sim-time-limit": t,
+                "seed-set" : seed,
+                "**.vadereScenarioPath" : scenario_muc_004,
+                "*.pNode[*].app[1].app.mapCfg":    mapCfgYmf,
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                },
         },
     ]
     par_var = OmnetSeedManager(
@@ -110,7 +117,7 @@ def main(base_path):
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=__file__.replace(".py", ""),
-        opp_config="final",
+        opp_config="final_mf_004",
         opp_basename="omnetpp_ymfd4s.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
         mobility_sim=("vadere", "latest"), # use omnet internal mobility models
@@ -124,6 +131,7 @@ def main(base_path):
         scenario_files=[
             os.path.abspath("../vadere/scenarios/mf_circle2.scenario"),
             os.path.abspath("../vadere/scenarios/mf_circle.scenario"),
+            os.path.abspath("../vadere/scenarios/mf_004_template.scenario"),
         ]
         )
 

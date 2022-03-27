@@ -33,7 +33,7 @@ import roveranalyzer.simulators.opp as OMNeT
 from roveranalyzer.utils.logging import logger, timing, logging
 from roveranalyzer.simulators.vadere.plots.scenario import Scenario 
 from roveranalyzer.analysis.flaskapp.application.model import get_measurements
-from roveranalyzer.analysis.common import Simulation
+from roveranalyzer.analysis.common import Simulation, SuqcRun
 from roveranalyzer.analysis.flaskapp.wsgi import run_app
 from omnetinireader.config_parser import ObjectValue
 
@@ -205,48 +205,57 @@ def count_diff(path, sims: Dict[str, Simulation]):
     PlotUtil.fig_to_pdf(path, [tbl_fig, fig1, fig2, fig3])
 
 
+def make_pics(s: SuqcRun):
+    sim = s.get_run_as_sim(key=(2,0))
+    dcd = sim.get_dcdMap()
+
+    fig1, ax = dcd.plot_count_diff(savefig=join(sim.data_root, "count_diff.pdf"))
+    fig2, ax = dcd.plot_err_box_over_time(bin_width=10.0)
+    ax.set_ylim(-8, 5)
+    fig2.savefig(join(sim.data_root, "err.pdf"))
+    print("done")
+
 
 if __name__ == "__main__":
 
     # _d = data
     # data_root, builder, sql = OppAnalysis.builder_from_output_folder(_d[-1]["value"])
     _d = []
-    # _d = data_dict("/mnt/data1tb/results/updated_dist/*")
-    # _d.extend(data_dict("/mnt/data1tb/results/transmit_wErr_dist/*"))
-    # _d.extend(data_dict("/mnt/data1tb/results/transmit_dist/*"))
 
-    _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg/simulation_runs/outputs/*/final_out",
-    suqc=True, prefix="step_err_ymf"))
+    # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg/simulation_runs/outputs/*/final_out",
+    # suqc=True, prefix="step_err_ymf"))
     
-    # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg2/simulation_runs/outputs/*/final_out",
-    # suqc=True, prefix="_ymfDistStep2"))
+    # ymf_dist_dbg_2 = SuqcRun("/mnt/data1tb/results/ymfDistDbg2")
+    # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
+    # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
+    # ymf_dist_dbg_4 = SuqcRun("/mnt/data1tb/results/ymfDistDbg4")
+    ymf_dist_dbg_5 = SuqcRun("/mnt/data1tb/results/ymfDistDbg5")
+    ymf_dist_dbg_6 = SuqcRun("/mnt/data1tb/results/ymfDistDbg6")
+    ymf_dist_dbg_7 = SuqcRun("/mnt/data1tb/results/ymfDistDbg7")
+
+    dcdMap_muc01 = SuqcRun("/mnt/data1tb/results/dcdMap_muc01")
+
+
+    # study = dcdMap_muc01
+    study = ymf_dist_dbg_6
+    # study = ymf_dist_dbg_5
+    # study = ymf_dist_dbg_7
+
+    make_pics(study) 
     
-    
-    # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg3/simulation_runs/outputs/*/final_out",
-    # suqc=True, prefix="ymfDistStep3"))
-    
+    # data, idx = OppAnalysis.get_neighborhood_table_size(sim.sql)
 
-    # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg4/simulation_runs/outputs/*/final_out",
-    #     suqc=True, prefix="ymfDistStep4"))
+    # d, c = OppAnalysis.box_plot(data, 10.0, "time")
+    # data = data.set_index("time").sort_index()
+    # print("done")
 
-    # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg5/simulation_runs/outputs/*/final_out",
-    #   suqc=True, prefix="ymfDistStep5"))
-
-    # _d.extend(data_dict("/mnt/data1tb/results/updated_dist_long/*"))
-    # _d.sort(key= lambda x: x.label)
-    _d = {s.label: s for s in _d}
-    _d = OrderedDict(sorted(_d.items(), key=lambda x: x[0]))
-
-    sim = next(iter(_d.values()))
-    out_path = abspath(join(sim.data_root, "../../run_output.pdf"))
-    count_diff(out_path, _d)
+    # out_path = abspath(join(study.output_folder, "run_output.pdf"))
+    # count_diff(out_path, study.get_simulation_dict())
 
 
     # update_hdf(OppAnalysis.append_count_diff_to_hdf, _d)
     
-    # run_app(_d)
-    # sim = [s for s in _d if "Sample_5_0" in s.data_root ][0]
-    # get_measurements(sim, 83., 2476, 115)
+    # run_app(study.get_simulation_dict(lbl_key=True))
 
     print("done")
 # %%

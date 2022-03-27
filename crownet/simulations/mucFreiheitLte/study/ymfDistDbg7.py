@@ -44,61 +44,10 @@ def main(base_path):
             "omnet": {  
                 "extends": "ymfPlusDist_4s_multiple_packet",
                 "sim-time-limit": t,
-                "seed-set" : seed,
-                "**.vadereScenarioPath" : scenario_3source,
-                "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 90.0, "alpha", 0.5, "zeroStep", BoolValue.FALSE),
-                }
-
-        },
-        {
-            "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
-                "sim-time-limit": t,
                 "seed-set" :seed,
                 "**.vadereScenarioPath" : scenario_3source,
                 "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 90.0, "alpha", 0.5, "zeroStep", BoolValue.TRUE)
-                }
-        },
-        {
-            "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
-                "sim-time-limit": t,
-                "seed-set" :seed,
-                "**.vadereScenarioPath" : scenario_3source,
-                "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.5, "zeroStep", BoolValue.FALSE)
-                }
-        },
-        {
-            "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
-                "sim-time-limit": t,
-                "seed-set" :seed,
-                "**.vadereScenarioPath" : scenario_3source,
-                "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.5, "zeroStep", BoolValue.TRUE)
-                }
-        },
-        {
-            "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
-                "sim-time-limit": t,
-                "seed-set" :seed,
-                "**.vadereScenarioPath" : scenario_3source,
-                "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.TRUE)
-                }
-        },
-        {
-            "omnet": {  
-                "extends": "ymfPlusDist_4s_multiple_packet",
-                "sim-time-limit": t,
-                "seed-set" :seed,
-                "**.vadereScenarioPath" : scenario_3source,
-                "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.TRUE, "mapTypeLog", QString("ymfPlusDistStep")),
+                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "mapTypeLog", QString("ymfPlusDistStep")),
                 "*.pNode[*].app[1].scheduler.generationInterval": "2000ms + uniform(0s, 50ms)"
                 },
         },
@@ -109,8 +58,30 @@ def main(base_path):
                 "seed-set" :seed,
                 "**.vadereScenarioPath" : scenario_3source,
                 "*.pNode[*].app[1].app.mapCfg": 
-                    mapCfgYmfDist.copy("stepDist", 90.0, "alpha", 0.75, "zeroStep", BoolValue.TRUE, "mapTypeLog", QString("ymfPlusDistStep")),
+                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "mapTypeLog", QString("ymfPlusDistStep")),
+                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)"
+                },
+        },
+        {
+            "omnet": {  
+                "extends": "ymfPlusDist_4s_multiple_packet",
+                "sim-time-limit": t,
+                "seed-set" :seed,
+                "**.vadereScenarioPath" : scenario_3source,
+                "*.pNode[*].app[1].app.mapCfg": 
+                    mapCfgYmfDist.copy("stepDist", 90.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "mapTypeLog", QString("ymfPlusDistStep")),
                 "*.pNode[*].app[1].scheduler.generationInterval": "2000ms + uniform(0s, 50ms)"
+                },
+        },
+        {
+            "omnet": {  
+                "extends": "ymfPlusDist_4s_multiple_packet",
+                "sim-time-limit": t,
+                "seed-set" :seed,
+                "**.vadereScenarioPath" : scenario_3source,
+                "*.pNode[*].app[1].app.mapCfg": 
+                    mapCfgYmfDist.copy("stepDist", 90.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "mapTypeLog", QString("ymfPlusDistStep")),
+                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)"
                 },
         },
     ]
