@@ -2,6 +2,7 @@
 from importlib import import_module
 from itertools import groupby
 from posixpath import basename, dirname
+from re import A
 from string import ascii_letters
 from typing import Dict, List
 import folium
@@ -9,6 +10,7 @@ from folium.plugins import TimestampedGeoJson, TimeSliderChoropleth, HeatMapWith
 from hjson import OrderedDict
 from matplotlib import projections
 from matplotlib.backends.backend_pdf import PdfPages
+import seaborn as sb
 import pandas as pd
 from pyproj import Proj
 from roveranalyzer.analysis.dashapp import OppModel
@@ -18,7 +20,7 @@ from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D
 from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
 from roveranalyzer.simulators.vadere.plots import scenario
 from roveranalyzer.utils.general import DataSource
-from roveranalyzer.utils.plot import Style
+from roveranalyzer.utils.plot import Style, check_ax
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,8 +33,8 @@ from roveranalyzer.analysis import OppAnalysis, DensityMap, HdfExtractor, DashBo
 import roveranalyzer.simulators.crownet.dcd as Dmap
 import roveranalyzer.simulators.opp as OMNeT
 from roveranalyzer.utils.logging import logger, timing, logging
-from roveranalyzer.simulators.vadere.plots.scenario import Scenario 
-from roveranalyzer.analysis.flaskapp.application.model import get_measurements
+from roveranalyzer.simulators.vadere.plots.scenario import Scenario
+from roveranalyzer.analysis.flaskapp.application.model import get_beacon_df, get_beacon_entry_exit, get_measurements
 from roveranalyzer.analysis.common import Simulation, SuqcRun
 from roveranalyzer.analysis.flaskapp.wsgi import run_app
 from omnetinireader.config_parser import ObjectValue
@@ -160,7 +162,7 @@ def update_hdf(fn, sims: Dict[str, Simulation]):
     # fn(args[0])
     with mp.Pool(processes=8) as pool:
         ret = pool.map(fn, args)
-    
+
     print("done")
 
 
@@ -190,14 +192,14 @@ def count_diff(path, sims: Dict[str, Simulation]):
         "tick_size": 10,
     }
     s.create_legend = False
-    
+
     sample_tbl = [i.get_run_description_0001() for i in args]
     sample_tbl = pd.concat(sample_tbl)
     tbl_fig, ax = plt.subplots(figsize=(16,9))
     PlotUtil.df_to_table(sample_tbl, ax)
     tbl_fig.suptitle("Sample Variation")
-    
-    data = {i[0].name: i for i in data } 
+
+    data = {i[0].name: i for i in data }
     fig1 = OppAnalysis.diff_plot(s, data["count_diff"])
     fig2 = OppAnalysis.err_box_plot(s, data["err_box"])
     fig3 = OppAnalysis.err_hist_plot(s, data["err_hist"])
@@ -206,13 +208,13 @@ def count_diff(path, sims: Dict[str, Simulation]):
 
 
 def make_pics(s: SuqcRun):
-    sim = s.get_run_as_sim(key=(2,0))
+    sim = s.get_run_as_sim(key=(6,0))
     dcd = sim.get_dcdMap()
 
-    fig1, ax = dcd.plot_count_diff(savefig=join(sim.data_root, "count_diff.pdf"))
+    fig1, ax = dcd.plot_count_diff(savefig=join(sim.data_root, "new_count_diff.pdf"))
     fig2, ax = dcd.plot_err_box_over_time(bin_width=10.0)
-    ax.set_ylim(-8, 5)
-    fig2.savefig(join(sim.data_root, "err.pdf"))
+    #ax.set_ylim(-8, 5)
+    fig2.savefig(join(sim.data_root, "new_err.pdf"))
     print("done")
 
 
@@ -224,7 +226,7 @@ if __name__ == "__main__":
 
     # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg/simulation_runs/outputs/*/final_out",
     # suqc=True, prefix="step_err_ymf"))
-    
+
     # ymf_dist_dbg_2 = SuqcRun("/mnt/data1tb/results/ymfDistDbg2")
     # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
     # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
@@ -234,15 +236,35 @@ if __name__ == "__main__":
     ymf_dist_dbg_7 = SuqcRun("/mnt/data1tb/results/ymfDistDbg7")
 
     dcdMap_muc01 = SuqcRun("/mnt/data1tb/results/dcdMap_muc01")
+    dcdMap_muc02 = SuqcRun("/mnt/data1tb/results/dcdMap_muc02")
+    dcdMap_muc04 = SuqcRun("/mnt/data1tb/results/dcdMap_muc04")
+    dcdMap_muc05 = SuqcRun("/mnt/data1tb/results/dcdMap_muc05")
 
 
-    # study = dcdMap_muc01
-    study = ymf_dist_dbg_6
+    # study = dcdMap_muc02
+    # study = dcdMap_muc04
+    study = dcdMap_muc05
+    # study = ymf_dist_dbg_6
     # study = ymf_dist_dbg_5
     # study = ymf_dist_dbg_7
 
-    make_pics(study) 
-    
+    # for sim in study.get_simulations():
+    # # sim = study.get_run_as_sim((0, 0))
+    #     print(f"use sim {sim.run_context.sample_name} ...")
+    #     d = OppAnalysis.get_cumulative_received_packet_delay(
+    #         sim.sql, 
+    #         "World.pNode[%].app[%].app"
+    #         )
+    #     d["delay"] *= 1000
+    #     fig, ax = check_ax(None)
+    #     print(f"{d.shape} with size {d.memory_usage()/1e6} \nin MB")
+    #     ax = sb.histplot(data=d["delay"], cumulative=True, element="step", fill=False, stat="probability", ax=ax)
+    #     ax.set_xlabel("delay in [ms]")
+    #     fig.savefig(join(sim.data_root, "delay_all.pdf"))
+
+
+    # make_pics(study)
+
     # data, idx = OppAnalysis.get_neighborhood_table_size(sim.sql)
 
     # d, c = OppAnalysis.box_plot(data, 10.0, "time")
@@ -254,8 +276,41 @@ if __name__ == "__main__":
 
 
     # update_hdf(OppAnalysis.append_count_diff_to_hdf, _d)
-    
+
     # run_app(study.get_simulation_dict(lbl_key=True))
+
+    # study ymf_dist_dbg_5
+    # nid = 6746
+    # cell = (110, 220)
+    # sim = study.get_run_as_sim((2, 0))
+
+    # study = dcdMap_muc04
+    nid = 13920
+    cell = (220, 230)
+    sim = study.get_run_as_sim((0, 0))
+    # with sim.builder.map_p.query as ctx: 
+        # n1 =ctx.select(key="count_map", where="source==13920 and ID==13920")
+        # n1 = n1.sort_index()
+        # n0 = ctx.select(key="count_map", where="ID==0")    
+        # n0 = n0.sort_index()
+    bs = get_beacon_entry_exit(sim, nid, cell)
+    
+    df = sim.builder.map_p[pd.IndexSlice[:, :, :, nid, nid], :]
+    df = df.reset_index(["source", "ID"])
+    n = sim.builder.global_p[pd.IndexSlice[:, cell[0], cell[1]], :]
+    fig, axes = plt.subplots(2, 2, figsize=(32, 18))
+    axes = [a for aa in axes for a in aa ]
+
+
+    df.loc[pd.IndexSlice[:, cell[0], cell[1], :], ["count"]].reset_index().plot("simtime", "count", drawstyle="steps-post", marker=".", ax=axes[0])
+    axes[0].set_title(f"own measurements for for cell {cell}")
+    bs.reset_index().plot(x="event_time", y="cell_change_cumsum", drawstyle="steps-post", marker=".", ax=axes[1])
+    axes[1].set_title(f"neighborhood table cell {cell}")
+    n.reset_index().plot("simtime", "count", drawstyle="steps-post", marker=".", ax=axes[2])
+    axes[2].set_title(f"ground truth cell {cell}")
+    fig.show()
+
+
 
     print("done")
 # %%
