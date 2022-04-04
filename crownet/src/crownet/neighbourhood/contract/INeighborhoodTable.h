@@ -6,7 +6,7 @@
  */
 
 #pragma once
-
+#include "crownet/crownet.h"
 #include "inet/common/geometry/common/Coord.h"
 #include "crownet/applications/beacon/BeaconReceptionInfo.h"
 #include "crownet/common/iterator/FilterIterator.h"
@@ -66,11 +66,14 @@ public:
     virtual ~INeighborhoodTable() = default;
 
     virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) = 0;
+    virtual bool processInfo(BeaconReceptionInfo *packet) = 0;
     // update table and remove old entries. Update local entry
-    virtual void checkTimeToLive() = 0;
+    virtual void checkAllTimeToLive() = 0;
+    virtual bool ttlReached(BeaconReceptionInfo*)=0;
     virtual void setOwnerId(int ownerId) = 0;
     virtual const int getOwnerId() const = 0;
     virtual const int getSize() = 0;
+
 
 
     void registerEntryListner(NeighborhoodEntryListner* listener);
@@ -79,6 +82,7 @@ public:
     void emitPreChanged(BeaconReceptionInfo* oldInfo);
     void emitPostChanged(BeaconReceptionInfo* newInfo);
     void emitRemoved(BeaconReceptionInfo* info);
+    void emitDropped(BeaconReceptionInfo* info);
 
 
 protected:
@@ -92,6 +96,7 @@ public:
     virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo)=0;
     virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
     virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
+    virtual void neighborhoodEntryDropped(INeighborhoodTable* table, BeaconReceptionInfo* info){/*do nothing*/};
 };
 
 

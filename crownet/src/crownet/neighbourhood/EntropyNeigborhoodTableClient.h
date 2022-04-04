@@ -37,7 +37,9 @@ public:
     virtual void handleMessage(cMessage *msg) override;
 
     virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
-    virtual void checkTimeToLive() override {}; // do nothing as client
+    virtual bool processInfo(BeaconReceptionInfo *packet) override {return true;} //todo
+    virtual void checkAllTimeToLive() override {}; // do nothing as client
+    virtual bool ttlReached(BeaconReceptionInfo*) override {return true;}// do nothing as client
     virtual void setOwnerId(int ownerId) override {this->ownerId = ownerId;}
     virtual const int getOwnerId() const override {return ownerId;}
     virtual const int getSize() override;

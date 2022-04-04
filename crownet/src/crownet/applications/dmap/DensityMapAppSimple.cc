@@ -36,7 +36,7 @@ void DensityMapAppSimple::initialize(int stage) {
 }
 
 void DensityMapAppSimple::computeValues() {
-    nTable->checkTimeToLive();
+    nTable->checkAllTimeToLive();
     BaseDensityMapApp::computeValues();
 }
 
@@ -54,6 +54,11 @@ void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table,
     //       for each cell. Then the additive logic with increment/decrement will also work.
     //
     // decrement count in old entry. Do not remove source from neighborhood. This will be done in the PostChange listener.
+    Enter_Method_Silent();
+    int n = getContainingNode(this)->getId();
+    if (n == 13920){
+        n = n + 1 -1;
+    }
     if (isRunning()){
         if (dcdMap->isInNeighborhood((int)oldInfo->getNodeId())){
             EV_INFO << LOG_MOD << hostId << " preChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(oldInfo) << endl;
@@ -74,6 +79,11 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
     //       for each cell. Then the additive logic with increment/decrement will also work.
     //
     // increment/update entry based on new beacon informationgetCellId
+    Enter_Method_Silent();
+    int n = getContainingNode(this)->getId();
+    if (n == 13920){
+        n = n + 1 -1;
+    }
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
         // update own position
@@ -106,6 +116,11 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     //       for each cell. Then the additive logic with increment/decrement will also work.
     //
     // remove beacon value from cell entry and remove source (nodeId) from neighborhood
+    Enter_Method_Silent();
+    int n = getContainingNode(this)->getId();
+    if (n == 13920){
+        n = n + 1 -1;
+    }
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         auto oldCell = dcdMap->getNeighborCell((int)info->getNodeId());

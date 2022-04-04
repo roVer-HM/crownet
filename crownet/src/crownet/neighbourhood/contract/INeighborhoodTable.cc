@@ -48,5 +48,10 @@ void INeighborhoodTable::emitRemoved(BeaconReceptionInfo* info){
         e->neighborhoodEntryRemoved(this, info);
     }
 }
+void INeighborhoodTable::emitDropped(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryDropped(this, info);
+    }
+}
 
 }

@@ -10,7 +10,7 @@ class MockNeighborhoodTable : public NeighborhoodTable{
 
   public:
     MOCK_METHOD2(scheduleAt, void(simtime_t t, cMessage* msg));
-    MOCK_METHOD0(checkTimeToLive, void());
+    MOCK_METHOD0(checkAllTimeToLive, void());
     MockNeighborhoodTable(){}
 
     BeaconReceptionInfo build(int id, int t1, int t2, inet::Coord c1, inet::Coord c2){
@@ -55,7 +55,7 @@ class NeighborhoodTableTest : public BaseOppTest {
     }
 };
 
-TEST_F(NeighborhoodTableTest, checkTimeToLive) {
+TEST_F(NeighborhoodTableTest, checkAllTimeToLive) {
   setSimTime(20.0); // set some positive simtime (to keep test values positve)
   simtime_t now = simTime().dbl(); // now == 0.0s
   double maxAge = 3.0;
@@ -71,7 +71,7 @@ TEST_F(NeighborhoodTableTest, checkTimeToLive) {
   apply(nTable.getOrCreateEntry(3), now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0));
   apply(nTable.getOrCreateEntry(4), now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
 
-  nTable.checkTimeToLive();
+  nTable.checkAllTimeToLive();
   EXPECT_TRUE(5 > nTable.getTable().size());
 
   // check table entries
@@ -111,7 +111,7 @@ TEST_F(NeighborhoodTableTest, handleMessage) {
   simtime_t time = simTime().dbl();
   double maxAge = 1.0;
   // important to define mock spies before invoking the function to test
-  EXPECT_CALL(mock, checkTimeToLive())
+  EXPECT_CALL(mock, checkAllTimeToLive())
     .Times(1);
   EXPECT_CALL(mock, scheduleAt(time + maxAge, ttl_msg))
     .Times(1);

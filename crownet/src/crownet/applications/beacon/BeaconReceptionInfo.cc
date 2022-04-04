@@ -6,6 +6,7 @@
  */
 
 #include "BeaconReceptionInfo.h"
+#include "crownet/crownet.h"
 
 namespace crownet {
 
@@ -82,6 +83,7 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
 
     // update timestamp
     sentTimePrio = header->getTimestamp();
+    sentSimTimePrio = timestamp_32_ms_to_simtime(header->getTimestamp(), simTime());
     receivedTimePrio = arrivalTime;
 
 

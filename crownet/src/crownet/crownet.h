@@ -32,4 +32,8 @@ extern omnetpp::cConfigOption *CFGID_FLOW_HOST;
 
 std::pair<std::string, int> getHostPortConfigOverride(omnetpp::cConfigOption *entry);
 
+uint32_t simtime_to_timestamp_32_ms(simtime_t t = -1.);
+
+simtime_t timestamp_32_ms_to_simtime(uint32_t tstamp, simtime_t base = -1.0);
+
 }

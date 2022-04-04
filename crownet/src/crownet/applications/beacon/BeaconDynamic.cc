@@ -7,6 +7,7 @@
 
 #include "crownet/applications/beacon/BeaconDynamic.h"
 #include "crownet/applications/beacon/Beacon_m.h"
+#include "crownet/crownet.h"
 
 namespace crownet {
 
@@ -34,7 +35,8 @@ Packet *BeaconDynamic::createPacket() {
     header->setSequencenumber(localInfo->nextSequenceNumber());
     header->setSourceId(getHostId());
     // mod 32
-    uint32_t time = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
+//    uint32_t time = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
+    uint32_t time = simtime_to_timestamp_32_ms();
     header->setTimestamp(time);
 
 
@@ -58,11 +60,10 @@ Packet *BeaconDynamic::createPacket() {
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
 
-
     auto info = nTable->getOrCreateEntry(packet->peekAtFront<DynamicBeaconHeader>()->getSourceId());
-
+    // process new beacon
     info->processInbound(packet, hostId, simTime());
-    nTable->emitPostChanged(info);
+    nTable->processInfo(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

@@ -33,9 +33,12 @@ public:
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
 
+    virtual bool ttlReached(BeaconReceptionInfo*) override;
+    virtual bool processInfo(BeaconReceptionInfo *packet) override;
     virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
-    virtual void checkTimeToLive() override;
+    virtual void checkAllTimeToLive() override;
     virtual const int getSize() override;
+
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }

@@ -23,9 +23,11 @@ public:
 
     virtual void onInit() override;
 
-    virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) override {/* do nothing */}
+    virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) override;
     virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
     virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
+    virtual void neighborhoodEntryDropped(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
+
 
     void setGlobalDensityMapHandler(IGlobalDensityMapHandler<RegularDcdMap>* globalMapHandler){
             this->globalMapHandler = globalMapHandler;
