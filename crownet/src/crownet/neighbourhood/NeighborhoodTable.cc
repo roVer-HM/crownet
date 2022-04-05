@@ -99,6 +99,7 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
      * Case4 Old info object (already seen node, preChange was called getOrCreate) ttl reached:
      *       info will be dropped. No call to map. The preChange already decrement the map no increment necessary.
      */
+    Enter_Method_Silent();
     if (ttlReached(info)){
         emitDropped(info);
         auto iter = _table.find(info->getNodeId());
