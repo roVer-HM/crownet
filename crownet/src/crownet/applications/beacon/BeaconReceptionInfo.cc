@@ -16,18 +16,18 @@ BeaconReceptionInfo::~BeaconReceptionInfo() {
     // TODO Auto-generated destructor stub
 }
 
-void BeaconReceptionInfo::setSentTimePrio(omnetpp::simtime_t time){
+void BeaconReceptionInfo::setSentTimeCurrent(omnetpp::simtime_t time){
     // mod 32
     // simtime_t in ms (uint64_t) sentTim only has unit32_t thus time mod 32
-    sentTimePrio = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
+    sentTimeCurrent = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
 }
 
 
 std::string BeaconReceptionInfo::str() const {
     std::stringstream s;
-    auto age = simTime() - getReceivedTimePrio();
+    auto age = simTime() - getReceivedTimeCurrent();
     s << "{id: " << getNodeId() \
-            << " a_t:" << getReceivedTimePrio().ustr()  \
+            << " a_t:" << getReceivedTimeCurrent().ustr()  \
             << " age:" << age.ustr() << "}";
     return s.str();
 }
@@ -75,19 +75,19 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
     // calculate interarrival jitter
     if (clockRate != 0) {
         // timesmap unit32_t field in ms
-        simtime_t d =  SimTime(header->getTimestamp() - sentTimePrio, SimTimeUnit::SIMTIME_MS) - (arrivalTime - receivedTimePrio);
+        simtime_t d =  SimTime(header->getTimestamp() - sentTimeCurrent, SimTimeUnit::SIMTIME_MS) - (arrivalTime - receivedTimeCurrent);
         if (d < 0)
             d = -d;
         jitter = jitter + (d - jitter) / 16;
     }
 
     // update timestamp
-    sentTimePrio = header->getTimestamp();
-    sentSimTimePrio = timestamp_32_ms_to_simtime(header->getTimestamp(), simTime());
-    receivedTimePrio = arrivalTime;
+    sentTimeCurrent = header->getTimestamp();
+    sentSimTimeCurrent = timestamp_32_ms_to_simtime(header->getTimestamp(), simTime());
+    receivedTimeCurrent = arrivalTime;
 
 
-
+    // todo keep last 3 values?
     if (!oldPacket || packetsReceivedCount == 1){
         // only update beacon data if the packet is the news received. Do not
         // use data from old out of order packets.

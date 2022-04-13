@@ -120,7 +120,7 @@ void GlobalEntropyMap::updateEntropy(){
                             _table[sourceId] = info;
                         }
                         _table[sourceId]->setPos(pos);
-                        _table[sourceId]->setReceivedTimePrio(now);
+                        _table[sourceId]->setReceivedTimeCurrent(now);
                         _table[sourceId]->setBeaconValue(value);
                     }
                 }
@@ -128,7 +128,7 @@ void GlobalEntropyMap::updateEntropy(){
         }
         // remove old values
         for( auto it=_table.cbegin(); it !=_table.cend();){
-            if (it->second->getReceivedTimePrio() < now){
+            if (it->second->getReceivedTimeCurrent() < now){
                 delete it->second;
                 it = _table.erase(it);
             } else {

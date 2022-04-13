@@ -115,7 +115,7 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
 }
 
 bool NeighborhoodTable::ttlReached(BeaconReceptionInfo* info){
-    return info->getSentSimTimePrio() + maxAge < simTime();
+    return info->getSentSimTimeCurrent() + maxAge < simTime();
 }
 
 void NeighborhoodTable::checkAllTimeToLive(){

@@ -67,7 +67,7 @@ void NeighborhoodEventWriter::writeData(INeighborhoodTable* table, BeaconRecepti
     eventnumber_t event_number = getSimulation()->getEventNumber();
 
     write() << table->getOwnerId() << sep << event_number << sep << event << sep << simTime().dbl() << sep \
-            << info->getReceivedTimePrio() << sep << info->getSentSimTimePrio() << sep \
+            << info->getReceivedTimeCurrent() << sep << info->getSentSimTimeCurrent() << sep \
             << info->getNodeId() << sep << info->getPos().x << sep << info->getPos().y << sep \
             << beaconValue << sep << info->getPacketsReceivedCount() << sep \
             << info->getPacketsLossCount() << sep << info->getMaxSequencenumber() << sep \

@@ -45,8 +45,8 @@ FsmState BeaconSimple::handleDataArrived(Packet *packet){
     auto p = packet->popAtFront<BeaconPacketSimple>();
 
     auto info = nTable->getOrCreateEntry(p->getNodeId());
-    info->setSentTimePrio(p->getTime());
-    info->setReceivedTimePrio(simTime());
+    info->setSentTimeCurrent(p->getTime());
+    info->setReceivedTimeCurrent(simTime());
     info->setPos(p->getPos());
     info->setEpsilon(p->getEpsilon());
     nTable->emitPostChanged(info);
