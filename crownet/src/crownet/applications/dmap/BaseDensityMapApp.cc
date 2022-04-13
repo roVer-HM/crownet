@@ -240,13 +240,6 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
               header->getSourceCellIdY());
       Coord senderPosition = header->getPos();
 
-      if (p->findTag<EntropyMap>() == nullptr){
-          // check local map for _nodeId and compare if the local and packet
-          // place the _nodeId in the same cell. For entropy maps this is not
-          // applied. Because the received value does not 'move' with the sending
-          // node like in the pedestrian count setup.
-          dcdMap->moveNeighborTo(sourceNodeId, sourceCellId);
-      }
 
 
       // update new measurements
