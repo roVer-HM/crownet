@@ -21,7 +21,7 @@ void NeighborhoodEventWriter::onInit(){
             "beacon_value", "pkt_count", "pkt_loss", "pkt_seq", "cell_x", "cell_y",
             };
 
-    write() << "#version=2 " << endl;
+    write() << "#version=3 " << endl;
     for (int i = 0; i < header.size(); i++){
         if (i < header.size() -1){
             write() << header[i] << sep;
