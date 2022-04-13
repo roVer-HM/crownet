@@ -31,23 +31,19 @@ void BeaconDynamic::initialize(int stage) {
 
 
 Packet *BeaconDynamic::createPacket() {
-    const auto& header = makeShared<DynamicBeaconHeader>();
-    header->setSequencenumber(localInfo->nextSequenceNumber());
-    header->setSourceId(getHostId());
-    // mod 32
-//    uint32_t time = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
-    uint32_t time = simtime_to_timestamp_32_ms();
-    header->setTimestamp(time);
-
-
     const auto &beacon = makeShared<DynamicBeaconPacket>();
+
+    beacon->setSequencenumber(localInfo->nextSequenceNumber());
+    beacon->setSourceId(getHostId());
+    uint32_t time = simtime_to_timestamp_32_ms();
+    beacon->setTimestamp(time);
+
+
     beacon->setPos(getPosition());
     beacon->setEpsilon({0.0, 0.0, 0.0});
-    // measurement time is same as packet creation.
-    beacon->setPosTimestamp(time);
     beacon->setNumberOfNeighbours(nTable->getSize());
 
-    auto packet = buildPacket(beacon, header);
+    auto packet = buildPacket(beacon);
 
     // process local for own location entry in neighborhood table.
     auto tmp = packet->dup();
@@ -60,7 +56,8 @@ Packet *BeaconDynamic::createPacket() {
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
 
-    auto info = nTable->getOrCreateEntry(packet->peekAtFront<DynamicBeaconHeader>()->getSourceId());
+    auto pSrcId = packet->peekAtFront<DynamicBeaconPacket>()->getSourceId();
+    auto info = nTable->getOrCreateEntry(pSrcId);
     // process new beacon
     info->processInbound(packet, hostId, simTime());
     nTable->processInfo(info);
