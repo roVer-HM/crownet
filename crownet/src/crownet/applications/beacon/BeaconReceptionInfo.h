@@ -30,12 +30,9 @@ public:
     // converts simtime_t time into unit32_t representation (ms)
     using BeaconReceptionInfo_Base::setSentTimePrio;
     virtual void setSentTimePrio(omnetpp::simtime_t time);
-    virtual simtime_t getSentSimTime()const {return sentSimTimePrio;}
 
     virtual std::string str() const override;
 
-protected:
-    simtime_t sentSimTimePrio;
 };
 
 } /* namespace crownet */

@@ -68,6 +68,7 @@ class AppInfoReception extends AppInfoBase {
 	simtime_t jitter = 0.0;
 	simtime_t receivedTimePrio = 0.0;
 	uint32_t  sentTimePrio = 0; 
+	simtime_t sentSimTimePrio = 0;
 	uint16_t  maxSequencenumberPrio = 0;
 	uint16_t  packetsReceivedCountPrio = 0;
 };
