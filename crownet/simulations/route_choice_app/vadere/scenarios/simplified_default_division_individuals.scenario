@@ -1,7 +1,7 @@
 {
   "name" : "simplified_default_division_individuals",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
