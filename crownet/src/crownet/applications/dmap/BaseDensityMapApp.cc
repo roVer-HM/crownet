@@ -96,8 +96,16 @@ FsmState BaseDensityMapApp::fsmAppMain(cMessage *msg) {
 void BaseDensityMapApp::initDcdMap(){
     // check if set by globalDensityMap (shared between all nodes)
     if (!converter){
-        setCoordinateConverter(inet::getModuleFromPar<OsgCoordConverterProvider>(
-                        par("coordConverterModule"), this)->getConverter());
+        auto _c = inet::getModuleFromPar<OsgCoordConverterProvider>(
+                par("coordConverterModule"), this)
+                ->getConverter();
+        auto cellSize = par("cellSize").doubleValue();
+        if (converter->getCellSize() != inet::Coord(cellSize, cellSize)){
+            throw cRuntimeError("cellSize mismatch between converter and density map. Converter [%f, %f] vs map %f",
+                    converter->getCellSize().x, converter->getCellSize().y, cellSize
+            );
+        }
+        setCoordinateConverter(_c);
     }
 
     if (!dcdMapFactory){

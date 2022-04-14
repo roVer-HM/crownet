@@ -45,6 +45,7 @@ void OsgCoordConverterLocal::initialize(int stage) {
                       par("offset_y").doubleValue()},
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
                       par("srs_code").stdstringValue());
+      _converter->setCellSize(par("cellSize").doubleValue());
       sceneOrientation = inet::Quaternion::NIL;
       scenePosition = _converter->getScenePosition();
       emit(simBoundSignal, this);
@@ -93,6 +94,7 @@ void OsgCoordConverterVadere::initialize(int stage) {
 
       _converter = std::make_shared<OsgCoordinateConverter>(
                 ref.offset, netBound, ref.epsg_code);
+      _converter->setCellSize(par("cellSize").doubleValue());
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
   } else if (stage == inet::INITSTAGE_LAST){
@@ -144,6 +146,7 @@ void OsgCoordConverterSumo::initialize(int stage) {
       offset = traci::TraCIPosition(netOffset[0], netOffset[1]);
 
       _converter = std::make_shared<OsgCoordinateConverter>(offset, netBoundary, projParameter);
+      _converter->setCellSize(par("cellSize").doubleValue());
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
   }

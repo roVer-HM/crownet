@@ -99,7 +99,12 @@ void GlobalDensityMap::initializeMap(){
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
                     ->getConverter();
-    converter->setCellSize(par("cellSize").doubleValue());
+    auto cellSize = par("cellSize").doubleValue();
+    if (converter->getCellSize() != inet::Coord(cellSize, cellSize)){
+        throw cRuntimeError("cellSize mismatch between converter and density map. Converter [%f, %f] vs map %f",
+                converter->getCellSize().x, converter->getCellSize().y, cellSize
+        );
+    }
 
     dcdMapFactory = std::make_shared<RegularDcdMapFactory>(converter);
 
