@@ -40,6 +40,16 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
     // duplicates and out of order!
     ++packetsReceivedCount;
 
+    // save previous values
+    receivedTimePrio = receivedTimeCurrent;
+    sentTimePrio = sentTimeCurrent;
+    sentSimTimePrio = sentSimTimeCurrent;
+    packetsReceivedCountPrio = packetsReceivedCountCurrent;
+    positionPrio = positionCurrent;
+    epsilonPrio = epsilonCurrent;
+    numberOfNeighboursPrio = numberOfNeighboursCurrent;
+    beaconValuePrio = beaconValueCurrent;
+
     // first packet. Initialize object
     if (packetsReceivedCount == 1){
         initialSequencenumber = beacon->getSequencenumber();
@@ -94,6 +104,7 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
         positionCurrent = beacon->getPos();
         epsilonCurrent = beacon->getEpsilon();
         numberOfNeighboursCurrent = beacon->getNumberOfNeighbours();
+        beaconValueCurrent = 1.0; // Always 1 for this kind of beacon
     }
 }
 

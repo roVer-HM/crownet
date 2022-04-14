@@ -74,5 +74,10 @@ class BeaconReceptionInfo extends AppInfoReception {
     inet::Coord epsilonCurrent;   
     uint16_t numberOfNeighboursCurrent; 
     double beaconValueCurrent = 1.0;
+    
+    inet::Coord positionPrio;
+    inet::Coord epsilonPrio;   
+    uint16_t numberOfNeighboursPrio; 
+    double beaconValuePrio = 1.0;
 };
 

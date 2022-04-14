@@ -17,10 +17,10 @@ class MockNeighborhoodTable : public NeighborhoodTable{
 
         BeaconReceptionInfo info;
         info.setNodeId(id);
-        info.setSentTimePrio(t1);
-        info.setReceivedTimePrio(t2);
-        info.setPos(c1);
-        info.setEpsilon(c2);
+        info.setSentTimeCurrent(t1);
+        info.setReceivedTimeCurrent(t2);
+        info.setPositionCurrent(c1);
+        info.setEpsilonCurrent(c2);
         return info;
     }
 };
@@ -39,25 +39,26 @@ class NeighborhoodTableTest : public BaseOppTest {
 
         BeaconReceptionInfo info;
         info.setNodeId(id);
-        info.setSentTimePrio(t1);
-        info.setReceivedTimePrio(t2);
-        info.setPos(c1);
-        info.setEpsilon(c2);
+        info.setSentTimeCurrent(t1);
+        info.setReceivedTimeCurrent(t2);
+        info.setPositionCurrent(c1);
+        info.setEpsilonCurrent(c2);
         return info;
     }
 
     BeaconReceptionInfo*  apply(BeaconReceptionInfo* info, simtime_t t1, simtime_t t2, inet::Coord c1, inet::Coord c2){
-        info->setSentTimePrio((uint32_t)t1.inUnit(SimTimeUnit::SIMTIME_MS));
-        info->setReceivedTimePrio(t2);
-        info->setPos(c1);
-        info->setEpsilon(c2);
+        info->setSentTimeCurrent((uint32_t)t1.inUnit(SimTimeUnit::SIMTIME_MS));
+        info->setSentSimTimeCurrent(t1);
+        info->setReceivedTimeCurrent(t2);
+        info->setPositionCurrent(c1);
+        info->setEpsilonCurrent(c2);
         return info;
     }
 };
 
 TEST_F(NeighborhoodTableTest, checkAllTimeToLive) {
   setSimTime(20.0); // set some positive simtime (to keep test values positve)
-  simtime_t now = simTime().dbl(); // now == 0.0s
+  simtime_t now = simTime().dbl(); // now == 20.0s
   double maxAge = 3.0;
   NeighborhoodTable nTable;
   nTable.setMaxAge(maxAge);

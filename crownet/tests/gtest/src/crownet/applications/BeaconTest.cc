@@ -59,49 +59,67 @@ class BeaconInfoTest : public BaseOppTest {
 
 TEST_F(BeaconInfoTest, BeaconRcvJitter) {
 
-    auto packet = createAtTime(1.0, 1);
+    auto packet1 = createAtTime(1.0, 1, 42, 5, inet::Coord{1.2, 3.4});
 
-    setSimTime(1.030); // + 30ms
+    setSimTime(1.030); // + 30ms receivd at
 
     BeaconReceptionInfo info;
-    auto id = packet->peekAtFront<DynamicBeaconHeader>()->getSourceId();
+    auto id = packet1->peekAtFront<DynamicBeaconPacket>()->getSourceId();
     info.setNodeId(id);
-    info.processInbound(packet, 55, simTime());
+    info.processInbound(packet1, 55, simTime());
 
     EXPECT_EQ(info.getInitialSequencenumber(), 1);
     EXPECT_EQ(info.getMaxSequencenumber(), 1);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 1);
     EXPECT_EQ(info.getPacketsLossCount(), 0);
+    EXPECT_EQ(info.getPositionCurrent(), inet::Coord(1.2, 3.4));
+    EXPECT_EQ(info.getEpsilonCurrent(), inet::Coord(0.0, 0.0));
+    EXPECT_EQ(info.getNumberOfNeighboursCurrent(), 5);
 
     EXPECT_EQ(info.getJitter().dbl(), 0.030/16);
 
-    EXPECT_EQ(info.getSentTimePrio(), 1000); //ms
-    EXPECT_EQ(info.getReceivedTimePrio(), simTime());
-    delete packet;
+    EXPECT_EQ(info.getSentTimeCurrent(), 1000); //ms
+    EXPECT_EQ(info.getReceivedTimeCurrent(), simTime());
+
+    EXPECT_FALSE(info.hasPrio());
 
     //////// second packet
 
-    packet = createAtTime(1.500, 3);
+    auto packet2 = createAtTime(1.500, 3, 42, 10, inet::Coord{5.6, 7.8});
 
 
     setSimTime(1.520); // + 20ms
 
-    info.processInbound(packet, 55, simTime());
+    info.processInbound(packet2, 55, simTime());
 
     EXPECT_EQ(info.getInitialSequencenumber(), 1);
     EXPECT_EQ(info.getMaxSequencenumber(), 3);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 2);
     EXPECT_EQ(info.getPacketsLossCount(), 1);
+    EXPECT_EQ(info.getPositionCurrent(), inet::Coord(5.6, 7.8));
+    EXPECT_EQ(info.getEpsilonCurrent(), inet::Coord(0.0, 0.0));
+    EXPECT_EQ(info.getNumberOfNeighboursCurrent(), 10);
 
     auto jitter = SimTime(0.030/16);
     jitter = jitter + (SimTime(0.01) - jitter)/16;
     EXPECT_EQ(info.getJitter().dbl(), jitter.dbl() );
 
-    EXPECT_EQ(info.getSentTimePrio(), 1500); //ms
-    EXPECT_EQ(info.getReceivedTimePrio(), simTime());
-    delete packet;
+    EXPECT_EQ(info.getSentTimeCurrent(), 1500); //ms
+    EXPECT_EQ(info.getReceivedTimeCurrent(), simTime());
+
+    EXPECT_TRUE(info.hasPrio());
+
+    EXPECT_EQ(info.getReceivedTimePrio().dbl(),  1.030);
+    EXPECT_EQ(info.getSentSimTimePrio().dbl(),  1.000);
+    EXPECT_EQ(info.getPositionPrio(), inet::Coord(1.2, 3.4));
+    EXPECT_EQ(info.getEpsilonPrio(), inet::Coord(0.0, 0.0));
+    EXPECT_EQ(info.getNumberOfNeighboursPrio(), 5);
+
+
+    delete packet1;
+    delete packet2;
 }
 
 TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap1) {

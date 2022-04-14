@@ -61,7 +61,7 @@ void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table,
             auto oldCell = dcdMap->getNeighborCell((int)oldInfo->getNodeId());
             if (dcdMap->hasEntry(oldCell)){
                 // if DcdMap contains a (local) entry for the cell decrement.
-                dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), oldInfo->getBeaconValue());
+                dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), oldInfo->getBeaconValueCurrent());
             }
         }
     }
@@ -83,10 +83,10 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
         auto ownerCellId = dcdMap->getOwnerCell();
 
         // access or create cell entry containing the beacon just received and increment the count.
-        auto beaconSourcePos = converter->position_cast_traci(newInfo->getPos());
+        auto beaconSourcePos = converter->position_cast_traci(newInfo->getPositionCurrent());
         auto beaconCellId = dcdMap->getCellId(beaconSourcePos);
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(beaconCellId);
-        cellEntryLocal->incrementCount(simTime(), newInfo->getBeaconValue());
+        cellEntryLocal->incrementCount(simTime(), newInfo->getBeaconValueCurrent());
         // update the entry distance struct. Current node (ownerCell is both the source and owner in the entry distance struct.
         // because this node 'measures' the  value in the cell from which the beacon comes from.
         const auto pos = getPosition();
@@ -112,7 +112,7 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         auto oldCell = dcdMap->getNeighborCell((int)info->getNodeId());
-        dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), info->getBeaconValue());
+        dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), info->getBeaconValueCurrent());
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
     }
 }
