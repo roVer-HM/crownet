@@ -120,16 +120,12 @@ bool NeighborhoodTable::ttlReached(BeaconReceptionInfo* info){
 
 void NeighborhoodTable::checkAllTimeToLive(){
     Enter_Method_Silent();
-    int n = getContainingNode(this)->getId();
-    if (n == 13920){
-        n = n + 1 -1;
-    }
+
     simtime_t now = simTime();
 //    if (now >lastCheck){
         // remove old entries
         for( auto it=_table.cbegin(); it !=_table.cend();){
             // Received + maxAge := time at which entry must be removed.
-//            if ((it->second->getReceivedTimePrio() + maxAge) < now){
             if (ttlReached(it->second)){
                 emitRemoved(it->second);
                 delete it->second;

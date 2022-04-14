@@ -55,10 +55,6 @@ void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table,
     //
     // decrement count in old entry. Do not remove source from neighborhood. This will be done in the PostChange listener.
     Enter_Method_Silent();
-    int n = getContainingNode(this)->getId();
-    if (n == 13920){
-        n = n + 1 -1;
-    }
     if (isRunning()){
         if (dcdMap->isInNeighborhood((int)oldInfo->getNodeId())){
             EV_INFO << LOG_MOD << hostId << " preChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(oldInfo) << endl;
@@ -80,10 +76,6 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
     //
     // increment/update entry based on new beacon informationgetCellId
     Enter_Method_Silent();
-    int n = getContainingNode(this)->getId();
-    if (n == 13920){
-        n = n + 1 -1;
-    }
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
         // update own position
@@ -117,10 +109,6 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     //
     // remove beacon value from cell entry and remove source (nodeId) from neighborhood
     Enter_Method_Silent();
-    int n = getContainingNode(this)->getId();
-    if (n == 13920){
-        n = n + 1 -1;
-    }
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         auto oldCell = dcdMap->getNeighborCell((int)info->getNodeId());
