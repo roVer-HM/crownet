@@ -79,11 +79,11 @@ void GlobalEntropyMap::updateMaps() {
 
     for(const auto& e: _table){
         const auto info = e.second;
-        const auto &posTraci = converter->position_cast_traci(info->getPos());
+        const auto &posTraci = converter->position_cast_traci(info->getPositionCurrent());
         // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
         //            for each cell so the additive setup works here!
         auto ee = dcdMapGlobal->getEntry<GridGlobalEntry>(posTraci);
-        ee->incrementCount(simTime(), info->getBeaconValue()); // increment by value.
+        ee->incrementCount(simTime(), info->getBeaconValueCurrent()); // increment by value.
         ee->nodeIds.insert((int)info->getNodeId());
     }
 
@@ -119,9 +119,9 @@ void GlobalEntropyMap::updateEntropy(){
                             take(info);
                             _table[sourceId] = info;
                         }
-                        _table[sourceId]->setPos(pos);
+                        _table[sourceId]->setPositionCurrent(pos);
                         _table[sourceId]->setReceivedTimeCurrent(now);
-                        _table[sourceId]->setBeaconValue(value);
+                        _table[sourceId]->setBeaconValueCurrent(value);
                     }
                 }
             }

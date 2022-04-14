@@ -38,7 +38,7 @@ public:
 
     static NeighborhoodTablePred_t inRadius_pred(const inet::Coord& pos, const double dist ){
         NeighborhoodTablePred_t f = [pos, dist](const NeighborhoodTableValue_t& val) -> bool {
-            return pos.distance(val.second->getPos()) < dist;
+            return pos.distance(val.second->getPositionCurrent()) < dist;
         };
         return f;
     }

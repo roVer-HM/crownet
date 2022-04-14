@@ -70,9 +70,9 @@ class DynamicBeaconPacket extends BaseDynamicBeacon
 
 class BeaconReceptionInfo extends AppInfoReception {
     @customize(true);
-    inet::Coord pos;
-    inet::Coord epsilon;   
-    uint16_t numberOfNeighbours; 
-    double beaconValue = 1.0;
+    inet::Coord positionCurrent;
+    inet::Coord epsilonCurrent;   
+    uint16_t numberOfNeighboursCurrent; 
+    double beaconValueCurrent = 1.0;
 };
 

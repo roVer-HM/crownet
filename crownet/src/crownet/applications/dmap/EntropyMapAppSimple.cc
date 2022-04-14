@@ -59,11 +59,11 @@ void EntropyMapAppSimple::updateLocalMap() {
     for(const auto& e : entropyClient->iter()){
         ++count;
         const auto info = e.second;
-        const auto &posTraci = converter->position_cast_traci(info->getPos());
+        const auto &posTraci = converter->position_cast_traci(info->getPositionCurrent());
                 // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
                 //            for each cell so the additive setup works here!
         auto ee = dcdMap->getEntry<GridEntry>(posTraci);
-        ee->incrementCount(now, info->getBeaconValue()); // entropy sever ensures that ther is at most on
+        ee->incrementCount(now, info->getBeaconValueCurrent()); // entropy sever ensures that ther is at most on
                                                          // entry per cell. Thus increment works here.
      }
 //     std::cout << LOG_MOD2 << count << " entries in Entropy table." << endl;

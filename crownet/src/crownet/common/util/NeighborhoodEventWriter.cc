@@ -54,21 +54,21 @@ void NeighborhoodEventWriter::neighborhoodEntryDropped(INeighborhoodTable* table
 
 
 void NeighborhoodEventWriter::writeData(INeighborhoodTable* table, BeaconReceptionInfo* info, std::string event){
-    auto pos = globalMapHandler->getConverter()->position_cast_traci(info->getPos());
+    auto pos = globalMapHandler->getConverter()->position_cast_traci(info->getPositionCurrent());
     auto cellPos = globalMapHandler->getCellKeyProvider()->getCellPosition(pos);
     int beaconValue = 0;
     if (event == "post_change"){
-        beaconValue = info->getBeaconValue();
+        beaconValue = info->getBeaconValueCurrent();
     } else if (event == "dropped") {
         beaconValue = 0;
     } else { //pre_changed, ttl_reached
-        beaconValue = -1*info->getBeaconValue();
+        beaconValue = -1*info->getBeaconValueCurrent();
     }
     eventnumber_t event_number = getSimulation()->getEventNumber();
 
     write() << table->getOwnerId() << sep << event_number << sep << event << sep << simTime().dbl() << sep \
             << info->getReceivedTimeCurrent() << sep << info->getSentSimTimeCurrent() << sep \
-            << info->getNodeId() << sep << info->getPos().x << sep << info->getPos().y << sep \
+            << info->getNodeId() << sep << info->getPositionCurrent().x << sep << info->getPositionCurrent().y << sep \
             << beaconValue << sep << info->getPacketsReceivedCount() << sep \
             << info->getPacketsLossCount() << sep << info->getMaxSequencenumber() << sep \
             << cellPos.x << sep << cellPos.y << endl;

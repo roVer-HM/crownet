@@ -91,9 +91,9 @@ void BeaconReceptionInfo::processInbound(Packet *inbound,
     if (!oldPacket || packetsReceivedCount == 1){
         // only update beacon data if the packet is the news received. Do not
         // use data from old out of order packets.
-        pos = beacon->getPos();
-        epsilon = beacon->getEpsilon();
-        numberOfNeighbours = beacon->getNumberOfNeighbours();
+        positionCurrent = beacon->getPos();
+        epsilonCurrent = beacon->getEpsilon();
+        numberOfNeighboursCurrent = beacon->getNumberOfNeighbours();
     }
 }
 
