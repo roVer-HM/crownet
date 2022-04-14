@@ -42,8 +42,8 @@ class CellKeyProvider {
 
 class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
  public:
-  GridCellIDKeyProvider(const RegularGridInfo& gridInfo)
-      : gridInfo(gridInfo) {}
+//  GridCellIDKeyProvider(const RegularGridInfo& gridInfo)
+//      : gridInfo(gridInfo) {}
   GridCellIDKeyProvider(std::shared_ptr<OsgCoordinateConverter> converter)
       : converter(converter), gridInfo(converter->getGridDescription()) {}
 

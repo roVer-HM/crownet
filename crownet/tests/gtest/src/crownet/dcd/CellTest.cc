@@ -10,6 +10,7 @@
 #include <string>
 
 #include "main_test.h"
+#include "crownet/crownet_testutil.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/common/RegularGridInfo.h"
@@ -18,20 +19,25 @@ using namespace crownet;
 
 namespace {
 
-RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
-RegularDcdMapFactory dcdFactory{grid};
+DcdFactoryProvider f = DcdFactoryProvider(
+        inet::Coord(.0, .0),
+        inet::Coord(10.0, 10.0),
+        1.0
+);
+RegularGridInfo  grid = f.grid;
+std::shared_ptr<RegularDcdMapFactory> dcdFactory = f.dcdFactory;
 
 }
 
 
 TEST(GenricCell, Test_constructor) {
-  Cell<int, int, SimTime> cell{dcdFactory.getTimeProvider(), 12, 13};
+  Cell<int, int, SimTime> cell{dcdFactory->getTimeProvider(), 12, 13};
   EXPECT_EQ(cell.getCellId(), 12);
   EXPECT_EQ(cell.getOwnerId(), 13);
 }
 
 TEST(GenricCell, Test_str) {
-  Cell<int, int, SimTime> cell{dcdFactory.getTimeProvider(), 12, 13};
+  Cell<int, int, SimTime> cell{dcdFactory->getTimeProvider(), 12, 13};
   std::string s = "{cell_id: 12 owner_id: 13}";
   EXPECT_STREQ(cell.str().c_str(), s.c_str());
 }
@@ -41,8 +47,8 @@ TEST(GenricCell, Test_str) {
 class RegularCellTest : public BaseOppTest {
  public:
   RegularCellTest()
-      : cell(dcdFactory.getTimeProvider(), GridCellID(5, 4), IntIdentifer(42)),
-        cellEmpty(dcdFactory.getTimeProvider(), GridCellID(6, 5), IntIdentifer(42)) {}
+      : cell(dcdFactory->getTimeProvider(), GridCellID(5, 4), IntIdentifer(42)),
+        cellEmpty(dcdFactory->getTimeProvider(), GridCellID(6, 5), IntIdentifer(42)) {}
   void SetUp() override {
     auto& m = cell.getData();
     // add data (node_key_t (owner), IEntry (count data)
@@ -244,11 +250,11 @@ TEST_F(RegularCellTest, increment_withDataInEntry) {
 class RegularCellComparisonTest : public BaseOppTest {
  public:
   RegularCellComparisonTest()
-      : cella_44(dcdFactory.getTimeProvider(), GridCellID(3, 4), IntIdentifer(44)),
-        cella_55(dcdFactory.getTimeProvider(), GridCellID(3, 4), IntIdentifer(55)),
-        cellb_44(dcdFactory.getTimeProvider(), GridCellID(3, 7), IntIdentifer(44)),
-        cellc_44(dcdFactory.getTimeProvider(), GridCellID(4, 0), IntIdentifer(44)),
-        celld_44(dcdFactory.getTimeProvider(), GridCellID(9, 9), IntIdentifer(44)) {}
+      : cella_44(dcdFactory->getTimeProvider(), GridCellID(3, 4), IntIdentifer(44)),
+        cella_55(dcdFactory->getTimeProvider(), GridCellID(3, 4), IntIdentifer(55)),
+        cellb_44(dcdFactory->getTimeProvider(), GridCellID(3, 7), IntIdentifer(44)),
+        cellc_44(dcdFactory->getTimeProvider(), GridCellID(4, 0), IntIdentifer(44)),
+        celld_44(dcdFactory->getTimeProvider(), GridCellID(9, 9), IntIdentifer(44)) {}
   void SetUp() override {}
 
  protected:
@@ -388,8 +394,8 @@ TEST_F(RegularCellTest, ymfPlustDist_1) {
     setSimTime(5.0);
     std::shared_ptr<YmfPlusDistVisitor> ymfP_v = std::make_shared<YmfPlusDistVisitor>();
     ymfP_v->setTime(5.0);
-    std::pair<float, float> ret = ymfP_v->getSums(cell);
-    EXPECT_EQ(ret.first, sum);
+    auto ret = ymfP_v->getSums(cell);
+    EXPECT_EQ(ret.age_sum, sum);
 
 }
 

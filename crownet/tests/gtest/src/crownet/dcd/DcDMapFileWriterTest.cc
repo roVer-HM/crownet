@@ -9,6 +9,8 @@
 #include <string>
 
 #include "main_test.h"
+#include "crownet/crownet_testutil.h"
+
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 #include "crownet/common/RegularGridInfo.h"
@@ -17,18 +19,23 @@ using namespace crownet;
 
 namespace {
 
-RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
-RegularDcdMapFactory dcdFactory{grid};
+DcdFactoryProvider f = DcdFactoryProvider(
+        inet::Coord(.0, .0),
+        inet::Coord(10.0, 10.0),
+        1.0
+);
+RegularGridInfo  grid = f.grid;
+std::shared_ptr<RegularDcdMapFactory> dcdFactory = f.dcdFactory;
 
 }
 
-class DcDMapFileWriterTest : public BaseOppTest {
+class DcDMapFileWriterTest : public BaseOppTest{
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   DcDMapFileWriterTest()
-      : mapEmpty(dcdFactory.create_shared_ptr(1)),
-        mapLocal(dcdFactory.create_shared_ptr(2)),
-        mapFull(dcdFactory.create_shared_ptr(3)) {}
+      : mapEmpty(dcdFactory->create_shared_ptr(1)),
+        mapLocal(dcdFactory->create_shared_ptr(2)),
+        mapFull(dcdFactory->create_shared_ptr(3)) {}
 
   void incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int i, double t) {
     auto e = map->getEntry<GridGlobalEntry>(traci::TraCIPosition(x, y));
@@ -148,13 +155,13 @@ TEST_F(DcDMapFileWriterTest, printglobal) {
   EXPECT_STREQ(out.str().c_str(), ret.c_str());
 }
 
-class DcDMapFileWriterNoGlobalEntryTest : public BaseOppTest {
+class DcDMapFileWriterNoGlobalEntryTest : public BaseOppTest, public DcdFactoryProvider {
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   DcDMapFileWriterNoGlobalEntryTest()
-      : mapEmpty(dcdFactory.create_shared_ptr(1)),
-        mapLocal(dcdFactory.create_shared_ptr(2)),
-        mapFull(dcdFactory.create_shared_ptr(3)) {}
+      : mapEmpty(dcdFactory->create_shared_ptr(1)),
+        mapLocal(dcdFactory->create_shared_ptr(2)),
+        mapFull(dcdFactory->create_shared_ptr(3)) {}
 
   void incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int i, double t) {
     auto e = map->getEntry<Entry>(traci::TraCIPosition(x, y));
