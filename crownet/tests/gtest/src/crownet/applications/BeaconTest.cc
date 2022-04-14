@@ -23,23 +23,19 @@ class BeaconInfoTest : public BaseOppTest {
         auto oldtime = simTime();
         setSimTime(t);
 
-        const auto& header = makeShared<DynamicBeaconHeader>();
-        header->setSequencenumber(seq);
-        header->setSourceId(id);
+        const auto& chunk = makeShared<DynamicBeaconPacket>();
+        chunk->setSequencenumber(seq);
+        chunk->setSourceId(id);
         // mod 32
         uint32_t time = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
-        header->setTimestamp(time);
+        chunk->setTimestamp(time);
 
-
-        const auto &beacon = makeShared<DynamicBeaconPacket>();
-        beacon->setPos(coord);
-        beacon->setEpsilon({0.0, 0.0});
+        chunk->setPos(coord);
+        chunk->setEpsilon({0.0, 0.0});
         // measurement time is same as packet creation.
-        beacon->setPosTimestamp(time);
-        beacon->setNumberOfNeighbours(neighours);
+        chunk->setNumberOfNeighbours(neighours);
         auto packet = new Packet();
-        packet->insertAtFront(header);
-        packet->insertAtBack(beacon);
+        packet->insertAtFront(chunk);
 
         setSimTime(oldtime);
         return packet;
