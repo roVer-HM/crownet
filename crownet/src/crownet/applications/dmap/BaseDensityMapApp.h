@@ -55,6 +55,8 @@ protected:
 
  //
  virtual Packet *createPacket() override;
+ virtual Ptr<Chunk>  buildHeader();
+ virtual Ptr<Chunk>  buildPayload(b maxData);
 
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
