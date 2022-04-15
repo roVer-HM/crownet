@@ -36,6 +36,7 @@ protected:
     virtual void initialize(int stage) override;
 
     virtual const char *createPacketName(const Ptr<const Chunk>& data) const override;
+    virtual const char *createPacketName() const;
     virtual void applyContentTags(Ptr<Chunk> content);
     virtual void applyPacketTags( Packet *);
 
