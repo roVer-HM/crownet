@@ -9,6 +9,7 @@
 
 #include "inet/common/geometry/Geometry_m.h"
 #include "crownet/dcd/generic/Cell.h"
+#include "crownet/crownet.h"
 #include "traci/Position.h"
 #include "crownet/common/RegularGridInfo.h"
 #include "crownet/common/converter/OsgCoordinateConverter.h"
@@ -23,6 +24,9 @@ class CellKeyProvider {
   virtual ~CellKeyProvider() = default;
 
   virtual C getCellKey(const traci::TraCIPosition& pos) = 0;
+  virtual C getCellKey(const inet::Coord& pos) = 0;
+  virtual bool changedCell(const traci::TraCIPosition& pos1, const traci::TraCIPosition& pos2) = 0;
+  virtual bool changedCell(const inet::Coord& pos1, const inet::Coord& pos2) = 0;
   virtual traci::TraCIPosition getCellPosition(const traci::TraCIPosition& pos) = 0;
   virtual traci::TraCIPosition getCellPosition(const GridCellID& gridCell) = 0;
 
@@ -39,7 +43,6 @@ class CellKeyProvider {
 };
 
 
-
 class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
  public:
 //  GridCellIDKeyProvider(const RegularGridInfo& gridInfo)
@@ -48,6 +51,10 @@ class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
       : converter(converter), gridInfo(converter->getGridDescription()) {}
 
   virtual GridCellID getCellKey(const traci::TraCIPosition& pos) override;
+  virtual GridCellID getCellKey(const inet::Coord& pos) override;
+  virtual bool changedCell(const traci::TraCIPosition& pos1, const traci::TraCIPosition& pos2) override;
+  virtual bool changedCell(const inet::Coord& pos1, const inet::Coord& pos2) override;
+
   virtual traci::TraCIPosition getCellPosition(const traci::TraCIPosition& pos) override;
   virtual traci::TraCIPosition getCellPosition(const GridCellID& gridCell) override;
 

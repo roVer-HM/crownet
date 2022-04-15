@@ -17,6 +17,21 @@ GridCellID GridCellIDKeyProvider::getCellKey(const traci::TraCIPosition& pos) {
   return GridCellID(x_id, y_id);
 }
 
+GridCellID GridCellIDKeyProvider::getCellKey(const inet::Coord& pos){
+    return getCellKey(converter->position_cast_traci(pos));
+}
+
+bool GridCellIDKeyProvider::changedCell(const traci::TraCIPosition& pos1, const traci::TraCIPosition& pos2){
+    auto id1 = getCellKey(pos1);
+    auto id2 = getCellKey(pos2);
+    return id1 != id2;
+}
+
+bool GridCellIDKeyProvider::changedCell(const inet::Coord& pos1, const inet::Coord& pos2){
+    return changedCell(converter->position_cast_traci(pos1), converter->position_cast_traci(pos2));
+}
+
+
 traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const traci::TraCIPosition& pos){
     return getCellPosition(getCellKey(pos));
 }

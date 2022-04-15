@@ -46,15 +46,66 @@ public:
 };
 
 
-TEST_F(GridCellIdKeyProvider_F, coordToCell){
-    EXPECT_EQ(s->getCellKey({1.0, 1.0}), GridCellID(0,0));
-    EXPECT_EQ(s->getCellKey({5.0, 95.0}), GridCellID(0,9));
-    EXPECT_EQ(s->getCellKey({0.0, 0.0}), GridCellID(0,0));
-    EXPECT_EQ(s->getCellKey({20.0, 10.0}), GridCellID(2,1));
-    EXPECT_EQ(s->getCellKey({19.9, 10.0}), GridCellID(1,1));
+TEST_F(GridCellIdKeyProvider_F, traciCoordToCell){
+    EXPECT_EQ(s->getCellKey(traci::TraCIPosition{1.0, 1.0}), GridCellID(0,0));
+    EXPECT_EQ(s->getCellKey(traci::TraCIPosition{5.0, 95.0}), GridCellID(0,9));
+    EXPECT_EQ(s->getCellKey(traci::TraCIPosition{0.0, 0.0}), GridCellID(0,0));
+    EXPECT_EQ(s->getCellKey(traci::TraCIPosition{20.0, 10.0}), GridCellID(2,1));
+    EXPECT_EQ(s->getCellKey(traci::TraCIPosition{19.9, 10.0}), GridCellID(1,1));
 
-    EXPECT_EQ(s->getCellKey({1.0, 15.0}), GridCellID(0,1));
-    EXPECT_EQ(r->getCellKey({1.0, 15.0}), GridCellID(0,0)); // rectangle cells!
+    EXPECT_EQ(s->getCellKey(traci::TraCIPosition{1.0, 15.0}), GridCellID(0,1));
+    EXPECT_EQ(r->getCellKey(traci::TraCIPosition{1.0, 15.0}), GridCellID(0,0)); // rectangle cells!
+}
+
+TEST_F(GridCellIdKeyProvider_F, inetCoordToCell){
+    EXPECT_EQ(s->getCellKey(inet::Coord{1.0, 99.0}), GridCellID(0,0));
+    EXPECT_EQ(s->getCellKey(inet::Coord{5.0, 5.0}), GridCellID(0,9));
+    EXPECT_EQ(s->getCellKey(inet::Coord{0.0, 100.0}), GridCellID(0,0));
+    EXPECT_EQ(s->getCellKey(inet::Coord{20.0, 90.0}), GridCellID(2,1));
+    EXPECT_EQ(s->getCellKey(inet::Coord{19.9, 90.0}), GridCellID(1,1));
+
+    EXPECT_EQ(s->getCellKey(inet::Coord{1.0, 85.0}), GridCellID(0,1));
+    EXPECT_EQ(r->getCellKey(inet::Coord{1.0, 185.0}), GridCellID(0,0)); // rectangle cells!
+}
+
+TEST_F(GridCellIdKeyProvider_F, traciCoordChangedCell){
+    EXPECT_FALSE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{1.0, 1.0}));
+    EXPECT_FALSE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{5.0, 9.0}));
+    EXPECT_FALSE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{1.0, 1.0}));
+    EXPECT_FALSE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{5.0, 15.0}));
+
+    EXPECT_TRUE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{10.0, 1.0}));
+    EXPECT_TRUE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{1.0, 10.0}));
+    EXPECT_TRUE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{10.0, 1.0}));
+    EXPECT_TRUE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{1.0, 20.0}));
+
+    EXPECT_TRUE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{15.0, 5.0}));
+    EXPECT_TRUE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{5.0, 15.0}));
+    EXPECT_TRUE(s->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{15.0, 15.0}));
+
+    EXPECT_TRUE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{15.0, 5.0}));
+    EXPECT_TRUE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{5.0, 25.0}));
+    EXPECT_TRUE(r->changedCell(traci::TraCIPosition{1.0, 1.0}, traci::TraCIPosition{15.0, 25.0}));
+}
+
+TEST_F(GridCellIdKeyProvider_F, inetCoordChangedCell){
+    EXPECT_FALSE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{1.0, 99.0}));
+    EXPECT_FALSE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{5.0, 91.0}));
+    EXPECT_FALSE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{1.0, 199.0}));
+    EXPECT_FALSE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{5.0, 185.0}));
+
+    EXPECT_TRUE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{10.0, 99.0}));
+    EXPECT_TRUE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{1.0, 90.0}));
+    EXPECT_TRUE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{10.0, 199.0}));
+    EXPECT_TRUE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{1.0, 180.0}));
+
+    EXPECT_TRUE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{15.0, 95.0}));
+    EXPECT_TRUE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{5.0, 85.0}));
+    EXPECT_TRUE(s->changedCell(inet::Coord{1.0, 99.0}, inet::Coord{15.0, 85.0}));
+
+    EXPECT_TRUE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{15.0, 195.0}));
+    EXPECT_TRUE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{5.0, 175.0}));
+    EXPECT_TRUE(r->changedCell(inet::Coord{1.0, 199.0}, inet::Coord{15.0, 175.0}));
 }
 
 TEST_F(GridCellIdKeyProvider_F, gridInfo){
@@ -106,7 +157,6 @@ TEST_F(GridCellIdKeyProvider_F, dist4){
     // one id off in both cases! but one id has a longer cellSize
     int dist5 = r->maxIdCellDist(GridCellID(2,2), GridCellID(3,3));
     EXPECT_EQ(dist5, 1);
-
 }
 
 
