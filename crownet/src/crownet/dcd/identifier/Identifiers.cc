@@ -27,6 +27,9 @@ bool GridCellID::operator<(const GridCellID& rhs) const {
 bool GridCellID::operator==(const GridCellID& rhs) const {
   return id.first == rhs.id.first && id.second == rhs.id.second;
 }
+bool GridCellID::operator!=(const GridCellID& rhs) const {
+  return !(*this == rhs);
+}
 
 int GridCellID::columns() const { return 2; }
 void GridCellID::writeTo(std::ostream& out, const std::string& sep) const {
