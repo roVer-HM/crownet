@@ -36,7 +36,7 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         
         // App logic
         string coordConverterModule;
-        double cellSize @unit(m) = default(3.0m);
+        double cellSize @unit(m) = default(5.0m);
         // FSM-mainApp trigger (not used by default ). If < 0 deactivated. Packet creation 
         // is manged by scheduler modules
         double mainAppInterval @unit(s) = default(-1.0s); //  
