@@ -60,6 +60,10 @@ void NeighborhoodTable::initialize(int stage){
                 registerEntryListner(l);
             }
         }
+        auto converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
+                        par("coordConverterModule"), this)
+                        ->getConverter();
+        cellKeyProvider = std::make_shared<GridCellIDKeyProvider>(converter);
     }
 }
 

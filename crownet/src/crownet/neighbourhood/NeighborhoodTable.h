@@ -10,6 +10,8 @@
 #include <omnetpp/cobject.h>
 #include "inet/common/InitStages.h"
 #include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
+#include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/common/MobilityProviderMixin.h"
 
 using namespace omnetpp;
@@ -72,6 +74,7 @@ protected:
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;
     simtime_t lastCheck;
+    std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
 };
 
 
