@@ -53,5 +53,23 @@ void INeighborhoodTable::emitDropped(BeaconReceptionInfo* info){
         e->neighborhoodEntryDropped(this, info);
     }
 }
+//////
+void INeighborhoodTable::emitLeaveCell(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryLeaveCell(this, info);
+    }
+}
+
+void INeighborhoodTable::emitEnterCell(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryEnterCell(this, info);
+    }
+}
+
+void INeighborhoodTable::emitStayInCell(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryStayInCell(this, info);
+    }
+}
 
 }

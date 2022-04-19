@@ -21,7 +21,7 @@ void NeighborhoodEventWriter::onInit(){
             "beacon_value", "pkt_count", "pkt_loss", "pkt_seq", "cell_x", "cell_y",
             };
 
-    write() << "#version=3 " << endl;
+    write() << "#version=4 " << endl;
     for (int i = 0; i < header.size(); i++){
         if (i < header.size() -1){
             write() << header[i] << sep;
@@ -53,26 +53,62 @@ void NeighborhoodEventWriter::neighborhoodEntryDropped(INeighborhoodTable* table
 }
 
 
+void NeighborhoodEventWriter::neighborhoodEntryLeaveCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
+    writeData(table, info, "leave_cell");
+}
+
+void NeighborhoodEventWriter::neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
+    writeData(table, info, "enter_cell");
+}
+
+void NeighborhoodEventWriter::neighborhoodEntryStayInCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
+    writeData(table, info, "stay_in_cell");
+}
+
+
+
 void NeighborhoodEventWriter::writeData(INeighborhoodTable* table, BeaconReceptionInfo* info, std::string event){
-    auto pos = globalMapHandler->getConverter()->position_cast_traci(info->getPositionCurrent());
-    auto cellPos = globalMapHandler->getCellKeyProvider()->getCellPosition(pos);
     int beaconValue = 0;
-    if (event == "post_change"){
-        beaconValue = info->getBeaconValueCurrent();
-    } else if (event == "dropped") {
+    simtime_t rcvdTime;
+    simtime_t sentTime;
+    Coord position;
+    if (event == "dropped") {
         beaconValue = 0;
+    } else if (event == "leave_cell"){
+        // current time but old position
+        beaconValue = -1;
+        rcvdTime = info->getReceivedTimeCurrent();
+        sentTime = info->getSentSimTimeCurrent();
+        position = info->getPositionPrio();
+    } else if (event == "enter_cell") {
+        // current time and current position
+        beaconValue = 1;
+        rcvdTime = info->getReceivedTimeCurrent();
+        sentTime = info->getSentSimTimeCurrent();
+        position = info->getPositionCurrent();
+    } else if (event == "stay_in_cell") {
+        // current time and current position no change of beacon value
+        beaconValue = 0;
+        rcvdTime = info->getReceivedTimeCurrent();
+        sentTime = info->getSentSimTimeCurrent();
+        position = info->getPositionCurrent();
+    } else if (event == "ttl_reached"){
+        // current time and current position (last known values but older than TTL)
+        beaconValue = -1;
+        rcvdTime = info->getReceivedTimeCurrent();
+        sentTime = info->getSentSimTimeCurrent();
+        position = info->getPositionCurrent();
     } else { //pre_changed, ttl_reached
-        beaconValue = -1*info->getBeaconValueCurrent();
+        throw cRuntimeError("wrong event: %s", event.c_str());
     }
     eventnumber_t event_number = getSimulation()->getEventNumber();
+    auto traciPosition = globalMapHandler->getConverter()->position_cast_traci(position);
+    auto cellPos = globalMapHandler->getCellKeyProvider()->getCellPosition(traciPosition);
 
     write() << table->getOwnerId() << sep << event_number << sep << event << sep << simTime().dbl() << sep \
-            << info->getReceivedTimeCurrent() << sep << info->getSentSimTimeCurrent() << sep \
-            << info->getNodeId() << sep << info->getPositionCurrent().x << sep << info->getPositionCurrent().y << sep \
-            << beaconValue << sep << info->getPacketsReceivedCount() << sep \
-            << info->getPacketsLossCount() << sep << info->getMaxSequencenumber() << sep \
-            << cellPos.x << sep << cellPos.y << endl;
-
+            << rcvdTime << sep << sentTime << sep << info->getNodeId() << sep << position.x << sep << position.y << sep \
+            << beaconValue << sep << info->getPacketsReceivedCount() << sep << info->getPacketsLossCount() << sep \
+            << info->getMaxSequencenumber() << sep << cellPos.x << sep << cellPos.y << endl;
 }
 
 }

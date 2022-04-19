@@ -25,6 +25,10 @@ public:
 
     virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) override;
     virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
+
+    virtual void neighborhoodEntryLeaveCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
+    virtual void neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
+    virtual void neighborhoodEntryStayInCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
     virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
     virtual void neighborhoodEntryDropped(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
 

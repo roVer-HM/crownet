@@ -83,6 +83,9 @@ public:
     void emitPostChanged(BeaconReceptionInfo* newInfo);
     void emitRemoved(BeaconReceptionInfo* info);
     void emitDropped(BeaconReceptionInfo* info);
+    void emitLeaveCell(BeaconReceptionInfo* info);
+    void emitEnterCell(BeaconReceptionInfo* info);
+    void emitStayInCell(BeaconReceptionInfo* info);
 
 
 protected:
@@ -96,6 +99,9 @@ public:
     virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo)=0;
     virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
     virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
+    virtual void neighborhoodEntryLeaveCell(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
+    virtual void neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
+    virtual void neighborhoodEntryStayInCell(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
     virtual void neighborhoodEntryDropped(INeighborhoodTable* table, BeaconReceptionInfo* info){/*do nothing*/};
 };
 

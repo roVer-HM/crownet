@@ -88,7 +88,8 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
         emit(neighborhoodTableChangedSignal, this);
         return info;
     } else {
-        emitPreChanged(_table[sourceId]); // remove node from old position
+        // return existing info object for update with new beacon packet information
+//        emitPreChanged(_table[sourceId]); // remove node from old position
         return _table[sourceId];
     }
 }
@@ -105,6 +106,7 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
      */
     Enter_Method_Silent();
     if (ttlReached(info)){
+        // information to old do not propagate to density map
         emitDropped(info);
         auto iter = _table.find(info->getNodeId());
         if(iter != _table.end()){
@@ -112,8 +114,27 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
         }
         delete info;
     } else {
+        // new info, already seen and cell change or already seen and same cell
+        if (!info->hasPrio()){
+            // new beacon. Node was not seen before or last beacon was sent more than TTL seconds ago.
+            // (1) enter cell
+            emitEnterCell(info);
+        } else if (cellKeyProvider->changedCell(info->getPositionCurrent(), info->getPositionPrio())){
+            // node moved! (1) decrement in old cell and (2) increment in new cell
+            // todo emitLeaveCell(info); //will access *prio location and current time
+            // todo emitEnterCell(info); //will access *current location and current time
+            // (1) leave old cell
+            emitLeaveCell(info);
+            // (2) enter new cell
+            emitEnterCell(info);
+        } else {
+            // node staed in cell! Only update time stampes.
+            //todo emitStayInCell(info); //will access *current time and
+            // (1) stay in cell (only time stamp update)
+            emitStayInCell(info);
+        }
         // info object is held in _table. Do not delete.
-        emitPostChanged(info);
+//        emitPostChanged(info);
     }
     return true;
 }

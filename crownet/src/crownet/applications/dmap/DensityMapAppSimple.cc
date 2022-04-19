@@ -55,6 +55,7 @@ void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table,
     //
     // decrement count in old entry. Do not remove source from neighborhood. This will be done in the PostChange listener.
     Enter_Method_Silent();
+    throw cRuntimeError("Remove! Old Code");
     if (isRunning()){
         if (dcdMap->isInNeighborhood((int)oldInfo->getNodeId())){
             EV_INFO << LOG_MOD << hostId << " preChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(oldInfo) << endl;
@@ -76,6 +77,7 @@ void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table
     //
     // increment/update entry based on new beacon informationgetCellId
     Enter_Method_Silent();
+    throw cRuntimeError("Remove! Old Code");
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
         // update own position
@@ -111,9 +113,103 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     Enter_Method_Silent();
     if (isRunning()){
         EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
-        auto oldCell = dcdMap->getNeighborCell((int)info->getNodeId());
-        dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), info->getBeaconValueCurrent());
+        auto cellId = dcdMap->getNeighborCell((int)info->getNodeId());
+        auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
+        cellEntryLocal->decrementCount(
+                info->getSentSimTimeCurrent(),
+                info->getReceivedTimeCurrent(),
+                1.0
+        );
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
+    }
+}
+
+void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
+/*
+ * Node moved from one cell to another. Therefore the old cell must be decrement using the new sent time
+ * as the change time. The info object must contain the current and prio value. If not this method will
+ * raise a runtime error.
+ *
+ */
+    Enter_Method_Silent();
+    if (isRunning()){
+        if (!info->hasPrio()){
+            throw cRuntimeError("Beacon info object does not contain prio values");
+        }
+        // get and check prio position
+        auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionPrio());
+        auto savedCellId = dcdMap->getNeighborCell((int)info->getNodeId());
+        if (cellId != savedCellId){
+            //todo add info to error message
+            throw cRuntimeError("BeaconReceptionInfo reports different cell id than saved in density map");
+        }
+        // decrement old cell by 1
+        // todo: update time only if it is the newest value?
+        auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
+        cellEntryLocal->decrementCount(
+                info->getSentSimTimeCurrent(),
+                info->getReceivedTimeCurrent(),
+                1.0
+        );
+        // remove node from Map NT
+        dcdMap->removeFromNeighborhood((int)info->getNodeId());
+    }
+}
+
+void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
+/*
+ * Node moved into a cell or this is the first beacon receivd from this node. The info object my contain
+ * data from a prio position but this is not needed here. This method only uses the current data.
+ */
+    Enter_Method_Silent();
+    if (isRunning()){
+        // get and check current position
+        auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionCurrent());
+        if (dcdMap->isInNeighborhood((int)info->getNodeId())){
+            //todo add info to error message
+            throw cRuntimeError("Node already in neighborhood");
+        }
+        // increment new cell by 1
+        // todo: update time only if it is the newest value?
+        auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
+        cellEntryLocal->incrementCount(
+                info->getSentSimTimeCurrent(),
+                info->getReceivedTimeCurrent(),
+                1.0
+        );
+        // add node to neighborhood
+        dcdMap->addToNeighborhood((int)info->getNodeId(), cellId);
+    }
+
+}
+
+void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
+/*
+ * Node stayed in the same cell compared to the prio beacon received. The position may differ but it does not
+ * have to. The info object must contain the current and prio value. The position of the prio and current value
+ * may differ but must map to the SAME cell. This method will not change the count of this cell and will only
+ * update the time stamps of the measurement.
+ */
+    Enter_Method_Silent();
+    if (isRunning()){
+        if (!info->hasPrio()){
+            throw cRuntimeError("Beacon info object does not contain prio values");
+        }
+        // get and check position for cellId
+        auto cellId_prio = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionPrio());
+        auto cellId_current = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionCurrent());
+        auto savedCellId = dcdMap->getNeighborCell((int)info->getNodeId());
+        if ((cellId_prio != cellId_current) || (cellId_current !=savedCellId)){
+            //todo add info to error message
+            throw cRuntimeError("Nodes prio and current cell do not match or current position "
+                    "and saved cell in map do not match");
+        }
+        // update time stamps only
+        auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId_current);
+        cellEntryLocal->touch(
+            info->getSentSimTimeCurrent(),
+            info->getReceivedTimeCurrent()
+        );
     }
 }
 

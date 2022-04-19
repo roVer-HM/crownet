@@ -47,6 +47,10 @@ protected:
  virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* newInfo) override;
  virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info) override;
 
+ virtual void neighborhoodEntryLeaveCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
+ virtual void neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
+ virtual void neighborhoodEntryStayInCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
+
 
 private:
   // application
