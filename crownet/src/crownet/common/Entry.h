@@ -53,8 +53,12 @@ class IEntry : public crownet::FilePrinter {
   const bool empty() const;
   virtual const bool valid() const { return _valid; }
   virtual void incrementCount(const time_type& t, const double& value = 1.0);
+  virtual void incrementCount(const time_type& sent_time, const time_type& received_time, const double& value = 1.0);
   virtual void decrementCount(const time_type& t, const double& value = 1.0);
+  virtual void decrementCount(const time_type& sent_time, const time_type& received_time, const double& value = 1.0);
   virtual void touch(const time_type& t);  // update time only
+  virtual void touch(const time_type& sent_time, const time_type& received_time);
+
 
   virtual const time_type& getMeasureTime() const;
   virtual void setMeasureTime(const time_type& time);
@@ -205,10 +209,15 @@ inline const bool IEntry<K, T>::empty() const {
 template <typename K, typename T>
 inline void IEntry<K, T>::incrementCount(const time_type& t, const double& value) {
   count += value;
-  measurement_time = t;
-  received_time = t;
-  _valid = true;
+  this->touch(t);
 }
+
+template <typename K, typename T>
+inline void IEntry<K, T>::incrementCount(const time_type& sent_time, const time_type& received_time, const double& value){
+    this->count += value;
+    this->touch(sent_time, received_time);
+}
+
 
 template <typename K, typename T>
 inline void IEntry<K, T>::decrementCount(const time_type& t, const double& value) {
@@ -216,16 +225,28 @@ inline void IEntry<K, T>::decrementCount(const time_type& t, const double& value
   if (count < 0) {
     throw omnetpp::cRuntimeError("Cell count decrement below 0.");
   }
-  _valid = true;
-  measurement_time = t;
-  received_time = t;
+  this->touch(t);
 }
 
 template <typename K, typename T>
-void IEntry<K, T>::touch(const time_type& t) {
-  measurement_time = t;
-  received_time = t;
-  _valid = true;
+inline void IEntry<K, T>::decrementCount(const time_type& sent_time, const time_type& received_time, const double& value){
+    this->count = count - value;
+    if (this->count < 0) {
+      throw omnetpp::cRuntimeError("Cell count decrement below 0.");
+    }
+    this->touch(sent_time, received_time);
+}
+
+template <typename K, typename T>
+inline void IEntry<K, T>::touch(const time_type& t) {
+  this->touch(t, t);
+}
+
+template <typename K, typename T>
+inline void IEntry<K, T>::touch(const time_type& sent_time, const time_type& received_time){
+    this->measurement_time = sent_time;
+    this->received_time = received_time;
+    this->_valid = true;
 }
 
 template <typename K, typename T>
