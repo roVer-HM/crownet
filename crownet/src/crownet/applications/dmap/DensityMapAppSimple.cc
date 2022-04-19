@@ -115,9 +115,10 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
         EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         auto cellId = dcdMap->getNeighborCell((int)info->getNodeId());
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
+        // TTL reached thus use the current simulation time and not the
+        // time stamps present in the info object for both values.
         cellEntryLocal->decrementCount(
-                info->getSentSimTimeCurrent(),
-                info->getReceivedTimeCurrent(),
+                simTime(),
                 1.0
         );
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
