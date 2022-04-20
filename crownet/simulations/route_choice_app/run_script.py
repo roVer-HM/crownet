@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys, os
-
+import time
 sys.path.append(os.path.abspath(".."))
 
 from roveranalyzer.simulators.crownet.runner import BaseRunner
@@ -24,7 +24,7 @@ if __name__ == "__main__":
         "--scenario-file",
         "vadere/scenarios/simplified_default_sequential.scenario",
         "--ctrl.controller-type",
-        "OpenLoop",
+        "ClosedLoop",
     ]
 
     if len(sys.argv) == 1:

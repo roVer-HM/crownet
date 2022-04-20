@@ -1,0 +1,6 @@
+id,run_id,"('Parameter', 'vadere', 'fixedSeed')","('Parameter', 'vadere', 'reactionProbabilities.[stimulusId==-400].reactionProbability')","('MetaInfo', 'required_wallclock_time')","('MetaInfo', 'return_code')"
+0,0,74895,0.0,762.844354391098,0
+1,0,4271,0.0,757.8899526596069,0
+2,0,56216,0.0,771.0593612194061,0
+3,0,63251,0.0,761.0230348110199,0
+4,0,75772,0.0,753.3463840484619,0

@@ -23,7 +23,6 @@ class NoController(Controller):
         super().__init__()
         self.time_step_size = 10.0
         self.densityMapper = None
-        self.counter = 0
         self.density_over_time = list()
 
     def handle_sim_step(self, sim_time, sim_state):
@@ -43,7 +42,7 @@ class NoController(Controller):
             densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
         elif isinstance(self.con_manager, ClientModeConnection):
             densities = list()
-            for a in [6, 7, 8, 9, 10]:
+            for a in [6, 8, 10]:
                 __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
                 densities.append(density)
         else:
@@ -54,7 +53,7 @@ class NoController(Controller):
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
             obs = self._get_obstacles_as_polygons()
-            measurement_areas = self._get_measurement_areas([1, 2, 3, 4, 5])
+            measurement_areas = self._get_measurement_areas([1, 3, 5])
             self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size,
                                                measurement_areas=measurement_areas, obstacles=obs)
         if result is not None:
@@ -79,7 +78,7 @@ class NoController(Controller):
         pass
 
     def handle_init(self, sim_time, sim_state):
-        self.counter = 0
+        self.counter = -1
         self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer(os.path.join(self.output_dir, "commandIds.txt"))))
 
     def compute_next_corridor_choice(self, sim_time):
@@ -95,7 +94,7 @@ class NoController(Controller):
 class OpenLoop(NoController, Controller):
     def __init__(self):
         super().__init__()
-        self.target_ids = [11, 21, 31, 41, 51]
+        self.target_ids = [11, 31, 51]
         self.redirected_agents = list()
         self.controlModelType = "RouteChoice"
         self.controlModelName = "distributePeds"
@@ -117,7 +116,7 @@ class OpenLoop(NoController, Controller):
         super().write_data()
 
     def apply_redirection_measure(self):
-        probabilities = [0, 0, 0, 0, 0]
+        probabilities = [0 for x in self.target_ids]
         probabilities[self.counter] = 1.0  # all of the agents should use one specific corridor
 
         command = {"targetIds": self.target_ids,
@@ -127,7 +126,7 @@ class OpenLoop(NoController, Controller):
             "commandId": self.commandID,
             "stimulusId": -400,
             "command": command,
-            "space": {"x": 0.5, "y": 0.5, "width": 5, "height": 15},  # get information directly after spawning process
+            "space": {"x": 0.0, "y": 0.0, "width": 25, "height": 25},  # get information directly after spawning process
         }
         action = json.dumps(action)
 
@@ -177,17 +176,8 @@ class ClosedLoop(OpenLoop, Controller):
         super().__init__()
 
     def choose_corridor(self):
-        number_of_time_steps_for_measurement = int(
-            np.round(self.time_step_size / self.sensor_time_step_size, 0)
-        )
-
-        densities = np.array(
-            self.density_over_time[-number_of_time_steps_for_measurement:]
-        ).mean(axis=0)
-        # set old corridor to inf to avoid congestion:
-        densities[self.counter] = np.inf
-        self.counter = np.argwhere(densities == densities.min()).ravel()[-1]
-
+        densities = np.array(self.density_over_time[-1:]).mean(axis=0)
+        self.counter = np.argwhere(densities == densities.min()).ravel()[0] # recommend shortest corridor
         print(
             f"The densities are: {densities.round(3)}. Minimum: index = {self.counter}."
         )
