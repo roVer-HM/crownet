@@ -96,7 +96,7 @@ class OpenLoop(NoController, Controller):
         super().__init__()
         self.target_ids = [11, 31, 51]
         self.redirected_agents = list()
-        self.controlModelType = "RouteChoice"
+        self.controlModelType = "RouteRecommendationModel"
         self.controlModelName = "distributePeds"
         self.commandID = 111
 
@@ -115,13 +115,30 @@ class OpenLoop(NoController, Controller):
         self.processor_manager.post_loop("sending_times", commandIdsSent)
         super().write_data()
 
-    def apply_redirection_measure(self):
-        probabilities = [0 for x in self.target_ids]
-        probabilities[self.counter] = 1.0  # all of the agents should use one specific corridor
 
-        command = {"targetIds": self.target_ids,
-                   "probability": probabilities,
+    def recommendRoute(self, targetId):
+        if targetId == 11:
+            return {"targetIds": self.target_ids,
+                   "probability": [1.0, 0.0, 0.0],
+                   "instruction" : f"use corridor {targetId}"
                    }
+        if targetId == 31:
+            return {"targetIds": self.target_ids,
+                    "probability": [0.3, 0.5, 0.0],
+                    "instruction": f"use corridor {targetId}"
+                    }
+        if targetId == 51:
+            return {"targetIds": self.target_ids,
+                    "probability": [0.1, 0.3, 0.6],
+                    "instruction": f"use corridor {targetId}"
+                    }
+
+
+    def apply_redirection_measure(self):
+
+
+        command = self.recommendRoute(self.target_ids[self.counter])
+
         action = {
             "commandId": self.commandID,
             "stimulusId": -400,
@@ -191,13 +208,17 @@ if __name__ == "__main__":
                     "OpenLoop", #
                     "--scenario-file",
                     "simplified_default_sequential.scenario",
-                    "--experiment-label",
-                    f"no_disturbance_openControl",
                     "--port",
                     "9999",
                     "--host-name",
                     "vadere",
                     "--client-mode",
+                    #"--start-server",
+                    #"--gui-mode",
+                    "--output-dir",
+                    "sim-output-task1",
+                    #"-j",
+                    #"/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar"
                     ]
     else:
         settings = sys.argv[1:]
