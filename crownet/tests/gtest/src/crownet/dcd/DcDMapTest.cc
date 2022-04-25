@@ -50,6 +50,7 @@ class RegularDcDMapTest : public BaseOppTest {
   }
 
   void SetUp() override {
+    setSimTime(0.0);
     // [1, 1] count 2
     incr(mapLocal, 1.2, 1.2, 100, 30.0);
     incr(mapLocal, 1.5, 1.5, 101, 30.0);

@@ -58,7 +58,8 @@ class IEntry : public crownet::FilePrinter {
   virtual void decrementCount(const time_type& sent_time, const time_type& received_time, const double& value = 1.0);
   virtual void touch(const time_type& t);  // update time only
   virtual void touch(const time_type& sent_time, const time_type& received_time);
-
+  virtual void setTime(const time_type& t);
+  virtual void setTime(const time_type& sent_time, const time_type& received_time);
 
   virtual const time_type& getMeasureTime() const;
   virtual void setMeasureTime(const time_type& time);
@@ -73,6 +74,8 @@ class IEntry : public crownet::FilePrinter {
   virtual void setEntryDist(const EntryDist&);
   virtual void setEntryDist(EntryDist&& dist);
 
+  virtual const double getSelectionRank() const;
+  virtual void setSelectionRank(const double rank);
 
   virtual int compareMeasureTime(const IEntry& other) const;
   virtual int compareReceivedTime(const IEntry& other) const;
@@ -98,7 +101,8 @@ class IEntry : public crownet::FilePrinter {
   bool operator==(const IEntry<K, T>& rhs) const;
 
  protected:
-  double count = 0;
+  double count = 0.0;
+  double selectionRank = std::numeric_limits<double>::max();
   time_type measurement_time;
   time_type received_time;
   bool _valid;
@@ -244,9 +248,22 @@ inline void IEntry<K, T>::touch(const time_type& t) {
 
 template <typename K, typename T>
 inline void IEntry<K, T>::touch(const time_type& sent_time, const time_type& received_time){
+    if(this->measurement_time <= sent_time ){
+        this->measurement_time = sent_time;
+        this->received_time = received_time;
+    }
+    this->_valid = true;
+}
+
+template <typename K, typename T>
+inline void IEntry<K, T>::setTime(const time_type& t) {
+  this->setTime(t, t);
+}
+
+template <typename K, typename T>
+inline void IEntry<K, T>::setTime(const time_type& sent_time, const time_type& received_time){
     this->measurement_time = sent_time;
     this->received_time = received_time;
-    this->_valid = true;
 }
 
 template <typename K, typename T>
@@ -296,6 +313,17 @@ template <typename K, typename T>
 void IEntry<K, T>::setEntryDist(EntryDist&& dist){
     this->entryDist = std::move(dist);
 }
+
+template <typename K, typename T>
+const double IEntry<K, T>::getSelectionRank() const{
+    return this->selectionRank;
+}
+
+template <typename K, typename T>
+void IEntry<K, T>::setSelectionRank(const double rank){
+    this->selectionRank = rank;
+}
+
 
 template <typename K, typename T>
 inline int IEntry<K, T>::compareMeasureTime(const IEntry& other) const {
@@ -363,14 +391,16 @@ template <typename K, typename T>
 void IEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
   out << this->count << sep << this->measurement_time << sep
       << this->received_time << sep << this->source << sep << this->selected_in  << sep
-      << this->entryDist.sourceHost << sep << this->entryDist.sourceEntry << sep << this->entryDist.hostEntry;
+      << this->selectionRank << sep << this->entryDist.sourceHost << sep
+      << this->entryDist.sourceEntry << sep << this->entryDist.hostEntry;
 }
 
 template <typename K, typename T>
 void IEntry<K, T>::writeHeaderTo(std::ostream& out,
                                  const std::string& sep) const {
   out << "count" << sep << "measured_t" << sep << "received_t" << sep
-      << "source" << sep << "selection" << sep << "sourcerHost" << sep << "sourceEntry" << sep << "hostEntry" ;
+      << "source" << sep << "selection" << sep << "selectionRank" << sep
+      << "sourcerHost" << sep << "sourceEntry" << sep << "hostEntry" ;
 }
 
 template <typename K, typename T>
@@ -387,14 +417,15 @@ bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
 template <typename K, typename T>
 void IGlobalEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
   out << this->count << sep << this->measurement_time << sep
-      << this->received_time << sep << this->source << sep << this->selected_in;
+      << this->received_time << sep << this->source << sep << this->selected_in << sep
+      << this->selectionRank;
 }
 
 template <typename K, typename T>
 void IGlobalEntry<K, T>::writeHeaderTo(std::ostream& out,
                                  const std::string& sep) const {
   out << "count" << sep << "measured_t" << sep << "received_t" << sep
-      << "source" << sep << "selection";
+      << "source" << sep << "selection" << sep << "selectionRank";
 }
 
 template <typename K, typename T>

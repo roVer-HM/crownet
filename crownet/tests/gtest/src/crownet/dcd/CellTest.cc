@@ -50,6 +50,7 @@ class RegularCellTest : public BaseOppTest {
       : cell(dcdFactory->getTimeProvider(), GridCellID(5, 4), IntIdentifer(42)),
         cellEmpty(dcdFactory->getTimeProvider(), GridCellID(6, 5), IntIdentifer(42)) {}
   void SetUp() override {
+    setSimTime(0.0);
     auto& m = cell.getData();
     // add data (node_key_t (owner), IEntry (count data)
     m[IntIdentifer(14)] = ctor.entry();  // count 2
@@ -385,10 +386,10 @@ TEST_F(RegularCellTest, ymfVisitor_2) {
 
 TEST_F(RegularCellTest, ymfPlustDist_1) {
     auto m = cell.getData();
-    m[IntIdentifer(14)]->touch(1.0);
-    m[IntIdentifer(15)]->touch(2.0);
-    m[IntIdentifer(16)]->touch(3.0);
-    m[IntIdentifer(17)]->touch(4.0);
+    m[IntIdentifer(14)]->setTime(1.0);
+    m[IntIdentifer(15)]->setTime(2.0);
+    m[IntIdentifer(16)]->setTime(3.0);
+    m[IntIdentifer(17)]->setTime(4.0);
     m[IntIdentifer(42)]->reset();
     double sum = 4. + 3. + 2. + 1. - (4*1.);
     setSimTime(5.0);

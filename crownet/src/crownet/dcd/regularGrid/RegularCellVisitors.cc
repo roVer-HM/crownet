@@ -99,6 +99,9 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
       ret = e.second;
     }
   }
+  if (ret){
+      ret->setSelectionRank(0.0);
+  }
   return ret;
 }
 
@@ -149,6 +152,7 @@ RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) co
       double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
       ymfPlusDist = alpha * (age)/d.age_sum +
               (1-alpha) * e.second->getEntryDist().sourceEntry/d.dist_sum;
+      e.second->setSelectionRank(ymfPlusDist);
       if (ret == nullptr) {
         ret = e.second;
         ret_ymfPlusDist = ymfPlusDist;
@@ -184,6 +188,7 @@ RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell
 
       ymfPlusDist = alpha * (age)/d.age_sum +
               (1-alpha) * dist/d.dist_sum;
+      e.second->setSelectionRank(ymfPlusDist);
       if (ret == nullptr) {
         ret = e.second;
         ret_ymfPlusDist = ymfPlusDist;
@@ -201,6 +206,7 @@ RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell
 RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
     // to check local exists.... raise error.....
     auto val = cell.getLocal();
+    val->setSelectionRank(0.0);
     return val;
 }
 
@@ -217,6 +223,7 @@ RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell) const {
   auto entry = cell.createEntry(sum/num);
   entry->setMeasureTime(time/num);
   entry->setReceivedTime(time/num);
+  entry->setSelectionRank(0.0);
   return entry;
 }
 
@@ -237,7 +244,7 @@ RegularCell::entry_t_ptr MedianVisitor::applyTo(const RegularCell& cell) const {
   auto entry = cell.createEntry((double)(count[left] + count[right])/2);
   entry->setMeasureTime((double)(count[left] + count[right])/2);
   entry->setReceivedTime((double)(time[left] + time[right])/2);
-
+  entry->setSelectionRank(0.0);
   return entry;
 }
 
@@ -252,6 +259,7 @@ RegularCell::entry_t_ptr InvSourceDistVisitor::applyTo(const RegularCell& cell) 
   }
   auto entry = cell.createEntry(itemSum/weightSum);
   entry->touch(this->time);
+  entry->setSelectionRank(0.0);
   return entry;
 }
 
@@ -264,6 +272,7 @@ RegularCell::entry_t_ptr MaxCountVisitor::applyTo(const RegularCell& cell) const
           count = p->getCount();
       }
   }
+  p->setSelectionRank(0.0);
   return p;
 }
 
