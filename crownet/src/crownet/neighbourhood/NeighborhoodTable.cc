@@ -121,20 +121,15 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
             emitEnterCell(info);
         } else if (cellKeyProvider->changedCell(info->getPositionCurrent(), info->getPositionPrio())){
             // node moved! (1) decrement in old cell and (2) increment in new cell
-            // todo emitLeaveCell(info); //will access *prio location and current time
-            // todo emitEnterCell(info); //will access *current location and current time
             // (1) leave old cell
             emitLeaveCell(info);
             // (2) enter new cell
             emitEnterCell(info);
         } else {
             // node staed in cell! Only update time stampes.
-            //todo emitStayInCell(info); //will access *current time and
             // (1) stay in cell (only time stamp update)
             emitStayInCell(info);
         }
-        // info object is held in _table. Do not delete.
-//        emitPostChanged(info);
     }
     return true;
 }
