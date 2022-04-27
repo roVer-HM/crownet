@@ -42,9 +42,9 @@ class NoController(Controller):
             densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
         elif isinstance(self.con_manager, ClientModeConnection):
             densities = list()
-            for a in [6, 8, 10]:
-                #__, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
-                density = -11.0 #TODO replace
+            for a in [25, 24, 23]:
+                __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
+                #density = -11.0 #TODO replace
                 densities.append(density)
         else:
             raise ValueError("Cannot handle send_ctl command.")
@@ -95,7 +95,7 @@ class NoController(Controller):
 class OpenLoop(NoController, Controller):
     def __init__(self):
         super().__init__()
-        self.target_ids = [11, 21, 31]
+        self.target_ids = [31, 21, 11]
         self.redirected_agents = list()
         self.controlModelType = "InformationStimulusProvider"
         self.controlModelName = "distributePeds"
@@ -121,12 +121,14 @@ class OpenLoop(NoController, Controller):
     def apply_redirection_measure(self):
 
         command = {"instruction": f"use target [{self.target_ids[self.counter]}]"}
+        print(command)
 
         action = {
             "commandId": self.commandID,
             "stimulusId": -400,
             "command": command,
-            "space": {"x": 175.0, "y": 260.0, "width": 5, "height": 5},  # get information directly after spawning process
+            #"space": {"x": 0.0, "y": 0.0, "width": 500, "height": 500},
+            "space": {"x": 180.0, "y": 190.0, "width": 20.0, "height": 15.0},  # get information directly after spawning process
         }
         action = json.dumps(action)
 
@@ -188,7 +190,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         # default settings for control-vadere (no Omnetpp!)
         settings = ["--controller-type",
-                    "OpenLoop", #
+                    "ClosedLoop", #
                     "--scenario-file",
                     "route_choice_real_world.scenario",
                     "--port",
