@@ -43,7 +43,8 @@ class NoController(Controller):
         elif isinstance(self.con_manager, ClientModeConnection):
             densities = list()
             for a in [6, 8, 10]:
-                __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
+                #__, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
+                density = -11.0 #TODO replace
                 densities.append(density)
         else:
             raise ValueError("Cannot handle send_ctl command.")
@@ -94,9 +95,9 @@ class NoController(Controller):
 class OpenLoop(NoController, Controller):
     def __init__(self):
         super().__init__()
-        self.target_ids = [11, 31, 51]
+        self.target_ids = [11, 21, 31]
         self.redirected_agents = list()
-        self.controlModelType = "RouteRecommendationModel"
+        self.controlModelType = "InformationStimulusProvider"
         self.controlModelName = "distributePeds"
         self.commandID = 111
 
@@ -116,34 +117,16 @@ class OpenLoop(NoController, Controller):
         super().write_data()
 
 
-    def recommendRoute(self, targetId):
-        if targetId == 11:
-            return {"targetIds": self.target_ids,
-                   "probability": [1.0, 0.0, 0.0],
-                   "instruction" : f"use corridor {targetId}"
-                   }
-        if targetId == 31:
-            return {"targetIds": self.target_ids,
-                    "probability": [0.3, 0.5, 0.0],
-                    "instruction": f"use corridor {targetId}"
-                    }
-        if targetId == 51:
-            return {"targetIds": self.target_ids,
-                    "probability": [0.1, 0.3, 0.6],
-                    "instruction": f"use corridor {targetId}"
-                    }
-
 
     def apply_redirection_measure(self):
 
-
-        command = self.recommendRoute(self.target_ids[self.counter])
+        command = {"instruction": f"use target [{self.target_ids[self.counter]}]"}
 
         action = {
             "commandId": self.commandID,
             "stimulusId": -400,
             "command": command,
-            "space": {"x": 0.0, "y": 0.0, "width": 25, "height": 25},  # get information directly after spawning process
+            "space": {"x": 175.0, "y": 260.0, "width": 5, "height": 5},  # get information directly after spawning process
         }
         action = json.dumps(action)
 
@@ -207,7 +190,7 @@ if __name__ == "__main__":
         settings = ["--controller-type",
                     "OpenLoop", #
                     "--scenario-file",
-                    "simplified_default_sequential.scenario",
+                    "route_choice_real_world.scenario",
                     "--port",
                     "9999",
                     "--host-name",

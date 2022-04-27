@@ -1,5 +1,5 @@
 {
-  "name" : "route_choice_real_world",
+  "name" : "route_choice_real_world_default",
   "description" : "",
   "release" : "2.2",
   "processWriters" : {
@@ -884,7 +884,7 @@
       }, {
         "id" : 1,
         "shape" : {
-          "x" : 0.3,
+          "x" : 184.3,
           "y" : 190.5,
           "width" : 10.0,
           "height" : 10.0,
@@ -1010,8 +1010,8 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 0.0,
-        "endTime" : 0.0,
+        "startTime" : 10.0,
+        "endTime" : 10000.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
