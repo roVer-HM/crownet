@@ -1,7 +1,7 @@
 {
   "name" : "route_choice_real_world",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -156,7 +156,21 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "MultiPerceptionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
+            "routeChoices" : [ {
+              "instruction" : "use target [11]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 1.0, 0.0, 0.0 ]
+            } ]
+          }
+        },
+        "perception" : "SimplePerceptionModel",
         "cognition" : "ProbabilisticCognitionModel"
       }
     },
@@ -986,9 +1000,21 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
+    "stimulusInfos" : [ {
+      "timeframe" : {
+        "startTime" : 10.0,
+        "endTime" : 10000.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "stimuli" : [ {
+        "type" : "InformationStimulus",
+        "id" : -1,
+        "information" : "use target [11]"
+      } ]
+    } ],
     "reactionProbabilities" : [ {
-      "stimulusId" : -400,
+      "stimulusId" : -1,
       "reactionProbability" : 1.0
     } ]
   }
