@@ -2,7 +2,7 @@
 #
 # OMNeT++ Simulator with the following extensions:
 # - INET Framework    (in /models/inet4)
-# - simuLTE           (in /models/simulte)
+# - simu5g            (in /models/simu5g)
 # - VEINS             (in /models/veins)
 
 
@@ -10,13 +10,13 @@
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
 
 # Specify the version/tag of inet to be put in the container:
-ENV INETRELEASE v4.3.0
-ENV SIMULTERELEASE hm_master
+ENV INETRELEASE hm_master
+ENV SIMU5GRELEASE hm_master
 ENV VEINSRELEASE hm_master
 # Note: Remember to update the description below when changing versions/tags
 
 
-LABEL description "OMNeT++ Simulation Framework including inet, simulte and veins models (roVer project)"
+LABEL description "OMNeT++ Simulation Framework including inet, simu5g and veins models (roVer project)"
 LABEL maintainer  "wischhof@ieee.org"
 
 #################### INET #############################################################################
@@ -44,7 +44,7 @@ RUN make makefiles && \
     make MODE=debug CONFIGNAME=gcc-debug -j $(nproc) all && \
     find . -type f -name '*.o' -exec rm {} +
 
-#################### SIMULTE ###########################################################################
+#################### SIMU5G ###########################################################################
 
 # clone the sources (version/tag is specified in the git command at the end)
 WORKDIR /models
@@ -52,14 +52,14 @@ WORKDIR /models
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN --mount=type=ssh git \
-       clone --branch $SIMULTERELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git
+       clone --branch $SIMU5GRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/simu5g.git
 
 # pull again (so a cached layer having the clone gets updated)
-WORKDIR /models/simulte
+WORKDIR /models/simu5g
 
 ARG NOCACHE_PULL=0
 RUN --mount=type=ssh git \
-       pull ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git $SIMULTERELEASE
+       pull ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git $SIMU5GRELEASE
 
 # configure and compile
 RUN make makefiles && \
