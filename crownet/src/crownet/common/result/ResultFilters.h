@@ -24,12 +24,14 @@ class IncidentAgeFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 class LastHopAgeFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 
@@ -37,6 +39,7 @@ class RcvdHostIdFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 
@@ -44,24 +47,28 @@ class HostIdFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 class RcvdSequenceIdFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 class SimBoundFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 class SimOffsetFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                              cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
 };
 
 }  // namespace crownet

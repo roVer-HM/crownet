@@ -64,16 +64,18 @@ module TransportLayerRoadUser like INetworkNode
 
         //# Node specs
         string nodeType = "UE";     // DO NOT CHANGE
-        int masterId = default(0);
-        int macNodeId = default(0); // TODO: this is not a real parameter
-        int macCellId = default(0); // TODO: this is not a real parameter
+        int masterId @mutable;
+        int macNodeId @mutable = default(0); // TODO: this is not a real parameter
+        int macCellId @mutable = default(0); // TODO: this is not a real parameter
 
         //# D2D capability
         string nicType = default("LteNicUe");
 
         //# Network Layer specs
         bool hasIpv4 = default(true);
-        bool hasIpv6 = default(false);
+        bool hasIpv6 = default(false);     
+        ipv4.configurator.typename = "HostAutoConfigurator";
+        ipv4.configurator.interfaces = "cellular";
 
         //# Link Layer specs
         bool hasCellular = default(true);
@@ -81,7 +83,7 @@ module TransportLayerRoadUser like INetworkNode
         int numWlanNic = default(0);
 
         **.interfaceTableModule = default(absPath(".interfaceTable"));
-        *.routingTableModule = default("^.^.ipv4.routingTable");
+        *.routingTableModule = default(absPath(".ipv4.routingTable"));
         **.mobilityModule = default(absPath(".mobility"));
         **.neighborhoodTableMobdule = default(absPath(".nTable"));
         **.multicastInterface = default("cellular");
@@ -118,21 +120,20 @@ module TransportLayerRoadUser like INetworkNode
                 *.radioDriverModule = absPath("^.radioDriver[0]");
                 runtime.datetime = middleware.datetime;
         }
+        //# individual network layers (must be orderedfrom lower to upper layer)
+        cellularNic: <nicType> like ICellularNic if hasCellular {
+            nodeType = parent.nodeType;
+            ip2nic.typename = "Geo2Nic";
+            //d2dCapable = d2dCapable;
+            @display("p=710.304,672.672");
+        }
+        wlanNic[numWlanNic]: <default("Ieee80211Interface")> like IWirelessInterface if hasWlan {
+            parameters:
+                @display("p=407.68,672.672,row,150;q=queue");
+        }
         radioDriver: <default("LteRadioDriver")> like IDispatchRadioDriver if useArtery {
             parameters:
                 @display("p=109.76,553.504,row,100");
-        }
-        udp: <default(firstAvailableOrEmpty("Udp"))> like IUdp if hasUdp {
-            parameters:
-                @display("p=346.69598,370.856");
-        }
-        tcp: <default(firstAvailableOrEmpty("Tcp", "TcpLwip", "TcpNsc"))> like ITcp if hasTcp {
-            parameters:
-                @display("p=473.53598,370.856");
-        }
-        sctp: <default(firstAvailableOrEmpty("Sctp"))> like ISctp if hasSctp {
-            parameters:
-                @display("p=710.304,370.856");
         }
         ipv4: <default("Ipv4NetworkLayer")> like INetworkLayer if hasIpv4 {
             parameters:
@@ -147,16 +148,17 @@ module TransportLayerRoadUser like INetworkNode
             parameters:
                 @display("p=681.312,526.688;q=queue");
         }
-        cellularNic: <nicType> like ICellularNic if hasCellular {
-            nodeType = nodeType;
-            ip2nic.typename = "Geo2Nic";
-            //d2dCapable = d2dCapable;
-            @display("p=710.304,672.672");
-        }
-
-        wlanNic[numWlanNic]: <default("Ieee80211Interface")> like IWirelessInterface if hasWlan {
+        udp: <default(firstAvailableOrEmpty("Udp"))> like IUdp if hasUdp {
             parameters:
-                @display("p=407.68,672.672,row,150;q=queue");
+                @display("p=346.69598,370.856");
+        }
+        tcp: <default(firstAvailableOrEmpty("Tcp", "TcpLwip", "TcpNsc"))> like ITcp if hasTcp {
+            parameters:
+                @display("p=473.53598,370.856");
+        }
+        sctp: <default(firstAvailableOrEmpty("Sctp"))> like ISctp if hasSctp {
+            parameters:
+                @display("p=710.304,370.856");
         }
         // message dispatcher for SAP between transport and network layer
         tn: MessageDispatcher {
@@ -167,9 +169,6 @@ module TransportLayerRoadUser like INetworkNode
         nl: MessageDispatcher {
             parameters:
                 @display("p=550,596;b=600,5,,,,1");
-        }
-        configurator: HostAutoConfigurator {
-            @display("p=216.384,54.88;is=s");
         }
 
     connections allowunconnected:

@@ -56,9 +56,9 @@ void IntervalScheduler::scheduleGenerationTimer()
         stopScheduling = true;
         // todo emit signal
     } else {
-        auto scheduleAt = std::max(now, app->getStartTime()) + delay;
+        clocktime_t scheduleAt = SIMTIME_AS_CLOCKTIME(std::max(now, app->getStartTime()) + delay);
         if (startOffset > simtime_t::ZERO){
-            scheduleAt += startOffset;
+            scheduleAt += SIMTIME_AS_CLOCKTIME(startOffset);
             startOffset = 0.0;
         }
         EV_INFO << simTime().ustr() << " schedule application" << endl;

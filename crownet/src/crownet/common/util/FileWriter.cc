@@ -47,7 +47,7 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
 };
 
 BaseFileWriter::BaseFileWriter(std::string filePath, std::string sep, long bufferSize)
-        :filePath(filePath),  sep(sep), bufferSize(bufferSize){}
+        : sep(sep), filePath(filePath), bufferSize(bufferSize){}
 
 void BaseFileWriter::initialize(){
     if (isInitialized()){

@@ -133,11 +133,11 @@ double ControlTraCiApi::handleControlLoop(){
 void ControlTraCiApi::checkCompound(tcpip::Storage& cmd, int numElements){
     int type = cmd.readUnsignedByte();
     if (type != TYPE_COMPOUND){
-        throw omnetpp::cRuntimeError("expected compound object got %s", type);
+        throw omnetpp::cRuntimeError("expected compound object (TYPE_COMPOUND: 0x%02x) got 0x%02x", TYPE_COMPOUND, type);
     }
     int cmpSize = cmd.readInt();
     if (cmpSize != numElements){
-        throw omnetpp::cRuntimeError("expected %s itmes in compound object got %s", numElements, cmpSize);
+        throw omnetpp::cRuntimeError("expected %i items in compound object got %i", numElements, cmpSize);
     }
 
 }
@@ -146,7 +146,6 @@ tcpip::Storage ControlTraCiApi::handleControllerOppRequest(ForwardCmd& ctrlCmd){
     // extract payload and forward
      tcpip::Storage cmd;
      cmd.writeStorage(myInput, ctrlCmd.payloadLength);
-     int cmdLength = cmd.readCmdLength();
      int cmdId = cmd.readUnsignedByte();
      int varId = cmd.readUnsignedByte(); // varId = 32, das was von python geschickt wurde
      std::string objectIdentifer = cmd.readString();

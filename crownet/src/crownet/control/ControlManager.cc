@@ -111,7 +111,6 @@ std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd&
     density_vals.push_back(cellProvider->getCellSize().y);
     auto iter = map->valid();
      for( auto item: iter){
-         const auto cell = item.first.val();
          const auto measure = item.second.val();
          if(measure){
              auto x = item.first.val().first;

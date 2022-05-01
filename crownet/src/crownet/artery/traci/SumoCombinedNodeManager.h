@@ -83,6 +83,7 @@ protected:
     using NodeInitializer = std::function<void(omnetpp::cModule*)>;
 
     void finish() override;
+    using traci::Listener::finish;
 
     void traciInit() override;
     void traciStep() override;
@@ -96,8 +97,8 @@ protected:
     virtual void updateVehicle(const std::string&, VehicleSink*);
     virtual omnetpp::cModule* createModule(const std::string&, omnetpp::cModuleType*, const std::string& moduleVector);
     virtual omnetpp::cModule* addNodeModule(const std::string&, omnetpp::cModuleType*, NodeInitializer&, const std::string& moduleVector);
-    virtual void removePersonNodeModule(const std::string&);
-    virtual void removeVehicleNodeModule(const std::string&);
+    virtual void removePersonNodeModule(const std::string&, bool deleteModule);
+    virtual void removeVehicleNodeModule(const std::string&, bool deleteModule);
 
     virtual omnetpp::cModule* getNodeModule(const std::string&);
     virtual omnetpp::cModule* getPersonNodeModule(const std::string& id);
