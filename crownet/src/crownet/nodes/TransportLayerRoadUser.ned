@@ -64,7 +64,7 @@ module TransportLayerRoadUser like INetworkNode
 
         //# Node specs
         string nodeType = "UE";     // DO NOT CHANGE
-        int masterId @mutable;
+        int masterId @mutable = default(0);
         int macNodeId @mutable = default(0); // TODO: this is not a real parameter
         int macCellId @mutable = default(0); // TODO: this is not a real parameter
 
@@ -74,13 +74,15 @@ module TransportLayerRoadUser like INetworkNode
         //# Network Layer specs
         bool hasIpv4 = default(true);
         bool hasIpv6 = default(false);     
-        ipv4.configurator.typename = "HostAutoConfigurator";
-        ipv4.configurator.interfaces = "cellular";
 
         //# Link Layer specs
         bool hasCellular = default(true);
         bool hasWlan = default(false);
         int numWlanNic = default(0);
+        
+        //# IPv4 configurator
+        ipv4.configurator.typename = "HostAutoConfigurator";
+        ipv4.configurator.interfaces = default(ifTrueOrElse(hasCellular, ifTrueOrElse(hasWlan,"cellular, wlan0", "cellular"), ifTrueOrElse(hasWlan, "wlan0", "")));
 
         **.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default(absPath(".ipv4.routingTable"));
@@ -117,8 +119,8 @@ module TransportLayerRoadUser like INetworkNode
                 @display("p=109.76,393.568");
                 *.middlewareModule = absPath("^.middleware");
                 *.mobilityModule = absPath("^.mobility");
-                *.radioDriverModule = absPath("^.radioDriver[0]");
-                runtime.datetime = middleware.datetime;
+                *.radioDriverModule = absPath("^.radioDriver");
+                runtime.datetime = parent.middleware.datetime;
         }
         //# individual network layers (must be orderedfrom lower to upper layer)
         cellularNic: <nicType> like ICellularNic if hasCellular {

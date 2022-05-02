@@ -19,7 +19,7 @@
 namespace crownet {
 
 
-class BaseFileWriter : public omnetpp::cObject {
+class BaseFileWriter : public omnetpp::cOwnedObject {
 public:
     static std::string getAbsOutputPath(std::string fileName);
 
