@@ -52,14 +52,14 @@ WORKDIR /models
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 RUN --mount=type=ssh git \
-       clone --branch $SIMU5GRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/simu5g.git
+       clone --branch $SIMU5GRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/Simu5G.git
 
 # pull again (so a cached layer having the clone gets updated)
-WORKDIR /models/simu5g
+WORKDIR /models/Simu5G
 
 ARG NOCACHE_PULL=0
 RUN --mount=type=ssh git \
-       pull ssh://git@sam-dev.cs.hm.edu:6000/rover/simulte.git $SIMU5GRELEASE
+       pull ssh://git@sam-dev.cs.hm.edu:6000/rover/Simu5G.git $SIMU5GRELEASE
 
 # configure and compile
 RUN make makefiles && \
