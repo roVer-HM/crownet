@@ -51,7 +51,7 @@ target clean : TARGET = clean
 target cleanall : TARGET = cleanall
 target makefiles : TARGET = makefiles
 
-.PHONY: all $(models)
+.PHONY: all $(models) python-hint
 
 all: $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
 
@@ -98,10 +98,26 @@ analysis-clean:
 	rm -rf out/$(venv_user)
 	rm -rf out/$(venv_dev)
 
-venv-build: $(python_venvs)
+venv-build: $(python_venvs) python-hint
 
 out:
 	mkdir -v out/
+
+python-hint:
+	@echo ""
+	@echo ""
+	@echo "*** Important Note: ***"
+	@echo "Please make shure that $(PYTHON) is installed also _OUTSIDE_ of the docker container."
+	@echo "Furthermore, make shure that executing \"python3\" launches $(PYTHON), e.g. by setting"
+	@echo "an appropriate link. If launching \"python3\" shows a version of $(PYTHON), you are ok."
+	@echo "Please also check that the $(PYTHON)-distutils package is installed via apt."
+	@echo ""
+	@echo "Reason (just in case you are wondering why this is important...):"
+	@echo "Some CrowNet python scripts (e.g. fingerprint scripts) are started outside a container."
+	@echo "These are sharing the virtual environment (venv) with python scripts launched inside"
+	@echo "the CrowNet docker containers. This does only work, if the same python versions are"
+	@echo "available and used by default in and outside the container."
+	@echo ""
 
 #-create source distributions of all python packages---------------------------
 
