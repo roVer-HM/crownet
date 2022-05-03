@@ -71,6 +71,7 @@ build-for-sim:
   artifacts:
     paths:
     - ${CROWNET_HOME}/scripts
+    - ${CROWNET_HOME}/out
     - ${CROWNET_HOME}/simu5g
     - ${CROWNET_HOME}/inet4
     - ${CROWNET_HOME}/crownet
