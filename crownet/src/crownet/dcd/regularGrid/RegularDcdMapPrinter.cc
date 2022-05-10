@@ -101,7 +101,7 @@ void RegularDcdMapGlobalPrinter::writeHeaderTo(std::ostream& out,
                                                const std::string& sep) const {
   out << "simtime" << sep << "x" << sep << "y"
      << sep << "count" << sep  << "measured_t" << sep << "received_t"
-     << sep << "source" << sep << "selection" << sep << "selectionRank" <<
+     << sep << "source" << sep << "selection" << sep << "selectionRank" << sep
      << "own_cell" << sep << "node_id" << std::endl;
 }
 
