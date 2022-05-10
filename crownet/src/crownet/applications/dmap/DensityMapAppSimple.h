@@ -38,9 +38,15 @@ protected:
  virtual void initialize(int stage) override;
  virtual void finish() override;
 
+ //FSM
+ virtual FsmState fsmSetup(cMessage *msg)override;
+
  // IDensityMapHandler
  virtual void updateLocalMap() override;
  virtual void computeValues() override;
+
+ // App logic
+ virtual void initLocalMap() override;
 
  //NeighborhoodEntryListner
  virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo)override;

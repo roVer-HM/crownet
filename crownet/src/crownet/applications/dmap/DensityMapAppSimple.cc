@@ -47,6 +47,26 @@ void DensityMapAppSimple::updateLocalMap() {
      */
 }
 
+//FSM
+FsmState DensityMapAppSimple::fsmSetup(cMessage *msg) {
+    auto ret = BaseDensityMapApp::fsmSetup(msg);
+    initLocalMap();
+    return ret;
+}
+
+/**
+ * Read already existing neighborhood into density map.
+ */
+void DensityMapAppSimple::initLocalMap(){
+
+    nTable->checkAllTimeToLive();
+    for (const auto& el : nTable->iter()){
+        neighborhoodEntryEnterCell(nTable, el.second);
+    }
+
+}
+
+
 void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) {
     // Note: Implementation assumes additive cell entry values. Each beacon provides an additive portion of the
     //       cell value. Used for node counts.
@@ -144,6 +164,7 @@ void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, 
             //todo add info to error message
             throw cRuntimeError("BeaconReceptionInfo reports different cell id than saved in density map");
         }
+        EV_INFO << LOG_MOD << hostId << " leave-cell:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source
@@ -177,6 +198,7 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
             //todo add info to error message
             throw cRuntimeError("Node already in neighborhood");
         }
+        EV_INFO << LOG_MOD << hostId << " enter-cell:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source
@@ -219,6 +241,7 @@ void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table,
             throw cRuntimeError("Nodes prio and current cell do not match or current position "
                     "and saved cell in map do not match");
         }
+        EV_INFO << LOG_MOD << hostId << " stay-in-cell:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source

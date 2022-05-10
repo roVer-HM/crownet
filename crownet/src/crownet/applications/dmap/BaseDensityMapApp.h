@@ -66,6 +66,7 @@ protected:
  virtual void initDcdMap();
  virtual void initWriter();
  virtual bool mergeReceivedMap(Packet *packet);
+ virtual void initLocalMap() {/*do nothing on default*/};
 
  // IDensityMapHandler
  // update map with data from neighborhood table
