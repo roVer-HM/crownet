@@ -34,7 +34,10 @@ CROWNET_INCLUDE="-I$CROWNET_PATH -L$CROWNET_PATH"
 INET_PATH="../../../../inet4/src/"
 INET_INCLUDE="-I$INET_PATH -L$INET_PATH"
 
-EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET${_Dbg} -lCROWNET${_Dbg}"
+VANETZA_PATH="../../../../artery/extern/vanetza/"
+ARTERY_PATH="../../../../artery"
+
+EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET${_Dbg} -lCROWNET${_Dbg} -I${ARTERY_PATH}/src -I${ARTERY_PATH}/src/traci/sumo -I${VANETZA_PATH}"
 
 opp_test gen $OPT -v $TESTFILES || exit 1
 echo
