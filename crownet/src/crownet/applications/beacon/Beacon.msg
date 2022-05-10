@@ -35,14 +35,6 @@ namespace crownet;
 
 
 
-class BeaconPacketSimple extends inet::ApplicationPacket
-{
-    int nodeId;
-    simtime_t time;
-    inet::Coord pos;
-    inet::Coord epsilon;
-};
-
 class BeaconBase extends inet::ApplicationPacket {
     
 }
