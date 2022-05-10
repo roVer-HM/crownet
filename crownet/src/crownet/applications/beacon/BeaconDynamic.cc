@@ -41,7 +41,8 @@ Packet *BeaconDynamic::createPacket() {
 
     beacon->setPos(getPosition());
     beacon->setEpsilon({0.0, 0.0, 0.0});
-    beacon->setNumberOfNeighbours(nTable->getSize());
+    // nTable contains current node thus #neighbors = size() - 1
+    beacon->setNumberOfNeighbours(std::max(0, nTable->getSize()-1));
 
     auto packet = buildPacket(beacon);
 
