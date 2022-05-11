@@ -79,8 +79,6 @@ public:
     void registerEntryListner(NeighborhoodEntryListner* listener);
     void registerFirst(NeighborhoodEntryListner* listener);
     void removeEntryListener(NeighborhoodEntryListner* listener);
-    void emitPreChanged(BeaconReceptionInfo* oldInfo);
-    void emitPostChanged(BeaconReceptionInfo* newInfo);
     void emitRemoved(BeaconReceptionInfo* info);
     void emitDropped(BeaconReceptionInfo* info);
     void emitLeaveCell(BeaconReceptionInfo* info);
@@ -96,8 +94,6 @@ protected:
 class NeighborhoodEntryListner {
 public:
     virtual ~NeighborhoodEntryListner() = default;
-    virtual void neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo)=0;
-    virtual void neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
     virtual void neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
     virtual void neighborhoodEntryLeaveCell(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;
     virtual void neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info)=0;

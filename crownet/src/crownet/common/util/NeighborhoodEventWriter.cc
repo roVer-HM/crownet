@@ -40,14 +40,6 @@ void NeighborhoodEventWriter::neighborhoodEntryRemoved(INeighborhoodTable* table
     writeData(table, info, "ttl_reached");
 }
 
-void NeighborhoodEventWriter::neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* info) {
-    writeData(table, info, "post_change");
-}
-
-void NeighborhoodEventWriter::neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo){
-    writeData(table, oldInfo, "pre_change");
-}
-
 void NeighborhoodEventWriter::neighborhoodEntryDropped(INeighborhoodTable* table, BeaconReceptionInfo* info){
     writeData(table, info, "dropped");
 }

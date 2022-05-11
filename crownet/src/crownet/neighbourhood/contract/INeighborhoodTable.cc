@@ -33,16 +33,6 @@ void INeighborhoodTable::removeEntryListener(NeighborhoodEntryListner* listener)
     }
 }
 
-void INeighborhoodTable::emitPreChanged(BeaconReceptionInfo* oldInfo){
-    for(auto e : this->listeners){
-        e->neighborhoodEntryPreChanged(this, oldInfo);
-    }
-}
-void INeighborhoodTable::emitPostChanged(BeaconReceptionInfo* newInfo){
-    for(auto e : this->listeners){
-        e->neighborhoodEntryPostChanged(this, newInfo);
-    }
-}
 void INeighborhoodTable::emitRemoved(BeaconReceptionInfo* info){
     for(auto e : this->listeners){
         e->neighborhoodEntryRemoved(this, info);

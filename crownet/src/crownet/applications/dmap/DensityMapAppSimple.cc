@@ -67,62 +67,6 @@ void DensityMapAppSimple::initLocalMap(){
 }
 
 
-void DensityMapAppSimple::neighborhoodEntryPreChanged(INeighborhoodTable* table, BeaconReceptionInfo* oldInfo) {
-    // Note: Implementation assumes additive cell entry values. Each beacon provides an additive portion of the
-    //       cell value. Used for node counts.
-    //       Workaround for absolute values (i.e. temperature, entropy values): Ensure at most ONE beacon source (nodeId)
-    //       for each cell. Then the additive logic with increment/decrement will also work.
-    //
-    // decrement count in old entry. Do not remove source from neighborhood. This will be done in the PostChange listener.
-    Enter_Method_Silent();
-    throw cRuntimeError("Remove! Old Code");
-    if (isRunning()){
-        if (dcdMap->isInNeighborhood((int)oldInfo->getNodeId())){
-            EV_INFO << LOG_MOD << hostId << " preChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(oldInfo) << endl;
-            auto oldCell = dcdMap->getNeighborCell((int)oldInfo->getNodeId());
-            if (dcdMap->hasEntry(oldCell)){
-                // if DcdMap contains a (local) entry for the cell decrement.
-                dcdMap->getEntry<GridEntry>(oldCell)->decrementCount(simTime(), oldInfo->getBeaconValueCurrent());
-            }
-        }
-    }
-}
-
-
-void DensityMapAppSimple::neighborhoodEntryPostChanged(INeighborhoodTable* table, BeaconReceptionInfo* newInfo){
-    // Note: Implementation assumes additive cell entry values. Each beacon provides an additive portion of the
-    //       cell value. Used for node counts.
-    //       Workaround for absolute values (i.e. temperature, entropy values): Ensure at most ONE beacon source (nodeId)
-    //       for each cell. Then the additive logic with increment/decrement will also work.
-    //
-    // increment/update entry based on new beacon informationgetCellId
-    Enter_Method_Silent();
-    throw cRuntimeError("Remove! Old Code");
-    if (isRunning()){
-        EV_INFO << LOG_MOD << hostId << " postChange:" << cObjectPrinter::shortBeaconInfoShortPrinter(newInfo) << endl;
-        // update own position
-        updateOwnLocationInMap();
-        auto ownerCellId = dcdMap->getOwnerCell();
-
-        // access or create cell entry containing the beacon just received and increment the count.
-        auto beaconSourcePos = converter->position_cast_traci(newInfo->getPositionCurrent());
-        auto beaconCellId = dcdMap->getCellId(beaconSourcePos);
-        auto cellEntryLocal = dcdMap->getEntry<GridEntry>(beaconCellId);
-        cellEntryLocal->incrementCount(simTime(), newInfo->getBeaconValueCurrent());
-        // update the entry distance struct. Current node (ownerCell is both the source and owner in the entry distance struct.
-        // because this node 'measures' the  value in the cell from which the beacon comes from.
-        const auto pos = getPosition();
-        cellEntryLocal->setEntryDist(dcdMap->getCellKeyProvider()->getExactDist(pos, pos, beaconCellId));
-
-        // update position of beacon source in neighborhood table.
-        dcdMap->addToNeighborhood((int)newInfo->getNodeId(), beaconSourcePos);
-        if (dcdMap->getOwnerId().value() == (int)newInfo->getNodeId()){
-            // update owner location if beacon comes from owner.
-            dcdMap->setOwnerCell(beaconCellId);
-        }
-    }
-}
-
 void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info){
     // Note: Implementation assumes additive cell entry values. Each beacon provides an additive portion of the
     //       cell value. Used for node counts.
