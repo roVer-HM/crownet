@@ -18,23 +18,35 @@ import random
 
 def main(base_path):
     
-    t = UnitValue.s(400.0)
-
+    t = UnitValue.s(60.0)
+    seed = "1502"
+    
     par_var = [
         {
             "omnet": {  
+                "sim-time-limit": t,
+                "seed-set" : seed,
                 "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/osm_medium_map/isartor.sumo.cfg")'
             },
         },
-        # {
-        #     "omnet": {  
-        #         "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/simpleCrossing/example_peds_cars.sumo2.cfg")'
-        #     },
-        # },
+        {
+            "omnet": {  
+                "sim-time-limit": t,
+                "seed-set" : seed,
+                "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/osm_medium_map/isartor_2.sumo.cfg")'
+            },
+        },
+        {
+            "omnet": {  
+                "sim-time-limit": t,
+                "seed-set" : seed,
+                "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/osm_medium_map/isartor_3.sumo.cfg")'
+            },
+        },
     ]
     par_var = OmnetSeedManager(
         par_variations=par_var, 
-        rep_count=3, 
+        rep_count=1, 
         omnet_fixed=False, 
         vadere_fixed=None).get_new_seed_variation()
 
@@ -68,7 +80,12 @@ def main(base_path):
     # Todo add all necessary sumo files not present in the ini file. 
     env.copy_data(
         base_ini_file=ini_file,
-        scenario_files=[]
+        scenario_files=[
+            os.path.abspath("../sumo/osm_medium_map/isartor_2.sumo.cfg"),
+            os.path.abspath("../sumo/osm_medium_map/sc2_70.rou.xml"),
+            os.path.abspath("../sumo/osm_medium_map/isartor_3.sumo.cfg"),
+            os.path.abspath("../sumo/osm_medium_map/sc2_100.rou.xml")
+            ]
         )
     
     _rnd = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))

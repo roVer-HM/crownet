@@ -22,9 +22,11 @@ class SimulationRun(BaseRunner):
     # add as many methods as needed and add the process_as annotation.
     # Use `prio` to ensure exeuction order (Bigger number higher prio)
     
-    # @process_as({"prio": 20, "type": "post"})
-    # def foo(self):
-        # pass
+    #@process_as({"prio": 20, "type": "post"})
+    #def foo(self):
+    #    result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result.base_dir())
+        
+        
     
     # @process_as({"prio": 10, "type": "pre"})
     # def bar(self):

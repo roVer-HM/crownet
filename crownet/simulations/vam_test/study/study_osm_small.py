@@ -18,19 +18,31 @@ import random
 
 def main(base_path):
     
-    t = UnitValue.s(400.0)
+    t = UnitValue.s(60.0)
+    seed = "1502"
 
     par_var = [
         {
             "omnet": {  
-                "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/simpleCrossing/example_peds_cars.sumo.cfg")'
+                "sim-time-limit": t,
+                "seed-set" : seed,
+                "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/osm_small_map/crossing.sumo.cfg")'
             },
         },
-        # {
-        #     "omnet": {  
-        #         "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/simpleCrossing/example_peds_cars.sumo2.cfg")'
-        #     },
-        # },
+        {
+           "omnet": { 
+                "sim-time-limit": t,
+                "seed-set" : seed,
+                "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/osm_small_map/crossing_2.sumo.cfg")'
+           },
+        },
+        {
+           "omnet": { 
+                "sim-time-limit": t,
+                "seed-set" : seed,
+                "*.traci.launcher.sumoCfgBase": 'absFilePath("sumo/osm_small_map/crossing_3.sumo.cfg")'
+           },
+        },
     ]
     par_var = OmnetSeedManager(
         par_variations=par_var, 
@@ -69,8 +81,10 @@ def main(base_path):
     env.copy_data(
         base_ini_file=ini_file,
         scenario_files=[
-            os.path.abspath("../sumo/simpleCrossing/example_peds_cars.sumo.cfg"),
-            os.path.abspath("../sumo/simpleCrossing/example_peds_cars.rou.xml"),
+            os.path.abspath("../sumo/osm_small_map/crossing_2.sumo.cfg"),
+            os.path.abspath("../sumo/osm_small_map/sc1_30.rou.xml"),
+            os.path.abspath("../sumo/osm_small_map/crossing_3.sumo.cfg"),
+            os.path.abspath("../sumo/osm_small_map/sc1_60.rou.xml")
             ]
         )
     
@@ -85,8 +99,8 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    # par_var, data = setup.run(len(par_var))
-    par_var, data = setup.run(1)
+    par_var, data = setup.run(len(par_var))
+    #par_var, data = setup.run(1)
 
 
 
