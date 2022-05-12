@@ -14,8 +14,6 @@
 // 
 
 #include "crownet/applications/common/scheduler/IntervalScheduler.h"
-#include "inet/common/ModuleAccess.h"
-#include "crownet/crownet.h"
 
 using namespace inet;
 

@@ -50,7 +50,6 @@ protected:
  NeighborhoodTable_t _table;
  cMessage *entropyTimer = nullptr;
  simtime_t entropyTimerInterval;
- simtime_t lastEntropyUpdate;
  EntropyProvider *entropyProvider = nullptr;
 
 };

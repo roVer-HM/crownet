@@ -41,6 +41,39 @@ void CrownetPacketSourceBase::initialize(int stage)
     }
 }
 
+const char *CrownetPacketSourceBase::createPacketName() const
+{
+    return StringFormat::formatString(packetNameFormat, [&] (char directive) {
+        static std::string result;
+        switch (directive) {
+            case 'N':
+                result = packetName;
+                break;
+            case 'n':
+                result = getFullName();
+                break;
+            case 'p':
+                result = getFullPath();
+                break;
+            case 'c':
+                result = std::to_string(numProcessedPackets);
+                break;
+            case 't':
+                result = simTime().str();
+                break;
+            case 'e':
+                result = std::to_string(getSimulation()->getEventNumber());
+                break;
+            case 'i':
+                result = std::to_string(hostId);
+                break;
+            default:
+                throw cRuntimeError("Unknown directive: %c", directive);
+        }
+        return result.c_str();
+    });
+}
+
 const char *CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& data) const
 {
     return StringFormat::formatString(packetNameFormat, [&] (char directive) {
@@ -85,16 +118,16 @@ const char *CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& da
 
 void CrownetPacketSourceBase::applyContentTags(Ptr<Chunk> content){
     if (attachCreationTimeTag)
-        content->addTag<CreationTimeTag>()->setCreationTime(simTime());
+        content->addTagIfAbsent<CreationTimeTag>()->setCreationTime(simTime());
     if (attachIdentityTag) {
         auto identityStart = IdentityTag::getNextIdentityStart(content->getChunkLength());
-        content->addTag<IdentityTag>()->setIdentityStart(identityStart);
+        content->addTagIfAbsent<IdentityTag>()->setIdentityStart(identityStart);
     }
     if (attachHostIdTag){
-        content->addTag<HostIdTag>()->setHostId(hostId);
+        content->addTagIfAbsent<HostIdTag>()->setHostId(hostId);
     }
     if (attachSequenceIdTag){
-        content->addTag<SequenceIdTag>()->setSequenceNumber(numProcessedPackets);
+        content->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(numProcessedPackets);
     }
 }
 void CrownetPacketSourceBase::applyPacketTags(Packet *packet){

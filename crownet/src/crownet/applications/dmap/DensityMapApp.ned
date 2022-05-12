@@ -36,24 +36,19 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         
         // App logic
         string coordConverterModule;
-        double cellSize @unit(m) = default(3.0m);
-        // update interval of local maps with neighborhood table 
-        // This interval is independent of the sent interval of the application in 
-        // its basic configuration. 
-        double localMapUpdateInterval @unit(s) = default(1.0s); 
-        // If density map is used with entropy generated data the movement of the sending node
-        // does not change the data in the old or new cell. In contrast, the for the pedestrian 
-        // density map the movement does influnce the denstiy (count) in the old and new cell. 
-        // The EntropyTag is used to switch the processing of received map packets to correct
-        // this behavior. Default false. (-> pedestrian density map is the default behavior)
-        bool attachEntropyTag = default(false);
+        double cellSize @unit(m) = default(5.0m);
+        // FSM-mainApp trigger (not used by default ). If < 0 deactivated. Packet creation 
+        // is manged by scheduler modules
+        double mainAppInterval @unit(s) = default(-1.0s); //  
         
         object mapCfg = default(crownet::MapCfg{
             writeDensityLog: true,
             mapType: "ymf",
             mapTypeLog: "all",
+            cellAgeTTL: 10.0s,
             idStreamType: "insertionOrder"
         });
+        
         bool writeDensityLog = default(true);
 }
 
@@ -64,6 +59,10 @@ simple ArteryDensityMapApp  extends BaseDensityMapApp  {
         string middelwareModule = default("^.^.middleware"); //node internal
         string identiyRegistryModule = default("identiyRegistry");
         string routerModule = default("^.^.vanetza.router");
+        // Use FSM-mainApp state to tirgger local map update by accessing 
+        // the vaneza managed neighborhood tabale. 
+        mainAppInterval @unit(s) = default(1.0s);
+        
         
 }
 
@@ -74,3 +73,9 @@ simple DensityMapAppSimple  extends BaseDensityMapApp  {
          string neighborhoodTableMobdule = default("nTable");
 }
 
+simple EntropyMapAppSimple  extends BaseDensityMapApp  {
+
+    parameters:
+        @class(crownet::EntropyMapAppSimple);
+        string neighborhoodTableMobdule = default("nTable");
+}

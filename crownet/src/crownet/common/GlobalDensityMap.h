@@ -23,6 +23,7 @@
 #include "inet/common/InitStages.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
+#include "crownet/common/util/Writer.h"
 #include "crownet/common/util/FileWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "traci/NodeManager.h"
@@ -76,6 +77,16 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual std::shared_ptr<RegularDcdMap> getMap() override {
       return getDcdMapGlobal();
   }
+  virtual std::shared_ptr<OsgCoordinateConverter> getConverter() const override {
+      return converter;
+  }
+  virtual std::shared_ptr<GridCellIDKeyProvider> getCellKeyProvider() const override {
+      return cellKeyProvider;
+  }
+  virtual std::shared_ptr<RegularDcdMapFactory> getDcdMapFactory() const override {
+      return dcdMapFactory;
+  }
+
 
   virtual void acceptNodeVisitor(traci::ITraciNodeVisitor* visitor);
 
@@ -101,8 +112,8 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
   std::string m_mobilityModule;
-  std::unique_ptr<ActiveFileWriter> fileWriter;
-  RegularGridInfo grid;
+  std::shared_ptr<ActiveWriter> fileWriter;
+
 
 };
 

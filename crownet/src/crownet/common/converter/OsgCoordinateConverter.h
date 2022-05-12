@@ -67,7 +67,7 @@ class Projection {
 
 class OsgCoordinateConverter {
  public:
-  OsgCoordinateConverter();
+//  OsgCoordinateConverter();
   OsgCoordinateConverter(inet::Coord zoneOriginOffset, inet::Coord simBound,
                          std::string epgs_code);
   OsgCoordinateConverter(traci::TraCIPosition zoneOriginOffset,
@@ -95,10 +95,15 @@ class OsgCoordinateConverter {
   double getBoundaryWidth() const;
   double getBoundaryHeight() const;
   inet::Coord getBoundary() const;
+  inet::Coord getGridSize() const {return getBoundary();} // alias for boundary.
   inet::Coord getOffset() const;
+
+  RegularGridInfo getGridDescription() const;
   RegularGridInfo getGridDescription(const inet::Coord& cellSize) const;
   RegularGridInfo getGridDescription(const double cellSize) const;
-
+  void setCellSize(const inet::Coord& cellSize) {this->cellSize = cellSize;}
+  void setCellSize(const double cellSize) {this->cellSize = inet::Coord(cellSize, cellSize);}
+  inet::Coord getCellSize() const {return this->cellSize;}
 
 
   // always apply TCS->OCS
@@ -203,6 +208,7 @@ class OsgCoordinateConverter {
   //  * y positive down
   traci::TraCIPosition zoneOriginOffset;  // TCS base
   traci::Boundary simBound;               // TCS base
+  inet::Coord cellSize;
   osgEarth::SpatialReference* c_srs;
   Projection zoneOffsetProjection;
 };

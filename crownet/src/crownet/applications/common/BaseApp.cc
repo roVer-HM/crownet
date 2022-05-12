@@ -202,7 +202,7 @@ const inet::b BaseApp::getAvailablePduLenght() {
 }
 
 const bool BaseApp::isRunning(){
-    return fsmRoot.getState() == FsmRootStates::WAIT_ACTIVE;
+    return _isRunning;
 }
 
 const bool BaseApp::isStopped(){
@@ -242,6 +242,7 @@ FsmState BaseApp::fsmSetup(cMessage *msg) {
   }
 
   setupTimers();
+  _isRunning  = true;
   return FsmRootStates::WAIT_ACTIVE;
 }
 
@@ -261,7 +262,7 @@ FsmState BaseApp::fsmSendPacket(Packet *pkt){
 
 FsmState BaseApp::fsmAppMain(cMessage *msg) {
   // do nothing
-  EV_WARN << "BaseApp has no AppMain. Implement for active message generate. App will still receive messages!"
+  EV_WARN << "BaseApp has no AppMain logic. Implement in child classes if needed. App will still receive messages!"
           << std::endl;
   return FsmRootStates::WAIT_ACTIVE;
 }
@@ -270,6 +271,7 @@ FsmState BaseApp::fsmTeardown(cMessage *msg) {
     socketProvider->close();
   cancelAndDelete(appLifeTime);
   appLifeTime = nullptr;
+  _isRunning = false;
 
   return FsmRootStates::WAIT_INACTIVE;
 }
@@ -280,6 +282,7 @@ FsmState BaseApp::fsmDestroy(cMessage *msg) {
   // by OS and OS closes sockets of crashed programs.
   cancelAndDelete(appLifeTime);
   appLifeTime = nullptr;
+  _isRunning = false;
 
   return FsmRootStates::WAIT_INACTIVE;
 }

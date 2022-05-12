@@ -176,6 +176,7 @@ void Cell<C, N, T>::computeValue(const Fn computeAlg) {
   // 1 clear selection flag on all entries
   for(auto & e : this->data){
       e.second->setSelectedIn("");
+      e.second->setSelectionRank(std::numeric_limits<double>::max());
   }
   // 2 apply computeAlg to select or compute value which represents this cell.
   this->cell_value = computeAlg->operator()(*this);  // may set empty shared_ptr

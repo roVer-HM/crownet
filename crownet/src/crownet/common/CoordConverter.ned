@@ -26,6 +26,7 @@ simple CoordConverterBase like ICoordConverter {
         @statistic[simBoundY](source="yCoord(simBound(simBoundSig))"; record=last);
         @statistic[simOffsetX](source="xCoord(simOffset(simOffsetSig))"; record=last);
         @statistic[simOffsetY](source="yCoord(simOffset(simOffsetSig))"; record=last);
+        double cellSize @unit(m) = default(5.0m);
 }
 
 // locally defined converter. Use configuration of parameters

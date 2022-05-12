@@ -47,6 +47,8 @@ class ArteryDensityMapApp : public BaseDensityMapApp,
 
   // FSM
   virtual FsmState fsmSetup(cMessage *msg) override;
+  virtual FsmState fsmAppMain(cMessage *msg) override;
+
 
   // IDensityMapHandler
   virtual void updateLocalMap() override;

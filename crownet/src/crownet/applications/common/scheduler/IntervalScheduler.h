@@ -16,8 +16,7 @@
 #ifndef CROWNET_APPLICATIONS_COMMON_SCHEDULER_INTERVALSCHEDULER_H_
 #define CROWNET_APPLICATIONS_COMMON_SCHEDULER_INTERVALSCHEDULER_H_
 
-#include "inet/common/StringFormat.h"
-
+#include "crownet/crownet.h"
 #include "crownet/applications/common/scheduler/AppSchedulerBase.h"
 
 using namespace inet;

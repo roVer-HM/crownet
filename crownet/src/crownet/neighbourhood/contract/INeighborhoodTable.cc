@@ -33,19 +33,32 @@ void INeighborhoodTable::removeEntryListener(NeighborhoodEntryListner* listener)
     }
 }
 
-void INeighborhoodTable::emitPreChanged(BeaconReceptionInfo* oldInfo){
-    for(auto e : this->listeners){
-        e->neighborhoodEntryPreChanged(this, oldInfo);
-    }
-}
-void INeighborhoodTable::emitPostChanged(BeaconReceptionInfo* newInfo){
-    for(auto e : this->listeners){
-        e->neighborhoodEntryPostChanged(this, newInfo);
-    }
-}
 void INeighborhoodTable::emitRemoved(BeaconReceptionInfo* info){
     for(auto e : this->listeners){
         e->neighborhoodEntryRemoved(this, info);
+    }
+}
+void INeighborhoodTable::emitDropped(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryDropped(this, info);
+    }
+}
+//////
+void INeighborhoodTable::emitLeaveCell(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryLeaveCell(this, info);
+    }
+}
+
+void INeighborhoodTable::emitEnterCell(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryEnterCell(this, info);
+    }
+}
+
+void INeighborhoodTable::emitStayInCell(BeaconReceptionInfo* info){
+    for(auto e : this->listeners){
+        e->neighborhoodEntryStayInCell(this, info);
     }
 }
 

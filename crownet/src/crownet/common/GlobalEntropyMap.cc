@@ -79,11 +79,11 @@ void GlobalEntropyMap::updateMaps() {
 
     for(const auto& e: _table){
         const auto info = e.second;
-        const auto &posTraci = converter->position_cast_traci(info->getPos());
+        const auto &posTraci = converter->position_cast_traci(info->getPositionCurrent());
         // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
         //            for each cell so the additive setup works here!
         auto ee = dcdMapGlobal->getEntry<GridGlobalEntry>(posTraci);
-        ee->incrementCount(simTime(), info->getBeaconValue()); // increment by value.
+        ee->incrementCount(simTime(), info->getBeaconValueCurrent()); // increment by value.
         ee->nodeIds.insert((int)info->getNodeId());
     }
 
@@ -100,8 +100,9 @@ void GlobalEntropyMap::updateMaps() {
 
 void GlobalEntropyMap::updateEntropy(){
     auto now = simTime();
-    auto prevUpdate = lastEntropyUpdate;
-    if (now > lastEntropyUpdate){
+    auto prevUpdate = getLastUpdatedAt();
+    RegularGridInfo grid = converter->getGridDescription();
+    if (now > prevUpdate){
         for(int x = 0; x < grid.getCellCount().x ; x++) {
             for(int y = 0; y < grid.getCellCount().y; y++){
                 if (entropyProvider->selectCell(x, y, now)){
@@ -118,16 +119,16 @@ void GlobalEntropyMap::updateEntropy(){
                             take(info);
                             _table[sourceId] = info;
                         }
-                        _table[sourceId]->setPos(pos);
-                        _table[sourceId]->setReceivedTimePrio(now);
-                        _table[sourceId]->setBeaconValue(value);
+                        _table[sourceId]->setPositionCurrent(pos);
+                        _table[sourceId]->setReceivedTimeCurrent(now);
+                        _table[sourceId]->setBeaconValueCurrent(value);
                     }
                 }
             }
         }
         // remove old values
         for( auto it=_table.cbegin(); it !=_table.cend();){
-            if (it->second->getReceivedTimePrio() < now){
+            if (it->second->getReceivedTimeCurrent() < now){
                 delete it->second;
                 it = _table.erase(it);
             } else {
@@ -136,7 +137,7 @@ void GlobalEntropyMap::updateEntropy(){
         }
     }
     std::cout << LOG_MOD2 << _table.size() << " entries in Entropy table." << endl;
-    lastEntropyUpdate = now;
+    setLastUpdatedAt(now);
 }
 
 

@@ -24,8 +24,32 @@
 using namespace inet;
 
 namespace crownet {
-Register_ResultFilter("incidentAge", IncidentAgeFilter);
 
+Register_ResultFilter("simTimeIntervalFilter", SimTimeIntervalFilter);
+void SimTimeIntervalFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                      cObject *object, cObject *details) {
+    if (filterInterval < 0 || t >= nextLogTime){
+        nextLogTime = t + filterInterval;
+        fire(this, t, object, details);
+    }
+}
+
+void SimTimeIntervalFilter::init(cComponent *component, cProperty *attrsProperty){
+    cPointerResultFilter::init(component, attrsProperty);
+    if(attrsProperty->containsKey("interval_par")){
+        auto _val = attrsProperty->getValue("interval_par");
+        if(component->hasPar(_val)){
+            this->filterInterval = component->par(_val);
+        } else {
+            throw cRuntimeError("simTimeIntervalFilter expected '%s' parameter on module '%s'", _val, component->getFullPath().c_str());
+        }
+    } else {
+        throw cRuntimeError("simTimeIntervalFilter expected a statistic attribute 'interval_par'");
+    }
+
+}
+
+Register_ResultFilter("incidentAge", IncidentAgeFilter);
 void IncidentAgeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                       cObject *object, cObject *details) {
   if (auto packet = dynamic_cast<Packet *>(object)) {

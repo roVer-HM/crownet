@@ -1,5 +1,6 @@
 %description:
-Local DcDMap updates based on the neighborhood table must have aging zero values.
+Deactivating beacon must lead to reduced count in density map in case when densiy packet 
+do not contain beacons!  
 
 %file: package.ned 
 // 
@@ -76,9 +77,9 @@ extends = _default, D2D_General, DcDMap, stationary_n5
 10,7.5,1.0,1.0,3.0
 11,8.0,0.0,0.0,0.0
 12,8.5,0.0,1.0,3.0
-13,9.0,1.0,1.0,3.0
-14,9.5,1.0,1.0,3.0
-15,10.0,1.0,1.0,3.0
+13,9.0,0.0,1.0,3.0
+14,9.5,0.0,1.0,3.0
+15,10.0,0.0,1.0,3.0
 
 
 %contains: stdout
