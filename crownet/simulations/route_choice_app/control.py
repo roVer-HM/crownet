@@ -7,6 +7,7 @@ from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateLi
 from flowcontrol.crownetcontrol.traci.connection_manager import ClientModeConnection, ServerModeConnection
 from flowcontrol.strategy.sensor.density import MeasurementArea, DensityMapper
 from flowcontrol.dataprocessor.dataprocessor import *
+from flowcontrol.strategy.controlaction import InformationStimulus, Rectangle, StimulusInfo, Location
 
 sys.path.append(os.path.abspath(".."))
 
@@ -118,47 +119,42 @@ class OpenLoop(NoController, Controller):
 
     def apply_redirection_measure(self):
 
-        command = {"instruction": f"use target [{self.target_ids[self.counter]}]"}
-        print(command)
-
-        action = {
-            "timeframe" : {
-                "startTime" : 0.0,  # as soon as received
-                "endTime" : 10000,  # simTimeEnd
-                "repeat" : False,
-                "waitTimeBetweenRepetition" : 0.0
-            },
-            "location" : {
-                "areas" : [ {
-                    "x" : 180.0,
-                    "y" : 190.0,
-                    "width" : 20.0,
-                    "height" : 15.0,
-                    "type" : "RECTANGLE"
-                } ]
-            },
-            "subpopulationFilter": {
-                "affectedPedestrianIds": []
-            },
-            "stimuli" : [ {
-                "type" : "InformationStimulus",
-                "information" : f"use target [{self.target_ids[self.counter]}]"
-            } ]
-        }
+        rectangle = Rectangle(x=180., y=190., width=20., height=15.)
+        location = Location(areas=[rectangle])
+        recommendation = InformationStimulus(f"use target [{self.target_ids[self.counter]}]")
+        s = StimulusInfo(location=location, stimuli=[recommendation])
+        action0 = s.toJSON()
 
         # action = {
-        #     "commandId": self.commandID,
-        #     "stimulusId": -400,
-        #     "command": command,
-        #     # "space": {"x": 0.0, "y": 0.0, "width": 500, "height": 500},
-        #     "space": {"x": 180.0, "y": 190.0, "width": 20.0, "height": 15.0},
-        #     # get information directly after spawning process
+        #     "timeframe" : {
+        #         "startTime" : 0.0,  # as soon as received
+        #         "endTime" : 10000,  # simTimeEnd
+        #         "repeat" : False,
+        #         "waitTimeBetweenRepetition" : 0.0
+        #     },
+        #     "location" : {
+        #         "areas" : [ {
+        #             "x" : 180.0,
+        #             "y" : 190.0,
+        #             "width" : 20.0,
+        #             "height" : 15.0,
+        #             "type" : "RECTANGLE"
+        #         } ]
+        #     },
+        #     "subpopulationFilter": {
+        #         "affectedPedestrianIds": []
+        #     },
+        #     "stimuli" : [ {
+        #         "type" : "InformationStimulus",
+        #         "information" : f"use target [{self.target_ids[self.counter]}]"
+        #     } ]
         # }
-        action = json.dumps(action)
+        #
+        # action = json.dumps(action)
 
         self.processor_manager.write("commandId", self.commandID)
         if isinstance(self.con_manager, ServerModeConnection):
-            self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName,
+            self.con_manager.domains.v_sim.send_control(message=action0, model=self.controlModelName,
                                                         sending_node_id="misc[0].app[0]")
         else:
             self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
