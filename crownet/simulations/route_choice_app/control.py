@@ -157,7 +157,7 @@ class OpenLoop(NoController, Controller):
             self.con_manager.domains.v_sim.send_control(message=action0, model=self.controlModelName,
                                                         sending_node_id="misc[0].app[0]")
         else:
-            self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
+            self.con_manager.domains.v_sim.send_control(message=action0, model=self.controlModelName)
 
     def _increase_counter(self):
         self.counter += 1
