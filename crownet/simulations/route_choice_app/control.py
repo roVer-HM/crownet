@@ -15,8 +15,8 @@ from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
 from shapely.geometry import Polygon
 
-
 PRECISION = 8
+
 
 class NoController(Controller):
     def __init__(self):
@@ -29,7 +29,7 @@ class NoController(Controller):
         self.processor_manager.update_sim_time(sim_time)
         self.measure_state(sim_time)
 
-        if sim_time % self.time_step_size == 0 and sim_time>=self.time_step_size: #TODO allow >= 0 in second condition
+        if sim_time % self.time_step_size == 0 and sim_time >= self.time_step_size:  # TODO allow >= 0 in second condition
             self.compute_next_corridor_choice(sim_time)
             self.apply_redirection_measure()
             self.commandID += 1
@@ -44,12 +44,11 @@ class NoController(Controller):
             densities = list()
             for a in [25, 24, 23]:
                 __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
-                #density = -11.0 #TODO replace
+                # density = -11.0 #TODO replace
                 densities.append(density)
         else:
             raise ValueError("Cannot handle send_ctl command.")
         self.density_over_time.append(densities)
-
 
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
@@ -80,7 +79,8 @@ class NoController(Controller):
 
     def handle_init(self, sim_time, sim_state):
         self.counter = -1
-        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(writer=Writer(os.path.join(self.output_dir, "commandIds.txt"))))
+        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(
+            writer=Writer(os.path.join(self.output_dir, "commandIds.txt"))))
 
     def compute_next_corridor_choice(self, sim_time):
         pass
@@ -116,20 +116,44 @@ class OpenLoop(NoController, Controller):
         self.processor_manager.post_loop("sending_times", commandIdsSent)
         super().write_data()
 
-
-
     def apply_redirection_measure(self):
 
         command = {"instruction": f"use target [{self.target_ids[self.counter]}]"}
         print(command)
 
         action = {
-            "commandId": self.commandID,
-            "stimulusId": -400,
-            "command": command,
-            #"space": {"x": 0.0, "y": 0.0, "width": 500, "height": 500},
-            "space": {"x": 180.0, "y": 190.0, "width": 20.0, "height": 15.0},  # get information directly after spawning process
+            "timeframe" : {
+                "startTime" : 0.0,  # as soon as received
+                "endTime" : 10000,  # simTimeEnd
+                "repeat" : False,
+                "waitTimeBetweenRepetition" : 0.0
+            },
+            "location" : {
+                "areas" : [ {
+                    "x" : 180.0,
+                    "y" : 190.0,
+                    "width" : 20.0,
+                    "height" : 15.0,
+                    "type" : "RECTANGLE"
+                } ]
+            },
+            "subpopulationFilter": {
+                "affectedPedestrianIds": []
+            },
+            "stimuli" : [ {
+                "type" : "InformationStimulus",
+                "information" : f"use target [{self.target_ids[self.counter]}]"
+            } ]
         }
+
+        # action = {
+        #     "commandId": self.commandID,
+        #     "stimulusId": -400,
+        #     "command": command,
+        #     # "space": {"x": 0.0, "y": 0.0, "width": 500, "height": 500},
+        #     "space": {"x": 180.0, "y": 190.0, "width": 20.0, "height": 15.0},
+        #     # get information directly after spawning process
+        # }
         action = json.dumps(action)
 
         self.processor_manager.write("commandId", self.commandID)
@@ -138,7 +162,6 @@ class OpenLoop(NoController, Controller):
                                                         sending_node_id="misc[0].app[0]")
         else:
             self.con_manager.domains.v_sim.send_control(message=action, model=self.controlModelName)
-
 
     def _increase_counter(self):
         self.counter += 1
@@ -169,8 +192,10 @@ class OpenLoop(NoController, Controller):
         self.con_manager.domains.v_sim.init_control(
             self.controlModelName, self.controlModelType, self.get_reaction_model_parameters()
         )
-        self.processor_manager.registerProcessor("sending_times", SendingTimes(Writer(os.path.join(self.output_dir,"sending_times.txt"))))
-        self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(Writer(os.path.join(self.output_dir,"path_choice.txt"))))
+        self.processor_manager.registerProcessor("sending_times", SendingTimes(
+            Writer(os.path.join(self.output_dir, "sending_times.txt"))))
+        self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(
+            Writer(os.path.join(self.output_dir, "path_choice.txt"))))
 
 
 class ClosedLoop(OpenLoop, Controller):
@@ -179,7 +204,7 @@ class ClosedLoop(OpenLoop, Controller):
 
     def choose_corridor(self):
         densities = np.array(self.density_over_time[-1:]).mean(axis=0)
-        self.counter = np.argwhere(densities == densities.min()).ravel()[0] # recommend shortest corridor
+        self.counter = np.argwhere(densities == densities.min()).ravel()[0]  # recommend shortest corridor
         print(
             f"The densities are: {densities.round(3)}. Minimum: index = {self.counter}."
         )
@@ -190,7 +215,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         # default settings for control-vadere (no Omnetpp!)
         settings = ["--controller-type",
-                    "ClosedLoop", #
+                    "ClosedLoop",  #
                     "--scenario-file",
                     "route_choice_real_world.scenario",
                     "--port",
@@ -198,12 +223,12 @@ if __name__ == "__main__":
                     "--host-name",
                     "vadere",
                     "--client-mode",
-                    #"--start-server",
-                    #"--gui-mode",
+                    # "--start-server",
+                    # "--gui-mode",
                     "--output-dir",
                     "sim-output-task1",
-                    #"-j",
-                    #"/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar"
+                    # "-j",
+                    # "/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar"
                     ]
     else:
         settings = sys.argv[1:]
@@ -214,6 +239,3 @@ if __name__ == "__main__":
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings)
     controller.register_state_listener("default", sub, set_default=True)
     controller.start_controller()
-
-
-
