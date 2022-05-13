@@ -26,8 +26,13 @@ path_vadere_simple = PathHelper.from_env(
 )
 
 
-# utility
-def find(file_extension, path) -> List[str]:
+def find(file_extension: str, path: str) -> List[str]:
+    """ Finds all file of a certain type within a folder and its sub-folders.
+
+    :param file_extension: The file extension
+    :param path: The root folder to be searched
+    :return: A list of paths to all files with the given extension in the folder and all sub-folders
+    """
     result = []
     for root, dirs, files in os.walk(path.abs_path()):
         for name in files:
@@ -37,6 +42,12 @@ def find(file_extension, path) -> List[str]:
 
 
 def simulations_from_folder(path: PathHelper, description: str) -> List[Simulation]:
+    """ Finds all simulation data under the given path and returns Simulation objects for each
+
+    :param path: The path which will be searched
+    :param description: A description which will be given to all Simulations objects
+    :return: A list of Simulations objects which were found under the path and its sub-folders
+    """
     res = []
     vec_files = find(".vec", path)
     for i, vec_file in enumerate(vec_files):
