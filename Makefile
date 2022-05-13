@@ -21,11 +21,13 @@ mod_suqc          := analysis/suq-controller
 # the models are ordered in three different levels:
 # Level 1: These models do only depend on the OMNeT++ core libraries.
 # Level 2: These models depend on Level 1 models, e.g. inet.
-# Level 3: These models depend on Level 2 models, e.g. Simu5G.
+# Level 3: These models depend on Level 2 models, veins_inet
+# Level 4: These models depend on Level 3 models, e.g. Simu5G.
 models_l1 := $(mod_inet) $(mod_veins)
-models_l2 := $(mod_simu5g) $(mod_veins_inet)
-models_l3 := $(mod_crownet)
-models := $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
+models_l2 := $(mod_veins_inet) $(mod_artery)
+models_l3 := $(mod_simu5g) 
+models_l4 := $(mod_crownet)
+models :=  $(models_l4) $(models_l3) $(models_l2) $(models_l1)
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
 PYTHON := python3.8
@@ -53,9 +55,11 @@ target makefiles : TARGET = makefiles
 
 .PHONY: all $(models) python-hint
 
-all: $(models_l3) $(mod_artery) $(models_l2) $(models_l1)
+all: $(models_l4) $(models_l3) $(models_l2) $(models_l1)
 
-$(models_l3): $(models_l2) $(mod_artery)
+$(models_l4): $(models_l3) 
+
+$(models_l3): $(models_l2) 
 
 $(models_l2): $(models_l1)
 
@@ -81,10 +85,7 @@ configure_veins:
 configure_veins_inet:
 	cd $(mod_veins_inet); ./configure --with-inet=../../../$(mod_inet)
 
-$(models_l3) $(models_l2) $(models_l1):
-	$(MAKE) -j$$(($(NUM_CPUS)*2)) --directory=$@ $(TARGET) MODE=$(MODE)
-
-$(mod_artery): $(models_l2) $(models_l1)
+$(models_l4) $(models_l3) $(models_l2) $(models_l1):
 	$(MAKE) -j$$(($(NUM_CPUS)*2)) --directory=$@ $(TARGET) MODE=$(MODE)
 
 #Python analysis setup##########################################################
