@@ -1,7 +1,8 @@
 {
   "name" : "simplified_default_sequential",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.2",
+  "commithash" : "0fb24a9f02b3089b60f0edfe56fdc81f7eb8d94e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -257,7 +258,13 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "MultiPerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel"
+        "cognition" : "ProbabilisticCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesMultiPerceptionModel" : { },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
+            "routeChoices" : [ ]
+          }
+        }
       }
     },
     "topography" : {
@@ -572,10 +579,6 @@
         }
       }
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -400,
-      "reactionProbability" : 0.5
-    } ]
+    "stimulusInfos" : [ ]
   }
 }
