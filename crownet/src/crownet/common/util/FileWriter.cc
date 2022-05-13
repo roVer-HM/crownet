@@ -47,7 +47,7 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
 };
 
 BaseFileWriter::BaseFileWriter(std::string filePath, std::string sep, long bufferSize)
-        : sep(sep), filePath(filePath), bufferSize(bufferSize){}
+        : BufferWriter(bufferSize), filePath(filePath),  sep(sep){}
 
 void BaseFileWriter::initialize(){
     if (isInitialized()){
@@ -97,14 +97,7 @@ void BaseFileWriter::writeMetaData(std::map<std::string, std::string>& mData){
 
 }
 
-std::ostream &BaseFileWriter::write(){
-    long pos = buffer.tellp();
-    if (pos > bufferSize){
-        // write buffer to field
-        writeBuffer();
-    }
-    return buffer;
-}
+
 
 
 
@@ -152,7 +145,7 @@ ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<FilePrinter> pr
 ActiveFileWriter::ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep, long bufferSize)
     : BaseFileWriter(filePath, sep, bufferSize), printer(std::move(printer)) {}
 
-void ActiveFileWriter::writeHeader() { printer->writeHeaderTo(write(), sep); }
+void ActiveFileWriter::initWriter() { printer->writeHeaderTo(write(), sep); }
 
 void ActiveFileWriter::writeData() { printer->writeTo(write(), sep); }
 

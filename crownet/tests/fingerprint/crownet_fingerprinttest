@@ -165,8 +165,13 @@ class FingerprintTestCaseGenerator():
     def parse_tags(tags):
         _tags = {}
         if len(tags) > 0 and ";" not in tags:
-            # no key value parse but something was found
-            _tags.setdefault("default", tags)
+            if ":" in tags:
+                # only one container:tag pair found
+                ret = tags.split(":")
+                _tags[ret[0]] = ret[1]
+            else:
+                # assume single tag value which will be used for all containers as default
+                _tags.setdefault("default", tags)
         else:
             for kv in tags.split(";"):
                 if ":" in kv:

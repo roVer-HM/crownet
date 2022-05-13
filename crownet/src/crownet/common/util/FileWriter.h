@@ -14,51 +14,44 @@
 #include <vector>
 #include <omnetpp.h>
 
+#include "Writer.h"
 #include "FilePrinter.h"
 
 namespace crownet {
 
 
-class BaseFileWriter : public omnetpp::cOwnedObject {
+class BaseFileWriter : public BufferWriter {
 public:
     static std::string getAbsOutputPath(std::string fileName);
 
 public:
     BaseFileWriter(std::string filePath="", std::string sep=";", long bufferSize=8192);
     ~BaseFileWriter();
-    void flush();
-    void close();
     void writeMetaData(std::map<std::string, std::string>& mData);
-    std::ostream &write();
 
-    virtual void initialize();
+    virtual void initialize() override;
 
     const char * getFilePath() const { return filePath.c_str();}
     void setFilePath(const char * path){ this->filePath = std::string(path);}
     const char * getSep() const { return sep.c_str();}
     void setSep(const char * sep) { this->sep = std::string(sep); }
-    long getBufferSize() const { return bufferSize; }
-    void setBufferSize(long bufferSize) { this->bufferSize = bufferSize; }
 
+    virtual void flush() override;
+    virtual void close() override;
 
     bool isInitialized() const {return  init;}
     virtual void onInit() {/* do nothing */}
 
     template <typename T>
     friend std::ostream &operator<<(BaseFileWriter &output, const T &_t);
-private:
-    void writeBuffer();
-
-protected:
-    std::string sep;
 
 private:
     std::string filePath;
     std::ofstream file;
-    long bufferSize;
-    std::ostringstream buffer;
-    bool init = false;
-    bool closed = false;
+
+protected:
+    void writeBuffer() override;
+    std::string sep;
 };
 
 template <typename T>
@@ -67,15 +60,19 @@ inline std::ostream &operator<<(BaseFileWriter &output, const T &_t) {
   return output.write();
 }
 
-class ActiveFileWriter : public BaseFileWriter{
+
+
+class ActiveFileWriter : public BaseFileWriter,
+                         public ActiveWriter {
 
  public:
   virtual ~ActiveFileWriter()=default;
   ActiveFileWriter(std::string filePath, std::shared_ptr<FilePrinter> printer, std::string sep=";", long bufferSize=8192);
 
 
-  void writeHeader();
-  void writeData();
+  virtual void initWriter() override;
+  virtual void writeData() override;
+  virtual void finish() override { close(); }
 
 
  private:

@@ -65,8 +65,10 @@ class Cell {
  public:
   virtual ~Cell() = default;
   Cell() {}
-  Cell(std::shared_ptr<TimeProvider<T>> timeProvider, cell_key_t cell_id, node_key_t owner_id)
-      : timeProvider(timeProvider), cell_id(cell_id), owner_id(owner_id) {}
+  Cell(std::shared_ptr<TimeProvider<T>> timeProvider,
+       cell_key_t cell_id,
+       node_key_t owner_id)
+      : timeProvider(timeProvider),cell_id(cell_id), owner_id(owner_id) {}
 
   // getter
   map_t& getData() { return data; }
@@ -96,6 +98,7 @@ class Cell {
   const cell_key_t& getCellId() const { return cell_id; }
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
+  const entry_t_ptr val() const {return cell_value;}
   const time_t lastSent(){ return last_sent; }
 
   // setter

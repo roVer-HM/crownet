@@ -26,6 +26,7 @@ control001_aid:
   tags:
     exec: python3
     type: shell
+    omnetpp: 6.0pre11_220214-1045
 
 control001_udp:
   wd: simulations/testSim
@@ -45,6 +46,7 @@ control001_udp:
   tags:
     exec: python3
     type: shell
+    omnetpp: 6.0pre11_220214-1045
 
 
 control001_udp_only:
@@ -65,5 +67,6 @@ control001_udp_only:
   tags:
     exec: python3
     type: shell
+    omnetpp: 6.0pre11_220214-1045
 
 

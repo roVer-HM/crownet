@@ -30,7 +30,7 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) override;
 
 private:
-    NeighborhoodTable* nTable = nullptr;
+    INeighborhoodTable* nTable = nullptr;
     double minSentFrequency;
     double maxSentFrequyncy;
     double maxBandwith;

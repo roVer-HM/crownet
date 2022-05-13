@@ -36,7 +36,7 @@ clean: checkmakefiles
 	echo clean all build targets ...
 	-rm -f src/CROWNET_dbg
 	-rm -f src/CROWNET
-	-rm -f src/linCROWNET_dbg
+	-rm -f src/libCROWNET_dbg
 	-rm -f src/libCROWNET
 
 cleanall: checkmakefiles

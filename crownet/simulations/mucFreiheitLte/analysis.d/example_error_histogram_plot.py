@@ -1,7 +1,6 @@
 # %%
 import os
 from typing import Tuple
-from roveranalyzer.simulators.crownet.dcd.dcd_map import savefigure
 
 from roveranalyzer.utils import Project
 import roveranalyzer.simulators.crownet.dcd as Dmap

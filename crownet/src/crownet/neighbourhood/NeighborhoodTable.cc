@@ -16,6 +16,7 @@
 #include "inet/common/ModuleAccess.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/crownet.h"
 
 using namespace omnetpp;
 using namespace inet;
@@ -59,12 +60,16 @@ void NeighborhoodTable::initialize(int stage){
                 registerEntryListner(l);
             }
         }
+        auto converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
+                        par("coordConverterModule"), this)
+                        ->getConverter();
+        cellKeyProvider = std::make_shared<GridCellIDKeyProvider>(converter);
     }
 }
 
 void NeighborhoodTable::handleMessage(cMessage *msg){
     if (msg == ttl_msg){
-        checkTimeToLive();
+        checkAllTimeToLive();
         scheduleAt(simTime() + maxAge, ttl_msg);
     } else {
         throw cRuntimeError("Unknown Message received");
@@ -79,26 +84,73 @@ BeaconReceptionInfo* NeighborhoodTable::getOrCreateEntry(const int sourceId){
         take(info);
         _table[sourceId] = info;
         tableSize = _table.size();
+        setLastUpdatedAt(simTime());
         emit(neighborhoodTableChangedSignal, this);
         return info;
     } else {
-        emitPreChanged(_table[sourceId]);
+        // return existing info object for update with new beacon packet information
+//        emitPreChanged(_table[sourceId]); // remove node from old position
         return _table[sourceId];
     }
 }
-
-
-void NeighborhoodTable::checkTimeToLive(){
+bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
+    /*
+     * Case1 New info object (never seen node) ttl not reached: post change will increment map
+     * Case2 New info object (never seen node) ttl reached: drop will never change map (count or timestamp)
+     *       There was no preChange thus the map was never touched during the processing of this beacon info.
+     * Case3 Old info object (already seen node, preChange was called getOrCreate) ttl not reached: post change
+     *       will increment map at new location. If it was in the same cell the -1 / +1 will cancel out put
+     *       timestamp is updated
+     * Case4 Old info object (already seen node, preChange was called getOrCreate) ttl reached:
+     *       info will be dropped. No call to map. The preChange already decrement the map no increment necessary.
+     */
     Enter_Method_Silent();
+    if (ttlReached(info)){
+        // information to old do not propagate to density map
+        emitDropped(info);
+        auto iter = _table.find(info->getNodeId());
+        if(iter != _table.end()){
+            _table.erase(iter);
+        }
+        delete info;
+    } else {
+        // new info, already seen and cell change or already seen and same cell
+        if (!info->hasPrio()){
+            // new beacon. Node was not seen before or last beacon was sent more than TTL seconds ago.
+            // (1) enter cell
+            emitEnterCell(info);
+        } else if (cellKeyProvider->changedCell(info->getPositionCurrent(), info->getPositionPrio())){
+            // node moved! (1) decrement in old cell and (2) increment in new cell
+            // (1) leave old cell
+            emitLeaveCell(info);
+            // (2) enter new cell
+            emitEnterCell(info);
+        } else {
+            // node staed in cell! Only update time stampes.
+            // (1) stay in cell (only time stamp update)
+            emitStayInCell(info);
+        }
+    }
+    return true;
+}
+
+bool NeighborhoodTable::ttlReached(BeaconReceptionInfo* info){
+    return info->getSentSimTimeCurrent() + maxAge < simTime();
+}
+
+void NeighborhoodTable::checkAllTimeToLive(){
+    Enter_Method_Silent();
+
     simtime_t now = simTime();
-    if (now >lastCheck){
+//    if (now >lastCheck){
         // remove old entries
         for( auto it=_table.cbegin(); it !=_table.cend();){
             // Received + maxAge := time at which entry must be removed.
-            if ((it->second->getReceivedTimePrio() + maxAge) < now){
+            if (ttlReached(it->second)){
                 emitRemoved(it->second);
                 delete it->second;
                 it = _table.erase(it);
+                setLastUpdatedAt(now);
             } else {
                 ++it;
             }
@@ -106,12 +158,12 @@ void NeighborhoodTable::checkTimeToLive(){
         lastCheck = now;
         tableSize = _table.size();
         emit(neighborhoodTableChangedSignal, this);
-    }
+//    }
 }
 
-const int NeighborhoodTable::getNeighbourCount(){
+const int NeighborhoodTable::getSize(){
     Enter_Method_Silent();
-    checkTimeToLive();
+    checkAllTimeToLive();
     return _table.size();
 }
 
