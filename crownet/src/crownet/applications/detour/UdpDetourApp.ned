@@ -30,6 +30,12 @@ simple UdpDetourApp like IApp
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
+        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPkHostId](title="received host id"; source="rcvdHostId(packetReceived)"; record=vector; interpolationmode=none);
+        
+        
+        
         @lifecycleSupport;
 	    // sender parameters
 	    double incidentTime @unit(s) = default(-1.0s); // time at which the incident (see reason) is triggerd. If -1 no incident is triggerd and app only performs passive task (receive and repeate)

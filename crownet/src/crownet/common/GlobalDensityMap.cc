@@ -56,6 +56,7 @@ void GlobalDensityMap::finish() {
   getSystemModule()->unsubscribe(registerMap, this);
   getSystemModule()->unsubscribe(removeMap, this);
   getSystemModule()->unsubscribe(traciConnected, this);
+  fileWriter->finish();
 }
 
 void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
@@ -66,6 +67,12 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
       auto mapHandler = check_and_cast<GridHandler *>(obj);
       mapHandler->setMapFactory(dcdMapFactory);
       mapHandler->setCoordinateConverter(converter);
+
+      if (par("writerType").stdstringValue() == "sql"){
+          // only share the sql writer between maps
+          // todo mw
+          // mapHandler->setSqlApi(api);
+      }
   }
   else if (signalId == registerMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
@@ -92,30 +99,53 @@ void GlobalDensityMap::initializeMap(){
     converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
                     par("coordConverterModule"), this)
                     ->getConverter();
+    auto cellSize = par("cellSize").doubleValue();
+    if (converter->getCellSize() != inet::Coord(cellSize, cellSize)){
+        throw cRuntimeError("cellSize mismatch between converter and density map. Converter [%f, %f] vs map %f",
+                converter->getCellSize().x, converter->getCellSize().y, cellSize
+        );
+    }
 
-    grid = converter->getGridDescription(par("cellSize").doubleValue());
-    dcdMapFactory = std::make_shared<RegularDcdMapFactory>(grid);
+    dcdMapFactory = std::make_shared<RegularDcdMapFactory>(converter);
 
     dcdMapGlobal = dcdMapFactory->create_shared_ptr(IntIdentifer(-1));  // global
     cellKeyProvider = dcdMapFactory->getCellKeyProvider();
 
     // 2) setup writer.
-    ActiveFileWriterBuilder fBuilder{};
-    fBuilder.addMetadata("IDXCOL", 3);
-    fBuilder.addMetadata("XSIZE", grid.getGridSize().x);
-    fBuilder.addMetadata("YSIZE", grid.getGridSize().y);
-    // todo cellsize in x and y
-    fBuilder.addMetadata("CELLSIZE", grid.getCellSize().x);
-    fBuilder.addMetadata<std::string>(
-        "MAP_TYPE",
-        "global");  // The global density map is the ground
-                    // truth. No algorihm needed.
-    fBuilder.addMetadata<int>("NODE_ID", -1);
-    fBuilder.addPath("global");
+    if (par("writerType").stdstringValue() == "csv"){
+        ActiveFileWriterBuilder fBuilder{};
+        fBuilder.addMetadata("IDXCOL", 3);
+        fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+        fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
+        fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+        fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+        // todo cellsize in x and y
+        fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+        fBuilder.addMetadata("VERSION", std::string("0.2")); // todo!!!
+        fBuilder.addMetadata<std::string>(
+            "MAP_TYPE",
+            "global");  // The global density map is the ground
+                        // truth. No algorihm needed.
+        fBuilder.addMetadata<int>("NODE_ID", -1);
+        fBuilder.addPath("global");
 
-    fileWriter.reset(fBuilder.build(
-        std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
-    fileWriter->writeHeader();
+        fileWriter.reset(fBuilder.build(
+            std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
+    } else if (par("writerType").stdstringValue() == "sql"){
+//      todo mw
+//
+//      create sqlApi <--- will be shared
+//      create sqlWriter/Printer for global map
+//          todo mw setup SqlLiteWriter
+//          auto sqlWriter = std::make_shared<SqlLiteWriter>();
+//          auto sqlPrinter = std::make_shared<RegularDcdMapSqlValuePrinter>(dcdMapGlobal);
+//          sqlWriter->setSqlApi(sqlApi);
+//          sqlWriter->setPrinter(sqlPrinter);
+//          filewriter = sqlWriter;
+    } else {
+        throw cRuntimeError("expected sql or csv as writer type got '%s'", par("writerType").stringValue());
+    }
+    fileWriter->initWriter();
 }
 
 
@@ -126,6 +156,13 @@ void GlobalDensityMap::initialize(int stage) {
       vectorNodeModules = t.asVector();
       cStringTokenizer tt(par("nodeModules").stringValue(), ";");
       singleNodeModules = tt.asVector();
+      cModule* _traciModuleListener = findModuleByPath(par("traciModuleListener").stringValue());
+      if (_traciModuleListener){
+          traciModuleListener = check_and_cast<ITraCiNodeVisitorAcceptor*>(_traciModuleListener);
+      }
+
+
+
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
 
@@ -144,7 +181,8 @@ void GlobalDensityMap::initialize(int stage) {
   }
 }
 
-void GlobalDensityMap::acceptNodeVisitor(INodeVisitor* visitor){
+void GlobalDensityMap::acceptNodeVisitor(traci::ITraciNodeVisitor* visitor){
+    // check nodes NOT managed by TraCI
     cModule* root = findModuleByPath("<root>");
     for(const auto& path: vectorNodeModules){
         cModule* m = root->getSubmodule(path.c_str(), 0);
@@ -152,7 +190,7 @@ void GlobalDensityMap::acceptNodeVisitor(INodeVisitor* visitor){
             if (m->isVector()){
                for(int i = 0; i < m->getVectorSize(); i++){
                    cModule* mm = root->getSubmodule(path.c_str(), i);
-                   visitor->visitNode(mm);
+                   visitor->visitNode("", mm);
                }
             } else {
                 throw cRuntimeError("expected vector node with name %s", path.c_str());
@@ -162,8 +200,12 @@ void GlobalDensityMap::acceptNodeVisitor(INodeVisitor* visitor){
     for(const auto& path: singleNodeModules){
         cModule* m = findModuleByPath(path.c_str());
         if (m){
-            visitor->visitNode(m);
+            visitor->visitNode("", m);
         }
+    }
+    // check nodes managed by TraCI
+    if (traciModuleListener){
+        traciModuleListener->acceptTraciVisitor(this);
     }
 }
 
@@ -183,7 +225,7 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
   }
 }
 
-void GlobalDensityMap::visitNode(omnetpp::cModule *mod) {
+void GlobalDensityMap::visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) {
   const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));
   // convert to traci 2D position
   const auto &pos = mobility->getCurrentPosition();

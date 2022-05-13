@@ -21,6 +21,7 @@
 #include <traci/NodeManager.h>
 #include "traci/Position.h"
 #include "traci/SubscriptionManager.h"
+#include "crownet/artery/traci/TraCiNodeVisitorAcceptor.h"
 //#include "traci/PersonSink.h"
 
 namespace traci {
@@ -36,7 +37,9 @@ namespace  crownet {
 
 class SumoCombinedNodeManager : public traci::NodeManager,
                                 public traci::Listener,
-                                public omnetpp::cSimpleModule {
+                                public omnetpp::cSimpleModule,
+                                public ITraCiNodeVisitorAcceptor
+{
 public:
     static const omnetpp::simsignal_t addNodeSignal;
     static const omnetpp::simsignal_t updateNodeSignal;
@@ -72,6 +75,9 @@ public:
     public:
         virtual std::shared_ptr<PersonCache> getCache() const = 0;
     };
+
+protected:
+    void acceptTraciVisitor(traci::ITraciNodeVisitor* v) override { visit(v); }
 
 protected:
     using NodeInitializer = std::function<void(omnetpp::cModule*)>;

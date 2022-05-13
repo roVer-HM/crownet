@@ -9,13 +9,27 @@
 
 namespace crownet {
 
+void RegularDcdMapSqlValuePrinter::writeSqlStatement(std::ostream& out){
+    //todo mw write dcdMap State to sql buffer (out)
+    // out << "insert ..."
+}
+
+void RegularDcdMapSqlValuePrinter::createSchema(std::ostream& out){
+    //todo mw
+    // out << "insert ..."
+}
+
+void RegularDcdMapSqlValuePrinter::writeInitSqlStatement(std::ostream& out) {
+    //todo mw write metadata for given map
+    // out << "insert ..."
+}
+
 int RegularDcdMapValuePrinter::columns() const { return 9; }
 
 void RegularDcdMapValuePrinter::writeTo(std::ostream& out,
                                         const std::string& sep) const {
   // for all cells in dcd map
-  for (auto it = map->valid(); it != it.end(); ++it) {
-    auto val = *it;
+    for (const auto& val : map->valid()) {
     int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
 
     out << omnetpp::simTime().dbl() << sep;
@@ -31,19 +45,18 @@ void RegularDcdMapValuePrinter::writeHeaderTo(std::ostream& out,
                                               const std::string& sep) const {
   out << "simtime" << sep << "x" << sep << "y" << sep << "count" << sep
       << "measured_t" << sep << "received_t" << sep << "source" << sep
-      << "selection" << sep << "own_cell" << std::endl;
+      << "selection" << sep << "selectionRank" << sep <<  "sourceHost" << sep << "sourceEntry" << sep << "hostEntry" << sep << "own_cell" << std::endl;
 }
 
 void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
                                       const std::string& sep) const {
   // for all cells in dcd map
-  for (auto it = map->valid(); it != it.end(); ++it) {
-    auto val = *it; // [cell_id, cell]
+    for (const auto& val : map->valid()){
     int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
     // for all measurements in cell
     bool foundSelected = false;
-    for (auto cIt = val.second.validIter(); cIt != cIt.end(); ++cIt) {
-      auto entry = (*cIt).second;
+    for (const auto& cell: val.second.validIter()){
+      auto entry = cell.second;
       if (!foundSelected){
           foundSelected = !entry->getSelectedIn().empty();
       }
@@ -70,8 +83,7 @@ void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
 
 void RegularDcdMapGlobalPrinter::writeTo(std::ostream& out,
                                          const std::string& sep) const {
-  for (auto it = map->validLocal(); it != it.end(); ++it) {
-    auto val = *it;
+    for(const auto& val : map->validLocal()){
     int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
     const auto lEntry = val.second.get<GridGlobalEntry>();
 
@@ -87,9 +99,10 @@ void RegularDcdMapGlobalPrinter::writeTo(std::ostream& out,
 
 void RegularDcdMapGlobalPrinter::writeHeaderTo(std::ostream& out,
                                                const std::string& sep) const {
-  out << "simtime" << sep << "x" << sep << "y" << sep << "count" << sep
-      << "measured_t" << sep << "received_t" << sep << "source" << sep
-      << "selection" << sep << "own_cell" << sep << "node_id" << std::endl;
+  out << "simtime" << sep << "x" << sep << "y"
+     << sep << "count" << sep  << "measured_t" << sep << "received_t"
+     << sep << "source" << sep << "selection" << sep << "selectionRank" << sep
+     << "own_cell" << sep << "node_id" << std::endl;
 }
 
 }  // namespace crownet

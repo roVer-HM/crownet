@@ -1,2 +1,3 @@
 .venv
-simulation_studies/*/results*
+simulation_studies/*/output
+propagation/**/tests/*.json

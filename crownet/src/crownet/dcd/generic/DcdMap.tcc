@@ -186,8 +186,15 @@ template <typename C, typename N, typename T>
 typename DcDMap<C, N, T>::cell_t& DcDMap<C, N, T>::createCell(
     const cell_key_t& cell_id) {
   auto entry = this->cells.emplace(
-      std::piecewise_construct, std::forward_as_tuple(cell_id),
-      std::forward_as_tuple(cell_t(timeProvider, cell_id, this->getOwnerId())));
+      std::piecewise_construct,
+      std::forward_as_tuple(cell_id),
+      std::forward_as_tuple(cell_t(
+              timeProvider,
+              cell_id,
+              this->getOwnerId()
+              )
+      )
+  );
   this->cellKeyStream->addNew(cell_id, this->timeProvider->now());
   return entry.first->second;
 }

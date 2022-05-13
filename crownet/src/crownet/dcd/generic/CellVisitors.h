@@ -87,6 +87,23 @@ class Timestamped{
   typename C::time_t time;
 };
 
+template <typename C>
+class IdenpotanceTimestamped : public  Timestamped<C>{
+ public:
+    IdenpotanceTimestamped() : Timestamped<C>() {}
+    IdenpotanceTimestamped(typename C::time_t time) : Timestamped<C>(time) {}
+    void setLastCall(const typename C::time_t& t){
+        this->lastTime = t;
+    }
+    const bool checkLastCall() const {
+        return this->time > this->lastTime;
+    }
+
+ protected:
+  typename C::time_t lastTime;
+};
+
+
 /**
  * Convenient Visitor for returning value_type !! const !!
  *
@@ -135,6 +152,13 @@ class TimestampedVoidCellVisitor : public VoidCellVisitor<C>, public Timestamped
  public:
     TimestampedVoidCellVisitor() : VoidCellVisitor<C>(), Timestamped<C>() {}
     TimestampedVoidCellVisitor(typename C::time_t time) :  Timestamped<C>(time) {}
+};
+
+template <typename C>
+class IdenpotanceTimestampedVoidCellVisitor : public VoidCellVisitor<C>, public IdenpotanceTimestamped<C> {
+ public:
+    IdenpotanceTimestampedVoidCellVisitor() : VoidCellVisitor<C>(), IdenpotanceTimestamped<C>() {}
+    IdenpotanceTimestampedVoidCellVisitor(typename C::time_t time) :  IdenpotanceTimestamped<C>(time) {}
 };
 
 /**

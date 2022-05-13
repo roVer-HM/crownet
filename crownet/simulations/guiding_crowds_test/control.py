@@ -56,42 +56,27 @@ class PingPong(Controller):
 
 if __name__ == "__main__":
 
-    sub = VadereDefaultStateListener.with_vars(
-        "persons",
-        {"pos": tc.VAR_POSITION, "speed": tc.VAR_SPEED, "angle": tc.VAR_ANGLE},
-        init_sub=True,
-    )
-
-    controller = PingPong()
-
-    scenario_file = get_scenario_file("vadere/scenarios/test001.scenario")
-
     if len(sys.argv) == 1:
-        # settings = [
-        #     "--port",
-        #     "9999",
-        #     "--host-name",
-        #     "localhost",
-        #     "--client-mode",
-        #     "--start-server",
-        # ]
-
-        settings = [
-            "--port",
-            "9997",
-            "--host-name",
-            "0.0.0.0",
-        ]
-
-
-        controller = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=controller)
+        settings = ["--scenario-file",
+                    "test001.scenario",
+                    "--experiment-label",
+                    f"tiktok",
+                    "--port",
+                    "9999",
+                    "--host-name",
+                    "vadere",
+                    "--client-mode",
+                    ]
     else:
-        controller = get_controller_from_args(
-            working_dir=os.path.dirname(os.path.abspath(__file__)),
-            controller=controller,)
+        settings = sys.argv[1:]
+
+    sub = VadereDefaultStateListener.with_vars(
+        "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
+    )
+    controller = get_controller_from_args(working_dir=os.getcwd(), args=settings, controller=PingPong())
+    controller.register_state_listener("default", sub, set_default=True)
+    controller.start_controller()
 
 
-    kwargs = {"file_name": scenario_file, "file_content": get_scenario_content(scenario_file)}
-    controller.register_state_listener("default", sub, set_default=True) #? new
-    controller.start_controller(**kwargs)
+
 

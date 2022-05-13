@@ -21,6 +21,7 @@
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
 
+
 using namespace inet;
 using omnetpp::cStringTokenizer;
 
@@ -34,7 +35,7 @@ UdpDetourAppVadere::~UdpDetourAppVadere() {}
 void UdpDetourAppVadere::initialize(int stage) {
   UdpDetourApp::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
-    // nothing here
+      //
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     auto mobility = inet::getModuleFromPar<ControllableObject>(
         par("mobilityModule"), inet::getContainingNode(this));

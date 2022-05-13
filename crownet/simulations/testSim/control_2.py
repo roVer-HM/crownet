@@ -11,6 +11,9 @@ sys.path.append(os.path.abspath(".."))
 from flowcontrol.strategy.controller.dummy_controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
+
+
+#TODO remove??
 class ChangeTarget(Controller):
 
     def __init__(self):

@@ -66,7 +66,7 @@ network World
         traci.core.selfStopping = default(false);
         traci.core.typename = default("VadereCore");
 
-        traci.launcher.typename = default("VadereLauchner");
+        traci.launcher.typename = default("VadereLauncher");
         traci.launcher.hostname = default("vadere");
 		traci.launcher.port = default(9998);
 

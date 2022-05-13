@@ -38,6 +38,7 @@ final_test_2:
   tags:
     exec: python3
     type: shell
+    omnetpp: 6.0pre11_220214-1045
 
 final_test_3:
   wd: simulations/guiding_crowds_test
@@ -57,6 +58,7 @@ final_test_3:
   tags:
     exec: python3
     type: shell
+    omnetpp: 6.0pre11_220214-1045
 
 test_4:
   wd: simulations/guiding_crowds_test

@@ -10,9 +10,23 @@
 #include <omnetpp.h>
 
 #include "crownet/common/util/FilePrinter.h"
+#include "crownet/common/util/SqlLiteWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 
 namespace crownet {
+
+class RegularDcdMapSqlValuePrinter : public SqlPrinter {
+public:
+    RegularDcdMapSqlValuePrinter(std::shared_ptr<RegularDcdMap> map) : map(map){};
+    void writeSqlStatement(std::ostream& out) override;
+    void createSchema(std::ostream& out) override;
+    void writeInitSqlStatement(std::ostream& out) override;
+
+protected:
+ std::shared_ptr<RegularDcdMap> map;
+// todo postion provider?
+
+};
 
 // todo integrate with crownet/common/util/FileWriter.h
 class RegularDcdMapValuePrinter : public FilePrinter {

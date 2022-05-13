@@ -17,12 +17,16 @@ include ../lib/default_testConfig.ini
 [Config final]
 extends = _default, D2D_General, stationary_n3
 network = crownet.test.omnetpp.lib.TestStationaryWorld
+*.coordConverter.typename = "OsgCoordConverterLocal"
+*.coordConverter.xBound = 30.0m
+*.coordConverter.yBound = 30.0m
+**.cellSize = 3.0m
 
 *.misc[*].numApps = 1
 *.misc[*].app[0].socket.typename = "UdpSocketManager"
 # Beacon Application
 *.misc[*].app[0].typename = "BeaconApp"
-*.misc[*].app[0].app.typename = "BeaconSimple"
+*.misc[*].app[0].app.typename = "BeaconDynamic"
 *.misc[*].app[0].app.startTime = uniform(0s,0.02s)
 *.misc[*].app[0].scheduler.typename = "IntervalScheduler"
 *.misc[*].app[0].scheduler.generationInterval = 50ms

@@ -103,6 +103,11 @@ inet::Coord OsgCoordinateConverter::getOffset() const {
 }
 
 
+RegularGridInfo OsgCoordinateConverter::getGridDescription() const{
+    return getGridDescription(this->cellSize);
+}
+
+
 RegularGridInfo OsgCoordinateConverter::getGridDescription(const inet::Coord& cellSize) const {
     auto gridSize = getBoundary();
     RegularGridInfo info;
@@ -115,8 +120,6 @@ RegularGridInfo OsgCoordinateConverter::getGridDescription(const inet::Coord& ce
 RegularGridInfo OsgCoordinateConverter::getGridDescription(const double cellSize) const{
     return getGridDescription({cellSize, cellSize, 0.0});
 }
-
-
 
 osgEarth::GeoPoint OsgCoordinateConverter::addZoneOriginOffset(
     const traci::TraCIPosition& pos) const {

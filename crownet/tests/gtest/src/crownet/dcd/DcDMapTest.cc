@@ -10,6 +10,8 @@
 #include <string>
 
 #include "main_test.h"
+#include "crownet/crownet_testutil.h"
+
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
@@ -18,17 +20,24 @@
 using namespace crownet;
 
 namespace {
-RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
-RegularDcdMapFactory dcdFactory{grid};
+
+DcdFactoryProvider f = DcdFactoryProvider(
+        inet::Coord(.0, .0),
+        inet::Coord(10.0, 10.0),
+        1.0
+);
+RegularGridInfo  grid = f.grid;
+std::shared_ptr<RegularDcdMapFactory> dcdFactory = f.dcdFactory;
+
 }
 
 class RegularDcDMapTest : public BaseOppTest {
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   RegularDcDMapTest()
-      : mapEmpty(dcdFactory.create(1)),
-        mapLocal(dcdFactory.create(2)),
-        mapFull(dcdFactory.create(3)) {}
+      : mapEmpty(dcdFactory->create(1)),
+        mapLocal(dcdFactory->create(2)),
+        mapFull(dcdFactory->create(3)) {}
 
   void incr(RegularDcdMap& map, double x, double y, int i, double t) {
     // local entry!
@@ -41,6 +50,7 @@ class RegularDcDMapTest : public BaseOppTest {
   }
 
   void SetUp() override {
+    setSimTime(0.0);
     // [1, 1] count 2
     incr(mapLocal, 1.2, 1.2, 100, 30.0);
     incr(mapLocal, 1.5, 1.5, 101, 30.0);
@@ -320,7 +330,7 @@ TEST(RegularMap, update_move) {
   auto m3 = std::make_shared<RegularEntry>(19, 18., 17., IntIdentifer(40));
 
   auto cellId1 = GridCellID(5, 4);
-  RegularDcdMap map = dcdFactory.create(IntIdentifer(55));
+  RegularDcdMap map = dcdFactory->create(IntIdentifer(55));
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
@@ -344,7 +354,7 @@ TEST(RegularMap, update1) {
   auto m2 = std::make_shared<RegularEntry>(3, 2., 1., IntIdentifer(40));
 
   auto cellId1 = GridCellID(5, 4);
-  RegularDcdMap map = dcdFactory.create(IntIdentifer(55));
+  RegularDcdMap map = dcdFactory->create(IntIdentifer(55));
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
@@ -373,7 +383,7 @@ TEST(RegularMap, update2) {
 
   auto cellId1 = GridCellID(5, 4);
   auto cellId2 = GridCellID(3, 9);
-  RegularDcdMap map = dcdFactory.create(IntIdentifer(55));
+  RegularDcdMap map = dcdFactory->create(IntIdentifer(55));
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));

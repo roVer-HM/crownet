@@ -1,7 +1,7 @@
 {
   "name" : "simple_detour_100x177_miat1.25",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -362,6 +362,8 @@
         "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 1,
         "shape" : {
@@ -371,8 +373,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
-        "distributionParameters" : [ 0.0375 ],
+        "interSpawnTimeDistribution" : "poisson",
+        "distributionParameters" : {
+          "numberPedsPerSecond" : 0.0375
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -393,8 +397,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
-        "distributionParameters" : [ 0.0375 ],
+        "interSpawnTimeDistribution" : "poisson",
+        "distributionParameters" : {
+          "numberPedsPerSecond" : 0.0375
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -415,8 +421,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
-        "distributionParameters" : [ 0.0375 ],
+        "interSpawnTimeDistribution" : "poisson",
+        "distributionParameters" : {
+          "numberPedsPerSecond" : 0.0375
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -437,8 +445,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.PoissonDistribution",
-        "distributionParameters" : [ 0.0375 ],
+        "interSpawnTimeDistribution" : "poisson",
+        "distributionParameters" : {
+          "numberPedsPerSecond" : 0.0375
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,

@@ -1,7 +1,7 @@
 {
   "name" : "mf_base_initial_peds",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -122,7 +122,7 @@
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : {
-          "epsgCode" : "EPSG:32632",
+          "epsgCode" : "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
           "description" : "UTM Zone 32U OpenStreetMap export osm2vadere.py-cd85ed55c1ca7e6ef981761da973addf98ac2b07-dirty",
           "translation" : {
             "x" : 692152.0894735109,
@@ -3174,6 +3174,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 1001,
         "shape" : {
@@ -3192,8 +3194,10 @@
             "y" : 158.59125952143222
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3223,8 +3227,10 @@
             "y" : 225.09726159647107
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3254,8 +3260,10 @@
             "y" : 125.56888923142105
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3285,8 +3293,10 @@
             "y" : 104.61519689764827
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3316,8 +3326,10 @@
             "y" : 134.85620195046067
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3347,8 +3359,10 @@
             "y" : 147.5738470396027
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3378,8 +3392,10 @@
             "y" : 221.6611376684159
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3409,8 +3425,10 @@
             "y" : 363.0436927303672
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3440,8 +3458,10 @@
             "y" : 171.5487187989056
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3471,8 +3491,10 @@
             "y" : 88.29599837306887
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3502,8 +3524,10 @@
             "y" : 18.918302612379193
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3533,8 +3557,10 @@
             "y" : 21.872196461074054
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3564,8 +3590,10 @@
             "y" : 264.80283942911774
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 60,
         "startTime" : 0.0,
@@ -3621,7 +3649,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3674,7 +3718,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : -1.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : -1.0,
+          "pathogenAbsorptionRate" : -1.0,
+          "minInfectiousDose" : -1.0,
+          "exposedPeriod" : -1.0,
+          "infectiousPeriod" : -1.0,
+          "recoveredPeriod" : -1.0
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

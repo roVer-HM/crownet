@@ -1,3 +1,4 @@
+.vscode/**
 **/core
 log.out
 VadereTestingSuite.preferences.xml
@@ -6,6 +7,9 @@ VadereTestingSuite.preferences.xml
 **/vadere-server-output
 **/.directory
 **/*.legacy
+**/analysis.d/**/*.html
+**/simulations/*/suqc
+.vscode
 tags
 tags*
 compile_commands.json
@@ -16,6 +20,7 @@ compile_commands.json
 **/results
 docker/**/ide/*.tar.gz
 docker/**/ide/*.tgz
+cache-directory
 
 # ignore gitlab-runner local test directory
 /builds

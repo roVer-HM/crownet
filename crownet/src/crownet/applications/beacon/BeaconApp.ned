@@ -23,20 +23,6 @@ moduleinterface IBeaconApp extends IBaseApp {
     parameters:
 }
 
-simple BeaconSimple extends BaseApp like IBeaconApp {
-    
-    parameters:
-        @display("i=block/broadcast");
-        @class(crownet::BeaconSimple);       
-        // Aid app override defaults
-        packetName = default("BeaconSimple");
-		packetLength = default(300B);
-		allEmptyDestAddress = false;
-        
-        // App logic
-        string neighborhoodTableMobdule =  default("mobility");
-}
-
 simple BeaconDynamic extends BaseApp like IBeaconApp {
     
     parameters:

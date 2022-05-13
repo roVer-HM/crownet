@@ -19,6 +19,11 @@ include ../lib/default_testConfig.ini
 [Config final]
 extends = _default, D2D_General, DcDMap, stationary_n1
 
+*.coordConverter.typename = "OsgCoordConverterLocal"
+*.coordConverter.xBound = 30.0m
+*.coordConverter.yBound = 30.0m
+**.cellSize = 3.0m
+
 *.misc[*].app[1].scheduler.numberPackets = -1
 *.misc[*].app[1].scheduler.amoutOfData = 1000B
 # update interval bigger than sim time. Do not sent data in this case

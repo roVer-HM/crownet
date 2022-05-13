@@ -44,6 +44,15 @@ BeaconReceptionInfo* EntropyNeigborhoodTableClient::getOrCreateEntry(const int s
     throw cRuntimeError("Not implemented in EntropyNeigborhoodTableClient");
 }
 
+
+const int EntropyNeigborhoodTableClient::getSize(){
+    int count = 0;
+    for (const auto& t : iter()){
+        count++;
+    }
+    return count;
+}
+
 // iterator default to all elements in map
 NeighborhoodTableIter_t
 EntropyNeigborhoodTableClient::iter() {

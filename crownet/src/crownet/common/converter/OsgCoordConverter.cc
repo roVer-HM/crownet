@@ -16,8 +16,13 @@
 #include "inet/common/INETDefs.h"
 #include "inet/common/geometry/common/Coord.h"
 #include "crownet/artery/traci/VadereApi.h"
+#include "crownet/artery/traci/VadereUtils.h"
 #include "crownet/artery/traci/VadereCore.h"
 #include "crownet/common/util/crownet_util.h"
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 
 namespace {
 
@@ -40,6 +45,7 @@ void OsgCoordConverterLocal::initialize(int stage) {
                       par("offset_y").doubleValue()},
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
                       par("srs_code").stdstringValue());
+      _converter->setCellSize(par("cellSize").doubleValue());
       sceneOrientation = inet::Quaternion::NIL;
       scenePosition = _converter->getScenePosition();
       emit(simBoundSignal, this);
@@ -64,27 +70,47 @@ void OsgCoordConverterLocal::handleMessage(omnetpp::cMessage*) {
 
 
 void OsgCoordConverterVadere::initialize(int stage) {
-    cSimpleModule::initialize(stage);
+  cSimpleModule::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
+      // use current directory as fallback to create absolute paths for Vadere.
+      fs::path iniBaseDir = fs::current_path();
+      fs::path resultDir (cSimulation::getActiveSimulation()
+                                                        ->getEnvir()
+                                                        ->getConfigEx()
+                                                        ->getVariable(CFGVAR_RESULTDIR));
+      resultDir = resultDir.is_relative() ? fs::absolute(resultDir, iniBaseDir) : resultDir;
 
+      fs::path vSPath (par("vadereScenarioPath").stdstringValue());
+      vSPath = vSPath.is_relative() ? fs::absolute(vSPath, iniBaseDir) : vSPath;
+
+      vadere::CoordianteSystemSettings settings =
+              vadere::getCoordianteSystemSettings(vSPath.string());
+
+      CoordRef ref;
+      ref.epsg_code = settings.epsg;
+      // offset needs to be negative offset to mirror sumo behavior
+      ref.offset = TraCIPosition(-1*settings.offsetX, -1*settings.offsetY);
+      traci::Boundary netBound(settings.bound);
+
+      _converter = std::make_shared<OsgCoordinateConverter>(
+                ref.offset, netBound, ref.epsg_code);
+      _converter->setCellSize(par("cellSize").doubleValue());
+      emit(simBoundSignal, this);
+      emit(simOffsetSignal, this);
   } else if (stage == inet::INITSTAGE_LAST){
       VadereCore* core = inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
       subscribeTraCI(core);
   }
+
 }
 
 void OsgCoordConverterVadere::traciConnected(){
     VadereCore* core =
                 inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
     auto m_api = core->getVadereApi();
-    CoordRef ref = m_api->v_simulation.getCoordRef();
-    traci::Boundary netBound = traci::Boundary(m_api->v_simulation.getNetBoundary());
-    _converter = std::make_shared<OsgCoordinateConverter>(
-              ref.offset, netBound, ref.epsg_code);
     m_api->setConverter(_converter);
     emit(simBoundSignal, this);
     emit(simOffsetSignal, this);
-
 }
 
 ////////////////////////////////////////////
@@ -120,6 +146,7 @@ void OsgCoordConverterSumo::initialize(int stage) {
       offset = traci::TraCIPosition(netOffset[0], netOffset[1]);
 
       _converter = std::make_shared<OsgCoordinateConverter>(offset, netBoundary, projParameter);
+      _converter->setCellSize(par("cellSize").doubleValue());
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
   }
@@ -129,7 +156,7 @@ std::vector<double> OsgCoordConverterSumo::parse(const std::string& input, const
     omnetpp::cStringTokenizer tokenizer(input.c_str(), ",");
     std::vector<double> ret = tokenizer.asDoubleVector();
     if(ret.size() != count){
-        throw cRuntimeError("expected %d tokens but found %d '%s'", count, ret.size(), input.c_str());
+        throw cRuntimeError("expected %d tokens but found %zu '%s'", count, ret.size(), input.c_str());
     }
     return ret;
 }

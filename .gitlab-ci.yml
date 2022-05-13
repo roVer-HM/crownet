@@ -2,7 +2,7 @@ variables:
  GIT_SUBMODULE_STRATEGY: recursive    # clone submodules
  GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vadere submodule)
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this.
- OPP_CONT_TAG: 'latest'             # tag of OMNeT++ container to be used
+ OPP_CONT_TAG: '6.0pre11_220214-1045'             # tag of OMNeT++ container to be used
  OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${OPP_CONT_TAG} exec'
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
@@ -40,7 +40,7 @@ build-for-sim:
   script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker pull $CI_REGISTRY/rover/crownet/omnetpp
+    - docker pull ${CI_REGISTRY}/rover/crownet/omnetpp:${OPP_CONT_TAG}
     - docker pull $CI_REGISTRY/rover/crownet/sumo
     - docker pull $CI_REGISTRY/rover/crownet/vadere
     - docker pull $CI_REGISTRY/rover/crownet/flowcontrol
@@ -171,6 +171,7 @@ uq-test:
   script:
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq"
+    - "pip install -r requirements.txt"
     - "python3 -m unittest discover -v"
 
 # run given simulation-campaign

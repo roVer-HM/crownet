@@ -18,7 +18,7 @@ package crownet.simulations.networks;
 
 import crownet.simulations.networks.World;
 import inet.node.inet.AdhocHost;
-
+import crownet.nodes.ApplicationLayerPedestrian;
 
 
 network World_Wlan extends World
@@ -31,10 +31,12 @@ network World_Wlan extends World
         hasCellularCoreNetwork = false;
         hasWlan = true;
         hasStoryboard = false;
+        station[*].mobility.typename = default("StationaryMobility");
+        
 
     submodules:
 
-        station[numStationary]: AdhocHost if hasStationary {
+        station[numStationary]: ApplicationLayerPedestrian if hasStationary {
             parameters:
                 @display("r=,,#707070;p=94.814995,266.385;i=device/accesspoint_s;t1=t");
         }

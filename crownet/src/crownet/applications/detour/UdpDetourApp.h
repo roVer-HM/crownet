@@ -92,6 +92,7 @@ class UdpDetourApp : public ApplicationBase, public UdpSocket::ICallback {
   // statistics
   int numSent = 0;
   int numReceived = 0;
+  int hostId = -1;
 
   // parameters
   simtime_t incidentTime;

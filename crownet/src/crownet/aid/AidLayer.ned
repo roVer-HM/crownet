@@ -77,7 +77,7 @@ module DcdAidLayer extends SimpleAidLayer {
 		densityMap.socket.typename = "AidSocketManager";
 		densityMap.socket.destPort = 30001;
 		densityMap.socket.localPort = 30001;
-        beacon.app.typename = default("BeaconSimple");
+        beacon.app.typename = default("BeaconDynamic");
         beacon.socket.typename = "AidSocketManager";
         beacon.socket.destPort = 30002;
         beacon.socket.localPort = 30002;

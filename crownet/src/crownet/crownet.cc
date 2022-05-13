@@ -34,4 +34,19 @@ std::pair<std::string, int> getHostPortConfigOverride(omnetpp::cConfigOption *en
     }
 }
 
+uint32_t simtime_to_timestamp_32_ms(simtime_t t){
+    if (t < simtime_t::ZERO){
+        t = simTime();
+    }
+    return (uint32_t)(t.inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
+}
+
+simtime_t timestamp_32_ms_to_simtime(uint32_t tstamp, simtime_t base){
+    if (base < 0){
+        base = simTime(); // use current time
+    }
+    uint64_t t = (uint64_t)tstamp + (base.inUnit(SimTimeUnit::SIMTIME_MS) & 0xFFFFFFFF00000000);
+    return SimTime(t, SimTimeUnit::SIMTIME_MS);
+}
+
 }
