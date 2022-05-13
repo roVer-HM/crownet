@@ -29,7 +29,25 @@ class MapCfg extends cOwnedObject {
      bool writeDensityLog;
      string mapType;
      string mapTypeLog;
-     string idStreamType;   
+     simtime_t cellAgeTTL @editable;
+     string idStreamType;
+}
+
+class MapCfgYmf extends MapCfg {
+    mapType = "ymf";
+}
+
+class MapCfgYmfPlusDist extends MapCfgYmf {
+ 	mapType = "ymfPlusDist";
+ 	double alpha;   
+}
+
+class MapCfgYmfPlusDistStep extends MapCfgYmfPlusDist {
+ 	mapType = "ymfPlusDistStep";
+ 	double stepDist;
+ 	bool zeroStep = true; // if true set step function to zero for dist  <= step_dist 
+ 						  // otherwise set function value to value at step_dist
+ 						  // for all dist <= step_dist
 }
 
 
@@ -70,6 +88,8 @@ cplusplus(cc){{
 class LocatedDcDCell extends DcDCell {
     uint16_t idOffsetX;   // 2B
     uint16_t idOffsetY;   // 2B
+    double sourceEntryDist = 0.; // todo fix header size?
+    
 }
 
 cplusplus(LocatedDcDCell){{
@@ -97,6 +117,7 @@ class MapHeader extends inet::FieldsChunk {
  	uint32_t refCoordLat; // Y in microdegree
  	uint16_t refIdOffsetX;
 	uint16_t refIdOffsetY;
+	inet::Coord pos;
 	
 	// todo check
  	uint16_t sourceCellIdX; // 2B

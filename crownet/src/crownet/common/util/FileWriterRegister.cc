@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "inet/common/ModuleAccess.h"
+#include "crownet/common/ModuleAccess.h"
 
 
 #include "FileWriterRegister.h"
@@ -50,10 +50,14 @@ bool FileWriterRegister::hasWriter(std::string writerKey) {
 
 BaseFileWriter* FileWriterRegister::getWriter(std::string writerKey) {
     if (writerKey == "neighborhoodWriter" && writerRegister->containsKey(writerKey.c_str())) {
+
+
         auto w = (NeighborhoodEventWriter*)writerRegister->get(writerKey.c_str()).objectValue();
         if (!w->isInitialized()){
             w->initialize();
         }
+        auto handler = inet::findModuleFromPar<IGlobalDensityMapHandler<RegularDcdMap>>(par("globalMapModule"), this);
+        w->setGlobalDensityMapHandler(handler);
         return dynamic_cast<BaseFileWriter*>(w);
      }
      throw cRuntimeError("Writer not found for key %s", writerKey.c_str());

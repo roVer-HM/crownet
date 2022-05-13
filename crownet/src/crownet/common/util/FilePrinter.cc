@@ -10,7 +10,7 @@
 namespace crownet {
 
 cObjectPrinter cObjectPrinter::shortBeaconInfoShortPrinter(
-        {"nodeId","receivedTimePrio", "maxSequencenumberPrio", "pos", "numberOfNeighbours"});
+        {"nodeId","receivedTimeCurrent", "maxSequencenumber", "positionCurrent", "numberOfNeighboursCurrent"});
 
 
 int cObjectPrinter::columns() const { return fields.size(); }

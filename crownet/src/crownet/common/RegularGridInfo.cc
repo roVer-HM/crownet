@@ -16,10 +16,27 @@
 #include "RegularGridInfo.h"
 #include <omnetpp/cexception.h>
 
+
 namespace crownet {
 
 RegularGridInfo::RegularGridInfo(const inet::Coord& gridSize, const inet::Coord& cellSize)
   : gridSize(gridSize), cellSize(cellSize){
+
+    cellCount.x = std::floor(gridSize.x/cellSize.x);
+    cellCount.y = std::floor(gridSize.y/cellSize.y);
+    cellCount.z = 0.0;
+
+    std::vector<traci::TraCIPosition> vec;
+    traci::TraCIPosition upperRight{0.0, 0.0, 0.0};
+    upperRight.x = gridSize.x;
+    upperRight.y = gridSize.y;
+    vec.push_back(traci::TraCIPosition{0.0, 0.0, 0.0});
+    vec.push_back(upperRight);
+    simBound = traci::Boundary(vec);
+}
+
+RegularGridInfo::RegularGridInfo(const traci::Boundary simBound, const inet::Coord& gridSize, const inet::Coord& cellSize)
+  : gridSize(gridSize), cellSize(cellSize), simBound(simBound){
 
     cellCount.x = std::floor(gridSize.x/cellSize.x);
     cellCount.y = std::floor(gridSize.y/cellSize.y);
@@ -29,9 +46,8 @@ RegularGridInfo::RegularGridInfo(const inet::Coord& gridSize, const inet::Coord&
 const inet::Coord RegularGridInfo::getCellCenter(const int x, const int y) const{
     return inet::Coord(x * cellSize.x + cellSize.x/2, y * cellSize.y + cellSize.y/2, 0.0);
 }
-const inet::Coord RegularGridInfo::getCellCenter(inet::Coord position) const {
-    return getCellCenter((int)position.x, (int)position.y);
-}
+
+
 const int RegularGridInfo::getCellId(const int x, const int y)const{
     // row major order
     if (x < 0 || x >= cellCount.x){

@@ -24,9 +24,10 @@
 #include "crownet/applications/dmap/dmap_m.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
-#include "crownet/common/util/FileWriter.h"
+#include "crownet/common/util/Writer.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "crownet/dcd/generic/CellVisitors.h"
+#include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 
 using namespace omnetpp;
@@ -54,7 +55,8 @@ protected:
 
  //
  virtual Packet *createPacket() override;
- virtual void applyContentTags(Ptr<Chunk> content) override;
+ virtual Ptr<Chunk>  buildHeader();
+ virtual Ptr<Chunk>  buildPayload(b maxData);
 
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
@@ -64,6 +66,7 @@ protected:
  virtual void initDcdMap();
  virtual void initWriter();
  virtual bool mergeReceivedMap(Packet *packet);
+ virtual void initLocalMap() {/*do nothing on default*/};
 
  // IDensityMapHandler
  // update map with data from neighborhood table
@@ -72,7 +75,10 @@ protected:
  virtual void writeMap() override;
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
- virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory>) override;
+ virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) override;
+ //todo mw
+ //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) override;
+ virtual void updateOwnLocationInMap();
 
  // AppStatusInfo
  virtual const bool canProducePacket() override;
@@ -82,18 +88,21 @@ protected:
  std::shared_ptr<GridCellIDKeyProvider> cellProvider;
  std::shared_ptr<OsgCoordinateConverter> converter;
  std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
+ // todo mw
+// std::shared_ptr<SqlApi> sqlApi;
 
  std::shared_ptr<RegularDcdMap> dcdMap;
- std::unique_ptr<ActiveFileWriter> fileWriter;
+ std::shared_ptr<ActiveWriter> fileWriter;
  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
+ std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
- RegularGridInfo grid;
+
 
 
  RegularDcdMapWatcher* dcdMapWatcher;
- cMessage *localMapTimer;
- cPar *localMapUpdateInterval;
+ cMessage *mainAppTimer;
+ cPar *mainAppInterval;
 
 };
 

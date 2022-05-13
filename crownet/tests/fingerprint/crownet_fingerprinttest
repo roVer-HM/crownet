@@ -165,8 +165,13 @@ class FingerprintTestCaseGenerator():
     def parse_tags(tags):
         _tags = {}
         if len(tags) > 0 and ";" not in tags:
-            # no key value parse but something was found
-            _tags.setdefault("default", tags)
+            if ":" in tags:
+                # only one container:tag pair found
+                ret = tags.split(":")
+                _tags[ret[0]] = ret[1]
+            else:
+                # assume single tag value which will be used for all containers as default
+                _tags.setdefault("default", tags)
         else:
             for kv in tags.split(";"):
                 if ":" in kv:
@@ -350,6 +355,11 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
 
             # --fingerprint=
             arg_list = ArgList.from_flat_list(sim["args"])
+
+            # set omnetpp container tag - if specified
+            if "omnetpp" in sim["tags"]:
+                arg_list.add("--omnet-tag", sim["tags"]["omnetpp"])
+
             # set debug logging for test
             if (self.args.verbose > 0):
                 _v = "v" * self.args.verbose
@@ -1385,13 +1395,13 @@ def parse_arguments(_args=None):
     if defaultNumThreads > 2:
         defaultNumThreads -= 2
     main = argparse.ArgumentParser(
-        prog="Fingerprint Testrunner",
         description="Run the fingerprint tests specified as OMNeT++ or CrowNet fingerprint files."
     )
     # PARENT
     parent = argparse.ArgumentParser(add_help=False)
     parent.add_argument('-C', '--directory',
-                        help='Change to DIRECTORY before executing the tests. Working dirs in the test files are relative to this.')
+                        help='Change to DIRECTORY before executing the tests. Working dirs in the test files are relative to this.', 
+                        default=os.getcwd())
     parent.add_argument('-t', '--threads', type=int, default=defaultNumThreads,
                         help='number of parallel threads (default: number of CPUs, currently ' + str(
                             defaultNumThreads) + ')')
@@ -1415,7 +1425,7 @@ def parse_arguments(_args=None):
     )
     parent.add_argument('-r', '--repeat', type=int, default=1, help='number of repeating each test (default: 1)')
 
-    sub = main.add_subparsers(title="Available Commands")
+    sub = main.add_subparsers(title="Available Commands", dest='subparser_name')
 
     # COMMAND 1 "opp"
     opp_argparser(sub.add_parser(
@@ -1430,7 +1440,12 @@ def parse_arguments(_args=None):
         description="Run CrowNet fingerprints"
     ))
 
-    return main.parse_args(_args)
+    parsed_args = main.parse_args(_args)
+
+    if not parsed_args.subparser_name:
+        main.error("Please specify one of the subcommands \"opp\" or \"crownet\".")
+
+    return parsed_args
 
 
 if __name__ == "__main__":

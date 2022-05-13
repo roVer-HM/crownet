@@ -27,7 +27,7 @@ simple GlobalDensityMap like IGlobalDensityMap
         @class(crownet::GlobalDensityMap);
         string mobilityModule = default (".mobility");
         string coordConverterModule = default("coordConverter");
-        double cellSize @unit(m) = default(3.0m);
+        double cellSize @unit(m) = default(5.0m);
         // search these nodes for the ground truth setup. 
         string vectorNodeModules= default("misc"); // does not work with Traci managed vectors! Use traciModuleListener
         string nodeModules= default("");
@@ -35,6 +35,7 @@ simple GlobalDensityMap like IGlobalDensityMap
         // if true use "traci.connected" to trigger density map setup. Otherwise use stage 13
         bool useSignalMapInit = default(true); 
 
+		string writerType = default("csv"); // or sql
         double writeMapInterval @unit(s) = default(2.0s) ;
 }
 

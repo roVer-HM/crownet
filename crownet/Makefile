@@ -38,7 +38,7 @@ clean: checkmakefiles
 	echo clean all build targets ...
 	-rm -f src/CROWNET_dbg
 	-rm -f src/CROWNET
-	-rm -f src/linCROWNET_dbg
+	-rm -f src/libCROWNET_dbg
 	-rm -f src/libCROWNET
 
 cleanall: checkmakefiles
@@ -129,10 +129,10 @@ makefiles-so:
 	touch  src/__make_sharedlib
 
 src/libCROWNET$(_D) : makefiles-so
-	cd src &&  $(MAKE) -j $(NUM_CPUS)
+	cd src &&  $(MAKE) $(ADD_CXXFLAGS) -j $(NUM_CPUS)
 
 src/CROWNET$(D): makefiles
-	cd src &&  $(MAKE) -j $(NUM_CPUS)
+	cd src &&  $(MAKE) $(ADD_CXXFLAGS) -j $(NUM_CPUS)
 
 build-lib: src/libCROWNET$(_D)
 
@@ -172,6 +172,7 @@ makefiles-test: src/libCROWNET$(_D)
 		-K5G_PROJ=../../../../simu5g \
 		-KVEINS_PROJ=../../../../veins \
 		-KVEINS_INET_PROJ=../../../../veins/subprojects/veins_inet \
+		-KCXXFLAGS=-std=c++17 \
 		-I. \
 		-I$$\(CROWNET_PORJ\)/src \
 		-L$$\(CROWNET_PORJ\)/src \

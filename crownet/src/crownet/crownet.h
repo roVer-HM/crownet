@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inet/common/INETDefs.h"
+#include "crownet/common/ModuleAccess.h"
 #include "inet/common/geometry/Geometry_m.h"
 #include "crownet/common/util/RingBuffer.h"
 
@@ -8,6 +9,10 @@
 #define DEBUG_ON_MODULE_ID(_ID) { if (getId() == _ID){DEBUG_TRAP;}}
 #define LOG_MOD   simTime() << " " << this->getFullPath() << " : "
 #define LOG_MOD2   simTime() << " " << this->getFullPath() << " :   "
+#define APP_DBG(_MOD, _TYPE)  \
+    cModule* _app = findByPropertyUp(_MOD, #_TYPE); \
+    int _node = getContainingNode(_MOD)->getId(); \
+
 
 
 namespace std {
@@ -26,5 +31,9 @@ extern omnetpp::cConfigOption *CFGID_SUMO_HOST;
 extern omnetpp::cConfigOption *CFGID_FLOW_HOST;
 
 std::pair<std::string, int> getHostPortConfigOverride(omnetpp::cConfigOption *entry);
+
+uint32_t simtime_to_timestamp_32_ms(simtime_t t = -1.);
+
+simtime_t timestamp_32_ms_to_simtime(uint32_t tstamp, simtime_t base = -1.0);
 
 }
