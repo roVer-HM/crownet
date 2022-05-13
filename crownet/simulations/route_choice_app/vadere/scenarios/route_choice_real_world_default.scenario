@@ -157,12 +157,12 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
             "priority" : {
               "1" : "InformationStimulus"
             }
           },
-          "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
             "routeChoices" : [ {
               "instruction" : "use target [11]",
               "targetIds" : [ 11, 21, 31 ],
@@ -1020,10 +1020,6 @@
         "id" : -1,
         "information" : "use target [11]"
       } ]
-    } ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -1,
-      "reactionProbability" : 1.0
     } ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "simplified_default_sequential",
   "description" : "",
-  "release" : "2.2",
+  "release" : "2.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -256,7 +256,6 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "attributesModel" : { },
         "perception" : "MultiPerceptionModel",
         "cognition" : "ProbabilisticCognitionModel"
       }
