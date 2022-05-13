@@ -1,4 +1,3 @@
-import fnmatch
 import os
 from typing import List
 from matplotlib import pyplot as plt
@@ -28,18 +27,18 @@ path_vadere_simple = PathHelper.from_env(
 
 
 # utility
-def find(pattern, path) -> List[str]:
+def find(file_extension, path) -> List[str]:
     result = []
     for root, dirs, files in os.walk(path.abs_path()):
         for name in files:
-            if fnmatch.fnmatch(name, pattern):
+            if name.endswith(file_extension):
                 result.append(os.path.join(root, name))
     return result
 
 
 def simulations_from_folder(path: PathHelper, description: str) -> List[Simulation]:
     res = []
-    vec_files = find("*.vec", path)
+    vec_files = find(".vec", path)
     for i, vec_file in enumerate(vec_files):
         res.append(Simulation(i, os.path.dirname(vec_file), description))
     return res
