@@ -5,6 +5,6 @@
 /simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              6195-3075/tplx, PASS, vadere:latest;omnetpp:6.0
 /simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              b156-9df4/tplx, PASS, vadere:latest;omnetpp:6.0
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              d2bf-04db/tplx, PASS, sumo:latest;omnetpp:6.0
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              490a-6873/tplx, PASS, sumo:latest;omnetpp:6.0
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              521d-eadc/tplx, PASS, sumo:latest;omnetpp:6.0
 /simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              9523-1dce/tplx, PASS, vadere:latest;omnetpp:6.0
 
