@@ -58,23 +58,10 @@ class SimulationRun(BaseRunner):
         OppAnalysis.append_count_diff_to_hdf(sim)
     
     @process_as({"prio": 960, "type": "post"})
-    def remove_denisty_map_csv(self):
+    def remove_density_map_csv(self):
         _, builder, _ = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
         for f in builder.map_paths:
             os.remove(f)
-
-    # @process_as({"prio": 970, "type": "post"})
-    # def abs_err(self):
-    #     result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
-    #     builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-    #     sel = list(OppAnalysis.find_selection_method(builder))
-    #     if len(sel) > 1:
-    #         print(f"multiple selections found: {sel}")
-    #     dcd = builder.build_dcdMap(selection=sel[0])
-    #     dcd.plot_count_diff()
-    #     print("foo")
-
-
 
 
 
