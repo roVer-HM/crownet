@@ -146,6 +146,7 @@ tcpip::Storage ControlTraCiApi::handleControllerOppRequest(ForwardCmd& ctrlCmd){
     // extract payload and forward
      tcpip::Storage cmd;
      cmd.writeStorage(myInput, ctrlCmd.payloadLength);
+     cmd.readCmdLength();
      int cmdId = cmd.readUnsignedByte();
      int varId = cmd.readUnsignedByte(); // varId = 32, das was von python geschickt wurde
      std::string objectIdentifer = cmd.readString();
