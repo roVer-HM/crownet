@@ -138,9 +138,9 @@ out/$(venv_dev): analysis-build | out
 		. ./$(venv_dev)/bin/activate && \
 		pip3 install --upgrade pip && \
 		pip3 install wheel && \
-		pip3 install -r ../$(mod_flowcontrol)/requirements.txt && \
-		pip3 install -r ../$(mod_roveranalyzer)/requirements-dev.txt && \
-		pip3 install -r ../$(mod_suqc)/requirements.txt
+		pip3 install --editable ../$(mod_flowcontrol) && \
+		pip3 install --editable ../$(mod_roveranalyzer) && \
+		pip3 install --editable ../$(mod_suqc)
 
 #------------------------------------------------------------------------------
 
