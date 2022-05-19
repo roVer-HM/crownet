@@ -11,6 +11,7 @@ from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolValue
 import random
+from suqc.utils.SeedManager.SeedManager import SeedManager
 
 from suqc.utils.general import get_env_name
 
@@ -133,7 +134,9 @@ def main(base_path):
         scenario_files=[]
         )
 
-    _rnd = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+    _r = SeedManager.get_new_random_object()
+    _rnd = ''.join(_r.choices(string.ascii_lowercase + string.digits, k=6))
+    print(f"use random suffix: '{_rnd}'")
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     setup = CrownetRequest(
         env_man = env,
