@@ -117,7 +117,7 @@ void VadereNodeManager::traciStep() {
 
 void VadereNodeManager::traciClose() {
   for (unsigned i = m_nodes.size(); i > 0; --i) {
-    removeNodeModule(m_nodes.begin()->first);
+    removeNodeModule(m_nodes.begin()->first, false);
   }
 }
 
@@ -144,7 +144,7 @@ void VadereNodeManager::addMovingObject(const std::string& id) {
 
 void VadereNodeManager::removeMovingObject(const std::string& id) {
   emit(removePersonSignal, id.c_str());
-  removeNodeModule(id);
+  removeNodeModule(id, true);
   m_persons.erase(id);
 }
 
@@ -162,8 +162,16 @@ void VadereNodeManager::updateMovingObject(const std::string& id,
 
 cModule* VadereNodeManager::createModule(const std::string&,
                                          cModuleType* type) {
-  cModule* module =
-      type->create(m_personModuleVectorName.c_str(), getSystemModule(), m_nodeIndex, m_nodeIndex);
+
+    cModule* parentModule = getSystemModule();
+
+  if (!parentModule->hasSubmoduleVector(m_personModuleVectorName.c_str())) {
+      parentModule->addSubmoduleVector(m_personModuleVectorName.c_str(), m_nodeIndex + 1);
+  }
+  else
+      parentModule->setSubmoduleVectorSize(m_personModuleVectorName.c_str(), m_nodeIndex + 1);
+  cModule* module = type->create(m_personModuleVectorName.c_str(), parentModule, m_nodeIndex);
+
   ++m_nodeIndex;
   return module;
 }
@@ -191,12 +199,13 @@ cModule* VadereNodeManager::addNodeModule(const std::string& id,
   return module;
 }
 
-void VadereNodeManager::removeNodeModule(const std::string& id) {
+void VadereNodeManager::removeNodeModule(const std::string& id, bool deleteModule) {
   cModule* module = getNodeModule(id);
   if (module) {
     emit(removeNodeSignal, id.c_str(), module);
     module->callFinish();
-    module->deleteModule();
+    if(deleteModule)
+        module->deleteModule();
     m_nodes.erase(id);
   } else {
     EV_DEBUG << "Node with id " << id << " does not exist, no removal\n";

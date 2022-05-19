@@ -39,7 +39,7 @@ class Aid : public LayeredProtocolBase {
   static const Protocol aid;  // adaptive information dissemination
 
   // init stage for AID
-  static const InitStages INITSTAGE_AID_LAYER;
+  static const InitStage INITSTAGE_AID_LAYER;
   // start operation stage for AID
   static const ModuleStartOperation::Stage STAGE_AID_PROTOCOLS;
 
@@ -49,12 +49,12 @@ class Aid : public LayeredProtocolBase {
   virtual void initialize(int stage) override;
   virtual void registerServiceAndProtocol();
 
-  virtual bool isUpperMessage(cMessage *message) override;
-  virtual bool isLowerMessage(cMessage *message) override;
+  virtual bool isUpperMessage(cMessage *message) const override;
+  virtual bool isLowerMessage(cMessage *message) const override;
 
-  virtual bool isInitializeStage(int stage) override;
-  virtual bool isModuleStartStage(int stage) override;
-  virtual bool isModuleStopStage(int stage) override;
+  virtual bool isInitializeStage(int stage) const override;
+  virtual bool isModuleStartStage(int stage) const override;
+  virtual bool isModuleStopStage(int stage) const override;
   /** LayeredProtocolBase End**/
 
   /** ILifeCycle **/

@@ -20,7 +20,6 @@
 namespace crownet {
 
 
-
 class BaseFileWriter : public BufferWriter {
 public:
     static std::string getAbsOutputPath(std::string fileName);

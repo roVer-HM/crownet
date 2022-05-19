@@ -1,0 +1,34 @@
+From ed08be0a26da716edba856b1b4e5abe9fcf991b8 Mon Sep 17 00:00:00 2001
+From: Lars Wischhof <lars.wischhof@hm.edu>
+Date: Wed, 20 Apr 2022 10:14:49 +0200
+Subject: [PATCH] fix: SharingTag needs to be used for str methods
+
+---
+ src/inet/common/packet/Packet.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/inet/common/packet/Packet.cc b/src/inet/common/packet/Packet.cc
+index 249b00f234..55381e34a1 100644
+--- a/src/inet/common/packet/Packet.cc
++++ b/src/inet/common/packet/Packet.cc
+@@ -16,7 +16,7 @@
+ //
+ 
+ #include "inet/common/packet/Packet.h"
+-
++#include "inet/common/packet/tag/SharingTagSet.h"
+ #include "inet/common/ProtocolTag_m.h"
+ #include "inet/common/packet/Message.h"
+ #include "inet/common/packet/chunk/SequenceChunk.h"
+@@ -313,7 +313,7 @@ std::string Packet::tagStr() const {
+ }
+ 
+ // TODO: move?
+-TagSet& getTags(cMessage *msg)
++SharingTagSet& getTags(cMessage *msg)
+ {
+     if (msg->isPacket())
+         return check_and_cast<Packet *>(msg)->getTags();
+-- 
+2.34.1
+

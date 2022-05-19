@@ -17,7 +17,7 @@ package crownet.queueing.meter;
 
 import inet.queueing.base.PacketMeterBase;
 import inet.queueing.contract.IPacketMeter;
-import inet.queueing.meter.RateMeter;
+import inet.queueing.meter.ExponentialRateMeter;
 
 
 simple GenericPacketMeter extends PacketMeterBase like IPacketMeter 
