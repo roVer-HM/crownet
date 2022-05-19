@@ -2,21 +2,21 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint,    expectedResult, tags
-/simulations/openair/,                  -f omnetpp.ini -c S1 		-r 0,    80s,              0da7-383a/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S1-UA 	-r 0,    80s,              f7db-d5ea/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S1-25 	-r 0,    80s,              57f0-c6ec/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S1-25-UA 	-r 0,    80s,              fc89-1034/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S2 		-r 0,    20s,              ba74-eb78/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S2-UA 	-r 0,    20s,              2735-3659/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S2-25 	-r 0,    80s,              a535-7b1f/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              7b5d-9bed/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              9c0c-f950/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              ad71-3eaa/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              75b8-24db/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              fe0b-3e4d/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S1 		-r 0,    80s,              589b-a71a/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S1-UA 	-r 0,    80s,              b768-3880/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S1-25 	-r 0,    80s,              f4ac-1a87/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S1-25-UA 	-r 0,    80s,              b768-3880/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S2 		-r 0,    20s,              2a0c-4d48/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S2-UA 	-r 0,    20s,              ad3d-416b/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S2-25 	-r 0,    80s,              14ea-c4da/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              a940-2690/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              5f5c-848b/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              4647-2f8b/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              dd2f-1bf5/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              4370-7a3c/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
 
 # D2D scenarios
-/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              6c01-ba1f/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              c50a-18cf/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              8a1a-60e6/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
-/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              154b-6945/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              ef03-ffeb/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              0ef2-4015/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              ce48-3de0/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
+/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              9fd4-a067/tplx,  PASS,   omnetpp:6.0pre11_220214-1045
