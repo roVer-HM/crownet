@@ -40,7 +40,12 @@ const simsignal_t GlobalDensityMap::removeMap =
     cComponent::registerSignal("RemoveDensityMap");
 
 GlobalDensityMap::~GlobalDensityMap() {
-  if (writeMapTimer) cancelAndDelete(writeMapTimer);
+  if (writeMapTimer) {
+      cancelAndDelete(writeMapTimer);
+  }
+  if (appDeleteNode){
+      cancelAndDelete(appDeleteNode);
+  }
 }
 
 void GlobalDensityMap::initialize() {
@@ -152,16 +157,16 @@ void GlobalDensityMap::initializeMap(){
 void GlobalDensityMap::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
-      cStringTokenizer t(par("vectorNodeModules").stringValue(), ";");
-      vectorNodeModules = t.asVector();
       cStringTokenizer tt(par("nodeModules").stringValue(), ";");
       singleNodeModules = tt.asVector();
       cModule* _traciModuleListener = findModuleByPath(par("traciModuleListener").stringValue());
       if (_traciModuleListener){
           traciModuleListener = check_and_cast<ITraCiNodeVisitorAcceptor*>(_traciModuleListener);
       }
-
-
+      if (par("deleteTime").doubleValue() > 0.0){
+          appDeleteNode = new cMessage("deleteNode");
+          scheduleAt(par("deleteTime").doubleValue(), appDeleteNode);
+      }
 
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
     m_mobilityModule = par("mobilityModule").stdstringValue();
@@ -183,20 +188,22 @@ void GlobalDensityMap::initialize(int stage) {
 
 void GlobalDensityMap::acceptNodeVisitor(traci::ITraciNodeVisitor* visitor){
     // check nodes NOT managed by TraCI
+    // only vector 'misc' is supported.
     cModule* root = findModuleByPath("<root>");
-    for(const auto& path: vectorNodeModules){
-        cModule* m = root->getSubmodule(path.c_str(), 0);
-        if (m){
-            if (m->isVector()){
-               for(int i = 0; i < m->getVectorSize(); i++){
-                   cModule* mm = root->getSubmodule(path.c_str(), i);
+    cModule* m = root->getSubmodule("misc", misc_base_index);
+    if (m){
+        if (m->isVector()){
+           for(int i = misc_base_index; i < m->getVectorSize(); i++){
+               cModule* mm = root->getSubmodule("misc", i);
+               if (mm){
                    visitor->visitNode("", mm);
                }
-            } else {
-                throw cRuntimeError("expected vector node with name %s", path.c_str());
-            }
+           }
+        } else {
+            throw cRuntimeError("expected vector node with name 'misc'");
         }
     }
+
     for(const auto& path: singleNodeModules){
         cModule* m = findModuleByPath(path.c_str());
         if (m){
@@ -220,7 +227,28 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
 
     // 3) reschedule
     scheduleAt(simTime() + writeMapInterval, msg);
-  } else {
+  }  else if (msg == appDeleteNode) {
+      //hack: Allows the 'one time deletion' of nodes in the vector from the beginning.
+      //misc_base_index will point to the 'new' first element. The vector size is not changed
+      //by this deletion.
+      int removeCount = std::floor(dezentralMaps.size() * par("deletePercentage").doubleValue());
+      misc_base_index = removeCount;
+      std::vector<cModule*> nodes;
+      for (const auto& e : dezentralMaps){
+          if (removeCount <= 0){
+              break;
+          }
+          cModule* m = e.second->getModule();
+          nodes.push_back(getContainingNode(m));
+          --removeCount;
+      }
+      for (auto n: nodes){
+          n->callFinish();  //ensures 'normal' shutdown and unregistering of removed node
+          n->deleteModule();
+      }
+      cancelAndDelete(appDeleteNode);
+      appDeleteNode = nullptr;
+  }  else {
     delete msg;
   }
 }
