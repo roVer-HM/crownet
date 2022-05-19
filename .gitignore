@@ -1,6 +1,7 @@
 .vscode/**
 **/core
 log.out
+.makeenv.tmp
 VadereTestingSuite.preferences.xml
 **/__cache__
 **/scenarios/meshes

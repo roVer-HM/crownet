@@ -32,6 +32,10 @@ models :=  $(models_l4) $(models_l3) $(models_l2) $(models_l1)
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
 PYTHON := python3.8
 
+# prepare environment (sub-projects need to set env variables)
+IGNORE := $(shell bash -c "source $(mod_inet)/setenv; env | sed 's/=/:=/' | sed 's/^/export /' > .makeenv.tmp")                         
+include .makeenv.tmp   
+
 # check if omnetpp is found
 ifeq (, $(shell which opp_configfilepath))
  $(error opp_configfilepath not found. In order to run the command within the roVer docker container, try "omnetpp exec make")

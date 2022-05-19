@@ -9,7 +9,7 @@ import artery.networking.IVanetza;
 import artery.inet.PlainVehicle;
 import artery.nic.IRadioDriver;
 import artery.application.IMiddleware;
-import inet.node.inet.INetworkNode;
+import inet.node.contract.INetworkNode;
 import inet.linklayer.contract.IWirelessInterface;
 import inet.mobility.contract.IMobility;
 import inet.networklayer.common.InterfaceTable;
