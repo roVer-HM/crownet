@@ -11,7 +11,7 @@ from flowcontrol.strategy.controlaction import InformationStimulus, Rectangle, S
 
 sys.path.append(os.path.abspath(".."))
 
-from flowcontrol.strategy.controller.dummy_controller import Controller
+from flowcontrol.crownetcontrol.controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
 from shapely.geometry import Polygon
@@ -19,21 +19,32 @@ from shapely.geometry import Polygon
 PRECISION = 8
 
 
+from flowcontrol.strategy.timestepping.timestepping import FixedTimeStepper
+
 class NoController(Controller):
+
     def __init__(self):
-        super().__init__()
-        self.time_step_size = 10.0
-        self.densityMapper = None
+        super().__init__(
+            control_algorithm=None,
+            time_stepper=FixedTimeStepper(time_step_size=10.0, start_time=4.0),
+            processor_manager=Manager()
+        )
         self.density_over_time = list()
 
     def handle_sim_step(self, sim_time, sim_state):
         self.processor_manager.update_sim_time(sim_time)
         self.measure_state(sim_time)
 
-        if sim_time % self.time_step_size == 0 and sim_time >= self.time_step_size:  # TODO allow >= 0 in second condition
-            self.compute_next_corridor_choice(sim_time)
-            self.apply_redirection_measure()
-            self.commandID += 1
+        self.compute_next_corridor_choice(sim_time)
+
+
+        self.apply_redirection_measure()
+        self.commandID += 1
+
+        self.time_stepper.forward_time()
+
+        print("")
+
 
     def measure_state(self, sim_time):
         if isinstance(self.con_manager, ServerModeConnection):
@@ -93,19 +104,14 @@ class NoController(Controller):
         self.processor_manager.finish()
 
 
-class OpenLoop(NoController, Controller):
+class OpenLoop(Controller):
+
     def __init__(self):
         super().__init__()
         self.target_ids = [31, 21, 11]
         self.redirected_agents = list()
-        self.controlModelType = "InformationStimulusProvider"
-        self.controlModelName = "distributePeds"
         self.commandID = 111
 
-        self.reaction_model = {
-            "isBernoulliParameterCertain": True,
-            "BernoulliParameter": 1.0,
-        }
 
     def measure_state(self, sim_time):
         commandIds = self.con_manager.domains.v_sim.get_received_command_ids(22)
@@ -120,37 +126,10 @@ class OpenLoop(NoController, Controller):
     def apply_redirection_measure(self):
 
         rectangle = Rectangle(x=180., y=190., width=20., height=15.)
-        location = Location(areas=[rectangle])
+        location = Location(areas=rectangle)
         recommendation = InformationStimulus(f"use target [{self.target_ids[self.counter]}]")
-        s = StimulusInfo(location=location, stimuli=[recommendation])
+        s = StimulusInfo(location=location, stimuli=recommendation)
         action0 = s.toJSON()
-
-        # action = {
-        #     "timeframe" : {
-        #         "startTime" : 0.0,  # as soon as received
-        #         "endTime" : 10000,  # simTimeEnd
-        #         "repeat" : False,
-        #         "waitTimeBetweenRepetition" : 0.0
-        #     },
-        #     "location" : {
-        #         "areas" : [ {
-        #             "x" : 180.0,
-        #             "y" : 190.0,
-        #             "width" : 20.0,
-        #             "height" : 15.0,
-        #             "type" : "RECTANGLE"
-        #         } ]
-        #     },
-        #     "subpopulationFilter": {
-        #         "affectedPedestrianIds": []
-        #     },
-        #     "stimuli" : [ {
-        #         "type" : "InformationStimulus",
-        #         "information" : f"use target [{self.target_ids[self.counter]}]"
-        #     } ]
-        # }
-        #
-        # action = json.dumps(action)
 
         self.processor_manager.write("commandId", self.commandID)
         if isinstance(self.con_manager, ServerModeConnection):
@@ -175,13 +154,7 @@ class OpenLoop(NoController, Controller):
     def choose_corridor(self):
         self._increase_counter()
 
-    def get_reaction_model_parameters(self):
-        return json.dumps(
-            self.reaction_model
-        )
 
-    def set_reaction_model_parameters(self, reaction_probability):
-        self.reaction_model["BernoulliParameter"] = reaction_probability
 
     def handle_init(self, sim_time, sim_state):
         super().handle_init(sim_time, sim_state)
@@ -211,7 +184,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         # default settings for control-vadere (no Omnetpp!)
         settings = ["--controller-type",
-                    "ClosedLoop",  #
+                    "NoController",  #
                     "--scenario-file",
                     "route_choice_real_world.scenario",
                     "--port",

@@ -7,7 +7,7 @@ from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateLi
 
 sys.path.append(os.path.abspath(".."))
 
-from flowcontrol.strategy.controller.dummy_controller import Controller
+from flowcontrol.crownetcontrol.controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
 
