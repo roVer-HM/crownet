@@ -46,8 +46,8 @@ void OsgCoordConverterLocal::initialize(int stage) {
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
                       par("srs_code").stdstringValue());
       _converter->setCellSize(par("cellSize").doubleValue());
-      sceneOrientation = inet::Quaternion::NIL;
-      scenePosition = _converter->getScenePosition();
+//      sceneOrientation = inet::Quaternion::NIL;
+//      scenePosition = _converter->getScenePosition();
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
     }

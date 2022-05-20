@@ -2,7 +2,6 @@
 
 import json
 import os
-from secrets import choice
 import sys
 import geopandas as g
 import pandas as pd
@@ -94,7 +93,7 @@ class OppIniWriter:
         else:
             raise ValueError("Out of bound")
 
-    def to_geo_frame(self, epsg=Project.OpenStreetMaps, run=1):
+    def to_geo_frame(self, epsg=Project.OpenStreetMaps, run=0):
         
         nodes = self.nodes[run]
         geo = [Point(x, y) for _, x, y in nodes]
@@ -104,7 +103,7 @@ class OppIniWriter:
         return df
     
     def write_config(self, writer, config="", run=0):
-        _df = self.to_geo_frame(Project.WSG84_lat_lon)
+        _df = self.to_geo_frame(Project.WSG84_lat_lon, run=run)
 
         nodes = self.nodes[run]
 
@@ -147,11 +146,11 @@ def override_yes_no_append():
 
 ns = parse_args()
 if ns.vadere != "":
-    w = OppIniWriter.from_vadere(ns.vadere, seed=ns.seed)
+    w : OppIniWriter = OppIniWriter.from_vadere(ns.vadere, seed=ns.seed)
 elif ns.sumo != "":
-    w = OppIniWriter.from_sumo(ns.sumo, seed=ns.seed)
+    w : OppIniWriter = OppIniWriter.from_sumo(ns.sumo, seed=ns.seed)
 
-
+mode = "w"
 if os.path.exists(ns.output):
     print("Output file already exist!")
     mode = override_yes_no_append()

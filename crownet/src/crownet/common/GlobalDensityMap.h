@@ -98,6 +98,9 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   void writeMaps();
 
  protected:
+  cMessage *appDeleteNode = nullptr;
+  int misc_base_index =0;
+
   cMessage *writeMapTimer = nullptr;
   simtime_t writeMapInterval;
   simtime_t lastUpdate;

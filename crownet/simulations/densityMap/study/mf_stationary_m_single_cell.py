@@ -25,8 +25,8 @@ def main(base_path):
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
-        "mapTypeLog", QString("ymfPlusDistStep"),
-        # "mapTypeLog", QString("all"),    # debug only
+        # "mapTypeLog", QString("ymfPlusDistStep"),
+        "mapTypeLog", QString("all"),    # debug only
         "cellAgeTTL", UnitValue.s(-1.0),    # -1.0 no TTL in 
         "alpha", 0.75,
         "idStreamType", QString("insertionOrder"),
@@ -40,42 +40,16 @@ def main(base_path):
         "idStreamType", QString("insertionOrder"),
     )
     time = UnitValue.s(100.0)
+    # time = UnitValue.s(6.0)
 
     par_var = [
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_10_0",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..3].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..3].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_10_1",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..3].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..3].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_10_2",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..3].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..3].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
         {
             "omnet": {
                 "extends": "_stationary_m_base, misc_pos_50_0",
                 "sim-time-limit": time,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..15].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..15].app[1].app.stopTime" : UnitValue.s(40),
+                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
+                "*.gloablDensityMap.deletePercentage": "0.30"
                 },
         },
         {
@@ -83,8 +57,8 @@ def main(base_path):
                 "extends": "_stationary_m_base, misc_pos_50_1",
                 "sim-time-limit": time,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..15].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..15].app[1].app.stopTime" : UnitValue.s(40),
+                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
+                "*.gloablDensityMap.deletePercentage": "0.30"
                 },
         },
         {
@@ -92,8 +66,37 @@ def main(base_path):
                 "extends": "_stationary_m_base, misc_pos_50_2",
                 "sim-time-limit": time,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..15].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..15].app[1].app.stopTime" : UnitValue.s(40),
+                # "*.gloablDensityMap.deleteTime": UnitValue.s(3),
+                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
+                "*.gloablDensityMap.deletePercentage": "0.30"
+                },
+        },
+        {
+            "omnet": {
+                "extends": "_stationary_m_base_single_cell, misc_pos_50_0",
+                "sim-time-limit": time,
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
+                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
+                "*.gloablDensityMap.deletePercentage": "0.30"
+                },
+        },
+        {
+            "omnet": {
+                "extends": "_stationary_m_base_single_cell, misc_pos_50_1",
+                "sim-time-limit": time,
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
+                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
+                "*.gloablDensityMap.deletePercentage": "0.30"
+                },
+        },
+        {
+            "omnet": {
+                "extends": "_stationary_m_base_single_cell, misc_pos_50_2",
+                "sim-time-limit": time,
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
+                # "*.gloablDensityMap.deleteTime": UnitValue.s(3),
+                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
+                "*.gloablDensityMap.deletePercentage": "0.30"
                 },
         },
     ]
@@ -134,8 +137,7 @@ def main(base_path):
         scenario_files=[]
         )
 
-    _r = SeedManager.get_new_random_object()
-    _rnd = ''.join(_r.choices(string.ascii_lowercase + string.digits, k=6))
+    _rnd = SeedManager.rnd_suffix()
     print(f"use random suffix: '{_rnd}'")
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     setup = CrownetRequest(
