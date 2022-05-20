@@ -15,6 +15,9 @@ from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolVa
 import pprint
 import random
 
+from suqc.utils.SeedManager.SeedManager import SeedManager
+from suqc.utils.general import get_env_name
+
 
 
 def main(base_path):
@@ -87,7 +90,7 @@ def main(base_path):
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name=__file__.replace(".py", ""),
+        env_name=get_env_name(base_dir, __file__.replace(".py", "")),
         opp_config="final_mf_005",
         opp_basename="omnetpp_ymfd4s.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
@@ -106,8 +109,7 @@ def main(base_path):
         )
 
 
-    r = random.Random(round(time.time()))
-    _rnd = ''.join(r.choices(string.ascii_lowercase + string.digits, k=6))
+    _rnd = SeedManager.rnd_suffix()
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     setup = CrownetRequest(
         env_man = env,
