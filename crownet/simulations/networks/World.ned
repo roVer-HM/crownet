@@ -27,7 +27,7 @@ import inet.node.ethernet.Eth10M;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import inet.physicallayer.wireless.common.contract.packetlevel.IRadioMedium;
-import inet.node.inet.INetworkNode;
+import inet.node.contract.INetworkNode;
 import inet.common.geometry.common.IGeographicCoordinateSystem;
 import simu5g.world.radio.ChannelControl;
 import simu5g.common.binder.Binder;

@@ -23,7 +23,7 @@ public:
 };
 
 
-class BufferWriter : public omnetpp::cObject {
+class BufferWriter : public omnetpp::cOwnedObject {
 
 public:
     BufferWriter(long bufferSize=8192): bufferSize(bufferSize){}

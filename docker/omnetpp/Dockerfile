@@ -13,10 +13,10 @@
 FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-cpp:latest
 
 # Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-6.0pre11
+ENV OMNETRELEASE omnetpp-6.0
 # Note: Remember to update the description below when changing OMNETRELEASE
 
-LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0pre11)"
+LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # Use bash shell

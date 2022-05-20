@@ -1,6 +1,0 @@
-
-<config>
-    <interface hosts='*' address='20.0.x.x' netmask='255.255.255.0'/>
-    <multicast-group hosts="misc[*]" interfaces="wlanNic" address="224.0.0.10"/>
-    <multicast-group hosts="misc[*]" interfaces="cellularNic" address="224.0.0.10"/>
-</config>

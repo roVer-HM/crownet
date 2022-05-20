@@ -1,0 +1,55 @@
+From ca25c8ae4d04f4195b281e45ba2cd223a8f3a881 Mon Sep 17 00:00:00 2001
+From: Lars Wischhof <lars.wischhof@hm.edu>
+Date: Wed, 20 Apr 2022 08:53:25 +0200
+Subject: [PATCH] applied patch to print tag strings
+
+---
+ src/inet/common/packet/Packet.cc | 20 ++++++++++++++++++++
+ src/inet/common/packet/Packet.h  |  1 +
+ 2 files changed, 21 insertions(+)
+
+diff --git a/src/inet/common/packet/Packet.cc b/src/inet/common/packet/Packet.cc
+index 4eb0eaf8c2..249b00f234 100644
+--- a/src/inet/common/packet/Packet.cc
++++ b/src/inet/common/packet/Packet.cc
+@@ -301,5 +301,25 @@ std::string Packet::str() const
+     return stream.str();
+ }
+ 
++std::string Packet::tagStr() const {
++    int numTags = tags.getNumTags();
++    std::stringstream out;
++    out << "TagSet:{";
++    for(int i=0; i < numTags - 1; i++){
++        out <<  tags.getTag(i)->getClassName() << ", ";
++    }
++    out << tags.getTag(numTags-1)->getClassName() << "}";
++    return out.str();
++}
++
++// TODO: move?
++TagSet& getTags(cMessage *msg)
++{
++    if (msg->isPacket())
++        return check_and_cast<Packet *>(msg)->getTags();
++    else
++        return check_and_cast<Message *>(msg)->getTags();
++}
++
+ } // namespace
+ 
+diff --git a/src/inet/common/packet/Packet.h b/src/inet/common/packet/Packet.h
+index bd9f1864ec..bb4be82a2d 100644
+--- a/src/inet/common/packet/Packet.h
++++ b/src/inet/common/packet/Packet.h
+@@ -1407,6 +1407,7 @@ class INET_API Packet : public cPacket, public IPrintableObject, public ITaggedO
+      * Returns a human readable string representation.
+      */
+     virtual std::string str() const override;
++    virtual std::string tagStr() const;
+     //@}
+ };
+ 
+-- 
+2.34.1
+

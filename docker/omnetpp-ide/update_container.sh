@@ -1,9 +1,9 @@
 #!/bin/bash
 CONTAINER='omnetpp-ide'
-VERSION_TAG="latest"
-#VERSION_TAG="6.0pre11"
+#VERSION_TAG="latest"
+VERSION_TAG="6.0"
 # change base name to update version.
-BASE_NAME="omnetpp-6.0pre11"
+BASE_NAME="omnetpp-6.0"
 
 # IDE download
 URL_BASE="https://github.com/omnetpp/omnetpp/releases/download/$BASE_NAME/"
@@ -31,8 +31,15 @@ if [[ ! -f "$CACHE/$IDE_TAR" ]]; then
     echo "extract $OPP_TAR to $TMP"
     mkdir --verbose --parent  "$TMP"
     tar -xf "$CACHE/$OPP_TAR" --directory "$TMP"
-    echo "extract IDE tar from $TMP/$BASE_NAME"
-    tar -zcf "$CACHE/$IDE_TAR" -C "$TMP/$BASE_NAME" ide
+
+    OPP_SUBFOLDER="$BASE_NAME"
+    # handle special case: 6.0rc2 is stored in 6.0 folder
+    if [[ "$OPP_SUBFOLDER" == "omnetpp-6.0rc2" ]]; then
+        OPP_SUBFOLDER="omnetpp-6.0"
+    fi
+
+    echo "extract IDE tar from $TMP/$OPP_SUBFOLDER"
+    tar -zcf "$CACHE/$IDE_TAR" -C "$TMP/$OPP_SUBFOLDER" ide
 else
     echo "use cased version: $CACHE/$IDE_TAR"
 fi

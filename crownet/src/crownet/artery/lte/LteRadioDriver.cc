@@ -46,7 +46,7 @@ std::once_flag register_protocol_flag;
 }  // namespace
 
 int LteRadioDriver::numInitStages() const {
-  return inet::InitStages::NUM_INIT_STAGES;
+  return NUM_INIT_STAGES;
 }
 
 void LteRadioDriver::initialize(int stage) {

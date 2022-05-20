@@ -74,14 +74,17 @@ cGroupFigure *SumoSceneCanvasVisualizer::createMapFigure(const cXMLElement* map)
     for(cXMLElement* junc : junctions){
         std::string id = junc->getAttribute("id");
         std::vector<cFigure::Point> points = parseShape(junc->getAttribute("shape"));
-        cPolygonFigure *polygon = new cPolygonFigure();
-        points.pop_back();
-        polygon->setPoints(points);
-        polygon->setFilled(true);
-        polygon->setLineColor(cFigure::BLACK);
-        polygon->setFillColor(COLOR_JUNCTION_PATH);
-        polygon->setName(id.c_str());
-        junctionGroup->addFigure(polygon);
+
+        if (points.size() > 0) {
+            cPolygonFigure *polygon = new cPolygonFigure();
+            points.pop_back();
+            polygon->setPoints(points);
+            polygon->setFilled(true);
+            polygon->setLineColor(cFigure::BLACK);
+            polygon->setFillColor(COLOR_JUNCTION_PATH);
+            polygon->setName(id.c_str());
+            junctionGroup->addFigure(polygon);
+        }
     }
 
     return mapFigure;
@@ -95,9 +98,14 @@ std::vector<cFigure::Point> SumoSceneCanvasVisualizer::parseShape(const char* sh
         throw cRuntimeError("expected an even number of double values");
     }
 
+    if (points.size() == 0) {
+        return fPoints;
+    }
+
     for(int i=0; i < points.size()-1; i=i+2){
         fPoints.push_back(converter->toCanvas(points[i], points[i+1]));
     }
+
     return fPoints;
 }
 

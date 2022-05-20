@@ -54,7 +54,7 @@ Packet *CrownetPassivePacketSourceBase::pullPacket(cGate *gate)
     auto packet = providePacket(gate);
     // statistics
     handlePacketProcessed(packet);
-    animateSendPacket(packet, outputGate);
+    animatePullPacket(packet, outputGate);
     emit(packetPulledSignal, packet);
     updateDisplayString();
     return packet;

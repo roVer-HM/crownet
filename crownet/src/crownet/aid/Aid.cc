@@ -39,9 +39,6 @@ Aid::~Aid() {}
 
 // Custom protocol identifiers
 const Protocol Aid::aid("aid", "AID");
-// use INITSTAGE_ROUTING_PROTOCOLS to be after transport and before
-// application.
-const InitStages Aid::INITSTAGE_AID_LAYER = INITSTAGE_ROUTING_PROTOCOLS;
 // use STAGE_ROUTING_PROTOCOLS to be after transport and before
 // application.
 const ModuleStartOperation::Stage Aid::STAGE_AID_PROTOCOLS =
@@ -52,7 +49,7 @@ const ModuleStartOperation::Stage Aid::STAGE_AID_PROTOCOLS =
 void Aid::initialize(int stage) {
   LayeredProtocolBase::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
-  } else if (stage == INITSTAGE_AID_LAYER) {
+  } else if (stage == INITSTAGE_ROUTING_PROTOCOLS) {
     // after Transport before Applications.
 
     // register AID service and protocol for IProtocolRegistrationListener
@@ -62,19 +59,19 @@ void Aid::initialize(int stage) {
 }
 
 void Aid::registerServiceAndProtocol() {
-  registerService(Aid::aid, gate("upperIn"), gate("lowerIn"));
-  registerProtocol(Aid::aid, gate("lowerOut"), gate("upperOut"));
+  registerService(Aid::aid, gate("upperIn"), gate("upperOut"));
+  registerProtocol(Aid::aid, gate("lowerOut"), gate("lowerIn"));
 }
 
-bool Aid::isUpperMessage(cMessage *msg) { return msg->arrivedOn("upperIn"); }
+bool Aid::isUpperMessage(cMessage *msg) const { return msg->arrivedOn("upperIn"); }
 
-bool Aid::isLowerMessage(cMessage *msg) { return msg->arrivedOn("lowerIn"); }
+bool Aid::isLowerMessage(cMessage *msg) const { return msg->arrivedOn("lowerIn"); }
 
-bool Aid::isInitializeStage(int stage) { return stage == INITSTAGE_AID_LAYER; }
+bool Aid::isInitializeStage(int stage) const { return stage == INITSTAGE_ROUTING_PROTOCOLS; }
 
-bool Aid::isModuleStartStage(int stage) { return stage == STAGE_AID_PROTOCOLS; }
+bool Aid::isModuleStartStage(int stage) const { return stage == STAGE_AID_PROTOCOLS; }
 
-bool Aid::isModuleStopStage(int stage) { return stage == STAGE_AID_PROTOCOLS; }
+bool Aid::isModuleStopStage(int stage) const { return stage == STAGE_AID_PROTOCOLS; }
 
 /** LayeredProtocolBase End **/
 

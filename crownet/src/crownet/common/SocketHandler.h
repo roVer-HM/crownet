@@ -69,7 +69,7 @@ class SocketHandler : public ISocket {
   virtual void destroy() override;
   virtual bool isOpen() const override;
   // SocketHandler Interface
-  virtual void send(Packet *pk) = 0;
+  virtual void send(Packet *pk) override = 0;
   virtual void sendTo(Packet *pk, L3Address destAddr, int destPort) = 0;
 
   /** process arrived socket message/packet using the aidConn.
