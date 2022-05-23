@@ -28,7 +28,7 @@ using namespace omnetpp;
 namespace crownet {
 
 //todo: check if still working after update?
-class InetVaderePersonMobility : public InetMobility,
+class InetVaderePersonMobility : public InetPersonMobility,
                             public VaderePersonSink,
                             public IPositionHistoryProvider {
  public:
