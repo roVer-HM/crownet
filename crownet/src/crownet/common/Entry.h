@@ -12,6 +12,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <limits>
 
 #include "crownet/common/util/FilePrinter.h"
 

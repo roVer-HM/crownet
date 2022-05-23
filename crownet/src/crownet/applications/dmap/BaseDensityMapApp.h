@@ -76,6 +76,7 @@ protected:
  virtual std::shared_ptr<RegularDcdMap> getMap() override;
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) override;
+ virtual cModule* getModule() override { return this;}
  //todo mw
  //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) override;
  virtual void updateOwnLocationInMap();
