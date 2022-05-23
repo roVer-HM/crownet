@@ -46,7 +46,6 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppInterval = &par("mainAppInterval");
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
-      cellAgeHandler = std::make_shared<TTLCellAgeHandler>(mapCfg->getCellAgeTTL(), simTime());
 
 
     } else if (stage == INITSTAGE_APPLICATION_LAYER){
@@ -120,6 +119,8 @@ void BaseDensityMapApp::initDcdMap(){
     cellProvider = dcdMapFactory->getCellKeyProvider();
     // do not share valueVisitor between nodes.
     valueVisitor = dcdMapFactory->createValueVisitor(mapCfg);
+    cellAgeHandler = std::make_shared<TTLCellAgeHandler>(dcdMap, mapCfg->getCellAgeTTL(), simTime());
+
 }
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {

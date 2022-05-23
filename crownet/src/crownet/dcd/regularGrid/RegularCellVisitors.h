@@ -57,12 +57,13 @@ class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 
 class TTLCellAgeHandler : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
 public:
-    TTLCellAgeHandler(RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
-     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), ttl(ttl){}
+    TTLCellAgeHandler(RegularDcdMapPtr dcdMap, RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
+     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), dcdMap(dcdMap), ttl(ttl){}
  virtual void applyTo(RegularCell& cell) override;
  virtual std::string getVisitorName() const override { return "silentCellAgeHandler"; }
 
 protected:
+ RegularDcdMapPtr dcdMap;
  RegularCell::time_t ttl;
 };
 
