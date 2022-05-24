@@ -1,3 +1,0 @@
-Info:Analyzing scenario file scenarios/separation_slow_fast
-Info:<separation_slow_fast> Transform to: 1.15
-Info:Migration successful. Move copy of old version to "legacy" directory
