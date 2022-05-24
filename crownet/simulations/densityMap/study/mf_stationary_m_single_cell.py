@@ -1,3 +1,4 @@
+from functools import partial
 import os
 import string
 from pandas.core.indexes import base
@@ -14,6 +15,7 @@ import random
 from suqc.utils.SeedManager.SeedManager import SeedManager
 
 from suqc.utils.general import get_env_name
+from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 
 
@@ -130,7 +132,8 @@ def main(base_path):
         communication_sim=("omnet", "latest"),
         # handle_existing="force_replace"
         # handle_existing="write_in"
-        handle_existing="ask_user_replace"
+        handle_existing="ask_user_replace",
+        scenario_provider_class=partial(VariationBasedScenarioProvider, par_var=parameter_variation)
     )
     env.copy_data(
         base_ini_file=ini_file,
