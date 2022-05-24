@@ -1,7 +1,7 @@
 {
   "name" : "mf_1d_m_2x5m",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

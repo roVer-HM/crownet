@@ -1,8 +1,7 @@
 {
-  "name" : "mf_005-2_template",
+  "name" : "mf_m_dyn_const_4e20s_15x12_180",
   "description" : "",
   "release" : "2.1",
-  "commithash" : "0857d265c090cf324e12c39abe7160814a86518a",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -1270,7 +1269,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 62,
+        "id" : 2131,
         "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
@@ -1312,32 +1311,6 @@
           }, {
             "x" : 206.6,
             "y" : 284.9
-          } ]
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2115,
-        "absorbing" : false,
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 213.0,
-            "y" : 213.6
-          }, {
-            "x" : 208.2,
-            "y" : 214.8
-          }, {
-            "x" : 208.5,
-            "y" : 218.2
-          }, {
-            "x" : 213.8,
-            "y" : 217.1
           } ]
         },
         "waitingTime" : 0.0,
@@ -1669,7 +1642,7 @@
         },
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
-        "nextTarget" : [ 2118, 2119, 2121, 2117, 62, 2122 ],
+        "nextTarget" : [ 2118, 2119, 2121, 2117, 2131, 2122 ],
         "probabilityToChangeTarget" : [ ]
       }, {
         "id" : 6,
@@ -1682,7 +1655,7 @@
         },
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
-        "nextTarget" : [ 2121, 2117, 62, 2124 ],
+        "nextTarget" : [ 2121, 2117, 2131, 2124 ],
         "probabilityToChangeTarget" : [ ]
       }, {
         "id" : 7,
@@ -1704,7 +1677,7 @@
         },
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
-        "nextTarget" : [ 62, 2121, 2117, 2119, 2120 ],
+        "nextTarget" : [ 2131, 2121, 2117, 2119, 2120 ],
         "probabilityToChangeTarget" : [ ]
       }, {
         "id" : 8,
@@ -1755,7 +1728,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1788,7 +1761,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1821,7 +1794,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1854,7 +1827,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1887,7 +1860,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1898,7 +1871,7 @@
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 61,
+        "id" : 1131,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1920,7 +1893,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1953,7 +1926,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -1977,7 +1950,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 3.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2005,13 +1978,12 @@
             "y" : 294.4
           } ]
         },
-        "interSpawnTimeDistribution" : "timeSeries",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "intervalLength" : 5.0,
-          "spawnsPerInterval" : [ 5, 0, 10, 8 ]
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 50,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2044,7 +2016,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 10.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2077,7 +2049,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 5.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2101,7 +2073,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2125,7 +2097,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 8.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2149,7 +2121,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,
@@ -2173,7 +2145,7 @@
           "updateFrequency" : 20.0
         },
         "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "maxSpawnNumberTotal" : 12,
         "startTime" : 0.0,
         "endTime" : 90.0,
         "spawnAtRandomPositions" : true,

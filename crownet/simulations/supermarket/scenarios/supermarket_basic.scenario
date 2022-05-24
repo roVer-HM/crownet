@@ -1,7 +1,8 @@
 {
   "name" : "supermarket_basic",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.1",
+  "commithash" : "0857d265c090cf324e12c39abe7160814a86518a",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

@@ -1,7 +1,8 @@
 {
   "name" : "mf_base_initial_peds",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.1",
+  "commithash" : "0857d265c090cf324e12c39abe7160814a86518a",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -3653,20 +3654,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -3722,20 +3711,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
