@@ -1,0 +1,11 @@
+#!/bin/bash
+NRTHREADS=$(getconf _NPROCESSORS_ONLN)
+
+if [[ $# -ne 1 ]]; then
+    echo "Illegal number of parameters: Please specify the configuration to be used." >&2
+    exit 2
+fi
+
+echo "INFO: Using $NRTHREADS parallel threads for simulation study."
+
+omnetpp exec opp_runall -j$NRTHREADS ../../src/run_crownet -n .:../../src -u Cmdenv -c $1
