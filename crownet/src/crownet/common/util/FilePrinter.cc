@@ -10,7 +10,7 @@
 namespace crownet {
 
 cObjectPrinter cObjectPrinter::shortBeaconInfoShortPrinter(
-        {"nodeId","receivedTimePrio", "maxSequencenumberPrio", "pos", "numberOfNeighbours"});
+        {"nodeId","receivedTimeCurrent", "maxSequencenumber", "positionCurrent", "numberOfNeighboursCurrent"});
 
 
 int cObjectPrinter::columns() const { return fields.size(); }
@@ -19,7 +19,7 @@ std::ostream& cObjectPrinter::writeTo(std::ostream& out, const omnetpp::cObject*
     readIds(data);
     omnetpp::cClassDescriptor* d = data->getDescriptor();
     for(int i = 0; i < fieldIds.size(); i++){
-        out << d->getFieldValueAsString(const_cast<omnetpp::cObject*>(data), fieldIds[i], 0);
+        out << d->getFieldValueAsString(omnetpp::toAnyPtr(data), fieldIds[i], 0);
         if(i < sepCount){
             out << sep;
         }

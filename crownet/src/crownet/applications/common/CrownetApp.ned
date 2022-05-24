@@ -97,6 +97,7 @@ module CrownetAidApp extends CrownetApp
 
 module BeaconApp extends CrownetApp {
  	parameters:
+ 	    @BeaconApp;
  		@display("i=block/broadcast;is=s");
  		app.typename = default("BeaconDynamic");
  		socket.typename = default("UdpSocketManager");
@@ -107,6 +108,7 @@ module BeaconApp extends CrownetApp {
 
 module DensityMapApp extends CrownetApp {
  	parameters:
+ 	    @MapApp;
  		@display("i=block/users;is=s"); 
  		app.typename = default("DensityMapAppSimple");
  		socket.typename = default("UdpSocketManager");

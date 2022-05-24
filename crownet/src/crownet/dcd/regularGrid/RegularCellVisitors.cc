@@ -27,11 +27,33 @@ void ResetVisitor::applyTo(RegularCell& cell) {
   }
 }
 
+void ResetLocalVisitor::applyTo(RegularCell& cell) {
+    if (cell.hasLocal()) {
+      cell.getLocal()->reset(time);
+    }
+  }
+
 
 void ClearVisitor::applyTo(RegularCell& cell) {
   for (auto e : cell) {
     e.second->clear(time);
   }
+}
+
+void TTLCellAgeHandler::applyTo(RegularCell& cell) {
+    if (checkLastCall()){ // only execute once
+        for (auto e : cell) {
+            if (ttl > 0.0 && time > (ttl + e.second->getMeasureTime())){
+                if (e.first == dcdMap->getOwnerId()){
+                    // if `e` is the local map and this value reached the TTL, it is
+                    // necessary to clear the Node->Cell association map of the DcDMap
+                    // where `Cell` equals to current cell.
+                    dcdMap->removeFromNeighborhood(cell.getCellId());
+                }
+                e.second->reset(simtime_t::ZERO);
+            }
+        }
+    }
 }
 
 void ClearSelection::applyTo(RegularCell& cell) {
@@ -83,12 +105,114 @@ RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
       ret = e.second;
     }
   }
+  if (ret){
+      ret->setSelectionRank(0.0);
+  }
   return ret;
+}
+
+
+YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell) const {
+    double age_sum = 0.0;
+    double age_min = std::numeric_limits<double>::max();
+    double distance_sum = 0.0;
+    double now = this->time.dbl(); // current time the visitor is called.
+
+    double age = .0;
+    int count = 0;
+    for (const auto& e : cell.validIter()) {
+        /*
+         * Collect the sum of age difference relative to the
+         * youngest measure (i.e. smallest age). For this
+         * sum up all ages and find the smallest age at the same
+         * time. Subtract count*age_min after the fact from age_sum.
+         */
+        age = now - e.second->getMeasureTime().dbl();
+        if(age < age_min){
+            age_min = age;
+        }
+        age_sum += age;
+        ++count;
+
+        /*
+         * In the case of a local entry the 'sourceEntry' and 'ownerEntry'
+         * values must be the same. Thus the sum of all sourceEntry values
+         * is correct.
+         * TODO EntryDist for localEntry is ZERO {0, 0, 0}
+         */
+        distance_sum += e.second->getEntryDist().sourceEntry;
+    }
+    age_sum = age_sum - count*age_min;
+    return sum_data{age_sum, age_min, distance_sum};
+}
+
+RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) const {
+
+    sum_data d = getSums(cell);
+    double now = this->time.dbl(); // current time the visitor is called.
+
+    RegularCell::entry_t_ptr ret = nullptr;
+    double ret_ymfPlusDist = 0.0;
+    double ymfPlusDist = 0.0;
+    for (const auto& e : cell.validIter()) {
+      double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
+      ymfPlusDist = alpha * (age)/d.age_sum +
+              (1-alpha) * e.second->getEntryDist().sourceEntry/d.dist_sum;
+      e.second->setSelectionRank(ymfPlusDist);
+      if (ret == nullptr) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+        continue;
+      }
+
+      if (ymfPlusDist < ret_ymfPlusDist) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+      }
+    }
+    return ret;
+}
+
+RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell) const {
+
+    sum_data d = getSums(cell);
+    double now = this->time.dbl(); // current time the visitor is called.
+
+    RegularCell::entry_t_ptr ret = nullptr;
+    double ret_ymfPlusDist = 0.0;
+    double ymfPlusDist = 0.0;
+    for (const auto& e : cell.validIter()) {
+      double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
+      double dist = e.second->getEntryDist().sourceEntry;
+      if (zeroStep){
+          // set dist to zero if distance is smaller than threshold
+          dist = (dist <= stepDist) ? 0 : dist;
+      } else {
+          // set dist to threshold if distance is smaller than threshold
+          dist = (dist <= stepDist) ? stepDist : dist;
+      }
+
+      ymfPlusDist = alpha * (age)/d.age_sum +
+              (1-alpha) * dist/d.dist_sum;
+      e.second->setSelectionRank(ymfPlusDist);
+      if (ret == nullptr) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+        continue;
+      }
+
+      if (ymfPlusDist < ret_ymfPlusDist) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+      }
+    }
+    return ret;
 }
 
 RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
     // to check local exists.... raise error.....
     auto val = cell.getLocal();
+    val->setSelectionRank(0.0);
     return val;
 }
 
@@ -105,6 +229,7 @@ RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell) const {
   auto entry = cell.createEntry(sum/num);
   entry->setMeasureTime(time/num);
   entry->setReceivedTime(time/num);
+  entry->setSelectionRank(0.0);
   return entry;
 }
 
@@ -125,7 +250,7 @@ RegularCell::entry_t_ptr MedianVisitor::applyTo(const RegularCell& cell) const {
   auto entry = cell.createEntry((double)(count[left] + count[right])/2);
   entry->setMeasureTime((double)(count[left] + count[right])/2);
   entry->setReceivedTime((double)(time[left] + time[right])/2);
-
+  entry->setSelectionRank(0.0);
   return entry;
 }
 
@@ -140,6 +265,7 @@ RegularCell::entry_t_ptr InvSourceDistVisitor::applyTo(const RegularCell& cell) 
   }
   auto entry = cell.createEntry(itemSum/weightSum);
   entry->touch(this->time);
+  entry->setSelectionRank(0.0);
   return entry;
 }
 
@@ -152,6 +278,7 @@ RegularCell::entry_t_ptr MaxCountVisitor::applyTo(const RegularCell& cell) const
           count = p->getCount();
       }
   }
+  p->setSelectionRank(0.0);
   return p;
 }
 

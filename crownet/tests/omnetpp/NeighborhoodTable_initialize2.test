@@ -39,6 +39,10 @@ network = crownet.test.omnetpp.lib.NeighborhoodTableTestNetwork
 [Config final]
 sim-time-limit=10ms
 *.foo.table.maxAge = 7s
+*.coordConverter.typename = "OsgCoordConverterLocal"
+*.coordConverter.xBound = 30.0m
+*.coordConverter.yBound = 30.0m
+**.cellSize = 3.0m
 
 %contains: stdout
 maxAge: 7

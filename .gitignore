@@ -1,5 +1,7 @@
+.vscode/**
 **/core
 log.out
+.makeenv.tmp
 VadereTestingSuite.preferences.xml
 **/__cache__
 **/scenarios/meshes
@@ -19,6 +21,7 @@ compile_commands.json
 **/results
 docker/**/ide/*.tar.gz
 docker/**/ide/*.tgz
+cache-directory
 
 # ignore gitlab-runner local test directory
 /builds

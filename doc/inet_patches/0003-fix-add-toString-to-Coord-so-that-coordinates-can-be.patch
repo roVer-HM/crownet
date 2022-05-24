@@ -1,0 +1,25 @@
+From 3a20e0b98728b976e401eab6f559333b84834cea Mon Sep 17 00:00:00 2001
+From: Lars Wischhof <lars.wischhof@hm.edu>
+Date: Mon, 16 May 2022 10:54:21 +0200
+Subject: [PATCH] fix: add @toString to Coord so that coordinates can be
+ printed
+
+---
+ src/inet/common/geometry/Geometry.msg | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/inet/common/geometry/Geometry.msg b/src/inet/common/geometry/Geometry.msg
+index 1caaafb89e..b7b82e4465 100644
+--- a/src/inet/common/geometry/Geometry.msg
++++ b/src/inet/common/geometry/Geometry.msg
+@@ -29,6 +29,7 @@ namespace inet;
+ class Coord
+ {
+     @existingClass;
++    @toString(.str());
+     double x;
+     double y;
+     double z;
+-- 
+2.34.1
+

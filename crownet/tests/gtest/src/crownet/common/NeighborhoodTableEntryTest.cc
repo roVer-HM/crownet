@@ -12,10 +12,10 @@ class BeaconReceptionInfoTest : public BaseOppTest {
 
         BeaconReceptionInfo info;
         info.setNodeId(id);
-        info.setSentTimePrio(t1);
-        info.setReceivedTimePrio(t2);
-        info.setPos(c1);
-        info.setEpsilon(c2);
+        info.setSentTimeCurrent(t1);
+        info.setReceivedTimeCurrent(t2);
+        info.setPositionCurrent(c1);
+        info.setEpsilonCurrent(c2);
         return info;
     }
 };
@@ -30,17 +30,17 @@ TEST_F(BeaconReceptionInfoTest, constructor) {
     inet::Coord expectedEpsilon = inet::Coord(1.0,1.0);
 
     BeaconReceptionInfo e0;
-    EXPECT_TRUE(e0.getSentTimePrio() == 0);
-    EXPECT_TRUE(e0.getReceivedTimePrio() == 0);
-    EXPECT_TRUE(e0.getPos() == inet::Coord(0.0,0.0));
-    EXPECT_TRUE(e0.getEpsilon() == inet::Coord(0.0,0.0));
+    EXPECT_TRUE(e0.getSentTimeCurrent() == 0);
+    EXPECT_TRUE(e0.getReceivedTimeCurrent() == 0);
+    EXPECT_TRUE(e0.getPositionCurrent() == inet::Coord(0.0,0.0));
+    EXPECT_TRUE(e0.getEpsilonCurrent() == inet::Coord(0.0,0.0));
 
     BeaconReceptionInfo e1 = build(expectedId,expectedTimeSend,expectedTimeReceived,expectedPos,expectedEpsilon);
     EXPECT_TRUE(e1.getNodeId() == expectedId);
-    EXPECT_TRUE(e1.getSentTimePrio() == expectedTimeSend);
-    EXPECT_TRUE(e1.getReceivedTimePrio() == expectedTimeReceived);
-    EXPECT_TRUE(e1.getPos() == expectedPos);
-    EXPECT_TRUE(e1.getEpsilon() == expectedEpsilon);
+    EXPECT_TRUE(e1.getSentTimeCurrent() == expectedTimeSend);
+    EXPECT_TRUE(e1.getReceivedTimeCurrent() == expectedTimeReceived);
+    EXPECT_TRUE(e1.getPositionCurrent() == expectedPos);
+    EXPECT_TRUE(e1.getEpsilonCurrent() == expectedEpsilon);
 }
 
 
@@ -53,10 +53,10 @@ TEST_F(BeaconReceptionInfoTest, equals) {
     EXPECT_TRUE(e0.getNodeId() == nodeId);
 
     EXPECT_FALSE(e0.getNodeId() == e1.getNodeId());
-    EXPECT_FALSE(e0.getSentTimePrio() == e1.getSentTimePrio());
-    EXPECT_FALSE(e0.getReceivedTimePrio() == e1.getReceivedTimePrio());
-    EXPECT_FALSE(e0.getPos() == e1.getPos());
-    EXPECT_FALSE(e0.getEpsilon() == e1.getEpsilon());
+    EXPECT_FALSE(e0.getSentTimeCurrent() == e1.getSentTimeCurrent());
+    EXPECT_FALSE(e0.getReceivedTimeCurrent() == e1.getReceivedTimeCurrent());
+    EXPECT_FALSE(e0.getPositionCurrent() == e1.getPositionCurrent());
+    EXPECT_FALSE(e0.getEpsilonCurrent() == e1.getEpsilonCurrent());
 }
 
 TEST_F(BeaconReceptionInfoTest, string) {

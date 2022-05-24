@@ -164,11 +164,14 @@ void SumoCombinedNodeManager::traciStep()
 
 void SumoCombinedNodeManager::traciClose()
 {
+    // Note: modules are removed/unregistered but not deleted - otherwise opp will complain
+    //       (deletion is done later by opp environment)
+
     for (unsigned i = m_personNodes.size(); i > 0; --i) {
-        removePersonNodeModule(m_persons.begin()->first);
+        removePersonNodeModule(m_persons.begin()->first, false);
     }
     for (unsigned i = m_vehicleNodes.size(); i > 0; --i) {
-        removeVehicleNodeModule(m_vehicleNodes.begin()->first);
+        removeVehicleNodeModule(m_vehicleNodes.begin()->first, false);
     }
 }
 
@@ -226,7 +229,7 @@ void SumoCombinedNodeManager::addVehicle(const std::string& id)
 void SumoCombinedNodeManager::removeVehicle(const std::string& id)
 {
     emit(removeVehicleSignal, id.c_str());
-    removeVehicleNodeModule(id);
+    removeVehicleNodeModule(id, true);
     m_vehicles.erase(id);
 }
 
@@ -287,14 +290,23 @@ void SumoCombinedNodeManager::addPerson(const std::string& id)
 void SumoCombinedNodeManager::removePerson(const std::string& id)
 {
     emit(removePersonSignal, id.c_str());
-    removePersonNodeModule(id);
+    removePersonNodeModule(id, true);
     m_persons.erase(id);
 }
 
 cModule* SumoCombinedNodeManager::createModule(const std::string&, cModuleType* type, const std::string& moduleVector)
 {
-    cModule* module = type->create(moduleVector.c_str(), getSystemModule(), m_nodeIndex[moduleVector], m_nodeIndex[moduleVector]);
+    cModule* parentModule = getSystemModule();
+
+    if (!parentModule->hasSubmoduleVector(moduleVector.c_str())) {
+        parentModule->addSubmoduleVector(moduleVector.c_str(), m_nodeIndex[moduleVector] + 1);
+    }
+    else
+        parentModule->setSubmoduleVectorSize(moduleVector.c_str(), m_nodeIndex[moduleVector] + 1);
+    cModule* module = type->create(moduleVector.c_str(), parentModule, m_nodeIndex[moduleVector]);
+
     ++m_nodeIndex[moduleVector];
+
     return module;
 }
 
@@ -333,26 +345,28 @@ void SumoCombinedNodeManager::updatePerson(const std::string& id, PersonSink* si
 }
 
 
-void SumoCombinedNodeManager::removePersonNodeModule(const std::string& id)
+void SumoCombinedNodeManager::removePersonNodeModule(const std::string& id, bool deleteModule)
 {
     cModule* module = getPersonNodeModule(id);
     if (module) {
         emit(removeNodeSignal, id.c_str(), module);
         module->callFinish();
-        module->deleteModule();
+        if (deleteModule)
+            module->deleteModule();
         m_personNodes.erase(id);
     } else {
         EV_DEBUG << "Node with id " << id << " does not exist, no removal\n";
     }
 }
 
-void SumoCombinedNodeManager::removeVehicleNodeModule(const std::string& id)
+void SumoCombinedNodeManager::removeVehicleNodeModule(const std::string& id, bool deleteModule)
 {
     cModule* module = getVehicleNodeModule(id);
     if (module) {
         emit(removeNodeSignal, id.c_str(), module);
         module->callFinish();
-        module->deleteModule();
+        if (deleteModule)
+            module->deleteModule();
         m_vehicleNodes.erase(id);
     } else {
         EV_DEBUG << "Node with id " << id << " does not exist, no removal\n";

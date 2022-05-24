@@ -56,6 +56,14 @@ FsmState ArteryDensityMapApp::fsmSetup(cMessage *msg) {
   return BaseDensityMapApp::fsmSetup(msg);
 }
 
+FsmState ArteryDensityMapApp::fsmAppMain(cMessage *msg) {
+  // update density map state.
+  updateLocalMap();
+  mainAppTimer->setKind(FsmRootStates::APP_MAIN);
+  scheduleAfter(mainAppInterval->doubleValue(), mainAppTimer);
+  return FsmRootStates::WAIT_ACTIVE;
+}
+
 void ArteryDensityMapApp::updateLocalMap() {
   simtime_t measureTime = simTime();
   if (lastUpdate >= simTime()) {

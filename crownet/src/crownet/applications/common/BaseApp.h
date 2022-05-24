@@ -76,6 +76,7 @@ class BaseApp : public DataArrivedHandler,
   FsmState socketFsmResult = FsmRootStates::ERR;
   SocketProvider* socketProvider = nullptr;
   AppInfoLocal* localInfo = nullptr;
+  bool _isRunning = false;
 
  protected:
   virtual int numInitStages() const override { return NUM_INIT_STAGES; }

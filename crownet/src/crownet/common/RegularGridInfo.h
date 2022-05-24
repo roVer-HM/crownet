@@ -17,6 +17,7 @@
 
 #include "inet/common/geometry/Geometry_m.h"
 #include "crownet/dcd/identifier/Identifiers.h"
+#include <artery/traci/Cast.h>
 
 namespace crownet {
 
@@ -24,9 +25,11 @@ class RegularGridInfo {
 public:
     RegularGridInfo(): gridSize(), cellSize(), cellCount() {};
     RegularGridInfo(const inet::Coord& gridSize, const inet::Coord& cellSize);
+    RegularGridInfo(const traci::Boundary simBound, const inet::Coord& gridSize, const inet::Coord& cellSize);
     virtual ~RegularGridInfo()=default;
 
     const inet::Coord& getGridSize() const { return gridSize; }
+    const inet::Coord& getBound() const { return gridSize; }
     const inet::Coord& getCellSize() const { return cellSize; }
     const inet::Coord& getCellCount() const { return cellCount;}
     void setGridSize(const inet::Coord gSize) { gridSize = gSize; }
@@ -34,7 +37,8 @@ public:
     void setCellCount(const inet::Coord cCount) { cellCount = cCount;}
 
     const inet::Coord getCellCenter(const int x, const int y) const;
-    const inet::Coord getCellCenter(inet::Coord position) const;
+    const inet::Coord getOppCellCenter(inet::Coord position) const;
+
     const int getCellId(const int x, const int y)const;
     const int getCellId(inet::Coord position) const;
 
@@ -42,13 +46,16 @@ public:
     double maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;
     int maxIdCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;
 
+
 private:
-    inet::Coord gridSize;
-    inet::Coord cellSize;
+    inet::Coord gridSize;   // todo: assume gridSize == simBound!
+    traci::Boundary simBound;
+    inet::Coord cellSize;   //
     inet::Coord cellCount;
 
 
 };
+
 
 };
 

@@ -37,7 +37,7 @@ public:
         omnetpp::cClassDescriptor* d = this->getDescriptor();
         int fieldCount = d->getFieldCount();
         for (int i=0; i < fieldCount; i++){
-            out << d->getFieldValueAsString(const_cast<FilePrinterMixin<T>*>(this), i, 0);
+            out << d->getFieldValueAsString(omnetpp::toAnyPtr(const_cast<FilePrinterMixin<T>*>(this)), i, 0);
             if(i < (fieldCount-1) ){
                 out << sep;
             }

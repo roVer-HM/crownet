@@ -28,11 +28,11 @@ def getVariables():
     print("started")
 
 def sampling():
-    basis_omnet = ['**.channelModel.ue_height = 1.5', '**.channelModel.building_height = 20']
+    basis_omnet = ['**.channelModel[0].ue_height = 1.5', '**.channelModel[0].building_height = 20']
     basis_vadere = ['"speedDistributionMean" : 1.34', '"speedDistributionStandardDeviation" : 0.26']
 
-    samples_omnet = [['**.channelModel.ue_height = 1.7', '**.channelModel.building_height = 22'],
-                     ['**.channelModel.ue_height = 1.4', '**.channelModel.building_height = 18']]
+    samples_omnet = [['**.channelModel[0].ue_height = 1.7', '**.channelModel[0].building_height = 22'],
+                     ['**.channelModel[0].ue_height = 1.4', '**.channelModel[0].building_height = 18']]
     samples_vadere = [['"speedDistributionMean" : 1.35', '"speedDistributionStandardDeviation" : 0.32'],
                       ['"speedDistributionMean" : 1.25', '"speedDistributionStandardDeviation" : 0.25']]
     return basis_omnet,basis_vadere,samples_omnet,samples_vadere

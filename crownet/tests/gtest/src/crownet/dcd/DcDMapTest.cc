@@ -10,6 +10,8 @@
 #include <string>
 
 #include "main_test.h"
+#include "crownet/crownet_testutil.h"
+
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
@@ -18,22 +20,34 @@
 using namespace crownet;
 
 namespace {
-RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
-RegularDcdMapFactory dcdFactory{grid};
+
+DcdFactoryProvider f = DcdFactoryProvider(
+        inet::Coord(.0, .0),
+        inet::Coord(10.0, 10.0),
+        1.0
+);
+RegularGridInfo  grid = f.grid;
+std::shared_ptr<RegularDcdMapFactory> dcdFactory = f.dcdFactory;
+
 }
 
 class RegularDcDMapTest : public BaseOppTest {
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   RegularDcDMapTest()
-      : mapEmpty(dcdFactory.create(1)),
-        mapLocal(dcdFactory.create(2)),
-        mapFull(dcdFactory.create(3)) {}
+      : mapEmpty(dcdFactory->create(1)),
+        mapLocal(dcdFactory->create(2)),
+        mapFull(dcdFactory->create(3)) {}
 
   void incr(RegularDcdMap& map, double x, double y, int i, double t) {
     // local entry!
     map.getEntry<>(traci::TraCIPosition(x, y))->incrementCount(t);
     map.addToNeighborhood(IntIdentifer(i), traci::TraCIPosition(x, y));
+  }
+  void incr(RegularDcdMapPtr map, double x, double y, int i, double t) {
+    // local entry!
+    map->getEntry<>(traci::TraCIPosition(x, y))->incrementCount(t);
+    map->addToNeighborhood(IntIdentifer(i), traci::TraCIPosition(x, y));
   }
   void update(RegularDcdMap& map, int x, int y, int id, int count, double t) {
     auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
@@ -41,6 +55,7 @@ class RegularDcDMapTest : public BaseOppTest {
   }
 
   void SetUp() override {
+    setSimTime(0.0);
     // [1, 1] count 2
     incr(mapLocal, 1.2, 1.2, 100, 30.0);
     incr(mapLocal, 1.5, 1.5, 101, 30.0);
@@ -254,6 +269,15 @@ TEST_F(RegularDcDMapTest, removeFromNeighborhood_existing) {
   mapLocal.removeFromNeighborhood(100);
   EXPECT_FALSE(mapLocal.isInNeighborhood(100));
 }
+
+TEST_F(RegularDcDMapTest, removeFromNeighborhood_existing2) {
+  EXPECT_TRUE(mapLocal.isInNeighborhood(100));
+  EXPECT_TRUE(mapLocal.isInNeighborhood(101));
+  mapLocal.removeFromNeighborhood(GridCellID(1, 1)); // remove all nodes in cell [1,1]
+  EXPECT_FALSE(mapLocal.isInNeighborhood(100));
+  EXPECT_FALSE(mapLocal.isInNeighborhood(101));
+}
+
 TEST_F(RegularDcDMapTest, removeFromNeighborhood_notExisting) {
   EXPECT_FALSE(mapLocal.isInNeighborhood(999));
   mapLocal.removeFromNeighborhood(999);
@@ -310,6 +334,88 @@ TEST_F(RegularDcDMapTest, addToNeighborhood_notExisting) {
   EXPECT_EQ(GridCellID(4, 9), mapLocal.getNeighborCell(999));
 }
 
+TEST_F(RegularDcDMapTest, TTLCellAgeHandler_neighborhood) {
+    RegularDcdMapPtr map = dcdFactory->create_shared_ptr(1, "default");
+    setSimTime(0.0);
+    // [1, 1] count 2
+    incr(map, 1.2, 1.2, 100, 30.0);
+    incr(map, 1.5, 1.5, 101, 30.0);
+    // [3, 3] count 3
+    incr(map, 3.2, 3.2, 200, 32.0);
+    incr(map, 3.5, 3.5, 201, 32.0);
+    incr(map, 3.5, 3.5, 202, 32.0);
+    // [4, 4] count 1
+    incr(map, 4.2, 4.5, 300, 34.0);
+    // local neighbors [ 100, 101, 200, 201, 202, 300] #6
+
+
+    double ttl = 60.0; // seconds
+    setSimTime(39.0);
+    auto cellAgeHandler = std::make_shared<TTLCellAgeHandler>(map, ttl, simTime());
+    EXPECT_EQ(6, map->sizeOfNeighborhood());
+
+    cellAgeHandler->setTime(simTime());
+    map->visitCells(*cellAgeHandler);
+
+    EXPECT_EQ(6, map->sizeOfNeighborhood());
+    EXPECT_TRUE(map->isInNeighborhood(100));
+    EXPECT_TRUE(map->isInNeighborhood(101));
+
+    setSimTime(30.0 + 60.0 + 0.1); //
+    cellAgeHandler->setTime(simTime());
+    map->visitCells(*cellAgeHandler);
+
+    EXPECT_EQ(4, map->sizeOfNeighborhood());
+    EXPECT_FALSE(map->isInNeighborhood(100));
+    EXPECT_FALSE(map->isInNeighborhood(101));
+
+    setSimTime(32.0 + 60.0 + 0.1); //
+    cellAgeHandler->setTime(simTime());
+    map->visitCells(*cellAgeHandler);
+
+    EXPECT_EQ(1, map->sizeOfNeighborhood());
+}
+
+TEST_F(RegularDcDMapTest, TTLCellAgeHandler_cellCount) {
+    RegularDcdMapPtr map = dcdFactory->create_shared_ptr(1, "default");
+    setSimTime(0.0);
+    // [1, 1] count 2
+    incr(map, 1.2, 1.2, 100, 30.0);
+    incr(map, 1.5, 1.5, 101, 30.0);
+    // [3, 3] count 3
+    incr(map, 3.2, 3.2, 200, 32.0);
+    incr(map, 3.5, 3.5, 201, 32.0);
+    incr(map, 3.5, 3.5, 202, 32.0);
+    // [4, 4] count 1
+    incr(map, 4.2, 4.5, 300, 34.0);
+    // local neighbors [ 100, 101, 200, 201, 202, 300] #6
+
+
+    double ttl = 60.0; // seconds
+    setSimTime(39.0);
+    auto cellAgeHandler = std::make_shared<TTLCellAgeHandler>(map, ttl, simTime());
+
+
+    auto info1 = map->getCell(GridCellID(1,1)).getLocal();
+    auto info2 = map->getCell(GridCellID(3,3)).getLocal();
+
+    setSimTime(30.0 + 60.0 + 0.1); //
+    cellAgeHandler->setTime(simTime());
+
+    EXPECT_TRUE(info1->valid());
+    EXPECT_EQ(info1->getCount(), 2);
+    EXPECT_TRUE(info2->valid());
+    EXPECT_EQ(info2->getCount(), 3);
+
+    map->visitCells(*cellAgeHandler);
+
+    EXPECT_FALSE(info1->valid());
+    EXPECT_EQ(info1->getCount(), 0);
+    EXPECT_TRUE(info2->valid());        // no change keep same
+    EXPECT_EQ(info2->getCount(), 3);    // no change keep same
+
+}
+
 /**
  * check move semantic on update
  */
@@ -320,7 +426,7 @@ TEST(RegularMap, update_move) {
   auto m3 = std::make_shared<RegularEntry>(19, 18., 17., IntIdentifer(40));
 
   auto cellId1 = GridCellID(5, 4);
-  RegularDcdMap map = dcdFactory.create(IntIdentifer(55));
+  RegularDcdMap map = dcdFactory->create(IntIdentifer(55));
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
@@ -344,7 +450,7 @@ TEST(RegularMap, update1) {
   auto m2 = std::make_shared<RegularEntry>(3, 2., 1., IntIdentifer(40));
 
   auto cellId1 = GridCellID(5, 4);
-  RegularDcdMap map = dcdFactory.create(IntIdentifer(55));
+  RegularDcdMap map = dcdFactory->create(IntIdentifer(55));
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));
@@ -373,7 +479,7 @@ TEST(RegularMap, update2) {
 
   auto cellId1 = GridCellID(5, 4);
   auto cellId2 = GridCellID(3, 9);
-  RegularDcdMap map = dcdFactory.create(IntIdentifer(55));
+  RegularDcdMap map = dcdFactory->create(IntIdentifer(55));
 
   // cell must exist after update is called on it.
   EXPECT_FALSE(map.hasCell(cellId1));

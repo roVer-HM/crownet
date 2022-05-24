@@ -135,6 +135,7 @@ class DcDMap {
   int sizeOfNeighborhood() const;
   void clearNeighborhood();
   void removeFromNeighborhood(const node_key_t& neigborId);
+  void removeFromNeighborhood(const cell_key_t& cellId);
   cell_key_t getNeighborCell(const node_key_t& neigborId);
   void moveNeighborTo(const node_key_t& neigbourId, const cell_key_t& cellId);
   void addToNeighborhood(const node_key_t& neigbourId, const cell_key_t& cellId);

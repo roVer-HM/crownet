@@ -186,8 +186,15 @@ template <typename C, typename N, typename T>
 typename DcDMap<C, N, T>::cell_t& DcDMap<C, N, T>::createCell(
     const cell_key_t& cell_id) {
   auto entry = this->cells.emplace(
-      std::piecewise_construct, std::forward_as_tuple(cell_id),
-      std::forward_as_tuple(cell_t(timeProvider, cell_id, this->getOwnerId())));
+      std::piecewise_construct,
+      std::forward_as_tuple(cell_id),
+      std::forward_as_tuple(cell_t(
+              timeProvider,
+              cell_id,
+              this->getOwnerId()
+              )
+      )
+  );
   this->cellKeyStream->addNew(cell_id, this->timeProvider->now());
   return entry.first->second;
 }
@@ -285,6 +292,20 @@ void DcDMap<C, N, T>::clearNeighborhood() {
 template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::removeFromNeighborhood(const node_key_t& neigborId) {
   this->neighborhood.erase(neigborId);
+}
+
+template <typename C, typename N, typename T>
+void DcDMap<C, N, T>::removeFromNeighborhood(const cell_key_t& cellId) {
+    /*
+     * remove all nodes from `neighborhood` which are in the gvien `cellId`
+     */
+    for (auto it = this->neighborhood.begin(); it != this->neighborhood.end(); /*no incr*/){
+        if (it->second == cellId){
+            it = this->neighborhood.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 template <typename C, typename N, typename T>

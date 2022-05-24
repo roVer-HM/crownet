@@ -35,6 +35,16 @@ class ResetVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 };
 
 /**
+ * Reset local IEntries in a RegularCell
+ */
+class ResetLocalVisitor : public TimestampedVoidCellVisitor<RegularCell> {
+ public:
+    ResetLocalVisitor(RegularCell::time_t time)
+      : TimestampedVoidCellVisitor<RegularCell>(time) {}
+  virtual void applyTo(RegularCell& cell) override;
+};
+
+/**
  * Clear all IEntries within a RegularCell
  */
 class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
@@ -42,6 +52,19 @@ class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
   ClearVisitor(RegularCell::time_t time)
       : TimestampedVoidCellVisitor<RegularCell>(time) {}
   virtual void applyTo(RegularCell& cell) override;
+};
+
+
+class TTLCellAgeHandler : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
+public:
+    TTLCellAgeHandler(RegularDcdMapPtr dcdMap, RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
+     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), dcdMap(dcdMap), ttl(ttl){}
+ virtual void applyTo(RegularCell& cell) override;
+ virtual std::string getVisitorName() const override { return "silentCellAgeHandler"; }
+
+protected:
+ RegularDcdMapPtr dcdMap;
+ RegularCell::time_t ttl;
 };
 
 /**
@@ -135,10 +158,44 @@ class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
  public:
     YmfVisitor(RegularCell::time_t t = 0.0)
-      : TimestampedGetEntryVisitor<RegularCell>(t) {}
+      : TimestampedGetEntryVisitor<RegularCell>(t){}
   virtual RegularCell::entry_t_ptr applyTo(
       const RegularCell& cell) const override;
   virtual std::string getVisitorName() const override { return "ymf"; }
+
+};
+
+
+class YmfPlusDistVisitor : public TimestampedGetEntryVisitor<RegularCell> {
+protected:
+    struct sum_data {
+        double age_sum;
+        double age_min;
+        double dist_sum;
+    };
+public:
+    YmfPlusDistVisitor(double alpha = 0.5, RegularCell::time_t t = 0.0)
+        : TimestampedGetEntryVisitor<RegularCell>(t), alpha(alpha) {}
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) const override;
+    sum_data getSums(const RegularCell& cell) const;
+    virtual std::string getVisitorName() const override { return "ymfPlusDist"; }
+
+protected:
+    double alpha;
+};
+
+class YmfPlusDistStepVisitor : public YmfPlusDistVisitor {
+public:
+    YmfPlusDistStepVisitor(double alpha, RegularCell::time_t t, double stepDist, bool zeroStep)
+        : YmfPlusDistVisitor(alpha, t), stepDist(stepDist), zeroStep(zeroStep) {}
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) const override;
+    virtual std::string getVisitorName() const override { return "ymfPlusDistStep"; }
+
+protected:
+    double stepDist;
+    bool zeroStep;
 };
 
 class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {
@@ -149,6 +206,7 @@ class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {
       const RegularCell& cell) const override;
   virtual std::string getVisitorName() const override { return "local"; }
 };
+
 
 
 // class LocalVisitor : public GetCellVisitor<RegularCell> {

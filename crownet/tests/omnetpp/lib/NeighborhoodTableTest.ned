@@ -2,6 +2,8 @@ package crownet.test.omnetpp.lib;
 
 import crownet.neighbourhood.NeighborhoodTable;
 import inet.mobility.static.StationaryMobility;
+import crownet.common.ICoordConverter;
+import crownet.common.IGlobalDensityMap;
 
 simple NeighborhoodTableTestApp extends NeighborhoodTable{
     
@@ -25,4 +27,7 @@ module Node {
 network NeighborhoodTableTestNetwork {
   submodules:
     foo: Node{}
+    coordConverter: <default("OsgCoordConverterLocal")> like ICoordConverter if typename != "" {
+        @display("p=308.14874,207.69;i=block/table2;is=s");
+    }
 }

@@ -10,6 +10,8 @@
 #include <omnetpp/cobject.h>
 #include "inet/common/InitStages.h"
 #include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
+#include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/common/MobilityProviderMixin.h"
 
 using namespace omnetpp;
@@ -33,9 +35,12 @@ public:
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
 
+    virtual bool ttlReached(BeaconReceptionInfo*) override;
+    virtual bool processInfo(BeaconReceptionInfo *packet) override;
     virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
-    virtual void checkTimeToLive() override;
-    const int getNeighbourCount();
+    virtual void checkAllTimeToLive() override;
+    virtual const int getSize() override;
+
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }
@@ -69,6 +74,7 @@ protected:
     simtime_t maxAge;
     cMessage *ttl_msg = nullptr;
     simtime_t lastCheck;
+    std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
 };
 
 
@@ -76,6 +82,7 @@ class NeighborhoodTableSizeFilter : public cObjectResultFilter {
 public:
  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                             cObject *object, cObject *details) override;
+ using cObjectResultFilter::receiveSignal;
 };
 
 } /* namespace crownet */

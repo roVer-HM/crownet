@@ -51,7 +51,7 @@ class VadereNodeManager : public traci::NodeManager,
   using NodeInitializer = std::function<void(omnetpp::cModule*)>;
 
   void initialize() override;
-//  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
+  using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
   void finish() override;
 
   virtual void addMovingObject(const std::string&);
@@ -62,7 +62,7 @@ class VadereNodeManager : public traci::NodeManager,
   virtual omnetpp::cModule* addNodeModule(const std::string&,
                                           omnetpp::cModuleType*,
                                           NodeInitializer&);
-  virtual void removeNodeModule(const std::string&);
+  virtual void removeNodeModule(const std::string&, bool);
   virtual omnetpp::cModule* getNodeModule(const std::string&);
   virtual VaderePersonSink* getObjectSink(omnetpp::cModule*);
   virtual VaderePersonSink* getObjectSink(const std::string&);

@@ -12,6 +12,7 @@
 #include <string>
 
 #include "main_test.h"
+#include "crownet/crownet_testutil.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
@@ -19,17 +20,24 @@
 using namespace crownet;
 
 namespace {
-RegularGridInfo  grid{{10.0, 10.0}, {1.0, 1.0}};
-RegularDcdMapFactory dcdFactory{grid};
+
+DcdFactoryProvider f = DcdFactoryProvider(
+        inet::Coord(.0, .0),
+        inet::Coord(10.0, 10.0),
+        1.0
+);
+RegularGridInfo  grid = f.grid;
+std::shared_ptr<RegularDcdMapFactory> dcdFactory = f.dcdFactory;
+
 }
 
 class DcDMapIteraotrTest : public BaseOppTest {
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   DcDMapIteraotrTest()
-      : mapEmpty(dcdFactory.create(1)),
-        mapLocal(dcdFactory.create(2)),
-        mapFull(dcdFactory.create(3)) {}
+      : mapEmpty(dcdFactory->create(1)),
+        mapLocal(dcdFactory->create(2)),
+        mapFull(dcdFactory->create(3)) {}
 
   void incr(RegularDcdMap& map, double x, double y, int i, double t) {
     //local entry does not need i (Identifier of node counted)
