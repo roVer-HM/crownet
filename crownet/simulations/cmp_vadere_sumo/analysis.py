@@ -65,9 +65,8 @@ def main():
     # distance plots
     if len(sims_sumo_simple) > 0:
         fig1: plt.Figure
-        fig1, ax = a.distance_plot_mean(sims_sumo_simple[0:1], title="Sumo Simple", cutoff=0.7)
+        fig1, ax = a.distance_plot_mean(sims_sumo_simple, title="Sumo Simple", cutoff=0.7)
         fig1.savefig(expanduser('~/fig1.png'))
-        return
     if len(sims_vadere_simple) > 0:
         fig2, ax2 = a.distance_plot_mean(sims_vadere_simple, title="Vadere Simple", cutoff=0.7)
         fig2.savefig(expanduser('~/fig2.png'))
