@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import time
 import geopandas as g
 import pandas as pd
 import geopandas as gpd
@@ -65,7 +66,8 @@ class OppIniWriter:
             ref = s["scenario"]["topography"]["attributes"]["referenceCoordinateSystem"]
             offset = np.array([float(ref["translation"]["x"]), float(ref["translation"]["y"])])
             if seed is None:
-                seed = random.randint(-2147483648, 2147483647)
+                _r = random.Random(time.time())
+                seed = _r.randint(-2147483648, 2147483647)
             return cls(Project.from_proj(ref["epsgCode"]), offset, bound, seed)
         except Exception as e:
             raise RuntimeError(f"cannot parse scenario file {e}")
