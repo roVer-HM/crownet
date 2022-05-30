@@ -1,5 +1,5 @@
 {
-  "name" : "mf_1d_m_2x5m",
+  "name" : "mf_1d_m_const_2x5m_d280m",
   "description" : "",
   "release" : "2.1",
   "processWriters" : {
@@ -75,7 +75,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 1000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -115,9 +115,9 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 0.0,
-          "y" : 184.9,
+          "y" : 54.9,
           "width" : 415.0,
-          "height" : 20.2,
+          "height" : 280.2,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -126,16 +126,16 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 415.0,
-          "height" : 180.1,
+          "height" : 50.1,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "x" : 0.0,
-          "y" : 209.9,
+          "y" : 339.9,
           "width" : 415.0,
-          "height" : 184.5,
+          "height" : 54.5,
           "type" : "RECTANGLE"
         },
         "id" : 5
@@ -147,7 +147,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -164,7 +164,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -181,7 +181,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -198,7 +198,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -219,14 +219,14 @@
         "id" : 103,
         "shape" : {
           "x" : 405.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -243,14 +243,14 @@
         "id" : 101,
         "shape" : {
           "x" : 405.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
@@ -267,14 +267,14 @@
         "id" : 100,
         "shape" : {
           "x" : 0.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -291,14 +291,14 @@
         "id" : 102,
         "shape" : {
           "x" : 0.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,

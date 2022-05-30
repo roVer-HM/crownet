@@ -1,5 +1,5 @@
 {
-  "name" : "mf_1d_m_2x10m",
+  "name" : "mf_1d_m_poisson_2x5m_d20m",
   "description" : "",
   "release" : "2.1",
   "processWriters" : {
@@ -126,14 +126,14 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 415.0,
-          "height" : 175.1,
+          "height" : 180.1,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "x" : 0.0,
-          "y" : 214.9,
+          "y" : 209.9,
           "width" : 415.0,
           "height" : 184.5,
           "type" : "RECTANGLE"
@@ -149,7 +149,7 @@
           "x" : 400.0,
           "y" : 205.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -164,9 +164,9 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -181,9 +181,9 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -200,7 +200,7 @@
           "x" : 10.0,
           "y" : 205.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -221,7 +221,7 @@
           "x" : 405.0,
           "y" : 205.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
@@ -243,9 +243,9 @@
         "id" : 101,
         "shape" : {
           "x" : 405.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
@@ -267,9 +267,9 @@
         "id" : 100,
         "shape" : {
           "x" : 0.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
@@ -293,7 +293,7 @@
           "x" : 0.0,
           "y" : 205.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
