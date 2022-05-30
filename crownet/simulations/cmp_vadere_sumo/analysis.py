@@ -62,16 +62,21 @@ def main():
     sims_vadere_simple = simulations_from_folder(path_vadere_simple, "vadereSimple")
 
     # distance plots
-    fig1 = a.distance_plot_mean(sims_sumo_bottleneck, title="Sumo Bottleneck", cutoff=0.8)
-    fig2 = a.distance_plot_mean(sims_vadere_bottleneck, title="Vadere Bottleneck", cutoff=0.8)
-    # fig3 = a.distance_plot_mean(sims_sumo_simple, title="Sumo Simple", cutoff=0.7)
-    # fig4 = a.distance_plot_mean(sims_vadere_simple, title="Vadere Simple", cutoff=0.7)
+    if len(sims_sumo_simple) > 0:
+        fig1 = a.distance_plot_mean(sims_sumo_simple, title="Sumo Simple", cutoff=0.7)
+    if len(sims_vadere_simple) > 0:
+        fig2 = a.distance_plot_mean(sims_vadere_simple, title="Vadere Simple", cutoff=0.7)
+    if len(sims_sumo_bottleneck) > 0:
+        fig3 = a.distance_plot_mean(sims_sumo_bottleneck, title="Sumo Bottleneck", cutoff=0.8)
+    if len(sims_vadere_bottleneck) > 0:
+        fig4 = a.distance_plot_mean(sims_vadere_bottleneck, title="Vadere Bottleneck", cutoff=0.8)
 
-    # plot_pnode_positions
-    sim = sims_vadere_simple[0]
-    figs_vadere = a.plot_pnode_positions(sim, 0, 60, 20)
-    sim = sims_sumo_simple[0]
-    figs_sumo = a.plot_pnode_positions(sim, 0, 60, 20)
+    if len(sims_sumo_simple) > 0 and len(sims_vadere_simple) > 0:
+        # plot_pnode_positions
+        sim = sims_vadere_simple[0]
+        figs_vadere = a.plot_pnode_positions(sim, 0, 60, 20)
+        sim = sims_sumo_simple[0]
+        figs_sumo = a.plot_pnode_positions(sim, 0, 60, 20)
 
     # compare simulations vectors
     choice = True
