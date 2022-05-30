@@ -1,9 +1,16 @@
 #!/bin/bash
+
+if [[ $# -lt 1 ]]; then
+    echo "Illegal number of parameters: Please specify the configuration to be used." >&2
+    echo ""
+    echo "Usage: $0 [configuration] [max. threads (opt.)]"
+    exit 2
+fi
+
 NRTHREADS=$(getconf _NPROCESSORS_ONLN)
 
-if [[ $# -ne 1 ]]; then
-    echo "Illegal number of parameters: Please specify the configuration to be used." >&2
-    exit 2
+if [[ $# -eq 2 ]]; then
+    NRTHREADS=$2
 fi
 
 echo "INFO: Using $NRTHREADS parallel threads for simulation study."
