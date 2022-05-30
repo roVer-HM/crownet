@@ -19,6 +19,7 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 
 
+
 def main(base_path):
     # Enviroment setup.
     #
@@ -43,62 +44,14 @@ def main(base_path):
     )
     time = UnitValue.s(100.0)
 
-    par_var = [
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_10_0",
-                "sim-time-limit": time,
+    def var(ped, run):
+        return  {"omnet": {
+                "extends": f"_stationary_m_base, misc_pos_{ped}_{run}",
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..3].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..3].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_10_1",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..3].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..3].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_10_2",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..3].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..3].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_50_0",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..15].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..15].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_50_1",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..15].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..15].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_50_2",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.misc[0..15].app[0].app.stopTime" : UnitValue.s(40),
-                "*.misc[0..15].app[1].app.stopTime" : UnitValue.s(40),
-                },
-        },
-    ]
+                }}
+
+
+    par_var = [ var(ped, 0) for ped in [10, 25, 50, 75, 100, 125, 150, 175, 200] ]
 
     par_var = OmnetSeedManager(
         par_variations=par_var,
@@ -122,7 +75,7 @@ def main(base_path):
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
-        opp_config="final_stationary_m",
+        opp_config="final_stationary_mf",
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""), # use omnet internal mobility models
         # mobility_sim=("vadere", "latest"), # use omnet internal mobility models
