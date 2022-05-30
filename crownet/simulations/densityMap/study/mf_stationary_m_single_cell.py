@@ -19,6 +19,7 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 
 
+
 def main(base_path):
     # Enviroment setup.
     #
@@ -27,8 +28,8 @@ def main(base_path):
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
-        # "mapTypeLog", QString("ymfPlusDistStep"),
-        "mapTypeLog", QString("all"),    # debug only
+        "mapTypeLog", QString("ymfPlusDistStep"),
+        # "mapTypeLog", QString("all"),    # debug only
         "cellAgeTTL", UnitValue.s(-1.0),    # -1.0 no TTL in 
         "alpha", 0.75,
         "idStreamType", QString("insertionOrder"),
@@ -42,66 +43,15 @@ def main(base_path):
         "idStreamType", QString("insertionOrder"),
     )
     time = UnitValue.s(100.0)
-    # time = UnitValue.s(6.0)
 
-    par_var = [
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_50_0",
-                "sim-time-limit": time,
+    def var(ped, run):
+        return  {"omnet": {
+                "extends": f"_stationary_m_base_single_cell, misc_pos_{ped}_{run}",
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
-                "*.gloablDensityMap.deletePercentage": "0.30"
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_50_1",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
-                "*.gloablDensityMap.deletePercentage": "0.30"
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base, misc_pos_50_2",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                # "*.gloablDensityMap.deleteTime": UnitValue.s(3),
-                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
-                "*.gloablDensityMap.deletePercentage": "0.30"
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base_single_cell, misc_pos_50_0",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
-                "*.gloablDensityMap.deletePercentage": "0.30"
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base_single_cell, misc_pos_50_1",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
-                "*.gloablDensityMap.deletePercentage": "0.30"
-                },
-        },
-        {
-            "omnet": {
-                "extends": "_stationary_m_base_single_cell, misc_pos_50_2",
-                "sim-time-limit": time,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
-                # "*.gloablDensityMap.deleteTime": UnitValue.s(3),
-                "*.gloablDensityMap.deleteTime": UnitValue.s(40),
-                "*.gloablDensityMap.deletePercentage": "0.30"
-                },
-        },
-    ]
+                }}
+
+
+    par_var = [ var(ped, 0) for ped in [10, 25, 50, 75, 100, 125, 150, 175, 200] ]
 
     par_var = OmnetSeedManager(
         par_variations=par_var,
@@ -125,7 +75,7 @@ def main(base_path):
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
-        opp_config="final_stationary_m",
+        opp_config="final_stationary_mf",
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""), # use omnet internal mobility models
         # mobility_sim=("vadere", "latest"), # use omnet internal mobility models
@@ -140,7 +90,8 @@ def main(base_path):
         scenario_files=[]
         )
 
-    _rnd = SeedManager.rnd_suffix()
+    _r = SeedManager.get_new_random_object()
+    _rnd = ''.join(_r.choices(string.ascii_lowercase + string.digits, k=6))
     print(f"use random suffix: '{_rnd}'")
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     setup = CrownetRequest(
