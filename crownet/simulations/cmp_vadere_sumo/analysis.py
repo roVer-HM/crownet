@@ -1,6 +1,7 @@
 import os
 from typing import List
 from matplotlib import pyplot as plt
+from os.path import expanduser
 
 import roveranalyzer.simulators.crownet.analysis.compare as a
 
@@ -63,20 +64,26 @@ def main():
 
     # distance plots
     if len(sims_sumo_simple) > 0:
-        fig1 = a.distance_plot_mean(sims_sumo_simple, title="Sumo Simple", cutoff=0.7)
+        fig1: plt.Figure
+        fig1, ax = a.distance_plot_mean(sims_sumo_simple[0:1], title="Sumo Simple", cutoff=0.7)
+        fig1.savefig(expanduser('~/fig1.png'))
+        return
     if len(sims_vadere_simple) > 0:
-        fig2 = a.distance_plot_mean(sims_vadere_simple, title="Vadere Simple", cutoff=0.7)
+        fig2, ax2 = a.distance_plot_mean(sims_vadere_simple, title="Vadere Simple", cutoff=0.7)
+        fig2.savefig(expanduser('~/fig2.png'))
     if len(sims_sumo_bottleneck) > 0:
-        fig3 = a.distance_plot_mean(sims_sumo_bottleneck, title="Sumo Bottleneck", cutoff=0.8)
+        fig3, ax3 = a.distance_plot_mean(sims_sumo_bottleneck, title="Sumo Bottleneck", cutoff=0.8)
+        fig3.savefig(expanduser('~/fig3.png'))
     if len(sims_vadere_bottleneck) > 0:
-        fig4 = a.distance_plot_mean(sims_vadere_bottleneck, title="Vadere Bottleneck", cutoff=0.8)
+        fig4, ax4 = a.distance_plot_mean(sims_vadere_bottleneck, title="Vadere Bottleneck", cutoff=0.8)
+        fig4.savefig(expanduser('~/fig4.png'))
 
     if len(sims_sumo_simple) > 0 and len(sims_vadere_simple) > 0:
         # plot_pnode_positions
         sim = sims_vadere_simple[0]
-        figs_vadere = a.plot_pnode_positions(sim, 0, 60, 20)
+        fig_pos_vadere, ax = a.plot_pnode_positions(sim, 0, 60, 20)
         sim = sims_sumo_simple[0]
-        figs_sumo = a.plot_pnode_positions(sim, 0, 60, 20)
+        fig_pos_sumo, ax = a.plot_pnode_positions(sim, 0, 60, 20)
 
     # compare simulations vectors
     choice = True
@@ -107,9 +114,9 @@ def main():
     # average vadere sims
     df_vadere = a.average_sim_data(dfs_vadere)
     # plot comparison
-    fig5 = a.plot_comparison([df_vadere, df_sumo], ["vadere-bottleneck", "sumo-bottleneck"],
+    fig5, ax5 = a.plot_comparison([df_vadere, df_sumo], ["vadere-bottleneck", "sumo-bottleneck"],
                              vector_name=vector_name, unit=unit, rolling_only=False)
-    fig6 = a.plot_comparison([df_sumo], ["sumoBottleneck"], vector_name, unit, rolling_only=False)
+    fig6, ax6 = a.plot_comparison([df_sumo], ["sumoBottleneck"], vector_name, unit, rolling_only=False)
 
     plt.show()
 
