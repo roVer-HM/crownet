@@ -44,6 +44,12 @@ void TTLCellAgeHandler::applyTo(RegularCell& cell) {
     if (checkLastCall()){ // only execute once
         for (auto e : cell) {
             if (ttl > 0.0 && time > (ttl + e.second->getMeasureTime())){
+                if (e.first == dcdMap->getOwnerId()){
+                    // if `e` is the local map and this value reached the TTL, it is
+                    // necessary to clear the Node->Cell association map of the DcDMap
+                    // where `Cell` equals to current cell.
+                    dcdMap->removeFromNeighborhood(cell.getCellId());
+                }
                 e.second->reset(simtime_t::ZERO);
             }
         }
