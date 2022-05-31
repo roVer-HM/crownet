@@ -1,8 +1,8 @@
 {
   "name" : "test002",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "0857d265c090cf324e12c39abe7160814a86518a",
+  "release" : "2.2",
+  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,14 +102,32 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 183115877309837713,
+      "fixedSeed" : 0,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "MultiPerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel"
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "ProbabilisticCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
+            "routeChoices" : [ {
+              "instruction" : "use target [2]",
+              "targetIds" : [ 2, 3 ],
+              "targetProbabilities" : [ 1.0, 0.0 ]
+            }, {
+              "instruction" : "use target [3]",
+              "targetIds" : [ 2, 3 ],
+              "targetProbabilities" : [ 0.0, 1.0 ]
+            } ]
+          }
+        }
       }
     },
     "topography" : {
@@ -284,10 +302,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -400,
-      "reactionProbability" : 1.0
-    } ]
+    "stimulusInfos" : [ ]
   }
 }
