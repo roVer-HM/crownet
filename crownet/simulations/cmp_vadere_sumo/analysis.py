@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from os.path import expanduser
 
 import roveranalyzer.simulators.crownet.analysis.compare as a
+from roveranalyzer.simulators.crownet.analysis.compare import How
 
 from roveranalyzer.utils.path import PathHelper
 from roveranalyzer.simulators.opp.utils import Simulation
@@ -90,12 +91,12 @@ def main():
         module = "*World.pNode[*].app[0].app"
         vector_name = "rcvdPkLifetime:vector"
         unit = "[s]"
-        how = "mean"
+        how = How.mean
     else:
         module = "*World.pNode[*].cellularNic.mac"
         vector_name = "sentPacketToLowerLayer:vector(packetBytes)"
         unit = "[byte/s]"
-        how = "sum"
+        how = How.sum
 
     # aggregate sumo sims
     dfs_sumo = []
@@ -114,8 +115,10 @@ def main():
     df_vadere = a.average_sim_data(dfs_vadere)
     # plot comparison
     fig5, ax5 = a.plot_comparison([df_vadere, df_sumo], ["vadere-bottleneck", "sumo-bottleneck"],
-                             vector_name=vector_name, unit=unit, rolling_only=False)
-    fig6, ax6 = a.plot_comparison([df_sumo], ["sumoBottleneck"], vector_name, unit, rolling_only=False)
+                                  vector_name=vector_name, vector_description="received Pkt lifetime", unit=unit,
+                                  rolling_only=False)
+    fig6, ax6 = a.plot_comparison([df_sumo], ["sumoBottleneck"], vector_name=vector_name,
+                                  vector_description="received Pkt lifetime", unit=unit, rolling_only=False)
 
     plt.show()
 
