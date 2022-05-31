@@ -1,6 +1,7 @@
 from functools import partial
 import os, shutil
 import string
+from time import time_ns
 from pandas.core.indexes import base
 from scipy import rand
 from suqc.CommandBuilder.SumoCommand import SumoCommand
@@ -78,11 +79,15 @@ def main(base_path):
             }
         },
     ]
-    par_var = OmnetSeedManager(
+    seed_m = OmnetSeedManager(
         par_variations=par_var,
         rep_count=reps,
         omnet_fixed=True,
-        vadere_fixed=None).get_new_seed_variation()
+        vadere_fixed=None,
+        seed=time_ns(),
+        )
+    
+    par_var = seed_m.get_new_seed_variation()
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     
@@ -100,6 +105,7 @@ def main(base_path):
     model.timeout = None
     model.qoi(["all"])
     model.verbose()
+    model.set_seed_manager(seed_m) # log used creation seed
 
 
     # Enviroment setup.

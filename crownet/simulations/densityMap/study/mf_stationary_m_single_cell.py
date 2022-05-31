@@ -1,4 +1,5 @@
 from functools import partial
+import itertools
 import os
 import string
 from pandas.core.indexes import base
@@ -13,6 +14,7 @@ from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolValue
 import random
 from suqc.utils.SeedManager.SeedManager import SeedManager
+from time import time_ns
 
 from suqc.utils.general import get_env_name
 from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
@@ -50,14 +52,17 @@ def main(base_path):
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
                 }}
 
+    par_var = [ var(ped, run) for ped, run in itertools.product([10, 26, 50, 76, 100, 126, 150, 176, 200], [0]) ]
 
-    par_var = [ var(ped, 0) for ped in [10, 25, 50, 75, 100, 125, 150, 175, 200] ]
-
-    par_var = OmnetSeedManager(
+    seed_m = OmnetSeedManager(
         par_variations=par_var,
         rep_count=reps,
         omnet_fixed=False,
-        vadere_fixed=None).get_new_seed_variation()
+        vadere_fixed=None,
+        seed=time_ns(),
+        )
+    par_var = seed_m.get_new_seed_variation()
+    parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
     model = OmnetCommand()\
          .write_container_log() \
@@ -66,6 +71,7 @@ def main(base_path):
     model.timeout = None
     model.qoi(["all"])
     model.verbose()
+    model.set_seed_manager(seed_m) # log used creation seed
 
 
     ini_file = os.path.abspath("../omnetpp.ini")
@@ -90,10 +96,7 @@ def main(base_path):
         scenario_files=[]
         )
 
-    _r = SeedManager.get_new_random_object()
-    _rnd = ''.join(_r.choices(string.ascii_lowercase + string.digits, k=6))
-    print(f"use random suffix: '{_rnd}'")
-    parameter_variation = ParameterVariationBase().add_data_points(par_var)
+    _rnd = SeedManager.rnd_suffix(k=6)
     setup = CrownetRequest(
         env_man = env,
         parameter_variation=parameter_variation,
@@ -103,8 +106,8 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    par_var, data = setup.run(len(par_var))
-    # par_var, data = setup.run(1)
+    # par_var, data = setup.run(len(par_var))
+    par_var, data = setup.run(1)
 
 
 
