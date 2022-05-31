@@ -7,6 +7,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 5, 6 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "numAgents.csv",
+      "processors" : [ 7 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -14,9 +18,12 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberPedestrianProcessor",
+      "id" : 7
     } ],
     "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isWriteMetaData" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -75,7 +82,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 10000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -226,12 +233,12 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "updateFrequency" : 50.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -255,7 +262,7 @@
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -274,12 +281,12 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "updateFrequency" : 50.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -303,7 +310,7 @@
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
