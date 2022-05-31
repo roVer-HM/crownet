@@ -1,8 +1,8 @@
 {
   "name" : "simplified_default_sequential_disturbance",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "0857d265c090cf324e12c39abe7160814a86518a",
+  "release" : "2.2",
+  "commithash" : "0fb24a9f02b3089b60f0edfe56fdc81f7eb8d94e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -247,7 +247,13 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "MultiPerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel"
+        "cognition" : "ProbabilisticCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesMultiPerceptionModel" : { },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
+            "routeChoices" : [ ]
+          }
+        }
       }
     },
     "topography" : {
@@ -769,10 +775,6 @@
         }
       }
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -1,
-      "reactionProbability" : 1.0
-    } ]
+    "stimulusInfos" : [ ]
   }
 }
