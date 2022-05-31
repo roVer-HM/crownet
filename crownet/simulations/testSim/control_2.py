@@ -3,12 +3,11 @@ import sys, os
 import json
 
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
-from flowcontrol.crownetcontrol.setup.vadere import get_scenario_content
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 
 sys.path.append(os.path.abspath(".."))
 
-from flowcontrol.strategy.controller.dummy_controller import Controller
+from flowcontrol.crownetcontrol.controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
 
