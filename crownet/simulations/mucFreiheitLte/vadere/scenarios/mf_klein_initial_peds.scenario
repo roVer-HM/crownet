@@ -1,7 +1,8 @@
 {
   "name" : "mf_klein_initial_peds",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
+  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -120,7 +121,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -913,20 +928,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -982,20 +985,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1051,20 +1042,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1120,20 +1099,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1189,20 +1156,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1258,20 +1213,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1327,20 +1270,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1396,20 +1327,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1465,20 +1384,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1534,20 +1441,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1603,20 +1498,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1672,20 +1555,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1741,20 +1612,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : -1.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : -1.0,
-          "pathogenAbsorptionRate" : -1.0,
-          "minInfectiousDose" : -1.0,
-          "exposedPeriod" : -1.0,
-          "infectiousPeriod" : -1.0,
-          "recoveredPeriod" : -1.0
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -1787,14 +1646,15 @@
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
+      "location" : {
+        "areas" : [ ]
+      },
+      "subpopulationFilter" : {
+        "affectedPedestrianIds" : [ ]
+      },
       "stimuli" : [ {
-        "type" : "Wait",
-        "id" : -1
+        "type" : "Wait"
       } ]
-    } ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -1,
-      "reactionProbability" : 1.0
     } ]
   }
 }
