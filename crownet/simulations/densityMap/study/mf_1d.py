@@ -2,6 +2,7 @@ from functools import partial
 import os, shutil
 import string
 from time import time_ns
+from matplotlib.ft2font import BOLD
 from pandas.core.indexes import base
 from scipy import rand
 from suqc.CommandBuilder.SumoCommand import SumoCommand
@@ -41,7 +42,7 @@ def source(ids, distribution, params, start,  end, spawnNumber, maxSpawnNumber):
 
 
 def main(base_path):
-    reps = 1    # seed-set
+    reps = 10    # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
@@ -64,7 +65,7 @@ def main(base_path):
     s_5_20_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d20m.scenario")
     s_5_280_poisson = QString("vadere/scenarios/mf_1d_m_poisson_2x5m_d280m.scenario")
     s_5_280_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d280m.scenario")
-    t = UnitValue.s(320.0)
+    t = UnitValue.s(2000.0)
 
     source_top_left = 102
     source_top_right = 103
@@ -76,53 +77,6 @@ def main(base_path):
     ext_single_cell = "_1d"
 
     par_var = [
-        {
-            "omnet": {
-                "extends": ext_single_cell,
-                "sim-time-limit": t,
-                "**.vadereScenarioPath" : s_5_280_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
-                "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-                },
-            "vadere": {
-                **source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **source_max_spawn([source_top_right, source_bottom_left], num=1),
-            }
-        },
-        {
-            "omnet": {
-                "extends": ext_single_cell,
-                "sim-time-limit": t,
-                "**.vadereScenarioPath" : s_5_280_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
-                "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-                },
-            "vadere": {
-                **source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 50.0),
-            }
-        },
-        {
-            "omnet": {
-                "extends": ext_single_cell,
-                "sim-time-limit": t,
-                "**.vadereScenarioPath" : s_5_280_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
-                "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-                },
-            "vadere": {
-                **source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 20.0),
-            }
-        },
         {
             "omnet": {
                 "extends": ext_single_cell,
@@ -162,22 +116,29 @@ def main(base_path):
                 "**.vadereScenarioPath" : s_5_20_const,
                 "*.pNode[*].app[1].app.mapCfg":
                     mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
-                "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
             "vadere": {
                 **source_max_spawn([source_top_left, source_bottom_right], num=0),
                 **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 25.0),
+                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 50.0),
             }
         },
     ]
+
+    for v in par_var:
+        # -7492697142818052001
+        v["vadere"]["attributesSimulation.useFixedSeed"] = True
+        v["vadere"]["attributesSimulation.simulationSeed"] = -1
+        v["vadere"]["attributesSimulation.fixedSeed"] = -7492697142818052001
+        v["omnet"]["*.traci.launcher.useVadereSeed"] = BoolValue.TRUE
 
     seed_m = OmnetSeedManager(
         par_variations=par_var,
         rep_count=reps,
         omnet_fixed=False,
-        vadere_fixed=None,
+        vadere_fixed=None,  # set manually
         seed = time_ns()
         )
     par_var = seed_m.get_new_seed_variation()
