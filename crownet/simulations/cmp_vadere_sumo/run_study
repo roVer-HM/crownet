@@ -1,11 +1,29 @@
 #!/bin/bash
 
+ALL_CONFIGS="sumoSimple vadereSimple sumoBottleneck vadereBottleneck"
+
+start_container () {
+  if docker ps | grep -q $1; then 
+        echo "Container for $1 is already available."
+    else
+        echo "Starting container for $1..."
+        $1 & disown
+        sleep 5
+    fi
+}
+
 if [[ $# -lt 1 ]]; then
     echo "Illegal number of parameters: Please specify the configuration to be used." >&2
     echo ""
     echo "Usage: $0 [configuration] [max. threads (opt.)]"
+    echo "       Use \"all\" as configuration name to run all configurations (except the base configs)."
+    echo ""
+    echo "Valid configurations: $ALL_CONFIGS"
     exit 2
 fi
+
+start_container sumo
+start_container vadere
 
 NRTHREADS=$(getconf _NPROCESSORS_ONLN)
 
@@ -15,4 +33,10 @@ fi
 
 echo "INFO: Using $NRTHREADS parallel threads for simulation study."
 
-omnetpp exec opp_runall -j$NRTHREADS ../../src/run_crownet -n .:../../src -u Cmdenv -c $1
+if [ $1 == "all" ]; then
+    for cfg in $ALL_CONFIGS; do
+        omnetpp exec opp_runall -j$NRTHREADS ../../src/run_crownet -n .:../../src -u Cmdenv -c $cfg
+    done
+else
+    omnetpp exec opp_runall -j$NRTHREADS ../../src/run_crownet -n .:../../src -u Cmdenv -c $1
+fi
