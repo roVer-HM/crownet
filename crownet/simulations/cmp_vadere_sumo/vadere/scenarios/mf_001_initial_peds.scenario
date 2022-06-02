@@ -6487,10 +6487,10 @@
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
+        "speedDistributionMean" : 1.4,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
+        "minimumSpeed" : 0.2,
+        "maximumSpeed" : 2.0,
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
