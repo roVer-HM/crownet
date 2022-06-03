@@ -10,58 +10,49 @@ from roveranalyzer.utils.path import PathHelper
 from roveranalyzer.simulators.opp.utils import Simulation
 
 # paths
-path_sumo_bottleneck = PathHelper.from_env(
+
+path_results = PathHelper.from_env(
     f"CROWNET_HOME",
-    f"crownet/simulations/cmp_vadere_sumo/results/sumoBottleneck/",
-)
-path_sumo_simple = PathHelper.from_env(
-    f"CROWNET_HOME",
-    f"crownet/simulations/cmp_vadere_sumo/results/sumoSimple/",
-)
-path_vadere_bottleneck = PathHelper.from_env(
-    f"CROWNET_HOME",
-    f"crownet/simulations/cmp_vadere_sumo/results/vadereBottleneck/",
-)
-path_vadere_simple = PathHelper.from_env(
-    f"CROWNET_HOME",
-    f"crownet/simulations/cmp_vadere_sumo/results/vadereSimple/",
+    f"crownet/simulations/cmp_vadere_sumo/study/simple_study/simulation_runs/outputs/",
+    # f"crownet/simulations/cmp_vadere_sumo/results/",
 )
 
 
-def find(file_extension: str, path: str) -> List[str]:
+def find(file_extension: str, path: str, must_contain: str = None) -> List[str]:
     """ Finds all file of a certain type within a folder and its sub-folders.
 
     :param file_extension: The file extension
     :param path: The root folder to be searched
+    :param must_contain: Optional folder name which must be part of the path.
     :return: A list of paths to all files with the given extension in the folder and all sub-folders
     """
     result = []
     for root, dirs, files in os.walk(path.abs_path()):
         for name in files:
-            if name.endswith(file_extension):
+            if name.endswith(file_extension) and (not must_contain or (must_contain in root)):
                 result.append(os.path.join(root, name))
     return result
 
 
-def simulations_from_folder(path: PathHelper, description: str) -> List[Simulation]:
+def simulations_from_folder(path: PathHelper, configuration: str) -> List[Simulation]:
     """ Finds all simulation data under the given path and returns Simulation objects for each
 
     :param path: The path which will be searched
-    :param description: A description which will be given to all Simulations objects
+    :param configuration: Name of OMNeT++ configuration, will be given to all Simulations objects
     :return: A list of Simulations objects which were found under the path and its sub-folders
     """
     res = []
-    vec_files = find(".vec", path)
+    vec_files = find(".vec", path, configuration)
     for i, vec_file in enumerate(vec_files):
-        res.append(Simulation(i, os.path.dirname(vec_file), description))
+        res.append(Simulation(i, os.path.dirname(vec_file), configuration))
     return res
 
 
 def main():
-    sims_sumo_bottleneck = simulations_from_folder(path_sumo_bottleneck, "sumoBottleneck")
-    sims_sumo_simple = simulations_from_folder(path_sumo_simple, "sumoSimple")
-    sims_vadere_bottleneck = simulations_from_folder(path_vadere_bottleneck, "vadereBottleneck")
-    sims_vadere_simple = simulations_from_folder(path_vadere_simple, "vadereSimple")
+    sims_sumo_simple = simulations_from_folder(path_results, "sumoSimple")
+    sims_vadere_simple = simulations_from_folder(path_results, "vadereSimple")
+    sims_sumo_bottleneck = simulations_from_folder(path_results, "sumoBottleneck")
+    sims_vadere_bottleneck = simulations_from_folder(path_results, "vadereBottleneck")
 
     # distance plots
     if len(sims_sumo_simple) > 0:
@@ -98,6 +89,35 @@ def main():
         unit = "[byte/s]"
         how = How.sum
 
+
+
+    # TODO: redundant code - refactoring required!
+    # aggregate sumo sims
+    dfs_sumo = []
+    for sim in sims_sumo_simple:
+        df = a.aggregate_vectors_from_simulation(sim, module, vector_name, how)
+        dfs_sumo.append(df)
+        print("debug")
+    # average sumo sims
+    if len(dfs_sumo) > 0:
+        df_sumo = a.average_sim_data(dfs_sumo)
+        fig6, ax6 = a.plot_comparison([df_sumo], ["sumoSimple"], vector_name=vector_name,
+                                      vector_description="received Pkt lifetime", unit=unit, rolling_only=False)
+    # aggregate vadere sims
+    dfs_vadere = []
+    for sim in sims_vadere_simple:
+        df = a.aggregate_vectors_from_simulation(sim, module, vector_name, how)
+        dfs_vadere.append(df)
+    # average vadere sims
+    if len(dfs_vadere) > 0:
+        df_vadere = a.average_sim_data(dfs_vadere)
+    # plot comparison
+    if len(dfs_sumo) > 0 and len(dfs_vadere) > 0:
+        fig5, ax5 = a.plot_comparison([df_vadere, df_sumo], ["vadere-simple", "sumo-simple"],
+                                      vector_name=vector_name, vector_description="received Pkt lifetime", unit=unit,
+                                      rolling_only=False)
+
+    # TODO: redundant code - refactoring required!
     # aggregate sumo sims
     dfs_sumo = []
     for sim in sims_sumo_bottleneck:
@@ -105,20 +125,24 @@ def main():
         dfs_sumo.append(df)
         print("debug")
     # average sumo sims
-    df_sumo = a.average_sim_data(dfs_sumo)
+    if len(dfs_sumo) > 0:
+        df_sumo = a.average_sim_data(dfs_sumo)
+        fig7, ax7 = a.plot_comparison([df_sumo], ["sumoBottleneck"], vector_name=vector_name,
+                                      vector_description="received Pkt lifetime", unit=unit, rolling_only=False)
     # aggregate vadere sims
     dfs_vadere = []
     for sim in sims_vadere_bottleneck:
         df = a.aggregate_vectors_from_simulation(sim, module, vector_name, how)
         dfs_vadere.append(df)
     # average vadere sims
-    df_vadere = a.average_sim_data(dfs_vadere)
+    if len(dfs_vadere) > 0:
+        df_vadere = a.average_sim_data(dfs_vadere)
     # plot comparison
-    fig5, ax5 = a.plot_comparison([df_vadere, df_sumo], ["vadere-bottleneck", "sumo-bottleneck"],
-                                  vector_name=vector_name, vector_description="received Pkt lifetime", unit=unit,
-                                  rolling_only=False)
-    fig6, ax6 = a.plot_comparison([df_sumo], ["sumoBottleneck"], vector_name=vector_name,
-                                  vector_description="received Pkt lifetime", unit=unit, rolling_only=False)
+    if len(dfs_sumo) > 0 and len(dfs_vadere) > 0:
+        fig8, ax8 = a.plot_comparison([df_vadere, df_sumo], ["vadere-bottleneck", "sumo-bottleneck"],
+                                      vector_name=vector_name, vector_description="received Pkt lifetime", unit=unit,
+                                      rolling_only=False)
+
 
     plt.show()
 
