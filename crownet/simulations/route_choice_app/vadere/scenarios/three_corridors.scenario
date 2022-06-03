@@ -1,8 +1,7 @@
 {
-  "name" : "simplified_default_sequential",
+  "name" : "three_corridors",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "0fb24a9f02b3089b60f0edfe56fdc81f7eb8d94e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -257,12 +256,28 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "MultiPerceptionModel",
+        "perception" : "SimplePerceptionModel",
         "cognition" : "ProbabilisticCognitionModel",
         "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.perception.AttributesMultiPerceptionModel" : { },
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus"
+            }
+          },
           "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
-            "routeChoices" : [ ]
+            "routeChoices" : [ {
+              "instruction" : "use target [11]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 1.0, 0.0, 0.0 ]
+            }, {
+              "instruction" : "use target [21]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 0.0, 1.0, 0.0 ]
+            }, {
+              "instruction" : "use target [31]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 0.0, 0.0, 1.0 ]
+            } ]
           }
         }
       }
@@ -427,7 +442,7 @@
         "id" : 5
       }, {
         "shape" : {
-          "x" : 11.5,
+          "x" : 11.4,
           "y" : 25.0,
           "width" : 2.5,
           "height" : 86.0,
@@ -463,7 +478,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 31,
+        "id" : 21,
         "absorbing" : true,
         "shape" : {
           "x" : 11.5,
@@ -480,7 +495,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 51,
+        "id" : 31,
         "absorbing" : true,
         "shape" : {
           "x" : 19.0,

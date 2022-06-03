@@ -156,6 +156,8 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "ProbabilisticCognitionModel",
         "attributesModel" : {
           "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
             "priority" : {
@@ -177,9 +179,7 @@
               "targetProbabilities" : [ 0.0, 0.0, 1.0 ]
             } ]
           }
-        },
-        "perception" : "SimplePerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel"
+        }
       }
     },
     "topography" : {
@@ -893,7 +893,7 @@
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 11, 21, 31 ],
-        "probabilityToChangeTarget" : [ 0.1, 0.2, 0.7 ]
+        "probabilityToChangeTarget" : [ 0.7, 0.2, 0.1 ]
       }, {
         "id" : 23,
         "shape" : {
@@ -1015,9 +1015,14 @@
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
+      "location" : {
+        "areas" : [ ]
+      },
+      "subpopulationFilter" : {
+        "affectedPedestrianIds" : [ ]
+      },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "id" : -1,
         "information" : "use target [11]"
       } ]
     } ]
