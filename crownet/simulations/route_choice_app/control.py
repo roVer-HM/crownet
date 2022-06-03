@@ -48,7 +48,7 @@ class NoController(Controller):
             densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
         elif isinstance(self.con_manager, ClientModeConnection):
             densities = list()
-            for a in [25, 24, 23]:
+            for a in [101, 102, 103]:
                 __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
                 # density = -11.0 #TODO replace
                 densities.append(density)
@@ -59,7 +59,7 @@ class NoController(Controller):
     def update_density_map(self, cell_dim, cell_size, result):
         if self.densityMapper is None:
             obs = self._get_obstacles_as_polygons()
-            measurement_areas = self._get_measurement_areas([1, 3, 5])
+            measurement_areas = self._get_measurement_areas([1, 2, 3])
             self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size,
                                                measurement_areas=measurement_areas, obstacles=obs)
         if result is not None:
@@ -90,18 +90,25 @@ class NoController(Controller):
     def write_data(self):
         self.processor_manager.finish()
 
+    def set_redirection_area(self, area):
+        pass
+
 
 class OpenLoop(NoController, Controller):
 
     def __init__(self, control_alg = None):
-        self.target_ids = [31, 21, 11]
+        self.target_ids = [11, 21, 31]
         self.redirected_agents = list()
         self.commandID = 111
-        self.redirection_area = Rectangle(x=180., y=190., width=20., height=15.)
+        self.redirection_area = None
 
         if control_alg == None:
             control_alg= AlternateTargetAlgorithm(alternate_targets=self.target_ids)
         super().__init__(control_alg=control_alg)
+
+    def set_redirection_area(self, area):
+        self.redirection_area = area
+        print(f"Area set to {area}.")
 
 
     def get_stimulus_info(self):
@@ -135,6 +142,7 @@ class OpenLoop(NoController, Controller):
 
     def compute_next_corridor_choice(self):
         self.current_target = self.control_algorithm.get_next_target()
+        self.processor_manager.write("path_choice", self.current_target)
 
 
     def handle_init(self, sim_time, sim_state):
@@ -149,8 +157,7 @@ class OpenLoop(NoController, Controller):
 
 class ClosedLoop(OpenLoop, Controller):
     def __init__(self):
-        self.target_ids = [31, 21, 11]
-        control_alg = MinimalDensityAlgorithm(alternate_targets=self.target_ids)
+        control_alg = MinimalDensityAlgorithm(alternate_targets=[11, 21, 31])
         super().__init__(control_alg=control_alg)
 
 
@@ -167,25 +174,39 @@ if __name__ == "__main__":
         settings = ["--controller-type",
                     "OpenLoop",  #
                     "--scenario-file",
-                    "route_choice_real_world.scenario",
+                    "three_corridors.scenario",
                     "--port",
                     "9999",
                     "--host-name",
-                    "vadere",
+                    "localhost",
                     "--client-mode",
-                    # "--start-server",
-                    # "--gui-mode",
+                    "--start-server",
+                    "--gui-mode",
                     "--output-dir",
                     "sim-output-task1",
-                    # "-j",
-                    # "/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar"
+                    "-j",
+                    "/mnt/data/crownet/vadere/VadereSimulator/target/vadere-server.jar",
+                    "--download-jar-file",
+                    "false"
                     ]
     else:
         settings = sys.argv[1:]
+
+    print(settings)
 
     sub = VadereDefaultStateListener.with_vars(
         "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
     )
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings)
+
+    area = None
+    if "vadere/scenarios/route_choice_real_world.scenario" in settings:
+        area = Rectangle(x=180., y=190., width=20., height=15.)
+    elif "vadere/scenarios/three_corridors.scenario" in settings:
+        area = Rectangle(x=0., y=0., width=25., height=25.)
+    else:
+        raise ValueError("Redirection area undefined for scenario.") #TODO use measurement area instead (necessary for omnet)
+
+    controller.set_redirection_area(area)
     controller.register_state_listener("default", sub, set_default=True)
     controller.start_controller()
