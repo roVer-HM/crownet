@@ -7,15 +7,16 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LinearRegression
 
-reaction_prob_key = "('Parameter', 'vadere', 'reactionProbabilities.[stimulusId==-400].reactionProbability')"
+
+reaction_prob_key = "('Parameter', 'dummy_var', 'compliance_rate')"
 time_step_key = "timeStep"
 seed_key_key = "('Parameter', 'vadere', 'fixedSeed')"
 wall_clock_time_key = "('MetaInfo', 'required_wallclock_time')"
 return_code_key = "('MetaInfo', 'return_code')"
 simulation_time = 'Simulation time'
-corridors = {'areaDensityCountingNormed-PID14': "Corridor1",
-             'areaDensityCountingNormed-PID16': "Corridor2",
-             'areaDensityCountingNormed-PID18': "Corridor3"}
+corridors = {'areaDensityCountingNormed-PID101': "Corridor1",
+             'areaDensityCountingNormed-PID102': "Corridor2",
+             'areaDensityCountingNormed-PID103': "Corridor3"}
 velocities_dict = {'velocity-PID25': "Corridor1",
                    'velocity-PID27': "Corridor2",
                    'velocity-PID29': "Corridor3"}
@@ -23,8 +24,8 @@ densities_dict = {'density-PID25': "Corridor1",
                   'density-PID27': "Corridor2",
                   'density-PID29': "Corridor3"}
 c__ = {11: "Short",
-       31: "Medium",
-       51: "Long",
+       21: "Medium",
+       31: "Long",
        'Corridor1': "Short",
        'Corridor2': "Medium",
        'Corridor3': "Long",
@@ -45,7 +46,7 @@ time_step_size = 0.4
 var_corridor = "Corridor"
 reaction_prob_key_short = "reactionProbability"
 compliance_rate = "Compliance rate c"
-probs = np.linspace(0, 1.0, 41)
+probs = np.linspace(0, 1.0, 10)
 
 def get_fundamental_diagrams(controller_type, time_start=None):
     if time_start is None:
@@ -72,7 +73,10 @@ def get_fundamental_diagrams(controller_type, time_start=None):
     densities_["Controller"] = controller_type
     densities_.sort_index(axis=1, inplace=True)
 
-    if densities_.equals(get_densities(controller_type=controller_type)):
+
+    aaa = get_densities(controller_type=controller_type)
+
+    if densities_.equals(aaa):
         print(f"{controller_type}: density check successful.")
     else:
         raise ValueError("Fundamental diagram densities differ from measured densities.")
@@ -103,7 +107,7 @@ def get_time_controller_wise(controller_type):
     times = c1.join(c2)
     travel_times = pd.DataFrame(times["reachTime-PID12"].sub(times["startTime-PID13"]),
                                 columns=["travel_time"])
-    travel_times["Controller"] = controller_type
+    travel_times = travel_times.assign(Controller=controller_type)
     travel_times = travel_times[times["startTime-PID13"] >= sim_time_steady_flow_start]
 
     travel_times.reset_index(level="pedestrianId", inplace=True, drop=True)
@@ -192,7 +196,7 @@ def plot_travel_time(travel_time):
 
 
 def plot_hists_corridor1():
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0)
+    densities, velocities = get_fundamental_diagrams(controller_type="NoController")
 
     for c in ["Corridor1"]:
         velocities[c][densities[c] == 0] = np.nan
@@ -242,7 +246,7 @@ def plot_hists_corridor1():
 
 
 def get_fundamental_diagram_corridor1():
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0.0)
+    densities, velocities = get_fundamental_diagrams(controller_type="NoController")
 
     for c in ["Corridor1"]:
         velocities[c][densities[c] == 0] = np.nan
@@ -330,7 +334,7 @@ def get_path_choice(controller_type):
     path_choice.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
                      inplace=True)
     path_choice.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
-    path_choice["Controller"] = controller_type
+    path_choice = path_choice.assign(Controller=controller_type)
     path_choice.sort_index(axis=1, inplace=True)
 
     path_choice.reset_index(inplace=True)
@@ -504,13 +508,12 @@ def plot_path_choice(path_choice):
     ax[0].set_ylim(-10, 550)
     ax[0].set_ylabel("Number of recommendations")
     plot_route_1_recommended(path_choice, 11, ax[0])
-    plot_route_1_recommended(path_choice, 31, ax[1])
-    plot_route_1_recommended(path_choice, 51, ax[2])
+    plot_route_1_recommended(path_choice, 21, ax[1])
+    plot_route_1_recommended(path_choice, 31, ax[2])
     fig.savefig(f"figs/routesrecommded.pdf")
     plt.show()
 
 if __name__ == "__main__":
-    #TODO not tested
 
     
     travel_time = get_travel_times()

@@ -38,7 +38,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "densities.txt",
-      "processors" : [ 101, 102, 103 ]
+      "processors" : [ 101, 102, 103, 104, 105 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "targetIds.txt",
@@ -54,7 +54,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "fundamentalDiagramm.txt",
-      "processors" : [ 25, 27, 29 ]
+      "processors" : [ 25, 106, 27, 107, 29 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -160,6 +160,36 @@
         "measurementAreaId" : 3,
         "pedestrianVelocityProcessorId" : 23
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 104,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 11
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 105,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 12
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 106,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementAreaId" : 11,
+        "pedestrianVelocityProcessorId" : 23
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 107,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementAreaId" : 12,
+        "pedestrianVelocityProcessorId" : 23
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -225,7 +255,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 50.0,
+      "finishTime" : 1300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -249,15 +279,15 @@
           },
           "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
             "routeChoices" : [ {
-              "instruction" : "use target [11]",
+              "instruction" : "use target 11",
               "targetIds" : [ 11, 21, 31 ],
               "targetProbabilities" : [ 1.0, 0.0, 0.0 ]
             }, {
-              "instruction" : "use target [21]",
+              "instruction" : "use target 21",
               "targetIds" : [ 11, 21, 31 ],
               "targetProbabilities" : [ 0.0, 1.0, 0.0 ]
             }, {
-              "instruction" : "use target [31]",
+              "instruction" : "use target 31",
               "targetIds" : [ 11, 21, 31 ],
               "targetProbabilities" : [ 0.0, 0.0, 1.0 ]
             } ]
@@ -846,6 +876,24 @@
           "type" : "RECTANGLE"
         },
         "id" : 2
+      }, {
+        "shape" : {
+          "x" : 177.9,
+          "y" : 235.7,
+          "width" : 3.1,
+          "height" : 3.9,
+          "type" : "RECTANGLE"
+        },
+        "id" : 11
+      }, {
+        "shape" : {
+          "x" : 178.3,
+          "y" : 292.5,
+          "width" : 2.5,
+          "height" : 3.6,
+          "type" : "RECTANGLE"
+        },
+        "id" : 12
       } ],
       "stairs" : [ ],
       "targets" : [ {

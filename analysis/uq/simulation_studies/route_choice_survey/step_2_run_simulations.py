@@ -21,7 +21,7 @@ run_local = True
 # corresponding parameter. Again, the Vadere output is deleted after all scenarios run.
 
 scenario = "three_corridors" #TODO test "three_corridors" or "route_choice_real_world"
-scenario = "route_choice_real_world"
+#scenario = "route_choice_real_world"
 
 def run_controller(controller, qoi, par_var):
 
@@ -77,10 +77,20 @@ if __name__ == "__main__":
     start_time = time.time()
 
     reaction_probability_key = "finishTime"
-    probs = np.linspace(30, 40, 2)
-    par_var_ = [{'vadere': {reaction_probability_key: p}} for p in probs]
+    probs = np.linspace(0.0, 1.0, 10)
 
-    reps = 1
+    par_var_ = list()
+    for p in probs:
+
+        compliances = {'routeChoices.[instruction=="use target 11"].targetProbabilities': [1.0, 0.0, 0.0],
+                       "routeChoices.[instruction=='use target 21'].targetProbabilities": [1 - p, p, 0.0],
+                       'routeChoices.[instruction==use target 31].targetProbabilities': [1 - p, 0.0, p]}
+
+        sample = {'vadere': compliances, 'dummy_var': {"compliance_rate": p}}
+        par_var_.append(sample)
+
+
+    reps = 5
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     qoi1 = "densities.txt"
@@ -89,8 +99,10 @@ if __name__ == "__main__":
     qoi4 = "targetReachTime.txt"
     qoi5 = "path_choice.txt" # collect these quantities of interest
 
-    run_controller(controller="NoController", par_var= par_var[:reps] , qoi= [qoi1, qoi2, qoi3, qoi4] )
     run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3, qoi4, qoi5] )
     run_controller(controller="OpenLoop", par_var=par_var, qoi=[qoi1, qoi2, qoi3, qoi4, qoi5])
+    run_controller(controller="NoController", par_var=par_var[:reps], qoi=[qoi1, qoi2, qoi3, qoi4])  # only zero needed
+
+
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")

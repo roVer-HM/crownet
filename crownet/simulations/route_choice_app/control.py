@@ -114,7 +114,7 @@ class OpenLoop(NoController, Controller):
     def get_stimulus_info(self):
 
         location = Location(areas=self.redirection_area)
-        recommendation = InformationStimulus(f"use target [{self.current_target}]")
+        recommendation = InformationStimulus(f"use target {self.current_target}")
         s = StimulusInfo(location=location, stimuli=recommendation)
         return s
 
@@ -157,8 +157,10 @@ class OpenLoop(NoController, Controller):
 
 class ClosedLoop(OpenLoop, Controller):
     def __init__(self):
-        control_alg = MinimalDensityAlgorithm(alternate_targets=[11, 21, 31])
+        targets = [11, 21, 31]
+        control_alg = MinimalDensityAlgorithm(alternate_targets=targets)
         super().__init__(control_alg=control_alg)
+        self.target_ids = targets #not very elegant: overwrite target
 
 
     def compute_next_corridor_choice(self):

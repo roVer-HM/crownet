@@ -221,7 +221,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 50.0,
+      "finishTime" : 1300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -245,15 +245,15 @@
           },
           "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
             "routeChoices" : [ {
-              "instruction" : "use target [11]",
+              "instruction" : "use target 11",
               "targetIds" : [ 11, 21, 31 ],
               "targetProbabilities" : [ 1.0, 0.0, 0.0 ]
             }, {
-              "instruction" : "use target [21]",
+              "instruction" : "use target 21",
               "targetIds" : [ 11, 21, 31 ],
               "targetProbabilities" : [ 0.0, 1.0, 0.0 ]
             }, {
-              "instruction" : "use target [31]",
+              "instruction" : "use target 31",
               "targetIds" : [ 11, 21, 31 ],
               "targetProbabilities" : [ 0.0, 0.0, 1.0 ]
             } ]
