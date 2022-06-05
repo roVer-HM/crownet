@@ -13,8 +13,8 @@ from roveranalyzer.simulators.opp.utils import Simulation
 
 path_results = PathHelper.from_env(
     f"CROWNET_HOME",
-    f"crownet/simulations/cmp_vadere_sumo/study/simple_study/simulation_runs/outputs/",
-    # f"crownet/simulations/cmp_vadere_sumo/results/",
+    # f"crownet/simulations/cmp_vadere_sumo/study/simple_study/simulation_runs/outputs/",
+    f"crownet/simulations/cmp_vadere_sumo/results/",
 )
 
 
@@ -49,8 +49,10 @@ def simulations_from_folder(path: PathHelper, configuration: str) -> List[Simula
 
 
 def main():
-    sims_sumo_simple = simulations_from_folder(path_results, "sumoSimple")
-    sims_vadere_simple = simulations_from_folder(path_results, "vadereSimple")
+    # sims_sumo_simple = simulations_from_folder(path_results, "sumoSimple")
+    # sims_vadere_simple = simulations_from_folder(path_results, "vadereSimple")
+    sims_sumo_simple = simulations_from_folder(path_results, "sumoOnly2")
+    sims_vadere_simple = simulations_from_folder(path_results, "vadereOnly2")
     sims_sumo_bottleneck = simulations_from_folder(path_results, "sumoBottleneck")
     sims_vadere_bottleneck = simulations_from_folder(path_results, "vadereBottleneck")
 

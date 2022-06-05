@@ -1,9 +1,11 @@
-# Script for doing a simulation study.
+# Script for doing the simulation study.
 #
 # Launch this script via python3 or within your Python IDE to perform a simulation study.
 
 import os, shutil
 import string
+from typing import List, Dict, Any
+from enum import Enum
 from pandas.core.indexes import base
 from scipy import rand
 from suqc.CommandBuilder.SumoCommand import SumoCommand
@@ -18,72 +20,101 @@ from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolVa
 import pprint
 import random
 
+# number of repetitions to be performed for each parameter set
+REPS = 40
+
+
+class MobilitySimulatorType(Enum):
+    OMNET = 1
+    VADERE = 2
+    SUMO = 3
 
 
 def main(base_path):
-    
-    t = UnitValue.s(600.0)
+    time = UnitValue.s(600.0)
 
+    # only2: VADERE
     par_var = [
         {
             "omnet": {
-                 "*.traci.launcher.sumoCfgBase": 'absFilePath(\"sumo/simple/simple_only2.sumo.cfg")'
+                "sim-time-limit": time,
+                },
+        },
+    ]
+    run_parameter_study(base_path, MobilitySimulatorType.VADERE, "vadereOnly2", par_var)
+
+    # only2: SUMO
+    par_var = [
+        {
+            "omnet": {
+                "sim-time-limit": time,
             },
         },
     ]
+    run_parameter_study(base_path, MobilitySimulatorType.SUMO, "sumoOnly2", par_var)
+
+def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, config: str,
+                        par_var: List[Dict[str, Any]]):
     par_var = OmnetSeedManager(
-        par_variations=par_var, 
-        rep_count=10,
-        omnet_fixed=False, 
+        par_variations=par_var,
+        rep_count=REPS,
+        omnet_fixed=False,
         vadere_fixed=None).get_new_seed_variation()
 
-    model = SumoCommand()\
-        .write_container_log()\
-        .omnet_tag("latest")\
-        .sumo_tag("latest")\
-        .experiment_label("out")
-    model.timeout = None 
+    # Enviroment setup.
+    # 
+    ini_file = os.path.abspath("../omnetpp.ini")
+    study_name = __file__.replace(".py", "")
+    base_dir = os.path.abspath("../results/"+study_name+"/")
+    os.makedirs(base_dir, exist_ok=True)
+
+    if mobility_sim == MobilitySimulatorType.SUMO:
+        mobility_container = ("sumo", "latest")
+        model = SumoCommand() \
+            .sumo_tag("latest")
+    elif mobility_sim == MobilitySimulatorType.VADERE:
+        mobility_container = ("vadere", "latest")
+        model = VadereOppCommand() \
+            .vadere_tag("latest")
+    else:
+        mobility_container = None
+
+    model.write_container_log()
+    model.omnet_tag("latest")
+    model.experiment_label("out")
+    model.timeout = None
     model.qoi(["all"])
     model.verbose()
 
-
-    # Enviroment setup. 
-    # 
-    ini_file = os.path.abspath("../omnetpp.ini")
-    base_dir = os.path.abspath("../results/")
-    os.makedirs(base_dir, exist_ok=True)
-    
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name=__file__.replace(".py", ""),
-        opp_config="sumoSimple",
+        env_name=config,
+        opp_config=config,
         opp_basename="omnetpp.ini",
-        mobility_sim=("sumo", "latest"),
+        mobility_sim=mobility_container,
         communication_sim=("omnet", "latest"),
-        handle_existing="ask_user_replace"
+        handle_existing="force_replace"
+        # handle_existing="ask_user_replace"
     )
 
-
-    # Todo add all necessary sumo files not present in the ini file. 
     env.copy_data(
         base_ini_file=ini_file,
         scenario_files=[]
-        )
-    
+    )
+
     _rnd = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     setup = CrownetRequest(
-        env_man = env,
+        env_man=env,
         parameter_variation=parameter_variation,
         model=model,
         creator=opp_creator,
         rnd_hostname_suffix=f"_{_rnd}",
-        runscript_out="runscript.out"
+        runscript_out=config+"_runscript.out"
     )
     print("setup done")
     # par_var, data = setup.run(len(par_var))
     par_var, data = setup.run(20)
-
 
 
 if __name__ == "__main__":
