@@ -7,6 +7,7 @@ import time
 from datetime import timedelta
 
 import numpy as np
+import pandas as pd
 
 from suqc.CommandBuilder.VadereControlCommand import VadereControlCommand
 from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
@@ -73,6 +74,9 @@ def run_controller(controller, qoi, par_var):
 
 if __name__ == "__main__":
 
+
+    dists = pd.read_csv("route_choice_dists.dat")
+
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
     start_time = time.time()
 
@@ -80,17 +84,29 @@ if __name__ == "__main__":
     probs = np.linspace(0.0, 1.0, 10)
 
     par_var_ = list()
-    for p in probs:
-
-        compliances = {'routeChoices.[instruction=="use target 11"].targetProbabilities': [1.0, 0.0, 0.0],
-                       "routeChoices.[instruction=='use target 21'].targetProbabilities": [1 - p, p, 0.0],
-                       'routeChoices.[instruction==use target 31].targetProbabilities': [1 - p, 0.0, p]}
-
-        sample = {'vadere': compliances, 'dummy_var': {"compliance_rate": p}}
-        par_var_.append(sample)
+    conditions = ["A1","A2","A3","A4","B1","B2","B3","B4"]
+    for condition in conditions:
 
 
-    reps = 5
+
+        for stat in ["mean", "median", "q1", "q3"]:
+
+            df = dists[dists["condition"] == condition]
+
+            values_short_route = [1.0, 0.0, 0.0]
+            values_long_route = df[stat].round(2).values.tolist()
+            values_medium_route = [1-values_long_route[-1], values_long_route[-1] , 0.0]
+
+
+            compliances = {'routeChoices.[instruction=="use target 11"].targetProbabilities': values_short_route,
+                       "routeChoices.[instruction=='use target 21'].targetProbabilities": values_medium_route,
+                       'routeChoices.[instruction==use target 31].targetProbabilities': values_long_route}
+
+            sample = {'vadere': compliances, 'dummy_var': {"condition": condition, "statistic": stat}}
+            par_var_.append(sample)
+
+
+    reps = 3
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     qoi1 = "densities.txt"
@@ -100,9 +116,6 @@ if __name__ == "__main__":
     qoi5 = "path_choice.txt" # collect these quantities of interest
 
     run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3, qoi4, qoi5] )
-    run_controller(controller="OpenLoop", par_var=par_var, qoi=[qoi1, qoi2, qoi3, qoi4, qoi5])
     run_controller(controller="NoController", par_var=par_var[:reps], qoi=[qoi1, qoi2, qoi3, qoi4])  # only zero needed
-
-
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
