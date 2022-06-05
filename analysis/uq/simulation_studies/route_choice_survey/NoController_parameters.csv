@@ -1,6 +1,4 @@
-id,run_id,"('Parameter', 'dummy_var', 'compliance_rate')","('Parameter', 'vadere', 'fixedSeed')","('Parameter', 'vadere', 'routeChoices.[instruction==""use target 11""].targetProbabilities')","('Parameter', 'vadere', ""routeChoices.[instruction=='use target 21'].targetProbabilities"")","('Parameter', 'vadere', 'routeChoices.[instruction==use target 31].targetProbabilities')","('MetaInfo', 'required_wallclock_time')","('MetaInfo', 'return_code')"
-0,0,0.0,74895,"[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]",643.3960893154144,0
-1,0,0.0,4271,"[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]",620.4715511798859,0
-2,0,0.0,56216,"[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]",636.9638590812683,0
-3,0,0.0,63251,"[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]",631.8089537620544,0
-4,0,0.0,75772,"[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]","[1.0, 0.0, 0.0]",635.3361749649048,0
+id,run_id,"('Parameter', 'dummy_var', 'condition')","('Parameter', 'dummy_var', 'statistic')","('Parameter', 'vadere', 'fixedSeed')","('Parameter', 'vadere', 'routeChoices.[instruction==""use target 11""].targetProbabilities')","('Parameter', 'vadere', ""routeChoices.[instruction=='use target 21'].targetProbabilities"")","('Parameter', 'vadere', 'routeChoices.[instruction==use target 31].targetProbabilities')","('MetaInfo', 'required_wallclock_time')","('MetaInfo', 'return_code')"
+0,0,A1,mean,74895,"[1.0, 0.0, 0.0]","[0.71, 0.29, 0.0]","[0.36, 0.36, 0.29]",608.2558472156525,0
+1,0,A1,mean,4271,"[1.0, 0.0, 0.0]","[0.71, 0.29, 0.0]","[0.36, 0.36, 0.29]",608.1541428565979,0
+2,0,A1,mean,56216,"[1.0, 0.0, 0.0]","[0.71, 0.29, 0.0]","[0.36, 0.36, 0.29]",628.0613956451416,0
