@@ -129,74 +129,54 @@ def get_travel_times():
     c2 = get_time_controller_wise(controller_type="OpenLoop")
     c3 = get_time_controller_wise(controller_type="ClosedLoop")
     travel_times = pd.concat([c2, c3])
+    travel_times = travel_times[travel_times["travel_time"] != np.inf]
     return travel_times
 
 
 def plot_travel_time(travel_time):
-    travel_time = travel_time[travel_time["travel_time"] != np.inf]
 
     for c, data in travel_time.groupby(by=["Controller"]):
         data.drop(columns="Controller", inplace=True)
         data.reset_index(inplace=True, drop=True, )
-        data[reaction_prob_key_short] = data[reaction_prob_key_short].round(3)
-        data = data.pivot(columns=["reactionProbability"])
-        data.columns = data.columns.droplevel()
-        data.rename(columns=controller__, inplace=True)
-        data.boxplot(**args_boxplot)
-        plt.ylim()
-        plt.xlabel("Parameter c")
-        plt.ylim(0, 1000)
-        plt.title(f"{controller__[c]}")
-        plt.xticks(np.arange(1, 45, 4), [f"{x:.1f}" for x in np.linspace(0, 1, 11)])
-        plt.ylabel("Travel time [s]")
-        plt.xlabel(compliance_rate)
-        plt.savefig(f"figs/travel_time_{controller__[c]}.pdf")
-        plt.show()
-        print()
-
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
-    fig.subplots_adjust(wspace=0.1, hspace=0)
-
-    time_25 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.25).unstack(level=0)
-    time_25.columns = time_25.columns.droplevel(0)
-    time_25.rename(columns=controller__, inplace=True)
-    plt.sca(ax[0])
-    ax[0].hlines(y=time_25.max(), xmin=0, xmax=1, colors=["k"])
-    time_25.plot(marker="o", ax=ax[0])
-    plt.legend()
-    ax[0].set_title("25% Quartile")
-    ax[0].set_ylim(25, 250)
-    ax[0].legend()
-    ax[0].set_ylabel("Travel time [s]")
-    ax[0].set_xlabel(compliance_rate)
-
-    time_med = travel_time.groupby(by=["Controller", reaction_prob_key_short]).median().unstack(level=0)
-    time_med.columns = time_med.columns.droplevel(0)
-    time_med.rename(columns=controller__, inplace=True)
-    plt.sca(ax[1])
-    ax[1].hlines(y=time_med.max(), xmin=0, xmax=1, colors=["k"])
-    time_med.plot(marker="o", ax=ax[1])
-    ax[1].set_title("Median")
-    #ax[1].set_ylim(0, 250)
-    ax[1].legend()
-    # ax[1].set_ylabel("Travel time [s]")
-    ax[1].set_xlabel(compliance_rate)
-
-    time_75 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.75).unstack(level=0)
-    time_75.columns = time_75.columns.droplevel(0)
-    time_75.rename(columns=controller__, inplace=True)
-    plt.sca(ax[2])
-    ax[2].hlines(y=time_75.max(), xmin=0, xmax=1, colors=["k"])
-    time_75.plot(marker="o", ax=ax[2])
-    ax[2].set_title("75% Quartile")
-    #ax[2].set_ylim(0, 250)
-    ax[2].legend()
-    # ax[2].set_ylabel("Travel time [s]")
-    ax[2].set_xlabel(compliance_rate)
+        data.set_index(["condition", "stat"], inplace=True)
 
 
-    plt.savefig("figs/Travel_time.pdf")
-    plt.show()
+        for s_, data_s in data.groupby(level="stat"):
+
+
+            tit = f"BoxplotTravelTimeStat__{s_}_{c}"
+            data_s.index = data_s.index.droplevel(1)
+            data_s = pd.DataFrame(data_s.unstack() , columns= ["travel_time"])
+            data_s.reset_index(inplace=True)
+            data_s = data_s.drop(columns=["level_0"])
+            data_s = data_s.pivot(columns=[condition_short])
+            data_s.columns = data_s.columns.droplevel(0)
+
+            x = [data_s[column].dropna().values for column in data_s]
+            res = stats.kruskal(*x)
+
+            data_s.boxplot()
+            plt.title(f"{c}, point est. likeli: {s_}, Kruskal-Wallis: p={res.pvalue:.3f}")
+            plt.ylabel("Travel time [s]")
+            plt.xlabel("Communication strategy")
+            plt.savefig(f"figs/{tit}.pdf")
+            plt.show()
+
+            print()
+
+        statistics_ = data.groupby(level=["stat", "condition"]).describe()
+        statistics_.columns = statistics_.columns.droplevel(0)
+        statistics_.drop(columns='count', inplace=True)
+
+        for s_, data_s in statistics_.groupby(level="stat"):
+            # TODO replace with boxplo??
+            tit = f"TravelTimeStat__{s_}_{c}"
+            data_s.index = data_s.index.droplevel(0)
+            data_s.plot(subplots=True, title=f"Controller {c} Travel time {s_}", marker="o")
+            plt.savefig(f"figs/{tit}.pdf")
+            plt.show()
+
+
     print("")
 
 
@@ -521,12 +501,11 @@ def plot_path_choice(path_choice):
 if __name__ == "__main__":
 
     
-    #travel_time = get_travel_times()
-
-    travel_time = get_time_controller_wise(controller_type="ClosedLoop")
-
-
+    travel_time = get_travel_times()
     plot_travel_time(travel_time)
+
+
+
     plot_hists_corridor1()
 
     get_fundamental_diagram_corridor1()
