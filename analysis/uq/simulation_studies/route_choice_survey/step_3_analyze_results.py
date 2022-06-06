@@ -31,6 +31,11 @@ c__ = {11: "Short",
        'Corridor3': "Long",
        }
 
+condition = "('Parameter', 'dummy_var', 'condition')"
+stat = "('Parameter', 'dummy_var', 'statistic')"
+condition_short = 'condition'
+stat_short = 'stat'
+
 args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', markersize=3,
                                     linestyle='none', markeredgecolor='#AAAAAA'),
                     boxprops=dict(color='#464646'),
@@ -113,9 +118,9 @@ def get_time_controller_wise(controller_type):
     travel_times.reset_index(level="pedestrianId", inplace=True, drop=True)
 
     param = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
-    travel_times = travel_times.join(param[reaction_prob_key])
+    travel_times = travel_times.join(param[[condition, stat]])
 
-    travel_times.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    travel_times.rename(columns={condition: condition_short, stat: stat_short}, inplace=True)
 
     return travel_times
 
@@ -516,7 +521,11 @@ def plot_path_choice(path_choice):
 if __name__ == "__main__":
 
     
-    travel_time = get_travel_times()
+    #travel_time = get_travel_times()
+
+    travel_time = get_time_controller_wise(controller_type="ClosedLoop")
+
+
     plot_travel_time(travel_time)
     plot_hists_corridor1()
 
