@@ -2,7 +2,10 @@ from functools import partial
 import os, shutil
 import string
 from time import time_ns
+from matplotlib.ft2font import BOLD
 from pandas.core.indexes import base
+from scipy import rand
+from suqc.CommandBuilder.SumoCommand import SumoCommand
 from suqc.CommandBuilder.VadereOppCommand import VadereOppCommand
 from suqc.environment import CrownetEnvironmentManager
 from suqc.parameter.create import opp_creator, coupled_creator
@@ -39,7 +42,7 @@ def source(ids, distribution, params, start,  end, spawnNumber, maxSpawnNumber):
 
 
 def main(base_path):
-    reps = 5    # seed-set
+    reps = 10    # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
@@ -86,25 +89,9 @@ def main(base_path):
                 },
             "vadere": {
                 **source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 50.0),
+                **source_max_spawn([source_top_right, source_bottom_left], num=1),
             }
-        },
-        {
-            "omnet": {
-                "extends": ext_single_cell,
-                "sim-time-limit": t,
-                "**.vadereScenarioPath" : s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
-                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                },
-            "vadere": {
-                **source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 50.0),
-            }
+            
         },
         {
             "omnet": {
@@ -119,7 +106,7 @@ def main(base_path):
             "vadere": {
                 **source_max_spawn([source_top_left, source_bottom_right], num=0),
                 **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 25.0),
+                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 50.0),
             }
         },
         {
@@ -130,12 +117,12 @@ def main(base_path):
                 "*.pNode[*].app[1].app.mapCfg":
                     mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
             "vadere": {
                 **source_max_spawn([source_top_left, source_bottom_right], num=0),
                 **source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 25.0),
+                **source_dist_par([source_top_right, source_bottom_left], "updateFrequency", 50.0),
             }
         },
     ]
@@ -143,6 +130,7 @@ def main(base_path):
     for v in par_var:
         # -7492697142818052001
         v["vadere"]["attributesSimulation.useFixedSeed"] = True
+        v["vadere"]["attributesSimulation.simulationSeed"] = -1
         v["vadere"]["attributesSimulation.fixedSeed"] = -7492697142818052001
         v["omnet"]["*.traci.launcher.useVadereSeed"] = BoolValue.TRUE
 
@@ -207,7 +195,7 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    par_var, data = setup.run(min(8, len(par_var)))
+    par_var, data = setup.run(min(10, len(par_var)))
     # par_var, data = setup.run(1)y
 
 
