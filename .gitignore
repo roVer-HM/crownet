@@ -156,3 +156,5 @@ build
 dist
 
 /crownet/tests/fingerprint/yml_out.d/
+
+simulation-campaigns/.pydevproject
