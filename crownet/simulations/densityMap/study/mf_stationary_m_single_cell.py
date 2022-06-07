@@ -25,14 +25,13 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 def main(base_path):
     # Enviroment setup.
     #
-    reps = 1    # seed-set
-    
+    reps = 3   # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
         "mapTypeLog", QString("ymfPlusDistStep"),
         # "mapTypeLog", QString("all"),    # debug only
-        "cellAgeTTL", UnitValue.s(-1.0),    # -1.0 no TTL in 
+        "cellAgeTTL", UnitValue.s(30.0),    # -1.0 no TTL in 
         "alpha", 0.75,
         "idStreamType", QString("insertionOrder"),
         "stepDist", 150.0,
@@ -41,18 +40,22 @@ def main(base_path):
         "crownet::MapCfgYmf",
         "writeDensityLog", BoolValue.TRUE,
         "mapTypeLog", QString("ymf"),
+        # "mapTypeLog", QString("all"),
         "cellAgeTTL", UnitValue.s(-1.0),
         "idStreamType", QString("insertionOrder"),
     )
     time = UnitValue.s(100.0)
+    opp_config = "final_stationary_mf"
 
-    def var(ped, run):
+    def var(ped, run, cfg_tpl="misc_pos_"):
         return  {"omnet": {
-                "extends": f"_stationary_m_base_single_cell, misc_pos_{ped}_{run}",
+                "extends": f"_stationary_m_base_single_cell, {cfg_tpl}{ped}_{run}",
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
                 }}
 
     par_var = [ var(ped, run) for ped, run in itertools.product([10, 26, 50, 76, 100, 126, 150, 176, 200], [0]) ]
+    par_var.extend([var(density, run, cfg_tpl="full_") for density, run in itertools.product(range(5), [0])])
+    par_var.extend([var(density, run, cfg_tpl="quarter_") for density, run in itertools.product(range(5), [0])])
 
     seed_m = OmnetSeedManager(
         par_variations=par_var,
@@ -81,7 +84,7 @@ def main(base_path):
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
-        opp_config="final_stationary_mf",
+        opp_config=opp_config,
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""), # use omnet internal mobility models
         # mobility_sim=("vadere", "latest"), # use omnet internal mobility models
@@ -91,12 +94,9 @@ def main(base_path):
         handle_existing="ask_user_replace",
         scenario_provider_class=partial(VariationBasedScenarioProvider, par_var=parameter_variation)
     )
-    env.copy_data(
-        base_ini_file=ini_file,
-        scenario_files=[]
-        )
+    env.copy_data(base_ini_file=ini_file)
 
-    _rnd = SeedManager.rnd_suffix(k=6)
+    _rnd = SeedManager.rnd_suffix()
     setup = CrownetRequest(
         env_man = env,
         parameter_variation=parameter_variation,
@@ -106,7 +106,7 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    # par_var, data = setup.run(len(par_var))
+    # par_var, data = setup.run(min(10, len(par_var)))
     par_var, data = setup.run(1)
 
 
