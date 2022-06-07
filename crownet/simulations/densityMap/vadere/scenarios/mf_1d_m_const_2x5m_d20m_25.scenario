@@ -1,5 +1,5 @@
 {
-  "name" : "mf_1d_m_poisson_2x5m_d280m",
+  "name" : "mf_1d_m_const_2x5m_d20m_25",
   "description" : "",
   "release" : "2.2",
   "processWriters" : {
@@ -82,7 +82,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1000.0,
+      "finishTime" : 10000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -136,9 +136,9 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 0.0,
-          "y" : 54.9,
+          "y" : 184.9,
           "width" : 415.0,
-          "height" : 280.2,
+          "height" : 20.2,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -147,16 +147,16 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 415.0,
-          "height" : 50.1,
+          "height" : 180.1,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "x" : 0.0,
-          "y" : 339.9,
+          "y" : 209.9,
           "width" : 415.0,
-          "height" : 54.5,
+          "height" : 184.5,
           "type" : "RECTANGLE"
         },
         "id" : 5
@@ -168,7 +168,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 335.1,
+          "y" : 205.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -185,7 +185,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 50.1,
+          "y" : 180.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -202,7 +202,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 50.1,
+          "y" : 180.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -219,7 +219,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 335.1,
+          "y" : 205.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -240,19 +240,19 @@
         "id" : 103,
         "shape" : {
           "x" : 405.0,
-          "y" : 335.1,
+          "y" : 205.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.1
+          "updateFrequency" : 25.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -264,19 +264,19 @@
         "id" : 101,
         "shape" : {
           "x" : 405.0,
-          "y" : 50.1,
+          "y" : 180.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.1
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -288,19 +288,19 @@
         "id" : 100,
         "shape" : {
           "x" : 0.0,
-          "y" : 50.1,
+          "y" : 180.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.1
+          "updateFrequency" : 25.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -312,19 +312,19 @@
         "id" : 102,
         "shape" : {
           "x" : 0.0,
-          "y" : 335.1,
+          "y" : 205.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.1
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,

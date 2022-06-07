@@ -2,7 +2,6 @@
   "name" : "mf_m_dyn_poisson_02",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "18fe505ed2d6e17af245e31f7f8194207a0f910f",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
