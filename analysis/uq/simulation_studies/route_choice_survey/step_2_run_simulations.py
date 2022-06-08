@@ -43,10 +43,10 @@ def run_controller(controller, qoi, par_var):
         .create_vadere_container() \
         .experiment_label("output") \
         .with_control("control.py") \
-        .scenario_file(f"vadere/scenarios/{scenario}.scenario") \
         .control_argument("controller-type", controller) \
         .vadere_tag("latest") \
         .control_tag("latest")
+        #.scenario_file(f"vadere/scenarios/123.scenario")
 
 
     setup = CoupledDictVariation(
@@ -61,7 +61,7 @@ def run_controller(controller, qoi, par_var):
         remove_output=False,
     )
 
-    par, data = setup.run(12)
+    par, data = setup.run(2)
 
     par.to_csv(os.path.join(os.getcwd(), f"{controller}_parameters.csv"))
     for qoi_, vals_ in data.items():

@@ -201,10 +201,10 @@ if __name__ == "__main__":
     )
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings)
 
-    area = None
-    if "vadere/scenarios/route_choice_real_world.scenario" in settings:
+
+    if "route_choice_real_world.scenario" in settings:
         area = Rectangle(x=180., y=190., width=20., height=15.)
-    elif "vadere/scenarios/three_corridors.scenario" in settings:
+    elif "three_corridors.scenario" in settings:
         area = Rectangle(x=0., y=0., width=25., height=25.)
     else:
         raise ValueError("Redirection area undefined for scenario.") #TODO use measurement area instead (necessary for omnet)
