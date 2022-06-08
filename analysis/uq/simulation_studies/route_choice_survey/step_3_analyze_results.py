@@ -31,6 +31,11 @@ c__ = {11: "Short",
        'Corridor3': "Long",
        }
 
+condition = "('Parameter', 'dummy_var', 'condition')"
+stat = "('Parameter', 'dummy_var', 'statistic')"
+condition_short = 'condition'
+stat_short = 'stat'
+
 args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', markersize=3,
                                     linestyle='none', markeredgecolor='#AAAAAA'),
                     boxprops=dict(color='#464646'),
@@ -49,8 +54,6 @@ compliance_rate = "Compliance rate c"
 probs = np.linspace(0, 1.0, 10)
 
 def get_fundamental_diagrams(controller_type, time_start=None):
-    if time_start is None:
-        time_start = sim_time_steady_flow_start
 
     c1 = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
     c2 = pd.read_csv(f"{controller_type}_fundamentalDiagramm.csv", index_col=[0, 1])
@@ -59,29 +62,22 @@ def get_fundamental_diagrams(controller_type, time_start=None):
     densities_closed_loop[simulation_time] = densities_closed_loop[time_step_key] * time_step_size
     densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] >= time_start]
     densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] < sim_time_steady_flow_end]
-    densities_closed_loop.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
-                               inplace=True)
-    densities_closed_loop.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    densities_closed_loop.rename(columns={condition: condition_short, stat: stat_short}, inplace=True)
 
     velocities_ = densities_closed_loop.drop(columns=list(densities_dict.keys()))
     velocities_.rename(columns=velocities_dict, inplace=True)
     velocities_["Controller"] = controller_type
     velocities_.sort_index(axis=1, inplace=True)
+    velocities_ = velocities_[['Controller', 'Corridor1', 'Corridor2', 'Corridor3', 'Simulation time','condition', 'stat']]
 
     densities_ = densities_closed_loop.drop(columns=list(velocities_dict.keys()))
     densities_.rename(columns=densities_dict, inplace=True)
     densities_["Controller"] = controller_type
     densities_.sort_index(axis=1, inplace=True)
-
-
-    aaa = get_densities(controller_type=controller_type)
-
-    if densities_.equals(aaa):
-        print(f"{controller_type}: density check successful.")
-    else:
-        raise ValueError("Fundamental diagram densities differ from measured densities.")
+    densities_ = densities_[['Controller', 'Corridor1', 'Corridor2', 'Corridor3', 'Simulation time','condition', 'stat']]
 
     return densities_, velocities_
+
 
 
 def get_densities(controller_type):
@@ -113,9 +109,9 @@ def get_time_controller_wise(controller_type):
     travel_times.reset_index(level="pedestrianId", inplace=True, drop=True)
 
     param = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
-    travel_times = travel_times.join(param[reaction_prob_key])
+    travel_times = travel_times.join(param[[condition, stat]])
 
-    travel_times.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    travel_times.rename(columns={condition: condition_short, stat: stat_short}, inplace=True)
 
     return travel_times
 
@@ -124,184 +120,61 @@ def get_travel_times():
     c2 = get_time_controller_wise(controller_type="OpenLoop")
     c3 = get_time_controller_wise(controller_type="ClosedLoop")
     travel_times = pd.concat([c2, c3])
+    travel_times = travel_times[travel_times["travel_time"] != np.inf]
     return travel_times
 
 
 def plot_travel_time(travel_time):
-    travel_time = travel_time[travel_time["travel_time"] != np.inf]
 
     for c, data in travel_time.groupby(by=["Controller"]):
         data.drop(columns="Controller", inplace=True)
         data.reset_index(inplace=True, drop=True, )
-        data[reaction_prob_key_short] = data[reaction_prob_key_short].round(3)
-        data = data.pivot(columns=["reactionProbability"])
-        data.columns = data.columns.droplevel()
-        data.rename(columns=controller__, inplace=True)
-        data.boxplot(**args_boxplot)
-        plt.ylim()
-        plt.xlabel("Parameter c")
-        plt.ylim(0, 1000)
-        plt.title(f"{controller__[c]}")
-        plt.xticks(np.arange(1, 45, 4), [f"{x:.1f}" for x in np.linspace(0, 1, 11)])
-        plt.ylabel("Travel time [s]")
-        plt.xlabel(compliance_rate)
-        plt.savefig(f"figs/travel_time_{controller__[c]}.pdf")
-        plt.show()
-        print()
-
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
-    fig.subplots_adjust(wspace=0.1, hspace=0)
-
-    time_25 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.25).unstack(level=0)
-    time_25.columns = time_25.columns.droplevel(0)
-    time_25.rename(columns=controller__, inplace=True)
-    plt.sca(ax[0])
-    ax[0].hlines(y=time_25.max(), xmin=0, xmax=1, colors=["k"])
-    time_25.plot(marker="o", ax=ax[0])
-    plt.legend()
-    ax[0].set_title("25% Quartile")
-    ax[0].set_ylim(25, 250)
-    ax[0].legend()
-    ax[0].set_ylabel("Travel time [s]")
-    ax[0].set_xlabel(compliance_rate)
-
-    time_med = travel_time.groupby(by=["Controller", reaction_prob_key_short]).median().unstack(level=0)
-    time_med.columns = time_med.columns.droplevel(0)
-    time_med.rename(columns=controller__, inplace=True)
-    plt.sca(ax[1])
-    ax[1].hlines(y=time_med.max(), xmin=0, xmax=1, colors=["k"])
-    time_med.plot(marker="o", ax=ax[1])
-    ax[1].set_title("Median")
-    #ax[1].set_ylim(0, 250)
-    ax[1].legend()
-    # ax[1].set_ylabel("Travel time [s]")
-    ax[1].set_xlabel(compliance_rate)
-
-    time_75 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.75).unstack(level=0)
-    time_75.columns = time_75.columns.droplevel(0)
-    time_75.rename(columns=controller__, inplace=True)
-    plt.sca(ax[2])
-    ax[2].hlines(y=time_75.max(), xmin=0, xmax=1, colors=["k"])
-    time_75.plot(marker="o", ax=ax[2])
-    ax[2].set_title("75% Quartile")
-    #ax[2].set_ylim(0, 250)
-    ax[2].legend()
-    # ax[2].set_ylabel("Travel time [s]")
-    ax[2].set_xlabel(compliance_rate)
+        data.set_index(["condition", "stat"], inplace=True)
 
 
-    plt.savefig("figs/Travel_time.pdf")
-    plt.show()
-    print("")
+        for s_, data_s in data.groupby(level="stat"):
 
 
-def plot_hists_corridor1():
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController")
+            tit = f"BoxplotTravelTimeStat__{s_}_{c}"
+            data_s.index = data_s.index.droplevel(1)
+            data_s = pd.DataFrame(data_s.unstack() , columns= ["travel_time"])
+            data_s.reset_index(inplace=True)
+            data_s = data_s.drop(columns=["level_0"])
+            data_s = data_s.pivot(columns=[condition_short])
+            data_s.columns = data_s.columns.droplevel(0)
 
-    for c in ["Corridor1"]:
-        velocities[c][densities[c] == 0] = np.nan
+            x = [data_s[column].dropna().values for column in data_s]
+            res = stats.kruskal(*x)
 
-    velocities.dropna(inplace=True)
+            data_s.boxplot()
+            plt.title(f"{c}, point est. likeli: {s_}, Kruskal-Wallis: p={res.pvalue:.3f}")
+            plt.ylabel("Travel time [s]")
+            plt.xlabel("Communication strategy")
+            plt.savefig(f"figs/{tit}.png")
+            plt.show()
 
-    densities[simulation_time] = densities[simulation_time].round(2)
-    densities.reset_index(inplace=True)
-    densities.set_index(["id", simulation_time], inplace=True)
+            print()
 
-    for ii, data in densities["Corridor1"].groupby(by=["id"]):
-        data.index = data.index.droplevel(0)
-        data.plot(label=f"Simulation run {ii + 1}")  # bins=20, range=(0, 0.5))
+        statistics_ = data.groupby(level=["stat", "condition"]).describe()
+        statistics_.columns = statistics_.columns.droplevel(0)
+        statistics_.drop(columns='count', inplace=True)
 
-    plt.legend()
-    plt.xlabel("Simulation time [s]")
-    plt.ylabel("Density [$ped/m^{2}$]")
-    plt.title("Short corridor (no rerouting)")
-    plt.savefig("figs/DensityOverTime.pdf")
-    plt.show()
-
-    velocities[simulation_time] = velocities[simulation_time].round(2)
-    velocities.reset_index(inplace=True)
-    velocities.set_index(["id", simulation_time], inplace=True)
-
-    for ii, data in velocities["Corridor1"].groupby(by=["id"]):
-        data.index = data.index.droplevel(0)
-        data.plot(label=f"Simulation run {ii + 1}")  # bins=20, range=(0, 0.5))
-
-    plt.legend()
-    plt.xlabel("Simulation time [s]")
-    plt.ylabel("Velocity [$m/s$]")
-    plt.title("Short corridor (no rerouting)")
-    plt.savefig("figs/VelocityOverTime.pdf")
-    plt.show()
-
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController")
-    times = get_time_controller_wise(controller_type="NoController")
-
-    df = pd.concat([densities["Corridor1"].describe(), velocities["Corridor1"].describe()], axis=1)
-
-    df["t"] = times[times["travel_time"] != np.inf].describe()["travel_time"]
-
-    df.columns = ["Density $ped/m**2$", "Velocity $m/s$", "Travel time [s]"]
-    df = df.transpose()
-    df.to_latex("tables/NoControlCorridor1.tex", float_format="%.2f")
+        for s_, data_s in statistics_.groupby(level="stat"):
+            # TODO replace with boxplo??
+            tit = f"TravelTimeStat__{s_}_{c}"
+            data_s.index = data_s.index.droplevel(0)
+            data_s.plot(subplots=True, title=f"Controller {c} Travel time {s_}", marker="o")
+            plt.savefig(f"figs/{tit}.png")
+            plt.show()
 
 
-def get_fundamental_diagram_corridor1():
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController")
-
-    for c in ["Corridor1"]:
-        velocities[c][densities[c] == 0] = np.nan
-        densities[c][densities[c] == 0] = np.nan
-
-    densities.dropna(inplace=True)
-    velocities.dropna(inplace=True)
-
-    flux = densities["Corridor1"] * velocities["Corridor1"]
-
-
-    degree = 2
-    polyreg = make_pipeline(PolynomialFeatures(degree), LinearRegression())
-    polyreg.fit(densities["Corridor1"].values.reshape(-1, 1), flux.values.reshape(-1, 1))
-
-    plt.scatter(densities["Corridor1"], flux, label="Simulation data")
-    d__ = np.linspace(0, 2.1)
-    flow_reg = polyreg.predict(d__.reshape(-1, 1))
-    plt.plot(d__, flow_reg.ravel(), color="black", label="Regression (poly.)")
-
-    d___ = np.linspace(2.1, 3.2)
-    flow_reg_ = polyreg.predict(d___.reshape(-1, 1))
-    plt.plot(d___, flow_reg_.ravel(), color="black", linestyle="--", label=None)
-
-    plt.scatter(2.1, flow_reg.max(), marker="D", c="black", label="$J_{1,max}$ (Regression)")
-    plt.text(2.1 + 0.1, flow_reg.max() + 0.05, f'{flow_reg.max():.2f} (d = 2.1 $ped/m^{2}$)')
-
-    densitiy_max_flux = densities.iloc[np.where(flux == flux.max())[0][0], :]["Corridor1"]
-    plt.scatter(densitiy_max_flux, flux.max(), marker="s", c="black", label="$J_{1,max}$ (Data)")
-    plt.text(densitiy_max_flux + 0.1, flux.max() + 0.0, f'{flux.max():.2f} (d = {densitiy_max_flux:.2f} $ped/m^{2}$)')
-
-    plt.xlabel("Density [ped/m²]")
-    plt.ylabel("Specific flow [1/(ms)]")
-    plt.xlim(-0.1, 3.5)
-    plt.title(f"Fundamental diagram: short corridor")
-    plt.legend()
-    plt.savefig(f"figs/fundamentalDiagramShortCorridor1.pdf")
-    plt.show()
-
-    plt.scatter(densities["Corridor1"], velocities["Corridor1"], label="Simulation data")
-    plt.xlabel("Density [$ped/m^{2}$]")
-    plt.ylabel("Velocity [m/s]")
-    plt.title(f"Fundamental diagram: short corridor")
-    plt.xlim(-0.1, 3.5)
-    plt.legend()
-    plt.savefig(f"figs/fundamentalDiagramShortCorridor2.pdf")
-    plt.show()
-
-
-def get_densities_velocities():
-    densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop")
-    densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop")
+def get_densities_velocities(start_time = None):
+    densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop", time_start= start_time)
+    densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop", time_start=start_time)
 
     densities = pd.concat([densities_closed_loop, densities_open_loop])
     velocities = pd.concat([velocities_closed_loop, velocities_open_loop])
+
 
     for c in corridors.values():
         velocities[c][densities[c] == 0] = np.nan
@@ -331,16 +204,15 @@ def get_path_choice(controller_type):
     path_choice[simulation_time] = path_choice[time_step_key] * time_step_size
     path_choice = path_choice[path_choice[simulation_time] >= sim_time_steady_flow_start]
     path_choice = path_choice[path_choice[simulation_time] < sim_time_steady_flow_end]
-    path_choice.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
-                     inplace=True)
-    path_choice.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    path_choice = path_choice[[condition, stat, "Simulation time", "corridorRecommended"]]
+
+    path_choice.rename(columns={condition: condition_short, stat: stat_short}, inplace=True)
     path_choice = path_choice.assign(Controller=controller_type)
     path_choice.sort_index(axis=1, inplace=True)
 
     path_choice.reset_index(inplace=True)
     path_choice.drop(columns=["run_id", "id"], inplace=True)
     path_choice.set_index(simulation_time, inplace=True)
-    path_choice[reaction_prob_key_short] = path_choice[reaction_prob_key_short].round(3)
     return path_choice
 
 
@@ -378,31 +250,38 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
         i += 1
 
     fig.suptitle("                  ".join(c_order), fontsize=16, x=0.47)
-    plt.savefig(f"figs/{file_name}.pdf")
+    plt.savefig(f"figs/{file_name}.png")
     plt.show()
     print()
 
 
 def plot_route_1_recommended(path_choice, corridor_=11, ax=None):
-    corridor = c__[corridor_]
 
     pp = path_choice[path_choice["Controller"] == "OpenLoop"]
     pp = pp[pp["corridorRecommended"] == corridor_]
     l1 = 1  # len(pp["corridorRecommended"])
-    ppp = pp.groupby(by=reaction_prob_key_short).count()
+    ppp = pp.groupby(by=[stat_short,condition_short]).count()
 
     pp = path_choice[path_choice["Controller"] == "ClosedLoop"]
     pp = pp[pp["corridorRecommended"] == corridor_]
     l2 = 1  # len(pp["corridorRecommended"])
-    pp = pp.groupby(by=reaction_prob_key_short).count()
+    pp = pp.groupby(by=[stat_short,condition_short]).count()
 
     ppp = pd.concat([ppp["corridorRecommended"] / l1, pp["corridorRecommended"] / l2], axis=1).fillna(0)
     ppp.columns = list(controller__.values())
-    ax.plot(ppp, marker="o")
-    ax.legend(ppp.columns)
 
-    ax.set_xlabel(compliance_rate)
-    ax.set_title(f"{corridor} route")
+    for cont in ["Minimal density strategy", "Fixed order strategy"]:
+        df = ppp[cont].unstack()
+        df.transpose().plot.bar(subplots=True, layout=(2, 2), sharex=False, sharey= False, legend=None)
+        plt.suptitle(f"{cont}, {c__[corridor_]} corridor")
+        plt.savefig(f"figs/Recommendations_{cont}_{c__[corridor_]}.png")
+        plt.ylabel("Number of recommendations")
+        plt.xlabel("Condition")
+        plt.show()
+        print()
+
+
+
 
 
 
@@ -436,7 +315,7 @@ def compare_random_densitiies(dd, travel_time, value="Median", ):
 
 
     plt.subplots_adjust(wspace=0.2, hspace=0)
-    plt.savefig(f"figs/{value}DensityDist2.pdf")
+    plt.savefig(f"figs/{value}DensityDist2.png")
     plt.show()
 
     dd.boxplot(grid=False)
@@ -448,7 +327,7 @@ def compare_random_densitiies(dd, travel_time, value="Median", ):
 
     plt.ylabel(f"{value} density [$ped/m^2$]")
     plt.title("Short corridor")
-    plt.savefig(f"figs/{value}DensityDist.pdf")
+    plt.savefig(f"figs/{value}DensityDist.png")
     plt.show()
     # not normally distributed, if p < 0.05
     s_1 = stats.kstest(dd.iloc[:, 0], "norm")
@@ -477,12 +356,12 @@ def compare_random_densitiies(dd, travel_time, value="Median", ):
     a[0][1].set_xlim(60, 200)
     a[0][1].set_yticklabels([])
     plt.subplots_adjust(wspace=0.2, hspace=0)
-    plt.savefig(f"figs/{value}TravelDist2.pdf")
+    plt.savefig(f"figs/{value}TravelDist2.png")
     plt.show()
 
     times.boxplot()
     plt.ylabel(f"{value} travel time [s]")
-    plt.savefig(f"figs/{value}TravelDist.pdf")
+    plt.savefig(f"figs/{value}TravelDist.png")
     plt.show()
 
     s_1_ = stats.kstest(times.iloc[:, 0], "norm")
@@ -500,52 +379,81 @@ def compare_random_densitiies(dd, travel_time, value="Median", ):
         f.write(f"Kruskal Wallis test: times. no difference between groups, since  p = {kruskal_.pvalue} > 0.05.\n")
         f.write(f"mannwhitneyu test: times. no difference between groups , p = {mannwhitneyU_.pvalue} > 0.05.\n")
 
-    print()
 
 def plot_path_choice(path_choice):
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
-    fig.subplots_adjust(wspace=0.1, hspace=0)
-    ax[0].set_ylim(-10, 550)
-    ax[0].set_ylabel("Number of recommendations")
-    plot_route_1_recommended(path_choice, 11, ax[0])
-    plot_route_1_recommended(path_choice, 21, ax[1])
-    plot_route_1_recommended(path_choice, 31, ax[2])
-    fig.savefig(f"figs/routesrecommded.pdf")
-    plt.show()
+    plot_route_1_recommended(path_choice, 11)
+    plot_route_1_recommended(path_choice, 21)
+    plot_route_1_recommended(path_choice, 31)
+
+
+def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
+
+    for controller, data in quantity.groupby(by="Controller"):
+        data.set_index(["Simulation time"], inplace=True)
+        data.plot(linestyle = 'None', marker=".")
+        plt.ylabel(name)
+        plt.title(f"{controller}, {name}, {stationary}")
+        print("Start saving....")
+        plt.savefig(f"figs/Stationary_{controller}_{name}_{stationary}.png")
+        plt.show()
+        print("finished saving....")
+
+
+def plot_distributions(quantity, name="density"):
+
+    corridors = ["Corridor1", "Corridor2", "Corridor3"]
+    for controller, data in quantity.groupby(by="Controller"):
+
+        data.set_index(["stat", "condition"], inplace=True)
+        data = data[corridors]
+        for stats_, data_ in data.groupby(level="stat"):
+            data_.groupby(level="condition").boxplot(layout=(2,4))
+            plt.suptitle(f"{controller}, {name}, {stats_}")
+            plt.savefig(f"figs/{name}_{controller}_{stats_}.png")
+            plt.show()
+
+def compare_corridor1_dists(quantity, name="density"):
+
+    #quantity.set_index(, inplace=True)
+
+    for controller, data in quantity.groupby(by="Controller"):
+
+        data = data[["condition", "Corridor1", "stat"]]
+        data = data.set_index("stat")
+
+        for stats_, data_ in data.groupby(level="stat"):
+
+            data_ = data_.reset_index().pivot(values="Corridor1", columns="condition")
+
+            x = [data_[column].dropna().values for column in data_]
+            res = stats.kruskal(*x)
+
+            data_.boxplot()
+            plt.suptitle(f"Short c, {stats_} , {controller}, {name}, Kruskal-Wallis: p={res.pvalue:.3f}")
+            plt.savefig(f"figs/Short_{name}_{stats_}_{controller}.png")
+            plt.show()
+            print()
+
+
 
 if __name__ == "__main__":
 
     
     travel_time = get_travel_times()
-    plot_travel_time(travel_time)
-    plot_hists_corridor1()
-
-    get_fundamental_diagram_corridor1()
-
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
+    densities, velocities = get_densities_velocities(start_time=0.0)
+    densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
+    compare_corridor1_dists(densities_stat, name="Density")
+    compare_corridor1_dists(velocities_stat, name="Velocity")
+
+
+    plot_distributions(densities_stat, name="Density")
+    plot_distributions(velocities_stat, name="Velocity")
+
     plot_path_choice(path_choice=path_choice)
+    plot_travel_time(travel_time)
+    plot_stationary_behavior(densities_stat, name="Density")
+    plot_stationary_behavior(velocities_stat, name="Velocity")
+    plot_stationary_behavior(densities, name="Density", stationary="inflow")
+    plot_stationary_behavior(velocities, name="Velocity", stationary="inflow")
 
-    densities, velocities = get_densities_velocities()
-
-    plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [$ped/m^2$]")
-    plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocity [$m/s$]")
-
-    # write table data
-    velocities.drop(columns=simulation_time). \
-        groupby(by=["Controller", reaction_prob_key_short]). \
-        median(). \
-        to_latex("tables/velocities.tex")
-    d_med = densities.drop(columns=simulation_time). \
-        groupby(by=["Controller", reaction_prob_key_short]). \
-        median()
-    d_med.to_latex("tables/densities.tex")
-    compare_random_densitiies(dd=d_med, value="Median", travel_time=travel_time)
-
-    velocities.drop(columns=simulation_time). \
-        groupby(by=["Controller", reaction_prob_key_short]). \
-        mean(). \
-        to_latex("tables/velocities_mean.tex")
-    d_mean = densities.drop(columns=simulation_time). \
-        groupby(by=["Controller", reaction_prob_key_short]). \
-        mean()
-    d_mean.to_latex("tables/densities_mean.tex")
