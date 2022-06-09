@@ -76,6 +76,18 @@ if __name__ == "__main__":
 
 
     dists = pd.read_csv("route_choice_dists.dat")
+    dists2 = pd.read_csv("RouteUtilizations.csv")
+
+    list_ = list()
+    for pop, data in dists2.groupby(by="population"):
+        data.drop(columns="population", inplace=True)
+        data = data.set_index("condition").unstack().reset_index()
+        data = data.rename(columns={"level_0": "route", 0: pop})
+        list_.append(data)
+
+    dists2 = list_[0].merge(list_[1])
+    dists = dists2
+
 
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
     start_time = time.time()
@@ -87,9 +99,7 @@ if __name__ == "__main__":
     conditions = ["A1","A2","A3","A4","B1","B2","B3","B4"]
     for condition in conditions:
 
-
-
-        for stat in ["mean", "median", "q1", "q3"]:
+        for stat in ["Students", "Fans"]: # ["mean", "median", "q1", "q3"]:
 
             df = dists[dists["condition"] == condition]
 
@@ -106,7 +116,7 @@ if __name__ == "__main__":
             par_var_.append(sample)
 
 
-    reps = 3
+    reps = 5
     par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
 
     qoi1 = "densities.txt"
