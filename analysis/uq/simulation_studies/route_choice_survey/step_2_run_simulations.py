@@ -61,7 +61,7 @@ def run_controller(controller, qoi, par_var):
         remove_output=False,
     )
 
-    par, data = setup.run(2)
+    par, data = setup.run(10)
 
     par.to_csv(os.path.join(os.getcwd(), f"{controller}_parameters.csv"))
     for qoi_, vals_ in data.items():
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     qoi4 = "targetReachTime.txt"
     qoi5 = "path_choice.txt" # collect these quantities of interest
 
-    run_controller(controller="OpenLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3, qoi4, qoi5] )
-    #run_controller(controller="NoController", par_var=par_var[:reps], qoi=[qoi1, qoi2, qoi3, qoi4])  # only zero needed
+    run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3, qoi4, qoi5] )
+    run_controller(controller="NoController", par_var=par_var[:reps], qoi=[qoi1, qoi2, qoi3, qoi4])  # only zero needed
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")

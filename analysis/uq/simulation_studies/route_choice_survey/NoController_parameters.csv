@@ -1,4 +1,6 @@
 id,run_id,"('Parameter', 'dummy_var', 'condition')","('Parameter', 'dummy_var', 'statistic')","('Parameter', 'vadere', 'fixedSeed')","('Parameter', 'vadere', 'routeChoices.[instruction==""use target 11""].targetProbabilities')","('Parameter', 'vadere', ""routeChoices.[instruction=='use target 21'].targetProbabilities"")","('Parameter', 'vadere', 'routeChoices.[instruction==use target 31].targetProbabilities')","('MetaInfo', 'required_wallclock_time')","('MetaInfo', 'return_code')"
-0,0,A1,mean,74895,"[1.0, 0.0, 0.0]","[0.71, 0.29, 0.0]","[0.36, 0.36, 0.29]",608.2558472156525,0
-1,0,A1,mean,4271,"[1.0, 0.0, 0.0]","[0.71, 0.29, 0.0]","[0.36, 0.36, 0.29]",608.1541428565979,0
-2,0,A1,mean,56216,"[1.0, 0.0, 0.0]","[0.71, 0.29, 0.0]","[0.36, 0.36, 0.29]",628.0613956451416,0
+0,0,A1,Students,74895,"[1.0, 0.0, 0.0]","[0.75, 0.25, 0.0]","[0.4, 0.35, 0.25]",634.8471949100494,0
+1,0,A1,Students,4271,"[1.0, 0.0, 0.0]","[0.75, 0.25, 0.0]","[0.4, 0.35, 0.25]",623.6429345607758,0
+2,0,A1,Students,56216,"[1.0, 0.0, 0.0]","[0.75, 0.25, 0.0]","[0.4, 0.35, 0.25]",645.7931489944458,0
+3,0,A1,Students,63251,"[1.0, 0.0, 0.0]","[0.75, 0.25, 0.0]","[0.4, 0.35, 0.25]",622.643091917038,0
+4,0,A1,Students,75772,"[1.0, 0.0, 0.0]","[0.75, 0.25, 0.0]","[0.4, 0.35, 0.25]",622.5391361713409,0
