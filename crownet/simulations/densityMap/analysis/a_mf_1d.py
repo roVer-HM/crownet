@@ -1,6 +1,8 @@
 from __future__ import annotations
 from math import floor
-import multiprocessing
+
+from multiprocessing import get_context
+
 import os
 from matplotlib import pyplot as plt
 import numpy as np
@@ -41,33 +43,6 @@ def read_vadere_ts(ts_x_path, ts_y_path):
     data.index.name = "time"
     return data
 
-def merge_maps(study: SuqcRun, scenario_lbl: str, rep_ids: list) -> pd.DataFrame:
-    """Average density map over multiple runs / seeds
-
-    Args:
-        study (SuqcRun): Suqc study object (access to run definitions and output)
-        scenario_lbl (str): Label for scenario 
-        ids (list): List of runs over which to average. len(rep_ids) := N (number of seeds)
-
-    Returns:
-        pd.DataFrame: Index names ['simtime', ['scenario', 'data']] 
-    """
-    
-    df = []
-    for i, id in enumerate(rep_ids):
-        _map = study.get_sim(id).get_dcdMap()
-        _df = _map.count_diff().loc[:, ["count_mean"]]
-        _df = _df.rename(columns={"count_mean": "map_count"})
-        _df.columns = pd.MultiIndex.from_product(
-            [[scenario_lbl], [i], _df.columns],
-            names=["sim", "scenario", "data"]
-        )
-        df.append(_df)
-    
-    df = pd.concat(df, axis=1, verify_integrity=True).unstack()
-    df = df.groupby(level=["sim", "simtime", "data"]).describe() # over multiple runs/seeds
-    return df
-
 def process_variation(study: SuqcRun, scenario_lbl: str, rep_ids: list) -> dict:
     """collect results for one run based on multiple repetitions
 
@@ -83,7 +58,7 @@ def process_variation(study: SuqcRun, scenario_lbl: str, rep_ids: list) -> dict:
             "df": pd.DataFrame (N,M) index["simtime] 
         } 
     """
-    df = merge_maps(study, scenario_lbl, rep_ids)
+    df = OppAnalysis.merge_maps(study, scenario_lbl, rep_ids, data=["count_mean"], columns_rename=dict(count_mean="map_count"))
     adf = adf_test(df.reset_index()[["simtime", "mean"]].iloc[1:].copy(deep=True).set_index(["simtime"]))
     adf.name = "adf"
     adf = adf.to_frame()
@@ -110,7 +85,7 @@ def process_simulation_run(study: SuqcRun, scenario_map: dict, vadere_ts: pd.Dat
     # average raw data over seeds and calculate statistic 
     ret = []
     args = [ (study, k, scenario_map[k]["rep"]) for k in scenario_map.keys()]
-    with multiprocessing.Pool(10) as p:
+    with get_context("spwan").Pool(10) as p:
         ret: dict = p.starmap(process_variation, args)
     map_out = pd.concat([e["stat"] for e in ret], axis=1, verify_integrity=True).T
 
@@ -136,8 +111,8 @@ def create_map_ts_figure(study: SuqcRun, scenario_map:dict, ground_truth_ts: pd.
     
     # get average density map from scenario map
     run_args = [ (study, k, scenario_map[k]["rep"]) for k in scenario_map.keys()]
-    with multiprocessing.Pool(6) as pool:
-        maps=  pool.starmap(merge_maps, run_args)
+    with get_context("spawn").Pool(1) as pool:
+        maps=  pool.starmap(OppAnalysis.merge_maps, run_args)
     maps = pd.concat(maps, axis=0, verify_integrity=True)
 
     _v = ground_truth_ts.loc[:5000, [ts]]  # only first 5000 seconds
@@ -198,20 +173,20 @@ def process_1d_scenario():
     run_map = {
         "1d_0": dict(rep= list(range(0, 5)), ts=ts_x, lbl = r"1d\_0: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"),   # ts_x
         "1d_1": dict(rep=list(range(5, 10)), ts=ts_x, lbl = r"1d\_1: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$"),  # ts_x
-        "1d_2": dict(rep=list(range(10, 15)), ts=ts_y, lbl = r"1d\_2: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"), # ts_y
-        "1d_3": dict(rep=list(range(15, 20)), ts=ts_y, lbl = r"1d\_3: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$") # ts_y
+        # "1d_2": dict(rep=list(range(10, 15)), ts=ts_y, lbl = r"1d\_2: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"), # ts_y
+        # "1d_3": dict(rep=list(range(15, 20)), ts=ts_y, lbl = r"1d\_3: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$") # ts_y
     }
 
     # figure (ground truth)
     v_ts = read_vadere_ts(ts_x_path, ts_y_path)
-    make_vader_ts_figure(v_ts, out_path)
+    # make_vader_ts_figure(v_ts, out_path)
     # figure (maps over ground truth)
     create_map_ts_figure(run, run_map, v_ts, ts_x, out_path) 
-    create_map_ts_figure(run, run_map, v_ts, ts_y, out_path) 
+    # create_map_ts_figure(run, run_map, v_ts, ts_y, out_path) 
     # statistics for map and ground truth data
-    stat_sim, stat_vadere = process_simulation_run(run, run_map, v_ts)
-    stat_sim.to_csv(os.path.join(out_path, "mapStat.csv"))
-    stat_vadere.to_csv(os.path.join(out_path, "vadereStat.csv"))
+    # stat_sim, stat_vadere = process_simulation_run(run, run_map, v_ts)
+    # stat_sim.to_csv(os.path.join(out_path, "mapStat.csv"))
+    # stat_vadere.to_csv(os.path.join(out_path, "vadereStat.csv"))
     print("done")
 
 if __name__ == "__main__":

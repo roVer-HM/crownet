@@ -50,10 +50,11 @@ def main(base_path):
     def var(ped, run, cfg_tpl="misc_pos_"):
         return  {"omnet": {
                 "extends": f"_stationary_m_base_single_cell, {cfg_tpl}{ped}_{run}",
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist,
+                "seed-set": run,
                 }}
 
-    par_var = [ var(ped, run) for ped, run in itertools.product([10, 26, 50, 76, 100, 126, 150, 176, 200], [0]) ]
+    par_var = [ var(ped, run) for ped, run in itertools.product([10, 26, 50, 76, 100, 126, 150, 176, 200],[0, 1, 2]) ]
     par_var.extend([var(density, run, cfg_tpl="full_") for density, run in itertools.product(range(5), [0])])
     par_var.extend([var(density, run, cfg_tpl="quarter_") for density, run in itertools.product(range(5), [0])])
 
@@ -106,8 +107,8 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    # par_var, data = setup.run(min(10, len(par_var)))
-    par_var, data = setup.run(1)
+    par_var, data = setup.run(min(10, len(par_var)))
+    # par_var, data = setup.run(1)
 
 
 
