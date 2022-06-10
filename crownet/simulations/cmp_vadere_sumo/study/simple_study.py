@@ -256,7 +256,7 @@ def analyze_parameter_study(base_path: str, config: str) -> pd.DataFrame:
         dfs_avg = average_sim_data(dfs_aggregated)
         dfs_avg.to_hdf(os.path.join(os.path.join(get_results_dir(base_path), config),
                                     f'{var_parameter["name"]}_{param_value}_rcvdPktLifetime_avg.h5'),
-                       key=f'dfs_avg', mode='w')
+                       key=f'dfs_avg', mode='w', complevel=3)
         mean_values.append(dfs_avg["value"].mean())
         stddev_values.append(dfs_avg["value"].std())
         index_values.append(param_value)
