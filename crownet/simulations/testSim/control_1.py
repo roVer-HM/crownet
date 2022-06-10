@@ -40,16 +40,10 @@ class ChangeTarget(Controller):
         return s
 
 
-    def get_stimulus_info(self, target):
-
+    def handle_sim_step(self, sim_time, sim_state):
         s = self.get_stimulus_info(target=3)
         print(s.toJSON())
-        self.con_manager.domains.v_sim.send_control(message=s.toJSON())
-        self.time_stepper.forward_time()
-
-        s = self.get_stimulus_info(target=3)
-        print(s.toJSON())
-        self.con_manager.domains.v_sim.send_control(message=s.toJSON())
+        self.con_manager.domains.v_sim.send_control(message=s.toJSON(), sending_node_id="misc[0].app[0]")
         self.time_stepper.forward_time()
 
     def handle_init(self, sim_time, sim_state):

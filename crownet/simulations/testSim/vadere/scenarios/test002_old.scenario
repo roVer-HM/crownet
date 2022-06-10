@@ -1,8 +1,7 @@
 {
   "name" : "test002",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "18fe505ed2d6e17af245e31f7f8194207a0f910f",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -109,13 +108,7 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "MultiPerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel",
-        "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.perception.AttributesMultiPerceptionModel" : { },
-          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
-            "routeChoices" : [ ]
-          }
-        }
+        "cognition" : "ProbabilisticCognitionModel"
       }
     },
     "topography" : {
@@ -290,6 +283,10 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -400,
+      "reactionProbability" : 1.0
+    } ]
   }
 }
