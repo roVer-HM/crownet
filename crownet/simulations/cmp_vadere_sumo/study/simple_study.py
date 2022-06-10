@@ -10,6 +10,7 @@ import psutil
 import random
 import shutil
 import string
+import time
 from enum import Enum
 from typing import List, Dict, Any
 
@@ -88,7 +89,7 @@ def main(base_path):
     time = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
-    configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple"]
+    configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
 
     par_var = [
         {
@@ -196,6 +197,12 @@ def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, con
 
     print("setup done")
     nr_parallel = max_parallel_sims(mobility_sim)
+    nr_retries = 20
+    while nr_parallel < 1 and nr_retries > 0:
+        print(f'Cannot start simulations - not enough free memory! Retrying in 3s.')
+        time.sleep(3)
+        nr_parallel = max_parallel_sims(mobility_sim)
+        nr_retries = nr_retries - 1
     print(f'estimated maximum number of parallel simulations: {nr_parallel}')
     setup.run(nr_parallel)
 
@@ -206,8 +213,10 @@ def max_parallel_sims(mobility_sim: MobilitySimulatorType) -> int:
         estimated_mem_per_sim = estimated_mem_per_sim + MEM_PER_SIM_SUMO_GB
     elif mobility_sim == MobilitySimulatorType.VADERE:
         estimated_mem_per_sim = estimated_mem_per_sim + MEM_PER_SIM_VADERE_GB
-
-    max_sims = int(((psutil.virtual_memory()[4]) / (1024 * 1024 * 1024)) / estimated_mem_per_sim)
+    mem = psutil.virtual_memory()
+    # consider free and cached memory for simulations (since cached memory will be freed upon request)
+    mem_available_gb = ((mem.free + mem.cached) / (1024 * 1024 * 1024))
+    max_sims = int(mem_available_gb / estimated_mem_per_sim)
     return max_sims
 
 
