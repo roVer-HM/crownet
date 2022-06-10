@@ -86,7 +86,7 @@ class MobilitySimulatorType(Enum):
 
 
 def main(base_path):
-    time = UnitValue.s(600.0)
+    simtime = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
     configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
@@ -94,13 +94,13 @@ def main(base_path):
     par_var = [
         {
             "omnet": {
-                "sim-time-limit": time,
+                "sim-time-limit": simtime,
                 "*.*Node[*].app[0].scheduler.generationInterval": "0.1s"
             },
         },
         {
             "omnet": {
-                "sim-time-limit": time,
+                "sim-time-limit": simtime,
                 "*.*Node[*].app[0].scheduler.generationInterval": "0.01s"
             },
         },
@@ -224,7 +224,7 @@ def analyze_parameter_study(base_path: str, config: str) -> pd.DataFrame:
     # define what is to be analyzed
     module = "World.pNode[%].app[0].app"
     var_parameter = {"module": "World.pNode[0].app[0].scheduler",
-                 "name": "generationInterval"}
+                     "name": "generationInterval"}
 
     vec_names = {
         "rcvdPkLifetime:vector": {
@@ -254,8 +254,9 @@ def analyze_parameter_study(base_path: str, config: str) -> pd.DataFrame:
             vec_data = vec_data.sort_index()
             dfs_aggregated.append(vec_data)
         dfs_avg = average_sim_data(dfs_aggregated)
-        dfs_avg.to_csv(os.path.join(os.path.join(get_results_dir(base_path), config),
-                                    f'{var_parameter["name"]}_{param_value}_rcvdPktLifetime_avg.csv'), sep=" ")
+        dfs_avg.to_hdf(os.path.join(os.path.join(get_results_dir(base_path), config),
+                                    f'{var_parameter["name"]}_{param_value}_rcvdPktLifetime_avg.h5'),
+                       key=f'dfs_avg', mode='w')
         mean_values.append(dfs_avg["value"].mean())
         stddev_values.append(dfs_avg["value"].std())
         index_values.append(param_value)
