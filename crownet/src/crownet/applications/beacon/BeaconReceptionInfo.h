@@ -33,6 +33,17 @@ public:
 
     virtual std::string str() const override;
 
+    bool isUpdated() const {return updated;}
+
+    bool checkCurrentTtlReached(const omnetpp::simtime_t& ttl);
+    // will return true if there is no prio packet info
+    bool checkPrioTtlReached(const omnetpp::simtime_t& ttl);
+
+protected:
+
+    // true object was passed to density map
+    bool updated;
+
 };
 
 } /* namespace crownet */

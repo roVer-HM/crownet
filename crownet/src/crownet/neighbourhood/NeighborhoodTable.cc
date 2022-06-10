@@ -105,9 +105,22 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
      *       info will be dropped. No call to map. The preChange already decrement the map no increment necessary.
      */
     Enter_Method_Silent();
+    if (!info->isUpdated()){
+        // out of order packet do not process again
+        return true;
+    }
+
     if (ttlReached(info)){
         // information to old do not propagate to density map
-        emitDropped(info);
+        if (info->hasPrio()){
+            // received packet is to old at reception but a previous packet still exists.
+            // Because packets are created in a strict order the previous packet must have
+            // reached the ttl also. Map cleanup needed because previous packet exists.
+            emitRemoved(info);
+        } else {
+            // no previous packet exits just drop it. No map cleanup needed.
+            emitDropped(info);
+        }
         auto iter = _table.find(info->getNodeId());
         if(iter != _table.end()){
             _table.erase(iter);
@@ -135,7 +148,7 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
 }
 
 bool NeighborhoodTable::ttlReached(BeaconReceptionInfo* info){
-    return info->getSentSimTimeCurrent() + maxAge < simTime();
+    return info->checkCurrentTtlReached(maxAge);
 }
 
 void NeighborhoodTable::checkAllTimeToLive(){
