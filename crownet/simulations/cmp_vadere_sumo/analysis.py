@@ -91,8 +91,6 @@ def main():
         unit = "[byte/s]"
         how = How.sum
 
-
-
     # TODO: redundant code - refactoring required!
     # aggregate sumo sims
     dfs_sumo = []
