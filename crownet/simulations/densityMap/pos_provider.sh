@@ -51,7 +51,7 @@ for n in ${density[@]}; do
         --const-density ${n} \
         --seed-type order \
         --offset 0.25 0.25 0.5 0.5 \
-        --config-name "quater_${run}" \
+        --config-name "quarter_${run}" \
         --append \
         --output $OUT
     checkOK
