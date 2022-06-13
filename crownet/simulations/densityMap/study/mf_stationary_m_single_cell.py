@@ -25,7 +25,7 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 def main(base_path):
     # Enviroment setup.
     #
-    reps = 3   # seed-set
+    reps = 5   # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
@@ -47,25 +47,31 @@ def main(base_path):
     time = UnitValue.s(100.0)
     opp_config = "final_stationary_mf"
 
-    def var(ped, run, cfg_tpl="misc_pos_"):
+    def var(ped, opp_seed, pos_seed, cfg_tpl="misc_pos_"):
         return  {"omnet": {
-                "extends": f"_stationary_m_base_single_cell, {cfg_tpl}{ped}_{run}",
+                "extends": f"_stationary_m_base_single_cell, {cfg_tpl}{ped}_{pos_seed}",
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "seed-set": run,
+                "seed-set": str(opp_seed),
                 }}
 
-    par_var = [ var(ped, run) for ped, run in itertools.product([10, 26, 50, 76, 100, 126, 150, 176, 200],[0, 1, 2]) ]
-    par_var.extend([var(density, run, cfg_tpl="full_") for density, run in itertools.product(range(5), [0])])
-    par_var.extend([var(density, run, cfg_tpl="quarter_") for density, run in itertools.product(range(5), [0])])
-
     seed_m = OmnetSeedManager(
-        par_variations=par_var,
+        par_variations={},
         rep_count=reps,
         omnet_fixed=False,
         vadere_fixed=None,
         seed=time_ns(),
         )
-    par_var = seed_m.get_new_seed_variation()
+
+    # choose reps number of random position setups between [0..5]  and set 
+    # a random seed for each.
+    opp_seeds = seed_m.random.sample(range(1, 255), k=reps)
+    position_seeds = range(0, reps)
+    seed = list(zip(opp_seeds, position_seeds))
+    
+
+    par_var = [ var(ped, opp_seed=s[0], pos_seed=s[1]) for ped, s in itertools.product([10, 26, 50, 76, 100, 126, 150, 176, 200], seed) ]
+    par_var.extend([var(density, opp_seed=s[0], pos_seed=s[1], cfg_tpl="full_") for density, s in itertools.product(range(5), seed )])
+    par_var.extend([var(density, opp_seed=s[0], pos_seed=s[1], cfg_tpl="quarter_") for density, s in itertools.product(range(5), seed )])
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
     model = OmnetCommand()\
