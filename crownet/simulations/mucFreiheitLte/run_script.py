@@ -71,7 +71,7 @@ class SimulationRun(BaseRunner):
     #     if len(sel) > 1:
     #         print(f"multiple selections found: {sel}")
     #     dcd = builder.build_dcdMap(selection=sel[0])
-    #     dcd.plot_count_diff()
+    #     dcd.plot_map_count_diff()
     #     print("foo")
 
 

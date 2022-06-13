@@ -208,7 +208,7 @@ def make_pics(s: SuqcRun):
     sim = s.get_run_as_sim(key=(6,0))
     dcd = sim.get_dcdMap()
 
-    fig1, ax = dcd.plot_count_diff(savefig=join(sim.data_root, "new_count_diff.pdf"))
+    fig1, ax = dcd.plot_map_count_diff(savefig=join(sim.data_root, "new_count_diff.pdf"))
     fig2, ax = dcd.plot_err_box_over_time(bin_width=10.0)
     #ax.set_ylim(-8, 5)
     fig2.savefig(join(sim.data_root, "new_err.pdf"))

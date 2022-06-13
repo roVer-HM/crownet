@@ -13,7 +13,7 @@ matplotlib.use('TkAgg')
 from roveranalyzer.simulators.opp.scave import ScaveTool, OppSql, SqlOp
 # from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
 from roveranalyzer.utils import PathHelper, from_pickle
-from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2DMulti
+from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, DcdMap2DMulti
 from itertools import product
 import matplotlib.pyplot as plt
 from roveranalyzer.utils import check_ax
@@ -98,9 +98,9 @@ def make_density_plot(path, dcd):
         plt.close(f)
 
 
-def make_count_plot(path, dcd, para):
+def make_count_plot(path, dcd: DcdMap2D, para):
     # make count plot
-    f1, ax = dcd.plot_count_diff()
+    f1, ax = dcd.plot_map_count_diff()
     maxAge = para.loc[para["name"] == "maxAge", ["value"]].iloc[0].value
     title = f"{ax.title.get_text()} with neighborhood table maxAge {maxAge}"
     ax.set_title(title)
@@ -111,7 +111,7 @@ def make_count_plot(path, dcd, para):
 
 def make_delay_plot(dcd, para, delay, save_path):
     # make count plot
-    f1, ax = dcd.plot_count_diff()
+    f1, ax = dcd.plot_map_count_diff()
     font_dict = dcd.font_dict
 
     # ax.set_title("Node count and packet delay (beacon and map) over time", **font_dict["title"])
