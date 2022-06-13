@@ -49,12 +49,6 @@ def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
     beacon_apps = sql.m_app0()
     map_apps = sql.m_app1()
 
-    # x: DcdMap2D = builder.build_dcdMap(selection="ymfPlusDist")
-    # x.plot_count_diff(savefig=join(data_root, "count_diff.pdf"))
-    # x.plot_error_histogram()
-
-    # fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(16,9*5))
-    # x.plot_error_quantil_histogram(savefig=join(data_root, "error_hist_q.pdf"), ax=ax)
     i = pd.IndexSlice
 
     # cells = builder.position_p.geo(Project.OpenStreetMaps)[i[101., :]]
