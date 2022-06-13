@@ -57,6 +57,11 @@ class SimulationRun(BaseRunner):
         sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
         OppAnalysis.append_count_diff_to_hdf(sim)
     
+    @process_as({"prio": 965, "type": "post"})
+    def append_err_measure_hdf(self):
+        sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        OppAnalysis.append_err_measures_to_hdf(sim)
+    
     @process_as({"prio": 960, "type": "post"})
     def remove_density_map_csv(self):
         _, builder, _ = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
