@@ -37,6 +37,18 @@ class SimulationRun(BaseRunner):
         builder.build(self.ns.get("hdf_override", "False"))
 
     @process_as({"prio": 990, "type": "post"})
+    def extract_hdf(self):
+        result_dir, _, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
+        HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "beacon", sql, app=sql.m_app0())
+        HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "map", sql, app=sql.m_app1())
+        HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
+
+    @process_as({"prio": 980, "type": "post"})
+    def append_err_measure_hdf(self):
+        sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        OppAnalysis.append_err_measures_to_hdf(sim)
+    
+    @process_as({"prio": 970, "type": "post"})
     def create_common_plots(self):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
         builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
@@ -44,36 +56,12 @@ class SimulationRun(BaseRunner):
         if len(sel) > 1:
             print(f"multiple selections found: {sel}")
         OppAnalysis.create_common_plots(result_dir, builder, sql, selection=sel[0])
-
-    @process_as({"prio": 980, "type": "post"})
-    def extract_hdf(self):
-        result_dir, _, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
-        HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "beacon", sql, app=sql.m_app0())
-        HdfExtractor.extract_packet_loss(join(result_dir, "packet_loss.h5"), "map", sql, app=sql.m_app1())
-        HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
-
-    @process_as({"prio": 970, "type": "post"})
-    def append_hdf(self):
-        sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
-        OppAnalysis.append_count_diff_to_hdf(sim)
     
     @process_as({"prio": 960, "type": "post"})
-    def remove_denisty_map_csv(self):
+    def remove_density_map_csv(self):
         _, builder, _ = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
         for f in builder.map_paths:
             os.remove(f)
-
-    # @process_as({"prio": 970, "type": "post"})
-    # def abs_err(self):
-    #     result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
-    #     builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-    #     sel = list(OppAnalysis.find_selection_method(builder))
-    #     if len(sel) > 1:
-    #         print(f"multiple selections found: {sel}")
-    #     dcd = builder.build_dcdMap(selection=sel[0])
-    #     dcd.plot_map_count_diff()
-    #     print("foo")
-
 
 
 
