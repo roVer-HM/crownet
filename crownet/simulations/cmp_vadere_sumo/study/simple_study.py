@@ -36,11 +36,11 @@ from roveranalyzer.simulators.crownet.analysis.compare import aggregate_vectors_
 from roveranalyzer.simulators.crownet.analysis.compare import How
 
 # number of repetitions to be performed for each parameter set
-REPS = 2  # for testing we use 2, for reliable results it should be >10 (depending on stddev)
+REPS = 3  # for testing we use 2, for reliable results it should be >10 (depending on stddev)
 
 # estimated amount of memory per simulation
-MEM_PER_SIM_VADERE_GB = 11
-MEM_PER_SIM_SUMO_GB = 1
+MEM_PER_SIM_VADERE_GB = 15
+MEM_PER_SIM_SUMO_GB = 2
 MEM_PER_SIM_OMNET_GB = 1
 
 
@@ -89,22 +89,18 @@ def main(base_path):
     simtime = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
-    configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
+    # configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
+    configs = ["sumoBottleneck", "vadereBottleneck"]
 
-    par_var = [
-        {
-            "omnet": {
-                "sim-time-limit": simtime,
-                "*.*Node[*].app[0].scheduler.generationInterval": "0.1s"
-            },
-        },
-        {
-            "omnet": {
-                "sim-time-limit": simtime,
-                "*.*Node[*].app[0].scheduler.generationInterval": "0.01s"
-            },
-        },
-    ]
+    def var(interval):
+        return {"omnet": {
+            "sim-time-limit": simtime,
+            "*.*Node[*].app[0].scheduler.generationInterval": f"{interval}s"
+        }}
+
+    # note: for modifying several parameters and create par_var for all combinations, use
+    # itertools.product
+    par_var = [var(round(inter,3)) for inter in np.arange(0.01, 0.11, 0.01)]
 
     # run simulation studies
     for config in configs:
@@ -254,9 +250,10 @@ def analyze_parameter_study(base_path: str, config: str) -> pd.DataFrame:
             vec_data = vec_data.sort_index()
             dfs_aggregated.append(vec_data)
         dfs_avg = average_sim_data(dfs_aggregated)
-        dfs_avg.to_hdf(os.path.join(os.path.join(get_results_dir(base_path), config),
-                                    f'{var_parameter["name"]}_{param_value}_rcvdPktLifetime_avg.h5'),
-                       key=f'dfs_avg', mode='w', complevel=3)
+        # writing averaged data to hdf takes a long time - disabled currently
+        # dfs_avg.to_hdf(os.path.join(os.path.join(get_results_dir(base_path), config),
+        #                            f'{var_parameter["name"]}_{param_value}_rcvdPktLifetime_avg.h5'),
+        #               key=f'dfs_avg', mode='w', complevel=3)
         mean_values.append(dfs_avg["value"].mean())
         stddev_values.append(dfs_avg["value"].std())
         index_values.append(param_value)
