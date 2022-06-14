@@ -1,5 +1,7 @@
 from cProfile import label
+import os
 import itertools
+from itertools import product
 from multiprocessing import get_context
 from statistics import mean
 from itertools import repeat
@@ -70,22 +72,28 @@ def extract_count(run, idx):
 
 
 def process_relative_err(df: pd.DataFrame):
-    if any (df.loc[pd.IndexSlice[:, :, "glb"], "std"] != 0):
+    if any (df.loc[pd.IndexSlice[:, :, "map_glb_count"], "std"] != 0):
         raise ValueError("WARNING: global number of nodes differs between merged runs")
     
     df = df.rename(columns={"p_50": "median"})
     df = df.unstack('data').swaplevel(-2, -1, axis=1)
     df = df.sort_index(axis=1)
-    df = df.drop(columns=[('glb', 'std')])
+    df = df.drop(columns=[('map_glb_count', 'std'), ('map_glb_count', 'median')])
+    df = df.rename(columns={'map_mean_count':'map_count'})
     df.columns = [f"{l1}_{l2}" for l1, l2 in df.columns]
+    df = df.rename(columns={'map_glb_count_mean':'map_glb_count'})
     
-    g = 'glb_mean'
-    m = 'map_mean'
-    gn = 'glb_mean_n'
-    mn = 'map_mean_n'
-    df[mn] = min_max_norm(df[m], max=df[g].max())
+    g = 'map_glb_count'
+    m = 'map_count_mean'
+    gn = 'map_glb_count_n'
+    mn = 'map_count_mean_n'
+    mm = 'map_count_median'
+    mmn = 'map_count_median_n'
     df[gn] = min_max_norm(df[g])
-    df["map_err_n"] = df[mn] - df[gn]
+    df[mn] = min_max_norm(df[m], max=df[g].max())
+    df[mmn] = min_max_norm(df[mm], max=df[g].max())
+    
+    
     df.columns.name = "data"
     df = df.stack().sort_index()
     return df
@@ -108,91 +116,88 @@ def kwargs_map(fn, kwargs):
     except Exception as e:
         print(f"Error in {kwargs['scenario_lbl']} message: {e}")
         return (False, f"Error in {kwargs['scenario_lbl']} message: {e}")
-    
-
-if __name__ == "__main__":
-
-    df = pd.read_csv(
-        "/mnt/data1tb/results/mf_stationary_m_single_cell/simulation_runs/outputs/Sample_34_0/final_stationary_mf_out/beacons.csv",
-        delimiter=";",
-        skiprows=1
-    )
-    df = df.set_index(['table_owner', 'source_node', 'event_number'])
-    x = df.loc[37, 71, :]
 
 
-    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell/")
-    s = study.get_run_as_sim(3)
-    s.get_dcdMap()
-    sim: Simulation
-
+def main(study: SuqcRun):
     r = Rep()
     run_map = {}
     densities = [
-        (0.000611583389395144, "6.1e-4"),
-        (0.00076447923674393, "7.6e-4"),
-        (0.0009173750840927161, "9.2e-4"),
-        (0.001070270931441502, "1.1e-3"),
-        (0.001223166778790288, "1.2e-3")
+        (0.000611583389395144, "6.1e-4", 100),
+        (0.00076447923674393, "7.6e-4", 128),
+        (0.0009173750840927161, "9.2e-4", 152),
+        (0.001070270931441502, "1.1e-3", 176),
+        (0.001223166778790288, "1.2e-3", 200)
     ]
-    run_map.update(
-        { f"ped_{run}_0": dict(rep=r(), lbl="") for run in [10, 26, 50, 76, 100, 126, 150, 176, 200] }
-    )
-    run_map.update(
-        { f"full_{d_lbl}": dict(rep=r(), lbl="", density=d) for d, d_lbl in densities }
-    )
-    run_map.update(
-        { f"quarter_{d_lbl}": dict(rep=r(), lbl="", density=d) for d, d_lbl in densities }
-    )
-
-    # map = OppAnalysis.merge_maps(
-    #     study, "ped_50_0", run_map["ped_50_0"]["rep"],
-    #     data=["glb_count", "count_mean"], #["glb_count","count_mean", "sqerr_mean"],
-    #     columns_rename=dict(count_mean="map", glb_count="glb"),
-    #     frame_consumer=process_relative_err
-    # )
-
-    _runs = run_map.items()
-    # _runs = [('full_9.2e-4', run_map['full_9.2e-4'])]
-    data=["glb_count", "count_mean"]
-    columns_rename=dict(count_mean="map", glb_count="glb")
-    print("XXX")
-    kwargs_iter = [
-        {'study': s, 'scenario_lbl':run[0], 'rep_ids': run[1]["rep"], 'data':d, 'columns_rename':r, 'frame_consumer':c}
-        for s, run, d, r, c in 
-        zip(repeat(study), _runs, repeat(data), repeat(columns_rename), repeat(process_relative_err) )
-    ]
-    with get_context("spawn").Pool(6) as pool:
-        maps = pool.starmap(kwargs_map, zip(repeat(OppAnalysis.merge_maps), kwargs_iter))
-    # map = OppAnalysis.merge_maps(**kwargs_iter[0])
-
-    for ret, map in maps:
-        if not ret:
-            print(map)
     
-    maps = [map for ret, map in maps if ret]
-    map = pd.concat(maps, axis=0, verify_integrity=True)
-    
-
-    fig, ax = plt.subplots(1,1,figsize=(16,9))
-
-    ax.set_ylim(-1.0, 1.0)
-    ax.set_ylabel("relative error")
-    ax.set_xlabel("time in [s]")
-    ax.set_xlim(0, 100)
-    ax.xaxis.set_major_locator(MaxNLocator(10))
-    ax.set_title("Relative error over time")
-
-    for sim in map.index.get_level_values("sim").unique():
-        if "6.1e-4" in sim:
-            _df = map.loc[pd.IndexSlice[sim,:, "map_err_n"]]
-            ax.plot( _df.index, _df, label=sim)
-        ax.hlines(y=0, xmin=0, xmax=100, color="black")
+    run_map.update(
+        { f"ped_{run}_0": dict(rep=r(5), lbl="") for run in [10, 26, 50, 76, 100, 126, 150, 176, 200] }
+    )
+    run_map.update(
+        { f"415x394_{c}": dict(rep=r(5), lbl="", density=d) for d, d_lbl, c in densities }
+    )
+    run_map.update(
+        { f"207x196_{int(c/4)}": dict(rep=r(5), lbl="", density=d) for d, d_lbl, c in densities }
+    )
 
 
-    # mse = mean_squared_error(map.loc[:, ('glb_count', 'mean')], map.loc[:, ('map_count', 'mean')])
-    # ax = map["map_err_n"].reset_index().plot('simtime')
-    # ax.get_figure().show()
-    ax.legend()
+    merged_norm_path = os.path.join(study.base_path, "merged_normalized_map_measure.h5")
+    if os.path.exists(merged_norm_path):
+        map = pd.DataFrame(pd.HDFStore(merged_norm_path, mode="r").get("map_measure_norm_static"))
+    else:
+
+        _runs = run_map.items()
+        # _runs = [('full_9.2e-4', run_map['full_9.2e-4'])]
+        data=["map_glb_count", "map_mean_count"]
+        print("XXX")
+        kwargs_iter = [
+            {'study': s, 'scenario_lbl':run[0], 'rep_ids': run[1]["rep"], 'data':d, 'frame_consumer':c}
+            for s, run, d, c in 
+            zip(repeat(study), _runs, repeat(data), repeat(process_relative_err) )
+        ]
+        with get_context("spawn").Pool(10) as pool:
+            maps = pool.starmap(kwargs_map, zip(repeat(OppAnalysis.merge_maps), kwargs_iter))
+        # map = OppAnalysis.merge_maps(**kwargs_iter[0])
+
+        for ret, map in maps:
+            if not ret:
+                print(map)
+        
+        maps = [map for ret, map in maps if ret]
+        map: pd.DataFrame = pd.concat(maps, axis=0, verify_integrity=True)
+        map.to_hdf(merged_norm_path, key="map_measure_norm_static", mode="a")
+     
+
+    fig, axes = plt.subplots(3,1,figsize=(16,3*9))
+
+
+    for ax, lbl_filter in zip(axes, ["ped", "415", "207"]):
+        ax.set_ylim(0.0, 1.1)
+        ax.set_ylabel("norm. number of pedestrians")
+        ax.set_xlabel("time in [s]")
+        ax.set_xlim(0, 100)
+        ax.xaxis.set_major_locator(MaxNLocator(10))
+        ax.yaxis.set_major_locator(MaxNLocator(11))
+        if lbl_filter in ["ped", "415"]:
+            ax.set_title("Normalized number of pedestrians over time in Area [415x394]")
+        else:
+            ax.set_title("Normalized number of pedestrians over time in Area [207x196]")
+
+        _first_run = map.index.get_level_values(0)[0]
+        _glb = map.loc[pd.IndexSlice[_first_run, :, "map_glb_count_n"]]
+        ax.plot(_glb.index.get_level_values("simtime"), _glb, label="ground_truth", color="black")
+        for sim in map.index.get_level_values("sim").unique():
+            if lbl_filter in sim:
+                _df = map.loc[pd.IndexSlice[sim,:, "map_count_mean_n"]]
+                ax.plot( _df.index, _df, label=sim)
+        ax.legend(loc="center right")
+
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(study.base_path, 'normalized_pedestrian_count.pdf'))
     fig.show()
-    print("foo")
+
+if __name__ == "__main__":
+
+    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_1/")
+    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
+    main(study)
