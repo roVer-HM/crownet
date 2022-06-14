@@ -14,61 +14,12 @@ from roveranalyzer.utils.plot import check_ax
 from matplotlib.ticker import MaxNLocator
 import seaborn as sb
 import pandas as pd
-from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 
 def min_max_norm(data, min=0, max=None):
     max = data.max() if max is None else max
     return (data - min) / (max - min)
-
-
-def main(run: SuqcRun, idx=0, remove_time=40.0):
-
-    ret = [(*extract_count(run, idx), idx) for  idx in range(0, 9-3)]
-
-    df = pd.concat([i[0] for i in ret], axis=0, ignore_index=True)
-    
-    fig, ax = check_ax()
-    ax.plot("simtime", "glb_count_norm",data=df[df["run"]==0], label="ground_truth")
-    for r in df["run"].unique():
-        d = df[df["run"]==r]
-        ax.plot("simtime", "count_norm_mean", data = d, label=f"run_{r} N={d['glb_count'].max()}")
-
-
-    ax.set_ylim([0.0, 1.0])
-    ax.set_ylabel("Normalized pedestrian count")
-    ax.set_xlabel("time in [s]")
-    ax.set_xlim([0.0, 100.0])
-    ax.xaxis.set_major_locator(MaxNLocator(20))
-    ax.yaxis.set_major_locator(MaxNLocator(20))
-    ax.set_title("Normalized mean pedestrian count in static scenario after removal of 50% of nodes.")
-    fig.legend()
-
-    fig.show()
-    print("")
-
-
-def extract_count(run, idx):
-    sim: Simulation = run.get_sim(idx)
-    map: DcdMap2D = sim.get_dcdMap()
-    print(f"read index {idx}")
-    count_raw = map.count_diff()
-    c = count_raw.loc[:, ["glb_count", "count_mean", "count_p_50"]].copy(deep=True)
-    g = c["glb_count"]
-    c["run"] = idx
-    c["glb_count_norm"] = min_max_norm(c["glb_count"])
-    c["glb_count_h_max"] = (g.max()*(c.loc[40.0,["glb_count_norm"]] + 0.05))[0]
-    c["glb_count_norm_h_max"] = (c.loc[40.0,["glb_count_norm"]] + 0.05)[0]
-
-    c["glb_count_h_min"] = (g.max()* (c.loc[40.0,["glb_count_norm"]] - 0.05))[0]
-    c["glb_count_norm_h_min"] =  (c.loc[40.0,["glb_count_norm"]] - 0.05)[0]
-    
-    c["count_norm_mean"] = min_max_norm(c["count_mean"], max=g.max())
-    c["count_norm_median"] = min_max_norm(c["count_p_50"], max=g.max())
-    c["in_band"] = (c["count_norm_mean"] > c["glb_count_norm_h_min"]) & (c["count_norm_mean"] < c["glb_count_norm_h_max"])
-
-    return c.reset_index(), c["in_band"].idxmin()
 
 
 def process_relative_err(df: pd.DataFrame):
@@ -118,7 +69,7 @@ def kwargs_map(fn, kwargs):
         return (False, f"Error in {kwargs['scenario_lbl']} message: {e}")
 
 
-def main(study: SuqcRun):
+def read_data(study: SuqcRun):
     r = Rep()
     run_map = {}
     densities = [
@@ -146,9 +97,7 @@ def main(study: SuqcRun):
     else:
 
         _runs = run_map.items()
-        # _runs = [('full_9.2e-4', run_map['full_9.2e-4'])]
         data=["map_glb_count", "map_mean_count"]
-        print("XXX")
         kwargs_iter = [
             {'study': s, 'scenario_lbl':run[0], 'rep_ids': run[1]["rep"], 'data':d, 'frame_consumer':c}
             for s, run, d, c in 
@@ -165,8 +114,31 @@ def main(study: SuqcRun):
         maps = [map for ret, map in maps if ret]
         map: pd.DataFrame = pd.concat(maps, axis=0, verify_integrity=True)
         map.to_hdf(merged_norm_path, key="map_measure_norm_static", mode="a")
-     
 
+    return map 
+
+def get_convergence_time(map:pd.DataFrame, time_slice, err) -> dict:
+
+    df = map.loc[pd.IndexSlice[:, time_slice, ("map_count_mean_n", "map_glb_count_n")]].unstack("data").copy(deep=True).droplevel(0, axis=1)
+    mask = df["map_count_mean_n"] >= ( df["map_glb_count_n"] - err )
+    mask = mask &  (df["map_count_mean_n"] <= ( df["map_glb_count_n"] + err ))
+    df["convergence_mask"] = mask
+
+    ret  = []
+    for g, _df in df.groupby(["sim"]):
+        ret.append([g, _df["convergence_mask"].idxmax()[-1]-time_slice.start , map.loc[pd.IndexSlice[g, :, "map_glb_count"], :].max()[0]])
+    
+    return pd.DataFrame.from_records(ret, columns=["sim", "convergence_time", "ped_count"])
+
+def main(study: SuqcRun):
+
+    map = read_data(study).sort_index()
+
+    # get convergence time 
+    df_convergence = get_convergence_time(map, time_slice = slice(41,None), err=0.05)
+    df_convergence.to_csv(os.path.join(study.base_path, "convergence_time.csv"))
+
+    # create figures
     fig, axes = plt.subplots(3,1,figsize=(16,3*9))
 
 
@@ -194,10 +166,9 @@ def main(study: SuqcRun):
 
     fig.tight_layout()
     fig.savefig(os.path.join(study.base_path, 'normalized_pedestrian_count.pdf'))
-    fig.show()
 
 if __name__ == "__main__":
 
     study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_1/")
-    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
     main(study)
