@@ -119,7 +119,7 @@ def read_data(study: SuqcRun):
 
 def get_convergence_time(map:pd.DataFrame, time_slice, err) -> dict:
 
-    df = map.loc[pd.IndexSlice[:, time_slice, ("map_count_mean_n", "map_glb_count_n")]].unstack("data").copy(deep=True).droplevel(0, axis=1)
+    df = map.loc[pd.IndexSlice[:, time_slice, ("map_count_mean_n", "map_glb_count_n")],].unstack("data").copy(deep=True).droplevel(0, axis=1)
     mask = df["map_count_mean_n"] >= ( df["map_glb_count_n"] - err )
     mask = mask &  (df["map_count_mean_n"] <= ( df["map_glb_count_n"] + err ))
     df["convergence_mask"] = mask
@@ -169,6 +169,6 @@ def main(study: SuqcRun):
 
 if __name__ == "__main__":
 
-    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_1/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_1/")
+    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_3/")
     main(study)

@@ -13,6 +13,11 @@ from roveranalyzer.utils.plot import matplotlib_set_latex_param
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 
+from scipy.sparse import coo_array, coo_matrix, csc_array, csr
+import scipy.signal as sg
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+
 
 ts_x = "X_0.04"
 ts_y = "X_0.08"
@@ -58,8 +63,8 @@ def process_variation(study: SuqcRun, scenario_lbl: str, rep_ids: list) -> dict:
             "df": pd.DataFrame (N,M) index["simtime] 
         } 
     """
-    df = OppAnalysis.merge_maps(study, scenario_lbl, rep_ids, data=["count_mean"], columns_rename=dict(count_mean="map_count"))
-    adf = adf_test(df.reset_index()[["simtime", "mean"]].iloc[1:].copy(deep=True).set_index(["simtime"]))
+    df = OppAnalysis.merge_maps(study, scenario_lbl, rep_ids, data=("map_mean_count",))
+    adf = adf_test(df.reset_index()[["simtime", "mean"]].set_index(["simtime"]))
     adf.name = "adf"
     adf = adf.to_frame()
     adf.columns = pd.Index([scenario_lbl], name="scenario") 
@@ -85,7 +90,7 @@ def process_simulation_run(study: SuqcRun, scenario_map: dict, vadere_ts: pd.Dat
     # average raw data over seeds and calculate statistic 
     ret = []
     args = [ (study, k, scenario_map[k]["rep"]) for k in scenario_map.keys()]
-    with get_context("spwan").Pool(10) as p:
+    with get_context("spawn").Pool(10) as p:
         ret: dict = p.starmap(process_variation, args)
     map_out = pd.concat([e["stat"] for e in ret], axis=1, verify_integrity=True).T
 
@@ -122,7 +127,7 @@ def create_map_ts_figure(study: SuqcRun, scenario_map:dict, ground_truth_ts: pd.
     ax.plot(_v.index, _v, label=ts_[ts]["lbl"], marker=None, color="black")
     for sim in maps.index.get_level_values("sim").unique():
         if scenario_map[sim]["ts"] == ts:
-            _df: pd.DataFrame = maps.loc[pd.IndexSlice[sim, :, "map_count"], ["mean"]]
+            _df: pd.DataFrame = maps.loc[pd.IndexSlice[sim, :, "map_mean_count"], ["mean"]]
             max_y = max(max_y, _df["mean"].max())
             ax.plot(_df.index.get_level_values("simtime"), _df["mean"], label=scenario_map[sim]["lbl"], marker=None)
 
@@ -164,7 +169,8 @@ def make_vader_ts_figure(data: pd.DataFrame, output_path):
 
 def process_1d_scenario():
     matplotlib_set_latex_param()
-    out_path =   "/mnt/data1tb/results/mf_1d_8/"
+    # out_path =   "/mnt/data1tb/results/mf_1d_8/"
+    out_path =   "/mnt/data1tb/results/mf_1d_1/"
     vadere_output = os.path.join(os.environ["HOME"],"repos/crownet/crownet/simulations/densityMap/vadere/output/" )
     ts_x_path = os.path.join(vadere_output, "mf_1d_m_const_2x5m_d20m_2022-05-31_14-15-54.174/numAgents.csv")
     ts_y_path = os.path.join(vadere_output, "mf_1d_m_const_2x5m_d20m_25_2022-05-31_17-07-44.599/numAgents.csv")
@@ -173,8 +179,8 @@ def process_1d_scenario():
     run_map = {
         "1d_0": dict(rep= list(range(0, 5)), ts=ts_x, lbl = r"1d\_0: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"),   # ts_x
         "1d_1": dict(rep=list(range(5, 10)), ts=ts_x, lbl = r"1d\_1: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$"),  # ts_x
-        # "1d_2": dict(rep=list(range(10, 15)), ts=ts_y, lbl = r"1d\_2: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"), # ts_y
-        # "1d_3": dict(rep=list(range(15, 20)), ts=ts_y, lbl = r"1d\_3: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$") # ts_y
+        "1d_2": dict(rep=list(range(10, 15)), ts=ts_y, lbl = r"1d\_2: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"), # ts_y
+        "1d_3": dict(rep=list(range(15, 20)), ts=ts_y, lbl = r"1d\_3: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$") # ts_y
     }
 
     # figure (ground truth)
@@ -182,12 +188,58 @@ def process_1d_scenario():
     # make_vader_ts_figure(v_ts, out_path)
     # figure (maps over ground truth)
     create_map_ts_figure(run, run_map, v_ts, ts_x, out_path) 
-    # create_map_ts_figure(run, run_map, v_ts, ts_y, out_path) 
+    create_map_ts_figure(run, run_map, v_ts, ts_y, out_path) 
     # statistics for map and ground truth data
-    # stat_sim, stat_vadere = process_simulation_run(run, run_map, v_ts)
-    # stat_sim.to_csv(os.path.join(out_path, "mapStat.csv"))
-    # stat_vadere.to_csv(os.path.join(out_path, "vadereStat.csv"))
+    stat_sim, stat_vadere = process_simulation_run(run, run_map, v_ts)
+    stat_sim.to_csv(os.path.join(out_path, "mapStat.csv"))
+    stat_vadere.to_csv(os.path.join(out_path, "vadereStat.csv"))
     print("done")
+
+
+def conv_err():
+    matplotlib_set_latex_param()
+    out_path =   "/mnt/data1tb/results/mf_1d_8/"
+    run = SuqcRun(out_path)
+    run_map = {
+        "1d_0": dict(rep= list(range(0, 5)), ts=ts_x, lbl = r"1d\_0: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"),   # ts_x
+        "1d_1": dict(rep=list(range(5, 10)), ts=ts_x, lbl = r"1d\_1: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$"),  # ts_x
+        "1d_2": dict(rep=list(range(10, 15)), ts=ts_y, lbl = r"1d\_2: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$"), # ts_y
+        "1d_3": dict(rep=list(range(15, 20)), ts=ts_y, lbl = r"1d\_3: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$") # ts_y
+    }
+
+    virdis = cm.get_cmap('viridis', 256)
+
+    sim: Simulation = run.get_sim(0)
+    map = sim.get_dcdMap()
+    df = map._count_p[pd.IndexSlice[2000,:,:, 8239], :]
+    d = df.reset_index()
+    m = map.metadata
+    d["x"] /= m.cell_size
+    d["y"] /= m.cell_size
+    d["err"] = np.abs(d["err"])
+    spa = coo_array((d["err"], (d["x"], d["y"])), shape=m.cell_count) 
+    spa = spa.transpose()
+    kernel = np.full((3,3), fill_value=1/9)
+    spa_conv = sg.convolve2d(spa.toarray(), kernel, mode="same")
+    fig, ax = plt.subplots(1, 2, figsize=(16,9))
+    p = ax[0].pcolormesh(spa.toarray(), cmap=virdis, vmin=-1, vmax=1)
+    fig.colorbar(p, ax=ax[0])
+    ax[0].set_aspect('equal', adjustable='box')
+    ax[0].set_title("Error in 1D-Scenario")
+    p = ax[1].pcolormesh(spa_conv, cmap=virdis, vmin=-1, vmax=1)
+    fig.colorbar(p, ax=ax[1])
+    ax[1].set_title("Error in 1D-Scenario with 3x3(1/9) kernel")
+    ax[1].set_aspect('equal', adjustable='box')
+    fig.show()
+
+    print("np.power(spa.toarray(), 2).sum()/(84*79)")
+    print(np.power(spa.toarray(), 2).sum()/(84*79))
+
+    print("np.power(spa_conv, 2).sum()/(84*79)")
+    print(np.power(spa_conv, 2).sum()/(84*79))
+    print("")
+
 
 if __name__ == "__main__":
     process_1d_scenario()
+    # conv_err()

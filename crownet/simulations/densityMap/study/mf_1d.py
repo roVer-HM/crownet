@@ -207,7 +207,7 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    par_var, data = setup.run(min(8, len(par_var)))
+    par_var, data = setup.run(min(4, len(par_var)))
     # par_var, data = setup.run(1)y
 
 
