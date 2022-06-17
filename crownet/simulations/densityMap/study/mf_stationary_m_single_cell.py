@@ -25,7 +25,7 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 def main(base_path):
     # Enviroment setup.
     #
-    reps = 5   # seed-set
+    reps = 10   # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog", BoolValue.TRUE,
@@ -120,7 +120,7 @@ def main(base_path):
         runscript_out="runscript.out"
     )
     print("setup done")
-    par_var, data = setup.run(min(10, len(par_var)))
+    par_var, data = setup.run(min(12, len(par_var)))
     # par_var, data = setup.run(1)
 
 
