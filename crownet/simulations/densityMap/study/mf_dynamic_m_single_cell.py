@@ -29,22 +29,22 @@ def main(base_path):
         "writeDensityLog", BoolValue.TRUE,
         "mapTypeLog", QString("ymfPlusDistStep"),
         # "mapTypeLog", QString("all"),
-        "cellAgeTTL", UnitValue.s(-1.0),
+        "cellAgeTTL", UnitValue.s(30.0),
         "alpha", 0.75,
         "idStreamType", QString("insertionOrder"),
-        "stepDist", 50.0,
-        "zeroStep", BoolValue.TRUE)
+        "stepDist", 150.0,
+        "zeroStep", BoolValue.FALSE)
     mapCfgYmf = ObjectValue.from_args(
         "crownet::MapCfgYmf",
         "writeDensityLog", BoolValue.TRUE,
         "mapTypeLog", QString("ymf"),
         # "mapTypeLog", QString("all"),
-        "cellAgeTTL", UnitValue.s(-1.0),
+        "cellAgeTTL", UnitValue.s(30.0),
         "idStreamType", QString("insertionOrder"),
     )
-    scenario_overload = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
-    scenario_normal = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x8_120.scenario") 
-    scenario_poisson = QString("vadere/scenarios/mf_m_dyn_poisson_02.scenario") 
+    scenario_ped_180 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
+    # scenario_ped_120 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x8_120.scenario") 
+    # scenario_poisson = QString("vadere/scenarios/mf_m_dyn_poisson_02.scenario") 
     t = UnitValue.s(200.0)
 
     source_id_range = range(1117, 1132)
@@ -53,9 +53,9 @@ def main(base_path):
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath" : scenario_overload,
+                "**.vadereScenarioPath" : scenario_ped_180,
                 "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE,  "cellAgeTTL", UnitValue.s(-1.0)),
+                    mapCfgYmfDist.copy("cellAgeTTL", UnitValue.s(-1.0)),
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
@@ -67,9 +67,9 @@ def main(base_path):
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath" : scenario_overload,
+                "**.vadereScenarioPath" : scenario_ped_180,
                 "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(60.0)),
+                    mapCfgYmfDist.copy("cellAgeTTL", UnitValue.s(60.0)),
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
@@ -82,22 +82,16 @@ def main(base_path):
     seed_m = OmnetSeedManager(
         par_variations=par_var,
         rep_count=reps,
-        omnet_fixed=True,
-        vadere_fixed=None,
+        omnet_fixed=False,
+        vadere_fixed=False,
         seed=time_ns(),
+        # seed=0        # use for study debug/setup
         )
     
     par_var = seed_m.get_new_seed_variation()
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     
-    # Model := Call to run_script.py
-    # This will define how the simulation is run.
-    # These settings here will override defaults set during CrownetRequest setup.
-    # model = OmnetCommand() \
-    #     .write_container_log() \
-    #         .omnet_tag("latest") \
-    #             .experiment_label("out")
     model = VadereOppCommand()\
          .write_container_log() \
          .omnet_tag("latest") \
