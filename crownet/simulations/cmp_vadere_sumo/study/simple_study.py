@@ -6,6 +6,12 @@ import os
 import pprint
 
 import pandas as pd
+import numpy as np
+from pandas.core.indexes import base
+from scipy import rand
+import matplotlib.figure
+import matplotlib.axes
+from matplotlib import pyplot as plt
 import psutil
 import random
 import shutil
@@ -13,10 +19,6 @@ import string
 import time
 from enum import Enum
 from typing import List, Dict, Any
-
-import numpy as np
-from pandas.core.indexes import base
-from scipy import rand
 
 from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolValue
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
@@ -32,8 +34,6 @@ from roveranalyzer.utils.path import PathHelper
 from roveranalyzer.simulators.opp.scave import ScaveTool
 from roveranalyzer.simulators.opp.utils import Simulation
 from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
-from roveranalyzer.simulators.crownet.analysis.compare import aggregate_vectors_from_simulation, average_sim_data
-from roveranalyzer.simulators.crownet.analysis.compare import How
 
 # number of repetitions to be performed for each parameter set
 REPS = 3  # for testing we use 2, for reliable results it should be >10 (depending on stddev)
@@ -42,6 +42,10 @@ REPS = 3  # for testing we use 2, for reliable results it should be >10 (dependi
 MEM_PER_SIM_VADERE_GB = 15
 MEM_PER_SIM_SUMO_GB = 2
 MEM_PER_SIM_OMNET_GB = 1
+
+# file where analysis results are stored
+QOI_RESULTS_FILE = 'qoi_results.csv'
+QOI_RESULTS_TIME_FILE = 'qoi_results_t.csv'
 
 
 # --- generic utility functions - should be moved to roveranalyzer lateron
@@ -90,7 +94,8 @@ def main(base_path):
 
     # parameter variation: define parameters to be varied
     # configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
-    configs = ["sumoBottleneck", "vadereBottleneck"]
+    # configs = ["sumoBottleneck", "vadereBottleneck"]
+    configs = ["sumoOnly2", "vadereOnly2"]
 
     def var(interval):
         return {"omnet": {
@@ -100,7 +105,7 @@ def main(base_path):
 
     # note: for modifying several parameters and create par_var for all combinations, use
     # itertools.product
-    par_var = [var(round(inter,3)) for inter in np.arange(0.01, 0.11, 0.01)]
+    par_var = [var(round(inter, 3)) for inter in np.arange(0.01, 0.11, 0.01)]
 
     # run simulation studies
     for config in configs:
@@ -113,12 +118,34 @@ def main(base_path):
         run_parameter_study(base_path, mobility_type, config, par_var)
 
     # perform analysis
-    qoi_results = pd.DataFrame()
-    for config in configs:
-        qoi = analyze_parameter_study(base_path, config)
-        qoi_results = pd.concat([qoi_results, qoi])
+    qoi_results_path = os.path.join(base_path, QOI_RESULTS_FILE)
+    qoi_results_t_path = os.path.join(base_path, QOI_RESULTS_TIME_FILE)
+    if os.path.exists(qoi_results_path):
+        print(f'Warning: Analysis result file \"{qoi_results_path}\" already exists.')
+        confirmation = input(f'         Really delete \"{qoi_results_path}\" to re-run analysis? (y/N)')
+        if confirmation.lower() in ["y", "yes"]:
+            os.remove(qoi_results_path)
+            os.remove(qoi_results_t_path)
+
+    if not os.path.exists(qoi_results_path):
+        qoi_results = pd.DataFrame()
+        qoi_results_t = pd.DataFrame()
+        for config in configs:
+            qoi, qoi_t = analyze_parameter_study(base_path, config)
+            qoi_results = pd.concat([qoi_results, qoi])
+            qoi_results_t = pd.concat([qoi_results_t, qoi_t])
+        qoi_results.to_csv(qoi_results_path, sep=" ")
+        qoi_results_t.to_csv(qoi_results_t_path, sep=" ")
+    else:
+        qoi_results = pd.read_csv(qoi_results_path, sep=" ")
+        qoi_results_t = pd.read_csv(qoi_results_t_path, sep=" ")
+
+    # create plots
     print(qoi_results)
-    qoi_results.to_csv(os.path.join(base_path, 'qoi_results.csv'), sep=" ")
+    config_descriptions = {"sumoBottleneck": "bottleneck scenario: sumo",
+                           "vadereBottleneck": "bottleneck scenario: vadere"}
+    plot_pvar_delay(qoi_results, "Inter-TX Time [s]", "Delay [s]", config_descriptions)
+    plt.show()
 
 
 def get_results_dir(base_path: string):
@@ -233,13 +260,11 @@ def analyze_parameter_study(base_path: str, config: str) -> pd.DataFrame:
     # do analysis
     suq_run = SuqcRun(os.path.join(get_results_dir(base_path), config))
     par_to_sims = get_parameter_to_sims(suq_run, var_parameter["module"], var_parameter["name"])
-    mean_values = []
-    stddev_values = []
-    index_values = []
-    column_headers = ['config', 'mean', 'stddev']
+
+    dfs = pd.DataFrame()
     for param_value in par_to_sims.keys():
         print(f'Analyzing all simulations for parameter value: {param_value}')
-        dfs_aggregated = []
+
         for sim in par_to_sims[param_value]:
             print(f'   Analyzing simulation: {sim.data_root}')
             vec_data = sim.sql.vec_data_pivot(
@@ -247,22 +272,66 @@ def analyze_parameter_study(base_path: str, config: str) -> pd.DataFrame:
                 vec_names,
                 append_index=["srcHostId"],
             )
-            vec_data = vec_data.sort_index()
-            dfs_aggregated.append(vec_data)
-        dfs_avg = average_sim_data(dfs_aggregated)
-        # writing averaged data to hdf takes a long time - disabled currently
-        # dfs_avg.to_hdf(os.path.join(os.path.join(get_results_dir(base_path), config),
-        #                            f'{var_parameter["name"]}_{param_value}_rcvdPktLifetime_avg.h5'),
-        #               key=f'dfs_avg', mode='w', complevel=3)
-        mean_values.append(dfs_avg["value"].mean())
-        stddev_values.append(dfs_avg["value"].std())
-        index_values.append(param_value)
+            new_data = pd.concat({sim.label: vec_data}, names=['run_label'])  # add run_label as multi-level idx
+            new_data = pd.concat({param_value: new_data}, names=['param'])  # add parameter value as multi-level idx
+            dfs = pd.concat([dfs, new_data])
 
-    results_array = np.array([[config] * len(mean_values), mean_values, stddev_values])
-    results_array = np.transpose(results_array)
-    results_df = pd.DataFrame(data=results_array, index=index_values, columns=column_headers)
+    # calculate aggregated statistics for each parameter value
+    aggregated_results = dfs.groupby(level=["param"])["rcvdPktLifetime"].agg(["mean", "std", "max", "min"])
 
-    return results_df
+    # for time-based graphs: calculate averages over time-intervals
+    collected_time_series_list = list()
+    max_time = np.ceil(dfs.index.get_level_values("time").max())
+    aggregated_time_series = dfs.reset_index("time").groupby(level=["param", "run_label"])
+    # loop over all groups (runs) and calculate average
+    avg_interval = 1.0  # averaging interval [s]
+
+    for key, grp in aggregated_time_series:
+        print(f"Time-based averaging {key} with {avg_interval}s intervals")
+        avg = grp.groupby(pd.cut(grp["time"], np.arange(0, max_time, avg_interval))).aggregate(np.average)
+        avg.index = np.arange(0, max_time, avg_interval)[:len(np.arange(0, max_time, avg_interval)) - 1]
+        avg = pd.concat([avg], keys=[key[1]], names=['run_label'])
+        avg = pd.concat([avg], keys=[key[0]], names=['param'])
+        collected_time_series_list.append(avg)
+
+    time_avg_df = pd.concat(collected_time_series_list)
+    time_avg_df.index.set_names('sampling_time', level=2, inplace=True)
+    time_avg_df.index = time_avg_df.index.swaplevel('run_label', 'sampling_time')
+    time_avg_df = time_avg_df.groupby(level=["param", "sampling_time"]).agg(["mean"])
+
+    # TODO: call plot methods for aggregated time-intervals
+    data_to_plot = time_avg_df.xs('0.01s')["rcvdPktLifetime", "mean"]
+    plt.scatter(data_to_plot.index, data_to_plot)
+    data_to_plot = time_avg_df.xs('0.1s')["rcvdPktLifetime", "mean"]
+    plt.scatter(data_to_plot.index, data_to_plot)
+    plt.show()
+
+    # add config as index level
+    aggregated_results = pd.concat([aggregated_results], keys=[config], names=['config'])
+    time_avg_df = pd.concat([time_avg_df], keys=[config], names=['config'])
+
+    return aggregated_results, time_avg_df
+
+
+def plot_pvar_delay(data: pd.DataFrame, x_label: str, y_label: str,
+                    configs: Dict[str, str]) -> (matplotlib.figure.Figure,
+                                                 matplotlib.axes.Axes):
+    plt.rc('font', size=20)
+    fig, ax = plt.subplots()
+    fig.set_size_inches(16, 9)
+    # parameter_values = data[data["config"] == "sumoBottleneck"]
+    # parameter_values = parameter_values["Unnamed: 0"]
+    # data_values = data[data["config"] == "sumoBottleneck"]
+    # plt.scatter(parameter_values, data_values["mean"])
+
+    for config in configs.keys():
+        selected_data = data[data["config"] == config]
+        plt.scatter(selected_data["Unnamed: 0"], selected_data["mean"],
+                    label=configs[config])
+    plt.legend(loc="upper left")
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    return fig, ax
 
 
 if __name__ == "__main__":
