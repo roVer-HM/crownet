@@ -48,42 +48,36 @@ def main(base_path):
         "writeDensityLog", BoolValue.TRUE,
         "mapTypeLog", QString("ymfPlusDistStep"),
         # "mapTypeLog", QString("all"),
-        "cellAgeTTL", UnitValue.s(-1.0),
+        "cellAgeTTL", UnitValue.s(30.0),
         "alpha", 0.75,
         "idStreamType", QString("insertionOrder"),
-        "stepDist", 50.0,
-        "zeroStep", BoolValue.TRUE)
+        "stepDist", 150.0,
+        "zeroStep", BoolValue.FALSE)
     mapCfgYmf = ObjectValue.from_args(
         "crownet::MapCfgYmf",
         "writeDensityLog", BoolValue.TRUE,
         "mapTypeLog", QString("ymf"),
         # "mapTypeLog", QString("all"),
-        "cellAgeTTL", UnitValue.s(-1.0),
+        "cellAgeTTL", UnitValue.s(30.0),
         "idStreamType", QString("insertionOrder"),
     )
-    s_5_20_poisson = QString("vadere/scenarios/mf_1d_m_poisson_2x5m_d20m.scenario")
     s_5_20_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d20m.scenario")
-    s_5_280_poisson = QString("vadere/scenarios/mf_1d_m_poisson_2x5m_d280m.scenario")
-    s_5_280_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d280m.scenario")
+    # s_5_280_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d280m.scenario")
+    # s_5_20_poisson = QString("vadere/scenarios/mf_1d_m_poisson_2x5m_d20m.scenario")
+    # s_5_280_poisson = QString("vadere/scenarios/mf_1d_m_poisson_2x5m_d280m.scenario")
     t = UnitValue.s(5000.0)
 
     source_top_left = 102
     source_top_right = 103
     source_bottom_left = 100
     source_bottom_right = 101
-    source_range = [100, 101, 102, 103]
-
-    opp_config = "final_1d"
-    ext_single_cell = "_1d"
 
     par_var = [
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
                 "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
@@ -95,11 +89,9 @@ def main(base_path):
         },
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
                 "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
@@ -111,11 +103,9 @@ def main(base_path):
         },
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE, "cellAgeTTL", UnitValue.s(30.0)),
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
                 },
@@ -145,13 +135,6 @@ def main(base_path):
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     
-    # Model := Call to run_script.py
-    # This will define how the simulation is run.
-    # These settings here will override defaults set during CrownetRequest setup.
-    # model = OmnetCommand() \
-    #     .write_container_log() \
-    #         .omnet_tag("latest") \
-    #             .experiment_label("out")
     model = VadereOppCommand()\
          .write_container_log() \
          .omnet_tag("latest") \
@@ -172,7 +155,7 @@ def main(base_path):
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
-        opp_config="final_dynamic_m_vadere",
+        opp_config="final_1d",
         opp_basename="omnetpp.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
         mobility_sim=("vadere", "latest"), # use omnet internal mobility models

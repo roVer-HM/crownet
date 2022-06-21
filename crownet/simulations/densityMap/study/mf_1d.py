@@ -69,12 +69,9 @@ def main(base_path):
     source_bottom_left = 100
     source_bottom_right = 101
 
-    ext_single_cell = "_1d"
-
     par_var = [
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
@@ -89,7 +86,6 @@ def main(base_path):
         },
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
@@ -104,7 +100,6 @@ def main(base_path):
         },
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
@@ -119,7 +114,6 @@ def main(base_path):
         },
         {
             "omnet": {
-                "extends": ext_single_cell,
                 "sim-time-limit": t,
                 "**.vadereScenarioPath" : s_5_20_const,
                 "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
@@ -164,14 +158,13 @@ def main(base_path):
     # Enviroment setup.
     #
     ini_file = os.path.abspath("../omnetpp.ini")
-    # base_dir = os.path.abspath("../suqc")
     base_dir = os.path.abspath("/mnt/data1tb/results/")
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
-        opp_config="final_dynamic_m_vadere",
+        opp_config="final_1d",
         opp_basename="omnetpp.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
         mobility_sim=("vadere", "latest"), # use omnet internal mobility models

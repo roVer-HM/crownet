@@ -44,15 +44,8 @@ def main(base_path):
         "cellAgeTTL", UnitValue.s(-1.0),
         "idStreamType", QString("insertionOrder"),
     )
-    time = UnitValue.s(100.0)
     opp_config = "final_stationary_mf"
 
-    # def var(ped, opp_seed, pos_seed, cfg_tpl="misc_pos_"):
-    #     return  {"omnet": {
-    #             "extends": f"_stationary_m_base_single_cell, {cfg_tpl}{ped}_{pos_seed}",
-    #             "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist,
-    #             "seed-set": str(opp_seed),
-    #             }}
     def var(ped, opp_seed, pos_seed, cfg_tpl="misc_pos_"):
         return  {"omnet": {
                 "extends": f"_stationary_m_base_single_cell, {cfg_tpl}{ped}_{pos_seed}",
