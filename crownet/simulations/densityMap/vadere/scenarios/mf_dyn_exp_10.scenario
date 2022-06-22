@@ -1,5 +1,5 @@
 {
-  "name" : "mf_m_dyn_poisson_02",
+  "name" : "mf_dyn_exp_10",
   "description" : "",
   "release" : "2.2",
   "processWriters" : {
@@ -1746,7 +1746,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1779,7 +1779,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1812,7 +1812,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1845,7 +1845,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1878,7 +1878,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1911,7 +1911,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1944,7 +1944,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -1968,7 +1968,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2001,7 +2001,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2034,7 +2034,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2067,7 +2067,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2091,7 +2091,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2115,7 +2115,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2139,7 +2139,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -2163,7 +2163,7 @@
         },
         "interSpawnTimeDistribution" : "negativeExponential",
         "distributionParameters" : {
-          "mean" : 25.0
+          "mean" : 10.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
