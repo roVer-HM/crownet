@@ -1,6 +1,10 @@
+from copy import deepcopy
 from functools import partial
+from itertools import product
 import os
+import timeit as it
 from time import time_ns
+from timeit import repeat
 from suqc.CommandBuilder.VadereOppCommand import VadereOppCommand
 from suqc.environment import CrownetEnvironmentManager
 from suqc.parameter.create import coupled_creator
@@ -15,7 +19,7 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 
 def main(base_path):
-    reps = 1  # seed-set
+    reps = 5  # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog",
@@ -50,26 +54,24 @@ def main(base_path):
         "vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario"
     )
     # scenario_ped_120 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x8_120.scenario")
-    # scenario_poisson = QString("vadere/scenarios/mf_m_dyn_poisson_02.scenario")
-    t = UnitValue.s(200.0)
-
-    source_id_range = range(1117, 1132)
+    scenario_exp_25 = QString("vadere/scenarios/mf_dyn_exp_25.scenario")
+    scenario_exp_5 = QString("vadere/scenarios/mf_dyn_exp_5.scenario")
+    t = UnitValue.s(800.0)
+    # t = UnitValue.s(2.0)
+    source_end_time = 400.0
+    source_id_range = range(1117, 1131)
 
     par_var = [
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath": scenario_ped_180,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "cellAgeTTL", UnitValue.s(-1.0)
-                ),
+                "**.vadereScenarioPath": scenario_exp_25,  # iter arrival time of 25s (for each source)
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                "*.pNode[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
             },
             "vadere": {
-                **{f"sources.[id=={id}].spawnNumber": 5 for id in source_id_range},
                 **{
-                    f"sources.[id=={id}].maxSpawnNumberTotal": 10
+                    f"sources.[id=={id}].endTime": source_end_time
                     for id in source_id_range
                 },
             },
@@ -77,22 +79,33 @@ def main(base_path):
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath": scenario_ped_180,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "cellAgeTTL", UnitValue.s(60.0)
-                ),
+                "**.vadereScenarioPath": scenario_exp_5,  # iter arrival time of 5s (for each source)
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                "*.pNode[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
             },
             "vadere": {
-                **{f"sources.[id=={id}].spawnNumber": 3 for id in source_id_range},
                 **{
-                    f"sources.[id=={id}].maxSpawnNumberTotal": 6
+                    f"sources.[id=={id}].endTime": source_end_time
                     for id in source_id_range
                 },
             },
         },
     ]
+
+    alpha = [0.5, 0.65, 0.80, 0.95]
+    dist = [20, 80, 120, 200]
+    alpha_dist = product(alpha, dist)
+    par_var_tmp = []
+    for run in par_var:
+        for alpha, dist in alpha_dist:
+            _run = deepcopy(run)  # copy
+            _run["omnet"]["*.pNode[*].app[1].app.mapCfg"] = mapCfgYmfDist.copy(
+                "alpha", alpha, "stepDist", dist
+            )
+            par_var_tmp.append(_run)
+
+    par_var = par_var_tmp
+
     seed_m = OmnetSeedManager(
         par_variations=par_var,
         rep_count=reps,
@@ -113,7 +126,7 @@ def main(base_path):
         .experiment_label("out")
     )
     model.timeout = None
-    model.qoi(["all"])
+    model.qoi(["all", "960"])
     model.verbose()
     model.set_seed_manager(seed_m)  # log used creation seed
 
@@ -151,8 +164,11 @@ def main(base_path):
         runscript_out="runscript.out",
     )
     print("setup done")
-    par_var, data = setup.run(len(par_var))
+
+    ts = it.default_timer()
+    par_var, data = setup.run(min(8, len(par_var)))
     # par_var, data = setup.run(1)y
+    print(f"Study: took {(it.default_timer() - ts)/60:2.4f} minutes")
 
 
 if __name__ == "__main__":
