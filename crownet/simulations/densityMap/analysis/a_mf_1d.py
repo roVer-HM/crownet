@@ -6,17 +6,17 @@ from multiprocessing import get_context
 import os
 from matplotlib import pyplot as plt
 import numpy as np
-from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
+from roveranalyzer.analysis.common import Simulation, SuqcRun
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.analysis import adf_test
+from roveranalyzer.analysis.ts_analysis import adf_summary_test
 from roveranalyzer.utils.plot import matplotlib_set_latex_param
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 
-from scipy.sparse import coo_array, coo_matrix, csc_array, csr
+from scipy.sparse import coo_array
 import scipy.signal as sg
 from matplotlib import cm
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 
 ts_x = "X_0.04"
@@ -114,12 +114,7 @@ def process_simulation_run(study: SuqcRun, scenario_map: dict, vadere_ts: pd.Dat
     # calculate ground truth
     ground_truth = []
     for col in vadere_ts.columns:
-        _adf = adf_test(vadere_ts.loc[:, [col]])
-        _adf.name = "adf"
-        _adf = _adf.to_frame()
-        _adf.columns = pd.Index([col], name="scenario")
-        _stat = vadere_ts.loc[:, [col]].describe()
-        ground_truth.append(pd.concat([_adf, _stat], axis=0))
+        ground_truth.append(adf_summary_test(vadere_ts, col))
 
     ground_truth = pd.concat(ground_truth, axis=1).T
     ground_truth.index.name = "scenario"
