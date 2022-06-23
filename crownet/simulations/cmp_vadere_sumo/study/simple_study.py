@@ -93,10 +93,10 @@ def main(base_path):
     simtime = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
-    # configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
+    configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
 
     # configs = ["sumoBottleneck", "vadereBottleneck"]
-    configs = ["sumoOnly2", "vadereOnly2"]
+    # configs = ["sumoOnly2", "vadereOnly2"]
 
     def var(interval):
         return {"omnet": {
@@ -138,11 +138,19 @@ def main(base_path):
         "World.pNode[%].cellularNic.channelModel[0]": ["rcvdSinrUl"]
     }
 
+    # scalar values to be analyzed
+    # World.pNode[1].cellularNic.mac
+    scalars_analyzed = {
+        "World.pNode[%].cellularNic.mac": ["receivedPacketFromLowerLayer:count"],
+        "World.pNode[%].udp": ["packetReceived:count"]
+    }
+
     if not os.path.exists(qoi_results_path):
         qoi_results = pd.DataFrame()
         qoi_results_t = pd.DataFrame()
         for config in configs:
-            qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter, vectors_analyzed)
+            qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter, vectors_analyzed,
+                                                 scalars_analyzed)
             qoi_results = pd.concat([qoi_results, qoi])
             qoi_results_t = pd.concat([qoi_results_t, qoi_t])
         qoi_results.to_csv(qoi_results_path, sep=" ")
@@ -254,11 +262,13 @@ def max_parallel_sims(mobility_sim: MobilitySimulatorType) -> int:
     return max_sims
 
 
-def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str, str], vectors: Dict[str, List[str]]) \
+def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str, str], vectors: Dict[str, List[str]],
+                            scalars: Dict[str, List[str]]) \
         -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Analyze a parameter study whose results are stored under the specified base path.
 
+    :param scalars: dictionary mapping module names to all scalars to be analyzed for this module
     :param var_parameter: varied parameter in form of dictionary
             with "module" mapped to module name, "name" mapped to parameter name
     :param vectors: dictionary mapping module names to all vectors to be analyzed for this module
@@ -283,19 +293,27 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
     par_to_sims = get_parameter_to_sims(suq_run, var_parameter["module"], var_parameter["name"])
 
     dfs = pd.DataFrame()
+    dfs_scalar = pd.DataFrame()
     for param_value in par_to_sims.keys():
         print(f'Analyzing all simulations for parameter value: {param_value}')
 
         for sim in par_to_sims[param_value]:
             print(f'   Analyzing simulation: {sim.data_root}')
             new_data = _retrieve_vector_data(sim, vectors)
+            new_scalar_data = _retrieve_scalar_data(sim, scalars)
             new_data = pd.concat({sim.label: new_data}, names=['run_label'])  # add run_label as multi-level idx
+            new_scalar_data = pd.concat({sim.label: new_scalar_data}, names=['run_label'])
             new_data = pd.concat({param_value: new_data}, names=['param'])  # add parameter value as multi-level idx
+            new_scalar_data = pd.concat({param_value: new_scalar_data}, names=['param'])
             dfs = pd.concat([dfs, new_data])
+            dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
 
     # calculate aggregated statistics for each parameter value
     # aggregated_results = dfs.groupby(level=["param"])["rcvdPktLifetime"].agg(["mean", "std", "max", "min"])
     aggregated_results = dfs.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
+    additional_sca_results = dfs_scalar.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
+    aggregated_results = aggregated_results.merge(additional_sca_results, left_index=True, right_index=True,
+                                                  how='outer')
 
     # calculate time-based averages (e.g. for plotting over time)
     time_avg_df = _time_average(dfs)
@@ -329,6 +347,25 @@ def _retrieve_vector_data(sim, vectors):
             new_data = pd.merge(new_data, vec_data, on=["hostId", "time"], how="outer").sort_index()
     return new_data
 
+
+def _retrieve_scalar_data(sim, scalars):
+    new_data = pd.DataFrame()
+    for scalar_module in scalars.keys():
+        for sca_name in scalars[scalar_module]:
+            sca_data = sim.sql.sca_data(
+                module_name=scalar_module,
+                scalar_name=sca_name,
+            )
+            sca_data.drop(columns='scalarName', inplace=True)
+            sca_data.rename(columns={'scalarValue': sca_name}, inplace=True)
+
+            # merge vector data of different modules
+            if new_data.empty:
+                new_data = sca_data
+            else:
+                # new_data = pd.merge(new_data, vec_data, on=["hostId"], how="outer").sort_index()
+                new_data = pd.concat([new_data, sca_data], ignore_index=True, sort=False)
+    return new_data
 
 def _get_vector_names(vectors, vector_module):
     vec_names = {}
