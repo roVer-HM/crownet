@@ -156,14 +156,14 @@ def main(base_path):
         qoi_results.to_csv(qoi_results_path, sep=" ")
         qoi_results_t.to_csv(qoi_results_t_path, sep=" ")
     else:
-        qoi_results = pd.read_csv(qoi_results_path, sep=" ")
-        qoi_results_t = pd.read_csv(qoi_results_t_path, sep=" ")
+        qoi_results = pd.read_csv(qoi_results_path, sep=" ", index_col=[0, 1], header=[0, 1])
+        qoi_results_t = pd.read_csv(qoi_results_t_path, sep=" ", index_col=[0, 1], header=[0, 1])
 
     # create plots
     print(qoi_results)
     config_descriptions = {"sumoBottleneck": "bottleneck scenario: sumo",
                            "vadereBottleneck": "bottleneck scenario: vadere"}
-    plot_pvar_delay(qoi_results, "Inter-TX Time [s]", "Delay [s]", config_descriptions)
+    plot_pvar_delay(qoi_results, "Inter-TX Time [s]", "Delay [s]", config_descriptions, "rcvdPkLifetime")
     plt.show()
 
 
@@ -367,6 +367,7 @@ def _retrieve_scalar_data(sim, scalars):
                 new_data = pd.concat([new_data, sca_data], ignore_index=True, sort=False)
     return new_data
 
+
 def _get_vector_names(vectors, vector_module):
     vec_names = {}
     for vec_name in vectors[vector_module]:
@@ -396,22 +397,24 @@ def _time_average(dfs, avg_interval=1.0):
 
 
 def plot_pvar_delay(data: pd.DataFrame, x_label: str, y_label: str,
-                    configs: Dict[str, str]) -> (matplotlib.figure.Figure,
-                                                 matplotlib.axes.Axes):
+                    configs: Dict[str, str], plot_name: str) -> (matplotlib.figure.Figure,
+                                                                 matplotlib.axes.Axes):
     plt.rc('font', size=20)
     fig, ax = plt.subplots()
     fig.set_size_inches(16, 9)
 
     for config in configs.keys():
-        # selected_data = data.loc[[config]]
-        selected_data = data[data["config"] == config]
-        plt.scatter(selected_data["param"], selected_data["mean"],
+        selected_data = data.loc[config]
+        plt.scatter(selected_data.index, selected_data["rcvdPkLifetime", "mean"],
                     label=configs[config])
         # plt.errorbar(selected_data["param"], selected_data["mean"], yerr=selected_data["std"], fmt="o",
         #              label=configs[config])
     plt.legend(loc="upper left")
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
+    plt.savefig(f"{plot_name}.pdf")
+    plt.savefig(f"{plot_name}.png")
+    plt.savefig(f"{plot_name}.svg")
     return fig, ax
 
 
