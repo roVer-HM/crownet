@@ -36,7 +36,7 @@ from roveranalyzer.simulators.opp.utils import Simulation
 from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
 
 # number of repetitions to be performed for each parameter set
-REPS = 3  # for testing we use 2, for reliable results it should be >10 (depending on stddev)
+REPS = 10  # for testing we use 2, for reliable results it should be significantly more (depending on stddev)
 
 # estimated amount of memory per simulation
 MEM_PER_SIM_VADERE_GB = 15
