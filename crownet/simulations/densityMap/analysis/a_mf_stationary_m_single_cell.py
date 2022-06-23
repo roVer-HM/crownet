@@ -65,17 +65,6 @@ class Rep:
         return list(ret)
 
 
-def kwargs_map(fn, kwargs):
-    try:
-        print(f"Execute {kwargs['scenario_lbl']}")
-        ret = fn(**kwargs)
-        print(f"Execute {kwargs['scenario_lbl']} done.")
-        return (True, ret)
-    except Exception as e:
-        print(f"Error in {kwargs['scenario_lbl']} message: {e}")
-        return (False, f"Error in {kwargs['scenario_lbl']} message: {e}")
-
-
 def get_run_map(study: SuqcRun, rep_count=10):
     r = Rep()
     run_map = {}
@@ -125,28 +114,18 @@ def read_data(study: SuqcRun):
         _runs = run_map.items()
         data = ["map_glb_count", "map_mean_count"]
         kwargs_iter = [
-            {
-                "study": s,
-                "scenario_lbl": run[0],
-                "rep_ids": run[1]["rep"],
-                "data": d,
-                "frame_consumer": c,
-            }
-            for s, run, d, c in zip(
-                repeat(study), _runs, repeat(data), repeat(process_relative_err)
+            dict(
+                study=study,
+                scenario_lbl=run[0],
+                rep_ids=run[1]["rep"],
+                data=data,
+                frame_consumer=process_relative_err,
             )
+            for run in _runs
         ]
-        with get_context("spawn").Pool(10) as pool:
-            maps = pool.starmap(
-                kwargs_map, zip(repeat(OppAnalysis.merge_maps), kwargs_iter)
-            )
-        # map = OppAnalysis.merge_maps(**kwargs_iter[0])
-
-        for ret, map in maps:
-            if not ret:
-                print(map)
-
-        maps = [map for ret, map in maps if ret]
+        maps = run_kwargs_map(
+            func=OppAnalysis.merge_maps, kwargs_iter=kwargs_iter, pool_size=10
+        )
         map: pd.DataFrame = pd.concat(maps, axis=0, verify_integrity=True)
         map.to_hdf(merged_norm_path, key="map_measure_norm_static", mode="a")
 

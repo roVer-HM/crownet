@@ -19,7 +19,7 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 
 def main(base_path):
-    reps = 5  # seed-set
+    reps = 10  # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog",
@@ -55,7 +55,7 @@ def main(base_path):
     )
     # scenario_ped_120 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x8_120.scenario")
     scenario_exp_25 = QString("vadere/scenarios/mf_dyn_exp_25.scenario")
-    scenario_exp_5 = QString("vadere/scenarios/mf_dyn_exp_5.scenario")
+    scenario_exp_5 = QString("vadere/scenarios/mf_dyn_exp_05.scenario")
     t = UnitValue.s(800.0)
     # t = UnitValue.s(2.0)
     source_end_time = 400.0
@@ -93,8 +93,10 @@ def main(base_path):
     ]
 
     alpha = [0.5, 0.65, 0.80, 0.95]
-    dist = [20, 80, 120, 200]
-    alpha_dist = product(alpha, dist)
+    # dist = [20, 80, 120, 200]
+    dist = [80, 120, 160, 200]
+    alpha_dist = list(product(alpha, dist))
+    alpha_dist.append([1.0, 999])  # distance has no effect thus just one
     par_var_tmp = []
     for run in par_var:
         for alpha, dist in alpha_dist:
@@ -103,6 +105,7 @@ def main(base_path):
                 "alpha", alpha, "stepDist", dist
             )
             par_var_tmp.append(_run)
+        print("done")
 
     par_var = par_var_tmp
 
@@ -126,7 +129,7 @@ def main(base_path):
         .experiment_label("out")
     )
     model.timeout = None
-    model.qoi(["all", "960"])
+    model.qoi(["all"])
     model.verbose()
     model.set_seed_manager(seed_m)  # log used creation seed
 
