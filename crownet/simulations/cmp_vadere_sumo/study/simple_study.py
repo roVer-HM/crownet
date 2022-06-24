@@ -19,6 +19,8 @@ import string
 import time
 from enum import Enum
 from typing import List, Dict, Any, Tuple
+from multiprocessing import Pool
+from itertools import repeat
 
 from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolValue
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
@@ -47,24 +49,11 @@ MEM_PER_SIM_OMNET_GB = 1
 QOI_RESULTS_FILE = 'qoi_results.csv'
 QOI_RESULTS_TIME_FILE = 'qoi_results_t.csv'
 
+_MP_NR_PROCESSES = 20  # maximum number of parallel processes when analyzing the data
+
 
 # --- generic utility functions - should be moved to roveranalyzer lateron
 # TODO: move to roveranalyzer and remove duplicate code here and in analysis.py
-# def find(file_extension: str, path: str, must_contain: str = None) -> List[str]:
-#     """ Finds all file of a certain type within a folder and its sub-folders.
-#
-#     :param file_extension: The file extension
-#     :param path: The root folder to be searched
-#     :param must_contain: Optional folder name which must be part of the path.
-#     :return: A list of paths to all files with the given extension in the folder and all sub-folders
-#     """
-#     result = []
-#     for root, dirs, files in os.walk(path):
-#         for name in files:
-#             if name.endswith(file_extension) and (not must_contain or (must_contain in root)):
-#                 result.append(os.path.join(root, name))
-#     return result
-
 
 def get_parameter_to_sims(run: SuqcRun, module_name: str, parameter_name: str):
     simulations = run.get_simulations()
@@ -93,9 +82,9 @@ def main(base_path):
     simtime = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
-    configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
+    # configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
 
-    # configs = ["sumoBottleneck", "vadereBottleneck"]
+    configs = ["sumoBottleneck", "vadereBottleneck"]
     # configs = ["sumoOnly2", "vadereOnly2"]
 
     def var(interval):
@@ -277,46 +266,45 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
     :return: A tuple of two DataFrames. The first contains the aggregated analysis results,
     the second contains the averaged, time-based data, e.g. for plotting the vectors over time.
     """
-    # define what is to be analyzed
-    # module = "World.pNode[%].app[0].app"
-    #
-    # vec_names = {
-    #     "rcvdPkLifetime:vector": {
-    #         "name": "rcvdPktLifetime",
-    #         "dtype": float,
-    #     },
-    #     "rcvdPkHostId:vector": {"name": "srcHostId", "dtype": np.int32},
-    # }
 
-    # do analysis
     suq_run = SuqcRun(os.path.join(get_results_dir(base_path), config))
     par_to_sims = get_parameter_to_sims(suq_run, var_parameter["module"], var_parameter["name"])
 
-    dfs = pd.DataFrame()
+    dfs_vector = pd.DataFrame()
     dfs_scalar = pd.DataFrame()
-    for param_value in par_to_sims.keys():
-        print(f'Analyzing all simulations for parameter value: {param_value}')
+    if _MP_NR_PROCESSES > 1:
+        # run multiple analysis processes in parallel - since calculation might take a while
+        print(f'Analyzing all simulations for parameter values: {par_to_sims.keys()}')
+        with Pool(_MP_NR_PROCESSES) as p:
 
-        for sim in par_to_sims[param_value]:
-            print(f'   Analyzing simulation: {sim.data_root}')
-            new_data = _retrieve_vector_data(sim, vectors)
-            new_scalar_data = _retrieve_scalar_data(sim, scalars)
-            new_data = pd.concat({sim.label: new_data}, names=['run_label'])  # add run_label as multi-level idx
-            new_scalar_data = pd.concat({sim.label: new_scalar_data}, names=['run_label'])
-            new_data = pd.concat({param_value: new_data}, names=['param'])  # add parameter value as multi-level idx
-            new_scalar_data = pd.concat({param_value: new_scalar_data}, names=['param'])
-            dfs = pd.concat([dfs, new_data])
+            f_params = []
+            for param_value in par_to_sims.keys():
+                for sim in par_to_sims[param_value]:
+                    f_params.append((sim, param_value, vectors, scalars))
+
+            vec_sca_data = p.starmap(_analyze_singe_simulation, f_params)
+
+        # combine all analysis data in a single data frame
+        for (new_vector_data, new_scalar_data) in vec_sca_data:
+            dfs_vector = pd.concat([dfs_vector, new_vector_data])
             dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
+    else:
+        # use main thread for all calculations
+        for param_value in par_to_sims.keys():
+            print(f'Analyzing all simulations for parameter value: {param_value}')
+            for sim in par_to_sims[param_value]:
+                (new_vector_data, new_scalar_data) = _analyze_singe_simulation(sim, param_value, vectors, scalars)
+                dfs_vector = pd.concat([dfs_vector, new_vector_data])
+                dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
 
     # calculate aggregated statistics for each parameter value
-    # aggregated_results = dfs.groupby(level=["param"])["rcvdPktLifetime"].agg(["mean", "std", "max", "min"])
-    aggregated_results = dfs.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
+    aggregated_results = dfs_vector.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
     additional_sca_results = dfs_scalar.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
     aggregated_results = aggregated_results.merge(additional_sca_results, left_index=True, right_index=True,
                                                   how='outer')
 
     # calculate time-based averages (e.g. for plotting over time)
-    time_avg_df = _time_average(dfs)
+    time_avg_df = _time_average(dfs_vector)
 
     # TODO: call plot methods for aggregated time-intervals
     data_to_plot = time_avg_df.xs('0.01s')["rcvdPkLifetime", "mean"]
@@ -330,6 +318,17 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
     time_avg_df = pd.concat([time_avg_df], keys=[config], names=['config'])
 
     return aggregated_results, time_avg_df
+
+
+def _analyze_singe_simulation(simulation, parameter_value, vectors, scalars):
+    print(f'   Analyzing simulation for parameter {parameter_value}: {simulation.data_root}')
+    vec_data = _retrieve_vector_data(simulation, vectors)
+    sca_data = _retrieve_scalar_data(simulation, scalars)
+    vec_data = pd.concat({simulation.label: vec_data}, names=['run_label'])  # add run_label as multi-level idx
+    sca_data = pd.concat({simulation.label: sca_data}, names=['run_label'])
+    vec_data = pd.concat({parameter_value: vec_data}, names=['param'])  # add parameter value as multi-level idx
+    sca_data = pd.concat({parameter_value: sca_data}, names=['param'])
+    return vec_data, sca_data
 
 
 def _retrieve_vector_data(sim, vectors):
