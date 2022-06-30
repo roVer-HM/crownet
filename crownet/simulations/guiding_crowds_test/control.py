@@ -6,10 +6,9 @@ from flowcontrol.crownetcontrol.controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
 
-PRECISION = 8
-
 from flowcontrol.strategy.controller.control_algorithm import AlternateTargetAlgorithm
 from flowcontrol.strategy.timestepping.timestepping import FixedTimeStepper
+
 
 class PingPong(Controller):
     def __init__(self):
