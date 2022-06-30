@@ -82,9 +82,10 @@ def main(base_path):
     simtime = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
-    # configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "vadereSimple", "sumoBottleneck", "vadereBottleneck"]
+    configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "sumoSimpleTcp", "vadereSimple", "vadereSimpleTcp",
+               "sumoBottleneck", "sumoBottleneckTcp", "vadereBottleneck", "vadereBottleneckTcp"]
 
-    configs = ["sumoBottleneck", "vadereBottleneck"]
+    # configs = ["sumoBottleneck", "vadereBottleneck"]
     # configs = ["sumoOnly2", "vadereOnly2"]
 
     def var(interval):
