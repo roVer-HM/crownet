@@ -2,6 +2,7 @@
   "name" : "mf_dyn_exp_15",
   "description" : "",
   "release" : "2.2",
+  "commithash" : "ee261e56f363ff7d448aee3a9c1dcbc2df61156c",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
