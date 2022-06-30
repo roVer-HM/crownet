@@ -13,6 +13,7 @@ import inet.node.contract.INetworkNode;
 import inet.linklayer.contract.IWirelessInterface;
 import inet.mobility.contract.IMobility;
 import inet.networklayer.common.InterfaceTable;
+import inet.linklayer.contract.ILoopbackInterface;
 import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 import inet.applications.contract.IApp;
 import inet.mobility.contract.IMobility;
@@ -30,7 +31,7 @@ module TransportLayerRoadUser like INetworkNode
     parameters:
         @networkNode();
         @labels(node,ethernet-node,wireless-node);
-        
+
         @figure[transportLayer](type=rectangle; pos=250,306; size=600,130; fillColor=#ff0000; lineColor=#808080; cornerRadius=5; fillOpacity=0.1);
         @figure[transportLayer.title](type=text; pos=845,311; anchor=ne; text="transport layer");
 
@@ -49,7 +50,7 @@ module TransportLayerRoadUser like INetworkNode
         string osgModelColor = default(""); // tint color, no colorization by default
         string canvasImage = default(""); // image for canvas visualization, no image by default
         string canvasImageColor = default(""); // tint color, no colorization by default
-        
+
         int numRadios = default(1);
         bool withAntennaMobility = default(false);
         *.mobility.visualRepresentation = "^";
@@ -65,16 +66,23 @@ module TransportLayerRoadUser like INetworkNode
 
         //# Node specs
         string nodeType = "UE";     // DO NOT CHANGE
+        
         int masterId @mutable = default(0);
         int macNodeId @mutable = default(0); // TODO: this is not a real parameter
         int macCellId @mutable = default(0); // TODO: this is not a real parameter
+        
+        bool useNR = default(false);
+
+        int nrMasterId @mutable = default(0); // Note: must be 0 if useNR is false
+        int nrMacNodeId @mutable = default(0);
+        int nrMacCellId @mutable = default(0);
 
         //# D2D capability
-        string nicType = default("LteNicUe");
+        string nicType = default(ifTrueOrElse(useNR, "NRNicUe", "LteNicUe"));
 
         //# Network Layer specs
         bool hasIpv4 = default(true);
-        bool hasIpv6 = default(false);     
+        bool hasIpv6 = default(false);
 
         //# Link Layer specs
         bool hasCellular = default(true);
@@ -98,6 +106,7 @@ module TransportLayerRoadUser like INetworkNode
         int numPcapRecorders = default(0); // no of PcapRecorders
     gates:
         input lteRadioIn @directIn;
+        input nrRadioIn @directIn;
         input radioIn[numWlanNic] @directIn;     // connection to master
 
     submodules:
@@ -130,6 +139,10 @@ module TransportLayerRoadUser like INetworkNode
             //d2dCapable = d2dCapable;
             @display("p=710.304,672.672");
         }
+        lo: <default("LoopbackInterface")> like ILoopbackInterface {
+            parameters:
+                @display("p=536,672,row,150");
+        }
         wlanNic[numWlanNic]: <default("Ieee80211Interface")> like IWirelessInterface if hasWlan {
             parameters:
                 @display("p=407.68,672.672,row,150;q=queue");
@@ -141,11 +154,6 @@ module TransportLayerRoadUser like INetworkNode
         ipv4: <default("Ipv4NetworkLayer")> like INetworkLayer if hasIpv4 {
             parameters:
                 @display("p=425,507;q=queue");
-                //todo: hostAutoConfigurator with wlan and cellular
-                //set HostAutoConfigurator (deactivated)
-                //use standalone configurator
-                configurator.typename = "HostAutoConfigurator";
-                configurator.interfaces = default("cellular");
         }
         ipv6: <default("Ipv6NetworkLayer")> like INetworkLayer if hasIpv6 {
             parameters:
@@ -176,7 +184,8 @@ module TransportLayerRoadUser like INetworkNode
 
     connections allowunconnected:
         //# LTE Nic
-        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic);
+        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic) && !useNR;
+        cellularNic.nrRadioIn <-- nrRadioIn if exists(cellularNic) && useNR;
 
         cellularNic.upperLayerOut --> nl.in++ if exists(cellularNic);
         cellularNic.upperLayerIn <-- nl.out++ if exists(cellularNic);
@@ -211,6 +220,9 @@ module TransportLayerRoadUser like INetworkNode
 
         radioDriver.lowerLayerIn <-- nl.out++ if useArtery;
         radioDriver.lowerLayerOut --> nl.in++ if useArtery;
+
+        nl.out++ --> lo.upperLayerIn;
+        lo.upperLayerOut --> nl.in++;
 
         ipv4.transportIn <-- tn.out++ if hasIpv4;
         ipv4.transportOut --> tn.in++ if hasIpv4;
