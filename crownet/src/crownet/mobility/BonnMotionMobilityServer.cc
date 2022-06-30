@@ -32,6 +32,9 @@ void BonnMotionServerFile::loadFile(const char *filename){
     std::string line;
     int lineCount = 0;
     while (std::getline(in, line)) {
+        if(line.at(0) == '#'){
+            continue; // ignore comets
+        }
         lines.push_back(BonnMotionFile::Line());
         BonnMotionFile::Line& vec = lines.back();
 
