@@ -178,7 +178,7 @@ public:
         : TimestampedGetEntryVisitor<RegularCell>(t), alpha(alpha) {}
     virtual RegularCell::entry_t_ptr applyTo(
         const RegularCell& cell) const override;
-    sum_data getSums(const RegularCell& cell) const;
+    virtual sum_data getSums(const RegularCell& cell) const;
     virtual std::string getVisitorName() const override { return "ymfPlusDist"; }
 
 protected:
@@ -191,6 +191,7 @@ public:
         : YmfPlusDistVisitor(alpha, t), stepDist(stepDist), zeroStep(zeroStep) {}
     virtual RegularCell::entry_t_ptr applyTo(
         const RegularCell& cell) const override;
+    virtual sum_data getSums(const RegularCell& cell) const override;
     virtual std::string getVisitorName() const override { return "ymfPlusDistStep"; }
 
 protected:

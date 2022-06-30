@@ -208,6 +208,37 @@ RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell
     }
     return ret;
 }
+YmfPlusDistVisitor::sum_data YmfPlusDistStepVisitor::getSums(const RegularCell& cell) const {
+    double age_sum = 0.0;
+    double age_min = std::numeric_limits<double>::max();
+    double distance_sum = 0.0;
+    double now = this->time.dbl(); // current time the visitor is called.
+
+    double age = .0;
+    int count = 0;
+    for (const auto& e : cell.validIter()) {
+        /*
+         * Collect the sum of age difference relative to the
+         * youngest measure (i.e. smallest age). For this
+         * sum up all ages and find the smallest age at the same
+         * time. Subtract count*age_min after the fact from age_sum.
+         */
+        age = now - e.second->getMeasureTime().dbl();
+        if(age < age_min){
+            age_min = age;
+        }
+        age_sum += age;
+        ++count;
+
+        /*
+         * sum up step function result not only distance
+         */
+        auto dist = e.second->getEntryDist().sourceEntry;
+        distance_sum += (dist <= stepDist) ? stepDist : dist;
+    }
+    age_sum = age_sum - count*age_min;
+    return sum_data{age_sum, age_min, distance_sum};
+}
 
 RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {
     // to check local exists.... raise error.....
