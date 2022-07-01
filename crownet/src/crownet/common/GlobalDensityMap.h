@@ -40,6 +40,7 @@ namespace crownet {
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
                          public traci::ITraciNodeVisitor,
+                         public ITraCiNodeVisitorAcceptor,
                          public IGlobalDensityMapHandler<RegularDcdMap>{
  public:
   //  using Grid = RegularGridMap<std::string>;
@@ -49,6 +50,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   static const omnetpp::simsignal_t initMap;
   static const omnetpp::simsignal_t registerMap;
   static const omnetpp::simsignal_t removeMap;
+  static const omnetpp::simsignal_t registerNodeAcceptor;
 
   virtual ~GlobalDensityMap();
 
@@ -87,7 +89,8 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
       return dcdMapFactory;
   }
 
-
+  // handle static nodes here
+  virtual void acceptTraciVisitor(traci::ITraciNodeVisitor* visitor) override;
   virtual void acceptNodeVisitor(traci::ITraciNodeVisitor* visitor);
 
 
@@ -99,13 +102,15 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
 
  protected:
   cMessage *appDeleteNode = nullptr;
-  int misc_base_index =0;
+  int vectorNodeIndex =0;
+  std::string vectorNodeModule;
+  std::vector<std::string> singleNodeModules;
+
 
   cMessage *writeMapTimer = nullptr;
   simtime_t writeMapInterval;
   simtime_t lastUpdate;
-  std::vector<std::string> vectorNodeModules;
-  std::vector<std::string> singleNodeModules;
+  std::vector<ITraCiNodeVisitorAcceptor*> dynamicNodeVisitorAcceptors;
   ITraCiNodeVisitorAcceptor* traciModuleListener = nullptr;
 
   std::shared_ptr<OsgCoordinateConverter> converter;

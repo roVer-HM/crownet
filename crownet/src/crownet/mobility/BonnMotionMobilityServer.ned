@@ -20,6 +20,7 @@ moduleinterface BonnMotionServer {}
 simple BonnMotionMobilityServer like BonnMotionServer {
 	parameters:
 	   	@class(crownet::BonnMotionMobilityServer);
+	   	@signal[RegisterNodeAcceptor];
 	   	string traceFile; // the BonnMotion trace file 
 	   	bool is3D = default(false); // whether the trace file contains triplets or quadruples
 	   	string vectorNode = default("misc");

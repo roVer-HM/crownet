@@ -12,6 +12,7 @@
 #include <omnetpp/csimplemodule.h>
 #include <functional>
 #include "inet/mobility/single/BonnMotionFileCache.h"
+#include "crownet/artery/traci/TraCiNodeVisitorAcceptor.h"
 
 
 using namespace inet;
@@ -42,7 +43,8 @@ protected:
 
 
 class BonnMotionMobilityServer : public omnetpp::cSimpleModule,
-                                 public omnetpp::cListener
+                                 public omnetpp::cListener,
+                                 public ITraCiNodeVisitorAcceptor
 {
 public:
     static const omnetpp::simsignal_t bonnMotionTargetReached;
@@ -59,6 +61,8 @@ public:
     // cListner
     using omnetpp::cIListener::finish;  // [-Woverloaded-virtual]
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, double d, cObject *details) override;
+    // ITraCiNodeVisitorAcceptor
+    virtual void acceptTraciVisitor(traci::ITraciNodeVisitor* visitor) override;
 
 protected:
     using NodeInitializer = std::function<void(omnetpp::cModule*)>;

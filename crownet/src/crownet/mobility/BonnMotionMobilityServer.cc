@@ -11,6 +11,7 @@
 #include "inet/common/scenario/ScenarioManager.h"
 #include "inet/mobility/single/BonnMotionFileCache.h"
 #include "crownet/mobility/BonnMotionMobilityClient.h"
+#include "crownet/common/GlobalDensityMap.h"
 
 #include <list>
 #include <vector>
@@ -126,6 +127,8 @@ void BonnMotionMobilityServer::initialize(int stage)
         creationTimer = new cMessage("BonnMotionCreationTimer");
 
         scheduleNextCreationEvent();
+
+        emit(GlobalDensityMap::registerNodeAcceptor, this);
     }
 }
 
@@ -236,6 +239,14 @@ void BonnMotionMobilityServer::scheduleNextCreationEvent(){
         scheduleAt(timeLineIndex.second, creationTimer);
     }
 }
+
+void BonnMotionMobilityServer::acceptTraciVisitor(traci::ITraciNodeVisitor* visitor){
+    for(const auto& entry: nodeMap){
+        visitor->visitNode("", entry.second); //id not used
+    }
+}
+
+
 
 
 } /* namespace crownet */
