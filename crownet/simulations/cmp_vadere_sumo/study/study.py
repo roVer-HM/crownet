@@ -54,33 +54,10 @@ QOI_RESULTS_TIME_FILE = 'qoi_results_t.csv'
 _MP_NR_PROCESSES = 20  # maximum number of parallel processes when analyzing the data
 
 
-# --- generic utility functions - should be moved to roveranalyzer lateron
-# TODO: move to roveranalyzer and remove duplicate code here and in analysis.py
-
-def get_parameter_to_sims(run: SuqcRun, module_name: str, parameter_name: str):
-    simulations = run.get_simulations()
-    parameter_to_sims = {}
-    for sim in simulations:
-        scave_filter = ScaveTool().filter_builder().t_parameter().AND().module(module_name).AND().gOpen().name(
-            parameter_name).gClose().build()
-        df_param = ScaveTool().read_parameters(sim.sql.sca_path, scave_filter=scave_filter)
-        param_value = df_param.at[0, "value"]
-        if param_value not in parameter_to_sims:
-            parameter_to_sims[param_value] = []
-        parameter_to_sims[param_value].append(sim)
-    return parameter_to_sims
-
-
-# --- end of utility functions
-
-
-class MobilitySimulatorType(Enum):
-    OMNET = 1
-    VADERE = 2
-    SUMO = 3
-
-
 def main(base_path):
+    # ------------------------------------------------------------------------------------------------------------
+    # Configure simulation
+    # ------------------------------------------------------------------------------------------------------------
     simtime = UnitValue.s(600.0)
 
     # parameter variation: define parameters to be varied
@@ -91,6 +68,7 @@ def main(base_path):
     # configs = ["sumoBottleneck", "vadereBottleneck"]
     # configs = ["sumoOnly2", "vadereOnly2"]
     # configs = ["sumoSimpleTcp", "vadereSimpleTcp"]
+    # configs = ["sumoOnly2", "sumoSimpleTcp"]
 
     # define parameter variation template for configurations
     # The parameter p is lateron varied, usually in the range 1..10
@@ -113,27 +91,10 @@ def main(base_path):
     def par_var(configuration):
         return [var(configuration, round(inter, 3)) for inter in np.arange(1, 11, 1)]
 
-    # run simulation studies
-    for config in configs:
-        if "sumo" in config:
-            mobility_type = MobilitySimulatorType.SUMO
-        elif "vadere" in config:
-            mobility_type = MobilitySimulatorType.VADERE
-        else:
-            raise ValueError("Cannot determine mobility type based on config name.")
-        run_parameter_study(base_path, mobility_type, config, par_var(config))
-
-    # perform analysis
-    qoi_results_path = os.path.join(base_path, QOI_RESULTS_FILE)
-    qoi_results_t_path = os.path.join(base_path, QOI_RESULTS_TIME_FILE)
-    if os.path.exists(qoi_results_path):
-        print(f'Warning: Analysis result file \"{qoi_results_path}\" already exists.')
-        confirmation = input(f'         Really delete \"{qoi_results_path}\" to re-run analysis? (y/N)')
-        if confirmation.lower() in ["y", "yes"]:
-            os.remove(qoi_results_path)
-            os.remove(qoi_results_t_path)
-
-    # Parameter that was varied in parameter study
+    # ------------------------------------------------------------------------------------------------------------
+    # Configure analysis that will be performed on the simulation results
+    # ------------------------------------------------------------------------------------------------------------
+    # Parameter that was varied in parameter study and is
     def var_parameter(c):
         if "Tcp" in c:
             # for HTTP/TCP, the size of the reply sent back from the HTTP server is varied
@@ -172,6 +133,30 @@ def main(base_path):
             "World.pNode[%].udp": ["packetReceived:count"]
         }
 
+    # ------------------------------------------------------------------------------------------------------------
+    # run simulation studies
+    # ------------------------------------------------------------------------------------------------------------
+    for config in configs:
+        if "sumo" in config:
+            mobility_type = MobilitySimulatorType.SUMO
+        elif "vadere" in config:
+            mobility_type = MobilitySimulatorType.VADERE
+        else:
+            raise ValueError("Cannot determine mobility type based on config name.")
+        run_parameter_study(base_path, mobility_type, config, par_var(config))
+
+    # ------------------------------------------------------------------------------------------------------------
+    # perform analysis (as configured above)
+    # ------------------------------------------------------------------------------------------------------------
+    qoi_results_path = os.path.join(base_path, QOI_RESULTS_FILE)
+    qoi_results_t_path = os.path.join(base_path, QOI_RESULTS_TIME_FILE)
+    if os.path.exists(qoi_results_path):
+        print(f'Warning: Analysis result file \"{qoi_results_path}\" already exists.')
+        confirmation = input(f'         Really delete \"{qoi_results_path}\" to re-run analysis? (y/N)')
+        if confirmation.lower() in ["y", "yes"]:
+            os.remove(qoi_results_path)
+            os.remove(qoi_results_t_path)
+
     if not os.path.exists(qoi_results_path):
         qoi_results = pd.DataFrame()
         qoi_results_t = pd.DataFrame()
@@ -186,13 +171,43 @@ def main(base_path):
         qoi_results = pd.read_csv(qoi_results_path, sep=" ", index_col=[0, 1], header=[0, 1])
         qoi_results_t = pd.read_csv(qoi_results_t_path, sep=" ", index_col=[0, 1], header=[0, 1])
 
-    # create plots
+    # ------------------------------------------------------------------------------------------------------------
+    # create plots (based on results of analysis)
+    # ------------------------------------------------------------------------------------------------------------
     print(qoi_results)
     config_descriptions = {"sumoBottleneck": "bottleneck scenario: sumo",
                            "vadereBottleneck": "bottleneck scenario: vadere"}
     plot_pvar_delay(qoi_results, "Inter-TX Time [s]", "Delay [s]", config_descriptions, "rcvdPkLifetime")
     plt.show()
 
+
+# ------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
+
+# --- generic utility functions - should be moved to roveranalyzer lateron
+# TODO: move to roveranalyzer and remove duplicate code here and in analysis.py
+
+def get_parameter_to_sims(run: SuqcRun, module_name: str, parameter_name: str):
+    simulations = run.get_simulations()
+    parameter_to_sims = {}
+    for sim in simulations:
+        scave_filter = ScaveTool().filter_builder().t_parameter().AND().module(module_name).AND().gOpen().name(
+            parameter_name).gClose().build()
+        df_param = ScaveTool().read_parameters(sim.sql.sca_path, scave_filter=scave_filter)
+        param_value = df_param.at[0, "value"]
+        if param_value not in parameter_to_sims:
+            parameter_to_sims[param_value] = []
+        parameter_to_sims[param_value].append(sim)
+    return parameter_to_sims
+
+
+# --- end of utility functions
+
+
+class MobilitySimulatorType(Enum):
+    OMNET = 1
+    VADERE = 2
+    SUMO = 3
 
 def get_results_dir(base_path: string):
     study_name = os.path.basename(__file__).replace(".py", "")
