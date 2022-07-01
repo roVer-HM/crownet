@@ -4,6 +4,7 @@
 
 import os
 import pprint
+from functools import partial
 
 import pandas as pd
 import numpy as np
@@ -31,6 +32,7 @@ from suqc.parameter.create import opp_creator, coupled_creator
 from suqc.parameter.sampling import ParameterVariationBase
 from suqc.request import CoupledDictVariation, CrownetRequest
 from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
+from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 from roveranalyzer.utils.path import PathHelper
 from roveranalyzer.simulators.opp.scave import ScaveTool
@@ -85,18 +87,31 @@ def main(base_path):
     configs = ["sumoOnly2", "vadereOnly2", "sumoSimple", "sumoSimpleTcp", "vadereSimple", "vadereSimpleTcp",
                "sumoBottleneck", "sumoBottleneckTcp", "vadereBottleneck", "vadereBottleneckTcp"]
 
+    # subsets of the configurations (used for testing and repeating single parts)
     # configs = ["sumoBottleneck", "vadereBottleneck"]
     # configs = ["sumoOnly2", "vadereOnly2"]
+    # configs = ["sumoSimpleTcp", "vadereSimpleTcp"]
 
-    def var(interval):
+    # define parameter variation template for configurations
+    # The parameter p is lateron varied, usually in the range 1..10
+    def var(configuration, p):
+        if "Tcp" in configuration:
+            # TCP (varies load based on replyLength)
+            return {"omnet": {
+                "sim-time-limit": simtime,
+                "*.*Node[*].app[0].replyLength": f"intWithUnit(exponential({p * 10}kB))"
+            }}
+
+        # default: assume beacon app  (varies load based on generation interval)
         return {"omnet": {
             "sim-time-limit": simtime,
-            "*.*Node[*].app[0].scheduler.generationInterval": f"{interval}s"
+            "*.*Node[*].app[0].scheduler.generationInterval": f"{p * 0.01}s"
         }}
 
     # note: for modifying several parameters and create par_var for all combinations, use
     # itertools.product
-    par_var = [var(round(inter, 3)) for inter in np.arange(0.01, 0.11, 0.01)]
+    def par_var(configuration):
+        return [var(configuration, round(inter, 3)) for inter in np.arange(1, 11, 1)]
 
     # run simulation studies
     for config in configs:
@@ -106,7 +121,7 @@ def main(base_path):
             mobility_type = MobilitySimulatorType.VADERE
         else:
             raise ValueError("Cannot determine mobility type based on config name.")
-        run_parameter_study(base_path, mobility_type, config, par_var)
+        run_parameter_study(base_path, mobility_type, config, par_var(config))
 
     # perform analysis
     qoi_results_path = os.path.join(base_path, QOI_RESULTS_FILE)
@@ -119,28 +134,50 @@ def main(base_path):
             os.remove(qoi_results_t_path)
 
     # Parameter that was varied in parameter study
-    var_parameter = {"module": "World.pNode[0].app[0].scheduler",
-                     "name": "generationInterval"}
+    def var_parameter(c):
+        if "Tcp" in c:
+            # for HTTP/TCP, the size of the reply sent back from the HTTP server is varied
+            return {"module": "World.pNode[0].app[0]",
+                    "name": "replyLength"}
+        # default:
+        return {"module": "World.pNode[0].app[0].scheduler",
+                "name": "generationInterval"}
 
     # vectors to be analyzed
-    vectors_analyzed = {
-        "World.pNode[%].app[0].app": ["rcvdPkLifetime", "rcvdPkHostId"],
-        "World.pNode[%].cellularNic.channelModel[0]": ["rcvdSinrUl"]
-    }
+    def vectors_analyzed(c):
+        if "Tcp" in c:
+            # for HTTP/TCP, we evaluate the RTT reported by TCP
+            # and the 5G New Radio Signal to Noise + Interference Ration (SINR) in the uplink
+            return {
+                "World.pNode[%].tcp.conn%": ["rtt"],
+                "World.pNode[%].cellularNic.nrChannelModel[0]": ["rcvdSinrUl"]
+            }
+        # default:
+        return {
+            "World.pNode[%].app[0].app": ["rcvdPkLifetime", "rcvdPkHostId"],
+            "World.pNode[%].cellularNic.channelModel[0]": ["rcvdSinrUl"]
+        }
 
     # scalar values to be analyzed
     # World.pNode[1].cellularNic.mac
-    scalars_analyzed = {
-        "World.pNode[%].cellularNic.mac": ["receivedPacketFromLowerLayer:count"],
-        "World.pNode[%].udp": ["packetReceived:count"]
-    }
+    def scalars_analyzed(c):
+        if "Tcp" in c:
+            return {
+                "World.pNode[%].cellularNic.mac": ["receivedPacketFromLowerLayer:count"],
+                "World.pNode[%].app[%]": ["packetReceived:count"]
+            }
+        # default
+        return {
+            "World.pNode[%].cellularNic.mac": ["receivedPacketFromLowerLayer:count"],
+            "World.pNode[%].udp": ["packetReceived:count"]
+        }
 
     if not os.path.exists(qoi_results_path):
         qoi_results = pd.DataFrame()
         qoi_results_t = pd.DataFrame()
         for config in configs:
-            qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter, vectors_analyzed,
-                                                 scalars_analyzed)
+            qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter(config), vectors_analyzed(config),
+                                                 scalars_analyzed(config))
             qoi_results = pd.concat([qoi_results, qoi])
             qoi_results_t = pd.concat([qoi_results_t, qoi_t])
         qoi_results.to_csv(qoi_results_path, sep=" ")
@@ -168,7 +205,10 @@ def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, con
         par_variations=par_var,
         rep_count=REPS,
         omnet_fixed=False,
-        vadere_fixed=None).get_new_seed_variation()
+        vadere_fixed=False,
+        seed=time.time_ns(),
+        # seed = 0 # only for debugging/study setup
+    ).get_new_seed_variation()
 
     # Enviroment setup.
     # 
@@ -179,6 +219,8 @@ def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, con
         return
 
     os.makedirs(base_dir, exist_ok=True)
+
+    parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
     if mobility_sim == MobilitySimulatorType.SUMO:
         mobility_container = ("sumo", "latest")
@@ -206,8 +248,12 @@ def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, con
         opp_basename="omnetpp.ini",
         mobility_sim=mobility_container,
         communication_sim=("omnet", "latest"),
-        handle_existing="force_replace"
-        # handle_existing="ask_user_replace"
+        handle_existing="force_replace",
+        # handle_existing="ask_user_replace",
+        scenario_provider_class=partial(
+            VariationBasedScenarioProvider, par_var=parameter_variation
+        ),
+
     )
 
     env.copy_data(
@@ -216,7 +262,6 @@ def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, con
     )
 
     _rnd = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-    parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
     setup = CrownetRequest(
         env_man=env,
@@ -224,7 +269,7 @@ def run_parameter_study(base_path: str, mobility_sim: MobilitySimulatorType, con
         model=model,
         creator=opp_creator,
         rnd_hostname_suffix=f"_{_rnd}",
-        runscript_out=config + "_runscript.out"
+        runscript_out=config + "_runscript.out",
     )
 
     print("setup done")
@@ -308,10 +353,17 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
     time_avg_df = _time_average(dfs_vector)
 
     # TODO: call plot methods for aggregated time-intervals
-    data_to_plot = time_avg_df.xs('0.01s')["rcvdPkLifetime", "mean"]
-    plt.scatter(data_to_plot.index, data_to_plot)
-    data_to_plot = time_avg_df.xs('0.1s')["rcvdPkLifetime", "mean"]
-    plt.scatter(data_to_plot.index, data_to_plot)
+    # for now, we do just some example plots
+    if "Tcp" in config:
+        data_to_plot = time_avg_df.xs('intWithUnit(exponential(10kB))')["rtt", "mean"]
+        plt.scatter(data_to_plot.index, data_to_plot)
+        data_to_plot = time_avg_df.xs('intWithUnit(exponential(100kB))')["rtt", "mean"]
+        plt.scatter(data_to_plot.index, data_to_plot)
+    else:
+        data_to_plot = time_avg_df.xs('0.01s')["rcvdPkLifetime", "mean"]
+        plt.scatter(data_to_plot.index, data_to_plot)
+        data_to_plot = time_avg_df.xs('0.1s')["rcvdPkLifetime", "mean"]
+        plt.scatter(data_to_plot.index, data_to_plot)
     plt.show()
 
     # add config as index level

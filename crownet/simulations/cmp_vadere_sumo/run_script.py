@@ -34,13 +34,14 @@ class SimulationRun(BaseRunner):
     # @process_as({"prio": 10, "type": "pre"})
     # def bar(self):
     # pass
-    @process_as({"prio": 40, "type": "post"})
+
+    # Example for Post-Processing
+    # ===========================
+    # Note: currently disabled by commenting out the annotation since we do all analysis parts later in study.py
+    # @process_as({"prio": 40, "type": "post"})
     def packet_age(self):
         filename = "rcvdPkLifetime.txt"
-        # result_dir, builder, sql = OppAnalysis.builder_from_output_folder(data_root=self.result_base_dir())
         data_root = self.result_base_dir()
-
-    # vars_${iterationvarsf}rep_${repetition}.vec
 
         sql = OMNeT.CrownetSql(
             vec_path=f"{data_root}/vars_rep_0.vec",
