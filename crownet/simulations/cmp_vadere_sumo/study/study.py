@@ -161,10 +161,25 @@ def main(base_path):
         qoi_results = pd.DataFrame()
         qoi_results_t = pd.DataFrame()
         for config in configs:
-            qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter(config), vectors_analyzed(config),
-                                                 scalars_analyzed(config))
+            _analysis_path = SuqcRun(os.path.join(get_results_dir(base_path), config)).base_path
+            _qoi_part_path = os.path.join(_analysis_path, f"qoi_part_{config}.csv")
+            _qoi_t_part_path = os.path.join(_analysis_path, f"qoi_t_part_{config}.csv")
+            if not os.path.exists(_qoi_part_path) or not os.path.exists(_qoi_t_part_path):
+                # no existing data for this configuration - need to run analysis
+                qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter(config), vectors_analyzed(config),
+                                                     scalars_analyzed(config))
+                qoi.to_csv(_qoi_part_path, sep=" ")
+                qoi_t.to_csv(_qoi_t_part_path, sep=" ")
+            else:
+                # have existing data from previous analysis - load it
+                print(f"Loading: {_qoi_part_path}")
+                qoi, qoi_t = (pd.read_csv(_qoi_part_path, sep=" ", index_col=[0, 1], header=[0, 1]),
+                              pd.read_csv(_qoi_t_part_path, sep=" ", index_col=[0, 1], header=[0, 1]))
+
             qoi_results = pd.concat([qoi_results, qoi])
             qoi_results_t = pd.concat([qoi_results_t, qoi_t])
+
+        # save global analysis results (including data of all configs)
         qoi_results.to_csv(qoi_results_path, sep=" ")
         qoi_results_t.to_csv(qoi_results_t_path, sep=" ")
     else:
@@ -347,9 +362,11 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
 
         # combine all analysis data in a single data frame
         print(f'Combining dataframes...')
-        for (new_vector_data, new_scalar_data) in vec_sca_data:
-            dfs_vector = pd.concat([dfs_vector, new_vector_data])
-            dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
+        # for (new_vector_data, new_scalar_data) in vec_sca_data:
+        #    dfs_vector = pd.concat([dfs_vector, new_vector_data])
+        #    dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
+        dfs_vector = pd.concat(list(zip(*vec_sca_data))[0])
+        dfs_scalar = pd.concat(list(zip(*vec_sca_data))[1])
     else:
         # use main thread for all calculations
         for param_value in par_to_sims.keys():
