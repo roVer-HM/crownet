@@ -51,7 +51,7 @@ MEM_PER_SIM_OMNET_GB = 1
 QOI_RESULTS_FILE = 'qoi_results.csv'
 QOI_RESULTS_TIME_FILE = 'qoi_results_t.csv'
 
-_MP_NR_PROCESSES = 20  # maximum number of parallel processes when analyzing the data
+_MP_NR_PROCESSES = 10  # maximum number of parallel processes when analyzing the data
 
 
 def main(base_path):
@@ -346,6 +346,7 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
             vec_sca_data = p.starmap(_analyze_singe_simulation, f_params)
 
         # combine all analysis data in a single data frame
+        print(f'Combining dataframes...')
         for (new_vector_data, new_scalar_data) in vec_sca_data:
             dfs_vector = pd.concat([dfs_vector, new_vector_data])
             dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
@@ -359,12 +360,14 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
                 dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
 
     # calculate aggregated statistics for each parameter value
+    print(f'Calculating aggregated statistics over all runs...')
     aggregated_results = dfs_vector.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
     additional_sca_results = dfs_scalar.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
     aggregated_results = aggregated_results.merge(additional_sca_results, left_index=True, right_index=True,
                                                   how='outer')
 
     # calculate time-based averages (e.g. for plotting over time)
+    print(f'Calculating time-based averages...')
     time_avg_df = _time_average(dfs_vector)
 
     # TODO: call plot methods for aggregated time-intervals
