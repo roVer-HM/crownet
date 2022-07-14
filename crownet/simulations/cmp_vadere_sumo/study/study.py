@@ -35,7 +35,7 @@ from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
 from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 from roveranalyzer.utils.path import PathHelper
-from roveranalyzer.simulators.opp.scave import ScaveTool
+from roveranalyzer.simulators.opp.scave import ScaveTool, SqlEmptyResult
 from roveranalyzer.simulators.opp.utils import Simulation
 from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
 
@@ -176,8 +176,8 @@ def main(base_path):
                 qoi, qoi_t = (pd.read_csv(_qoi_part_path, sep=" ", index_col=[0, 1], header=[0, 1]),
                               pd.read_csv(_qoi_t_part_path, sep=" ", index_col=[0, 1], header=[0, 1]))
 
-            qoi_results = pd.concat([qoi_results, qoi])
-            qoi_results_t = pd.concat([qoi_results_t, qoi_t])
+            qoi_results = pd.concat([qoi_results, qoi], copy=False)
+            qoi_results_t = pd.concat([qoi_results_t, qoi_t], copy=False)
 
         # save global analysis results (including data of all configs)
         qoi_results.to_csv(qoi_results_path, sep=" ")
@@ -353,26 +353,30 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
         print(f'Analyzing all simulations for parameter values: {par_to_sims.keys()}')
         with Pool(_MP_NR_PROCESSES) as p:
 
-            f_params = []
             for param_value in par_to_sims.keys():
+                f_params = []
                 for sim in par_to_sims[param_value]:
                     f_params.append((sim, param_value, vectors, scalars))
+                print(f'Starting analysis for {var_parameter["name"]} == {param_value} ...')
+                vec_sca_data = p.starmap(_analyze_singe_simulation, f_params)
 
-            vec_sca_data = p.starmap(_analyze_singe_simulation, f_params)
-
-        # combine all analysis data in a single data frame
-        print(f'Combining dataframes...')
-        # for (new_vector_data, new_scalar_data) in vec_sca_data:
-        #    dfs_vector = pd.concat([dfs_vector, new_vector_data])
-        #    dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
-        dfs_vector = pd.concat(list(zip(*vec_sca_data))[0])
-        dfs_scalar = pd.concat(list(zip(*vec_sca_data))[1])
+                # combine all analysis data in a single data frame
+                print(f'Combining dataframes for {var_parameter["name"]} == {param_value} ...')
+                _vec_data_all = pd.concat(list(zip(*vec_sca_data))[0])
+                _sca_data_all = pd.concat(list(zip(*vec_sca_data))[1])
+                print(f'Appending results for {var_parameter["name"]} == {param_value} ...')
+                # TODO: replace by list operations (cheaper in terms of runtime)
+                dfs_vector = pd.concat([dfs_vector, _vec_data_all], copy=False)
+                dfs_scalar = pd.concat([dfs_scalar, _sca_data_all], copy=False)
+                _vec_data_all = pd.DataFrame()
+                _sca_data_all = pd.DataFrame()
     else:
         # use main thread for all calculations
         for param_value in par_to_sims.keys():
             print(f'Analyzing all simulations for parameter value: {param_value}')
             for sim in par_to_sims[param_value]:
                 (new_vector_data, new_scalar_data) = _analyze_singe_simulation(sim, param_value, vectors, scalars)
+                # TODO: replace by list operations (cheaper in terms of runtime)
                 dfs_vector = pd.concat([dfs_vector, new_vector_data])
                 dfs_scalar = pd.concat([dfs_scalar, new_scalar_data])
 
@@ -382,6 +386,11 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
     additional_sca_results = dfs_scalar.groupby(level=["param"]).agg(["mean", "std", "max", "min"])
     aggregated_results = aggregated_results.merge(additional_sca_results, left_index=True, right_index=True,
                                                   how='outer')
+
+    # save temporary file (so we can continue upon failure...)
+    # print(f'Saving temporary files...')
+    # aggregated_results.reset_index().to_feather('./aggregated_results_tmp.feather')
+    # dfs_vector.reset_index().to_feather('./dfs_vector_tmp.feather')
 
     # calculate time-based averages (e.g. for plotting over time)
     print(f'Calculating time-based averages...')
@@ -410,12 +419,21 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
 
 def _analyze_singe_simulation(simulation, parameter_value, vectors, scalars):
     print(f'   Analyzing simulation for parameter {parameter_value}: {simulation.data_root}')
-    vec_data = _retrieve_vector_data(simulation, vectors)
-    sca_data = _retrieve_scalar_data(simulation, scalars)
-    vec_data = pd.concat({simulation.label: vec_data}, names=['run_label'])  # add run_label as multi-level idx
-    sca_data = pd.concat({simulation.label: sca_data}, names=['run_label'])
-    vec_data = pd.concat({parameter_value: vec_data}, names=['param'])  # add parameter value as multi-level idx
-    sca_data = pd.concat({parameter_value: sca_data}, names=['param'])
+    try:
+        vec_data = _retrieve_vector_data(simulation, vectors)
+        sca_data = _retrieve_scalar_data(simulation, scalars)
+    except SqlEmptyResult as result:
+        print(f'_analyze_singe_simulation: error - no data available!')
+        print(f'simulation label: {simulation.label}')
+        print(f'vectors: {vectors}')
+        print(f'scalars: {scalars}')
+        print(f'{result}')
+        raise result
+
+    vec_data = pd.concat({simulation.label: vec_data}, names=['run_label'], copy=False)  # run_label as multi-level idx
+    sca_data = pd.concat({simulation.label: sca_data}, names=['run_label'], copy=False)
+    vec_data = pd.concat({parameter_value: vec_data}, names=['param'], copy=False)  # parameter value as multi-level idx
+    sca_data = pd.concat({parameter_value: sca_data}, names=['param'], copy=False)
     return vec_data, sca_data
 
 
@@ -463,20 +481,21 @@ def _get_vector_names(vectors, vector_module):
 
 
 def _time_average(dfs, avg_interval=1.0):
-    aggregated_time_series = dfs.reset_index("time").groupby(level=["param", "run_label"])
+    _max_time = np.ceil(dfs.index.get_level_values("time").max())
+    dfs.reset_index("time", inplace=True)
+    aggregated_time_series = dfs.groupby(level=["param", "run_label"])
     # loop over all groups (runs) and calculate average over avg_interval [s]
     collected_time_series_list = list()
-    max_time = np.ceil(dfs.index.get_level_values("time").max())
 
     for key, grp in aggregated_time_series:
         print(f"Time-based averaging {key} with {avg_interval}s intervals")
-        avg = grp.groupby(pd.cut(grp["time"], np.arange(0, max_time, avg_interval))).aggregate(np.nanmean)
-        avg.index = np.arange(0, max_time, avg_interval)[:len(np.arange(0, max_time, avg_interval)) - 1]
-        avg = pd.concat([avg], keys=[key[1]], names=['run_label'])
-        avg = pd.concat([avg], keys=[key[0]], names=['param'])
+        avg = grp.groupby(pd.cut(grp["time"], np.arange(0, _max_time, avg_interval))).aggregate(np.nanmean)
+        avg.index = np.arange(0, _max_time, avg_interval)[:len(np.arange(0, _max_time, avg_interval)) - 1]
+        avg = pd.concat([avg], keys=[key[1]], names=['run_label'], copy=False)
+        avg = pd.concat([avg], keys=[key[0]], names=['param'], copy=False)
         collected_time_series_list.append(avg)
 
-    time_avg_df = pd.concat(collected_time_series_list)
+    time_avg_df = pd.concat(collected_time_series_list, copy=False)
     time_avg_df.index.set_names('sampling_time', level=2, inplace=True)
     time_avg_df.index = time_avg_df.index.swaplevel('run_label', 'sampling_time')
     time_avg_df = time_avg_df.groupby(level=["param", "sampling_time"]).agg(["mean"])
