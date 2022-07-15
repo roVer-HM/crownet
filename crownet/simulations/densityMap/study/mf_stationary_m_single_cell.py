@@ -34,8 +34,6 @@ def main(base_path):
         QString("insertionOrder"),
         "stepDist",
         150.0,
-        "zeroStep",
-        BoolValue.FALSE,
     )
     mapCfgYmf = ObjectValue.from_args(
         "crownet::MapCfgYmf",

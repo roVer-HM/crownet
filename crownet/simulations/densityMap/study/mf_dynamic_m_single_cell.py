@@ -42,8 +42,6 @@ mapCfgYmfDist = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     150.0,
-    "zeroStep",
-    BoolValue.FALSE,
 )
 mapCfgYmf = ObjectValue.from_args(
     "crownet::MapCfgYmf",
@@ -60,7 +58,7 @@ mapCfgYmf = ObjectValue.from_args(
 scenario_ped_180 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
 # scenario_ped_120 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x8_120.scenario")
 scenario_exp_25 = QString("vadere/scenarios/mf_dyn_exp_25.scenario")
-scenario_exp_25 = QString("vadere/scenarios/mf_dyn_exp_10.scenario")
+scenario_exp_15 = QString("vadere/scenarios/mf_dyn_exp_15.scenario")
 scenario_exp_5 = QString("vadere/scenarios/mf_dyn_exp_05.scenario")
 t = UnitValue.s(800.0)
 # t = UnitValue.s(2.0)
@@ -93,7 +91,7 @@ def par_var_with_vadere():
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath": scenario_exp_5,  # iter arrival time of 5s (for each source)
+                "**.vadereScenarioPath": scenario_exp_15,  # iter arrival time of 5s (for each source)
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
             },
@@ -121,7 +119,7 @@ def par_var_bonn_motion():
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath": scenario_exp_5,  # iter arrival time of 25s (for each source)
+                "**.vadereScenarioPath": scenario_exp_15,  # iter arrival time of 25s (for each source)
                 "*.bonnMotionServer.traceFile": "to/be/changed",
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
@@ -137,7 +135,7 @@ def create_variation_with_bonn_motion(seed):
     for run in par_var:
         for alpha, dist in alpha_dist:
             _run = deepcopy(run)  # copy
-            _run["omnet"]["*.pNode[*].app[1].app.mapCfg"] = mapCfgYmfDist.copy(
+            _run["omnet"]["*.misc[*].app[1].app.mapCfg"] = mapCfgYmfDist.copy(
                 "alpha", alpha, "stepDist", dist
             )
             par_var_tmp.append(_run)
@@ -201,20 +199,24 @@ def create_variation_with_vadere(seed):
 
 
 def create_traces():
-    _, parameter_variation, _ = create_variation_with_vadere(1656000207970109272)
-    seeds = parameter_variation._points.stack().loc[
-        pd.IndexSlice[:, :, ["*.traci.launcher.seed"]], ("Parameter", "omnet")
-    ]
-    seeds = list(seeds.unstack(-1).iloc[:, 0].unique())
-
-    bm_base_dir = os.path.abspath("mf_dynamic_m_single_cell.d/")
+    seed_m = OmnetSeedManager(
+        par_variations=[],
+        rep_count=reps,
+        omnet_fixed=False,
+        vadere_fixed=False,
+        # seed=time_ns(),
+        seed=1656000207970109272
+        # seed=0        # use for study debug/setup
+    )
+    vadere_s, omnet_s = seed_m.get_seed_paring()
+    bm_base_dir = os.path.abspath("mf_dynamic_m_single_cell_7.d")
 
     par_var = [
         {
             "attributesSimulation.useFixedSeed": True,
             "attributesSimulation.fixedSeed": int(s),
         }
-        for s in seeds
+        for s in vadere_s
     ]
 
     jar_command = (
@@ -229,6 +231,9 @@ def create_traces():
     )
     for s in [
         join(bm_base_dir, "mf_dyn_exp_05.scenario"),
+        join(bm_base_dir, "mf_dyn_exp_10.scenario"),
+        join(bm_base_dir, "mf_dyn_exp_15.scenario"),
+        join(bm_base_dir, "mf_dyn_exp_20.scenario"),
         join(bm_base_dir, "mf_dyn_exp_25.scenario"),
     ]:
         out = f"{os.path.basename(s).split('.')[0]}.out"
@@ -245,7 +250,7 @@ def create_traces():
             remove_output=False,
         )
         try:
-            setup.run(4)
+            setup.run(5)
         except Exception:
             pass
 
@@ -364,11 +369,12 @@ def main_bonn_motion():
         .reset_index(drop=True)
     )
     trace_files = trace_files.apply(lambda i: i.value).unique()
-    bm_base_dir = os.path.abspath("mf_dynamic_m_single_cell.d/")
+    bm_base_dir = os.path.abspath("mf_dynamic_m_single_cell_7.d/")
     extra_files = []
     for f in trace_files:
         extra_files.append((join(bm_base_dir, os.path.basename(f)), f))
 
+    print(extra_files)
     env.copy_data(base_ini_file=ini_file, extraFiles=extra_files)
 
     _rnd = SeedManager.rnd_suffix()
@@ -383,7 +389,7 @@ def main_bonn_motion():
     print("setup done")
 
     ts = it.default_timer()
-    par_var, data = setup.run(8)
+    # par_var, data = setup.run(8)
     # par_var, data = setup.run(1)y
     print(f"Study: took {(it.default_timer() - ts)/60:2.4f} minutes")
 

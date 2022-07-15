@@ -1,4 +1,6 @@
+from __future__ import annotations
 from cProfile import label
+from dataclasses import dataclass
 import enum
 import os
 import itertools
@@ -10,8 +12,10 @@ from itertools import repeat
 from tokenize import group
 from traceback import print_tb
 from turtle import st
-from typing import List
+from typing import Any, Callable, Dict, List
+from unittest.util import strclass
 from matplotlib import markers
+from pyparsing import alphanums
 from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, percentile
@@ -36,20 +40,62 @@ def min_max_norm(data, min=0, max=None):
     return (data - min) / (max - min)
 
 
-def get_run_map(study: SuqcRun, rep_count=5):
-    def get_label(sim: Simulation):
-        cfg: OppConfigFileBase = sim.run_context.oppini
-        mapCfg: ObjectValue = cfg.get("*.pNode[*].app[1].app.mapCfg")
-        scenario = cfg.get("**.vadereScenarioPath")
-        r = re.compile(r".*_(\d+).*")
-        if match := r.match(scenario):
-            iat = match.groups()[0]
-        else:
-            iat = "??"
-        return f"{mapCfg['alpha']}_{mapCfg['stepDist']}_{iat}"
+def get_run_map(
+    study: SuqcRun, rep_count=10, map_filter: Callable[[Any], True] = lambda x: True
+):
+    # def get_label(sim: Simulation):
+    #     cfg: OppConfigFileBase = sim.run_context.oppini
+    #     mapCfg: ObjectValue = cfg.get("*.pNode[*].app[1].app.mapCfg")
+    #     scenario = cfg.get("**.vadereScenarioPath")
+    #     r = re.compile(r".*_(\d+).*")
+    #     if match := r.match(scenario):
+    #         iat = match.groups()[0]
+    #     else:
+    #         iat = "??"
+    #     return f"{mapCfg['alpha']}_{mapCfg['stepDist']}_{iat}"
 
-    run_map = study.create_run_map(rep=rep_count, lbl_f=get_label)
+    @dataclass(frozen=True)
+    class _lbl_class:
+        alpha: float = -1.0
+        dist: float = -1.0
+        iat: float = -1.0
 
+        @classmethod
+        def from_sim_v(cls, sim: Simulation, *args: Any, **kwds: Any) -> _lbl_class:
+            cfg: OppConfigFileBase = sim.run_context.oppini
+            mapCfg: ObjectValue = cfg.get("*.pNode[*].app[1].app.mapCfg")
+            scenario = cfg.get("**.vadereScenarioPath")
+            r = re.compile(r".*_(\d+).*")
+            if match := r.match(scenario):
+                iat = match.groups()[0]
+            else:
+                iat = "??"
+            return str(cls(alpha=mapCfg["alpha"], dist=mapCfg["stepDist"], iat=iat))
+
+        @classmethod
+        def from_sim_bm(cls, sim: Simulation) -> _lbl_class:
+            cfg: OppConfigFileBase = sim.run_context.oppini
+            mapCfg: ObjectValue = cfg.get("*.misc[*].app[1].app.mapCfg")
+            scenario = cfg.get("*.bonnMotionServer.traceFile")
+            r = re.compile(r".*exp_(\d+).*")
+            if match := r.match(scenario):
+                iat = match.groups()[0]
+            else:
+                iat = "??"
+            return str(cls(alpha=mapCfg["alpha"], dist=mapCfg["stepDist"], iat=iat))
+
+        def __call__(self, *args: Any, **kwds: Any) -> Any:
+            return self.__str__()
+
+        def __str__(self) -> str:
+            return self.__repr__()
+
+        def __repr__(self) -> str:
+            return f"{self.alpha}_{self.dist}_{self.iat}"
+
+    run_map = study.create_run_map(
+        rep=rep_count, lbl_f=_lbl_class.from_sim_bm, id_filter=map_filter
+    )
     return run_map
 
 
@@ -123,9 +169,9 @@ def collect_cell_mse(
     return df
 
 
-def get_mse_cell_data(study: SuqcRun, run_map: dict):
-    if os.path.exists(study.path("cell_mse.h5")):
-        data = pd.read_hdf(study.path("cell_mse.h5"), key="cell_mse")
+def get_mse_cell_data(study: SuqcRun, run_map: dict, hdf_path: str):
+    if os.path.exists(study.path(hdf_path)):
+        data = pd.read_hdf(study.path(hdf_path), key="cell_mse")
     else:
         data: List[(pd.DataFrame, dict)] = run_kwargs_map(
             collect_cell_mse,
@@ -137,7 +183,7 @@ def get_mse_cell_data(study: SuqcRun, run_map: dict):
         )
         data: pd.DataFrame = pd.concat(data, axis=0, verify_integrity=True)
         data = data.sort_index()
-        data.to_hdf(study.path("cell_mse.h5"), key="cell_mse", format="table")
+        data.to_hdf(study.path(hdf_path), key="cell_mse", format="table")
     return data
 
 
@@ -171,12 +217,7 @@ def plot_mse_cell(study: SuqcRun):
         pdf.savefig(fig)
 
 
-def main(study: SuqcRun):
-    run_map = get_run_map(study)
-    data = get_mse_cell_data(study, run_map)
-    data = data.groupby(by="run_id").mean()
-
-    styles = StyleMap(markersize=3, marker="o", linestyle="none")
+def get_alpha_dist(run_map: dict):
     alpha_ = {}
     dist_ = {}
     for lbl, run in run_map.items():
@@ -189,12 +230,29 @@ def main(study: SuqcRun):
         _data = dist_.get(d, [])
         _data.append(run)
         dist_[d] = _data
+    return alpha_, dist_
+
+
+def add_sorted_legends(ax: plt.Axes):
+    h, l = ax.get_legend_handles_labels()
+    h, l = zip(*sorted(zip(h, l), key=lambda t: t[1]))
+    ax.legend(h, l)
+
+
+def plot_mse_all(
+    study: SuqcRun,
+    data: pd.DataFrame,
+    run_map: dict,
+    styles: StyleMap,
+    figure_name: str,
+):
+
+    alpha_, dist_ = get_alpha_dist(run_map)
 
     fig, ax = plt.subplots(1, 2, figsize=(16, 9), sharey="all")
     ax_a: plt.Axes = ax[0]
     ax_b: plt.Axes = ax[1]
 
-    ax_a.set_xlim(0.45, 1.0)
     for a, runs in alpha_.items():
         for r in runs:
             reps = r["rep"]
@@ -204,12 +262,11 @@ def main(study: SuqcRun):
                 label=r["lbl"],
                 **styles.get_style(r["lbl"]),
             )
+    ax_a.set_xlim(0.45, 1.0)
     ax_a.set_title("Cell MSE over alpha")
     ax_a.set_ylabel("Cell MSE")
     ax_a.set_xlabel("Alpha")
-    h, l = ax_a.get_legend_handles_labels()
-    h, l = zip(*sorted(zip(h, l), key=lambda t: t[1]))
-    ax_a.legend(h, l)
+    add_sorted_legends(ax_a)
 
     for a, runs in dist_.items():
         for r in runs:
@@ -222,17 +279,126 @@ def main(study: SuqcRun):
             )
     ax_b.set_title("Cell MSE over distance")
     ax_b.set_xlabel("Distance threshold")
-    h, l = ax_b.get_legend_handles_labels()
-    h, l = zip(*sorted(zip(h, l), key=lambda t: t[1]))
-    ax_b.legend(h, l)
+    add_sorted_legends(ax_b)
 
-    fig.savefig(study.path("cell_mse.pdf"))
+    fig.savefig(study.path(figure_name))
+
+
+def plot_mse_for_seed(
+    study: SuqcRun, data: pd.DataFrame, run_map: dict, styles: StyleMap, figure_name
+):
+
+    alpha_, dist_ = get_alpha_dist(run_map)
+
+    with PdfPages(study.path(figure_name)) as pdf:
+        for _seed in range(10):
+            ymf_err = data.loc[run_map["1_999_15"]["rep"][_seed]]
+            fig, ax = plt.subplots(1, 2, figsize=(16, 9), sharey="all")
+            fig.suptitle(f"Seed {_seed}")
+            ax_a: plt.Axes = ax[0]
+            ax_b: plt.Axes = ax[1]
+
+            # ax_a.set_ylim(0.0015, 0.0025)
+            ax_a.set_xlim(0.45, 1.0)
+            for a, runs in alpha_.items():
+                for r in runs:
+                    reps = r["rep"]
+                    ax_a.plot(
+                        a,
+                        data.loc[reps[_seed]],
+                        label=r["lbl"],
+                        **styles.get_style(r["lbl"]),
+                    )
+            ax_a.set_title("Cell MSE over alpha")
+            ax_a.set_ylabel("Cell MSE")
+            ax_a.set_xlabel("Alpha")
+            add_sorted_legends(ax_a)
+            ax_a.hlines(ymf_err, 0.45, 1.0, colors="red")
+
+            for a, runs in dist_.items():
+                for r in runs:
+                    reps = r["rep"]
+                    ax_b.plot(
+                        a,
+                        data.loc[reps[_seed]],
+                        label=r["lbl"],
+                        **styles.get_style(r["lbl"]),
+                    )
+
+            # ax_b.set_ylim(0.0015, 0.0025)
+            ax_b.set_title("Cell MSE over distance")
+            ax_b.set_xlabel("Distance threshold")
+            add_sorted_legends(ax_b)
+            ax_b.hlines(ymf_err, 0, 1000, colors="red")
+            pdf.savefig(fig)
+
+
+def plot_mse_yDist_to_ymf(
+    study: SuqcRun,
+    data: pd.DataFrame,
+    run_map: dict,
+    styles: StyleMap,
+    figure_name: str,
+):
+
+    with PdfPages(study.path(figure_name)) as pdf:
+        fig, axes = plt.subplots(4, 4, figsize=(16, 9), sharey="all")
+        fig.suptitle("Cell MSE difference between ymfDist and ymf")
+        axes = list(chain(*axes))
+
+        ymin = data["err_to_ymf"].min()
+        ymax = data["err_to_ymf"].max()
+        for idx, run_dict in enumerate(run_map.items()):
+            if idx == 16:
+                continue
+            ax: plt.Axes = axes[idx]
+            ax.hlines(0, -1, 10, colors="gray")
+            ax.set_xticks(np.arange(10), labels=np.arange(10))
+            ax.set_ylim(ymin, ymax)
+            rep = run_dict[1]["rep"]
+            lbl = run_dict[0]
+            err = data.loc[rep, ["err_to_ymf"]]
+            ax.bar(np.arange(10), err.iloc[:, 0].to_numpy(), 0.35)
+            ax.set_ylabel("Cell MSE diff ymfDist-ymf")
+            ax.set_xlabel("Seeds / Runs")
+            ax.set_title(lbl)
+        fig.tight_layout()
+        pdf.savefig(fig)
+    print("done")
+
+
+def main():
+    id_filter = lambda x: all([i >= 170 for i in x])
+    # id_filter = lambda x : all([i < 170 for i in x])
+    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
+    run_map = get_run_map(study, map_filter=id_filter)
+
+    data = get_mse_cell_data(study, run_map, hdf_path="cell_mse_big.h5")
+    # data = get_mse_cell_data(study, run_map, hdf_path="cell_mse.h5")
+    data = data.groupby(by="run_id").mean()
+
+    ymf_err = np.tile(data.loc[run_map["1_999_15"]["rep"]], reps=17)
+    data = data.to_frame()
+    data["err_to_ymf"] = data["cell_mse"] - ymf_err
+
+    styles = StyleMap(markersize=3, marker="o", linestyle="none")
+
+    plot_mse_all(study, data, run_map, styles, figure_name="cell_mse_big.pdf")
+    plot_mse_for_seed(
+        study,
+        data["cell_mse"],
+        run_map,
+        styles,
+        figure_name="cell_mse_for_seed_big.pdf",
+    )
+    plot_mse_yDist_to_ymf(study, data, run_map, styles, "mse_diff_big.pdf")
+
+    # plot_mse_all(data, run_map, styles, figure_name="cell_mse.pdf")
+    # plot_mse_for_seed(study, data["cell_mse"], run_map, styles, figure_name="cell_mse_for_seed.pdf")
 
     print()
 
 
 if __name__ == "__main__":
-
-    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_3/")
-    main(study)
+    main()
     print("done")
