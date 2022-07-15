@@ -19,25 +19,34 @@ from suqc.utils.SeedManager.SeedManager import SeedManager
 from suqc.utils.general import get_env_name
 
 
-
 def main(base_path):
-    reps = 1    # seed-set
+    reps = 1  # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
-        "writeDensityLog", BoolValue.TRUE,
-        "mapTypeLog", QString("ymfPlusDistStep"),
+        "writeDensityLog",
+        BoolValue.TRUE,
+        "mapTypeLog",
+        QString("ymfPlusDistStep"),
         # "mapTypeLog", QString("all"),
-        "cellAgeTTL", UnitValue.s(60.0),
-        "alpha", 0.75,
-        "idStreamType", QString("insertionOrder"),
-        "stepDist", 50.0,
-        "zeroStep", BoolValue.TRUE)
+        "cellAgeTTL",
+        UnitValue.s(60.0),
+        "alpha",
+        0.75,
+        "idStreamType",
+        QString("insertionOrder"),
+        "stepDist",
+        50.0,
+    )
     mapCfgYmf = ObjectValue.from_args(
         "crownet::MapCfgYmf",
-        "writeDensityLog", BoolValue.TRUE,
-        "mapTypeLog", QString("all"),
-        "cellAgeTTL", UnitValue.s(-1.0),
-        "idStreamType", QString("insertionOrder"),
+        "writeDensityLog",
+        BoolValue.TRUE,
+        "mapTypeLog",
+        QString("all"),
+        "cellAgeTTL",
+        UnitValue.s(-1.0),
+        "idStreamType",
+        QString("insertionOrder"),
     )
     scenario_3source = QString("vadere/scenarios/mf_circle2.scenario")
     scenario_muc = QString("vadere/scenarios/mf_005_template.scenario")
@@ -50,20 +59,19 @@ def main(base_path):
         {
             "omnet": {
                 "sim-time-limit": t,
-                "seed-set" : seed,
-                "**.vadereScenarioPath" : scenario_muc,
-                "*.pNode[*].app[1].app.mapCfg":
-                    mapCfgYmfDist.copy("stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE),
+                "seed-set": seed,
+                "**.vadereScenarioPath": scenario_muc,
+                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                    "stepDist", 150.0, "alpha", 0.75, "zeroStep", BoolValue.FALSE
+                ),
                 "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-                },
+            },
         },
     ]
     par_var = OmnetSeedManager(
-        par_variations=par_var,
-        rep_count=reps,
-        omnet_fixed=True,
-        vadere_fixed=None).get_new_seed_variation()
+        par_variations=par_var, rep_count=reps, omnet_fixed=True, vadere_fixed=None
+    ).get_new_seed_variation()
 
     # Model := Call to run_script.py
     # This will define how the simulation is run.
@@ -72,14 +80,15 @@ def main(base_path):
     #     .write_container_log() \
     #         .omnet_tag("latest") \
     #             .experiment_label("out")
-    model = VadereOppCommand()\
-         .write_container_log() \
-         .omnet_tag("latest") \
-         .experiment_label("out")
+    model = (
+        VadereOppCommand()
+        .write_container_log()
+        .omnet_tag("latest")
+        .experiment_label("out")
+    )
     model.timeout = None
     model.qoi(["all"])
     model.verbose()
-
 
     # Enviroment setup.
     #
@@ -94,35 +103,33 @@ def main(base_path):
         opp_config="final_mf_005",
         opp_basename="omnetpp_ymfd4s.ini",
         # mobility_sim=("omnet", ""), # use omnet internal mobility models
-        mobility_sim=("vadere", "latest"), # use omnet internal mobility models
+        mobility_sim=("vadere", "latest"),  # use omnet internal mobility models
         communication_sim=("omnet", "latest"),
         # handle_existing="force_replace"
         # handle_existing="write_in"
-        handle_existing="ask_user_replace"
+        handle_existing="ask_user_replace",
     )
     env.copy_data(
         base_ini_file=ini_file,
         scenario_files=[
             os.path.abspath("../vadere/scenarios/mf_005_template.scenario"),
             os.path.abspath("../vadere/scenarios/mf_005-2_template.scenario"),
-        ]
-        )
-
+        ],
+    )
 
     _rnd = SeedManager.rnd_suffix()
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
     setup = CrownetRequest(
-        env_man = env,
+        env_man=env,
         parameter_variation=parameter_variation,
         model=model,
         creator=coupled_creator,
         rnd_hostname_suffix=f"_{_rnd}",
-        runscript_out="runscript.out"
+        runscript_out="runscript.out",
     )
     print("setup done")
     par_var, data = setup.run(len(par_var))
     # par_var, data = setup.run(1)
-
 
 
 if __name__ == "__main__":
