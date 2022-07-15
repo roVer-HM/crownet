@@ -1,12 +1,16 @@
 {
-  "name" : "mf_1d_m_2x5m",
+  "name" : "mf_1d_m_poisson_2x5m_d280m",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 5, 6 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "numAgents.csv",
+      "processors" : [ 7 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -14,9 +18,12 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberPedestrianProcessor",
+      "id" : 7
     } ],
     "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isWriteMetaData" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -75,7 +82,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 1000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -90,7 +97,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -115,9 +136,9 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 0.0,
-          "y" : 184.9,
+          "y" : 54.9,
           "width" : 415.0,
-          "height" : 20.2,
+          "height" : 280.2,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -126,16 +147,16 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 415.0,
-          "height" : 180.1,
+          "height" : 50.1,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "x" : 0.0,
-          "y" : 209.9,
+          "y" : 339.9,
           "width" : 415.0,
-          "height" : 184.5,
+          "height" : 54.5,
           "type" : "RECTANGLE"
         },
         "id" : 5
@@ -147,7 +168,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -164,7 +185,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -181,7 +202,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -198,7 +219,7 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 5.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
@@ -219,14 +240,14 @@
         "id" : 103,
         "shape" : {
           "x" : 405.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "numberPedsPerSecond" : 0.1
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -243,14 +264,14 @@
         "id" : 101,
         "shape" : {
           "x" : 405.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "numberPedsPerSecond" : 0.1
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
@@ -267,14 +288,14 @@
         "id" : 100,
         "shape" : {
           "x" : 0.0,
-          "y" : 180.1,
+          "y" : 50.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "numberPedsPerSecond" : 0.1
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -291,14 +312,14 @@
         "id" : 102,
         "shape" : {
           "x" : 0.0,
-          "y" : 205.1,
+          "y" : 335.1,
           "width" : 10.0,
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "poisson",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "numberPedsPerSecond" : 0.1
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
@@ -329,7 +350,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

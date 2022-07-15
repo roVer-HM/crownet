@@ -42,6 +42,7 @@ import crownet.common.ICoordConverter;
 import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
 import crownet.common.util.IFileWriterRegister;
+import crownet.mobility.BonnMotionServer;
 
 import artery.storyboard.IStoryboard;
 import artery.utility.IdentityRegistry;
@@ -147,7 +148,10 @@ network World
             @display("p=308.14874,406.35;is=vs");
         }
         fileWriterRegister: <default("")> like IFileWriterRegister if typename != "" {
-           @display("p=308.14874,506.35;is=vs");
+            @display("p=308.14874,506.35;is=vs");
+        }
+        bonnMotionServer: <default("")> like BonnMotionServer if typename != "" {
+            @display("p=449.2425,384.90375;i=block/table2_s;is=s");
         }
 
 

@@ -1,12 +1,16 @@
 {
-  "name" : "mf_1d_m_2x10m",
+  "name" : "mf_1d_m_const_2x5m_d20m_25",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 5, 6 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "numAgents.csv",
+      "processors" : [ 7 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -14,9 +18,12 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberPedestrianProcessor",
+      "id" : 7
     } ],
     "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isWriteMetaData" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -75,7 +82,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 10000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -90,7 +97,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -126,14 +147,14 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 415.0,
-          "height" : 175.1,
+          "height" : 180.1,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "x" : 0.0,
-          "y" : 214.9,
+          "y" : 209.9,
           "width" : 415.0,
           "height" : 184.5,
           "type" : "RECTANGLE"
@@ -149,7 +170,7 @@
           "x" : 400.0,
           "y" : 205.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -164,9 +185,9 @@
         "absorbing" : true,
         "shape" : {
           "x" : 400.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -181,9 +202,9 @@
         "absorbing" : true,
         "shape" : {
           "x" : 10.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -200,7 +221,7 @@
           "x" : 10.0,
           "y" : 205.1,
           "width" : 5.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -221,17 +242,17 @@
           "x" : 405.0,
           "y" : 205.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 25.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -243,19 +264,19 @@
         "id" : 101,
         "shape" : {
           "x" : 405.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -267,19 +288,19 @@
         "id" : 100,
         "shape" : {
           "x" : 0.0,
-          "y" : 175.1,
+          "y" : 180.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 25.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -293,17 +314,17 @@
           "x" : 0.0,
           "y" : 205.1,
           "width" : 10.0,
-          "height" : 9.8,
+          "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "poisson",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.7
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 0,
         "startTime" : 0.0,
-        "endTime" : 1000.0,
+        "endTime" : 10000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
@@ -329,7 +350,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

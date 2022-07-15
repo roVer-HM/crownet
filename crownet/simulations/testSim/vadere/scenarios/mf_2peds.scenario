@@ -13,9 +13,9 @@
       "filename" : "pedestrianPosition.csv",
       "processors" : [ 9 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "mesh.poly",
-      "processors" : [ ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.BonnMotionTrajectoryFile",
+      "filename" : "mf_2peds.bonnMotion",
+      "processors" : [ 10 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -29,6 +29,23 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
       "attributes" : {
         "interpolate" : true
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.BonnMotionTrajectoryProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesBonnMotionTrajectoryProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 9,
+        "scale" : {
+          "x" : 1.0,
+          "y" : 1.0
+        },
+        "translate" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "applyOffset" : false,
+        "origin" : "upper left"
       }
     } ],
     "isTimestamped" : true,
