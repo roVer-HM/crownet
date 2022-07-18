@@ -1,7 +1,7 @@
 # Script for doing the simulation study.
 #
 # Launch this script via python3 or within your Python IDE to perform a simulation study.
-
+import gc
 import os
 import pprint
 from functools import partial
@@ -18,6 +18,7 @@ import random
 import shutil
 import string
 import time
+import feather
 from enum import Enum
 from typing import List, Dict, Any, Tuple
 from multiprocessing import Pool
@@ -482,8 +483,12 @@ def _get_vector_names(vectors, vector_module):
 
 def _time_average(dfs, avg_interval=1.0):
     _max_time = np.ceil(dfs.index.get_level_values("time").max())
-    dfs.reset_index("time", inplace=True)
-    aggregated_time_series = dfs.groupby(level=["param", "run_label"])
+    # dfs.reset_index(["time", "hostId"], inplace=True)
+    # aggregated_time_series = dfs.groupby(level=["param", "run_label"], sort=False, observed=True)
+    dfs.reset_index(inplace=True)
+    aggregated_time_series = dfs.groupby(["param", "run_label"], sort=False, observed=True)
+    dfs = dfs.iloc[0:0]  # drop all data
+    gc.collect()  # trigger garbage collection
     # loop over all groups (runs) and calculate average over avg_interval [s]
     collected_time_series_list = list()
 
@@ -499,6 +504,8 @@ def _time_average(dfs, avg_interval=1.0):
     time_avg_df.index.set_names('sampling_time', level=2, inplace=True)
     time_avg_df.index = time_avg_df.index.swaplevel('run_label', 'sampling_time')
     time_avg_df = time_avg_df.groupby(level=["param", "sampling_time"]).agg(["mean"])
+    time_avg_df.sort_index(inplace=True)
+    gc.collect()  # trigger garbage collection
     return time_avg_df
 
 
