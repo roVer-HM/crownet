@@ -13,7 +13,7 @@
       "processors" : [ 7 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.BonnMotionTrajectoryFile",
-      "filename" : "bonnMotion.txt",
+      "filename" : "trace.bonnMotion",
       "processors" : [ 8 ]
     } ],
     "processors" : [ {
