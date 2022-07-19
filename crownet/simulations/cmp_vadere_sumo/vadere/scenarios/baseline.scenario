@@ -203,7 +203,7 @@
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
+        "startTime" : 0.5,
         "endTime" : 30.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
