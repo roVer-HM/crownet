@@ -190,35 +190,46 @@ def main(base_path):
 
 def generate_bonnmotion():
 
-    par_var = [
-        {
-            **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
-            **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
-            **v.source_dist_par(
-                [source_top_right, source_bottom_left], "updateFrequency", 25.0
-            ),
-        },
-        {
-            **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
-            **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
-            **v.source_dist_par(
-                [source_top_right, source_bottom_left], "updateFrequency", 50.0
-            ),
-        },
+    traces = [
+        (
+            os.path.abspath(os.path.join("..", s_5_20_const.value)),
+            "mf_1d_m_const_2x5m_d20m_iat_25",
+            {
+                **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
+                **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
+                **v.source_dist_par(
+                    [source_top_right, source_bottom_left], "updateFrequency", 25.0
+                ),
+            },
+        ),
+        (
+            os.path.abspath(os.path.join("..", s_5_20_const.value)),
+            "mf_1d_m_const_2x5m_d20m_iat_50",
+            {
+                **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
+                **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
+                **v.source_dist_par(
+                    [source_top_right, source_bottom_left], "updateFrequency", 50.0
+                ),
+            },
+        ),
     ]
 
     base_output_path = os.path.join(
         os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
     )
 
-    generate_traces(
-        scenarios=[os.path.abspath(os.path.join("..", s_5_20_const.value))],
-        par_var_default=par_var,
-        base_output_path=base_output_path,
-        jobs=1,
-        seeds=20,
-        override_output=False,
-    )
+    for scenario, name, par_var in traces:
+        print("gen")
+        generate_traces(
+            scenario=scenario,
+            scenario_name=name,
+            par_var_default=par_var,
+            base_output_path=base_output_path,
+            jobs=5,
+            seeds=20,
+            remove_output=True,
+        )
 
 
 if __name__ == "__main__":
