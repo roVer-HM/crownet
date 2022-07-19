@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from glob import glob
-from itertools import chain
+from itertools import chain, repeat
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -34,7 +34,16 @@ def main():
 
     with PdfPages(out_path) as pdf:
         for alpha in ["0", "0.25", "0.5", "0.75", "1"]:
-            fig, axes = plt.subplots(2, 3, sharey="all")
+            fig, axes = plt.subplots(
+                nrows=2,
+                ncols=3,
+                sharey="all",
+                subplot_kw=dict(aspect="equal"),
+                # gridspec_kw={
+                #     "width_ratios": list(repeat(1/3, 3)),
+                #     "height_ratios": list(repeat(.1, 2))
+                # }
+            )
             fig.suptitle(f"Rank value for $\\alpha={alpha}$")
             axes = list(chain(*axes))
             axes[-1].set_axis_off()
@@ -63,7 +72,7 @@ def main():
                 ax.set_ylabel("age [s]")
                 ax.set_ylim(0, 500)
                 ax.set_xlim(0, 500)
-                ax.set_aspect("equal")
+                # ax.set_aspect("equal")
             fig.tight_layout()
             pdf.savefig(fig)
     print("done")
