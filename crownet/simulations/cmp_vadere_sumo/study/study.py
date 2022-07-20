@@ -165,20 +165,25 @@ def main(base_path):
             _analysis_path = SuqcRun(os.path.join(get_results_dir(base_path), config)).base_path
             _qoi_part_path = os.path.join(_analysis_path, f"qoi_part_{config}.csv")
             _qoi_t_part_path = os.path.join(_analysis_path, f"qoi_t_part_{config}.csv")
-            if not os.path.exists(_qoi_part_path) or not os.path.exists(_qoi_t_part_path):
+            if not os.path.exists(_qoi_part_path):# or not os.path.exists(_qoi_t_part_path):
                 # no existing data for this configuration - need to run analysis
                 qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter(config), vectors_analyzed(config),
                                                      scalars_analyzed(config))
                 qoi.to_csv(_qoi_part_path, sep=" ")
-                qoi_t.to_csv(_qoi_t_part_path, sep=" ")
+                if qoi_t is not None:
+                    qoi_t.to_csv(_qoi_t_part_path, sep=" ")
             else:
                 # have existing data from previous analysis - load it
                 print(f"Loading: {_qoi_part_path}")
-                qoi, qoi_t = (pd.read_csv(_qoi_part_path, sep=" ", index_col=[0, 1], header=[0, 1]),
-                              pd.read_csv(_qoi_t_part_path, sep=" ", index_col=[0, 1], header=[0, 1]))
+                if os.path.exists(_qoi_t_part_path):
+                    qoi, qoi_t = (pd.read_csv(_qoi_part_path, sep=" ", index_col=[0, 1], header=[0, 1]),
+                                  pd.read_csv(_qoi_t_part_path, sep=" ", index_col=[0, 1], header=[0, 1]))
+                else:
+                    qoi, qoi_t = (pd.read_csv(_qoi_part_path, sep=" ", index_col=[0, 1], header=[0, 1]), None)
 
             qoi_results = pd.concat([qoi_results, qoi], copy=False)
-            qoi_results_t = pd.concat([qoi_results_t, qoi_t], copy=False)
+            if qoi_t is not None:
+                qoi_results_t = pd.concat([qoi_results_t, qoi_t], copy=False)
 
         # save global analysis results (including data of all configs)
         qoi_results.to_csv(qoi_results_path, sep=" ")
@@ -393,27 +398,30 @@ def analyze_parameter_study(base_path: str, config: str, var_parameter: Dict[str
     # aggregated_results.reset_index().to_feather('./aggregated_results_tmp.feather')
     # dfs_vector.reset_index().to_feather('./dfs_vector_tmp.feather')
 
-    # calculate time-based averages (e.g. for plotting over time)
-    print(f'Calculating time-based averages...')
-    time_avg_df = _time_average(dfs_vector)
-
-    # TODO: call plot methods for aggregated time-intervals
-    # for now, we do just some example plots
-    if "Tcp" in config:
-        data_to_plot = time_avg_df.xs('intWithUnit(exponential(10kB))')["rtt", "mean"]
-        plt.scatter(data_to_plot.index, data_to_plot)
-        data_to_plot = time_avg_df.xs('intWithUnit(exponential(100kB))')["rtt", "mean"]
-        plt.scatter(data_to_plot.index, data_to_plot)
-    else:
-        data_to_plot = time_avg_df.xs('0.01s')["rcvdPkLifetime", "mean"]
-        plt.scatter(data_to_plot.index, data_to_plot)
-        data_to_plot = time_avg_df.xs('0.1s')["rcvdPkLifetime", "mean"]
-        plt.scatter(data_to_plot.index, data_to_plot)
-    plt.show()
-
     # add config as index level
     aggregated_results = pd.concat([aggregated_results], keys=[config], names=['config'])
-    time_avg_df = pd.concat([time_avg_df], keys=[config], names=['config'])
+
+    # calculate time-based averages (e.g. for plotting over time)
+    # print(f'Calculating time-based averages...')
+    time_avg_df = None
+    # time_avg_df = _time_average(dfs_vector)
+
+    if time_avg_df is not None:
+        # TODO: call plot methods for aggregated time-intervals
+        # for now, we do just some example plots
+        if "Tcp" in config:
+            data_to_plot = time_avg_df.xs('intWithUnit(exponential(10kB))')["rtt", "mean"]
+            plt.scatter(data_to_plot.index, data_to_plot)
+            data_to_plot = time_avg_df.xs('intWithUnit(exponential(100kB))')["rtt", "mean"]
+            plt.scatter(data_to_plot.index, data_to_plot)
+        else:
+            data_to_plot = time_avg_df.xs('0.01s')["rcvdPkLifetime", "mean"]
+            plt.scatter(data_to_plot.index, data_to_plot)
+            data_to_plot = time_avg_df.xs('0.1s')["rcvdPkLifetime", "mean"]
+            plt.scatter(data_to_plot.index, data_to_plot)
+        plt.show()
+        # add config as index level
+        time_avg_df = pd.concat([time_avg_df], keys=[config], names=['config'])
 
     return aggregated_results, time_avg_df
 
