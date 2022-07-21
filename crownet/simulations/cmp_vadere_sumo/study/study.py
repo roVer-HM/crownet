@@ -165,7 +165,7 @@ def main(base_path):
             _analysis_path = SuqcRun(os.path.join(get_results_dir(base_path), config)).base_path
             _qoi_part_path = os.path.join(_analysis_path, f"qoi_part_{config}.csv")
             _qoi_t_part_path = os.path.join(_analysis_path, f"qoi_t_part_{config}.csv")
-            if not os.path.exists(_qoi_part_path):# or not os.path.exists(_qoi_t_part_path):
+            if not os.path.exists(_qoi_part_path):  # or not os.path.exists(_qoi_t_part_path):
                 # no existing data for this configuration - need to run analysis
                 qoi, qoi_t = analyze_parameter_study(base_path, config, var_parameter(config), vectors_analyzed(config),
                                                      scalars_analyzed(config))
@@ -196,10 +196,92 @@ def main(base_path):
     # create plots (based on results of analysis)
     # ------------------------------------------------------------------------------------------------------------
     print(qoi_results)
-    config_descriptions = {"sumoBottleneck": "bottleneck scenario: sumo",
-                           "vadereBottleneck": "bottleneck scenario: vadere"}
-    plot_pvar_delay(qoi_results, "Inter-TX Time [s]", "Delay [s]", config_descriptions, "rcvdPkLifetime")
+
+    _SUMO_MM = "sumo: striping mobility model"
+    _VADER_MM = "vadere: optimal steps mobility model"
+
+    config_descriptions = {"scenario": "bottleneck_udp_sl",
+                           "sumoBottleneck": _SUMO_MM,
+                           "vadereBottleneck": _VADER_MM}
+
+    plot_config(qoi_results, config_descriptions)
     plt.show()
+
+    config_descriptions = {"scenario": "bottleneck_tcp_nr",
+                           "sumoBottleneckTcp": _SUMO_MM,
+                           "vadereBottleneckTcp": _VADER_MM}
+
+    plot_config(qoi_results, config_descriptions)
+
+    config_descriptions = {"scenario": "sidewalk_udp_sl",
+                           "sumoSimple": _SUMO_MM,
+                           "vadereSimple": _VADER_MM}
+
+    plot_config(qoi_results, config_descriptions)
+    plt.show()
+
+    config_descriptions = {"scenario": "sidewalk_tcp_nr",
+                           "sumoSimpleTcp": _SUMO_MM,
+                           "vadereSimpleTcp": _VADER_MM}
+
+    plot_config(qoi_results, config_descriptions)
+    plt.show()
+
+    config_descriptions = {"scenario": "sidewalk_only2",
+                           "sumoOnly2": _SUMO_MM,
+                           "vadereOnly2": _VADER_MM}
+
+    plot_config(qoi_results, config_descriptions)
+    plt.show()
+
+
+def plot_config(qoi_results, config_descriptions):
+    if any("Tcp" in s for s in config_descriptions.keys()):
+        print("Plotting Tcp related plots...")
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "rtt", x_label="Mean HTTP Response Size [kB]",
+                      x_multiplier=10.0, reindex=-1,
+                      y_label="TCP RTT [s]")
+
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "rcvdSinrUl",
+                      x_label="Mean HTTP Response Size [kB]", y_label="Uplink SINR",  # ylimits=[5.25, 9],
+                      x_multiplier=10.0, reindex=-1, legend_loc="lower right")
+
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "packetReceived:count",
+                      x_label="Mean HTTP Response Size [kB]",
+                      x_multiplier=10.0,
+                      y_multiplier=0.001,
+                      y_label="Number of Received Packets ($\\cdot 10^3$, application layer)",
+                      reindex=-1,
+                      ylimits=[0, 12],
+                      with_errorbar=True)
+    else:
+        print("Plotting Udp/Sideling related plots..")
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "rcvdPkLifetime", x_label="Inter-TX Time [ms]",
+                      y_label="D2D Delay (application layer) [ms]", xlimits=[44.5, 104.5], ylimits=[0, 200],
+                      x_multiplier=10.0, y_multiplier=1000.0, with_errorbar=True)
+
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "rcvdSinrUl", x_label="Inter-TX Time [ms]",
+                      x_multiplier=10.0,  legend_loc="lower right",  # ylimits=[40, 50],
+                      y_label="Uplink SINR")
+
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "receivedPacketFromLowerLayer:count",
+                      x_label="Inter-TX Time [ms]",
+                      x_multiplier=10.0, y_multiplier=0.001,
+                      y_label="Number of Received Packets ($\\cdot 10^3$, link layer)",
+                      with_errorbar=True)
+
+        if True:
+            plot_pvar(qoi_results, config_descriptions, "packetReceived:count",
+                      x_label="Inter-TX Time [ms]",
+                      x_multiplier=10.0, y_multiplier=0.001,
+                      y_label="Number of Received Packets ($\\cdot 10^3$, application layer)",
+                      with_errorbar=True)
 
 
 # ------------------------------------------------------------------------------------------------------------
@@ -229,6 +311,7 @@ class MobilitySimulatorType(Enum):
     OMNET = 1
     VADERE = 2
     SUMO = 3
+
 
 def get_results_dir(base_path: string):
     study_name = os.path.basename(__file__).replace(".py", "")
@@ -517,25 +600,61 @@ def _time_average(dfs, avg_interval=1.0):
     return time_avg_df
 
 
-def plot_pvar_delay(data: pd.DataFrame, x_label: str, y_label: str,
-                    configs: Dict[str, str], plot_name: str) -> (matplotlib.figure.Figure,
-                                                                 matplotlib.axes.Axes):
+def plot_pvar(data: pd.DataFrame,
+              configs: Dict[str, str], data_name: str,
+              x_multiplier: float = 1.0,
+              y_multiplier: float = 1.0,
+              x_label: str = None, y_label: str = None,
+              legend_loc="upper right",
+              xlimits=None, ylimits=None,
+              reindex=0,
+              with_errorbar=False) -> (matplotlib.figure.Figure,
+                                       matplotlib.axes.Axes):
+    _symbols = ["o", "*", "v", "s"]
+
     plt.rc('font', size=20)
     fig, ax = plt.subplots()
-    fig.set_size_inches(16, 9)
-
+    if xlimits:
+        ax.set_xlim(xlimits)
+    if ylimits:
+        ax.set_ylim(ylimits)
+    fig.set_size_inches(9, 9)
+    _plot_nr = 0
     for config in configs.keys():
+        if config == "scenario":
+            continue
         selected_data = data.loc[config]
-        plt.scatter(selected_data.index, selected_data["rcvdPkLifetime", "mean"],
-                    label=configs[config])
-        # plt.errorbar(selected_data["param"], selected_data["mean"], yerr=selected_data["std"], fmt="o",
-        #              label=configs[config])
-    plt.legend(loc="upper left")
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
-    plt.savefig(f"{plot_name}.pdf")
-    plt.savefig(f"{plot_name}.png")
-    plt.savefig(f"{plot_name}.svg")
+        x_values = [float(x) * x_multiplier for x in range(1, len(selected_data.index) + 1, 1)]
+        y_values = y_multiplier * selected_data[data_name, "mean"]
+        y_err_values = y_multiplier * selected_data[data_name, "std"]
+        if reindex != 0:
+            y_values = y_values.reindex(index=np.roll(y_values.index, reindex))
+            y_err_values = y_err_values.reindex(index=np.roll(y_err_values.index, reindex))
+        if with_errorbar:
+            plt.errorbar(x_values, y_values,
+                         yerr=y_err_values,
+                         label=configs[config], fmt=_symbols[_plot_nr], markersize=15,
+                         capsize=10, elinewidth=3)
+        else:
+            plt.scatter(x_values, y_values,
+                        label=configs[config], marker=_symbols[_plot_nr], s=60)
+        _plot_nr = _plot_nr + 1
+
+    plt.legend(loc=legend_loc)
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
+
+    scenario_name = configs["scenario"]
+    data_name = data_name.replace(":", "_")
+
+    plt.savefig(f"{scenario_name}_{data_name}.pdf")
+    plt.savefig(f"{scenario_name}_{data_name}.png")
+    plt.savefig(f"{scenario_name}_{data_name}.svg")
+
+    # add small info text so we know which graphic this is
+    fig.suptitle(f'File: {scenario_name}_{data_name}.png', fontsize=10)
     return fig, ax
 
 
