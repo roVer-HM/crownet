@@ -302,10 +302,10 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 8.0,
+            "x" : 10.0,
             "y" : 0.5
           }, {
-            "x" : 8.0,
+            "x" : 10.0,
             "y" : 15.5
           }, {
             "x" : 24.5,
@@ -395,7 +395,7 @@
         "shape" : {
           "x" : 0.5,
           "y" : 0.5,
-          "width" : 2.5,
+          "width" : 1.0,
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
@@ -430,9 +430,9 @@
         "id" : 2
       }, {
         "shape" : {
-          "x" : 3.0,
+          "x" : 1.5,
           "y" : 0.5,
-          "width" : 5.0,
+          "width" : 8.5,
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
@@ -513,26 +513,74 @@
       "aerosolClouds" : [ ],
       "droplets" : [ ],
       "sources" : [ {
-        "id" : 39,
+        "id" : 11,
         "shape" : {
-          "x" : 3.0,
+          "x" : 1.5,
           "y" : 0.5,
-          "width" : 5.0,
-          "height" : 7.5,
+          "width" : 4.0,
+          "height" : 6.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 2
+          "updateFrequency" : 1.91839
         },
-        "spawnNumber" : 8,
+        "spawnNumber" : 5,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 2000.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 111 ],
+        "targetIds" : [ 11 ],
+        "groupSizeDistribution" : [ 0.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 31,
+        "shape" : {
+          "x" : 8.0,
+          "y" : 0.5,
+          "width" : 2.0,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.47853
+        },
+        "spawnNumber" : 5,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 2000.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 31 ],
+        "groupSizeDistribution" : [ 0.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 21,
+        "shape" : {
+          "x" : 5.5,
+          "y" : 0.5,
+          "width" : 2.5,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3.60308
+        },
+        "spawnNumber" : 5,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 2000.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 21 ],
         "groupSizeDistribution" : [ 0.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null

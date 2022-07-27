@@ -75,6 +75,12 @@ if __name__ == "__main__":
 
 
     dists = pd.read_csv("RouteUtilizations.csv")
+    sources = dists[dists["condition"] == "Uninformed"]
+
+    sources = sources.drop(columns="condition").set_index("population")
+    sources = 1/sources
+    sources = sources.div(sources.sum(axis=1), axis=0)*10
+    sources = sources.reset_index()
 
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
     start_time = time.time()
@@ -84,9 +90,12 @@ if __name__ == "__main__":
 
     par_var_ = list()
     conditions = ["Uninformed", "A1","A2","A3","A4","B1","B2","B3","B4"]
+
     for condition in conditions:
 
         for stat in ["Students", "Fans"]:
+
+            sources_ = sources[sources["population"] == stat]
 
             df = dists[dists["condition"] == condition]
             df = df[df["population"] == stat]
@@ -100,14 +109,29 @@ if __name__ == "__main__":
             values_long_route = default_vals
             values_medium_route = default_vals
 
-            if condition != "Uninformed":
+            if condition == "Uninformed":
+                compliances = {"usePsychologyLayer": False,
+                               'routeChoices.[instruction=="use target 11"].targetProbabilities': [-1,-1,-1],
+                               "routeChoices.[instruction=='use target 21'].targetProbabilities": [-1,-1,-1],
+                               'routeChoices.[instruction==use target 31].targetProbabilities': [-1,-1,-1]
+                               }
+            else:
                 values_short_route = [1.0, 0.0, 0.0]
                 values_long_route = default_vals
                 values_medium_route = [1-target_31_p, target_31_p , 0.0]
 
-            compliances = {'routeChoices.[instruction=="use target 11"].targetProbabilities': values_short_route,
+                compliances = {"usePsychologyLayer": True,
+                        'routeChoices.[instruction=="use target 11"].targetProbabilities': values_short_route,
                        "routeChoices.[instruction=='use target 21'].targetProbabilities": values_medium_route,
                        'routeChoices.[instruction==use target 31].targetProbabilities': values_long_route}
+
+            sources__ = { 'sources.[id==11].distributionParameters.updateFrequency': sources_["routeC"].values[0],
+                        'sources.[id==21].distributionParameters.updateFrequency': sources_["routeB"].values[0],
+                        'sources.[id==31].distributionParameters.updateFrequency': sources_["routeA"].values[0],
+            }
+
+            compliances = dict(compliances, **sources__)
+
 
             sample = {'vadere': compliances, 'dummy_var': {"condition": condition, "statistic": stat}}
             par_var_.append(sample)
