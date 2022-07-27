@@ -26,7 +26,7 @@ scenario = "three_corridors" #TODO test "three_corridors" or "route_choice_real_
 
 def run_controller(controller, qoi, par_var):
 
-    simulation_dir = "/mnt/data/route_choice_survey"
+    simulation_dir = "/mnt/data1TB/route_choice_survey"
 
     if os.environ["CROWNET_HOME"] is None:
         raise SystemError(
