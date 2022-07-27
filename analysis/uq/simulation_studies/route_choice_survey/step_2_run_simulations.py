@@ -46,7 +46,6 @@ def run_controller(controller, qoi, par_var):
         .control_argument("controller-type", controller) \
         .vadere_tag("latest") \
         .control_tag("latest")
-        #.scenario_file(f"vadere/scenarios/123.scenario")
 
 
     setup = CoupledDictVariation(
@@ -75,19 +74,7 @@ def run_controller(controller, qoi, par_var):
 if __name__ == "__main__":
 
 
-    dists = pd.read_csv("route_choice_dists.dat")
-    dists2 = pd.read_csv("RouteUtilizations.csv")
-
-    list_ = list()
-    for pop, data in dists2.groupby(by="population"):
-        data.drop(columns="population", inplace=True)
-        data = data.set_index("condition").unstack().reset_index()
-        data = data.rename(columns={"level_0": "route", 0: pop})
-        list_.append(data)
-
-    dists2 = list_[0].merge(list_[1])
-    dists = dists2
-
+    dists = pd.read_csv("RouteUtilizations.csv")
 
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
     start_time = time.time()
@@ -96,17 +83,27 @@ if __name__ == "__main__":
     probs = np.linspace(0.0, 1.0, 10)
 
     par_var_ = list()
-    conditions = ["A1","A2","A3","A4","B1","B2","B3","B4"]
+    conditions = ["Uninformed", "A1","A2","A3","A4","B1","B2","B3","B4"]
     for condition in conditions:
 
-        for stat in ["Students", "Fans"]: # ["mean", "median", "q1", "q3"]:
+        for stat in ["Students", "Fans"]:
 
             df = dists[dists["condition"] == condition]
+            df = df[df["population"] == stat]
 
-            values_short_route = [1.0, 0.0, 0.0]
-            values_long_route = df[stat].round(2).values.tolist()
-            values_medium_route = [1-values_long_route[-1], values_long_route[-1] , 0.0]
+            target_11_p = df["routeC"].values[0]
+            target_21_p = df["routeB"].values[0]
+            target_31_p = df["routeA"].values[0]
 
+            default_vals = [target_11_p, target_21_p, target_31_p]
+            values_short_route = default_vals
+            values_long_route = default_vals
+            values_medium_route = default_vals
+
+            if condition != "Uninformed":
+                values_short_route = [1.0, 0.0, 0.0]
+                values_long_route = default_vals
+                values_medium_route = [1-target_31_p, target_31_p , 0.0]
 
             compliances = {'routeChoices.[instruction=="use target 11"].targetProbabilities': values_short_route,
                        "routeChoices.[instruction=='use target 21'].targetProbabilities": values_medium_route,
@@ -126,6 +123,4 @@ if __name__ == "__main__":
     qoi5 = "path_choice.txt" # collect these quantities of interest
 
     run_controller(controller="ClosedLoop", par_var= par_var , qoi= [qoi1, qoi2, qoi3, qoi4, qoi5] )
-    run_controller(controller="NoController", par_var=par_var[:reps], qoi=[qoi1, qoi2, qoi3, qoi4])  # only zero needed
-
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
