@@ -87,7 +87,7 @@ TEST_F(RegularDcDMapAggregationTest, ymf_one_element) {
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
-TEST_F(RegularDcDMapAggregationTest, ymfDist_one_element_must_have_rank_0) {
+TEST_F(RegularDcDMapAggregationTest, ymfDist_one_element_must_have_rank_1) {
     clearMap();
     setSimTime(20.0);
     GridCellID cell{5, 5};
@@ -99,12 +99,12 @@ TEST_F(RegularDcDMapAggregationTest, ymfDist_one_element_must_have_rank_0) {
 
     EXPECT_EQ(entry, selected_value);
 
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(selected_value->getSelectionRank(), 1.0);
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
 
-TEST_F(RegularDcDMapAggregationTest, ymfDist_two_element_must_have_rank_0_and_1) {
+TEST_F(RegularDcDMapAggregationTest, ymfDist_two_elements) {
     clearMap();
     setSimTime(20.0);
     GridCellID cell{5, 5};
@@ -119,13 +119,13 @@ TEST_F(RegularDcDMapAggregationTest, ymfDist_two_element_must_have_rank_0_and_1)
 
     EXPECT_EQ(newerEntry, selected_value);
 
-    EXPECT_EQ(olderEntry->getSelectionRank(), 1.0);
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5*1.0 + 0.5*(110./210.));
+    EXPECT_EQ(selected_value->getSelectionRank(), 0.0 + 0.5*(100./210.));
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_one_element_must_have_rank_0_a) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_one_element_must_have_rank_1_a) {
     // with distance greater than stepDist
     clearMap();
     setSimTime(20.0);
@@ -138,11 +138,11 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_one_element_must_have_rank_0_a)
 
     EXPECT_EQ(entry, selected_value);
 
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(selected_value->getSelectionRank(), 1.0);
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_one_element_must_have_rank_0_b) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_one_element_must_have_rank_1_b) {
     // with distance smaller than stepDist
     clearMap();
     setSimTime(20.0);
@@ -155,12 +155,12 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_one_element_must_have_rank_0_b)
 
     EXPECT_EQ(entry, selected_value);
 
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(selected_value->getSelectionRank(), 1.0);
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_differ_in_both_ranks_must_have_rank_0_and_1) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_differ_in_both_ranks) {
     // with distance greater than stepDist for both
     clearMap();
     setSimTime(20.0);
@@ -176,12 +176,12 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement
 
     EXPECT_EQ(newerEntry, selected_value);
 
-    EXPECT_EQ(olderEntry->getSelectionRank(), 1.0);
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5*1.0 + 0.5*(110./210.));
+    EXPECT_EQ(selected_value->getSelectionRank(), 0.5*0. + 0.5*(100./210.));
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_below_step_dist_must_have_rank_0_and_dot_5) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_below_step_dist_must_have_rank_dot_25_and_dot_75) {
     /**
      * with distance smaller than stepDist for both --> only time will define rank
      *
@@ -205,13 +205,13 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement
 
     EXPECT_EQ(newerEntry, selected_value);
 
-    EXPECT_EQ(olderEntry->getSelectionRank(), .5);
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5*1.0 + 0.5*(300./600.));
+    EXPECT_EQ(selected_value->getSelectionRank(), 0.5*0.0 + 0.5*(300./600.) );
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_above_step_dist_with_SAME_dist_must_have_rank_0_and_dot_5) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_above_step_dist_with_SAME_dist_must_have_rank_dot_25_and_dot_75) {
     // with SAME distance greater than stepDist -->  only time will define rank
     clearMap();
     setSimTime(20.0);
@@ -227,12 +227,12 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement
 
     EXPECT_EQ(newerEntry, selected_value);
 
-    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5);
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(olderEntry->getSelectionRank(), 0.75);
+    EXPECT_EQ(selected_value->getSelectionRank(), 0.25);
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_above_step_dist_with_DIFFERENT_dist_must_have_rank_0_and_1) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement_above_step_dist_with_DIFFERENT_dist) {
     // with SAME distance greater than stepDist -->  only time will define rank
     clearMap();
     setSimTime(20.0);
@@ -248,12 +248,12 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_aggrement
 
     EXPECT_EQ(newerEntry, selected_value);
 
-    EXPECT_EQ(olderEntry->getSelectionRank(), 1.0);
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.0);
+    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5*1.0 +0.5*(330./630.));
+    EXPECT_EQ(selected_value->getSelectionRank(), 0.0*1.0 +0.5*(300./630.));
     EXPECT_EQ(selected_value->getCount(), 5);
 }
 
-TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrement_with_same_relative_difference_must_have_rank_dot5_dot5) {
+TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrement_with_same_relative_difference) {
     // with SAME distance greater than stepDist -->  only time will define rank
     clearMap();
     setSimTime(20.0);
@@ -266,8 +266,8 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrem
     YmfPlusDistStepVisitor v {0.5, simTime(), 100};
     mapFull.computeValues(&v);
     auto selected_value = mapFull.getCell(cell).val();
-    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5);
-    EXPECT_EQ(selected_value->getSelectionRank(), 0.5);
+    EXPECT_EQ(olderEntry->getSelectionRank(), 0.5*1.0 +0.5*(300./630.));
+    EXPECT_EQ(selected_value->getSelectionRank(), 0.0*1.0 +0.5*(330./630.));
 }
 
 TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrement_choose_older_value_due_to_closeness) {
@@ -276,7 +276,7 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrem
     std::stringstream hash_stream;
     std::string hash_str;
 
-    for (double stepDist = 0; stepDist < 200; stepDist+=50) {
+    for (double stepDist = 0; stepDist <= 200; stepDist+=50) {
         for (double alpha = 0; alpha <= 1; alpha+=.25){
             std::stringstream n;
             n << "rank_alpha" << alpha << "_stepDist" <<  stepDist << ".csv";
@@ -335,6 +335,6 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrem
             reinterpret_cast<const char*>(hash),
             reinterpret_cast<const char*>(hash) + sizeof hash),
             std::ostream_iterator<char>(hexDigest));
-      EXPECT_STREQ(hexDigest.str().c_str(), "BD8C172D5ED3351FC09A61D48E7AAD573BC5F7BA");
+      EXPECT_STREQ(hexDigest.str().c_str(), "7549DF831B36A50D87CF95130E2292D7A0638488");
 }
 
