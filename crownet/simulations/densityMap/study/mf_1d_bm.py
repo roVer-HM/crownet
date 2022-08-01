@@ -1,7 +1,7 @@
 from functools import partial
 import os
 from time import time_ns
-from suqc.CommandBuilder.VadereOppCommand import VadereOppCommand
+from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from suqc.environment import CrownetEnvironmentManager
 from suqc.parameter.create import coupled_creator
 from suqc.parameter.sampling import ParameterVariationBase
@@ -12,7 +12,7 @@ from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolVa
 from suqc.utils.SeedManager.SeedManager import SeedManager
 from suqc.utils.general import get_env_name
 from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
-from roveranalyzer.simulators.vadere.bonnmotion_traces import generate_traces
+import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
 import roveranalyzer.simulators.vadere.vadere_variation_helper as v
 
 
@@ -26,7 +26,7 @@ source_bottom_right = 101
 
 
 def main(base_path):
-    reps = 5  # seed-set
+    reps = 20  # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
         "writeDensityLog",
@@ -60,91 +60,70 @@ def main(base_path):
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath": s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
-                "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-            },
-            "vadere": {
-                **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **v.source_dist_par(
-                    [source_top_right, source_bottom_left], "updateFrequency", 50.0
-                ),
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
+                "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                # Hack to find correct trace ... (will be removed later)
+                "HACK_trace_name": "mf_1d_m_const_2x5m_d20m_iat_25.scenario",
+                "*.bonnMotionServer.traceFile": "to/be/changed",
             },
         },
         {
             "omnet": {
                 "sim-time-limit": t,
-                "**.vadereScenarioPath": s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
-                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-            },
-            "vadere": {
-                **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **v.source_dist_par(
-                    [source_top_right, source_bottom_left], "updateFrequency", 50.0
-                ),
-            },
-        },
-        {
-            "omnet": {
-                "sim-time-limit": t,
-                "**.vadereScenarioPath": s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
-                "*.pNode[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-            },
-            "vadere": {
-                **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **v.source_dist_par(
-                    [source_top_right, source_bottom_left], "updateFrequency", 25.0
-                ),
-            },
-        },
-        {
-            "omnet": {
-                "sim-time-limit": t,
-                "**.vadereScenarioPath": s_5_20_const,
-                "*.pNode[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
-                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-            },
-            "vadere": {
-                **v.source_max_spawn([source_top_left, source_bottom_right], num=0),
-                **v.source_max_spawn([source_top_right, source_bottom_left], num=-1),
-                **v.source_dist_par(
-                    [source_top_right, source_bottom_left], "updateFrequency", 25.0
-                ),
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
+                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                # Hack to find correct trace ... (will be removed later)
+                "HACK_trace_name": "mf_1d_m_const_2x5m_d20m_iat_50.scenario",
+                "*.bonnMotionServer.traceFile": "to/be/changed",
             },
         },
     ]
 
-    for v in par_var:
-        # -7492697142818052001
-        v["vadere"]["attributesSimulation.useFixedSeed"] = True
-        v["vadere"]["attributesSimulation.fixedSeed"] = -7492697142818052001
-        v["omnet"]["*.traci.launcher.useVadereSeed"] = BoolValue.TRUE
+    base_trace_dir = os.path.join(
+        os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
+    )
+    seed_cfg = BmTrace.read_seeds(base_trace_dir)
+    seed_dict = seed_cfg["opp_to_vadere"]
 
     seed_m = OmnetSeedManager(
         par_variations=par_var,
-        rep_count=reps,
+        rep_count=seed_cfg["reps"],
         omnet_fixed=False,
-        vadere_fixed=None,  # set manually
-        seed=time_ns(),
+        vadere_fixed=False,  # set manually
+        seed=seed_cfg["seed"],
     )
     par_var = seed_m.get_new_seed_variation()
+
+    trace_files = []
+    for var in par_var:
+        # match variation based on omnet seed with corresponding trace seed.
+        del var["vadere"]
+        opp = var["omnet"]
+
+        # check seed pairing
+        opp_seed = opp["seed-set"]
+        vadere_seed = int(opp["*.traci.launcher.seed"])
+        if seed_dict[opp_seed] != vadere_seed:
+            raise ValueError("Seed mismatch")
+
+        bm_file_name = f"trace_{os.path.basename(opp['HACK_trace_name'])}_{opp['*.traci.launcher.seed']}.bonnMotion"
+        trace_files.append(bm_file_name)
+        var["omnet"]["*.bonnMotionServer.traceFile"] = QString(
+            os.path.join("trace", bm_file_name)
+        )
+        for k in [
+            "*.traci.launcher.useVadereSeed",
+            "*.traci.launcher.seed",
+            "HACK_trace_name",
+        ]:
+            del var["omnet"][k]
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
     model = (
-        VadereOppCommand()
-        .write_container_log()
-        .omnet_tag("latest")
-        .experiment_label("out")
+        OmnetCommand().write_container_log().omnet_tag("latest").experiment_label("out")
     )
     model.timeout = None
     model.qoi(["all"])
@@ -154,7 +133,7 @@ def main(base_path):
     # Enviroment setup.
     #
     ini_file = os.path.abspath("../omnetpp.ini")
-    base_dir = os.path.abspath("/mnt/data1tb/results/")
+    base_dir = os.path.abspath("/home/sschuhbaeck/data")
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
@@ -162,8 +141,8 @@ def main(base_path):
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
         opp_config="final_1d",
         opp_basename="omnetpp.ini",
-        # mobility_sim=("omnet", ""), # use omnet internal mobility models
-        mobility_sim=("vadere", "latest"),  # use omnet internal mobility models
+        mobility_sim=("omnet", ""),  # use omnet internal mobility models
+        # mobility_sim=("vadere", "latest"),  # use omnet internal mobility models
         communication_sim=("omnet", "latest"),
         # handle_existing="force_replace"
         # handle_existing="write_in"
@@ -172,7 +151,9 @@ def main(base_path):
             VariationBasedScenarioProvider, par_var=parameter_variation
         ),
     )
-    env.copy_data(base_ini_file=ini_file)
+
+    extra_files = [(os.path.join(base_trace_dir, f), f) for f in trace_files]
+    env.copy_data(base_ini_file=ini_file, extraFiles=extra_files)
 
     _rnd = SeedManager.rnd_suffix()
     setup = CrownetRequest(
@@ -218,16 +199,21 @@ def generate_bonnmotion():
     base_output_path = os.path.join(
         os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
     )
+    # must be same for all scenarios used.
+    seed = time_ns()
+    seed_mgr = OmnetSeedManager(par_variations=[], rep_count=20, seed=seed)
+    paring = seed_mgr.get_seed_paring()
+    BmTrace.write_seed_paring(seed, paring, base_output_path)
 
     for scenario, name, par_var in traces:
         print("gen")
-        generate_traces(
+        BmTrace.generate_traces(
             scenario=scenario,
             scenario_name=name,
             par_var_default=par_var,
             base_output_path=base_output_path,
             jobs=5,
-            seeds=20,
+            vadere_seeds=paring[0],
             remove_output=True,
         )
 
