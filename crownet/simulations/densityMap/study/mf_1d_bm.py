@@ -169,7 +169,11 @@ def main(base_path):
     # par_var, data = setup.run(1)y
 
 
-def generate_bonnmotion():
+def generate_traces():
+
+    trace_output_path = os.path.join(
+        os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
+    )
 
     traces = [
         (
@@ -196,22 +200,19 @@ def generate_bonnmotion():
         ),
     ]
 
-    base_output_path = os.path.join(
-        os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
-    )
     # must be same for all scenarios used.
     seed = time_ns()
     seed_mgr = OmnetSeedManager(par_variations=[], rep_count=20, seed=seed)
     paring = seed_mgr.get_seed_paring()
-    BmTrace.write_seed_paring(seed, paring, base_output_path)
+    BmTrace.write_seed_paring(seed, paring, trace_output_path)
 
-    for scenario, name, par_var in traces:
-        print("gen")
+    for scenario, scenario_name, par_var in traces:
         BmTrace.generate_traces(
             scenario=scenario,
-            scenario_name=name,
+            scenario_name=scenario_name,
             par_var_default=par_var,
-            base_output_path=base_output_path,
+            base_output_path=trace_output_path,
+            keep_files=["trace.bonnMotion", "positions.csv", "postvis.traj"],
             jobs=5,
             vadere_seeds=paring[0],
             remove_output=True,
@@ -220,4 +221,4 @@ def generate_bonnmotion():
 
 if __name__ == "__main__":
     # main("./")
-    generate_bonnmotion()
+    generate_traces()

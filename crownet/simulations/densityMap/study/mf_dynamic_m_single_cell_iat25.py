@@ -1,24 +1,20 @@
 from __future__ import annotations
 from copy import deepcopy
 from functools import partial
-from glob import glob
 from itertools import product
-import json
 import os
-from os.path import join
-import shutil
+from os.path import join, abspath
 import timeit as it
 from time import time_ns
-from suqc.CommandBuilder.JarCommand import JarCommand
 from suqc.CommandBuilder.VadereOppCommand import VadereOppCommand
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from suqc.environment import CrownetEnvironmentManager
 from suqc.parameter.create import coupled_creator, opp_creator
-from suqc.parameter.postchanges import PostScenarioChangesBase
 from suqc.parameter.sampling import ParameterVariationBase
-from suqc.request import CrownetRequest, DictVariation
+from suqc.request import CrownetRequest
 from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
 from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolValue
+import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
 import pandas as pd
 
 from suqc.utils.SeedManager.SeedManager import SeedManager
@@ -199,73 +195,56 @@ def create_variation_with_vadere(seed):
     return opp_config, ParameterVariationBase().add_data_points(par_var), seed_m
 
 
-def create_traces():
-    seed_m = OmnetSeedManager(
+def create_traces(trace_output_path: str | None = None):
+    print("create traces")
+    if trace_output_path is None:
+        os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
+
+    traces = [
+        (abspath(join("../vadere/scenarios/", f"{name}.scenario")), name, {})
+        for name in [
+            "mf_dyn_exp_05",
+            "mf_dyn_exp_10",
+            "mf_dyn_exp_15",
+            "mf_dyn_exp_20",
+            "mf_dyn_exp_25",
+        ]
+    ]  # [ (scenario_path, name, par_var), ...]
+
+    # seed=time_ns()
+    seed = 1656000207970109272
+    seed_mgr = OmnetSeedManager(
         par_variations=[],
-        rep_count=reps,
+        rep_count=10,
         omnet_fixed=False,
         vadere_fixed=False,
-        # seed=time_ns(),
-        seed=1656000207970109272
-        # seed=0        # use for study debug/setup
+        seed=seed,
     )
-    vadere_s, omnet_s = seed_m.get_seed_paring()
-    bm_base_dir = os.path.abspath("mf_dynamic_m_single_cell_7.d")
+    description = """
+    hack: To generate the same first 10 parings for the seed used in 
+    an old settings, the rep count is fixed to rep_count=10 in the 
+    OmnetSeedManager. To create more than 10 parings call get_seed_paring()
+    multiple times and concatenate the parings and drop parings at the end if 
+    there are to many. Thus, to recreate the paring set rep_count=10 and not to 
+    'reps' as shown in the omnetSeedManager.json config.
+    """
+    a, b = seed_mgr.get_seed_paring()
+    aa, bb = seed_mgr.get_seed_paring()
+    paring = ([*a, *aa], [*b, *bb])
+    BmTrace.write_seed_paring(seed, paring, trace_output_path, comment=description)
 
-    par_var = [
-        {
-            "attributesSimulation.useFixedSeed": True,
-            "attributesSimulation.fixedSeed": int(s),
-        }
-        for s in vadere_s
-    ]
-
-    jar_command = (
-        JarCommand(
-            jar_file=join(
-                os.environ["CROWNET_HOME"],
-                "vadere/VadereSimulator/target/vadere-console.jar",
-            )
+    for scenario, scenario_name, par_var in traces:
+        print(f"create trace for: {scenario}")
+        BmTrace.generate_traces(
+            scenario=scenario,
+            scenario_name=scenario_name,
+            par_var_default=par_var,
+            keep_files=["trace.bonnMotion", "positions.csv", "postvis.traj"],
+            base_output_path=trace_output_path,
+            jobs=4,
+            vadere_seeds=paring[0],
+            remove_output=True,
         )
-        .add_option("-enableassertions")
-        .main_class("suq")
-    )
-    for s in [
-        join(bm_base_dir, "mf_dyn_exp_05.scenario"),
-        join(bm_base_dir, "mf_dyn_exp_10.scenario"),
-        join(bm_base_dir, "mf_dyn_exp_15.scenario"),
-        join(bm_base_dir, "mf_dyn_exp_20.scenario"),
-        join(bm_base_dir, "mf_dyn_exp_25.scenario"),
-    ]:
-        out = f"{os.path.basename(s).split('.')[0]}.out"
-        out_f = bm_base_dir
-        setup: DictVariation = DictVariation(
-            scenario_path=s,
-            parameter_dict_list=par_var,
-            qoi="trace.bonnMotion",
-            model=jar_command,
-            scenario_runs=1,
-            post_changes=None,
-            output_path=out_f,
-            output_folder=out,
-            remove_output=False,
-        )
-        try:
-            setup.run(5)
-        except Exception:
-            pass
-
-        for f in glob(os.path.join(out_f, out, "vadere_output/*_output")):
-            with open(join(f, s.split("/")[-1]), "r", encoding="utf-8") as fd:
-                scenario = json.load(fd)
-
-            seed = scenario["scenario"]["attributesSimulation"]["fixedSeed"]
-            bm_name = f"trace_{s.split('/')[-1]}_{seed}.bonnMotion"
-            shutil.copyfile(
-                src=join(f, "trace.bonnMotion"), dst=join(bm_base_dir, bm_name)
-            )
-
-    print("done")
 
 
 def main_vadere():
@@ -396,5 +375,5 @@ def main_bonn_motion():
 
 
 if __name__ == "__main__":
-    # create_traces()
-    main_bonn_motion()
+    create_traces(trace_output_path=os.path.abspath("traces_dynamic.d"))
+    # main_bonn_motion()
