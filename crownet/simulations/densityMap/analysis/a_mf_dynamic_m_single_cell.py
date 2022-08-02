@@ -292,7 +292,7 @@ def plot_mse_for_seed(
 
     with PdfPages(study.path(figure_name)) as pdf:
         for _seed in range(10):
-            ymf_err = data.loc[run_map["1_999_15"]["rep"][_seed]]
+            ymf_err = data.loc[run_map["1_999_25"]["rep"][_seed]]
             fig, ax = plt.subplots(1, 2, figsize=(16, 9), sharey="all")
             fig.suptitle(f"Seed {_seed}")
             ax_a: plt.Axes = ax[0]
@@ -368,33 +368,32 @@ def plot_mse_yDist_to_ymf(
 
 
 def main():
-    id_filter = lambda x: all([i >= 170 for i in x])
+    # id_filter = lambda x: all([i >= 170 for i in x])
     # id_filter = lambda x : all([i < 170 for i in x])
-    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
+    id_filter = lambda x: True
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25/")
+    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_1/")
     run_map = get_run_map(study, map_filter=id_filter)
 
-    data = get_mse_cell_data(study, run_map, hdf_path="cell_mse_big.h5")
-    # data = get_mse_cell_data(study, run_map, hdf_path="cell_mse.h5")
+    data = get_mse_cell_data(study, run_map, hdf_path="cell_mse.h5")
     data = data.groupby(by="run_id").mean()
 
-    ymf_err = np.tile(data.loc[run_map["1_999_15"]["rep"]], reps=17)
+    ymf_err = np.tile(data.loc[run_map["1_999_25"]["rep"]], reps=17)
     data = data.to_frame()
     data["err_to_ymf"] = data["cell_mse"] - ymf_err
 
     styles = StyleMap(markersize=3, marker="o", linestyle="none")
 
-    plot_mse_all(study, data, run_map, styles, figure_name="cell_mse_big.pdf")
+    plot_mse_all(study, data, run_map, styles, figure_name="cell_mse.pdf")
     plot_mse_for_seed(
         study,
         data["cell_mse"],
         run_map,
         styles,
-        figure_name="cell_mse_for_seed_big.pdf",
+        figure_name="cell_mse_for_seed.pdf",
     )
-    plot_mse_yDist_to_ymf(study, data, run_map, styles, "mse_diff_big.pdf")
-
-    # plot_mse_all(data, run_map, styles, figure_name="cell_mse.pdf")
-    # plot_mse_for_seed(study, data["cell_mse"], run_map, styles, figure_name="cell_mse_for_seed.pdf")
+    plot_mse_yDist_to_ymf(study, data, run_map, styles, "mse_diff.pdf")
 
     print()
 
