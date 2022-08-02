@@ -65,8 +65,8 @@ t = UnitValue.s(800.0)
 source_end_time = 400.0
 source_id_range = range(1117, 1131)
 
-# alpha = [0.5, 0.65, 0.80, 0.95]
-alpha = [0.05, 0.15, 0.25, 0.35]
+alpha = [0.5, 0.65, 0.80, 0.95]
+# alpha = [0.05, 0.15, 0.25, 0.35]
 # dist = [20, 80, 120, 200]
 dist = [80, 120, 160, 200]
 alpha_dist = list(product(alpha, dist))
