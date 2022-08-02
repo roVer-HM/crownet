@@ -385,8 +385,9 @@ class FingerprintTestCaseGenerator:
 
 class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
     def __init__(self, args):
-        super().__init__(args.match, args.exclude, args.repeat, TestCaseType.SHELL)
-        self.args = args
+        super().__init__(
+            args, args.match, args.exclude, args.repeat, TestCaseType.SHELL
+        )
 
     # parse YAML file into list of dicts
     def parse_file(self, file_path):
