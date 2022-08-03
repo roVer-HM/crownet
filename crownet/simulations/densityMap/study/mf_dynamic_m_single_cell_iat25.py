@@ -241,9 +241,9 @@ def create_traces(trace_output_path: str | None = None):
             par_var_default=par_var,
             keep_files=["trace.bonnMotion", "positions.csv", "postvis.traj"],
             base_output_path=trace_output_path,
-            jobs=4,
+            jobs=6,
             vadere_seeds=paring[0],
-            remove_output=True,
+            remove_output=False,
         )
 
 

@@ -1,58 +1,40 @@
 from __future__ import annotations
-from cProfile import label
 from dataclasses import dataclass
-import enum
-import os
-import itertools
-from itertools import chain, product
-from multiprocessing import get_context
+from itertools import chain
 import re
-from statistics import mean
-from itertools import repeat
-from tokenize import group
-from traceback import print_tb
-from turtle import st
-from typing import Any, Callable, Dict, List
-from unittest.util import strclass
-from matplotlib import markers
-from pyparsing import alphanums
-from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
+from typing import Any, Callable, Dict, List, Tuple
+from roveranalyzer.analysis.common import (
+    RunContext,
+    Simulation,
+    SuqcRun,
+    RunMap,
+    Parameter_Variation,
+)
 from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, percentile
-from roveranalyzer.simulators.opp.scave import CrownetSql
-from roveranalyzer.utils.dataframe import FrameConsumer
-from roveranalyzer.utils.general import Project
-from roveranalyzer.utils.parallel import run_args_map, run_kwargs_map
-from roveranalyzer.utils.plot import StyleMap, check_ax
+from roveranalyzer.utils.parallel import run_kwargs_map
+from roveranalyzer.utils.plot import StyleMap
 from matplotlib.ticker import MaxNLocator
 import seaborn as sb
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from shapely.geometry import Polygon
 from matplotlib.backends.backend_pdf import PdfPages
 from omnetinireader.config_parser import OppConfigFileBase, ObjectValue
-import matplotlib.colors as mcolors
-
-
-def min_max_norm(data, min=0, max=None):
-    max = data.max() if max is None else max
-    return (data - min) / (max - min)
 
 
 def get_run_map(
     study: SuqcRun, rep_count=10, map_filter: Callable[[Any], True] = lambda x: True
-):
-    # def get_label(sim: Simulation):
-    #     cfg: OppConfigFileBase = sim.run_context.oppini
-    #     mapCfg: ObjectValue = cfg.get("*.pNode[*].app[1].app.mapCfg")
-    #     scenario = cfg.get("**.vadereScenarioPath")
-    #     r = re.compile(r".*_(\d+).*")
-    #     if match := r.match(scenario):
-    #         iat = match.groups()[0]
-    #     else:
-    #         iat = "??"
-    #     return f"{mapCfg['alpha']}_{mapCfg['stepDist']}_{iat}"
+) -> RunMap:
+    """Create RunMap labels based on alpha / cut off distance
+
+    Args:
+        study (SuqcRun): _description_
+        rep_count (int, optional): Number of seeds used. Defaults to 10.
+        map_filter (_type_, optional): _description_. Defaults to lambda x:True.
+
+    Returns:
+        RunMap:  A dictionary with [str, ParameterVariation]
+    """
 
     @dataclass(frozen=True)
     class _lbl_class:
@@ -99,38 +81,41 @@ def get_run_map(
     return run_map
 
 
-def collect_count_error(study: SuqcRun, run_dict: dict):
+def collect_count_error_for_parameter_variation(
+    study: SuqcRun, par_var: Parameter_Variation
+):
     df = []
-    for idx, rep in enumerate(run_dict["rep"]):
+    for idx, rep in enumerate(par_var.reps):
         sim: Simulation = study.get_sim(rep)
         _df = sim.get_dcdMap().map_count_measure().loc[:, ["map_mean_err"]]
-        _df.columns = [f"{idx}-{run_dict['lbl']}"]
+        _df.columns = [f"{idx}-{par_var['lbl']}"]
         df.append(_df)
 
     df = pd.concat(df, axis=1, verify_integrity=True)
     return df
 
 
-def plot_position_error(study: SuqcRun):
-
-    run_map = get_run_map(study)
+def plot_count_error(study: SuqcRun, run_map: RunMap, figure_name: str):
 
     data: List[(pd.DataFrame, dict)] = run_kwargs_map(
-        collect_count_error,
-        [dict(study=study, run_dict=v) for v in run_map.values()],
+        collect_count_error_for_parameter_variation,
+        [dict(study=study, par_var=v) for v in run_map.get_parameter_variations()],
         pool_size=10,
         append_args=True,
     )
 
-    with PdfPages(study.path("count_error.pdf")) as pdf:
+    with PdfPages(study.path(figure_name)) as pdf:
         fig, axes = plt.subplots(4, 4, figsize=(16, 9), sharex="all", sharey="all")
         fig.suptitle("Count Error for alpha_dist_iat")
         axes = list(chain(*axes))
         for idx, d in enumerate(data):
             df = d[0]
-            run_dict = d[1]["run_dict"]
+            par_var: Parameter_Variation = d[1]["par_var"]
+            if "1_999" in par_var.label:
+                # ignore last one
+                continue
             ax: plt.Axes = axes[idx]
-            ax.set_title(f"{run_dict['lbl']}")
+            ax.set_title(f"{par_var.label}")
             ax.axhline(y=0, color="black")
             for n, col in enumerate(df.columns):
                 ax.plot(df.index, df[col], label=f"run_{n}", linewidth=1)
@@ -148,60 +133,24 @@ def plot_position_error(study: SuqcRun):
         pdf.savefig(fig)
 
 
-def collect_cell_mse(
-    study: SuqcRun,
-    run_dict: dict,
-    cell_count: int,
-    consumer: FrameConsumer = FrameConsumer.EMPTY,
-) -> pd.Series:
-    df = []
-    for idx, rep in enumerate(run_dict["rep"]):
-        sim: Simulation = study.get_sim(rep)
-        _df = sim.get_dcdMap().cell_count_measure(columns=["cell_mse"])
-        _df = _df.groupby(by=["simtime"]).sum() / cell_count
-        _df.columns = [rep]
-        _df.columns.name = "run_id"
-        df.append(_df)
-    df = pd.concat(df, axis=1, verify_integrity=True)
-    df = consumer(df)
-    df = df.stack()  # series
-    df.name = "cell_mse"
-    return df
+def plot_mse_cell_over_time(
+    study: SuqcRun, run_map: RunMap, data: pd.DataFrame, figure_name: str
+):
+    """Plot cell mean squared error over time for each variation. One line per seed."""
 
-
-def get_mse_cell_data(study: SuqcRun, run_map: dict, hdf_path: str):
-    if os.path.exists(study.path(hdf_path)):
-        data = pd.read_hdf(study.path(hdf_path), key="cell_mse")
-    else:
-        data: List[(pd.DataFrame, dict)] = run_kwargs_map(
-            collect_cell_mse,
-            [
-                dict(study=study, run_dict=v, cell_count=84 * 79)
-                for v in run_map.values()
-            ],
-            pool_size=20,
-        )
-        data: pd.DataFrame = pd.concat(data, axis=0, verify_integrity=True)
-        data = data.sort_index()
-        data.to_hdf(study.path(hdf_path), key="cell_mse", format="table")
-    return data
-
-
-def plot_mse_cell(study: SuqcRun):
-    run_map = get_run_map(study)
-
-    data = get_mse_cell_data(study, run_map)
-
-    with PdfPages(study.path("cell_mse.pdf")) as pdf:
+    with PdfPages(study.path(figure_name)) as pdf:
         fig, axes = plt.subplots(4, 4, figsize=(16, 9), sharex="all", sharey="all")
         fig.suptitle("Mean Squared Cell Error for alpha_dist_iat")
         axes = list(chain(*axes))
 
-        for idx, run_dict in enumerate(run_map.values()):
+        # do not plot ymf variation (e.g. alpha = 1)
+        for idx, par_var in enumerate(
+            run_map.filtered_parameter_variations(lambda lbl: "1_999" not in lbl)
+        ):
             ax: plt.Axes = axes[idx]
-            ax.set_title(f"{run_dict['lbl']}")
+            ax.set_title(par_var.label)
             ax.axhline(y=0, color="black")
-            for n, rep in enumerate(run_dict["rep"]):
+            for n, rep in enumerate(par_var.reps):
                 df = data.loc[pd.IndexSlice[:, rep]]
                 ax.plot(df.index, df, label=f"run_{n}", linewidth=1)
             ax.set_ylabel("cell mse")
@@ -217,23 +166,31 @@ def plot_mse_cell(study: SuqcRun):
         pdf.savefig(fig)
 
 
-def get_alpha_dist(run_map: dict):
+def _get_alpha_dist(
+    run_map: RunMap,
+) -> Tuple[Dict[str, Parameter_Variation], Dict[str, Parameter_Variation]]:
+    """Sort parameter variations based on alpha and dist. Each variation is part of both Dict[str, ...]
+    returned from this function.
+
+    Returns:
+        Tuple[Dict[str, Parameter_Variation], Dict[str, Parameter_Variation]]: _description_
+    """
     alpha_ = {}
     dist_ = {}
-    for lbl, run in run_map.items():
-        a = float(lbl.split("_")[0])
+    for par_var in run_map.get_parameter_variations():
+        a = float(par_var.label.split("_")[0])
         _data = alpha_.get(a, [])
-        _data.append(run)
+        _data.append(par_var)
         alpha_[a] = _data
 
-        d = float(lbl.split("_")[1])
+        d = float(par_var.label.split("_")[1])
         _data = dist_.get(d, [])
-        _data.append(run)
+        _data.append(par_var)
         dist_[d] = _data
     return alpha_, dist_
 
 
-def add_sorted_legends(ax: plt.Axes):
+def _add_sorted_legends(ax: plt.Axes):
     h, l = ax.get_legend_handles_labels()
     h, l = zip(*sorted(zip(h, l), key=lambda t: t[1]))
     ax.legend(h, l)
@@ -242,44 +199,44 @@ def add_sorted_legends(ax: plt.Axes):
 def plot_mse_all(
     study: SuqcRun,
     data: pd.DataFrame,
-    run_map: dict,
+    run_map: RunMap,
     styles: StyleMap,
     figure_name: str,
 ):
 
-    alpha_, dist_ = get_alpha_dist(run_map)
+    alpha_, dist_ = _get_alpha_dist(run_map)
 
     fig, ax = plt.subplots(1, 2, figsize=(16, 9), sharey="all")
     ax_a: plt.Axes = ax[0]
     ax_b: plt.Axes = ax[1]
 
-    for a, runs in alpha_.items():
-        for r in runs:
-            reps = r["rep"]
+    for alpha, par_vars in alpha_.items():
+        for par_var in par_vars:
+            reps = par_var.reps
             ax_a.plot(
-                a * np.ones(len(reps)),
+                alpha * np.ones(len(reps)),
                 data.loc[reps],
-                label=r["lbl"],
-                **styles.get_style(r["lbl"]),
+                label=par_var.label,
+                **styles.get_style(par_var.label),
             )
     ax_a.set_xlim(0.45, 1.0)
     ax_a.set_title("Cell MSE over alpha")
     ax_a.set_ylabel("Cell MSE")
     ax_a.set_xlabel("Alpha")
-    add_sorted_legends(ax_a)
+    _add_sorted_legends(ax_a)
 
-    for a, runs in dist_.items():
-        for r in runs:
-            reps = r["rep"]
+    for dist, par_vars in dist_.items():
+        for par_var in par_vars:
+            reps = par_var.reps
             ax_b.plot(
-                a * np.ones(len(reps)),
+                dist * np.ones(len(reps)),
                 data.loc[reps],
-                label=r["lbl"],
-                **styles.get_style(r["lbl"]),
+                label=par_var.label,
+                **styles.get_style(par_var.label),
             )
     ax_b.set_title("Cell MSE over distance")
     ax_b.set_xlabel("Distance threshold")
-    add_sorted_legends(ax_b)
+    _add_sorted_legends(ax_b)
 
     fig.savefig(study.path(figure_name))
 
@@ -287,8 +244,11 @@ def plot_mse_all(
 def plot_mse_for_seed(
     study: SuqcRun, data: pd.DataFrame, run_map: dict, styles: StyleMap, figure_name
 ):
+    """Plot cell mse for each axis (alpha, cut off distance) and each seed. Add comparison
+    line for youngest measurement first (i.e. alpha=1.0)
+    """
 
-    alpha_, dist_ = get_alpha_dist(run_map)
+    alpha_, dist_ = _get_alpha_dist(run_map)
 
     with PdfPages(study.path(figure_name)) as pdf:
         for _seed in range(10):
@@ -312,7 +272,7 @@ def plot_mse_for_seed(
             ax_a.set_title("Cell MSE over alpha")
             ax_a.set_ylabel("Cell MSE")
             ax_a.set_xlabel("Alpha")
-            add_sorted_legends(ax_a)
+            _add_sorted_legends(ax_a)
             ax_a.hlines(ymf_err, 0.45, 1.0, colors="red")
 
             for a, runs in dist_.items():
@@ -328,7 +288,7 @@ def plot_mse_for_seed(
             # ax_b.set_ylim(0.0015, 0.0025)
             ax_b.set_title("Cell MSE over distance")
             ax_b.set_xlabel("Distance threshold")
-            add_sorted_legends(ax_b)
+            _add_sorted_legends(ax_b)
             ax_b.hlines(ymf_err, 0, 1000, colors="red")
             pdf.savefig(fig)
 
@@ -337,9 +297,17 @@ def plot_mse_yDist_to_ymf(
     study: SuqcRun,
     data: pd.DataFrame,
     run_map: dict,
-    styles: StyleMap,
     figure_name: str,
 ):
+    """Plot the difference between the mse error compared to the youngest measurement first (i.e. alpha=1.0)
+    For each parameter variation one bar chart with each bar is one seed (run_id).
+
+    Args:
+        study (SuqcRun): _description_
+        data (pd.DataFrame): _description_
+        run_map (dict): _description_
+        figure_name (str): _description_
+    """
 
     with PdfPages(study.path(figure_name)) as pdf:
         fig, axes = plt.subplots(4, 4, figsize=(16, 9), sharey="all")
@@ -373,27 +341,37 @@ def main():
     id_filter = lambda x: True
     # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
     # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25/")
-    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_1/")
-    run_map = get_run_map(study, map_filter=id_filter)
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_1/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_2/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_3/")
+    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_4/")
+    run_map: RunMap = get_run_map(study, map_filter=id_filter)
 
-    data = get_mse_cell_data(study, run_map, hdf_path="cell_mse.h5")
-    data = data.groupby(by="run_id").mean()
+    data = OppAnalysis.get_mse_cell_data_for_study(
+        study, run_map, hdf_path="cell_mse.h5", cell_count=84 * 79, pool_size=20
+    )
+    data_mean_by_run_id = data.groupby(by="run_id").mean()
 
-    ymf_err = np.tile(data.loc[run_map["1_999_25"]["rep"]], reps=17)
-    data = data.to_frame()
-    data["err_to_ymf"] = data["cell_mse"] - ymf_err
+    # repeat  ymf error to calculate mse_diff for each run
+    ymf_err = np.tile(data_mean_by_run_id.loc[run_map["1_999_25"].reps], reps=17)
+    data_mean_by_run_id = data_mean_by_run_id.to_frame()
+    data_mean_by_run_id["err_to_ymf"] = data_mean_by_run_id["cell_mse"] - ymf_err
 
     styles = StyleMap(markersize=3, marker="o", linestyle="none")
 
-    plot_mse_all(study, data, run_map, styles, figure_name="cell_mse.pdf")
+    plot_mse_all(
+        study, data_mean_by_run_id, run_map, styles, figure_name="cell_mse.pdf"
+    )
     plot_mse_for_seed(
         study,
-        data["cell_mse"],
+        data_mean_by_run_id["cell_mse"],
         run_map,
         styles,
         figure_name="cell_mse_for_seed.pdf",
     )
-    plot_mse_yDist_to_ymf(study, data, run_map, styles, "mse_diff.pdf")
+    plot_mse_yDist_to_ymf(study, data_mean_by_run_id, run_map, "mse_diff.pdf")
+    # plot_mse_cell_over_time(study, run_map, data, "cell_mse_over_time.pdf")
+    # plot_count_error(study, run_map, "count_error_over_time.pdf")
 
     print()
 
