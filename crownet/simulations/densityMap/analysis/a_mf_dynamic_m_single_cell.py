@@ -6,13 +6,13 @@ from typing import Any, Callable, Dict, List, Tuple
 from roveranalyzer.analysis.common import (
     RunContext,
     Simulation,
-    SuqcRun,
+    SuqcStudy,
     RunMap,
     Parameter_Variation,
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import StyleMap
+from roveranalyzer.utils.plot import StyleMap, check_ax
 from matplotlib.ticker import MaxNLocator
 import seaborn as sb
 import pandas as pd
@@ -23,7 +23,7 @@ from omnetinireader.config_parser import OppConfigFileBase, ObjectValue
 
 
 def get_run_map(
-    study: SuqcRun, rep_count=10, map_filter: Callable[[Any], True] = lambda x: True
+    study: SuqcStudy, rep_count=10, map_filter: Callable[[Any], True] = lambda x: True
 ) -> RunMap:
     """Create RunMap labels based on alpha / cut off distance
 
@@ -82,7 +82,7 @@ def get_run_map(
 
 
 def collect_count_error_for_parameter_variation(
-    study: SuqcRun, par_var: Parameter_Variation
+    study: SuqcStudy, par_var: Parameter_Variation
 ):
     df = []
     for idx, rep in enumerate(par_var.reps):
@@ -95,7 +95,7 @@ def collect_count_error_for_parameter_variation(
     return df
 
 
-def plot_count_error(study: SuqcRun, run_map: RunMap, figure_name: str):
+def plot_count_error(study: SuqcStudy, run_map: RunMap, figure_name: str):
 
     data: List[(pd.DataFrame, dict)] = run_kwargs_map(
         collect_count_error_for_parameter_variation,
@@ -134,7 +134,7 @@ def plot_count_error(study: SuqcRun, run_map: RunMap, figure_name: str):
 
 
 def plot_mse_cell_over_time(
-    study: SuqcRun, run_map: RunMap, data: pd.DataFrame, figure_name: str
+    study: SuqcStudy, run_map: RunMap, data: pd.DataFrame, figure_name: str
 ):
     """Plot cell mean squared error over time for each variation. One line per seed."""
 
@@ -197,7 +197,7 @@ def _add_sorted_legends(ax: plt.Axes):
 
 
 def plot_mse_all(
-    study: SuqcRun,
+    study: SuqcStudy,
     data: pd.DataFrame,
     run_map: RunMap,
     styles: StyleMap,
@@ -242,7 +242,7 @@ def plot_mse_all(
 
 
 def plot_mse_for_seed(
-    study: SuqcRun, data: pd.DataFrame, run_map: dict, styles: StyleMap, figure_name
+    study: SuqcStudy, data: pd.DataFrame, run_map: RunMap, styles: StyleMap, figure_name
 ):
     """Plot cell mse for each axis (alpha, cut off distance) and each seed. Add comparison
     line for youngest measurement first (i.e. alpha=1.0)
@@ -294,9 +294,9 @@ def plot_mse_for_seed(
 
 
 def plot_mse_yDist_to_ymf(
-    study: SuqcRun,
+    study: SuqcStudy,
     data: pd.DataFrame,
-    run_map: dict,
+    run_map: RunMap,
     figure_name: str,
 ):
     """Plot the difference between the mse error compared to the youngest measurement first (i.e. alpha=1.0)
@@ -335,29 +335,24 @@ def plot_mse_yDist_to_ymf(
     print("done")
 
 
-def main():
-    # id_filter = lambda x: all([i >= 170 for i in x])
-    # id_filter = lambda x : all([i < 170 for i in x])
-    id_filter = lambda x: True
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_1/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_2/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_3/")
-    study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_4/")
-    run_map: RunMap = get_run_map(study, map_filter=id_filter)
+def plot_mse_yDist_to_ymf_box_plots(
+    study: SuqcStudy,
+    run_map: dict,
+    data: pd.DataFrame,
+    figure_name: str,
+):
 
-    data = OppAnalysis.get_mse_cell_data_for_study(
-        study, run_map, hdf_path="cell_mse.h5", cell_count=84 * 79, pool_size=20
-    )
-    data_mean_by_run_id = data.groupby(by="run_id").mean()
+    fig, ax = check_ax()
+    fig.suptitle("Cell MSE difference between ymfDist and ymf")
 
-    # repeat  ymf error to calculate mse_diff for each run
-    ymf_err = np.tile(data_mean_by_run_id.loc[run_map["1_999_25"].reps], reps=17)
-    data_mean_by_run_id = data_mean_by_run_id.to_frame()
-    data_mean_by_run_id["err_to_ymf"] = data_mean_by_run_id["cell_mse"] - ymf_err
 
-    styles = StyleMap(markersize=3, marker="o", linestyle="none")
+def plot_all(
+    study: SuqcStudy,
+    run_map: RunMap,
+    styles: StyleMap,
+    data: pd.DataFrame,
+    data_mean_by_run_id: pd.DataFrame,
+):
 
     plot_mse_all(
         study, data_mean_by_run_id, run_map, styles, figure_name="cell_mse.pdf"
@@ -374,6 +369,38 @@ def main():
     # plot_count_error(study, run_map, "count_error_over_time.pdf")
 
     print()
+
+
+def _get_mse_data(study: SuqcStudy, run_map: RunMap):
+
+    data = OppAnalysis.get_mse_cell_data_for_study(
+        study, run_map, hdf_path="cell_mse.h5", cell_count=84 * 79, pool_size=20
+    )
+    data_mean_by_run_id = data.groupby(by="run_id").mean()
+
+    # repeat  ymf error to calculate mse_diff for each run
+    ymf_err = np.tile(data_mean_by_run_id.loc[run_map["1_999_25"].reps], reps=17)
+    data_mean_by_run_id = data_mean_by_run_id.to_frame()
+    data_mean_by_run_id["err_to_ymf"] = data_mean_by_run_id["cell_mse"] - ymf_err
+    return data, data_mean_by_run_id
+
+
+def main():
+    # id_filter = lambda x: all([i >= 170 for i in x])
+    # id_filter = lambda x : all([i < 170 for i in x])
+    id_filter = lambda x: True
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_1/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_2/")
+    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_3/")
+    study = SuqcStudy("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_4/")
+    run_map: RunMap = get_run_map(study, map_filter=id_filter)
+    styles = StyleMap(markersize=3, marker="o", linestyle="none")
+    data, data_mean_by_run_id = _get_mse_data(study, run_map)
+
+    plot_mse_yDist_to_ymf_box_plots(study, run_map, data, "cell_mse_box_plot.pdf")
+    # plot_all(study, run_map, styles, data, data_mean_by_run_id)
 
 
 if __name__ == "__main__":

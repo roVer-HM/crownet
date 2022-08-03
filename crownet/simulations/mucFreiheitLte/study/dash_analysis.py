@@ -37,13 +37,19 @@ import roveranalyzer.simulators.crownet.dcd as Dmap
 import roveranalyzer.simulators.opp as OMNeT
 from roveranalyzer.utils.logging import logger, timing, logging
 from roveranalyzer.simulators.vadere.plots.scenario import Scenario
-from roveranalyzer.analysis.flaskapp.application.model import get_beacon_df, get_beacon_entry_exit, get_measurements, local_measure
-from roveranalyzer.analysis.common import Simulation, SuqcRun
+from roveranalyzer.analysis.flaskapp.application.model import (
+    get_beacon_df,
+    get_beacon_entry_exit,
+    get_measurements,
+    local_measure,
+)
+from roveranalyzer.analysis.common import Simulation, SuqcStudy
 from roveranalyzer.analysis.flaskapp.wsgi import run_app
 from omnetinireader.config_parser import ObjectValue
 
 
 from os.path import join, abspath
+
 
 def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
     beacon_apps = sql.m_app0()
@@ -52,17 +58,24 @@ def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
     i = pd.IndexSlice
 
     # cells = builder.position_p.geo(Project.OpenStreetMaps)[i[101., :]]
-    cells = builder.map_p.geo(Project.OpenStreetMaps)[i[101., :, :, :, 13817 ]]
+    cells = builder.map_p.geo(Project.OpenStreetMaps)[i[101.0, :, :, :, 13817]]
 
     pos_hdf = BaseHdfProvider(join(data_root, "postion.h5"))
     with pos_hdf.query as ctx:
         nodes = ctx.select("trajectories", where="time == 101.2")
         nodes = sql.apply_geo_position(nodes, Project.UTM_32N, Project.OpenStreetMaps)
-    m = DensityMap.get_interactive(cells=cells,nodes=nodes)
+    m = DensityMap.get_interactive(cells=cells, nodes=nodes)
     return m, cells, nodes
 
-_suqc = [os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/"]
-_repo = [os.environ["HOME"], "repos/crownet/crownet/simulations/mucFreiheitLte/results/"]
+
+_suqc = [
+    os.environ["HOME"],
+    "repos/crownet/crownet/simulations/mucFreiheitLte/suqc/circle/simulation_runs/Sample__0_0/results/",
+]
+_repo = [
+    os.environ["HOME"],
+    "repos/crownet/crownet/simulations/mucFreiheitLte/results/",
+]
 _ext = ["/mnt/data1tb/results/"]
 
 
@@ -133,6 +146,7 @@ _ext = ["/mnt/data1tb/results/"]
 # ]
 # data = {s.label: s for s in data}
 
+
 def data_dict(path, prefix="", suqc=False):
     runs = glob.glob(path)
     runs.sort()
@@ -141,9 +155,7 @@ def data_dict(path, prefix="", suqc=False):
     for i, p in enumerate(runs):
         if os.path.isdir(p):
             if suqc:
-                ret.append(Simulation.from_suqc_result(
-                    abspath(p), label=prefix
-                ))
+                ret.append(Simulation.from_suqc_result(abspath(p), label=prefix))
             else:
                 pass
                 # label = _n(i, basename(p))
@@ -152,9 +164,11 @@ def data_dict(path, prefix="", suqc=False):
                 # )
     return ret
 
+
 def update_hdf(fn, sims: Dict[str, Simulation]):
 
     import multiprocessing as mp
+
     args = [s[1] for s in sims.items()]
     # fn(args[0])
     with mp.Pool(processes=8) as pool:
@@ -168,6 +182,7 @@ def count_diff(path, sims: Dict[str, Simulation]):
 
     # collect data for each simulation
     import multiprocessing as mp
+
     args = [s[1] for s in sims.items()]
 
     # fn(args[0])
@@ -176,8 +191,8 @@ def count_diff(path, sims: Dict[str, Simulation]):
 
     # sort data based on statistics
     data = ret.T.tolist()
-    for  r in data:
-        r.sort(key = lambda x : x.source.data_root)
+    for r in data:
+        r.sort(key=lambda x: x.source.data_root)
 
     # plot data
     s = Style()
@@ -192,11 +207,11 @@ def count_diff(path, sims: Dict[str, Simulation]):
 
     sample_tbl = [i.get_run_description_0001() for i in args]
     sample_tbl = pd.concat(sample_tbl)
-    tbl_fig, ax = plt.subplots(figsize=(16,9))
+    tbl_fig, ax = plt.subplots(figsize=(16, 9))
     PlotUtil.df_to_table(sample_tbl, ax)
     tbl_fig.suptitle("Sample Variation")
 
-    data = {i[0].name: i for i in data }
+    data = {i[0].name: i for i in data}
     fig1 = OppAnalysis.diff_plot(s, data["count_diff"])
     fig2 = OppAnalysis.err_box_plot(s, data["err_box"])
     fig3 = OppAnalysis.err_hist_plot(s, data["err_hist"])
@@ -204,13 +219,15 @@ def count_diff(path, sims: Dict[str, Simulation]):
     PlotUtil.fig_to_pdf(path, [tbl_fig, fig1, fig2, fig3])
 
 
-def make_pics(s: SuqcRun):
-    sim = s.get_run_as_sim(key=(6,0))
+def make_pics(s: SuqcStudy):
+    sim = s.get_run_as_sim(key=(6, 0))
     dcd = sim.get_dcdMap()
 
-    fig1, ax = dcd.plot_map_count_diff(savefig=join(sim.data_root, "new_count_diff.pdf"))
+    fig1, ax = dcd.plot_map_count_diff(
+        savefig=join(sim.data_root, "new_count_diff.pdf")
+    )
     fig2, ax = dcd.plot_err_box_over_time(bin_width=10.0)
-    #ax.set_ylim(-8, 5)
+    # ax.set_ylim(-8, 5)
     fig2.savefig(join(sim.data_root, "new_err.pdf"))
     print("done")
 
@@ -227,9 +244,9 @@ if __name__ == "__main__":
     # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
     # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
     # ymf_dist_dbg_4 = SuqcRun("/mnt/data1tb/results/ymfDistDbg4")
-    ymf_dist_dbg_5 = SuqcRun("/mnt/data1tb/results/ymfDistDbg5")
-    ymf_dist_dbg_6 = SuqcRun("/mnt/data1tb/results/ymfDistDbg6")
-    ymf_dist_dbg_7 = SuqcRun("/mnt/data1tb/results/ymfDistDbg7")
+    ymf_dist_dbg_5 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg5")
+    ymf_dist_dbg_6 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg6")
+    ymf_dist_dbg_7 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg7")
 
     # dcdMap_muc01 = SuqcRun("/mnt/data1tb/results/dcdMap_muc01")
     # dcdMap_muc02 = SuqcRun("/mnt/data1tb/results/dcdMap_muc02")
@@ -237,16 +254,15 @@ if __name__ == "__main__":
     # dcdMap_muc05 = SuqcRun("/mnt/data1tb/results/dcdMap_muc05")
     # dcdMap_muc07 = SuqcRun("/mnt/data1tb/results/dcdMap_muc07")
     # dcdMap_muc08 = SuqcRun("/mnt/data1tb/results/dcdMap_muc08")
-    dcdMap_muc08 = SuqcRun("/mnt/data1tb/results/dcdMap_muc08")
-    dcdMap_muc09 = SuqcRun("/mnt/data1tb/results/dcdMap_muc09")
+    dcdMap_muc08 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc08")
+    dcdMap_muc09 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc09")
     # data = dcdMap_muc08.get_simulation_dict(lbl_key=True)
     # data.update(dcdMap_muc09.get_simulation_dict(lbl_key=True))
-    
-    dcdMap_muc10 = SuqcRun("/mnt/data1tb/results/dcdMap_muc10")
-    dcdMap_muc11 = SuqcRun("/mnt/data1tb/results/dcdMap_muc11")
+
+    dcdMap_muc10 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc10")
+    dcdMap_muc11 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc11")
     data = dcdMap_muc10.get_simulation_dict(lbl_key=True)
     data.update(dcdMap_muc11.get_simulation_dict(lbl_key=True))
-
 
     # study = dcdMap_muc02
     # study = dcdMap_muc04
@@ -274,17 +290,23 @@ if __name__ == "__main__":
     # cell = (145, 255)
     # sim = study.get_run_as_sim((0, 0))
     nid = 75997
-    cell = (145, 255 )
+    cell = (145, 255)
     sim = study.get_run_as_sim((0, 0))
 
     bs, _ = get_beacon_entry_exit(sim, nid, cell)
-    x = bs.set_index(["event_time", "event_id", "type"])["cumulated_count"].sort_index().reset_index(["event_id"], drop=True)
+    x = (
+        bs.set_index(["event_time", "event_id", "type"])["cumulated_count"]
+        .sort_index()
+        .reset_index(["event_id"], drop=True)
+    )
     x = x.loc[x.index.drop_duplicates()]
     x_time_index = x.index.get_level_values("event_time")
     map = x.loc[:, "densityMap"].to_frame()
     map.columns = ["map_count"]
     nt = x.loc[:, "neighborhoodTable"].to_frame()
-    nt_index_add = pd.Index(np.arange(np.floor(x_time_index.min()), np.ceil(x_time_index.max()), 1)).difference(nt.index)
+    nt_index_add = pd.Index(
+        np.arange(np.floor(x_time_index.min()), np.ceil(x_time_index.max()), 1)
+    ).difference(nt.index)
     nt_add = pd.DataFrame(columns=["cumulated_count"], index=nt_index_add)
     nt = pd.concat([nt_add, nt], axis=0).sort_index()
     nt.columns = ["nt_count"]
@@ -296,41 +318,41 @@ if __name__ == "__main__":
         nt.iloc[0, 1] = 0.0
     # nt = nt.ffill()
 
-    
     df = local_measure(sim, nid, cell)
     df = df.reset_index(["source", "ID"])
     n = sim.builder.global_p[pd.IndexSlice[:, cell[0], cell[1]], :]
     fig, axes = plt.subplots(2, 2, figsize=(32, 18))
-    axes = [a for aa in axes for a in aa ]
+    axes = [a for aa in axes for a in aa]
 
-    # pandas 
-    store: pd.HDFStore = pd.HDFStore(
-        path="/tmp/data.h5", 
-        mode="r")
+    # pandas
+    store: pd.HDFStore = pd.HDFStore(path="/tmp/data.h5", mode="r")
     df = store.select(
-        key="dcd_global_density", 
-        where="x==120 AND y==100",
-        columns=None  # all columns
-        )
+        key="dcd_global_density", where="x==120 AND y==100", columns=None  # all columns
+    )
     store.close()
 
     # own interface (using context manager)
-    hdf: DcdGlobalDensity = DcdGlobalDensity(
-        hdf_path="/tmp/data.h5"
-        )
+    hdf: DcdGlobalDensity = DcdGlobalDensity(hdf_path="/tmp/data.h5")
     # [[time, x, y], <columns>]
-    df = hdf[pd.IndexSlice[:, 120, 100], :] 
+    df = hdf[pd.IndexSlice[:, 120, 100], :]
 
-
-    df["count"].reset_index().plot("simtime", "count", drawstyle="steps-post", marker=".", ax=axes[0])
+    df["count"].reset_index().plot(
+        "simtime", "count", drawstyle="steps-post", marker=".", ax=axes[0]
+    )
     axes[0].set_title(f"own measurements for for cell {cell}/ NT")
-    bs.reset_index().plot(x="event_time", y="cumulated_count", drawstyle="steps-post", marker=".", ax=axes[0])
+    bs.reset_index().plot(
+        x="event_time",
+        y="cumulated_count",
+        drawstyle="steps-post",
+        marker=".",
+        ax=axes[0],
+    )
     axes[1].set_title(f"neighborhood table cell {cell}")
-    bs.reset_index().plot("simtime", "count", drawstyle="steps-post", marker=".", ax=axes[2])
+    bs.reset_index().plot(
+        "simtime", "count", drawstyle="steps-post", marker=".", ax=axes[2]
+    )
     axes[2].set_title(f"ground truth cell {cell}")
     fig.show()
-
-
 
     print("done")
 # %%

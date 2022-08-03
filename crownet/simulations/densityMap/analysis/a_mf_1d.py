@@ -6,7 +6,7 @@ from multiprocessing import get_context
 import os
 from matplotlib import pyplot as plt
 import numpy as np
-from roveranalyzer.analysis.common import Simulation, SuqcRun
+from roveranalyzer.analysis.common import Simulation, SuqcStudy
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.analysis import adf_test
 from roveranalyzer.analysis.ts_analysis import adf_summary_test
@@ -64,7 +64,7 @@ def read_vadere_ts(ts_x_path, ts_y_path):
     return data
 
 
-def process_variation(study: SuqcRun, scenario_lbl: str, rep_ids: list) -> dict:
+def process_variation(study: SuqcStudy, scenario_lbl: str, rep_ids: list) -> dict:
     """collect results for one run based on multiple repetitions
 
     Args:
@@ -92,7 +92,9 @@ def process_variation(study: SuqcRun, scenario_lbl: str, rep_ids: list) -> dict:
     return {"name": scenario_lbl, "stat": _out, "map": df}
 
 
-def process_simulation_run(study: SuqcRun, scenario_map: dict, vadere_ts: pd.DataFrame):
+def process_simulation_run(
+    study: SuqcStudy, scenario_map: dict, vadere_ts: pd.DataFrame
+):
     """Calcualte statistic for multiple scenarios
 
     Args:
@@ -127,7 +129,7 @@ def next_multiple(val, off=5):
 
 
 def create_map_ts_figure(
-    study: SuqcRun,
+    study: SuqcStudy,
     scenario_map: dict,
     ground_truth_ts: pd.DataFrame,
     ts: str,
@@ -225,7 +227,7 @@ def process_1d_scenario():
         "mf_1d_m_const_2x5m_d20m_25_2022-05-31_17-07-44.599/numAgents.csv",
     )
 
-    run = SuqcRun(out_path)
+    run = SuqcStudy(out_path)
     run_map = {
         "1d_0": dict(
             rep=list(range(0, 5)),
@@ -265,7 +267,7 @@ def process_1d_scenario():
 def conv_err():
     matplotlib_set_latex_param()
     out_path = "/mnt/data1tb/results/mf_1d_8/"
-    run = SuqcRun(out_path)
+    run = SuqcStudy(out_path)
     run_map = {
         "1d_0": dict(
             rep=list(range(0, 5)),

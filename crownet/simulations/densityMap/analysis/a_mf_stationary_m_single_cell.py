@@ -8,7 +8,7 @@ from itertools import repeat
 from tokenize import group
 from typing import List
 from matplotlib import markers
-from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
+from roveranalyzer.analysis.common import RunContext, Simulation, SuqcStudy
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, percentile
 from roveranalyzer.simulators.opp.scave import CrownetSql
@@ -65,7 +65,7 @@ class Rep:
         return list(ret)
 
 
-def get_run_map(study: SuqcRun, rep_count=10):
+def get_run_map(study: SuqcStudy, rep_count=10):
     r = Rep()
     run_map = {}
     densities = [
@@ -100,7 +100,7 @@ def get_run_map(study: SuqcRun, rep_count=10):
     return run_map
 
 
-def read_data(study: SuqcRun):
+def read_data(study: SuqcStudy):
 
     run_map = get_run_map(study)
 
@@ -164,7 +164,7 @@ def get_convergence_time(map: pd.DataFrame, time_slice, err) -> dict:
     )
 
 
-def main(study: SuqcRun):
+def main(study: SuqcStudy):
 
     map = read_data(study).sort_index()
 
@@ -205,7 +205,7 @@ def main(study: SuqcRun):
     fig.savefig(os.path.join(study.base_path, "normalized_pedestrian_count.pdf"))
 
 
-def plot_positions(study: SuqcRun, run_map: dict):
+def plot_positions(study: SuqcStudy, run_map: dict):
 
     args = [dict(study=study, run_dict=val) for val in run_map.values()]
     position_data = run_kwargs_map(
@@ -289,7 +289,7 @@ def update_hdf_files():
 if __name__ == "__main__":
 
     # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_1/")
-    study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
+    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
     # main(study)
     plot_positions(study, get_run_map(study))
     # update_hdf_files()
