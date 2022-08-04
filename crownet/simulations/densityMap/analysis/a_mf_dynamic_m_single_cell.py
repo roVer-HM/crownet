@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from itertools import chain
+from functools import partial
 import re
 from typing import Any, Callable, Dict, List, Tuple
 from roveranalyzer.analysis.common import (
@@ -20,6 +21,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from omnetinireader.config_parser import OppConfigFileBase, ObjectValue
+
+
+def lbl_f_alpha_dist(run_id: int | Tuple[int, int], study: SuqcStudy) -> str:
+    sim: Simulation = study.get_sim(run_id)
+    cfg: OppConfigFileBase = sim.run_context.oppini
+    mapCfg: ObjectValue = cfg.get("*.misc[*].app[1].app.mapCfg")
+    return f"({mapCfg['alpha']},{mapCfg['stepDist']})"
 
 
 def get_run_map(
@@ -335,15 +343,41 @@ def plot_mse_yDist_to_ymf(
     print("done")
 
 
-def plot_mse_yDist_to_ymf_box_plots(
+def plot_mse_yDist_to_ymf_box_plot(
     study: SuqcStudy,
-    run_map: dict,
+    run_map: RunMap,
     data: pd.DataFrame,
     figure_name: str,
 ):
 
+    # create mean cell mse for each run_id over time.
+    # data = data.groupby("run_id").mean()
+    # add label of the form '({alpha}, {dist}) to data
+    lbl_f = partial(lbl_f_alpha_dist, study=study)
+    lbl_df = run_map.id_to_label_series(lbl_f=lbl_f, enumerate_run=True)
+    data = (
+        data.join(lbl_df)
+        .reset_index()
+        .set_index(["run_index", "label"])
+        .drop(columns=["run_id", "cell_mse"])
+        .unstack(["label"])
+    )
+    sorted_index = data.mean().sort_values().index
+    data = data[sorted_index]
+    data.columns = data.columns.droplevel(0)
+
+    # data.reset_index().set_index(['run_id', 'label']).boxplot(by=["label"])
     fig, ax = check_ax()
-    fig.suptitle("Cell MSE difference between ymfDist and ymf")
+    ax.set_title(
+        f"Cell MSE difference between ymfDist and ymf (sorted by mean) N={len(data.iloc[:,0])}"
+    )
+    data.boxplot(ax=ax)
+    ax.set_xlabel(f"Variation (alpha, cut off distance)")
+    ax.set_ylabel("cell mse difference")
+    ax.axhline(y=0, color="red")
+    ax.axvline(x=np.argmax(data.columns == "(1,999)") + 1, color="red")
+
+    fig.savefig(study.path(figure_name))
 
 
 def plot_all(
@@ -367,8 +401,6 @@ def plot_all(
     plot_mse_yDist_to_ymf(study, data_mean_by_run_id, run_map, "mse_diff.pdf")
     # plot_mse_cell_over_time(study, run_map, data, "cell_mse_over_time.pdf")
     # plot_count_error(study, run_map, "count_error_over_time.pdf")
-
-    print()
 
 
 def _get_mse_data(study: SuqcStudy, run_map: RunMap):
@@ -399,7 +431,9 @@ def main():
     styles = StyleMap(markersize=3, marker="o", linestyle="none")
     data, data_mean_by_run_id = _get_mse_data(study, run_map)
 
-    plot_mse_yDist_to_ymf_box_plots(study, run_map, data, "cell_mse_box_plot.pdf")
+    plot_mse_yDist_to_ymf_box_plot(
+        study, run_map, data_mean_by_run_id, "cell_mse_box_plot.pdf"
+    )
     # plot_all(study, run_map, styles, data, data_mean_by_run_id)
 
 
