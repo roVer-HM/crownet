@@ -1,9 +1,12 @@
+from __future__ import annotations
+from copy import deepcopy
 from functools import partial
 import os
+import timeit as it
 from time import time_ns
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from suqc.environment import CrownetEnvironmentManager
-from suqc.parameter.create import coupled_creator
+from suqc.parameter.create import coupled_creator, opp_creator
 from suqc.parameter.sampling import ParameterVariationBase
 from suqc.request import CrownetRequest
 from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
@@ -25,7 +28,7 @@ source_bottom_left = 100
 source_bottom_right = 101
 
 
-def main(base_path):
+def main(trace_dir: str):
     reps = 20  # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
@@ -37,35 +40,21 @@ def main(base_path):
         "cellAgeTTL",
         UnitValue.s(30.0),
         "alpha",
-        0.75,
+        0.80,
         "idStreamType",
         QString("insertionOrder"),
         "stepDist",
-        150.0,
-    )
-    mapCfgYmf = ObjectValue.from_args(
-        "crownet::MapCfgYmf",
-        "writeDensityLog",
-        BoolValue.TRUE,
-        "mapTypeLog",
-        QString("ymf"),
-        # "mapTypeLog", QString("all"),
-        "cellAgeTTL",
-        UnitValue.s(30.0),
-        "idStreamType",
-        QString("insertionOrder"),
+        80.0,
     )
 
-    par_var = [
+    par_var_tmp = [
         {
             "omnet": {
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
                 "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
-                # Hack to find correct trace ... (will be removed later)
-                "HACK_trace_name": "mf_1d_m_const_2x5m_d20m_iat_25.scenario",
-                "*.bonnMotionServer.traceFile": "to/be/changed",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_25_SEED.bonnMotion",
             },
         },
         {
@@ -73,52 +62,19 @@ def main(base_path):
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.misc[*].app[0].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
-                # Hack to find correct trace ... (will be removed later)
-                "HACK_trace_name": "mf_1d_m_const_2x5m_d20m_iat_50.scenario",
-                "*.bonnMotionServer.traceFile": "to/be/changed",
+                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_50_SEED.bonnMotion",
             },
         },
     ]
 
-    base_trace_dir = os.path.join(
-        os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
-    )
-    seed_cfg = BmTrace.read_seeds(base_trace_dir)
-    seed_dict = seed_cfg["opp_to_vadere"]
-
-    seed_m = OmnetSeedManager(
-        par_variations=par_var,
-        rep_count=seed_cfg["reps"],
-        omnet_fixed=False,
-        vadere_fixed=False,  # set manually
-        seed=seed_cfg["seed"],
-    )
-    par_var = seed_m.get_new_seed_variation()
-
-    trace_files = []
-    for var in par_var:
-        # match variation based on omnet seed with corresponding trace seed.
-        del var["vadere"]
-        opp = var["omnet"]
-
-        # check seed pairing
-        opp_seed = opp["seed-set"]
-        vadere_seed = int(opp["*.traci.launcher.seed"])
-        if seed_dict[opp_seed] != vadere_seed:
-            raise ValueError("Seed mismatch")
-
-        bm_file_name = f"trace_{os.path.basename(opp['HACK_trace_name'])}_{opp['*.traci.launcher.seed']}.bonnMotion"
-        trace_files.append(bm_file_name)
-        var["omnet"]["*.bonnMotionServer.traceFile"] = QString(
-            os.path.join("trace", bm_file_name)
-        )
-        for k in [
-            "*.traci.launcher.useVadereSeed",
-            "*.traci.launcher.seed",
-            "HACK_trace_name",
-        ]:
-            del var["omnet"][k]
+    seed_paring = BmTrace.get_seed_paring(trace_dir)
+    par_var = []
+    for _var in par_var_tmp:
+        for opp_seed, trace_seed in seed_paring:
+            var = deepcopy(_var)
+            var = BmTrace.update_trace_config(var, opp_seed, trace_seed)
+            par_var.append(var)
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
@@ -128,18 +84,17 @@ def main(base_path):
     model.timeout = None
     model.qoi(["all"])
     model.verbose()
-    model.set_seed_manager(seed_m)  # log used creation seed
 
     # Enviroment setup.
     #
     ini_file = os.path.abspath("../omnetpp.ini")
-    base_dir = os.path.abspath("/home/sschuhbaeck/data")
+    base_dir = os.path.abspath("/mnt/data1tb/results/")
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
-        opp_config="final_1d",
+        opp_config="final_1d_bonn_motion",
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""),  # use omnet internal mobility models
         # mobility_sim=("vadere", "latest"),  # use omnet internal mobility models
@@ -152,7 +107,9 @@ def main(base_path):
         ),
     )
 
-    extra_files = [(os.path.join(base_trace_dir, f), f) for f in trace_files]
+    # copy seed setup file
+    seed_file = BmTrace.seed_json_path(trace_dir)
+    extra_files = [(seed_file, os.path.basename(seed_file))]
     env.copy_data(base_ini_file=ini_file, extraFiles=extra_files)
 
     _rnd = SeedManager.rnd_suffix()
@@ -160,21 +117,24 @@ def main(base_path):
         env_man=env,
         parameter_variation=parameter_variation,
         model=model,
-        creator=coupled_creator,
+        creator=partial(opp_creator, copy_f=[BmTrace.get_copy_fn(trace_dir)]),
         rnd_hostname_suffix=f"_{_rnd}",
         runscript_out="runscript.out",
     )
     print("setup done")
-    par_var, data = setup.run(min(4, len(par_var)))
+
+    ts = it.default_timer()
+    par_var, data = setup.run(min(8, len(par_var)))
     # par_var, data = setup.run(1)y
+    print(f"Study: took {(it.default_timer() - ts)/60:2.4f} minutes")
 
 
-def generate_traces():
+def generate_traces(trace_dir: str | None = None):
 
-    trace_output_path = os.path.join(
+    if trace_dir is None:
         os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
-    )
 
+    # [ (scenario_path, name, par_var), ...]
     traces = [
         (
             os.path.abspath(os.path.join("..", s_5_20_const.value)),
@@ -204,14 +164,14 @@ def generate_traces():
     seed = time_ns()
     seed_mgr = OmnetSeedManager(par_variations=[], rep_count=20, seed=seed)
     paring = seed_mgr.get_seed_paring()
-    BmTrace.write_seed_paring(seed, paring, trace_output_path)
+    BmTrace.write_seed_paring(seed, paring, trace_dir)
 
     for scenario, scenario_name, par_var in traces:
         BmTrace.generate_traces(
             scenario=scenario,
             scenario_name=scenario_name,
             par_var_default=par_var,
-            base_output_path=trace_output_path,
+            base_output_path=trace_dir,
             keep_files=["trace.bonnMotion", "positions.csv", "postvis.traj"],
             jobs=5,
             vadere_seeds=paring[0],
@@ -220,5 +180,5 @@ def generate_traces():
 
 
 if __name__ == "__main__":
-    # main("./")
-    generate_traces()
+    main("traces_mf_1d_bm.d")
+    # generate_traces("traces_mf_1d_bm.d")
