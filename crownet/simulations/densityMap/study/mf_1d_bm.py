@@ -40,7 +40,7 @@ def main(trace_dir: str):
         "cellAgeTTL",
         UnitValue.s(30.0),
         "alpha",
-        0.80,
+        0.95,
         "idStreamType",
         QString("insertionOrder"),
         "stepDist",
@@ -124,7 +124,7 @@ def main(trace_dir: str):
     print("setup done")
 
     ts = it.default_timer()
-    par_var, data = setup.run(min(8, len(par_var)))
+    # par_var, data = setup.run(min(8, len(par_var)))
     # par_var, data = setup.run(1)y
     print(f"Study: took {(it.default_timer() - ts)/60:2.4f} minutes")
 
