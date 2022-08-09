@@ -159,7 +159,7 @@ def get_traces(trace_dir: str) -> dict[str, List[dict]]:
     return sim
 
 
-def main(trace_dir: str):
+def main(trace_dir: str, filter: str = "both", seed: int | None = None):
     # Enviroment setup.
     #
     reps = 20  # seed-set
@@ -206,12 +206,27 @@ def main(trace_dir: str):
         }
         return base
 
+    def var_ymf(opp_seed, position_path):
+        base = {
+            "omnet": {
+                "extends": "_stationary_m_base_single_cell",
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                    "alpha", 1.00, "stepDist", 999
+                ),
+                "seed-set": str(opp_seed),
+                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+                "static-position-file": position_path,
+            }
+        }
+        return base
+
     seed_m = OmnetSeedManager(
         par_variations={},
         rep_count=reps,
         omnet_fixed=False,
         vadere_fixed=None,
-        seed=time_ns(),
+        seed=time_ns() if seed is None else seed,
     )
 
     # choose reps number of random position setups between [0..5]  and set
@@ -219,14 +234,21 @@ def main(trace_dir: str):
     _, opp_seeds = seed_m.get_seed_paring()
     traces = get_traces(trace_dir)
     par_var = []
+    if filter == "both":
+        var_f = [var, var_ymf]
+    elif filter == "ymf":
+        var_f = [var_ymf]
+    else:
+        var_f = [var]
     for variation_name, runs in traces.items():
         if len(runs) != len(opp_seeds):
             raise ValueError(
                 "stationary traces and configured repetitions do not match"
             )
-        for run in runs:
-            opp_seed = opp_seeds[run["run"]]
-            par_var.append(var(opp_seed, run["base_name"]))
+        for _f in var_f:
+            for run in runs:
+                opp_seed = opp_seeds[run["run"]]
+                par_var.append(_f(opp_seed, run["base_name"]))
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
 
@@ -274,6 +296,7 @@ def main(trace_dir: str):
 
 
 if __name__ == "__main__":
-    main("./mf_stationary_single_cell.d/")
+    # main("./mf_stationary_single_cell.d/")
+    main("./mf_stationary_single_cell.d/", filter="ymf", seed=1659968091603987908)
     # create_random_positions("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
     # get_traces("./mf_stationary_single_cell.d/")
