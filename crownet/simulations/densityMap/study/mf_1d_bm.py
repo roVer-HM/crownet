@@ -28,7 +28,14 @@ source_bottom_left = 100
 source_bottom_right = 101
 
 
-def main(trace_dir: str):
+def main(trace_dir: str, fix_trace_seed: int = -1):
+    """Create simulation runs
+
+    Args:
+        trace_dir (str): _description_
+        fix_tace_seed (int):  If -1 use variable seed as given by the SeedMangaer.
+        If 0 >= fix_trace_seed < reps use the given trace seed for all runs.
+    """
     reps = 20  # seed-set
     mapCfgYmfDist = ObjectValue.from_args(
         "crownet::MapCfgYmfPlusDistStep",
@@ -61,6 +68,68 @@ def main(trace_dir: str):
             "omnet": {
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
+                "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_50_SEED.bonnMotion",
+            },
+        },
+        {
+            "omnet": {
+                "sim-time-limit": t,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
+                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_25_SEED.bonnMotion",
+            },
+        },
+        {
+            "omnet": {
+                "sim-time-limit": t,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
+                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_50_SEED.bonnMotion",
+            },
+        },
+        {
+            "omnet": {
+                "sim-time-limit": t,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                    "alpha", "1.0", "step_dist", 999.0
+                ),
+                "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_25_SEED.bonnMotion",
+            },
+        },
+        {
+            "omnet": {
+                "sim-time-limit": t,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                    "alpha", "1.0", "step_dist", 999.0
+                ),
+                "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_50_SEED.bonnMotion",
+            },
+        },
+        {
+            "omnet": {
+                "sim-time-limit": t,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                    "alpha", "1.0", "step_dist", 999.0
+                ),
+                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+                "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_25_SEED.bonnMotion",
+            },
+        },
+        {
+            "omnet": {
+                "sim-time-limit": t,
+                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                    "alpha", "1.0", "step_dist", 999.0
+                ),
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
                 "*.bonnMotionServer.traceFile": "trace/trace_mf_1d_m_const_2x5m_d20m_iat_50_SEED.bonnMotion",
@@ -72,8 +141,14 @@ def main(trace_dir: str):
     par_var = []
     for _var in par_var_tmp:
         for opp_seed, trace_seed in seed_paring:
+            if fix_trace_seed >= 0:
+                # Use the same trace seed for all parameter settings.
+                # This will keep the mobility part constant and only changes the opp seed.
+                t_seed = seed_paring[fix_trace_seed][1]
+            else:
+                t_seed = trace_seed
             var = deepcopy(_var)
-            var = BmTrace.update_trace_config(var, opp_seed, trace_seed)
+            var = BmTrace.update_trace_config(var, opp_seed, t_seed)
             par_var.append(var)
 
     parameter_variation = ParameterVariationBase().add_data_points(par_var)
@@ -161,7 +236,8 @@ def generate_traces(trace_dir: str | None = None):
     ]
 
     # must be same for all scenarios used.
-    seed = time_ns()
+    # seed = time_ns()
+    seed = 1659624053104423856
     seed_mgr = OmnetSeedManager(par_variations=[], rep_count=20, seed=seed)
     paring = seed_mgr.get_seed_paring()
     BmTrace.write_seed_paring(seed, paring, trace_dir)
@@ -172,7 +248,12 @@ def generate_traces(trace_dir: str | None = None):
             scenario_name=scenario_name,
             par_var_default=par_var,
             base_output_path=trace_dir,
-            keep_files=["trace.bonnMotion", "positions.csv", "postvis.traj"],
+            keep_files=[
+                "trace.bonnMotion",
+                "positions.csv",
+                "postvis.traj",
+                "numAgents.csv",
+            ],
             jobs=5,
             vadere_seeds=paring[0],
             remove_output=True,
@@ -180,5 +261,5 @@ def generate_traces(trace_dir: str | None = None):
 
 
 if __name__ == "__main__":
-    main("traces_mf_1d_bm.d")
+    main("traces_mf_1d_bm.d", fix_trace_seed=0)
     # generate_traces("traces_mf_1d_bm.d")
