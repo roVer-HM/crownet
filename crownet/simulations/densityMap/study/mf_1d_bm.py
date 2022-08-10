@@ -95,7 +95,7 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
             "omnet": {
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "alpha", "1.0", "step_dist", 999.0
+                    "alpha", "1.0", "stepDist", 999.0
                 ),
                 "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
@@ -106,7 +106,7 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
             "omnet": {
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "alpha", "1.0", "step_dist", 999.0
+                    "alpha", "1.0", "stepDist", 999.0
                 ),
                 "*.misc[*].app[1].scheduler.generationInterval": "1000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "300ms + uniform(0s, 50ms)",
@@ -117,7 +117,7 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
             "omnet": {
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "alpha", "1.0", "step_dist", 999.0
+                    "alpha", "1.0", "stepDist", 999.0
                 ),
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
@@ -128,7 +128,7 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
             "omnet": {
                 "sim-time-limit": t,
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "alpha", "1.0", "step_dist", 999.0
+                    "alpha", "1.0", "stepDist", 999.0
                 ),
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",

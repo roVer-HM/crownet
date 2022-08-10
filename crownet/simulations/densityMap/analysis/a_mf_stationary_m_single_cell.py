@@ -1,5 +1,6 @@
 from cProfile import label
 import os
+import re
 import itertools
 from itertools import product
 from multiprocessing import get_context
@@ -8,7 +9,13 @@ from itertools import repeat
 from tokenize import group
 from typing import List
 from matplotlib import markers
-from roveranalyzer.analysis.common import RunContext, Simulation, SuqcStudy
+from roveranalyzer.analysis.common import (
+    RunContext,
+    RunMap,
+    Simulation,
+    RunMap,
+    SuqcStudy,
+)
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, percentile
 from roveranalyzer.simulators.opp.scave import CrownetSql
@@ -55,73 +62,54 @@ def process_relative_err(df: pd.DataFrame):
     return df
 
 
-class Rep:
-    def __init__(self):
-        self.num = 0
+def get_run_map(study: SuqcStudy, out_dir: str, load_if_present=True) -> RunMap:
+    if load_if_present and os.path.exists(os.path.join(out_dir, "run_map.json")):
+        return RunMap.load_from_json(os.path.join(out_dir, "run_map.json"))
 
-    def __call__(self, count=3) -> List[int]:
-        ret = range(self.num, self.num + count)
-        self.num += count
-        return list(ret)
-
-
-def get_run_map(study: SuqcStudy, rep_count=10):
-    r = Rep()
-    run_map = {}
-    densities = [
-        (0.000611583389395144, "6.1e-4", 96),
-        (0.00076447923674393, "7.6e-4", 128),
-        (0.0009173750840927161, "9.2e-4", 152),
-        (0.001070270931441502, "1.1e-3", 176),
-        (0.001223166778790288, "1.2e-3", 200),
-    ]
-
-    run_map.update(
-        {
-            f"ped_{run}_0": dict(rep=r(rep_count), lbl=f"ped_{run}_0")
-            for run in [10, 26, 50, 76, 100, 126, 150, 176, 200]
-        }
+    groups: dict = {}
+    pattern = re.compile(
+        r"_stationary_m_base_single_cell, (?P<base>.*?)(?P<num>\d+)_(?P<run_id>\d+)_(?P<seed>\d+)$"
     )
-    run_map.update(
-        {
-            f"415x394_{c}": dict(rep=r(rep_count), lbl=f"415x394_{c}", density=d)
-            for d, _, c in densities
-        }
-    )
-    run_map.update(
-        {
-            f"207x196_{int(c/4)}": dict(
-                rep=r(rep_count), lbl=f"207x196_{int(c/4)}", density=d
-            )
-            for d, _, c in densities
-        }
-    )
+    for sim in study.sim_iter():
+        extends = sim.run_context.oppini["extends"]
+        m = pattern.match(extends)
+        m = m.groupdict()
+        group_name = f"{m['base']}{m['num']}"
+        group = groups.get(group_name, [])
+        group.append((m["run_id"], sim))
+        groups[group_name] = group
 
+    run_map: RunMap = RunMap(output_dir=out_dir)
+    # sort group and append to RunMap
+    keys = list(groups.keys())
+    keys.sort()
+    for g_name in keys:
+        group = groups[g_name]
+        group.sort(key=lambda x: x[0])
+        run_map.append_or_add(RunMap(g_name, [sim[1] for sim in group]))
+
+    # 415x394  -> 207x196
+    run_map.save_json()
     return run_map
 
 
-def read_data(study: SuqcStudy):
+def read_data(run_map: RunMap):
 
-    run_map = get_run_map(study)
-
-    merged_norm_path = os.path.join(study.base_path, "merged_normalized_map_measure.h5")
+    merged_norm_path = run_map.path("merged_normalized_map_measure.h5")
     if os.path.exists(merged_norm_path):
         map = pd.DataFrame(
             pd.HDFStore(merged_norm_path, mode="r").get("map_measure_norm_static")
         )
     else:
 
-        _runs = run_map.items()
         data = ["map_glb_count", "map_mean_count"]
         kwargs_iter = [
             dict(
-                study=study,
-                scenario_lbl=run[0],
-                rep_ids=run[1]["rep"],
+                sim_group=sim,
                 data=data,
                 frame_consumer=process_relative_err,
             )
-            for run in _runs
+            for sim in run_map.values()
         ]
         maps = run_kwargs_map(
             func=OppAnalysis.merge_maps, kwargs_iter=kwargs_iter, pool_size=10
@@ -164,25 +152,25 @@ def get_convergence_time(map: pd.DataFrame, time_slice, err) -> dict:
     )
 
 
-def main(study: SuqcStudy):
+def main(run_map: RunMap):
 
-    map = read_data(study).sort_index()
+    map = read_data(run_map).sort_index()
 
     # get convergence time
     df_convergence = get_convergence_time(map, time_slice=slice(41, None), err=0.05)
-    df_convergence.to_csv(os.path.join(study.base_path, "convergence_time.csv"))
+    df_convergence.to_csv(run_map.path("convergence_time.csv"))
 
     # create figures
     fig, axes = plt.subplots(3, 1, figsize=(16, 3 * 9))
 
-    for ax, lbl_filter in zip(axes, ["ped", "415", "207"]):
+    for ax, lbl_filter in zip(axes, ["position", "full", "quarter"]):
         ax.set_ylim(0.0, 1.1)
         ax.set_ylabel("norm. number of pedestrians")
         ax.set_xlabel("time in [s]")
         ax.set_xlim(0, 100)
         ax.xaxis.set_major_locator(MaxNLocator(10))
         ax.yaxis.set_major_locator(MaxNLocator(11))
-        if lbl_filter in ["ped", "415"]:
+        if lbl_filter in ["position", "full"]:
             ax.set_title("Normalized number of pedestrians over time in Area [415x394]")
         else:
             ax.set_title("Normalized number of pedestrians over time in Area [207x196]")
@@ -202,12 +190,12 @@ def main(study: SuqcStudy):
         ax.legend(loc="center right")
 
     fig.tight_layout()
-    fig.savefig(os.path.join(study.base_path, "normalized_pedestrian_count.pdf"))
+    fig.savefig(run_map.path("normalized_pedestrian_count.pdf"))
 
 
-def plot_positions(study: SuqcStudy, run_map: dict):
+def plot_positions(run_map: RunMap):
 
-    args = [dict(study=study, run_dict=val) for val in run_map.values()]
+    args = [dict(sim_group=val) for val in run_map.values()]
     position_data = run_kwargs_map(
         func=OppAnalysis.merge_position,
         kwargs_iter=args,
@@ -216,9 +204,10 @@ def plot_positions(study: SuqcStudy, run_map: dict):
 
     figures = []
     for pos_df, kwargs in position_data:
-        rep_list = kwargs["run_dict"]["rep"]
-        lbl = kwargs["run_dict"]["lbl"]
-        sim = study.get_sim(rep_list[0])  # for offset only. Is equal for all rep's
+        sim_group: RunMap = kwargs["sim_group"]
+        rep_list = sim_group.reps
+        lbl = sim_group.group_name
+        sim: Simulation = sim_group[0]  # for offset only. Is equal for all rep's
         _, bound = sim.sql.get_sim_offset_and_bound()
         bound_poly = sim.sql.get_bound_polygon().exterior.xy
         fig, axes = plt.subplots(3, 4, figsize=(16, 9), sharex="all", sharey="all")
@@ -264,7 +253,7 @@ def plot_positions(study: SuqcStudy, run_map: dict):
         figures.append(fig)
         print(f"done with {lbl}")
 
-    with PdfPages(os.path.join(study.base_path, "postion.pdf")) as pdf:
+    with PdfPages(run_map.path("postion.pdf")) as pdf:
         for f in figures:
             pdf.savefig(f)
 
@@ -289,8 +278,11 @@ def update_hdf_files():
 if __name__ == "__main__":
 
     # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_1/")
-    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_2/")
-    # main(study)
-    plot_positions(study, get_run_map(study))
+    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_8/")
+    run_map: RunMap = get_run_map(
+        study, out_dir="/mnt/data1tb/results/mf_stationary_m_single_cell_8/"
+    )
+    main(run_map)
+    # plot_positions(study, get_run_map(study))
     # update_hdf_files()
     print("done")

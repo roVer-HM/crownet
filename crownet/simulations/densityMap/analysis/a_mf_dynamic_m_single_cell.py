@@ -1,12 +1,10 @@
 from __future__ import annotations
-from dataclasses import dataclass
 from itertools import chain
-from functools import partial
 import re
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Dict, List, Tuple
 from roveranalyzer.analysis.common import (
-    RunContext,
     Simulation,
+    RunMap,
     SimulationGroup,
     SuqcStudy,
     RunMap,
@@ -15,7 +13,6 @@ from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.utils.parallel import run_kwargs_map
 from roveranalyzer.utils.plot import StyleMap, check_ax
 from matplotlib.ticker import MaxNLocator
-import seaborn as sb
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -41,7 +38,7 @@ def from_sim_v(sim: Simulation) -> str:
     return f'{mapCfg["alpha"]}_{mapCfg["stepDist"]}_{iat}'
 
 
-def from_sim_bm(sim: Simulation) -> str:
+def from_sim_bm(sim: Simulation, **kwds) -> SimulationGroup:
     cfg: OppConfigFileBase = sim.run_context.oppini
     mapCfg: ObjectValue = cfg.get("*.misc[*].app[1].app.mapCfg")
     scenario = cfg.get("*.bonnMotionServer.traceFile")
@@ -50,7 +47,8 @@ def from_sim_bm(sim: Simulation) -> str:
         iat = match.groups()[0]
     else:
         iat = "??"
-    return f'{mapCfg["alpha"]}_{mapCfg["stepDist"]}_{iat}'
+    kwds["group_name"] = f'{mapCfg["alpha"]}_{mapCfg["stepDist"]}_{iat}'
+    return SimulationGroup(**kwds)
 
 
 def collect_count_error_for_simulation_group(sim_group: SimulationGroup):
