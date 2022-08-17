@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 from math import floor
 
 import json
@@ -57,58 +58,6 @@ def read_trace_ts(path, run_id, lbl):
     return df
 
 
-def read_all_vadere_ts(seed_mgr_path: str, trace_list_path: List[Tuple(str, int)]):
-    """read ground truth """
-    out_dir = os.path.dirname(seed_mgr_path)
-    with open(seed_mgr_path, "r") as fd:
-        seed_mgr = json.load(fd)
-        trace_seed_list = seed_mgr["vadere_seeds"]
-
-    kwargs = []
-    for path, lbl in trace_list_path:
-        base_dir = os.path.dirname(path)
-        with open(path, "r") as fd:
-            trace_list: dict = json.load(fd)
-
-        kwargs.extend(
-            [
-                dict(
-                    path=os.path.join(base_dir, data["numAgents.csv"]),
-                    run_id=trace_seed_list.index(int(seed)),
-                    seed=int(seed),
-                    lbl=lbl,
-                )
-                for seed, data in trace_list.items()
-            ]
-        )
-
-    data_all = run_kwargs_map(read_trace_ts, kwargs, pool_size=16)
-
-    data = [i[0] for i in data_all]
-    data_adf = [i[1] for i in data_all]
-
-    data = pd.concat(
-        data,
-        axis=1,
-        verify_integrity=True,
-    )
-    # transform time steps to real time value in seconds
-    data.index = data.index * 0.4
-    data.index.name = "time"
-    data = data.sort_index(axis=1)
-    data.unstack().to_csv(os.path.join(out_dir, "numAgents_all.csv"))
-
-    data_adf = pd.concat(data_adf, axis=1, verify_integrity=True)
-    data_adf = data_adf.sort_index(axis=1)
-    data_adf.unstack().to_csv(os.path.join(out_dir, "adf_test_all.csv"))
-
-    return data, data_adf
-
-
-def create_statistics_vadere(data: pd.DataFrame):
-    pass
-
-
 def process_variation(data: pd.Series, scenario_lbl: str) -> dict:
     """collect results for one run based on multiple repetitions
 
@@ -139,7 +88,7 @@ def process_variation(data: pd.Series, scenario_lbl: str) -> dict:
 def process_simulation_run(
     maps: pd.DataFrame, run_map: RunMap, vadere_ts: pd.DataFrame
 ):
-    """Calcualte statistic for multiple scenarios
+    """Calculate statistic for multiple scenarios
 
     Args:
         study (SuqcRun): Suqc study object (access to run definitions and output
@@ -257,13 +206,14 @@ def get_run_map(output_dir, load_if_present=True) -> RunMap:
 
     # only simulations 0-79 are correct. Others have wrong map config
     run_ymfd_1 = SuqcStudy("/mnt/data1tb/results/mf_1d_bm/")
-    factory = SimFactory()
+    sim_factory = SimFactory()
     run_map = run_ymfd_1.update_run_map(
         RunMap(output_dir),
         sim_per_group=20,
         id_offset=0,
-        sim_group_factory=factory,
+        sim_group_factory=sim_factory,
         id_filter=lambda x: x[0] < 80,
+        attr=dict(alg="yDist"),
     )
 
     # rerun of ymf variation aka (alpha = 1.0)
@@ -271,31 +221,35 @@ def get_run_map(output_dir, load_if_present=True) -> RunMap:
     run_map = run_ymf.update_run_map(
         run_map,
         sim_per_group=20,
-        id_offset=0,
-        sim_group_factory=factory,
         id_offset=run_map.max_id + 1,
-        id_filter=lambda x: x[0] < 80,
+        sim_group_factory=sim_factory,
+        attr=dict(alg="ymf"),
     )
 
     run_map.save_json()
     return run_map
 
 
+def get_average_density_maps(
+    run_map: RunMap, hdf_path: str | None = "maps.h5", hdf_key: str = "maps"
+) -> pd.DateFrame:
+    if hdf_path is not None and run_map.path_exists(hdf_path):
+        return pd.read_hdf(run_map.path(hdf_path), key=hdf_key)
+    # get average density map from scenario map
+
+    kwargs = [dict(sim_group=sim_group) for sim_group in run_map.values()]
+    maps = run_kwargs_map(OppAnalysis.merge_maps, kwargs, pool_size=10)
+    maps = pd.concat(maps, axis=0, verify_integrity=True)
+
+    if hdf_path is not None:
+        maps.to_hdf(run_map.path(hdf_path), key=hdf_key, format="table")
+
+    return maps
+
+
 def process_1d_scenario():
     matplotlib_set_latex_param()
-    output_dir = "/mnt/data1tb/results/mf_1d_bm_output/"
-    vadere_output = os.path.join(
-        os.environ["HOME"],
-        "repos/crownet/crownet/simulations/densityMap/vadere/output/",
-    )
-    ts_x_path = os.path.join(
-        vadere_output, "mf_1d_m_const_2x5m_d20m_2022-05-31_14-15-54.174/numAgents.csv"
-    )
-    ts_y_path = os.path.join(
-        vadere_output,
-        "mf_1d_m_const_2x5m_d20m_25_2022-05-31_17-07-44.599/numAgents.csv",
-    )
-
+    output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
     run_map = get_run_map(output_dir)
 
     trace_paths = {}
@@ -316,9 +270,7 @@ def process_1d_scenario():
     v_ts.columns = v_ts.columns.droplevel(["run_id"])
 
     # get average density map from scenario map
-    kwargs = [dict(sim_group=sim_group) for sim_group in run_map.values()]
-    maps = run_kwargs_map(OppAnalysis.merge_maps, kwargs, pool_size=4)
-    maps = pd.concat(maps, axis=0, verify_integrity=True)
+    maps = get_average_density_maps(run_map)
 
     # make_vader_ts_figure(v_ts, out_path)
     # figure (maps over ground truth)
@@ -349,10 +301,11 @@ class SimFactory:
         map_t = sim.run_context.ini_get(
             "*.misc[*].app[1].scheduler.generationInterval", r"^(\d+[a-z]*).*"
         )
-        attr = kwds.get("attr", {})
+        attr = deepcopy(kwds.get("attr", {}))
+        alg = attr.get("alg", "")
         attr[
             "lbl"
-        ] = f"1d\\_{self.group_num}: Beacon $\\vert$ Map $\Delta t = {beacon_t}\\vert {map_t}$"
+        ] = f"1d\\_{self.group_num}: Beacon $\\vert$ Map $\Delta t = {beacon_t}\\vert {map_t} {alg}$"
         attr["ts"] = ts
         kwds["attr"] = attr
         ret = SimulationGroup(group_name=f"1d_{self.group_num}", **kwds)
@@ -370,29 +323,6 @@ def conv_err():
         RunMap(out_path), sim_per_group=20, id_offset=0, sim_group_factory=factory
     )
     print("d")
-    # run_map = {
-    #     "1d_0": dict(
-    #         rep=list(range(0, 5)),
-    #         ts=ts_x,
-    #         lbl=r"1d\_0: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$",
-    #     ),  # ts_x
-    #     "1d_1": dict(
-    #         rep=list(range(5, 10)),
-    #         ts=ts_x,
-    #         lbl=r"1d\_1: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$",
-    #     ),  # ts_x
-    #     "1d_2": dict(
-    #         rep=list(range(10, 15)),
-    #         ts=ts_y,
-    #         lbl=r"1d\_2: Beacon $\vert$ Map $\Delta t = 300\vert 1000\,ms$",
-    #     ),  # ts_y
-    #     "1d_3": dict(
-    #         rep=list(range(15, 20)),
-    #         ts=ts_y,
-    #         lbl=r"1d\_3: Beacon $\vert$ Map $\Delta t = 1000\vert 4000\,ms$",
-    #     ),  # ts_y
-    # }
-
     virdis = cm.get_cmap("viridis", 256)
 
     sim: Simulation = run.get_sim(0)

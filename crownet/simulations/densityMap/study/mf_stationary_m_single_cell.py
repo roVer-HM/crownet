@@ -1,12 +1,9 @@
 from __future__ import annotations
 from functools import partial
 from glob import glob
-import itertools
-from nis import match
-from optparse import Option
+from typing import Callable
 import os
 import re
-import shutil
 from suqc.environment import CrownetEnvironmentManager
 from suqc.parameter.create import opp_creator
 from suqc.parameter.sampling import ParameterVariationBase
@@ -22,7 +19,6 @@ from omnetinireader.config_parser import OppConfigFileBase, OppConfigType, QStri
 from typing import List
 
 from suqc.utils.general import get_env_name
-from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 from subprocess import check_output
 
 
@@ -133,10 +129,14 @@ class CopyPositionCfg:
             ini_cfg.writer(fd)
 
 
-def get_traces(trace_dir: str) -> dict[str, List[dict]]:
+def get_traces(
+    trace_dir: str, include_filter: Callable[[str], bool] = lambda x: True
+) -> dict[str, List[dict],]:
     traces = glob(os.path.join(trace_dir, "*.ini"), recursive=False)
     sim = {}
     for t in traces:
+        if not include_filter(t):
+            continue
         base_name = os.path.basename(t)
         match = config_pattern.match(base_name)
         if not match:
@@ -159,7 +159,7 @@ def get_traces(trace_dir: str) -> dict[str, List[dict]]:
     return sim
 
 
-def main(trace_dir: str, filter: str = "both", seed: int | None = None):
+def main(trace_dir: str, filter: str = "both", seed: int | None = None, **kwds):
     # Enviroment setup.
     #
     reps = 20  # seed-set
@@ -201,7 +201,9 @@ def main(trace_dir: str, filter: str = "both", seed: int | None = None):
                 "seed-set": str(opp_seed),
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
-                "static-position-file": position_path,
+                "static-position-file": position_path,  # dummy will be removed later
+                "*.misc[66..110].app[1].app.startTime": "uniform(20s, 25s)",
+                "*.misc[66..110].app[0].app.startTime": "uniform(20s, 25s)",
             }
         }
         return base
@@ -216,7 +218,9 @@ def main(trace_dir: str, filter: str = "both", seed: int | None = None):
                 "seed-set": str(opp_seed),
                 "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
                 "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
-                "static-position-file": position_path,
+                "static-position-file": position_path,  # dummy will be removed later
+                "*.misc[66..110].app[1].app.startTime": "uniform(20s, 25s)",
+                "*.misc[66..110].app[0].app.startTime": "uniform(20s, 25s)",
             }
         }
         return base
@@ -232,7 +236,9 @@ def main(trace_dir: str, filter: str = "both", seed: int | None = None):
     # choose reps number of random position setups between [0..5]  and set
     # a random seed for each.
     _, opp_seeds = seed_m.get_seed_paring()
-    traces = get_traces(trace_dir)
+    traces = get_traces(
+        trace_dir, include_filter=kwds.get("include_filter", lambda x: True)
+    )
     par_var = []
     if filter == "both":
         var_f = [var, var_ymf]
@@ -295,8 +301,17 @@ def main(trace_dir: str, filter: str = "both", seed: int | None = None):
     # par_var, data = setup.run(1)
 
 
+def trace_filter_176(path: str):
+    return "full_176" in path
+
+
 if __name__ == "__main__":
     # main("./mf_stationary_single_cell.d/")
-    main("./mf_stationary_single_cell.d/", filter="ymf", seed=1659968091603987908)
+    main(
+        "./mf_stationary_single_cell.d/",
+        filter="both",
+        seed=1659968091603987908,
+        include_filter=trace_filter_176,
+    )
     # create_random_positions("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
     # get_traces("./mf_stationary_single_cell.d/")

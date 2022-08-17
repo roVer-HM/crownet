@@ -4,6 +4,7 @@ import itertools
 from typing import List
 from matplotlib.transforms import Affine2D
 from roveranalyzer.analysis.common import (
+    NamedSimulationGroupFactory,
     RunMap,
     Simulation,
     RunMap,
@@ -77,19 +78,29 @@ def _read_groups(study: SuqcStudy, run_map: RunMap, name_prefix: str, id_offset:
     return run_map
 
 
-def get_run_map(out_dir: str, load_if_present=True) -> RunMap:
-    if load_if_present and os.path.exists(os.path.join(out_dir, "run_map.json")):
-        return RunMap.load_from_json(os.path.join(out_dir, "run_map.json"))
+def run_map_with_2_step_ramp_up(output_path: str, *args, **kwargs) -> RunMap:
+    """Simulation of one variation with multiple steps to reach 100% of the set
+    pedestrians to see if a drop in the count accuracy persists.
+    """
+    run_map = RunMap(output_path)
+    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_5/")
+    run_map = study.update_run_map(
+        run_map,
+        20,
+        id_offset=0,
+        sim_group_factory=NamedSimulationGroupFactory(["ydist", "ymf"]),
+    )
+    return run_map
 
-    run_map = RunMap(out_dir)
+
+def run_map_from_4_8(output_path: str, *args, **kwargs) -> RunMap:
+    """Simulation run of ydist and ymf heuristic with multiple numbers of pedestrians as well as constant densities."""
+    run_map = RunMap(output_path)
     study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_8/")
     run_map = _read_groups(study, run_map, "ydist_", id_offset=0)
 
     study2 = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_4/")
     run_map = _read_groups(study2, run_map, "ymf_", id_offset=run_map.max_id + 1)
-
-    # 415x394  -> 207x196
-    run_map.save_json()
     return run_map
 
 
@@ -115,6 +126,8 @@ def read_data(run_map: RunMap, df_f: FrameConsumer = FrameConsumer.EMPTY):
             func=OppAnalysis.merge_maps, kwargs_iter=kwargs_iter, pool_size=10
         )
         map: pd.DataFrame = pd.concat(maps, axis=0, verify_integrity=True)
+        if isinstance(map, pd.Series):
+            map = map.to_frame()
         map.to_hdf(merged_norm_path, key="map_measure_norm_static", mode="a")
 
     return df_f(map)
@@ -263,6 +276,7 @@ def plot_positions(run_map: RunMap):
             ax.plot(
                 "x",
                 "y",
+                fmt="",
                 label="nodes stationary for total simulation",
                 data=pos_df.loc[run_id, :, :, True],
                 markersize=3,
@@ -318,6 +332,7 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
     # data = data.reset_index()
     data = data.reset_index().set_index(["sim_group", "sim_size", "simtime"])
 
+    data = data.drop(columns=["sim"])
     ret = data.groupby(["sim_group", "sim_size", "simtime"]).agg(
         ["mean", "std", "sem", "count"]
     )
@@ -348,7 +363,9 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
     with PdfPages(run_map.path("normalized_pedestrian_count_merged.pdf")) as pdf:
         for ylabel, err in p:
             fig, axes = plt.subplots(2, 1, figsize=(16, 2 * 9))
-            for ax_index, group in enumerate(["full", "quarter"]):
+            for ax_index, group in enumerate(
+                data.index.get_level_values("sim_size").unique().to_list()
+            ):
                 data_page = ret.loc[:, group, :]
                 ax: plt.Axes = axes[ax_index]
                 translate = ax_trans(ax, 2)
@@ -370,7 +387,9 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
                     label="ground_truth",
                     color="black",
                 )
-                for idx, sim in enumerate(["ydist", "ymf"]):
+                for idx, sim in enumerate(
+                    data.index.get_level_values("sim_group").unique().to_list()
+                ):
                     _df = data_page.loc[sim, :]
                     yerr = _df[err].to_numpy().T if isinstance(err, list) else _df[err]
                     ax.errorbar(
@@ -408,14 +427,13 @@ def update_hdf_files():
 
 if __name__ == "__main__":
 
-    run_map: RunMap = get_run_map(
-        out_dir="/mnt/data1tb/results/_density_map/02_stationary_output/"
-    )
-    # main(run_map)
-    map = read_data(run_map).sort_index()
-    plot_all_relative_pedestrian_count_ts(map)
-    plot_merged_relative_pedestrian_count_ts(map, run_map)
-    plot_positions(run_map)
-    plot_all_absolute_pedestrian_count_ts(map)
+    # run_map: RunMap = RunMap.load_or_create(
+    #   create_f=run_map_from_4_8, output_path="/mnt/data1tb/results/_density_map/02_stationary_output/"
+    # )
 
+    run_map: RunMap = RunMap.load_or_create(
+        create_f=run_map_with_2_step_ramp_up,
+        output_path="/mnt/data1tb/results/mf_stationary_m_single_cell_5/",
+    )
+    main(run_map)
     print("done")
