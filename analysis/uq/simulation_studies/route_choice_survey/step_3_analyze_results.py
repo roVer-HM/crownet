@@ -213,6 +213,9 @@ def get_path_choice(controller_type):
     path_choice.reset_index(inplace=True)
     path_choice.drop(columns=["run_id", "id"], inplace=True)
     path_choice.set_index(simulation_time, inplace=True)
+
+    path_choice = path_choice[path_choice["condition"]!="Uninformed"]
+
     return path_choice
 
 
@@ -256,6 +259,7 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
 
 
 def plot_route_1_recommended(path_choice, corridor_=11, ax=None):
+
 
     pp = path_choice[path_choice["Controller"] == "OpenLoop"]
     pp = pp[pp["corridorRecommended"] == corridor_]
@@ -386,6 +390,7 @@ def plot_path_choice(path_choice):
     plot_route_1_recommended(path_choice, 31)
 
 
+
 def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
 
     for controller, data in quantity.groupby(by="Controller"):
@@ -440,7 +445,7 @@ if __name__ == "__main__":
 
 
     travel_time = get_travel_times()
-    path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
+    path_choice =  get_path_choice("ClosedLoop")
     densities, velocities = get_densities_velocities(start_time=0.0)
     densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
 
