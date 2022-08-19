@@ -82,6 +82,11 @@ if __name__ == "__main__":
     sources = sources.div(sources.sum(axis=1), axis=0)*10
     sources = sources.reset_index()
 
+
+    work_around = dists[dists["condition"] == "Uninformed"].drop(columns="condition").set_index("population").reset_index()
+
+
+
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
     start_time = time.time()
 
@@ -96,6 +101,7 @@ if __name__ == "__main__":
         for stat in ["Students", "Fans"]:
 
             sources_ = sources[sources["population"] == stat]
+            work_around_ = work_around[work_around["population"] == stat]
 
             df = dists[dists["condition"] == condition]
             df = df[df["population"] == stat]
@@ -104,10 +110,10 @@ if __name__ == "__main__":
             target_21_p = df["routeB"].values[0]
             target_31_p = df["routeA"].values[0]
 
-            default_vals = [target_11_p, target_21_p, target_31_p]
-            values_short_route = default_vals
-            values_long_route = default_vals
-            values_medium_route = default_vals
+            #default_vals = [target_11_p, target_21_p, target_31_p]
+            #values_short_route = default_vals
+            #values_long_route = default_vals
+            #values_medium_route = default_vals
 
             if condition == "Uninformed":
                 compliances = {"usePsychologyLayer": False,
@@ -116,16 +122,16 @@ if __name__ == "__main__":
                                'routeChoices.[instruction==use target 31].targetProbabilities': [-1,-1,-1]
                                }
             else:
-                values_short_route = [1.0, 0.0, 0.0]
-                values_long_route = default_vals
-                values_medium_route = [1-target_31_p, target_31_p , 0.0]
+                values_short_route = [work_around_["routeC"].values[0], work_around_["routeB"].values[0], work_around_["routeA"].values[0]]
+                values_medium_route = [work_around_["routeC"].values[0], work_around_["routeB"].values[0], work_around_["routeA"].values[0]]
+                values_long_route = [df["routeC"].values[0], df["routeB"].values[0], df["routeA"].values[0]]
 
                 compliances = {"usePsychologyLayer": True,
                         'routeChoices.[instruction=="use target 11"].targetProbabilities': values_short_route,
                        "routeChoices.[instruction=='use target 21'].targetProbabilities": values_medium_route,
                        'routeChoices.[instruction==use target 31].targetProbabilities': values_long_route}
 
-            sources__ = { 'sources.[id==11].distributionParameters.updateFrequency': sources_["routeC"].values[0],
+            sources__ = {'sources.[id==11].distributionParameters.updateFrequency': sources_["routeC"].values[0],
                         'sources.[id==21].distributionParameters.updateFrequency': sources_["routeB"].values[0],
                         'sources.[id==31].distributionParameters.updateFrequency': sources_["routeA"].values[0],
             }

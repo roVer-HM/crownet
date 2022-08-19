@@ -19,12 +19,15 @@ from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 from flowcontrol.strategy.timestepping.timestepping import FixedTimeStepper
 from flowcontrol.strategy.controller.control_algorithm import AlternateTargetAlgorithm, MinimalDensityAlgorithm
 
+
+
+
 class NoController(Controller):
 
     def __init__(self, control_alg=None):
         super().__init__(
             control_algorithm=control_alg,
-            time_stepper=FixedTimeStepper(time_step_size=10.0, start_time=10.0),
+            time_stepper=FixedTimeStepper(time_step_size=2.0, start_time=10.0),
             processor_manager=Manager()
         )
         self.density_over_time = list()

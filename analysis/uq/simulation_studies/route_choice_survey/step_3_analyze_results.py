@@ -407,7 +407,7 @@ def plot_distributions(quantity, name="density"):
         data.set_index(["stat", "condition"], inplace=True)
         data = data[corridors]
         for stats_, data_ in data.groupby(level="stat"):
-            data_.groupby(level="condition").boxplot(layout=(2,4))
+            data_.groupby(level="condition").boxplot(layout=(3,4))
             plt.suptitle(f"{controller}, {name}, {stats_}")
             plt.savefig(f"figs/{name}_{controller}_{stats_}.png")
             plt.show()
@@ -438,11 +438,14 @@ def compare_corridor1_dists(quantity, name="density"):
 
 if __name__ == "__main__":
 
-    
+
     travel_time = get_travel_times()
     path_choice = pd.concat([get_path_choice("OpenLoop"), get_path_choice("ClosedLoop")], axis=0)
     densities, velocities = get_densities_velocities(start_time=0.0)
     densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
+
+    print(densities_stat.sort_values(by=['Corridor1'], ascending=False).iloc[0,:])
+
     compare_corridor1_dists(densities_stat, name="Density")
     compare_corridor1_dists(velocities_stat, name="Velocity")
 
