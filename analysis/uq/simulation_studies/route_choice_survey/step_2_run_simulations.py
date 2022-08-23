@@ -122,8 +122,8 @@ if __name__ == "__main__":
                                'routeChoices.[instruction==use target 31].targetProbabilities': [-1,-1,-1]
                                }
             else:
-                values_short_route = [work_around_["routeC"].values[0], work_around_["routeB"].values[0], work_around_["routeA"].values[0]]
-                values_medium_route = [work_around_["routeC"].values[0], work_around_["routeB"].values[0], work_around_["routeA"].values[0]]
+                values_short_route = [-1,-1,-1]
+                values_medium_route = [-1,-1,-1]
                 values_long_route = [df["routeC"].values[0], df["routeB"].values[0], df["routeA"].values[0]]
 
                 compliances = {"usePsychologyLayer": True,

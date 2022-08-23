@@ -171,6 +171,19 @@ class ClosedLoop(OpenLoop, Controller):
         self.processor_manager.write("path_choice", self.current_target)
 
 
+    def apply_redirection_measure(self):
+        self.compute_next_corridor_choice()
+        recommendation = self.get_stimulus_info()
+        self.processor_manager.write("commandId", self.commandID)
+
+        if self.current_target == 31:
+
+            if isinstance(self.con_manager, ServerModeConnection):
+                self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON(), sending_node_id="misc[0].app[0]")
+            else:
+                self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
+
+
 
 if __name__ == "__main__":
 
