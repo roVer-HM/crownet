@@ -1,7 +1,5 @@
-import os
 import re
 import itertools
-from typing import List
 from matplotlib.transforms import Affine2D
 from roveranalyzer.analysis.common import (
     NamedSimulationGroupFactory,
@@ -12,7 +10,6 @@ from roveranalyzer.analysis.common import (
     SuqcStudy,
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.utils.dataframe import FrameConsumer
 from roveranalyzer.utils.parallel import run_kwargs_map
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
@@ -54,8 +51,8 @@ def _process_relative_err(df: pd.DataFrame):
     return df
 
 
-def _read_groups(study: SuqcStudy, run_map: RunMap, name_prefix: str, id_offset: int):
-    groups: List = {}
+def _read_groups(study: SuqcStudy, run_map: RunMap, alg_name: str, id_offset: int):
+    groups: dict = {}
     pattern = re.compile(
         r"_stationary_m_base_single_cell, (?P<base>.*?)(?P<num>\d+)_(?P<run_id>\d+)_(?P<seed>\d+)$"
     )
@@ -63,17 +60,26 @@ def _read_groups(study: SuqcStudy, run_map: RunMap, name_prefix: str, id_offset:
         extends = sim.run_context.oppini["extends"]
         m = pattern.match(extends)
         m = m.groupdict()
-        group_name = f"{name_prefix}{m['base']}{m['num']}"
-        group = groups.get(group_name, [])
-        group.append((m["run_id"], sim))
+        group_name = f"{alg_name}_{m['base']}{m['num']}"
+        group = groups.get(group_name, {})
+        attr = group.get("attr", {})
+        attr["alg"] = alg_name
+        attr["num"] = m["num"]
+        attr["base"] = m["base"][:-1]
+        group["attr"] = attr
+        sim_list = group.get("sim_list", [])
+        sim_list.append((m["run_id"], sim))
+        group["sim_list"] = sim_list
         groups[group_name] = group
 
     keys = list(groups.keys())
     keys.sort()
     for g_name in keys:
         group = groups[g_name]
-        group.sort(key=lambda x: x[0])
-        run_map.append_or_add(SimulationGroup(g_name, [sim[1] for sim in group]))
+        sim_list = group["sim_list"]
+        sim_list.sort(key=lambda x: x[0])
+        sim_list = [s[1] for s in sim_list]
+        run_map.append_or_add(SimulationGroup(g_name, sim_list, attr=group["attr"]))
 
     return run_map
 
@@ -97,40 +103,22 @@ def run_map_from_4_8(output_path: str, *args, **kwargs) -> RunMap:
     """Simulation run of ydist and ymf heuristic with multiple numbers of pedestrians as well as constant densities."""
     run_map = RunMap(output_path)
     study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_8/")
-    run_map = _read_groups(study, run_map, "ydist_", id_offset=0)
+    run_map = _read_groups(study, run_map, "ydist", id_offset=0)
 
     study2 = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_4/")
-    run_map = _read_groups(study2, run_map, "ymf_", id_offset=run_map.max_id + 1)
+    run_map = _read_groups(study2, run_map, "ymf", id_offset=run_map.max_id + 1)
     return run_map
 
 
-def read_data(run_map: RunMap, df_f: FrameConsumer = FrameConsumer.EMPTY):
+def read_map_data(run_map: RunMap):
 
-    merged_norm_path = run_map.path("merged_normalized_map_measure.h5")
-    if os.path.exists(merged_norm_path):
-        map = pd.DataFrame(
-            pd.HDFStore(merged_norm_path, mode="r").get("map_measure_norm_static")
-        )
-    else:
-
-        data = ["map_glb_count", "map_mean_count"]
-        kwargs_iter = [
-            dict(
-                sim_group=sim,
-                data=data,
-                frame_consumer=_process_relative_err,
-            )
-            for sim in run_map.values()
-        ]
-        maps = run_kwargs_map(
-            func=OppAnalysis.merge_maps, kwargs_iter=kwargs_iter, pool_size=10
-        )
-        map: pd.DataFrame = pd.concat(maps, axis=0, verify_integrity=True)
-        if isinstance(map, pd.Series):
-            map = map.to_frame()
-        map.to_hdf(merged_norm_path, key="map_measure_norm_static", mode="a")
-
-    return df_f(map)
+    return OppAnalysis.merge_maps_for_run_map(
+        run_map=run_map,
+        data=["map_glb_count", "map_count_mean"],
+        frame_consumer=_process_relative_err,
+        hdf_path="merged_normalized_map_measure.h5",
+        hdf_key="map_measure_norm_static",
+    )
 
 
 def get_convergence_time(map: pd.DataFrame, time_slice, err) -> dict:
@@ -167,7 +155,7 @@ def get_convergence_time(map: pd.DataFrame, time_slice, err) -> dict:
 
 def main(run_map: RunMap):
 
-    map = read_data(run_map).sort_index()
+    map = read_map_data(run_map).sort_index()
 
     # get convergence time
     df_convergence = get_convergence_time(map, time_slice=slice(41, None), err=0.05)
@@ -408,6 +396,94 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
             pdf.savefig(fig)
 
 
+def plot_count_stats(run_map: RunMap):
+    maps = read_map_data(run_map)
+    groups = [
+        g.group_name for g in run_map.values() if g.attr["base"] == "density_full"
+    ]
+    groups.sort(key=lambda x: int(run_map.attr(x, "num")))
+    data = maps.loc[
+        pd.IndexSlice[groups, :, ["map_count_mean", "map_glb_count"]]
+    ].reset_index()
+    data["alg"] = data["sim"].apply(lambda x: run_map.attr(x, "alg"))
+    data["num"] = data["sim"].apply(lambda x: int(run_map.attr(x, "num")))
+    lbl = dict(map_count_mean="count", map_glb_count="gt")
+    data["data"] = data["data"].apply(lambda x: lbl[x])
+    data["data"] = data["data"] + "_" + data["alg"]
+    data = data[data["data"] != "gt_ymf"]
+    data["data"] = data["data"].str.replace("gt_ydist", "gt")
+    data = data.drop(columns=["sim", "alg"])
+    data = (
+        data.set_index(["num", "simtime", "data"])
+        .sort_index()
+        .unstack("data")
+        .droplevel(0, axis=1)
+    )
+    data = data.loc[:, ["gt", "count_ydist", "count_ymf"]]
+
+    for g, _df in data.groupby("num"):
+        print(g)
+        OppAnalysis.count_stat_plots(
+            _df.copy(deep=True).reset_index("num", drop=True),
+            lbl_dict={},
+            run_map=run_map,
+            out_name=f"peds_{g}_dist_plots.pdf",
+        )
+
+
+def plot_relative_count_stat(run_map: RunMap):
+    maps = read_map_data(run_map)
+    # select full size simulations only
+    groups = [
+        g.group_name for g in run_map.values() if g.attr["base"] == "density_full"
+    ]
+
+    # transform maps frame to into long format  [simtime](gt, ....)
+    gt = (
+        maps.loc[pd.IndexSlice[groups[0], :, ["map_glb_count_n"]]]
+        .reset_index()
+        .drop(columns=["sim"])
+    )
+    gt["data"] = "gt"
+    gt = gt.set_index(["simtime", "data"])
+    data = maps.loc[pd.IndexSlice[groups, :, ["map_count_mean_n"]]].reset_index()
+    data["alg"] = data["sim"].apply(lambda x: run_map.attr(x, "alg"))
+    data["data"] = (
+        "count_"
+        + data["alg"]
+        + "_"
+        + data["sim"].apply(lambda x: run_map.attr(x, "num"))
+    )
+    data = data[data["data"] != "gt_ymf"]
+    data["data"] = data["data"].str.replace("gt_ydist", "gt")
+    data = data.drop(columns=["sim", "alg"])
+    data = data.set_index(["simtime", "data"]).sort_index()
+    data = pd.concat([gt, data])
+    data = data.unstack("data").droplevel(0, axis=1)
+
+    # prepare statistic combinations (only match with ground truth and with algorithms)
+    nums = np.unique(np.sort([int(run_map.attr(g, "num")) for g in groups]))
+    stat_combination = []
+    for num in nums:
+        stat_combination.append(("gt", f"count_ydist_{num}"))
+        stat_combination.append(("gt", f"count_ymf_{num}"))
+    alg_combi = [(f"count_ydist_{num}", f"count_ymf_{num}") for num in nums]
+    stat_combination.extend(alg_combi)
+
+    # sort columns (simtime)[gt, ydist_A, ymf_A, ydist_B, ...]
+    data = data.loc[:, ["gt", *list(itertools.chain(*alg_combi))]]
+
+    # simplify label names
+    lbl_dict = {c: c.replace("count_", "") for c in data.columns[1:]}
+    OppAnalysis.count_stat_plots(
+        data,
+        lbl_dict=lbl_dict,
+        stat_col_combination=stat_combination,
+        run_map=run_map,
+        out_name=f"normalized_ped_count_dist_plots.pdf",
+    )
+
+
 def update_hdf_files():
     # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_3/")
     # study = SuqcRun("/mnt/data1tb/results/mf_1d_1/")
@@ -427,13 +503,15 @@ def update_hdf_files():
 
 if __name__ == "__main__":
 
-    # run_map: RunMap = RunMap.load_or_create(
-    #   create_f=run_map_from_4_8, output_path="/mnt/data1tb/results/_density_map/02_stationary_output/"
-    # )
-
     run_map: RunMap = RunMap.load_or_create(
-        create_f=run_map_with_2_step_ramp_up,
-        output_path="/mnt/data1tb/results/mf_stationary_m_single_cell_5/",
+        create_f=run_map_from_4_8,
+        output_path="/mnt/data1tb/results/_density_map/02_stationary_output/",
     )
-    main(run_map)
+
+    # run_map: RunMap = RunMap.load_or_create(
+    #     create_f=run_map_with_2_step_ramp_up,
+    #     output_path="/mnt/data1tb/results/mf_stationary_m_single_cell_5/",
+    # )
+    # main(run_map)
+    plot_relative_count_stat(run_map)
     print("done")

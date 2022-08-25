@@ -2,6 +2,7 @@ from __future__ import annotations
 from copy import deepcopy
 from math import floor
 
+from itertools import combinations
 import json
 import os
 from typing import Tuple, List
@@ -17,9 +18,13 @@ from roveranalyzer.analysis.common import (
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.analysis import adf_test
 from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import matplotlib_set_latex_param
+import roveranalyzer.utils.plot as PlotUtl
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
+import seaborn as sns
+
+sns.set(font_scale=1.5, rc={"text.usetex": True})
+from scipy.stats import mannwhitneyu, kstest
 
 from scipy.sparse import coo_array
 import scipy.signal as sg
@@ -200,10 +205,7 @@ def make_vader_ts_figure(data: pd.DataFrame, output_path):
     return fig, ax
 
 
-def get_run_map(output_dir, load_if_present=True) -> RunMap:
-    if load_if_present and os.path.exists(os.path.join(output_dir, "run_map.json")):
-        return RunMap.load_from_json(os.path.join(output_dir, "run_map.json"))
-
+def get_run_map(output_dir) -> RunMap:
     # only simulations 0-79 are correct. Others have wrong map config
     run_ymfd_1 = SuqcStudy("/mnt/data1tb/results/mf_1d_bm/")
     sim_factory = SimFactory()
@@ -225,8 +227,6 @@ def get_run_map(output_dir, load_if_present=True) -> RunMap:
         sim_group_factory=sim_factory,
         attr=dict(alg="ymf"),
     )
-
-    run_map.save_json()
     return run_map
 
 
@@ -247,10 +247,47 @@ def get_average_density_maps(
     return maps
 
 
-def process_1d_scenario():
-    matplotlib_set_latex_param()
+def plot_default_stats():
     output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
-    run_map = get_run_map(output_dir)
+    run_map = RunMap.load_or_create(get_run_map, output_dir)
+    maps = OppAnalysis.merge_maps_for_run_map(run_map)
+
+    # all X_0.08
+    for ped_f in ["X_0.08", "X_0.04"]:
+        g1 = [g.group_name for g in run_map.values() if g.attr["ts"] == ped_f]
+        g1.sort(key=lambda x: run_map.attr(x, "alg"))
+
+        # map to long form
+        g1_gt = (
+            maps.loc[pd.IndexSlice[g1[0], :, ["map_glb_count"]], ["mean"]]
+            .set_axis(["gt"], axis=1)
+            .reset_index(["sim", "data"], drop=True)
+        )
+        g1_maps = (
+            maps.loc[pd.IndexSlice[g1, :, ["map_mean_count"]], ["mean"]]
+            .unstack("sim")
+            .droplevel(0, axis=1)
+            .droplevel("data", axis=0)
+        )
+        g1_maps = pd.concat([g1_gt, g1_maps], axis=1)
+
+        def lbl(g_name, run_map: RunMap):
+            attr: dict = run_map[g_name].attr
+            return "$" + attr["ts"][2:] + " \\frac{ped}{s}$ " + attr["lbl"]
+
+        lbl_dict = {g: lbl(g, run_map) for g in run_map.keys()}
+        lbl_dict["gt"] = "Ground Truth"
+
+        print(f"create stat plots for {ped_f}")
+        OppAnalysis.count_stat_plots(
+            g1_maps, lbl_dict, run_map, f"{ped_f}_dist_plots.pdf"
+        )
+
+
+def process_1d_scenario():
+    PlotUtl.matplotlib_set_latex_param()
+    output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
+    run_map = RunMap.load_or_create(get_run_map, output_dir)
 
     trace_paths = {}
     for name, group in run_map.items():
@@ -261,8 +298,6 @@ def process_1d_scenario():
         trace_paths[
             group.attr["ts"]
         ] = f"../study/traces_mf_1d_bm.d/numAgents_{trace}.csv"
-
-    print("d")
 
     # figure (ground truth)
     v_ts = [read_trace_ts(path, 0, lbl) for lbl, path in trace_paths.items()]
@@ -305,7 +340,7 @@ class SimFactory:
         alg = attr.get("alg", "")
         attr[
             "lbl"
-        ] = f"1d\\_{self.group_num}: Beacon $\\vert$ Map $\Delta t = {beacon_t}\\vert {map_t} {alg}$"
+        ] = f"$1D_{self.group_num}$({alg}): Beacon $\\vert$ Map $\Delta t = {beacon_t}\\vert {map_t} $"
         attr["ts"] = ts
         kwds["attr"] = attr
         ret = SimulationGroup(group_name=f"1d_{self.group_num}", **kwds)
@@ -314,7 +349,7 @@ class SimFactory:
 
 
 def conv_err():
-    matplotlib_set_latex_param()
+    PlotUtl.matplotlib_set_latex_param()
     out_path = "/mnt/data1tb/results/mf_1d_8/"
     run = SuqcStudy(out_path)
 
@@ -322,7 +357,6 @@ def conv_err():
     run_map = run.update_run_map(
         RunMap(out_path), sim_per_group=20, id_offset=0, sim_group_factory=factory
     )
-    print("d")
     virdis = cm.get_cmap("viridis", 256)
 
     sim: Simulation = run.get_sim(0)
@@ -357,7 +391,8 @@ def conv_err():
 
 
 if __name__ == "__main__":
-    process_1d_scenario()
+    plot_default_stats()
+    # process_1d_scenario()
     # conv_err()
     # read_vadere_ts(
     #     "../study/traces_mf_1d_bm.d/omnetSeedManager.json",
