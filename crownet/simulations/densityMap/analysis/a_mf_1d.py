@@ -19,29 +19,55 @@ from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.analysis import adf_test
 from roveranalyzer.utils.parallel import run_kwargs_map
 import roveranalyzer.utils.plot as PlotUtl
+import roveranalyzer.utils.dataframe as FrameUtl
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import seaborn as sns
 
-sns.set(font_scale=1.5, rc={"text.usetex": True})
+sns.set(font_scale=1.1, rc={"text.usetex": True})
+sns.set_style("whitegrid")
+
 from scipy.stats import mannwhitneyu, kstest
 
 from scipy.sparse import coo_array
 import scipy.signal as sg
 from matplotlib import cm
 
+from omnetinireader.config_parser import ObjectValue
+
 
 ts_x = "X_0.04"  # iat_50
 ts_y = "X_0.08"  # iat_25
+_c = sns.color_palette()
+_c_map = {f"S1-{i}": _c[i] for i in range(8)}
+_c_map["Ground Truth"] = "black"
+
+
+class Cpallet:
+    def __init__(self, c) -> None:
+        self.c = c
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return list(self.c.values())[key]
+        if key in self.c:
+            return self.c[key]
+        for k, v in self.c.items():
+            if k.startswith(key):
+                return v
+        raise ValueError(f"key '{key}' not found.")
+
 
 ts_ = {
     ts_x: {
         "lbl": r"$X_t$ with ped. arrival rate $\lambda_1 = 0.04\,\frac{ped}{s}$",
-        "color": "red",
+        # "color": "red",
+        "color": _c[3],
     },
     ts_y: {
         "lbl": r"$Y_t$ with ped. arrival rate $\lambda_2 = 0.08\,\frac{ped}{s}$",
-        "color": "blue",
+        # "color": "blue",
+        "color": _c[0],
     },
 }
 
@@ -150,7 +176,8 @@ def create_map_ts_figure(
             ax.plot(
                 _df.index.get_level_values("simtime"),
                 _df["mean"],
-                label=run_map[sim].attr["lbl"],
+                color=_c_map[sim],
+                label=run_map[sim].attr["lbl_short"],
                 marker=None,
             )
 
@@ -200,12 +227,22 @@ def make_vader_ts_figure(data: pd.DataFrame, output_path):
     x_lbl[1] = "500"
     ax.set_xticklabels(x_lbl)
     ax.legend(loc="lower right")
-    if output_path is not None:
-        fig.savefig(os.path.join(output_path, "ped_time_series.pdf"))
+    fig.savefig(output_path)
     return fig, ax
 
 
-def get_run_map(output_dir) -> RunMap:
+def get_run_map_single_run(output_dir) -> RunMap:
+    run_ymfd_1 = SuqcStudy("/mnt/data1tb/results/mf_1d_bm_1/")
+    sim_factory = SimFactory()
+    run_map = run_ymfd_1.update_run_map(
+        RunMap(output_dir),
+        sim_per_group=20,
+        id_offset=0,
+        sim_group_factory=sim_factory,
+    )
+
+
+def get_run_map_split(output_dir) -> RunMap:
     # only simulations 0-79 are correct. Others have wrong map config
     run_ymfd_1 = SuqcStudy("/mnt/data1tb/results/mf_1d_bm/")
     sim_factory = SimFactory()
@@ -215,7 +252,6 @@ def get_run_map(output_dir) -> RunMap:
         id_offset=0,
         sim_group_factory=sim_factory,
         id_filter=lambda x: x[0] < 80,
-        attr=dict(alg="yDist"),
     )
 
     # rerun of ymf variation aka (alpha = 1.0)
@@ -225,7 +261,6 @@ def get_run_map(output_dir) -> RunMap:
         sim_per_group=20,
         id_offset=run_map.max_id + 1,
         sim_group_factory=sim_factory,
-        attr=dict(alg="ymf"),
     )
     return run_map
 
@@ -247,9 +282,7 @@ def get_average_density_maps(
     return maps
 
 
-def plot_default_stats():
-    output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
-    run_map = RunMap.load_or_create(get_run_map, output_dir)
+def plot_default_stats(run_map: RunMap):
     maps = OppAnalysis.merge_maps_for_run_map(run_map)
 
     # all X_0.08
@@ -272,22 +305,23 @@ def plot_default_stats():
         g1_maps = pd.concat([g1_gt, g1_maps], axis=1)
 
         def lbl(g_name, run_map: RunMap):
-            attr: dict = run_map[g_name].attr
-            return "$" + attr["ts"][2:] + " \\frac{ped}{s}$ " + attr["lbl"]
+            return run_map.attr(g_name, "lbl_short")
 
         lbl_dict = {g: lbl(g, run_map) for g in run_map.keys()}
         lbl_dict["gt"] = "Ground Truth"
 
         print(f"create stat plots for {ped_f}")
-        OppAnalysis.count_stat_plots(
-            g1_maps, lbl_dict, run_map, f"{ped_f}_dist_plots.pdf"
+        OppAnalysis.plot_descriptive_comparision(
+            g1_maps,
+            lbl_dict,
+            run_map,
+            f"{ped_f}_dist_plots.pdf",
+            palette=Cpallet(_c_map),
         )
 
 
-def process_1d_scenario():
+def process_1d_scenario(run_map: RunMap):
     PlotUtl.matplotlib_set_latex_param()
-    output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
-    run_map = RunMap.load_or_create(get_run_map, output_dir)
 
     trace_paths = {}
     for name, group in run_map.items():
@@ -303,11 +337,11 @@ def process_1d_scenario():
     v_ts = [read_trace_ts(path, 0, lbl) for lbl, path in trace_paths.items()]
     v_ts = pd.concat(v_ts, axis=1, verify_integrity=True)
     v_ts.columns = v_ts.columns.droplevel(["run_id"])
-
+    v_ts = v_ts[v_ts.index <= 5000.0]
     # get average density map from scenario map
     maps = get_average_density_maps(run_map)
 
-    # make_vader_ts_figure(v_ts, out_path)
+    make_vader_ts_figure(v_ts, run_map.path("ped_time_series.pdf"))
     # figure (maps over ground truth)
     create_map_ts_figure(run_map, v_ts, maps, ts_x, output_dir)
     create_map_ts_figure(run_map, v_ts, maps, ts_y, output_dir)
@@ -315,7 +349,41 @@ def process_1d_scenario():
     # statistics for map and ground truth data
     stat_df = process_simulation_run(maps, run_map, v_ts)
     stat_df.to_csv(run_map.path("stat.csv"))
+    extract_tex_tables(stat_df)
     print("done")
+
+
+def extract_tex_tables(df: pd.DataFrame | str, run_map: RunMap):
+    _format = {
+        "Test Statistic": "{:.3f}".format,
+        "p-value": "{:.4e}".format,
+        "Critical Value (1%)": "{:.3f}".format,
+        "mean": "{:.2f}".format,
+        "std": "{:.2f}".format,
+    }
+
+    _rename = {
+        "Critical Value (1%)": "Crit. (1%)",
+        "Test Statistic": "Stat.",
+        "scenario": "Sim.",
+        "mean": "Mean",
+        "std": "Std",
+    }
+
+    if isinstance(df, str):
+        df: pd.DataFrame = pd.read_csv(df)
+        df = df.set_index("scenario")
+
+    for _ts in ["X_0.08", "X_0.04"]:
+        g = [n for n, g in run_map.items() if g.attr["ts"] == _ts]
+        g.sort()
+        g.append(_ts)
+        FrameUtl.save_as_csv(
+            df.loc[g],
+            run_map.path(f"stat_{_ts}.tex"),
+            rename=_rename,
+            col_format=_format,
+        )
 
 
 class SimFactory:
@@ -336,14 +404,17 @@ class SimFactory:
         map_t = sim.run_context.ini_get(
             "*.misc[*].app[1].scheduler.generationInterval", r"^(\d+[a-z]*).*"
         )
+        alg: ObjectValue = sim.run_context.ini_get("*.misc[*].app[1].app.mapCfg")
         attr = deepcopy(kwds.get("attr", {}))
-        alg = attr.get("alg", "")
+        attr["alg"] = "ymf" if float(alg["alpha"]) == 1.0 else "yDist"
+        alg = attr["alg"]
         attr[
             "lbl"
-        ] = f"$1D_{self.group_num}$({alg}): Beacon $\\vert$ Map $\Delta t = {beacon_t}\\vert {map_t} $"
+        ] = f"S1-{self.group_num} ({alg}): Beacon $\\vert$ Map $\Delta t = {beacon_t}\\vert {map_t}$"
+        attr["lbl_short"] = f"S1-{self.group_num} ({alg})"
         attr["ts"] = ts
         kwds["attr"] = attr
-        ret = SimulationGroup(group_name=f"1d_{self.group_num}", **kwds)
+        ret = SimulationGroup(group_name=f"S1-{self.group_num}", **kwds)
         self.group_num += 1
         return ret
 
@@ -391,13 +462,12 @@ def conv_err():
 
 
 if __name__ == "__main__":
+
+    # output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
+    # run_map = RunMap.load_or_create(get_run_map_split, output_dir)
+
+    output_dir = "/mnt/data1tb/results/_density_map/01a_1d_output/"
+    run_map = RunMap.load_or_create(get_run_map_single_run, output_dir)
     plot_default_stats()
-    # process_1d_scenario()
-    # conv_err()
-    # read_vadere_ts(
-    #     "../study/traces_mf_1d_bm.d/omnetSeedManager.json",
-    #     [
-    #     ("../study/traces_mf_1d_bm.d/trace_list_mf_1d_m_const_2x5m_d20m_iat_50.json", ts_x),
-    #     ("../study/traces_mf_1d_bm.d/trace_list_mf_1d_m_const_2x5m_d20m_iat_25.json", ts_y),
-    #     ]
-    # )
+    process_1d_scenario()
+    # extract_tex_tables(run_map.path("stat.csv"), run_map)

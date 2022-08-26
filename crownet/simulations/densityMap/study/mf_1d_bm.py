@@ -243,6 +243,7 @@ def generate_traces(trace_dir: str | None = None):
     BmTrace.write_seed_paring(seed, paring, trace_dir)
 
     for scenario, scenario_name, par_var in traces:
+        print(f"traces for  {scenario_name}")
         BmTrace.generate_traces(
             scenario=scenario,
             scenario_name=scenario_name,
@@ -256,7 +257,7 @@ def generate_traces(trace_dir: str | None = None):
             ],
             jobs=5,
             vadere_seeds=paring[0],
-            remove_output=True,
+            remove_output=False,
         )
 
 
