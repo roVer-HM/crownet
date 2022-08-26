@@ -74,10 +74,13 @@ t = UnitValue.s(800.0)
 source_end_time = 400.0
 source_id_range = range(1117, 1131)
 
-alpha = [0.5, 0.65, 0.80, 0.95]
-# alpha = [0.05, 0.15, 0.25, 0.35]
-# dist = [20, 80, 120, 200]
-dist = [80, 120, 160, 200]
+# default
+# alpha = [0.5, 0.65, 0.80, 0.95]
+# dist = [80, 120, 160, 200]
+# 25.05.2022
+alpha = [0.65, 0.80, 0.9, 0.95]
+dist = [60, 80, 120, 160]
+
 alpha_dist = list(product(alpha, dist))
 alpha_dist.append([1.0, 999])  # distance has no effect thus just one
 
@@ -150,7 +153,7 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
 
     par_var = []
     for _var in par_var_tmp:
-        for opp_seed, trace_seed in seed_paring[10:]:
+        for opp_seed, trace_seed in seed_paring:
             var = deepcopy(_var)
             var = BmTrace.update_trace_config(var, opp_seed, trace_seed)
             par_var.append(var)
@@ -198,10 +201,10 @@ def create_traces(trace_dir: str | None = None):
     traces = [
         (abspath(join("../vadere/scenarios/", f"{name}.scenario")), name, {})
         for name in [
-            "mf_dyn_exp_05",
-            "mf_dyn_exp_10",
+            # "mf_dyn_exp_05",
+            # "mf_dyn_exp_10",
             "mf_dyn_exp_15",
-            "mf_dyn_exp_20",
+            # "mf_dyn_exp_20",
             "mf_dyn_exp_25",
         ]
     ]
@@ -322,7 +325,7 @@ def main_bonn_motion():
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name=get_env_name(base_dir, __file__.replace(".py", "_test")),
+        env_name=get_env_name(base_dir, __file__.replace(".py", "")),
         opp_config=opp_config,
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""),  # use omnet internal mobility models
@@ -359,5 +362,5 @@ def main_bonn_motion():
 
 
 if __name__ == "__main__":
-    create_traces(trace_dir=os.path.abspath("traces_dynamic.d"))
+    # create_traces(trace_dir=os.path.abspath("traces_dynamic.d"))
     main_bonn_motion()
