@@ -423,7 +423,7 @@ def plot_count_stats(run_map: RunMap):
 
     for g, _df in data.groupby("num"):
         print(g)
-        OppAnalysis.count_stat_plots(
+        OppAnalysis.plot_descriptive_comparison(
             _df.copy(deep=True).reset_index("num", drop=True),
             lbl_dict={},
             run_map=run_map,
@@ -475,7 +475,7 @@ def plot_relative_count_stat(run_map: RunMap):
 
     # simplify label names
     lbl_dict = {c: c.replace("count_", "") for c in data.columns[1:]}
-    OppAnalysis.count_stat_plots(
+    OppAnalysis.plot_descriptive_comparison(
         data,
         lbl_dict=lbl_dict,
         stat_col_combination=stat_combination,

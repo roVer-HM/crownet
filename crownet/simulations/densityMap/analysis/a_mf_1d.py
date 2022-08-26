@@ -311,7 +311,7 @@ def plot_default_stats(run_map: RunMap):
         lbl_dict["gt"] = "Ground Truth"
 
         print(f"create stat plots for {ped_f}")
-        OppAnalysis.plot_descriptive_comparision(
+        OppAnalysis.plot_descriptive_comparison(
             g1_maps,
             lbl_dict,
             run_map,

@@ -1,21 +1,32 @@
 from __future__ import annotations
 from itertools import chain
 import re
-from typing import Dict, List, Tuple
+from matplotlib.colors import LinearSegmentedColormap
+from typing import Callable, Dict, List, Tuple, Any
 from roveranalyzer.analysis.common import (
     Simulation,
     RunMap,
     SimulationGroup,
+    SimGroupFilter,
     SuqcStudy,
     RunMap,
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
+from roveranalyzer.simulators.crownet.common.dcd_metadata import DcdMetaData
+from roveranalyzer.simulators.vadere.plots.scenario import (
+    Scenario,
+    VaderScenarioPlotHelper,
+)
+from roveranalyzer.utils import dataframe
 from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import StyleMap, check_ax
+from roveranalyzer.utils.plot import PlotUtil, StyleMap, check_ax, empty_fig
+import roveranalyzer.utils.plot as _Plot
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.stats import mannwhitneyu, kstest
 from matplotlib.backends.backend_pdf import PdfPages
 from omnetinireader.config_parser import OppConfigFileBase, ObjectValue
 
@@ -38,7 +49,7 @@ def from_sim_v(sim: Simulation) -> str:
     return f'{mapCfg["alpha"]}_{mapCfg["stepDist"]}_{iat}'
 
 
-def from_sim_bm(sim: Simulation, **kwds) -> SimulationGroup:
+def sim_group_bonnmotion(sim: Simulation, **kwds) -> SimulationGroup:
     cfg: OppConfigFileBase = sim.run_context.oppini
     mapCfg: ObjectValue = cfg.get("*.misc[*].app[1].app.mapCfg")
     scenario = cfg.get("*.bonnMotionServer.traceFile")
@@ -47,8 +58,14 @@ def from_sim_bm(sim: Simulation, **kwds) -> SimulationGroup:
         iat = match.groups()[0]
     else:
         iat = "??"
-    kwds["group_name"] = f'{mapCfg["alpha"]}_{mapCfg["stepDist"]}_{iat}'
-    return SimulationGroup(**kwds)
+    kwargs = dict(**kwds)
+    kwargs["group_name"] = f'{mapCfg["alpha"]}_{mapCfg["stepDist"]}_{iat}'
+    attr = kwargs.get("attr", {})
+    attr["alpha"] = mapCfg["alpha"]
+    attr["stepDist"] = mapCfg["stepDist"]
+    attr["iat"] = iat
+    kwargs["attr"] = attr
+    return SimulationGroup(**kwargs)
 
 
 def collect_count_error_for_simulation_group(sim_group: SimulationGroup):
@@ -353,6 +370,117 @@ def plot_all(
     )
 
 
+def describtive_two_way_comparison_msce(
+    run_map: RunMap,
+    filter_run: SimGroupFilter = lambda _: True,
+    compare_with="1_999_25",
+    output_path="mce_stats_for_alg.pdf",
+    value_axes_label="Mean Squared Cell Error (MSCE)",
+):
+    data, data_mean_by_run_id = _get_mse_data(run_map)
+    data = data.reset_index().merge(
+        run_map.id_to_label_series(enumerate_run=True).reset_index(), on="run_id"
+    )
+
+    groups = [g.group_name for g in run_map.values() if filter_run(g)]
+    groups.sort(
+        key=lambda x: (int(run_map.attr(x, "alpha")), int(run_map.attr(x, "stepDist")))
+    )
+    if compare_with not in groups:
+        groups.append(compare_with)
+
+    # MSCE mean cell error for one timestep created from MSE of each cell
+    data = (
+        data.set_index(["label", "simtime", "seed"])
+        .loc[:, ["cell_mse"]]
+        .groupby(["label", "simtime"])
+        .mean()
+        .unstack(["label"])
+        .droplevel(0, axis=1)
+    )
+    data = data[groups]
+    # split groups into triplets containging ground truth 'compare_with' and one of the other runs
+    col_combination = [(c, compare_with) for c in groups if c != compare_with]
+
+    # cleanup lables and fix color palette
+    lbl_dict = {c: c.replace("_", "-") for c in data.columns}
+    palette = sns.color_palette("colorblind", n_colors=len(col_combination[0]))
+    with run_map.pdf_page(output_path) as pdf_file:
+        for cols in col_combination:
+            title = f"Comparision {' - '.join(cols)}"
+            print(f"build {title}")
+
+            OppAnalysis.plot_descriptive_comparison(
+                data.loc[:, cols],
+                lbl_dict=lbl_dict,
+                run_map=run_map,
+                out_name=output_path,
+                pdf_file=pdf_file,
+                palette=palette,
+                value_axes_label=value_axes_label,
+            )
+
+
+def describtive_two_way_comparison_count(
+    run_map: RunMap,
+    filter_run: SimGroupFilter = lambda _: True,
+    compare_with="1_999_25",
+    output_path="count_stats_for_alg.pdf",
+    value_axes_label="pedestrian count",
+):
+
+    maps = OppAnalysis.merge_maps_for_run_map(
+        run_map, pool_size=20, hdf_path=run_map.path("maps.h5")
+    )
+
+    # select runs to compare with
+    groups = [g.group_name for g in run_map.values() if filter_run(g)]
+    groups.sort(key=lambda x: run_map.attr(x, "alpha"))
+    if compare_with not in groups:
+        groups.append(compare_with)
+
+    sim_lbls = maps.index.get_level_values(0).unique()
+    if not all(g in sim_lbls for g in groups):
+        raise ValueError(
+            f"Not all selecetd simulation runs exist. selected groups: '{groups}' groups in data: '{sim_lbls}' "
+        )
+
+    # choose selecetd groups + ground truth and create a long format dataframe
+    data = (
+        maps.loc[pd.IndexSlice[groups, :, "map_mean_count"], ["mean"]]
+        .droplevel("data", axis=0)
+        .unstack("sim")
+        .droplevel(0, axis=1)
+    )
+    data_gt = (
+        maps.loc[pd.IndexSlice[groups[0], :, "map_glb_count"], ["mean"]]
+        .droplevel(["sim", "data"], axis=0)
+        .set_axis(["gt"], axis=1)
+    )
+    data = pd.concat([data_gt, data], axis=1)
+
+    # split groups into triplets containging ground truth 'compare_with' and one of the other runs
+    col_combination = [("gt", c, compare_with) for c in groups if c != compare_with]
+
+    # clearup lables and fix color palette
+    lbl_dict = {c: c.replace("_", "-") for c in data.columns}
+    palette = sns.color_palette("colorblind", n_colors=len(col_combination[0]))
+    with run_map.pdf_page(output_path) as pdf_file:
+        for cols in col_combination:
+            title = f"Comparision {' - '.join(cols)}"
+            print(f"build {title}")
+
+            OppAnalysis.plot_descriptive_comparison(
+                data.loc[:, cols],
+                lbl_dict=lbl_dict,
+                run_map=run_map,
+                out_name=output_path,
+                pdf_file=pdf_file,
+                palette=palette,
+                value_axes_label=value_axes_label,
+            )
+
+
 def _get_mse_data(run_map: RunMap):
 
     data = OppAnalysis.get_mse_cell_data_for_study(
@@ -381,30 +509,49 @@ def _get_mse_data(run_map: RunMap):
     return data, data_mean_by_run_id
 
 
-def main():
-    # id_filter = lambda x: all([i >= 170 for i in x])
-    # id_filter = lambda x : all([i < 170 for i in x])
-    id_filter = lambda x: True
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_1/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_2/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_3/")
+def get_run_map_N20(output_path: str, *args, **kwargs) -> RunMap:
+    """One simulation run with 20 seeds"""
+    study1 = SuqcStudy("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_5/")
+    run_map: RunMap = RunMap(output_dir=output_path)
+
+    run_map = study1.update_run_map(
+        run_map,
+        sim_per_group=20,
+        id_offset=0,
+        sim_group_factory=sim_group_bonnmotion,
+        allow_new_groups=True,
+    )
+    return run_map
+
+
+def get_run_map_N20_split(output_path: str, *args, **kwargs) -> RunMap:
+    """Combine two simulation runs with 10 seeds each"""
     study1 = SuqcStudy("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_4/")
     study2 = SuqcStudy("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_test/")
 
-    run_map: RunMap = RunMap(output_dir="/mnt/data1tb/results/mf_dyn_20_seeds")
+    run_map: RunMap = RunMap(output_dir=output_path)
 
     run_map = study1.update_run_map(
-        run_map, sim_per_group=10, id_offset=0, lbl_f=from_sim_bm, allow_new_groups=True
+        run_map,
+        sim_per_group=10,
+        id_offset=0,
+        sim_group_factory=sim_group_bonnmotion,
+        allow_new_groups=True,
     )
+
+    # append extra seeds to existing groups.
     run_map = study2.update_run_map(
         run_map,
         sim_per_group=10,
         id_offset=len(study1),
-        lbl_f=from_sim_bm,
+        sim_group_factory=sim_group_bonnmotion,
         allow_new_groups=False,
     )
+
+    return run_map
+
+
+def main(run_map: RunMap):
     styles = StyleMap(markersize=3, marker="o", linestyle="none")
     data, data_mean_by_run_id = _get_mse_data(run_map)
 
@@ -415,5 +562,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # run_map = RunMap.load_or_create(get_run_map_N20_split, output_path="/mnt/data1tb/results/_density_map/03_dynamic_output/")
+    run_map = RunMap.load_or_create(
+        get_run_map_N20,
+        output_path="/mnt/data1tb/results/_density_map/03a_dynamic_output/",
+    )
+    # plot_mse_err_stats(run_map)
+    # plot_per_seed_stats(run_map)
+    describtive_two_way_comparison_msce(run_map)
+    # describtive_two_way_comparison_count(run_map)
+    # main(run_map)
     print("done")
