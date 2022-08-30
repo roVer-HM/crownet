@@ -44,7 +44,7 @@ mapCfgYmfDist = ObjectValue.from_args(
     QString("ymfPlusDistStep"),
     # "mapTypeLog", QString("all"),
     "cellAgeTTL",
-    UnitValue.s(30.0),
+    UnitValue.s(15.0),
     "alpha",
     0.75,
     "idStreamType",
@@ -60,7 +60,7 @@ mapCfgYmf = ObjectValue.from_args(
     QString("ymf"),
     # "mapTypeLog", QString("all"),
     "cellAgeTTL",
-    UnitValue.s(30.0),
+    UnitValue.s(15.0),
     "idStreamType",
     QString("insertionOrder"),
 )

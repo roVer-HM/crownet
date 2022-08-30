@@ -32,15 +32,45 @@ from scipy.stats import mannwhitneyu, kstest
 from scipy.sparse import coo_array
 import scipy.signal as sg
 from matplotlib import cm
+from matplotlib.colors import to_rgb
 
 from omnetinireader.config_parser import ObjectValue
 
 
 ts_x = "X_0.04"  # iat_50
 ts_y = "X_0.08"  # iat_25
-_c = sns.color_palette()
+_c = [
+    to_rgb(i)
+    for i in [
+        "#DD5422",
+        "#4EDD22",
+        "#F0E532",
+        "#71472C",
+        "#299BA3",
+        "#999999",
+        "#CA79A8",
+        "#339955",
+    ]
+]
+
+ts_ = {
+    ts_x: {
+        "lbl": r"$X_t$ with ped. arrival rate $\lambda_1 = 0.04\,\frac{ped}{s}$",
+        "lbl_short": r"$X_t$",
+        # "color": "red",
+        "color": to_rgb("#4B72B0"),
+    },
+    ts_y: {
+        "lbl": r"$Y_t$ with ped. arrival rate $\lambda_2 = 0.08\,\frac{ped}{s}$",
+        "lbl_short": r"$Y_t$",
+        # "color": "blue",
+        "color": to_rgb("#C44E51"),
+    },
+}
 _c_map = {f"S1-{i}": _c[i] for i in range(8)}
 _c_map["Ground Truth"] = "black"
+_c_map[ts_[ts_x]["lbl_short"]] = ts_[ts_x]["color"]
+_c_map[ts_[ts_y]["lbl_short"]] = ts_[ts_y]["color"]
 
 
 class Cpallet:
@@ -56,20 +86,6 @@ class Cpallet:
             if k.startswith(key):
                 return v
         raise ValueError(f"key '{key}' not found.")
-
-
-ts_ = {
-    ts_x: {
-        "lbl": r"$X_t$ with ped. arrival rate $\lambda_1 = 0.04\,\frac{ped}{s}$",
-        # "color": "red",
-        "color": _c[3],
-    },
-    ts_y: {
-        "lbl": r"$Y_t$ with ped. arrival rate $\lambda_2 = 0.08\,\frac{ped}{s}$",
-        # "color": "blue",
-        "color": _c[0],
-    },
-}
 
 
 def read_trace_ts(path, run_id, lbl):
@@ -160,13 +176,15 @@ def create_map_ts_figure(
     maps: pd.DataFrame,
     ts: str,
     output_path: str | None = None,
+    _ax: plt.Axes | None = None,
+    lbl_key: str = "lbl",
 ):
 
     _v = ground_truth_ts.loc[:5000, [ts]]  # only first 5000 seconds
     max_y = _v[ts].max()  # get ground truth max y value for axis
 
-    fig, ax = plt.subplots(1, 1, figsize=(16, 9))
-    ax.plot(_v.index, _v, label=ts_[ts]["lbl"], marker=None, color="black")
+    fig, ax = PlotUtl.check_ax(_ax)
+    ax.plot(_v.index, _v, label=ts_[ts][lbl_key], marker=None, color=ts_[ts]["color"])
     for sim in maps.index.get_level_values("sim").unique():
         if run_map[sim].attr["ts"] == ts:
             _df: pd.DataFrame = maps.loc[
@@ -189,28 +207,31 @@ def create_map_ts_figure(
             ax.xaxis.set_major_locator(MaxNLocator(10))
             ax.legend(loc="lower right")
 
-    if output_path is not None:
+    if output_path is not None and _ax is None:
+        # only save stand alone figures
         fig.savefig(run_map.path(f"ped_count_ts_map_{ts}.pdf"))
 
     return fig, ax
 
 
-def make_vader_ts_figure(data: pd.DataFrame, output_path):
+def make_vader_ts_figure(
+    data: pd.DataFrame, output_path, _ax: plt.Axes | None = None, lbl_key="lbl"
+):
     """
     Plot ground truth
     """
-    fig, ax = plt.subplots(1, 1, figsize=(16, 9))
+    fig, ax = PlotUtl.check_ax(_ax)
     ax.plot(
         data.index,
         data.loc[:, [ts_x]],
-        label=ts_[ts_x]["lbl"],
+        label=ts_[ts_x][lbl_key],
         marker=None,
         color=ts_[ts_x]["color"],
     )
     ax.plot(
         data.index,
         data.loc[:, [ts_y]],
-        label=ts_[ts_y]["lbl"],
+        label=ts_[ts_y][lbl_key],
         marker=None,
         color=ts_[ts_y]["color"],
     )
@@ -218,16 +239,18 @@ def make_vader_ts_figure(data: pd.DataFrame, output_path):
     ax.set_ylabel("Number of Pedestrians")
     ax.set_xlabel("Time in [s]")
     ax.set_ylim(0, 35)
-    ax.set_xlim(0, 10000)
+    ax.set_xlim(0, 5000)
     ax.vlines(500, ymin=0, ymax=35, linestyles="--", label=None, color="black")
-    ax.xaxis.set_major_locator(MaxNLocator(20))
+    ax.xaxis.set_major_locator(MaxNLocator(10))
     x_lbl = [
-        str(i if idx % 2 == 0 else "") for idx, i in enumerate(np.arange(0, 10001, 500))
+        str(i if idx % 2 == 0 else i) for idx, i in enumerate(np.arange(0, 5001, 500))
     ]
     x_lbl[1] = "500"
     ax.set_xticklabels(x_lbl)
     ax.legend(loc="lower right")
-    fig.savefig(output_path)
+    # save figure only in stand alone mode
+    if _ax is None:
+        fig.savefig(output_path)
     return fig, ax
 
 
@@ -240,6 +263,7 @@ def get_run_map_single_run(output_dir) -> RunMap:
         id_offset=0,
         sim_group_factory=sim_factory,
     )
+    return run_map
 
 
 def get_run_map_split(output_dir) -> RunMap:
@@ -268,6 +292,11 @@ def get_run_map_split(output_dir) -> RunMap:
 def get_average_density_maps(
     run_map: RunMap, hdf_path: str | None = "maps.h5", hdf_key: str = "maps"
 ) -> pd.DateFrame:
+    """Density maps (aggregated over seeds) for all simulation groups in RunMap
+
+    Returns:
+        pd.DateFrame: (sim, simtime, data)[mean, std, p_50]
+    """
     if hdf_path is not None and run_map.path_exists(hdf_path):
         return pd.read_hdf(run_map.path(hdf_path), key=hdf_key)
     # get average density map from scenario map
@@ -333,13 +362,16 @@ def process_1d_scenario(run_map: RunMap):
             group.attr["ts"]
         ] = f"../study/traces_mf_1d_bm.d/numAgents_{trace}.csv"
 
+    # get average density map from scenario map
+    maps = get_average_density_maps(run_map)
     # figure (ground truth)
     v_ts = [read_trace_ts(path, 0, lbl) for lbl, path in trace_paths.items()]
     v_ts = pd.concat(v_ts, axis=1, verify_integrity=True)
     v_ts.columns = v_ts.columns.droplevel(["run_id"])
-    v_ts = v_ts[v_ts.index <= 5000.0]
-    # get average density map from scenario map
-    maps = get_average_density_maps(run_map)
+    # use the same time frame as simulated.
+    v_ts = v_ts[v_ts.index <= maps.index.get_level_values("simtime").max()]
+
+    paper_plot(run_map, v_ts, maps)
 
     make_vader_ts_figure(v_ts, run_map.path("ped_time_series.pdf"))
     # figure (maps over ground truth)
@@ -349,18 +381,12 @@ def process_1d_scenario(run_map: RunMap):
     # statistics for map and ground truth data
     stat_df = process_simulation_run(maps, run_map, v_ts)
     stat_df.to_csv(run_map.path("stat.csv"))
-    extract_tex_tables(stat_df)
+    extract_tex_tables(stat_df, run_map)
+
     print("done")
 
 
 def extract_tex_tables(df: pd.DataFrame | str, run_map: RunMap):
-    _format = {
-        "Test Statistic": "{:.3f}".format,
-        "p-value": "{:.4e}".format,
-        "Critical Value (1%)": "{:.3f}".format,
-        "mean": "{:.2f}".format,
-        "std": "{:.2f}".format,
-    }
 
     _rename = {
         "Critical Value (1%)": "Crit. (1%)",
@@ -368,6 +394,13 @@ def extract_tex_tables(df: pd.DataFrame | str, run_map: RunMap):
         "scenario": "Sim.",
         "mean": "Mean",
         "std": "Std",
+    }
+    _format = {
+        "Stat.": "\\num{{{:.3f}}}".format,
+        "p-value": "\\num{{{:.4e}}}".format,
+        "Crit. (1%)": "\\num{{{:.3f}}}".format,
+        "Mean": "{:.2f}".format,
+        "Std": "{:.2f}".format,
     }
 
     if isinstance(df, str):
@@ -378,11 +411,14 @@ def extract_tex_tables(df: pd.DataFrame | str, run_map: RunMap):
         g = [n for n, g in run_map.items() if g.attr["ts"] == _ts]
         g.sort()
         g.append(_ts)
-        FrameUtl.save_as_csv(
+        FrameUtl.save_as_tex_table(
             df.loc[g],
             run_map.path(f"stat_{_ts}.tex"),
             rename=_rename,
             col_format=_format,
+            str_replace=lambda x: x.replace("X\_0.04", "$X_t$").replace(
+                "X\_0.08", "$Y_t$"
+            ),
         )
 
 
@@ -417,6 +453,68 @@ class SimFactory:
         ret = SimulationGroup(group_name=f"S1-{self.group_num}", **kwds)
         self.group_num += 1
         return ret
+
+
+def paper_plot(run_map: RunMap, gt_ts: pd.DataFrame, maps: pd.DataFrame):
+
+    fig, (ax_ts, sim_ts, err_cdf) = plt.subplots(1, 3, figsize=(20, 6))
+
+    global ts_x
+    global ts_y
+
+    make_vader_ts_figure(gt_ts, "no_save", _ax=ax_ts, lbl_key="lbl_short")
+    create_map_ts_figure(
+        run_map, gt_ts, maps, ts_x, "no_save", sim_ts, lbl_key="lbl_short"
+    )
+    create_map_ts_figure(
+        run_map, gt_ts, maps, ts_y, "no_save", sim_ts, lbl_key="lbl_short"
+    )
+
+    _ts_y = [gn for gn, g in run_map.items() if g.attr["ts"] == "X_0.08"]
+    _ts_x = [gn for gn, g in run_map.items() if g.attr["ts"] == "X_0.04"]
+    _df = []
+    data = (
+        maps.loc[pd.IndexSlice[:, :, "map_mean_count"], ["mean"]]
+        .unstack(["data", "sim"])
+        .droplevel([0, 1], axis=1)
+    )
+    data_glb = (
+        maps.loc[pd.IndexSlice[:, :, "map_glb_count"], ["mean"]]
+        .unstack(["data", "sim"])
+        .droplevel([0, 1], axis=1)
+    )
+    data = pd.concat(
+        [data_glb.loc[:, [_ts_y[0]]].set_axis([ts_[ts_y]["lbl_short"]], axis=1), data],
+        axis=1,
+    )
+    data = pd.concat(
+        [data_glb.loc[:, [_ts_x[0]]].set_axis([ts_[ts_x]["lbl_short"]], axis=1), data],
+        axis=1,
+    )
+
+    _ts_y.insert(0, ts_[ts_y]["lbl_short"])
+    _ts_x.insert(0, ts_[ts_x]["lbl_short"])
+    col_order = [*_ts_y, *_ts_x]
+
+    sns.ecdfplot(data[col_order], palette=_c_map, ax=err_cdf, legend=False)
+
+    ax_ts.set_title("Time Series Ground Truth")
+    err_cdf.set_title("Empirical Cumulative Density Function")
+    err_cdf.set_xlabel("Number of Pedestrian")
+
+    _h, _l = sim_ts.get_legend_handles_labels()
+    ax_ts.get_legend().remove()
+    sim_ts.get_legend().remove()
+    fig.legend(
+        np.array(_h).reshape(2, 5).T.reshape((1, 10))[0],
+        np.array(_l).reshape(2, 5).T.reshape((1, 10))[0],
+        loc="lower center",
+        ncol=5,
+        fontsize="x-small",
+    )
+    fig.tight_layout(rect=(0.0, 0.07, 1.0, 1.0))
+
+    fig.savefig(run_map.path("1d_plot_descriptive.pdf"))
 
 
 def conv_err():
@@ -468,6 +566,6 @@ if __name__ == "__main__":
 
     output_dir = "/mnt/data1tb/results/_density_map/01a_1d_output/"
     run_map = RunMap.load_or_create(get_run_map_single_run, output_dir)
-    plot_default_stats()
-    process_1d_scenario()
-    # extract_tex_tables(run_map.path("stat.csv"), run_map)
+    plot_default_stats(run_map)
+    # process_1d_scenario(run_map)
+    extract_tex_tables(run_map.path("stat.csv"), run_map)
