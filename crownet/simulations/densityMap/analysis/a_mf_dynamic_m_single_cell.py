@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import partial
 from itertools import chain
 import re
 from matplotlib.colors import LinearSegmentedColormap
@@ -511,7 +512,7 @@ def _get_mse_data(run_map: RunMap):
 
 def get_run_map_N20(output_path: str, *args, **kwargs) -> RunMap:
     """One simulation run with 20 seeds"""
-    study1 = SuqcStudy("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_5/")
+    study1 = SuqcStudy(kwargs["src_path"])
     run_map: RunMap = RunMap(output_dir=output_path)
 
     run_map = study1.update_run_map(
@@ -563,13 +564,20 @@ def main(run_map: RunMap):
 
 if __name__ == "__main__":
     # run_map = RunMap.load_or_create(get_run_map_N20_split, output_path="/mnt/data1tb/results/_density_map/03_dynamic_output/")
+    # run_map = RunMap.load_or_create(
+    #     partial(get_run_map_N20, src_path="/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_5/"),
+    #     output_path="/mnt/data1tb/results/_density_map/03a_dynamic_output/",
+    # )
     run_map = RunMap.load_or_create(
-        get_run_map_N20,
-        output_path="/mnt/data1tb/results/_density_map/03a_dynamic_output/",
+        partial(
+            get_run_map_N20,
+            src_path="/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_6/",
+        ),
+        output_path="/mnt/data1tb/results/_density_map/03b_dynamic_output/",
     )
-    # plot_mse_err_stats(run_map)
-    # plot_per_seed_stats(run_map)
+
+    main(run_map)
+    plot_per_seed_stats(run_map)
     describtive_two_way_comparison_msce(run_map)
-    # describtive_two_way_comparison_count(run_map)
-    # main(run_map)
+    describtive_two_way_comparison_count(run_map)
     print("done")

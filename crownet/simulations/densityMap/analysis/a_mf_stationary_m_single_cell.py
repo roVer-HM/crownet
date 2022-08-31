@@ -11,12 +11,17 @@ from roveranalyzer.analysis.common import (
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.utils.parallel import run_kwargs_map
+from roveranalyzer.utils.plot import matplotlib_set_latex_param
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import numpy as np
 import scipy.stats as st
+from scipy.stats import mannwhitneyu, kstest
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+
+# load global settingsjj
+matplotlib_set_latex_param()
 
 
 def _min_max_norm(data, min=0, max=None):
@@ -299,12 +304,7 @@ def plot_positions(run_map: RunMap):
             pdf.savefig(f)
 
 
-def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap):
-    # normalized mean only
-    _glb = data.loc[data.index.get_level_values("sim")[0], :, "map_glb_count_n"]
-    data = data.loc[:, :, "map_count_mean_n"].copy()
-    # add group discriminator
-
+def filter_data(data: pd.DataFrame):
     mask_ydist = data.index.get_level_values("sim").str.startswith("ydist")
     mask_ymf = data.index.get_level_values("sim").str.startswith("ymf")
     mask_full = data.index.get_level_values("sim").str.contains("full")
@@ -317,10 +317,17 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
     data.loc[mask_full, ["sim_size"]] = "full"
     data.loc[mask_quarter, ["sim_size"]] = "quarter"
     data.loc[mask_position, ["sim_size"]] = "position"
-    # data = data.reset_index()
     data = data.reset_index().set_index(["sim_group", "sim_size", "simtime"])
-
     data = data.drop(columns=["sim"])
+    return data
+
+
+def merge_relative_with_error_bars(run_map: RunMap, data=None):
+    data: pd.DataFrame = read_map_data(run_map).sort_index() if data is None else data
+    _glb = data.loc[data.index.get_level_values("sim")[0], :, "map_glb_count_n"]
+    data = data.loc[pd.IndexSlice[:, :, "map_count_mean_n"], :].copy()
+    # add group discriminator
+    data = filter_data(data)
     ret = data.groupby(["sim_group", "sim_size", "simtime"]).agg(
         ["mean", "std", "sem", "count"]
     )
@@ -333,13 +340,35 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
     ret["clm_olow"] = ret["mean"] - clm_l
     ret["clm_ohigh"] = clm_h - ret["mean"]
 
-    p = [
-        ("Mean +/- Std Dev", "std"),
-        ("Mean +/- SEM", "sem"),
-        ("Mean with 95% confidence interval", ["clm_olow", "clm_ohigh"]),
-    ]
+    ret = ret.join(_glb)
+    ret = ret.rename(columns={0: "glb"})
 
-    def ax_trans(ax: plt.Axes, num=2, offset=0.1):
+    stat = []
+    for sim_size in ret.index.get_level_values("sim_size").unique():
+        stat_df = (
+            ret.loc[pd.IndexSlice[["ydist", "ymf"], sim_size, :], ["mean"]]
+            .unstack(["sim_size", "sim_group"])
+            .droplevel([0, 1], axis=1)
+            .reset_index(drop=True)
+        )
+        t = mannwhitneyu(stat_df.iloc[:, 0], stat_df.iloc[:, 1])
+        stat.append([t[0], t[1], f"{sim_size}-ydist/ymf"])
+    stat = pd.DataFrame(np.array(stat), columns=["stat", "p-value", "name"])
+
+    return ret, data, stat
+
+
+def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap):
+
+    ret, data, stat = merge_relative_with_error_bars(run_map, data)
+
+    p = [
+        ("norm. Count +/- Std Dev", "std"),
+        # ("Mean +/- SEM", "sem"),
+        # ("Mean with 95% confidence interval", ["clm_olow", "clm_ohigh"]),
+    ]
+    # normalized mean only
+    def ax_trans(ax: plt.Axes, num=2, offset=0.2):
         """Transformations which creates distributes 'num' items 'offset' amount apparat around zero."""
         _start = 0.0 - float((num - 1) * offset) / 2
         _stop = _start + num * offset
@@ -350,48 +379,60 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
 
     with PdfPages(run_map.path("normalized_pedestrian_count_merged.pdf")) as pdf:
         for ylabel, err in p:
-            fig, axes = plt.subplots(2, 1, figsize=(16, 2 * 9))
-            for ax_index, group in enumerate(
-                data.index.get_level_values("sim_size").unique().to_list()
-            ):
-                data_page = ret.loc[:, group, :]
-                ax: plt.Axes = axes[ax_index]
-                translate = ax_trans(ax, 2)
-                if group in ["position", "full"]:
-                    ax.set_title(
-                        f"Normalized number of pedestrians over time in Area [415x394] - {group}"
-                    )
-                else:
-                    ax.set_title(
-                        f"Normalized number of pedestrians over time in Area [207x196] - {group}"
-                    )
-                ax.set_ylim(0.4, 1.1)
-                ax.set_ylabel(ylabel)
-                ax.set_xlabel("Time in seconds")
-
-                ax.plot(
-                    _glb.index.get_level_values("simtime"),
-                    _glb,
-                    label="ground_truth",
-                    color="black",
+            fig, ax = plt.subplots(1, 1, figsize=(16, 9))
+            id_sel = list(itertools.product(["full", "quarter"], ["ymf", "ydist"]))
+            _glb = ret.loc[pd.IndexSlice[id_sel[0][1], id_sel[0][0], :], "glb"]
+            ax.plot(
+                _glb.index.get_level_values("simtime"),
+                _glb,
+                drawstyle="steps-post",
+                label="Ground Truth",
+                color="black",
+            )
+            ax.set_title(
+                f"Normalized number of pedestrians over time in areas A1=[415x394] A2=[207x196]"
+            )
+            ax.set_ylim(0.4, 1.1)
+            ax.set_xlim(0, 100)
+            ax.set_ylabel(ylabel)
+            ax.set_xlabel("Time in seconds")
+            ax.xaxis.set_major_locator(MaxNLocator(10))
+            # data
+            translate = ax_trans(ax, len(id_sel))
+            for idx, (group, sim) in enumerate(id_sel):
+                _df = ret.loc[sim, group, :]
+                yerr = _df[err].to_numpy().T if isinstance(err, list) else _df[err]
+                ax.errorbar(
+                    _df.index.get_level_values("simtime"),
+                    _df["mean"],
+                    transform=translate[idx],
+                    yerr=yerr,
+                    fmt="-" if idx < 2 else "-.",
+                    linewidth=1,
+                    elinewidth=1,
+                    capsize=2,
+                    capthick=1,
+                    label=f"S2-{'A1' if group=='full' else 'A2'}-{sim}",
                 )
-                for idx, sim in enumerate(
-                    data.index.get_level_values("sim_group").unique().to_list()
-                ):
-                    _df = data_page.loc[sim, :]
-                    yerr = _df[err].to_numpy().T if isinstance(err, list) else _df[err]
-                    ax.errorbar(
-                        _df.index.get_level_values("simtime"),
-                        _df["mean"],
-                        yerr=yerr,
-                        transform=translate[idx],
-                        linewidth=0.8,
-                        elinewidth=0.5,
-                        capsize=2,
-                        capthick=0.5,
-                        label=sim,
-                    )
-                    ax.legend()
+                ax.legend()
+            stat = stat[["name", "p-value"]]
+            stat = stat[~stat["name"].str.contains("position")]
+            stat["name"] = stat["name"].apply(
+                lambda x: x.replace("full", "S2-A1")
+                if "full" in x
+                else x.replace("quarter", "S2-A2")
+            )
+            stat.columns = ["Mann-Whitney U", "p-value"]
+            stat["p-value"] = stat["p-value"].astype(float).apply("{:.4e}".format)
+
+            tbl = ax.table(
+                cellText=stat.values,
+                cellLoc="center",
+                colLabels=stat.columns,
+                bbox=(0.5, 0.25, 0.5, 0.2),
+            )
+            tbl.scale(1, 2)
+            tbl.set_zorder(999)  # on top
             fig.tight_layout()
             pdf.savefig(fig)
 
@@ -513,5 +554,6 @@ if __name__ == "__main__":
     #     output_path="/mnt/data1tb/results/mf_stationary_m_single_cell_5/",
     # )
     # main(run_map)
-    plot_relative_count_stat(run_map)
+    # plot_relative_count_stat(run_map)
+    plot_merged_relative_pedestrian_count_ts(None, run_map)
     print("done")
