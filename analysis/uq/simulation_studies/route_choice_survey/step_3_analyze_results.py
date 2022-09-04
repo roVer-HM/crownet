@@ -3,6 +3,17 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+condition_names = {"A1": "Congestion info\n + arrow\n",
+                   "A2": "Congestion info\n + arrow\n+ top down view\n",
+                   "A3": "Congestion info\n + arrow\n+ team spirit\n",
+                   "A4": "Congestion info\n + arrow\n+ top down view\n+ team spirit\n",
+                   "B1": "Arrow \n",
+                   "B2": "Arrow \n+ top down view\n",
+                   "B3": "Arrow \n+ team spirit\n",
+                   "B4": "Arrow \n+ top down view\n+ team spirit\n",
+                   "Uninformed": "No information\n"
+                   }
+
 
 reaction_prob_key = "('Parameter', 'dummy_var', 'compliance_rate')"
 time_step_key = "timeStep"
@@ -93,7 +104,7 @@ def get_densities(controller_type):
     return densities_closed_loop
 
 
-def get_time_controller_wise(controller_type):
+def get_travel_time(controller_type):
     c1 = pd.read_csv(f"{controller_type}_startTime.csv", index_col=[0, 1, 2])
     c2 = pd.read_csv(f"{controller_type}_targetReachTime.csv", index_col=[0, 1, 2])
     times = c1.join(c2)
@@ -109,15 +120,13 @@ def get_time_controller_wise(controller_type):
 
     travel_times.rename(columns={condition: condition_short, stat: stat_short}, inplace=True)
 
-    return travel_times
-
-
-def get_travel_times():
-    c2 = get_time_controller_wise(controller_type="OpenLoop")
-    c3 = get_time_controller_wise(controller_type="ClosedLoop")
-    travel_times = pd.concat([c2, c3])
     travel_times = travel_times[travel_times["travel_time"] != np.inf]
+
+    travel_times["condition"].replace(condition_names, inplace=True)
+
     return travel_times
+
+
 
 
 def plot_travel_time(travel_time):
@@ -139,6 +148,9 @@ def plot_travel_time(travel_time):
             data_s = data_s.pivot(columns=[condition_short])
             data_s.columns = data_s.columns.droplevel(0)
 
+            col = data_s.pop("No information\n")
+            data_s.insert(0, col.name, col)
+
             x = [data_s[column].dropna().values for column in data_s]
             res = stats.kruskal(*x)
 
@@ -147,6 +159,7 @@ def plot_travel_time(travel_time):
             plt.ylabel("Travel time [s]")
             plt.xlabel("Communication strategy")
             plt.savefig(f"figs/{tit}.png")
+            plt.xticks(rotation=90, ha="right", rotation_mode="anchor")
             plt.show()
 
             print()
@@ -212,6 +225,8 @@ def get_path_choice(controller_type):
 
     path_choice = path_choice[path_choice["condition"]!="Uninformed"]
 
+    #path_choice.rename(index=condition_names, inplace=True)
+    path_choice["condition"].replace(condition_names, inplace=True)
     return path_choice
 
 
@@ -262,36 +277,10 @@ def plot_number_of_recommendations_long_route(path_choice):
     ppp.columns.name = "Group"
 
 
-
-    aa = {"A1": ("congestion info", "arrow", "", ""),
-          "A2": ("congestion info", "arrow", "top down view", ""),
-          "A3": ("congestion info", "arrow", "", "team spirit"),
-          "A4": ("congestion info", "arrow", "top down view", "top down view"),
-          "B1": ("", "arrow", "", ""),
-          "B2": ("", "arrow", "top down view", ""),
-          "B3": ("", "arrow", "", "team spirit"),
-          "B4": ("", "arrow", "top down view", "top down view")
-          }
-
-    aa = {"A1": ("Congestion info\n + arrow\n"),
-          "A2": ("Congestion info\n + arrow\n+ top down view\n"),
-          "A3": ("Congestion info\n + arrow\n+ team spirit\n"),
-          "A4": ("Congestion info\n + arrow\n+ top down view\n+ team spirit\n"),
-          "B1": ("Arrow \n"),
-          "B2": ("Arrow \n+ top down view\n"),
-          "B3": ("Arrow \n+ team spirit\n"),
-          "B4": ("Arrow \n+ top down view\n+ team spirit\n")
-          }
-
-
-    ppp.index = pd.Index(aa.values())
     ppp.sort_index(inplace=True)
 
-
-    ax = ppp.plot.bar()
+    ppp.plot.bar()
     plt.xticks(ha="right", rotation_mode="anchor")
-
-
     plt.ylabel("Number of recommendations \n for the long route")
     plt.xlabel("Condition")
     plt.savefig(f"figs/NumberOfRouteRecommendationsLongRoute.pdf")
@@ -453,11 +442,10 @@ if __name__ == "__main__":
 
 
     path_choice =  get_path_choice("ClosedLoop")
-
     plot_number_of_recommendations_long_route(path_choice)
 
-
-    travel_time = get_travel_times()
+    travel_time = get_travel_time(controller_type="ClosedLoop")
+    plot_travel_time(travel_time)
 
 
     densities, velocities = get_densities_velocities(start_time=0.0)
@@ -471,7 +459,7 @@ if __name__ == "__main__":
     plot_distributions(velocities_stat, name="Velocity")
 
 
-    plot_travel_time(travel_time)
+
     plot_stationary_behavior(densities_stat, name="Density")
     plot_stationary_behavior(velocities_stat, name="Velocity")
     plot_stationary_behavior(densities, name="Density", stationary="inflow")
