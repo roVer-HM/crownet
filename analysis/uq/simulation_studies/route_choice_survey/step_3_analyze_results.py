@@ -3,10 +3,6 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import LinearRegression
-
 
 reaction_prob_key = "('Parameter', 'dummy_var', 'compliance_rate')"
 time_step_key = "timeStep"
@@ -258,31 +254,49 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
     print()
 
 
-def plot_route_1_recommended(path_choice, corridor_=11, ax=None):
+def plot_number_of_recommendations_long_route(path_choice):
+    corridor_ = 31 # long corridor
+
+    path_choice = path_choice[path_choice["corridorRecommended"] == corridor_]
+    ppp = path_choice.groupby(by=[stat_short, condition_short]).count()["corridorRecommended"].unstack().transpose()
+    ppp.columns.name = "Group"
 
 
-    pp = path_choice[path_choice["Controller"] == "OpenLoop"]
-    pp = pp[pp["corridorRecommended"] == corridor_]
-    l1 = 1  # len(pp["corridorRecommended"])
-    ppp = pp.groupby(by=[stat_short,condition_short]).count()
 
-    pp = path_choice[path_choice["Controller"] == "ClosedLoop"]
-    pp = pp[pp["corridorRecommended"] == corridor_]
-    l2 = 1  # len(pp["corridorRecommended"])
-    pp = pp.groupby(by=[stat_short,condition_short]).count()
+    aa = {"A1": ("congestion info", "arrow", "", ""),
+          "A2": ("congestion info", "arrow", "top down view", ""),
+          "A3": ("congestion info", "arrow", "", "team spirit"),
+          "A4": ("congestion info", "arrow", "top down view", "top down view"),
+          "B1": ("", "arrow", "", ""),
+          "B2": ("", "arrow", "top down view", ""),
+          "B3": ("", "arrow", "", "team spirit"),
+          "B4": ("", "arrow", "top down view", "top down view")
+          }
 
-    ppp = pd.concat([ppp["corridorRecommended"] / l1, pp["corridorRecommended"] / l2], axis=1).fillna(0)
-    ppp.columns = list(controller__.values())
+    aa = {"A1": ("Congestion info\n + arrow\n"),
+          "A2": ("Congestion info\n + arrow\n+ top down view\n"),
+          "A3": ("Congestion info\n + arrow\n+ team spirit\n"),
+          "A4": ("Congestion info\n + arrow\n+ top down view\n+ team spirit\n"),
+          "B1": ("Arrow \n"),
+          "B2": ("Arrow \n+ top down view\n"),
+          "B3": ("Arrow \n+ team spirit\n"),
+          "B4": ("Arrow \n+ top down view\n+ team spirit\n")
+          }
 
-    for cont in ["Minimal density strategy", "Fixed order strategy"]:
-        df = ppp[cont].unstack()
-        df.transpose().plot.bar(subplots=True, layout=(2, 2), sharex=False, sharey= False, legend=None)
-        plt.suptitle(f"{cont}, {c__[corridor_]} corridor")
-        plt.savefig(f"figs/Recommendations_{cont}_{c__[corridor_]}.png")
-        plt.ylabel("Number of recommendations")
-        plt.xlabel("Condition")
-        plt.show()
-        print()
+
+    ppp.index = pd.Index(aa.values())
+    ppp.sort_index(inplace=True)
+
+
+    ax = ppp.plot.bar()
+    plt.xticks(ha="right", rotation_mode="anchor")
+
+
+    plt.ylabel("Number of recommendations \n for the long route")
+    plt.xlabel("Condition")
+    plt.savefig(f"figs/NumberOfRouteRecommendationsLongRoute.pdf")
+    plt.show()
+    print()
 
 
 
@@ -384,12 +398,6 @@ def compare_random_densitiies(dd, travel_time, value="Median", ):
         f.write(f"mannwhitneyu test: times. no difference between groups , p = {mannwhitneyU_.pvalue} > 0.05.\n")
 
 
-def plot_path_choice(path_choice):
-    plot_route_1_recommended(path_choice, 11)
-    plot_route_1_recommended(path_choice, 21)
-    plot_route_1_recommended(path_choice, 31)
-
-
 
 def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
 
@@ -444,12 +452,16 @@ def compare_corridor1_dists(quantity, name="density"):
 if __name__ == "__main__":
 
 
-    travel_time = get_travel_times()
     path_choice =  get_path_choice("ClosedLoop")
+
+    plot_number_of_recommendations_long_route(path_choice)
+
+
+    travel_time = get_travel_times()
+
+
     densities, velocities = get_densities_velocities(start_time=0.0)
     densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
-
-    print(densities_stat.sort_values(by=['Corridor1'], ascending=False).iloc[0,:])
 
     compare_corridor1_dists(densities_stat, name="Density")
     compare_corridor1_dists(velocities_stat, name="Velocity")
@@ -458,7 +470,7 @@ if __name__ == "__main__":
     plot_distributions(densities_stat, name="Density")
     plot_distributions(velocities_stat, name="Velocity")
 
-    plot_path_choice(path_choice=path_choice)
+
     plot_travel_time(travel_time)
     plot_stationary_behavior(densities_stat, name="Density")
     plot_stationary_behavior(velocities_stat, name="Velocity")
