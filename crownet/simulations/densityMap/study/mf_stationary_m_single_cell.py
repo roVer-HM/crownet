@@ -1,4 +1,5 @@
 from __future__ import annotations
+from ast import arg
 from functools import partial
 from glob import glob
 from typing import Callable
@@ -20,6 +21,35 @@ from typing import List
 
 from suqc.utils.general import get_env_name
 from subprocess import check_output
+
+mapCfgYmfDist = ObjectValue.from_args(
+    "crownet::MapCfgYmfPlusDistStep",
+    "writeDensityLog",
+    BoolValue.TRUE,
+    "mapTypeLog",
+    QString("ymfPlusDistStep"),
+    # "mapTypeLog", QString("all"),    # debug only
+    "cellAgeTTL",
+    UnitValue.s(30.0),  # -1.0 no TTL in
+    "alpha",
+    0.95,
+    "idStreamType",
+    QString("insertionOrder"),
+    "stepDist",
+    80.0,
+)
+mapCfgYmf = ObjectValue.from_args(
+    "crownet::MapCfgYmf",
+    "writeDensityLog",
+    BoolValue.TRUE,
+    "mapTypeLog",
+    QString("ymf"),
+    # "mapTypeLog", QString("all"),
+    "cellAgeTTL",
+    UnitValue.s(-1.0),
+    "idStreamType",
+    QString("insertionOrder"),
+)
 
 
 def create_random_positions(
@@ -97,6 +127,48 @@ def create_random_positions(
         )
 
 
+def create_positions_2(
+    base_dir: str, number_of_runs: int = 20, seed: int | None = None
+):
+    seed = (
+        random.Random(time_ns()).randint(-2147483648, 2147483647)
+        if seed is None
+        else seed
+    )
+    cmd = os.path.join(os.environ["CROWNET_HOME"], "scripts/rnd_stationary_positions")
+
+    nodes_area_1 = [2, 8, 16, 24, 32, 48, 64]
+    nodes_area_2 = [2, 4, 6, 8, 12, 16]
+    args: list = [
+        "--vadere",
+        os.path.abspath("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario"),
+        "--seed",
+        str(seed),
+        "--seed-type",
+        "pos",
+        "--number-of-runs",
+        str(number_of_runs),
+        "--config-name",
+        "density_full",
+        "--output-dir",
+        base_dir,
+    ]
+    for num in nodes_area_1:
+        check_output([cmd, *args, "--number-of-positions", str(num)])
+    args[args.index("density_full")] = "density_quarter"
+    args.extend(
+        [
+            "--offset",
+            "0.25",
+            "0.25",
+            "0.5",
+            "0.5",
+        ]
+    )
+    for num in nodes_area_2:
+        check_output([cmd, *args, "--number-of-positions", str(num)])
+
+
 config_pattern = re.compile(r".*?(?P<num>\d+)_(?P<run>\d+)_(?P<seed>\d+)\.ini")
 
 
@@ -132,6 +204,7 @@ class CopyPositionCfg:
 def get_traces(
     trace_dir: str, include_filter: Callable[[str], bool] = lambda x: True
 ) -> dict[str, List[dict],]:
+    """Search for trace files in directory"""
     traces = glob(os.path.join(trace_dir, "*.ini"), recursive=False)
     sim = {}
     for t in traces:
@@ -159,71 +232,55 @@ def get_traces(
     return sim
 
 
-def main(trace_dir: str, filter: str = "both", seed: int | None = None, **kwds):
+def var_ydist(opp_seed, position_path):
+    _r = random.Random(opp_seed)
+    rnd_start_time = f"{25.0*_r.random()}s"
+    base = {
+        "omnet": {
+            "extends": "_stationary_m_base_single_cell",
+            "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist,
+            "seed-set": str(opp_seed),
+            "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+            "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+            "static-position-file": position_path,  # dummy will be removed later
+            "*.misc[*].app[1].app.startTime": rnd_start_time,
+            "*.misc[*].app[0].app.startTime": rnd_start_time,
+        }
+    }
+    return base
+
+
+def var_ymf(opp_seed, position_path):
+    _r = random.Random(opp_seed)
+    rnd_start_time = f"{25.0*_r.random()}s"
+    base = {
+        "omnet": {
+            "extends": "_stationary_m_base_single_cell",
+            "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
+                "alpha", 1.00, "stepDist", 999
+            ),
+            "seed-set": str(opp_seed),
+            "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
+            "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
+            "static-position-file": position_path,  # dummy will be removed later
+            "*.misc[*].app[1].app.startTime": rnd_start_time,
+            "*.misc[*].app[0].app.startTime": rnd_start_time,
+        }
+    }
+    return base
+
+
+def main(
+    trace_dir: str,
+    alg_filter: str = "both",
+    trace_filter: Callable[[str], bool] = lambda _: True,
+    seed: int | None = None,
+    **kwds,
+):
     # Enviroment setup.
     #
     reps = 20  # seed-set
-    mapCfgYmfDist = ObjectValue.from_args(
-        "crownet::MapCfgYmfPlusDistStep",
-        "writeDensityLog",
-        BoolValue.TRUE,
-        "mapTypeLog",
-        QString("ymfPlusDistStep"),
-        # "mapTypeLog", QString("all"),    # debug only
-        "cellAgeTTL",
-        UnitValue.s(30.0),  # -1.0 no TTL in
-        "alpha",
-        0.95,
-        "idStreamType",
-        QString("insertionOrder"),
-        "stepDist",
-        80.0,
-    )
-    mapCfgYmf = ObjectValue.from_args(
-        "crownet::MapCfgYmf",
-        "writeDensityLog",
-        BoolValue.TRUE,
-        "mapTypeLog",
-        QString("ymf"),
-        # "mapTypeLog", QString("all"),
-        "cellAgeTTL",
-        UnitValue.s(-1.0),
-        "idStreamType",
-        QString("insertionOrder"),
-    )
     opp_config = "final_stationary_mf"
-
-    def var(opp_seed, position_path):
-        base = {
-            "omnet": {
-                "extends": "_stationary_m_base_single_cell",
-                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist,
-                "seed-set": str(opp_seed),
-                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
-                "static-position-file": position_path,  # dummy will be removed later
-                "*.misc[66..110].app[1].app.startTime": "uniform(20s, 25s)",
-                "*.misc[66..110].app[0].app.startTime": "uniform(20s, 25s)",
-            }
-        }
-        return base
-
-    def var_ymf(opp_seed, position_path):
-        base = {
-            "omnet": {
-                "extends": "_stationary_m_base_single_cell",
-                "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(
-                    "alpha", 1.00, "stepDist", 999
-                ),
-                "seed-set": str(opp_seed),
-                "*.misc[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.misc[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
-                "static-position-file": position_path,  # dummy will be removed later
-                "*.misc[66..110].app[1].app.startTime": "uniform(20s, 25s)",
-                "*.misc[66..110].app[0].app.startTime": "uniform(20s, 25s)",
-            }
-        }
-        return base
 
     seed_m = OmnetSeedManager(
         par_variations={},
@@ -236,21 +293,20 @@ def main(trace_dir: str, filter: str = "both", seed: int | None = None, **kwds):
     # choose reps number of random position setups between [0..5]  and set
     # a random seed for each.
     _, opp_seeds = seed_m.get_seed_paring()
-    traces = get_traces(
-        trace_dir, include_filter=kwds.get("include_filter", lambda x: True)
-    )
+    traces = get_traces(trace_dir, include_filter=trace_filter)
     par_var = []
-    if filter == "both":
-        var_f = [var, var_ymf]
-    elif filter == "ymf":
+    if alg_filter == "both":
+        var_f = [var_ydist, var_ymf]
+    elif alg_filter == "ymf":
         var_f = [var_ymf]
     else:
-        var_f = [var]
+        var_f = [var_ydist]
     for variation_name, runs in traces.items():
         if len(runs) != len(opp_seeds):
             raise ValueError(
                 "stationary traces and configured repetitions do not match"
             )
+        # execute callables to create variations
         for _f in var_f:
             for run in runs:
                 opp_seed = opp_seeds[run["run"]]
@@ -306,12 +362,13 @@ def trace_filter_176(path: str):
 
 
 if __name__ == "__main__":
-    # main("./mf_stationary_single_cell.d/")
-    main(
-        "./mf_stationary_single_cell.d/",
-        filter="both",
-        seed=1659968091603987908,
-        include_filter=trace_filter_176,
-    )
+    main("./mf_stationary_single_cell.d/", trace_filter=lambda x: "position_" not in x)
+    # main(
+    #     "./mf_stationary_single_cell.d/",
+    #     filter="both",
+    #     seed=1659968091603987908,
+    #     include_filter=trace_filter_176,
+    # )
     # create_random_positions("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
+    # create_positions_2("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
     # get_traces("./mf_stationary_single_cell.d/")

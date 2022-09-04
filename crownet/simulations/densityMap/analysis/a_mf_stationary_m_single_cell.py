@@ -1,5 +1,8 @@
+from __future__ import annotations
+from multiprocessing import pool
 import re
 import itertools
+from sqlite3 import converters
 from matplotlib.transforms import Affine2D
 from roveranalyzer.analysis.common import (
     NamedSimulationGroupFactory,
@@ -11,16 +14,21 @@ from roveranalyzer.analysis.common import (
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import matplotlib_set_latex_param
-from matplotlib.ticker import MaxNLocator
+from roveranalyzer.utils.plot import check_ax, matplotlib_set_latex_param
+import roveranalyzer.utils.dataframe as FrameUtl
+import roveranalyzer.utils.plot as PlotUtl
+from matplotlib.ticker import MaxNLocator, FixedLocator
 import pandas as pd
 import numpy as np
+import seaborn as sn
 import scipy.stats as st
 from scipy.stats import mannwhitneyu, kstest
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-# load global settingsjj
+from omnetinireader.config_parser import ObjectValue
+
+# load global settings
 matplotlib_set_latex_param()
 
 
@@ -29,7 +37,7 @@ def _min_max_norm(data, min=0, max=None):
     return (data - min) / (max - min)
 
 
-def _process_relative_err(df: pd.DataFrame):
+def _rename_merged(df: pd.DataFrame) -> pd.DataFrame:
     if any(df.loc[pd.IndexSlice[:, :, "map_glb_count"], "std"] != 0):
         raise ValueError("WARNING: global number of nodes differs between merged runs")
 
@@ -40,23 +48,27 @@ def _process_relative_err(df: pd.DataFrame):
     df = df.rename(columns={"map_mean_count": "map_count"})
     df.columns = [f"{l1}_{l2}" for l1, l2 in df.columns]
     df = df.rename(columns={"map_glb_count_mean": "map_glb_count"})
+    return df
 
-    g = "map_glb_count"
-    m = "map_count_mean"
-    gn = "map_glb_count_n"
-    mn = "map_count_mean_n"
-    mm = "map_count_median"
-    mmn = "map_count_median_n"
-    df[gn] = _min_max_norm(df[g])
-    df[mn] = _min_max_norm(df[m], max=df[g].max())
-    df[mmn] = _min_max_norm(df[mm], max=df[g].max())
+
+def _prepare_collected(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.unstack(["data"]).droplevel(0, axis=1)
+    df = df.rename(columns={"map_mean_count": "map_count_mean"})
+    return df
+
+
+def _process_relative_err(df: pd.DataFrame, norm_colum="map_glb_count"):
+
+    _max = df[norm_colum].max()
+    for c in df.columns:
+        df[f"{c}_n"] = _min_max_norm(df[c], min=0, max=_max)
 
     df.columns.name = "data"
     df = df.stack().sort_index()
     return df
 
 
-def _read_groups(study: SuqcStudy, run_map: RunMap, alg_name: str, id_offset: int):
+def _read_groups(study: SuqcStudy, run_map: RunMap, id_offset: int):
     groups: dict = {}
     pattern = re.compile(
         r"_stationary_m_base_single_cell, (?P<base>.*?)(?P<num>\d+)_(?P<run_id>\d+)_(?P<seed>\d+)$"
@@ -65,13 +77,17 @@ def _read_groups(study: SuqcStudy, run_map: RunMap, alg_name: str, id_offset: in
         extends = sim.run_context.oppini["extends"]
         m = pattern.match(extends)
         m = m.groupdict()
-        group_name = f"{alg_name}_{m['base']}{m['num']}"
-        group = groups.get(group_name, {})
-        attr = group.get("attr", {})
-        attr["alg"] = alg_name
-        attr["num"] = m["num"]
+
+        alg: ObjectValue = sim.run_context.ini_get("*.misc[*].app[1].app.mapCfg")
+        attr = {}
+        attr["alg"] = "ymf" if float(alg["alpha"]) == 1.0 else "yDist"
+        attr["num"] = int(m["num"])
         attr["base"] = m["base"][:-1]
+
+        group_name = f"{attr['alg']}_{m['base']}{m['num']}"
+        group = groups.get(group_name, {})
         group["attr"] = attr
+
         sim_list = group.get("sim_list", [])
         sim_list.append((m["run_id"], sim))
         group["sim_list"] = sim_list
@@ -99,30 +115,49 @@ def run_map_with_2_step_ramp_up(output_path: str, *args, **kwargs) -> RunMap:
         run_map,
         20,
         id_offset=0,
-        sim_group_factory=NamedSimulationGroupFactory(["ydist", "ymf"]),
+        sim_group_factory=NamedSimulationGroupFactory(["yDist", "ymf"]),
     )
     return run_map
+
+
+def run_map_from_6(output_path: str, *args, **kwargs) -> RunMap:
+    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_6/")
+    return _read_groups(study, RunMap(output_path), id_offset=0)
 
 
 def run_map_from_4_8(output_path: str, *args, **kwargs) -> RunMap:
     """Simulation run of ydist and ymf heuristic with multiple numbers of pedestrians as well as constant densities."""
     run_map = RunMap(output_path)
     study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_8/")
-    run_map = _read_groups(study, run_map, "ydist", id_offset=0)
+    run_map = _read_groups(study, run_map, id_offset=0)
 
     study2 = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_4/")
-    run_map = _read_groups(study2, run_map, "ymf", id_offset=run_map.max_id + 1)
+    run_map = _read_groups(study2, run_map, id_offset=run_map.max_id + 1)
     return run_map
 
 
 def read_map_data(run_map: RunMap):
-
     return OppAnalysis.merge_maps_for_run_map(
         run_map=run_map,
-        data=["map_glb_count", "map_count_mean"],
-        frame_consumer=_process_relative_err,
+        data=["map_glb_count", "map_mean_count"],
+        frame_consumer=FrameUtl.FrameConsumerList.get(
+            _rename_merged, _process_relative_err
+        ),
         hdf_path="merged_normalized_map_measure.h5",
         hdf_key="map_measure_norm_static",
+        pool_size=20,
+    )
+
+
+def read_map_data_by_run(run_map: RunMap) -> pd.DataFrame:
+    fc_list = FrameUtl.FrameConsumerList.get(_prepare_collected, _process_relative_err)
+    return OppAnalysis.collect_maps_for_run_map(
+        run_map=run_map,
+        data=["map_glb_count", "map_mean_count"],
+        frame_consumer=fc_list,
+        hdf_path="normalized_map_measure.h5",
+        hdf_key="map_measure_norm_static",
+        pool_size=20,
     )
 
 
@@ -147,15 +182,105 @@ def get_convergence_time(map: pd.DataFrame, time_slice, err) -> dict:
             [
                 g,
                 _df["convergence_mask"].idxmax()[-1] - time_slice.start,
-                map.loc[
-                    pd.IndexSlice[g, :, "map_glb_count"],
-                ].max(),
+                float(
+                    map.loc[
+                        pd.IndexSlice[g, :, "map_glb_count"],
+                    ].max()
+                ),
             ]
         )
 
-    return pd.DataFrame.from_records(
-        ret, columns=["sim", "convergence_time", "ped_count"]
+    ret = pd.DataFrame(ret, columns=["sim", "convergence_time", "ped_count"]).set_index(
+        "sim"
     )
+
+    _missing: pd.Index = df.index.get_level_values(0).unique().difference(ret.index)
+    if len(_missing) > 0:
+        _df = (
+            map.loc[_missing, df.index.get_level_values(1).max(), "map_glb_count"]
+            .reset_index(["simtime", "data"], drop=True)
+            .set_axis(["ped_count"], axis=1)
+        )
+        _df["convergence_time"] = float("inf")
+        ret = pd.concat([ret, _df], axis=0)
+
+    return ret
+
+
+def plot_convergence(
+    run_map: RunMap,
+    convergence_error=0.05,
+    event_time: float = 40.0,
+    ax: plt.Axes | None = None,
+):
+
+    df = read_map_data_by_run(run_map)
+    time_slice = slice(event_time, None, None)
+    # calculate convergence time step for each simulation (sim, run)
+    df = df.unstack("data").droplevel(0, axis=1).loc[:, :, time_slice]
+    df["abs_err"] = np.abs(df["map_glb_count_n"] - df["map_count_mean_n"])
+    df["conv_mask"] = df["abs_err"] < convergence_error
+    df["convergence_time"] = df.index.get_level_values("simtime") - event_time
+    # convergence is reached at first time point where ["conv_mask"] is true --> idxmax()
+    # Note if ["conv_mask"] is never true, i.e. convergence is not reached the first index
+    # for that group is used.
+    conv_idx = pd.MultiIndex.from_tuples(
+        df.groupby(["sim", "run"])["conv_mask"].idxmax()
+    )
+    df = df.loc[conv_idx]
+    # set convergence time for runs that did not reach convergence to -1
+    df.loc[~df["conv_mask"], ["convergence_time"]] = -1.0
+    # add attribute
+    _attr = run_map.attr_df()
+    _attr["area"] = _attr["base"].apply(lambda x: x.split("_")[-1])
+    _attr["area"] = _attr["area"].str.replace("position", "full")
+    _attr["area"] = _attr["area"].str.replace("full", "A1")
+    _attr["area"] = _attr["area"].str.replace("quarter", "A2")
+    df = df.join(_attr, on="sim").reset_index().sort_values("num")
+    # add count of same convergence time for each group
+    ct_count = df.groupby(["num", "alg", "convergence_time"]).count().iloc[:, 0]
+    ct_count.name = "count"
+    df = df.join(ct_count, on=["num", "alg", "convergence_time"])
+    df = df.reset_index()
+    # create small x-axis offset to prevent overlapping data
+    df["ped_count"] = df["num"]
+    df = df.set_index(["num", "alg", "run"]).sort_index()
+    df.loc[pd.IndexSlice[:, "ymf", :], ["ped_count"]] += 0.3
+    df.loc[pd.IndexSlice[:, "yDist", :], ["ped_count"]] -= 0.3
+
+    # create scatter plot
+    df = df.rename(
+        columns=dict(
+            ped_count="Number of pedestrians", convergence_time="Convergence time"
+        )
+    )
+    fig, ax = check_ax(ax)
+    ax = sn.scatterplot(
+        ax=ax,
+        data=df.reset_index(),
+        x="Number of pedestrians",
+        y="Convergence time",
+        hue="alg",
+        style="area",
+        size="count",
+    )
+
+    # create x axis tick labels based on data
+    l = np.sort(df.index.get_level_values("num").unique()).astype(int)
+    ax.xaxis.set_major_locator(FixedLocator(l))
+    ax.set_xticklabels(l, rotation=90, ha="center")
+    # fix legend layout and position
+    h, l = ax.get_legend_handles_labels()
+    _del_idx = [l.index(_l) for _l in ["alg", "count", "area"]]
+    for idx in _del_idx[::-1]:
+        del h[idx]
+        del l[idx]
+    fig.legend(h, l, loc="lower center", ncol=len(h), fontsize="x-small")
+    ax.get_legend().remove()
+    # save figure
+    ax.set_title("Convergence time for mean density map for each simulation run")
+    ax.get_figure().tight_layout()
+    fig.savefig(run_map.path("convergence_time_per_run.pdf"))
 
 
 def main(run_map: RunMap):
@@ -163,14 +288,16 @@ def main(run_map: RunMap):
     map = read_map_data(run_map).sort_index()
 
     # get convergence time
-    df_convergence = get_convergence_time(map, time_slice=slice(41, None), err=0.05)
+    df_convergence = get_convergence_time(map, time_slice=slice(51, None), err=0.05)
     df_convergence.to_csv(run_map.path("convergence_time.csv"))
 
     # plot
     plot_all_relative_pedestrian_count_ts(map)
     plot_merged_relative_pedestrian_count_ts(map, run_map)
-    plot_positions(run_map)
+    # plot_positions(run_map)
     plot_all_absolute_pedestrian_count_ts(map)
+    plot_convergence(run_map, event_time=51.0, convergence_error=0.05)
+    plot_relative_count_stat(run_map)
 
 
 def plot_all_absolute_pedestrian_count_ts(map: pd.DataFrame):
@@ -269,7 +396,7 @@ def plot_positions(run_map: RunMap):
             ax.plot(
                 "x",
                 "y",
-                fmt="",
+                # fmt="",
                 label="nodes stationary for total simulation",
                 data=pos_df.loc[run_id, :, :, True],
                 markersize=3,
@@ -304,21 +431,22 @@ def plot_positions(run_map: RunMap):
             pdf.savefig(f)
 
 
-def filter_data(data: pd.DataFrame):
-    mask_ydist = data.index.get_level_values("sim").str.startswith("ydist")
+def split_sim_key(data: pd.DataFrame, keep_index: bool = False):
+    """Split concatenated string key to separate entities"""
+    mask_ydist = data.index.get_level_values("sim").str.startswith("yDist")
     mask_ymf = data.index.get_level_values("sim").str.startswith("ymf")
     mask_full = data.index.get_level_values("sim").str.contains("full")
     mask_quarter = data.index.get_level_values("sim").str.contains("quarter")
     mask_position = data.index.get_level_values("sim").str.contains("position")
     data["sim_group"] = ""
     data["sim_size"] = ""
-    data.loc[mask_ydist, ["sim_group"]] = "ydist"
+    data.loc[mask_ydist, ["sim_group"]] = "yDist"
     data.loc[mask_ymf, ["sim_group"]] = "ymf"
     data.loc[mask_full, ["sim_size"]] = "full"
     data.loc[mask_quarter, ["sim_size"]] = "quarter"
     data.loc[mask_position, ["sim_size"]] = "position"
-    data = data.reset_index().set_index(["sim_group", "sim_size", "simtime"])
-    data = data.drop(columns=["sim"])
+    if not keep_index:
+        data = data.reset_index("sim", drop=True)
     return data
 
 
@@ -327,7 +455,8 @@ def merge_relative_with_error_bars(run_map: RunMap, data=None):
     _glb = data.loc[data.index.get_level_values("sim")[0], :, "map_glb_count_n"]
     data = data.loc[pd.IndexSlice[:, :, "map_count_mean_n"], :].copy()
     # add group discriminator
-    data = filter_data(data)
+    data = split_sim_key(data)
+    data = data.reset_index().set_index(["sim_group", "sim_size", "simtime"])
     ret = data.groupby(["sim_group", "sim_size", "simtime"]).agg(
         ["mean", "std", "sem", "count"]
     )
@@ -346,7 +475,7 @@ def merge_relative_with_error_bars(run_map: RunMap, data=None):
     stat = []
     for sim_size in ret.index.get_level_values("sim_size").unique():
         stat_df = (
-            ret.loc[pd.IndexSlice[["ydist", "ymf"], sim_size, :], ["mean"]]
+            ret.loc[pd.IndexSlice[["yDist", "ymf"], sim_size, :], ["mean"]]
             .unstack(["sim_size", "sim_group"])
             .droplevel([0, 1], axis=1)
             .reset_index(drop=True)
@@ -363,7 +492,7 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
     ret, data, stat = merge_relative_with_error_bars(run_map, data)
 
     p = [
-        ("norm. Count +/- Std Dev", "std"),
+        ("Normalized  pedestrian count +/- Std Dev", "std"),
         # ("Mean +/- SEM", "sem"),
         # ("Mean with 95% confidence interval", ["clm_olow", "clm_ohigh"]),
     ]
@@ -380,7 +509,7 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
     with PdfPages(run_map.path("normalized_pedestrian_count_merged.pdf")) as pdf:
         for ylabel, err in p:
             fig, ax = plt.subplots(1, 1, figsize=(16, 9))
-            id_sel = list(itertools.product(["full", "quarter"], ["ymf", "ydist"]))
+            id_sel = list(itertools.product(["full", "quarter"], ["ymf", "yDist"]))
             _glb = ret.loc[pd.IndexSlice[id_sel[0][1], id_sel[0][0], :], "glb"]
             ax.plot(
                 _glb.index.get_level_values("simtime"),
@@ -423,7 +552,9 @@ def plot_merged_relative_pedestrian_count_ts(data: pd.DataFrame, run_map: RunMap
                 else x.replace("quarter", "S2-A2")
             )
             stat.columns = ["Mann-Whitney U", "p-value"]
-            stat["p-value"] = stat["p-value"].astype(float).apply("{:.4e}".format)
+            stat = FrameUtl.format_frame(
+                stat, si_func={"p-value": FrameUtl.siunitx(precision=3)}
+            )
 
             tbl = ax.table(
                 cellText=stat.values,
@@ -493,10 +624,10 @@ def plot_relative_count_stat(run_map: RunMap):
         "count_"
         + data["alg"]
         + "_"
-        + data["sim"].apply(lambda x: run_map.attr(x, "num"))
+        + data["sim"].apply(lambda x: str(run_map.attr(x, "num")))
     )
     data = data[data["data"] != "gt_ymf"]
-    data["data"] = data["data"].str.replace("gt_ydist", "gt")
+    data["data"] = data["data"].str.replace("gt_yDist", "gt")
     data = data.drop(columns=["sim", "alg"])
     data = data.set_index(["simtime", "data"]).sort_index()
     data = pd.concat([gt, data])
@@ -506,9 +637,9 @@ def plot_relative_count_stat(run_map: RunMap):
     nums = np.unique(np.sort([int(run_map.attr(g, "num")) for g in groups]))
     stat_combination = []
     for num in nums:
-        stat_combination.append(("gt", f"count_ydist_{num}"))
+        stat_combination.append(("gt", f"count_yDist_{num}"))
         stat_combination.append(("gt", f"count_ymf_{num}"))
-    alg_combi = [(f"count_ydist_{num}", f"count_ymf_{num}") for num in nums]
+    alg_combi = [(f"count_yDist_{num}", f"count_ymf_{num}") for num in nums]
     stat_combination.extend(alg_combi)
 
     # sort columns (simtime)[gt, ydist_A, ymf_A, ydist_B, ...]
@@ -544,16 +675,23 @@ def update_hdf_files():
 
 if __name__ == "__main__":
 
-    run_map: RunMap = RunMap.load_or_create(
-        create_f=run_map_from_4_8,
-        output_path="/mnt/data1tb/results/_density_map/02_stationary_output/",
-    )
+    # run_map: RunMap = RunMap.load_or_create(
+    #     create_f=run_map_from_4_8,
+    #     output_path="/mnt/data1tb/results/_density_map/02_stationary_output/",
+    # )
 
     # run_map: RunMap = RunMap.load_or_create(
     #     create_f=run_map_with_2_step_ramp_up,
     #     output_path="/mnt/data1tb/results/mf_stationary_m_single_cell_5/",
     # )
+
+    run_map: RunMap = RunMap.load_or_create(
+        create_f=run_map_from_6,
+        output_path="/mnt/data1tb/results/_density_map/02a_stationary_output/",
+    )
+
+    plot_convergence(run_map, event_time=51.0, convergence_error=0.05)
     # main(run_map)
     # plot_relative_count_stat(run_map)
-    plot_merged_relative_pedestrian_count_ts(None, run_map)
+    # plot_merged_relative_pedestrian_count_ts(None, run_map)
     print("done")
