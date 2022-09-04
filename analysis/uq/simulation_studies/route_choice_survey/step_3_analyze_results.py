@@ -131,50 +131,41 @@ def get_travel_time(controller_type):
 
 def plot_travel_time(travel_time):
 
-    for c, data in travel_time.groupby(by=["Controller"]):
-        data.drop(columns="Controller", inplace=True)
-        data.reset_index(inplace=True, drop=True, )
-        data.set_index(["condition", "stat"], inplace=True)
+
+    data = travel_time
+    data.drop(columns="Controller", inplace=True)
+    data.reset_index(inplace=True, drop=True, )
+    data.set_index(["condition", "stat"], inplace=True)
+
+    for s_, data_s in data.groupby(level="stat"):
+
+        tit = f"TravelTime{s_}"
+        data_s.index = data_s.index.droplevel(1)
+        data_s = pd.DataFrame(data_s.unstack() , columns= ["travel_time"])
+        data_s.reset_index(inplace=True)
+        data_s = data_s.drop(columns=["level_0"])
+        data_s = data_s.pivot(columns=[condition_short])
+        data_s.columns = data_s.columns.droplevel(0)
+
+        col = data_s.pop("No information\n")
+        data_s.insert(0, col.name, col)
+
+        x = [data_s[column].dropna().values for column in data_s]
+        res = stats.kruskal(*x)
+
+        data_s.boxplot()
+        plt.title(f"Group: {s_}")
+        plt.ylabel("Travel time [s]")
+        plt.xlabel("Communication strategy")
+        plt.savefig(f"figs/{tit}.pdf")
+        plt.xticks(rotation=90, ha="right", rotation_mode="anchor")
+        plt.show()
 
 
-        for s_, data_s in data.groupby(level="stat"):
+    statistics_ = data.groupby(level=["stat", "condition"]).describe()
+    statistics_.to_latex("tables/TravelTimeStatistics.tex", escape=False, float_format="%.1f")
+    print()
 
-
-            tit = f"BoxplotTravelTimeStat__{s_}_{c}"
-            data_s.index = data_s.index.droplevel(1)
-            data_s = pd.DataFrame(data_s.unstack() , columns= ["travel_time"])
-            data_s.reset_index(inplace=True)
-            data_s = data_s.drop(columns=["level_0"])
-            data_s = data_s.pivot(columns=[condition_short])
-            data_s.columns = data_s.columns.droplevel(0)
-
-            col = data_s.pop("No information\n")
-            data_s.insert(0, col.name, col)
-
-            x = [data_s[column].dropna().values for column in data_s]
-            res = stats.kruskal(*x)
-
-            data_s.boxplot()
-            plt.title(f"{c}, point est. likeli: {s_}, Kruskal-Wallis: p={res.pvalue:.3f}")
-            plt.ylabel("Travel time [s]")
-            plt.xlabel("Communication strategy")
-            plt.savefig(f"figs/{tit}.png")
-            plt.xticks(rotation=90, ha="right", rotation_mode="anchor")
-            plt.show()
-
-            print()
-
-        statistics_ = data.groupby(level=["stat", "condition"]).describe()
-        statistics_.columns = statistics_.columns.droplevel(0)
-        statistics_.drop(columns='count', inplace=True)
-
-        for s_, data_s in statistics_.groupby(level="stat"):
-            # TODO replace with boxplo??
-            tit = f"TravelTimeStat__{s_}_{c}"
-            data_s.index = data_s.index.droplevel(0)
-            data_s.plot(subplots=True, title=f"Controller {c} Travel time {s_}", marker="o")
-            plt.savefig(f"figs/{tit}.png")
-            plt.show()
 
 
 def get_densities_velocities(start_time = None):
@@ -282,7 +273,7 @@ def plot_number_of_recommendations_long_route(path_choice):
     ppp.plot.bar()
     plt.xticks(ha="right", rotation_mode="anchor")
     plt.ylabel("Number of recommendations \n for the long route")
-    plt.xlabel("Condition")
+    plt.xlabel("Communication strategy")
     plt.savefig(f"figs/NumberOfRouteRecommendationsLongRoute.pdf")
     plt.show()
     print()
