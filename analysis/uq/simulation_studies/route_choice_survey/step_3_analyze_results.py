@@ -327,9 +327,9 @@ def plot_velocities_densities_short_corridor(densities, velocities):
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
         plt.title(f"{stats_}")
-        plt.savefig(f"figs/DensityShortCorridor{stats_}.pdf", bbox_inches= "tight")
         plt.ylabel("Density [$ped/m^2$] \n in the short corridor")
         plt.ylim(bottom= -0.05, top=1.7)
+        plt.savefig(f"figs/DensityShortCorridor{stats_}.pdf", bbox_inches="tight")
         plt.show()
 
     velocities = velocities[["condition", "Corridor1", "stat"]]
@@ -343,9 +343,9 @@ def plot_velocities_densities_short_corridor(densities, velocities):
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
         plt.title(f"{stats_}")
-        plt.savefig(f"figs/VelocityShortCorridor{stats_}.pdf", bbox_inches= "tight")
         plt.ylabel("Velocity [$m/s^2$] \n in the short corridor")
         plt.ylim(bottom= -0.05, top=2.2)
+        plt.savefig(f"figs/VelocityShortCorridor{stats_}.pdf", bbox_inches="tight")
         plt.show()
 
     statistics_velocity = velocities.reset_index().set_index(["stat", "condition"]).groupby(["stat", "condition"]).describe()
