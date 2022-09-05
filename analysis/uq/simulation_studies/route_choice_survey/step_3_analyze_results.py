@@ -11,7 +11,7 @@ condition_names = {"A1": "Congestion info\n + arrow\n",
                    "B2": "Arrow \n+ top down view\n",
                    "B3": "Arrow \n+ team spirit\n",
                    "B4": "Arrow \n+ top down view\n+ team spirit\n",
-                   "Uninformed": "No information\n"
+                   "Uninformed": "No congestion\ninformation\n"
                    }
 
 
@@ -60,6 +60,11 @@ reaction_prob_key_short = "reactionProbability"
 compliance_rate = "Compliance rate c"
 probs = np.linspace(0, 1.0, 10)
 
+def move_no_info_to_first_col(df):
+    col = df.pop("No congestion\ninformation\n")
+    df.insert(0, col.name, col)
+    return df
+
 def get_fundamental_diagrams(controller_type, time_start=None):
 
     c1 = pd.read_csv(f"{controller_type}_parameters.csv", index_col=[0, 1])
@@ -82,6 +87,12 @@ def get_fundamental_diagrams(controller_type, time_start=None):
     densities_["Controller"] = controller_type
     densities_.sort_index(axis=1, inplace=True)
     densities_ = densities_[['Controller', 'Corridor1', 'Corridor2', 'Corridor3', 'Simulation time','condition', 'stat']]
+
+    densities_["condition"].replace(condition_names, inplace=True)
+    velocities_["condition"].replace(condition_names, inplace=True)
+
+    #densities_ = move_no_info_to_first_col(densities_)
+    #velocities_ = move_no_info_to_first_col(velocities_)
 
     return densities_, velocities_
 
@@ -147,16 +158,15 @@ def plot_travel_time(travel_time):
         data_s = data_s.pivot(columns=[condition_short])
         data_s.columns = data_s.columns.droplevel(0)
 
-        col = data_s.pop("No information\n")
-        data_s.insert(0, col.name, col)
+        data_s = move_no_info_to_first_col(data_s)
 
         x = [data_s[column].dropna().values for column in data_s]
         res = stats.kruskal(*x)
 
         data_s.boxplot()
-        plt.title(f"Group: {s_}")
+        plt.title(f"{s_}")
         plt.ylabel("Travel time [s]")
-        plt.xlabel("Communication strategy")
+        plt.xlabel("")
         plt.savefig(f"figs/{tit}.pdf")
         plt.xticks(rotation=90, ha="right", rotation_mode="anchor")
         plt.show()
@@ -169,12 +179,7 @@ def plot_travel_time(travel_time):
 
 
 def get_densities_velocities(start_time = None):
-    densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop", time_start= start_time)
-    densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop", time_start=start_time)
-
-    densities = pd.concat([densities_closed_loop, densities_open_loop])
-    velocities = pd.concat([velocities_closed_loop, velocities_open_loop])
-
+    densities, velocities = get_fundamental_diagrams(controller_type="ClosedLoop", time_start= start_time)
 
     for c in corridors.values():
         velocities[c][densities[c] == 0] = np.nan
@@ -218,6 +223,7 @@ def get_path_choice(controller_type):
 
     #path_choice.rename(index=condition_names, inplace=True)
     path_choice["condition"].replace(condition_names, inplace=True)
+
     return path_choice
 
 
@@ -271,9 +277,9 @@ def plot_number_of_recommendations_long_route(path_choice):
     ppp.sort_index(inplace=True)
 
     ppp.plot.bar()
-    plt.xticks(ha="right", rotation_mode="anchor")
+    plt.xticks(ha="right", rotation_mode="anchor", rotation=90)
     plt.ylabel("Number of recommendations \n for the long route")
-    plt.xlabel("Communication strategy")
+    plt.xlabel("")
     plt.savefig(f"figs/NumberOfRouteRecommendationsLongRoute.pdf")
     plt.show()
     print()
@@ -405,45 +411,57 @@ def plot_distributions(quantity, name="density"):
             plt.savefig(f"figs/{name}_{controller}_{stats_}.png")
             plt.show()
 
-def compare_corridor1_dists(quantity, name="density"):
+def plot_velocities_densities_short_corridor(densities, velocities):
 
-    #quantity.set_index(, inplace=True)
 
-    for controller, data in quantity.groupby(by="Controller"):
+    densities = densities[["condition", "Corridor1", "stat"]]
+    densities = densities.set_index("stat")
 
-        data = data[["condition", "Corridor1", "stat"]]
-        data = data.set_index("stat")
+    for stats_, data_ in densities.groupby(level="stat"):
+        data_ = data_.reset_index().pivot(values="Corridor1", columns="condition")
+        #x = [data_[column].dropna().values for column in data_]
+        #res = stats.kruskal(*x)
+        data_ = move_no_info_to_first_col(data_)
+        data_.boxplot()
+        plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
+        plt.title(f"{stats_}")
+        plt.savefig(f"figs/DensityShortCorridor{stats_}.pdf")
+        plt.ylabel("Density [$ped/m^2$] \n in the short corridor")
+        plt.ylim(bottom= -0.05, top=1.7)
+        plt.show()
 
-        for stats_, data_ in data.groupby(level="stat"):
+    velocities = velocities[["condition", "Corridor1", "stat"]]
+    velocities = velocities.set_index("stat")
 
-            data_ = data_.reset_index().pivot(values="Corridor1", columns="condition")
-
-            x = [data_[column].dropna().values for column in data_]
-            res = stats.kruskal(*x)
-
-            data_.boxplot()
-            plt.suptitle(f"Short c, {stats_} , {controller}, {name}, Kruskal-Wallis: p={res.pvalue:.3f}")
-            plt.savefig(f"figs/Short_{name}_{stats_}_{controller}.png")
-            plt.show()
-            print()
+    for stats_, data_ in velocities.groupby(level="stat"):
+        data_ = data_.reset_index().pivot(values="Corridor1", columns="condition")
+        #x = [data_[column].dropna().values for column in data_]
+        #res = stats.kruskal(*x)
+        data_ = move_no_info_to_first_col(data_)
+        data_.boxplot()
+        plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
+        plt.title(f"{stats_}")
+        plt.savefig(f"figs/VelocityShortCorridor{stats_}.pdf")
+        plt.ylabel("Velocity [$m/s^2$] \n in the short corridor")
+        plt.ylim(bottom= -0.05, top=2.2)
+        plt.show()
 
 
 
 if __name__ == "__main__":
 
 
-    path_choice =  get_path_choice("ClosedLoop")
-    plot_number_of_recommendations_long_route(path_choice)
+    #path_choice =  get_path_choice("ClosedLoop")
+    #plot_number_of_recommendations_long_route(path_choice)
 
-    travel_time = get_travel_time(controller_type="ClosedLoop")
-    plot_travel_time(travel_time)
+    #travel_time = get_travel_time(controller_type="ClosedLoop")
+    #plot_travel_time(travel_time)
 
 
     densities, velocities = get_densities_velocities(start_time=0.0)
     densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
 
-    compare_corridor1_dists(densities_stat, name="Density")
-    compare_corridor1_dists(velocities_stat, name="Velocity")
+    plot_velocities_densities_short_corridor(densities_stat, velocities_stat)
 
 
     plot_distributions(densities_stat, name="Density")
