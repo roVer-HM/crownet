@@ -167,8 +167,8 @@ def plot_travel_time(travel_time):
         plt.title(f"{s_}")
         plt.ylabel("Travel time [s]")
         plt.xlabel("")
-        plt.savefig(f"figs/{tit}.pdf", bbox_inches= "tight")
         plt.xticks(rotation=90, ha="right", rotation_mode="anchor")
+        plt.savefig(f"figs/{tit}.pdf", bbox_inches= "tight")
         plt.show()
 
 
@@ -228,7 +228,7 @@ def get_path_choice(controller_type):
 
 
 def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped/m*2]"):
-    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(10, 12.5))
+    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(12.5, 12.5))
     fig.subplots_adjust(wspace=0.05, hspace=0.3)
 
     i = 0
