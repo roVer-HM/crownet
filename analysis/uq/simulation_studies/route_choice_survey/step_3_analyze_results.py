@@ -167,7 +167,7 @@ def plot_travel_time(travel_time):
         plt.title(f"{s_}")
         plt.ylabel("Travel time [s]")
         plt.xlabel("")
-        plt.savefig(f"figs/{tit}.pdf")
+        plt.savefig(f"figs/{tit}.pdf", bbox_inches= "tight")
         plt.xticks(rotation=90, ha="right", rotation_mode="anchor")
         plt.show()
 
@@ -261,7 +261,7 @@ def plot_quantity(densities, file_name, y_min=0, y_max=2.5, ylabel="Density [ped
         i += 1
 
     fig.suptitle("                  ".join(c_order), fontsize=16, x=0.47)
-    plt.savefig(f"figs/{file_name}.png")
+    plt.savefig(f"figs/{file_name}.png", bbox_inches= "tight")
     plt.show()
     print()
 
@@ -279,7 +279,7 @@ def plot_number_of_recommendations_long_route(path_choice):
     plt.xticks(ha="right", rotation_mode="anchor", rotation=90)
     plt.ylabel("Number of recommendations \n for the long route")
     plt.xlabel("")
-    plt.savefig(f"figs/NumberOfRouteRecommendationsLongRoute.pdf")
+    plt.savefig(f"figs/NumberOfRouteRecommendationsLongRoute.pdf", bbox_inches="tight")
     plt.show()
     print()
 
@@ -309,7 +309,7 @@ def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
               xlabel = "Simulation time [s]",
               xticks = [0,250,500,750,1000,1250])
     plt.suptitle(f"Density in front of short corridor\nNo congestion information")
-    plt.savefig(f"figs/SteadyFlowDensity.pdf")
+    plt.savefig(f"figs/SteadyFlowDensity.pdf", bbox_inches= "tight")
     plt.show()
 
 
@@ -327,7 +327,7 @@ def plot_velocities_densities_short_corridor(densities, velocities):
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
         plt.title(f"{stats_}")
-        plt.savefig(f"figs/DensityShortCorridor{stats_}.pdf")
+        plt.savefig(f"figs/DensityShortCorridor{stats_}.pdf", bbox_inches= "tight")
         plt.ylabel("Density [$ped/m^2$] \n in the short corridor")
         plt.ylim(bottom= -0.05, top=1.7)
         plt.show()
@@ -343,7 +343,7 @@ def plot_velocities_densities_short_corridor(densities, velocities):
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
         plt.title(f"{stats_}")
-        plt.savefig(f"figs/VelocityShortCorridor{stats_}.pdf")
+        plt.savefig(f"figs/VelocityShortCorridor{stats_}.pdf", bbox_inches= "tight")
         plt.ylabel("Velocity [$m/s^2$] \n in the short corridor")
         plt.ylim(bottom= -0.05, top=2.2)
         plt.show()
