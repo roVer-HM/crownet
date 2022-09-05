@@ -273,7 +273,6 @@ def plot_number_of_recommendations_long_route(path_choice):
     ppp = path_choice.groupby(by=[stat_short, condition_short]).count()["corridorRecommended"].unstack().transpose()
     ppp.columns.name = "Group"
 
-
     ppp.sort_index(inplace=True)
 
     ppp.plot.bar()
@@ -288,131 +287,34 @@ def plot_number_of_recommendations_long_route(path_choice):
 
 
 
-
-def compare_random_densitiies(dd, travel_time, value="Median", ):
-    time = travel_time
-
-    # median or mean does not make difference
-
-    dd = d_med.drop(columns=["Corridor2", "Corridor3"])
-    dd.reset_index(0, inplace=True)
-    dd = dd.pivot(columns="Controller")
-    dd = dd.drop(0.0)
-    dd.columns = dd.columns.droplevel(0)
-    dd.rename(columns=controller__, inplace=True)
-    a = dd.hist(figsize=(10,4),grid=False)
-    a[0][0].set_ylim(0, 20)
-    a[0][0].set_xlim(0.22, 2.1)
-    a[0][0].set_xlabel("Median density [$ped/m^2$]")
-    a[0][1].set_xlabel("Median density [$ped/m^2$]")
-    a[0][0].set_ylabel("Counts")
-    a[0][1].set_ylim(0, 20)
-    a[0][1].set_yticklabels([])
-    a[0][1].set_xlim(0.22, 2.1)
-
-    for xxx in [0,1]:
-        left, right = a[0][xxx].get_ylim()
-        los = [0.2, 0.31, 0.43, 0.71, 1.08] #,, 2.17
-        a[0][xxx].vlines(los[1:], ymin=left, ymax=right, color='b', linestyles='--')
-        for los_, letter in zip(los, ["A", "B", "C", "D", "E", "F"]):
-            a[0][xxx].text(los_ + 0.05, 10, f"LOS {letter}", rotation=90)
-
-
-    plt.subplots_adjust(wspace=0.2, hspace=0)
-    plt.savefig(f"figs/{value}DensityDist2.png")
-    plt.show()
-
-    dd.boxplot(grid=False)
-    left, right = plt.xlim()
-    los = [0.31, 0.43, 0.71, 1.08, 2.17]
-    plt.hlines(los, xmin=left, xmax=right, color='b', linestyles='--')
-    for los_, letter in zip(los, ["A", "B", "C", "D", "E", "F"]):
-        plt.text(1.5, los_ - 0.075, f"LOS {letter}")
-
-    plt.ylabel(f"{value} density [$ped/m^2$]")
-    plt.title("Short corridor")
-    plt.savefig(f"figs/{value}DensityDist.png")
-    plt.show()
-    # not normally distributed, if p < 0.05
-    s_1 = stats.kstest(dd.iloc[:, 0], "norm")
-    s_2 = stats.kstest(dd.iloc[:, 1], "norm")
-
-    # difference between medians, if p < 0.05
-    kruskal = stats.kruskal(dd.iloc[:, 0], dd.iloc[:, 1])
-    mannwhitneyU = stats.mannwhitneyu(dd.iloc[:, 0], dd.iloc[:, 1])
-
-    times = travel_time.groupby(by=["Controller", reaction_prob_key_short]).median()
-    times.reset_index(0, inplace=True)
-    times = times.pivot(columns="Controller")
-    times = times.drop(0.0)
-    times.columns = times.columns.droplevel(0)
-    times.rename(columns=controller__, inplace=True)
-
-    a = times.hist(figsize=(10,4), grid=False)
-    a[0][0].set_ylim(0, 16)
-    a[0][0].set_xlim(60, 200)
-    a[0][0].set_xlabel("Median travel time [$s$]")
-    a[0][0].set_ylabel("Counts")
-
-    a[0][1].set_xlabel("Median travel time [$s$]")
-    #a[0][1].set_ylabel("Counts")
-    a[0][1].set_ylim(0, 16)
-    a[0][1].set_xlim(60, 200)
-    a[0][1].set_yticklabels([])
-    plt.subplots_adjust(wspace=0.2, hspace=0)
-    plt.savefig(f"figs/{value}TravelDist2.png")
-    plt.show()
-
-    times.boxplot()
-    plt.ylabel(f"{value} travel time [s]")
-    plt.savefig(f"figs/{value}TravelDist.png")
-    plt.show()
-
-    s_1_ = stats.kstest(times.iloc[:, 0], "norm")
-    s_2_ = stats.kstest(times.iloc[:, 1], "norm")
-    kruskal_ = stats.kruskal(times.iloc[:, 0], times.iloc[:, 1])
-    mannwhitneyU_ = stats.mannwhitneyu(times.iloc[:, 0], times.iloc[:, 1])
-
-    with open('tables/statistical_test.txt', 'w+') as f:
-        f.write(f"{dd.columns[0]}: densities not normally distributed, since p = {s_1.pvalue} < 0.05.\n")
-        f.write(f"{dd.columns[1]}: densities not normally distributed, since p = {s_2.pvalue} < 0.05.\n")
-        f.write(f"Kruskal Wallis test: densities. no difference between groups, since  p = {kruskal.pvalue} > 0.05.\n")
-        f.write(f"mannwhitneyu test: densities. difference between groups , p = {mannwhitneyU.pvalue} < 0.05.\n")
-        f.write(f"{times.columns[0]}: densities not normally distributed, since p = {s_1_.pvalue} < 0.05.\n")
-        f.write(f"{times.columns[1]}: densities not normally distributed, since p = {s_2_.pvalue} < 0.05.\n")
-        f.write(f"Kruskal Wallis test: times. no difference between groups, since  p = {kruskal_.pvalue} > 0.05.\n")
-        f.write(f"mannwhitneyu test: times. no difference between groups , p = {mannwhitneyU_.pvalue} > 0.05.\n")
-
-
-
 def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
 
-    for controller, data in quantity.groupby(by="Controller"):
-        data.set_index(["Simulation time"], inplace=True)
-        data.plot(linestyle = 'None', marker=".")
-        plt.ylabel(name)
-        plt.title(f"{controller}, {name}, {stationary}")
-        print("Start saving....")
-        plt.savefig(f"figs/Stationary_{controller}_{name}_{stationary}.png")
-        plt.show()
-        print("finished saving....")
+    data = quantity.reset_index()
+    data["id"] = data["id"] + 1
+    data = data[data["id"] <= 10] # sample 0...9: no congestion
+    data.set_index(["Simulation time"], inplace=True)
+    data = data[["Corridor1", "id"]]
+
+    data = data.pivot(values="Corridor1", columns="id")
+    data.columns.name = "Seed"
+
+    fig, ax = plt.subplots(figsize=(6,8))
+
+    data.plot(subplots=True, layout=(5,2),
+              sharex=True,
+              sharey=True,
+              legend=False,
+              ax=ax,
+              ylabel="Density\n[$ped/m^2$]",
+              xlabel = "Simulation time [s]",
+              xticks = [0,250,500,750,1000,1250])
+    plt.suptitle(f"Density in front of short corridor\nNo congestion information")
+    plt.savefig(f"figs/SteadyFlowDensity.pdf")
+    plt.show()
 
 
-def plot_distributions(quantity, name="density"):
-
-    corridors = ["Corridor1", "Corridor2", "Corridor3"]
-    for controller, data in quantity.groupby(by="Controller"):
-
-        data.set_index(["stat", "condition"], inplace=True)
-        data = data[corridors]
-        for stats_, data_ in data.groupby(level="stat"):
-            data_.groupby(level="condition").boxplot(layout=(3,4))
-            plt.suptitle(f"{controller}, {name}, {stats_}")
-            plt.savefig(f"figs/{name}_{controller}_{stats_}.png")
-            plt.show()
 
 def plot_velocities_densities_short_corridor(densities, velocities):
-
 
     densities = densities[["condition", "Corridor1", "stat"]]
     densities = densities.set_index("stat")
@@ -446,31 +348,29 @@ def plot_velocities_densities_short_corridor(densities, velocities):
         plt.ylim(bottom= -0.05, top=2.2)
         plt.show()
 
+    statistics_velocity = velocities.reset_index().set_index(["stat", "condition"]).groupby(["stat", "condition"]).describe()
+    statistics_velocity.to_latex("tables/ShortCorridorStatisticsVelocity.tex", escape=False, float_format="%.1f")
+
+    statistics_density = densities.reset_index().set_index(["stat", "condition"]).groupby(
+        ["stat", "condition"]).describe()
+    statistics_density.to_latex("tables/ShortCorridorStatisticsDensity.tex", escape=False, float_format="%.1f")
 
 
 if __name__ == "__main__":
 
+    # produce figures
+    path_choice =  get_path_choice("ClosedLoop")
+    plot_number_of_recommendations_long_route(path_choice)
 
-    #path_choice =  get_path_choice("ClosedLoop")
-    #plot_number_of_recommendations_long_route(path_choice)
-
-    #travel_time = get_travel_time(controller_type="ClosedLoop")
-    #plot_travel_time(travel_time)
+    travel_time = get_travel_time(controller_type="ClosedLoop")
+    plot_travel_time(travel_time)
 
 
     densities, velocities = get_densities_velocities(start_time=0.0)
     densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
 
     plot_velocities_densities_short_corridor(densities_stat, velocities_stat)
-
-
-    plot_distributions(densities_stat, name="Density")
-    plot_distributions(velocities_stat, name="Velocity")
-
-
-
-    plot_stationary_behavior(densities_stat, name="Density")
-    plot_stationary_behavior(velocities_stat, name="Velocity")
     plot_stationary_behavior(densities, name="Density", stationary="inflow")
-    plot_stationary_behavior(velocities, name="Velocity", stationary="inflow")
+
+
 
