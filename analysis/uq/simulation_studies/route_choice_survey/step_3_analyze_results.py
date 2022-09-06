@@ -286,21 +286,29 @@ def plot_number_of_recommendations_long_route(path_choice):
 
 
 
+def plot_stationary_behavior(density, nr_of_seeds = 10):
 
-def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
+    if nr_of_seeds == 1:
+        layout = (1,1)
+        fsize = (6,4)
+    elif nr_of_seeds == 10:
+        layout = (5, 2)
+        fsize= (6,8)
+    else:
+        raise ValueError("Not supported.")
 
-    data = quantity.reset_index()
+    data = density.reset_index()
     data["id"] = data["id"] + 1
-    data = data[data["id"] <= 10] # sample 0...9: no congestion
+    data = data[data["id"] <= nr_of_seeds] # sample 0...9: no congestion
     data.set_index(["Simulation time"], inplace=True)
     data = data[["Corridor1", "id"]]
 
     data = data.pivot(values="Corridor1", columns="id")
     data.columns.name = "Seed"
 
-    fig, ax = plt.subplots(figsize=(6,8))
+    fig, ax = plt.subplots(figsize=fsize)
 
-    data.plot(subplots=True, layout=(5,2),
+    data.plot(subplots=True, layout=layout,
               sharex=True,
               sharey=True,
               legend=False,
@@ -309,7 +317,7 @@ def plot_stationary_behavior(quantity, name="Density", stationary="stationary"):
               xlabel = "Simulation time [s]",
               xticks = [0,250,500,750,1000,1250])
     plt.suptitle(f"Density in front of short corridor\nNo congestion information")
-    plt.savefig(f"figs/SteadyFlowDensity.pdf", bbox_inches= "tight")
+    plt.savefig(f"figs/SteadyFlowDensitySeeds{nr_of_seeds}.pdf", bbox_inches= "tight")
     plt.show()
 
 
@@ -356,6 +364,7 @@ def plot_velocities_densities_short_corridor(densities, velocities):
     statistics_density.to_latex("tables/ShortCorridorStatisticsDensity.tex", escape=False, float_format="%.1f")
 
 
+
 if __name__ == "__main__":
 
     # produce figures
@@ -365,12 +374,13 @@ if __name__ == "__main__":
     travel_time = get_travel_time(controller_type="ClosedLoop")
     plot_travel_time(travel_time)
 
-
     densities, velocities = get_densities_velocities(start_time=0.0)
     densities_stat, velocities_stat = get_densities_velocities(start_time=sim_time_steady_flow_start)
 
     plot_velocities_densities_short_corridor(densities_stat, velocities_stat)
-    plot_stationary_behavior(densities, name="Density", stationary="inflow")
+    plot_stationary_behavior(densities, nr_of_seeds=1)
+    plot_stationary_behavior(densities, nr_of_seeds=10)
+
 
 
 
