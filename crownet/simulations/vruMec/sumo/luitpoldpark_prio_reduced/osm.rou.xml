@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+
+    <vType id="ped_pedestrian" vClass="pedestrian"/>
+    <vType id="car_vh" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70"/>
+
+<person id="ped0" depart="0.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped1" depart="8.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped2" depart="16.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped3" depart="24.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped4" depart="32.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped5" depart="40.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped6" depart="48.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped7" depart="56.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped8" depart="64.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped9" depart="72.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped10" depart="80.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped11" depart="88.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped12" depart="96.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped13" depart="104.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped14" depart="112.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped15" depart="120.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped16" depart="128.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped17" depart="136.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped18" depart="144.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+<person id="ped19" depart="152.00" type="ped_pedestrian">
+<walk from="-82790717#5" to="19683461#0"/>
+</person>
+
+
+</routes>

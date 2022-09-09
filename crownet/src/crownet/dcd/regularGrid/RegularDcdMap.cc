@@ -26,8 +26,9 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::shared_ptr<OsgCoordinateConverte
     visitor_dispatcher["ymfPlusDistStep"] = [this](MapCfg* mapCfg){
         double alpha = check_and_cast<MapCfgYmfPlusDistStep*>(mapCfg)->getAlpha();
         double stepDist = check_and_cast<MapCfgYmfPlusDistStep*>(mapCfg)->getStepDist();
+        bool zeroStep = check_and_cast<MapCfgYmfPlusDistStep*>(mapCfg)->getZeroStep();
 
-        return std::make_shared<YmfPlusDistStepVisitor>(alpha, timeProvider->now(), stepDist);
+        return std::make_shared<YmfPlusDistStepVisitor>(alpha, timeProvider->now(), stepDist, zeroStep);
     };
     visitor_dispatcher["mean"] = [this](MapCfg* mapCfg){return std::make_shared<MeanVisitor>(timeProvider->now());};
     visitor_dispatcher["median"] = [this](MapCfg* mapCfg){return std::make_shared<MedianVisitor>(timeProvider->now());};

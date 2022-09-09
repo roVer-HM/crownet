@@ -49,6 +49,12 @@ def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
     beacon_apps = sql.m_app0()
     map_apps = sql.m_app1()
 
+    # x: DcdMap2D = builder.build_dcdMap(selection="ymfPlusDist")
+    # x.plot_count_diff(savefig=join(data_root, "count_diff.pdf"))
+    # x.plot_error_histogram()
+
+    # fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(16,9*5))
+    # x.plot_error_quantil_histogram(savefig=join(data_root, "error_hist_q.pdf"), ax=ax)
     i = pd.IndexSlice
 
     # cells = builder.position_p.geo(Project.OpenStreetMaps)[i[101., :]]
@@ -208,7 +214,7 @@ def make_pics(s: SuqcRun):
     sim = s.get_run_as_sim(key=(6,0))
     dcd = sim.get_dcdMap()
 
-    fig1, ax = dcd.plot_map_count_diff(savefig=join(sim.data_root, "new_count_diff.pdf"))
+    fig1, ax = dcd.plot_count_diff(savefig=join(sim.data_root, "new_count_diff.pdf"))
     fig2, ax = dcd.plot_err_box_over_time(bin_width=10.0)
     #ax.set_ylim(-8, 5)
     fig2.savefig(join(sim.data_root, "new_err.pdf"))

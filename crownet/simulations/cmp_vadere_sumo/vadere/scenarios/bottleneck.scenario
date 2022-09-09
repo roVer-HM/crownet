@@ -1,8 +1,7 @@
 {
   "name" : "bottleneck",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -109,21 +108,7 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel",
-        "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
-            "priority" : {
-              "1" : "InformationStimulus",
-              "2" : "ChangeTargetScripted",
-              "3" : "ChangeTarget",
-              "4" : "Threat",
-              "5" : "Wait",
-              "6" : "WaitInArea",
-              "7" : "DistanceRecommendation"
-            }
-          },
-          "org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel" : { }
-        }
+        "cognition" : "SimpleCognitionModel"
       }
     },
     "topography" : {
@@ -431,6 +416,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

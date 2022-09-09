@@ -57,13 +57,12 @@ class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 
 class TTLCellAgeHandler : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
 public:
-    TTLCellAgeHandler(RegularDcdMapPtr dcdMap, RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
-     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), dcdMap(dcdMap), ttl(ttl){}
+    TTLCellAgeHandler(RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
+     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), ttl(ttl){}
  virtual void applyTo(RegularCell& cell) override;
  virtual std::string getVisitorName() const override { return "silentCellAgeHandler"; }
 
 protected:
- RegularDcdMapPtr dcdMap;
  RegularCell::time_t ttl;
 };
 
@@ -172,15 +171,13 @@ protected:
         double age_sum;
         double age_min;
         double dist_sum;
-        double dist_min;
-        int count;
     };
 public:
     YmfPlusDistVisitor(double alpha = 0.5, RegularCell::time_t t = 0.0)
         : TimestampedGetEntryVisitor<RegularCell>(t), alpha(alpha) {}
     virtual RegularCell::entry_t_ptr applyTo(
         const RegularCell& cell) const override;
-    virtual sum_data getSums(const RegularCell& cell) const;
+    sum_data getSums(const RegularCell& cell) const;
     virtual std::string getVisitorName() const override { return "ymfPlusDist"; }
 
 protected:
@@ -189,16 +186,15 @@ protected:
 
 class YmfPlusDistStepVisitor : public YmfPlusDistVisitor {
 public:
-    YmfPlusDistStepVisitor(double alpha, RegularCell::time_t t, double stepDist)
-        : YmfPlusDistVisitor(alpha, t), stepDist(stepDist) {}
+    YmfPlusDistStepVisitor(double alpha, RegularCell::time_t t, double stepDist, bool zeroStep)
+        : YmfPlusDistVisitor(alpha, t), stepDist(stepDist), zeroStep(zeroStep) {}
     virtual RegularCell::entry_t_ptr applyTo(
         const RegularCell& cell) const override;
-    virtual sum_data getSums(const RegularCell& cell) const override;
-    virtual const double getDistValue(const double dist) const;
     virtual std::string getVisitorName() const override { return "ymfPlusDistStep"; }
 
 protected:
     double stepDist;
+    bool zeroStep;
 };
 
 class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {

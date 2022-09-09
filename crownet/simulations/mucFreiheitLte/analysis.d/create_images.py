@@ -29,7 +29,7 @@ def create_figures(root):
     dcd2 = b(p2, "ymfPlusDist")
     l_hdl = []
     l_lbl = []
-    fig, ax = dcd1.plot_map_count_diff()
+    fig, ax = dcd1.plot_count_diff()
     for l in ax.get_lines():
         if l._label == "Actual count":
             l_hdl.insert(0, l)
@@ -38,7 +38,7 @@ def create_figures(root):
             l_hdl.append(l)
             l_lbl.append("Mittlere Anzahl (Ymf)")
 
-    fig, ax = dcd2.plot_map_count_diff(ax=ax)
+    fig, ax = dcd2.plot_count_diff(ax=ax)
     l_hdl.append(ax.get_lines()[-1])
     l_lbl.append("Mittlere Anzahl (YmfPlus)")
     fig.legends.clear()

@@ -40,8 +40,12 @@ void SumoSceneCanvasVisualizer::initialize(int stage){
 
 
 cGroupFigure *SumoSceneCanvasVisualizer::createMapFigure(const cXMLElement* map){
-    const cFigure::Color COLOR_HIGHWAY_PATH = { 128, 128, 128 };
+    const cFigure::Color COLOR_HIGHWAY_PATH = { 0, 0, 0 };
+    const cFigure::Color COLOR_FOOTWAY_PATH = { 128, 128, 128 };
     const cFigure::Color COLOR_JUNCTION_PATH = { 255, 85, 0 };
+    const cFigure::Color COLOR_POLY_PATH_BUILDING = { 100, 100, 100 };
+    const cFigure::Color COLOR_POLY_PATH_WATER = { 60, 60, 255 };
+    const cFigure::Color COLOR_NATURAL_PATH = { 60, 255, 60 };
 
     auto lanesGroup = new cGroupFigure("lanes");
     auto junctionGroup = new cGroupFigure("junctions");
@@ -54,15 +58,22 @@ cGroupFigure *SumoSceneCanvasVisualizer::createMapFigure(const cXMLElement* map)
     for(cXMLElement* lane : lanes){
         std::string id = lane->getAttribute("id");
         auto width_str = lane->getAttribute("width");
-        if (width_str == nullptr){
+        auto speed_str = lane->getAttribute("speed");
+
+        if (width_str == nullptr || speed_str == nullptr){
             continue;
         }
+
         double width = std::strtod(std::string(width_str).c_str(), nullptr);
+        double speed = std::strtod(std::string(speed_str).c_str(), nullptr);
+
+        cFigure::Color highwayColor= COLOR_FOOTWAY_PATH;
+
         std::vector<cFigure::Point> points = parseShape(lane->getAttribute("shape"));
         cPolylineFigure *polyline = new cPolylineFigure();
         polyline->setPoints(points);
         polyline->setZoomLineWidth(true);
-        polyline->setLineColor(COLOR_HIGHWAY_PATH);
+        polyline->setLineColor(highwayColor);
         polyline->setName(id.c_str());
         polyline->setLineWidth(width);
         polyline->setCapStyle(cFigure::CAP_BUTT);
@@ -86,6 +97,39 @@ cGroupFigure *SumoSceneCanvasVisualizer::createMapFigure(const cXMLElement* map)
             junctionGroup->addFigure(polygon);
         }
     }
+
+    auto poly = map->getElementsByTagName("poly");
+    for(cXMLElement* p : poly){
+        std::string id = p->getAttribute("id");
+        std::string type = p->getAttribute("type");
+
+        cFigure::Color polyColor;
+
+        if (type.substr(0, 8) == "building") {
+            polyColor = COLOR_POLY_PATH_BUILDING;
+        } else if (type.substr(0, 13) == "natural.water") {
+            polyColor = COLOR_POLY_PATH_WATER;
+        } else if (type.substr(0, 7) == "highway") {
+            polyColor = COLOR_HIGHWAY_PATH;
+        } else if (type.substr(0, 7) == "natural" || type.substr(0, 6) == "forest" || type.substr(0, 7) == "leisure") {
+            polyColor = COLOR_NATURAL_PATH;
+        } else {
+            continue;
+        }
+
+        std::vector<cFigure::Point> points = parseShape(p->getAttribute("shape"));
+
+        if (points.size() > 0) {
+            cPolygonFigure *polygon = new cPolygonFigure();
+            points.pop_back();
+            polygon->setPoints(points);
+            polygon->setFilled(true);
+            polygon->setFillColor(polyColor);
+            polygon->setName(id.c_str());
+            junctionGroup->addFigure(polygon);
+        }
+    }
+
 
     return mapFigure;
 }

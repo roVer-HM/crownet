@@ -9,7 +9,6 @@
 
 #include "crownet/dcd/generic/Cell.h"
 #include <omnetpp.h>
-#include <functional>
 
 namespace crownet {
 
@@ -177,21 +176,6 @@ template <typename C>
 class CheckCellVisitor : public ConstCellVisitor<C, bool> {
  public:
   virtual bool applyTo(const C& cell) const = 0;
-};
-
-template <typename C>
-class ConstLambdaVisitor: public ConstCellVisitor<C, void> {
-public:
-    using func_t = std::function<void(const  C&)>;
-    ConstLambdaVisitor(func_t func) : func(func) {}
-    ConstLambdaVisitor() : func([](const C& cell){return;}) {} // do nothing lambda
-
-    virtual void applyTo(const C& cell) const override {
-        func(cell);
-    }
-
-private:
-    func_t func;
 };
 
 template <typename C>

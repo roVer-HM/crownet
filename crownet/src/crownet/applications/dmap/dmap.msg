@@ -20,8 +20,6 @@ import inet.common.TagBase;
 import inet.common.Units;
 
 cplusplus{{
-  #include <sstream>
-  #include <string>
   using namespace inet;  
 }}
 
@@ -35,16 +33,6 @@ class MapCfg extends cOwnedObject {
      string idStreamType;
 }
 
-cplusplus(MapCfg){{
-  public:
-  	virtual std::string str() const override {
- 		std::stringstream s;
- 		s << "mapType:" << mapType << " cellAgeTTL: " << cellAgeTTL;
- 		return s.str();
-  	}
-}}
-
-
 class MapCfgYmf extends MapCfg {
     mapType = "ymf";
 }
@@ -57,16 +45,10 @@ class MapCfgYmfPlusDist extends MapCfgYmf {
 class MapCfgYmfPlusDistStep extends MapCfgYmfPlusDist {
  	mapType = "ymfPlusDistStep";
  	double stepDist;
+ 	bool zeroStep = true; // if true set step function to zero for dist  <= step_dist 
+ 						  // otherwise set function value to value at step_dist
+ 						  // for all dist <= step_dist
 }
-cplusplus(MapCfgYmfPlusDistStep){{
-  public:
-  	virtual std::string str() const override {
- 		std::stringstream s;
- 		s << MapCfgYmfPlusDist::str();
- 		s << "stepDist:" << stepDist;
- 		return s.str();
-  	}
-}}
 
 
 class DcDCell {

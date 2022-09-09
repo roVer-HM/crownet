@@ -26,7 +26,7 @@ if [ -z "$VERSION_TAG" ]; then
     VERSION_TAG="latest"
 fi
 
-TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG -t ghcr.io/rover-hm/$IMAGE_SHORT:$VERSION_TAG -t ghcr.io/rover-hm/$IMAGE_SHORT:$DATE_TAG"
+TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG"
 
 echo "Adding ssh key(s) to ssh agent (might be required for access to private repos)..."
 ssh-add

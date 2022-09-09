@@ -32,6 +32,8 @@ def main():
     p = b1.build()
     dcd = b1.build_dcdMap()
     
+    # f, ax = dcd.plot_count_diff()
+
     map = p.global_p.geo(to_crs=Project.OpenStreetMaps).get_dataframe()
 
     _i = pd.IndexSlice

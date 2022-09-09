@@ -28,20 +28,20 @@ simple GlobalDensityMap like IGlobalDensityMap
         string mobilityModule = default (".mobility");
         string coordConverterModule = default("coordConverter");
         double cellSize @unit(m) = default(5.0m);
-
-		string writerType = default("csv"); // or sql
-        double writeMapInterval @unit(s) = default(2.0s) ;
-        
         // search these nodes for the ground truth setup. 
-        string vectorNodeModule= default("misc"); // does not work with Traci managed vectors! Use traciModuleListener
+        string vectorNodeModules= default("misc"); // does not work with Traci managed vectors! Use traciModuleListener
         double deleteTime @unit(s) = default(-1.0s);
         double deletePercentage = default(0.0);
         string nodeModules= default("");
+        
         string traciModuleListener = default("traci.nodes"); // if missing it will be ignored.
         // if true use "traci.connected" to trigger density map setup. Otherwise use stage 13
         bool useSignalMapInit = default(true); 
-}
+        
 
+		string writerType = default("csv"); // or sql
+        double writeMapInterval @unit(s) = default(2.0s) ;
+}
 
 
 

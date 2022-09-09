@@ -295,20 +295,6 @@ void DcDMap<C, N, T>::removeFromNeighborhood(const node_key_t& neigborId) {
 }
 
 template <typename C, typename N, typename T>
-void DcDMap<C, N, T>::removeFromNeighborhood(const cell_key_t& cellId) {
-    /*
-     * remove all nodes from `neighborhood` which are in the gvien `cellId`
-     */
-    for (auto it = this->neighborhood.begin(); it != this->neighborhood.end(); /*no incr*/){
-        if (it->second == cellId){
-            it = this->neighborhood.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-
-template <typename C, typename N, typename T>
 void DcDMap<C, N, T>::moveNeighborTo(const node_key_t& neigborId,
                                      const cell_key_t& cellId) {
 

@@ -38,8 +38,6 @@ const simsignal_t GlobalDensityMap::registerMap =
     cComponent::registerSignal("RegisterDensityMap");
 const simsignal_t GlobalDensityMap::removeMap =
     cComponent::registerSignal("RemoveDensityMap");
-const simsignal_t GlobalDensityMap::registerNodeAcceptor =
-    cComponent::registerSignal("RegisterNodeAcceptor");
 
 GlobalDensityMap::~GlobalDensityMap() {
   if (writeMapTimer) {
@@ -54,7 +52,6 @@ void GlobalDensityMap::initialize() {
     getSystemModule()->subscribe(initMap, this);
   getSystemModule()->subscribe(registerMap, this);
   getSystemModule()->subscribe(removeMap, this);
-  getSystemModule()->subscribe(registerNodeAcceptor, this);
   // listen to traciConnected signal to setup density map *before*
   // subscriptions and node are initialized.
   getSystemModule()->subscribe(traciConnected, this);
@@ -93,9 +90,6 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
     dezentralMaps.erase(mapHandler->getMap()->getOwnerId());
     EV_DEBUG << "remove DensityMap for node: "
              << mapHandler->getMap()->getOwnerId();
-  } else if (signalId == registerNodeAcceptor){
-      auto acceptor = check_and_cast<ITraCiNodeVisitorAcceptor*>(obj);
-      dynamicNodeVisitorAcceptors.push_back(acceptor);
   }
 }
 void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
@@ -163,21 +157,11 @@ void GlobalDensityMap::initializeMap(){
 void GlobalDensityMap::initialize(int stage) {
   cSimpleModule::initialize(stage);
   if (stage == INITSTAGE_LOCAL) {
-      // setup ground truth search locations
-      // i.e single nodes, vector nodes not managed by TraCI, or TraCI managed vectors.
-      // other sources can be registered over the signal registerNodeAcceptor
       cStringTokenizer tt(par("nodeModules").stringValue(), ";");
       singleNodeModules = tt.asVector();
-
-      vectorNodeModule = par("vectorNodeModule").stdstringValue();
-      if (vectorNodeModule != ""){
-          dynamicNodeVisitorAcceptors.push_back(this);
-      }
-
       cModule* _traciModuleListener = findModuleByPath(par("traciModuleListener").stringValue());
       if (_traciModuleListener){
-          auto acceptor = check_and_cast<ITraCiNodeVisitorAcceptor*>(_traciModuleListener);
-          dynamicNodeVisitorAcceptors.push_back(acceptor);
+          traciModuleListener = check_and_cast<ITraCiNodeVisitorAcceptor*>(_traciModuleListener);
       }
       if (par("deleteTime").doubleValue() > 0.0){
           appDeleteNode = new cMessage("deleteNode");
@@ -202,27 +186,23 @@ void GlobalDensityMap::initialize(int stage) {
   }
 }
 
-void GlobalDensityMap::acceptTraciVisitor(traci::ITraciNodeVisitor* visitor){
-    // check nodes NOT managed by TraCI
-       // only vector 'misc' is supported.
-       cModule* root = findModuleByPath("<root>");
-       cModule* m = root->getSubmodule(vectorNodeModule.c_str(), vectorNodeIndex);
-       if (m){
-           if (m->isVector()){
-              for(int i = vectorNodeIndex; i < m->getVectorSize(); i++){
-                  cModule* mm = root->getSubmodule("misc", i);
-                  if (mm){
-                      visitor->visitNode("", mm);
-                  }
-              }
-           } else {
-               throw cRuntimeError("expected vector node with name 'misc'");
-           }
-       }
-}
-
 void GlobalDensityMap::acceptNodeVisitor(traci::ITraciNodeVisitor* visitor){
-
+    // check nodes NOT managed by TraCI
+    // only vector 'misc' is supported.
+    cModule* root = findModuleByPath("<root>");
+    cModule* m = root->getSubmodule("misc", misc_base_index);
+    if (m){
+        if (m->isVector()){
+           for(int i = misc_base_index; i < m->getVectorSize(); i++){
+               cModule* mm = root->getSubmodule("misc", i);
+               if (mm){
+                   visitor->visitNode("", mm);
+               }
+           }
+        } else {
+            throw cRuntimeError("expected vector node with name 'misc'");
+        }
+    }
 
     for(const auto& path: singleNodeModules){
         cModule* m = findModuleByPath(path.c_str());
@@ -230,11 +210,10 @@ void GlobalDensityMap::acceptNodeVisitor(traci::ITraciNodeVisitor* visitor){
             visitor->visitNode("", m);
         }
     }
-    // call all acceptors registered. (i.e. traci, bonn motion server, or this in case of static nodes)
-    for (auto acceptor : dynamicNodeVisitorAcceptors){
-        acceptor->acceptTraciVisitor(visitor);
+    // check nodes managed by TraCI
+    if (traciModuleListener){
+        traciModuleListener->acceptTraciVisitor(this);
     }
-
 }
 
 
@@ -253,7 +232,7 @@ void GlobalDensityMap::handleMessage(cMessage *msg) {
       //misc_base_index will point to the 'new' first element. The vector size is not changed
       //by this deletion.
       int removeCount = std::floor(dezentralMaps.size() * par("deletePercentage").doubleValue());
-      vectorNodeIndex = removeCount;
+      misc_base_index = removeCount;
       std::vector<cModule*> nodes;
       for (const auto& e : dezentralMaps){
           if (removeCount <= 0){

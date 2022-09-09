@@ -22,7 +22,6 @@
 namespace crownet {
 
 using RegularDcdMap = DcDMap<GridCellID, IntIdentifer, omnetpp::simtime_t>;
-using RegularDcdMapPtr = std::shared_ptr<RegularDcdMap>;
 using RegularDcdMapWatcher = DcdMapWatcher<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 using VisitorCreator = std::function<std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>>(MapCfg*)>;
 using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>()>;

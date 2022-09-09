@@ -11,4 +11,3 @@
     4. [StartUp Terminal](./Running-a-Simulation/StartUp-Terminal.md)
 5. [SimulationVM](./SimulationVM.md)
 6. [TestedConfigs](./TestedConfigs.md)
-7. [Dynamic BonnMotion Traces](./use-dynamic-bonnMotion-traces.md)
