@@ -39,6 +39,7 @@ from roveranalyzer.utils.path import PathHelper
 from roveranalyzer.simulators.opp.scave import ScaveTool, SqlEmptyResult
 from roveranalyzer.simulators.opp.utils import Simulation
 from roveranalyzer.analysis.common import RunContext, Simulation, SuqcRun
+from roveranalyzer.simulators.crownet.analysis.compare import simulations_from_folder, plot_pnode_positions
 
 # number of repetitions to be performed for each parameter set
 REPS = 10  # for testing we use 2, for reliable results it should be significantly more (depending on stddev)
@@ -197,8 +198,8 @@ def main(base_path):
     # ------------------------------------------------------------------------------------------------------------
     print(qoi_results)
 
-    _SUMO_MM = "sumo: striping mobility model"
-    _VADER_MM = "vadere: optimal steps mobility model"
+    _SUMO_MM = "sumo: striping"
+    _VADER_MM = "vadere: OSM"
 
     config_descriptions = {"scenario": "bottleneck_udp_sl",
                            "sumoBottleneck": _SUMO_MM,
@@ -253,7 +254,7 @@ def plot_config(qoi_results, config_descriptions):
                       x_label="Mean HTTP Response Size [kB]",
                       x_multiplier=10.0,
                       y_multiplier=0.001,
-                      y_label="Number of Received Packets ($\\cdot 10^3$, application layer)",
+                      y_label="# Received Packets ($\\cdot 10^3$, app. layer)",
                       reindex=-1,
                       ylimits=[0, 12],
                       with_errorbar=True)
@@ -263,24 +264,26 @@ def plot_config(qoi_results, config_descriptions):
             plot_pvar(qoi_results, config_descriptions, "rcvdPkLifetime", x_label="Inter-TX Time [ms]",
                       y_label="D2D Delay (application layer) [ms]", xlimits=[44.5, 104.5], ylimits=[0, 200],
                       x_multiplier=10.0, y_multiplier=1000.0, with_errorbar=True)
+            # y_label="D2D Delay (application layer) [s]",  xlimits=[24.5, 104.5], ylimits=[-5, 75],
+            # x_multiplier=10.0, y_multiplier=1.0, with_errorbar=True)
 
         if True:
             plot_pvar(qoi_results, config_descriptions, "rcvdSinrUl", x_label="Inter-TX Time [ms]",
-                      x_multiplier=10.0,  legend_loc="lower right",  # ylimits=[40, 50],
+                      x_multiplier=10.0, legend_loc="lower right",  # ylimits=[40, 50],
                       y_label="Uplink SINR")
 
         if True:
             plot_pvar(qoi_results, config_descriptions, "receivedPacketFromLowerLayer:count",
                       x_label="Inter-TX Time [ms]",
                       x_multiplier=10.0, y_multiplier=0.001,
-                      y_label="Number of Received Packets ($\\cdot 10^3$, link layer)",
+                      y_label="# Received Packets ($\\cdot 10^3$, link layer)",
                       with_errorbar=True)
 
         if True:
             plot_pvar(qoi_results, config_descriptions, "packetReceived:count",
                       x_label="Inter-TX Time [ms]",
                       x_multiplier=10.0, y_multiplier=0.001,
-                      y_label="Number of Received Packets ($\\cdot 10^3$, application layer)",
+                      y_label="# Received Packets ($\\cdot 10^3$, app. layer)",
                       with_errorbar=True)
 
 
@@ -612,8 +615,9 @@ def plot_pvar(data: pd.DataFrame,
                                        matplotlib.axes.Axes):
     _symbols = ["o", "*", "v", "s"]
 
-    plt.rc('font', size=20)
+    plt.rc('font', size=28)
     fig, ax = plt.subplots()
+    fig.subplots_adjust(left=0.16)
     if xlimits:
         ax.set_xlim(xlimits)
     if ylimits:
@@ -633,11 +637,11 @@ def plot_pvar(data: pd.DataFrame,
         if with_errorbar:
             plt.errorbar(x_values, y_values,
                          yerr=y_err_values,
-                         label=configs[config], fmt=_symbols[_plot_nr], markersize=15,
+                         label=configs[config], fmt=_symbols[_plot_nr], markersize=20,
                          capsize=10, elinewidth=3)
         else:
             plt.scatter(x_values, y_values,
-                        label=configs[config], marker=_symbols[_plot_nr], s=60)
+                        label=configs[config], marker=_symbols[_plot_nr], s=400)
         _plot_nr = _plot_nr + 1
 
     plt.legend(loc=legend_loc)
@@ -658,5 +662,34 @@ def plot_pvar(data: pd.DataFrame,
     return fig, ax
 
 
+def sim_position_plot(base_path, simulation_path, config, file_id, remove_xticks=False, wide_format=False):
+    _simpath = os.path.join(base_path, simulation_path)
+    sim = simulations_from_folder(_simpath, config)
+    _figs = plot_pnode_positions(sim[0], 0, 500, 100, remove_xticks=remove_xticks)
+    if wide_format:
+        _figs[0].set_size_inches(10, 3.5)
+    else:
+        _figs[0].set_size_inches(5, 3.5)
+    # _figs[0].subplots_adjust(bottom=0.14)
+    plt.show()
+    _figs[0].savefig(f"{config}_pos_{file_id}.pdf")
+    _figs[0].savefig(f"{config}_pos_{file_id}.png")
+    _figs[0].savefig(f"{config}_pos_{file_id}.svg")
+
+
 if __name__ == "__main__":
-    main("./")
+    # main("./")
+    # additional plots for single simulations
+    sim_position_plot("./", "../results/study/sumoSimple/simulation_runs/outputs/Sample_1_0/sumoSimple_out/",
+                      "sumoSimple", "sample_1_0", remove_xticks=True)
+    sim_position_plot("./", "../results/study/sumoSimple/simulation_runs/outputs/Sample_2_0/sumoSimple_out/",
+                      "sumoSimple", "sample_3_0", remove_xticks=True)
+    sim_position_plot("./", "../results/study/vadereSimple/simulation_runs/outputs/Sample_1_0/vadereSimple_out/",
+                      "vadereSimple", "sample_1_0", remove_xticks=True)
+    sim_position_plot("./", "../results/study/vadereSimple/simulation_runs/outputs/Sample_3_0/vadereSimple_out/",
+                      "vadereSimple", "sample_3_0", remove_xticks=True)
+    sim_position_plot("./", "../results/study/sumoBottleneck/simulation_runs/outputs/Sample_1_0/sumoBottleneck_out/",
+                      "sumoBottleneck", "sample_1_0", wide_format=True)
+    sim_position_plot("./",
+                      "../results/study/vadereBottleneck/simulation_runs/outputs/Sample_1_0/vadereBottleneck_out/",
+                      "vadereBottleneck", "sample_1_0", wide_format=True)
