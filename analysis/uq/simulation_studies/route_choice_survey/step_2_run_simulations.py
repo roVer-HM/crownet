@@ -44,8 +44,8 @@ def run_controller(controller, qoi, par_var):
         .experiment_label("output") \
         .with_control("control.py") \
         .control_argument("controller-type", controller) \
-        .vadere_tag("latest") \
-        .control_tag("latest")
+        .vadere_tag("220816-1012") \
+        .control_tag("220527-1453")
 
 
     setup = CoupledDictVariation(
