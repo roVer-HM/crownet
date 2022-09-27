@@ -78,8 +78,9 @@ if __name__ == "__main__":
     sources = dists[dists["condition"] == "Uninformed"]
 
     sources = sources.drop(columns="condition").set_index("population")
+    sources = sources.div(sources.sum(axis=1), axis=0) * 10
     sources = 1/sources
-    sources = sources.div(sources.sum(axis=1), axis=0)*10
+
     sources = sources.reset_index()
 
 
@@ -101,6 +102,7 @@ if __name__ == "__main__":
         for stat in ["Students", "Fans"]:
 
             sources_ = sources[sources["population"] == stat]
+            sources_ = sources_.set_index("population").values.round(3).tolist()[0]
             work_around_ = work_around[work_around["population"] == stat]
 
             df = dists[dists["condition"] == condition]
@@ -110,10 +112,6 @@ if __name__ == "__main__":
             target_21_p = df["routeB"].values[0]
             target_31_p = df["routeA"].values[0]
 
-            #default_vals = [target_11_p, target_21_p, target_31_p]
-            #values_short_route = default_vals
-            #values_long_route = default_vals
-            #values_medium_route = default_vals
 
             if condition == "Uninformed":
                 compliances = {"usePsychologyLayer": False,
@@ -131,10 +129,7 @@ if __name__ == "__main__":
                        "routeChoices.[instruction=='use target 21'].targetProbabilities": values_medium_route,
                        'routeChoices.[instruction==use target 31].targetProbabilities': values_long_route}
 
-            sources__ = {'sources.[id==11].distributionParameters.updateFrequency': sources_["routeC"].values[0],
-                        'sources.[id==21].distributionParameters.updateFrequency': sources_["routeB"].values[0],
-                        'sources.[id==31].distributionParameters.updateFrequency': sources_["routeA"].values[0],
-            }
+            sources__ = {'targetChangers.[id==4].probabilityToChangeTarget': sources_}
 
             compliances = dict(compliances, **sources__)
 

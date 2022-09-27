@@ -508,7 +508,20 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 4,
+        "shape" : {
+          "x" : 1.5,
+          "y" : 0.5,
+          "width" : 8.5,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_ELEMENT",
+        "nextTarget" : [ 11, 21, 31 ],
+        "probabilityToChangeTarget" : [ 0.5, 0.3, 0.2 ]
+      } ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
       "droplets" : [ ],
@@ -517,15 +530,15 @@
         "shape" : {
           "x" : 1.5,
           "y" : 0.5,
-          "width" : 4.0,
+          "width" : 8.5,
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.91839
+          "updateFrequency" : 2
         },
-        "spawnNumber" : 5,
+        "spawnNumber" : 10,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 2000.0,
@@ -533,54 +546,6 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 11 ],
-        "groupSizeDistribution" : [ 0.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 31,
-        "shape" : {
-          "x" : 8.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 6.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 4.47853
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 2000.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 31 ],
-        "groupSizeDistribution" : [ 0.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 21,
-        "shape" : {
-          "x" : 5.5,
-          "y" : 0.5,
-          "width" : 2.5,
-          "height" : 6.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 3.60308
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 2000.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 21 ],
         "groupSizeDistribution" : [ 0.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
