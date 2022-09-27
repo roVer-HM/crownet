@@ -135,10 +135,38 @@ def create_positions_2(
         if seed is None
         else seed
     )
-    cmd = os.path.join(os.environ["CROWNET_HOME"], "scripts/rnd_stationary_positions")
 
-    nodes_area_1 = [2, 8, 16, 24, 32, 48, 64]
-    nodes_area_2 = [2, 4, 6, 8, 12, 16]
+    nodes_area_1 = [2, 8, 16, 24, 32, 48, 64]  # A1 (Big)
+    nodes_area_2 = [2, 4, 6, 8, 12, 16]  # A2 (Small)
+    _create_trace_from_list(nodes_area_1, nodes_area_2, seed, base_dir, number_of_runs)
+
+
+def create_missing_2(base_dir: str, number_of_runs: int = 20, seed: int | None = None):
+    seed = (
+        random.Random(time_ns()).randint(-2147483648, 2147483647)
+        if seed is None
+        else seed
+    )
+
+    nodes_area_1 = [4, 6, 12, 38, 44, 50]  # A1 (Big)
+    nodes_area_2 = [48, 64, 96, 128, 152, 176, 200]  # A2 (Small)
+    _create_trace_from_list(nodes_area_1, nodes_area_2, seed, base_dir, number_of_runs)
+
+
+def only_missing(path: str):
+    nodes_area_1 = [4, 6, 12, 38, 44, 50]  # A1 (Big)
+    nodes_area_2 = [48, 64, 96, 128, 152, 176, 200]  # A2 (Small)
+
+    if any([f"full_{n}" in path for n in nodes_area_1]):
+        return True
+    if any([f"quarter_{n}" in path for n in nodes_area_2]):
+        return True
+    return False
+
+
+def _create_trace_from_list(nodes_area_1, nodes_area_2, seed, base_dir, number_of_runs):
+
+    cmd = os.path.join(os.environ["CROWNET_HOME"], "scripts/rnd_stationary_positions")
     args: list = [
         "--vadere",
         os.path.abspath("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario"),
@@ -362,7 +390,8 @@ def trace_filter_176(path: str):
 
 
 if __name__ == "__main__":
-    main("./mf_stationary_single_cell.d/", trace_filter=lambda x: "position_" not in x)
+    # main("./mf_stationary_single_cell.d/", trace_filter=lambda x: "position_" not in x)
+    main("./mf_stationary_single_cell.d/", trace_filter=only_missing)
     # main(
     #     "./mf_stationary_single_cell.d/",
     #     filter="both",
@@ -371,4 +400,5 @@ if __name__ == "__main__":
     # )
     # create_random_positions("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
     # create_positions_2("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
+    # create_missing_2("./mf_stationary_single_cell.d/", number_of_runs=20, seed=131313)
     # get_traces("./mf_stationary_single_cell.d/")
