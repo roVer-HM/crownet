@@ -1,10 +1,12 @@
 from __future__ import annotations
 from copy import deepcopy
+import itertools
 from math import floor
 
 from itertools import combinations
 import json
 import os
+from re import I
 from typing import Tuple, List
 from matplotlib import pyplot as plt
 import numpy as np
@@ -20,7 +22,7 @@ from roveranalyzer.analysis import adf_test
 from roveranalyzer.utils.parallel import run_kwargs_map
 import roveranalyzer.utils.plot as PlotUtl
 import roveranalyzer.utils.dataframe as FrameUtl
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, FixedLocator
 import pandas as pd
 import seaborn as sns
 
@@ -53,24 +55,42 @@ _c = [
     ]
 ]
 
+
 ts_ = {
     ts_x: {
-        "lbl": r"$X_t$ with ped. arrival rate $\lambda_1 = 0.04\,\frac{ped}{s}$",
-        "lbl_short": r"$X_t$",
+        "lbl": r"$X_{2.4}$ with ped. arrival rate $\lambda_1 = 2.4\,\frac{ped}{min}$",
+        "lbl_short": r"$X_{2.4}$",
         # "color": "red",
         "color": to_rgb("#4B72B0"),
     },
     ts_y: {
-        "lbl": r"$Y_t$ with ped. arrival rate $\lambda_2 = 0.08\,\frac{ped}{s}$",
-        "lbl_short": r"$Y_t$",
+        "lbl": r"$X_{4.8}$ with ped. arrival rate $\lambda_2 = 4.8\,\frac{ped}{min}$",
+        "lbl_short": r"$X_{4.8}$",
         # "color": "blue",
         "color": to_rgb("#C44E51"),
     },
 }
-_c_map = {f"S1-{i}": _c[i] for i in range(8)}
-_c_map["Ground Truth"] = "black"
-_c_map[ts_[ts_x]["lbl_short"]] = ts_[ts_x]["color"]
-_c_map[ts_[ts_y]["lbl_short"]] = ts_[ts_y]["color"]
+
+(c1, c2, c3, c4) = [sns.color_palette("tab10")[i] for i in [-1, 2, 4, 1]]
+
+
+_c_map = {
+    "S1-0": dict(color=c3, linestyle="-", zorder=5),
+    "S1-1": dict(color=c1, linestyle="-", zorder=5),
+    "S1-2": dict(color=c4, linestyle="-", zorder=5),
+    "S1-3": dict(color=c2, linestyle="-", zorder=5),
+    "S1-4": dict(color=c1, linestyle=":", zorder=6),
+    "S1-5": dict(color=c3, linestyle=":", zorder=6),
+    "S1-6": dict(color=c2, linestyle=":", zorder=6),
+    "S1-7": dict(color=c4, linestyle=":", zorder=6),
+    "Ground Truth": dict(color="black", linestyle="-", zorder=3),
+    ts_[ts_x]["lbl_short"]: dict(color=ts_[ts_x]["color"], linestyle="-", zorder=3),
+    ts_[ts_y]["lbl_short"]: dict(color=ts_[ts_y]["color"], linestyle="-", zorder=3),
+}
+# _c_map = {f"S1-{i}": _c[i] for i in range(8)}
+# _c_map["Ground Truth"] = "black"
+# _c_map[ts_[ts_x]["lbl_short"]] = ts_[ts_x]["color"]
+# _c_map[ts_[ts_y]["lbl_short"]] = ts_[ts_y]["color"]
 
 
 class Cpallet:
@@ -194,8 +214,8 @@ def create_map_ts_figure(
             ax.plot(
                 _df.index.get_level_values("simtime"),
                 _df["mean"],
-                color=_c_map[sim],
-                label=run_map[sim].attr["lbl_short"],
+                **_c_map[sim],
+                label=run_map[sim].attr["lbl_short"].replace("-", ":"),
                 marker=None,
             )
 
@@ -389,16 +409,16 @@ def process_1d_scenario(run_map: RunMap):
 def extract_tex_tables(df: pd.DataFrame | str, run_map: RunMap):
 
     _rename = {
-        "Critical Value (1%)": "Crit. (1%)",
+        "scenario": "Simulation",
+        "p-value": "p-value",
         "Test Statistic": "Stat.",
-        "scenario": "Sim.",
         "mean": "Mean",
         "std": "Std",
     }
     _format = {
         "Stat.": "\\num{{{:.3f}}}".format,
         "p-value": "\\num{{{:.4e}}}".format,
-        "Crit. (1%)": "\\num{{{:.3f}}}".format,
+        # "Crit. (1%)": "\\num{{{:.3f}}}".format,
         "Mean": "{:.2f}".format,
         "Std": "{:.2f}".format,
     }
@@ -412,13 +432,13 @@ def extract_tex_tables(df: pd.DataFrame | str, run_map: RunMap):
         g.sort()
         g.append(_ts)
         FrameUtl.save_as_tex_table(
-            df.loc[g],
+            df.loc[g].reset_index()[_rename.keys()],
             run_map.path(f"stat_{_ts}.tex"),
             rename=_rename,
             col_format=_format,
-            str_replace=lambda x: x.replace("X\_0.04", "$X_t$").replace(
-                "X\_0.08", "$Y_t$"
-            ),
+            str_replace=lambda x: x.replace("X\_0.04", "$X_{2.4}$")
+            .replace("X\_0.08", "$X_{4.8}$")
+            .replace("S1-", "S1:"),
         )
 
 
@@ -457,64 +477,92 @@ class SimFactory:
 
 def paper_plot(run_map: RunMap, gt_ts: pd.DataFrame, maps: pd.DataFrame):
 
-    fig, (ax_ts, sim_ts, err_cdf) = plt.subplots(1, 3, figsize=(20, 6))
-
     global ts_x
     global ts_y
 
-    make_vader_ts_figure(gt_ts, "no_save", _ax=ax_ts, lbl_key="lbl_short")
-    create_map_ts_figure(
-        run_map, gt_ts, maps, ts_x, "no_save", sim_ts, lbl_key="lbl_short"
-    )
-    create_map_ts_figure(
-        run_map, gt_ts, maps, ts_y, "no_save", sim_ts, lbl_key="lbl_short"
-    )
+    with plt.rc_context(PlotUtl.paper_rc()):
+        fig, (ax_ts, sim_ts, err_cdf) = plt.subplots(1, 3, figsize=(20, 6))
+        make_vader_ts_figure(gt_ts, "no_save", _ax=ax_ts, lbl_key="lbl_short")
+        create_map_ts_figure(
+            run_map, gt_ts, maps, ts_x, "no_save", sim_ts, lbl_key="lbl_short"
+        )
+        create_map_ts_figure(
+            run_map, gt_ts, maps, ts_y, "no_save", sim_ts, lbl_key="lbl_short"
+        )
 
-    _ts_y = [gn for gn, g in run_map.items() if g.attr["ts"] == "X_0.08"]
-    _ts_x = [gn for gn, g in run_map.items() if g.attr["ts"] == "X_0.04"]
-    _df = []
-    data = (
-        maps.loc[pd.IndexSlice[:, :, "map_mean_count"], ["mean"]]
-        .unstack(["data", "sim"])
-        .droplevel([0, 1], axis=1)
-    )
-    data_glb = (
-        maps.loc[pd.IndexSlice[:, :, "map_glb_count"], ["mean"]]
-        .unstack(["data", "sim"])
-        .droplevel([0, 1], axis=1)
-    )
-    data = pd.concat(
-        [data_glb.loc[:, [_ts_y[0]]].set_axis([ts_[ts_y]["lbl_short"]], axis=1), data],
-        axis=1,
-    )
-    data = pd.concat(
-        [data_glb.loc[:, [_ts_x[0]]].set_axis([ts_[ts_x]["lbl_short"]], axis=1), data],
-        axis=1,
-    )
+        _loc = np.arange(0, 5001, 500)
+        _lbl = [_l if _l % 1000 == 0 else "" for _l in _loc]
+        _lbl[1] = "500"
+        for _a in [ax_ts, sim_ts]:
+            _a.xaxis.set_major_locator(FixedLocator(_loc))
+            _a.set_xticklabels(_lbl)
 
-    _ts_y.insert(0, ts_[ts_y]["lbl_short"])
-    _ts_x.insert(0, ts_[ts_x]["lbl_short"])
-    col_order = [*_ts_y, *_ts_x]
+        _ts_y = [gn for gn, g in run_map.items() if g.attr["ts"] == "X_0.08"]
+        _ts_x = [gn for gn, g in run_map.items() if g.attr["ts"] == "X_0.04"]
+        _df = []
+        data = (
+            maps.loc[pd.IndexSlice[:, :, "map_mean_count"], ["mean"]]
+            .unstack(["data", "sim"])
+            .droplevel([0, 1], axis=1)
+        )
+        data_glb = (
+            maps.loc[pd.IndexSlice[:, :, "map_glb_count"], ["mean"]]
+            .unstack(["data", "sim"])
+            .droplevel([0, 1], axis=1)
+        )
+        data = pd.concat(
+            [
+                data_glb.loc[:, [_ts_y[0]]].set_axis([ts_[ts_y]["lbl_short"]], axis=1),
+                data,
+            ],
+            axis=1,
+        )
+        data = pd.concat(
+            [
+                data_glb.loc[:, [_ts_x[0]]].set_axis([ts_[ts_x]["lbl_short"]], axis=1),
+                data,
+            ],
+            axis=1,
+        )
 
-    sns.ecdfplot(data[col_order], palette=_c_map, ax=err_cdf, legend=False)
+        _ts_y.insert(0, ts_[ts_y]["lbl_short"])
+        _ts_x.insert(0, ts_[ts_x]["lbl_short"])
+        col_order = [*_ts_y, *_ts_x]
 
-    ax_ts.set_title("Time Series Ground Truth")
-    err_cdf.set_title("Empirical Cumulative Density Function")
-    err_cdf.set_xlabel("Number of Pedestrian")
+        for c in data.columns:
+            _x = data[c].sort_values().values
+            _y = np.arange(len(_x)) / float(len(_x))
+            err_cdf.plot(_x, _y, **_c_map[c])
 
-    _h, _l = sim_ts.get_legend_handles_labels()
-    ax_ts.get_legend().remove()
-    sim_ts.get_legend().remove()
-    fig.legend(
-        np.array(_h).reshape(2, 5).T.reshape((1, 10))[0],
-        np.array(_l).reshape(2, 5).T.reshape((1, 10))[0],
-        loc="lower center",
-        ncol=5,
-        fontsize="x-small",
-    )
-    fig.tight_layout(rect=(0.0, 0.07, 1.0, 1.0))
+        # ax_ts.set_title("Time Series Ground Truth")
+        err_cdf.set_ylabel("ECDF")
+        err_cdf.set_xlabel("Number of Pedestrians")
+        err_cdf.xaxis.set_major_locator(FixedLocator(np.arange(0, 36, 5)))
+        for ax in fig.axes:
+            ax.set_title("")
 
-    fig.savefig(run_map.path("1d_plot_descriptive.pdf"))
+        _h, _l = sim_ts.get_legend_handles_labels()
+        ax_ts.get_legend().remove()
+        sim_ts.get_legend().remove()
+        _h = np.array(_h).reshape(2, 5).T.reshape((1, 10))[0]
+        _l = np.array(_l).reshape(2, 5).T.reshape((1, 10))[0]
+        _filter = [*list(np.arange(1, 10, 2)), *list(np.arange(0, 10, 2))]
+        # _filter = list(itertools.chain(*_filter))
+        fig.legend(
+            _h[_filter],
+            _l[_filter],
+            # _h,
+            # _l,
+            loc="lower center",
+            ncol=10,
+            frameon=False,
+            labelspacing=0.2,
+            handletextpad=0.2,
+            columnspacing=0.8,
+            handlelength=1.0,
+        )
+        fig.tight_layout(rect=(0.0, 0.09, 1.0, 1.0))
+        fig.savefig(run_map.path("1d_plot_descriptive.pdf"))
 
 
 def conv_err():
@@ -566,6 +614,6 @@ if __name__ == "__main__":
 
     output_dir = "/mnt/data1tb/results/_density_map/01a_1d_output/"
     run_map = RunMap.load_or_create(get_run_map_single_run, output_dir)
-    plot_default_stats(run_map)
-    # process_1d_scenario(run_map)
-    extract_tex_tables(run_map.path("stat.csv"), run_map)
+    # plot_default_stats(run_map)
+    process_1d_scenario(run_map)
+    # extract_tex_tables(run_map.path("stat.csv"), run_map)

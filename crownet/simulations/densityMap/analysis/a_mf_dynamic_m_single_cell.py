@@ -1,8 +1,25 @@
 from __future__ import annotations
+from cProfile import label
+from cmath import exp
+import cmath
 from functools import partial
+import os
 from itertools import chain
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits import axes_grid1
+from shapely.geometry import Polygon
+from matplotlib import patches
 import re
-from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.lines as mlines
+from matplotlib.transforms import Bbox
+from matplotlib.colors import (
+    LinearSegmentedColormap,
+    TwoSlopeNorm,
+    to_rgba_array,
+    Normalize,
+)
+import seaborn as sn
+from collections.abc import Sized, Sequence
 from typing import Callable, Dict, List, Tuple, Any
 from roveranalyzer.analysis.common import (
     Simulation,
@@ -22,6 +39,7 @@ from roveranalyzer.utils import dataframe
 from roveranalyzer.utils.parallel import run_kwargs_map
 from roveranalyzer.utils.plot import PlotUtil, StyleMap, check_ax, empty_fig
 import roveranalyzer.utils.plot as _Plot
+import roveranalyzer.utils.dataframe as FrameUtl
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import numpy as np
@@ -30,6 +48,10 @@ import matplotlib.pyplot as plt
 from scipy.stats import mannwhitneyu, kstest
 from matplotlib.backends.backend_pdf import PdfPages
 from omnetinireader.config_parser import OppConfigFileBase, ObjectValue
+from roveranalyzer.utils.plot import check_ax, matplotlib_set_latex_param
+
+# load global settings
+matplotlib_set_latex_param()
 
 
 def lbl_f_alpha_dist(sim: Simulation) -> str:
@@ -275,10 +297,33 @@ def plot_mse_for_seed(
             pdf.savefig(fig)
 
 
+def mse_combi_plot(
+    data: pd.DataFrame,
+    run_map: RunMap,
+):
+    layout = np.array(range(4 * 6)).reshape((4, 6))
+    layout[:, 4:] = 99
+    with plt.rc_context(_Plot.paper_rc()):
+        fig, axd = plt.subplot_mosaic(layout, figsize=(20, 6))
+        idx = [i for i in axd.keys() if i < 99]
+        idx.sort()
+        diff_ax = [axd[i] for i in idx]
+        plot_mse_yDist_to_ymf(data, run_map, figure_name=None, axes=diff_ax)
+        for ax in diff_ax:
+            ax.xaxis.grid(False)
+            ax.yaxis.grid(False)
+        plot_mse_yDist_to_ymf_box_plot(run_map, data, figure_name=None, ax=axd[99])
+        axd[99].set_title("")
+        fig.tight_layout(w_pad=0.3)
+        fig.savefig(run_map.path("msme_combi.pdf"))
+    print("Hi")
+
+
 def plot_mse_yDist_to_ymf(
     data: pd.DataFrame,
     run_map: RunMap,
     figure_name: str,
+    axes: List[plt.Axes] | None = None,
 ):
     """Plot the difference between the mse error compared to the youngest measurement first (i.e. alpha=1.0)
     For each parameter variation one bar chart with each bar is one seed (run_id).
@@ -289,37 +334,88 @@ def plot_mse_yDist_to_ymf(
         figure_name (str): _description_
     """
 
-    with PdfPages(run_map.path(figure_name)) as pdf:
-        fig, axes = plt.subplots(4, 4, figsize=(16, 9), sharey="all")
-        fig.suptitle("Cell MSE difference between ymfDist and ymf")
+    if axes is None:
+        fig, axes = plt.subplots(4, 4, figsize=(20, 7), sharey="all")
+        # fig.suptitle("Cell MSE difference between ymfDist and ymf")
         axes = list(chain(*axes))
+    else:
+        fig = axes[0].get_figure()
 
-        ymin = data["err_to_ymf"].min()
-        ymax = data["err_to_ymf"].max()
-        for idx, item in enumerate(run_map.items()):
-            if idx == 16:
-                continue
-            group_name = item[0]
-            sim_group: SimulationGroup = item[1]
-            seed_num = len(sim_group)
-            ax: plt.Axes = axes[idx]
-            ax.hlines(0, -1, seed_num, colors="gray")
-            ax.set_xticks(np.arange(seed_num), labels=np.arange(seed_num))
-            ax.set_ylim(ymin, ymax)
-            err = data.loc[sim_group.reps, ["err_to_ymf"]]
-            ax.bar(np.arange(len(sim_group)), err.iloc[:, 0].to_numpy(), 0.35)
-            ax.set_ylabel("Cell MSE diff ymfDist-ymf")
+    ymin = data["err_to_ymf"].min()
+    ymax = data["err_to_ymf"].max()
+    for idx, item in enumerate(run_map.items()):
+        if idx == 16:
+            continue
+        if idx % 4 == 0:
+            if idx >= 12:
+                ax_loc = "left_low"
+            else:
+                ax_loc = "left"
+        else:
+            if idx >= 12:
+                ax_loc = "low"
+            else:
+                ax_loc = ""
+
+        group_name = item[0]
+        sim_group: SimulationGroup = item[1]
+        seed_num = len(sim_group)
+        ax: plt.Axes = axes[idx]
+        ax.hlines(0, -1, seed_num, colors="gray")
+        ax.set_ylim(ymin, ymax)
+        err = data.loc[sim_group.reps, ["err_to_ymf"]]
+        ax.bar(np.arange(len(sim_group)), err.iloc[:, 0].to_numpy(), 0.55)
+        if "left" in ax_loc:
+            ax.set_ylabel("MSME diff", fontsize="large")
+        if "low" in ax_loc:
             ax.set_xlabel("Seeds / Runs")
-            ax.set_title(group_name)
+            ax.set_xticks(
+                np.arange(seed_num),
+                labels=[i if i % 2 == 0 else "" for i in np.arange(seed_num)],
+            )
+            ax.set_xticklabels(ax.get_xticklabels(), fontsize="x-large")
+        else:
+            ax.set_xticks(np.arange(seed_num), labels=np.arange(seed_num))
+            ax.set_xticklabels([])
+        # if not "left" in ax_loc:
+        #     ax.set_yticklabels([])
+        lbl = group_name.split("_")
+        if idx == 0:
+            ax.text(
+                0.05,
+                0.1,
+                f"$\\alpha={lbl[0]}, D={lbl[1]}$",
+                fontsize="xx-large",
+                horizontalalignment="left",
+                verticalalignment="bottom",
+                transform=ax.transAxes,
+                fontweight="bold",
+                backgroundcolor="white",
+                zorder=9,
+            )
+        else:
+            ax.text(
+                0.97,
+                0.9,
+                f"$\\alpha={lbl[0]}, D={lbl[1]}$",
+                fontsize="xx-large",
+                horizontalalignment="right",
+                verticalalignment="top",
+                transform=ax.transAxes,
+                fontweight="bold",
+                backgroundcolor="white",
+                zorder=9,
+            )
+
+    if figure_name is not None:
         fig.tight_layout()
-        pdf.savefig(fig)
-    print("done")
+        with PdfPages(run_map.path(figure_name)) as pdf:
+            pdf.savefig(fig)
+    return fig, axes
 
 
 def plot_mse_yDist_to_ymf_box_plot(
-    run_map: RunMap,
-    data: pd.DataFrame,
-    figure_name: str,
+    run_map: RunMap, data: pd.DataFrame, figure_name: str, ax: plt.Axes | None = None
 ):
 
     # create mean cell mse for each run_id over time.
@@ -335,18 +431,33 @@ def plot_mse_yDist_to_ymf_box_plot(
     data = data[sorted_index]
     data.columns = data.columns.droplevel(0)
 
-    # data.reset_index().set_index(['run_id', 'label']).boxplot(by=["label"])
-    fig, ax = check_ax()
-    ax.set_title(
-        f"Cell MSE difference between ymfDist and ymf (sorted by mean) N={len(data.iloc[:,0])}"
-    )
-    data.boxplot(ax=ax)
-    ax.set_xlabel(f"Variation (alpha, cut off distance)")
-    ax.set_ylabel("cell mse difference")
-    ax.axhline(y=0, color="red")
-    ax.axvline(x=np.argmax(data.columns == "(1,999)") + 1, color="red")
+    with plt.rc_context(_Plot.paper_rc(tick_labelsize="x-large")):
+        # data.reset_index().set_index(['run_id', 'label']).boxplot(by=["label"])
+        fig, ax = check_ax(ax, figsize=(8, 8))
+        # ax.set_title(
+        #     f"Cell MSE difference between ymfDist and ymf (sorted by mean) N={len(data.iloc[:,0])}"
+        # )
+        b = data.boxplot(ax=ax, meanline=True, showmeans=True)
+        ax.set_xlabel(f"Variation (alpha, cut off distance)", fontsize="xx-large")
+        ax.set_ylabel("MSME diff", labelpad=-8, fontsize="large")
+        ax.axhline(y=0, color="red")
+        ax.axvline(x=np.argmax(data.columns == "(1,999)") + 1, color="red")
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center")
+        ax.legend(
+            handles=[
+                mlines.Line2D([], [], color="#a6a6a6", linestyle="-", label="median"),
+                mlines.Line2D([], [], color="#54a767", linestyle="--", label="mean"),
+            ],
+            loc="upper left",
+            facecolor="white",
+            framealpha=1,
+        )
 
-    fig.savefig(run_map.path(figure_name))
+        if figure_name is not None:
+            fig.tight_layout()
+            fig.savefig(run_map.path(figure_name))
+        else:
+            return fig, ax
 
 
 def plot_all(
@@ -369,6 +480,532 @@ def plot_all(
     plot_mse_yDist_to_ymf_box_plot(
         run_map, data_mean_by_run_id, "cell_mse_box_plot.pdf"
     )
+    plot_test(run_map)
+
+
+def plot_per_seed_stats(run_map: RunMap):
+    data, data_mean_by_run_id = _get_mse_data(run_map)
+    ts_per_seed = data.reset_index().merge(
+        run_map.id_to_label_series(enumerate_run=True).reset_index(), on="run_id"
+    )
+    ts_per_seed = (
+        ts_per_seed.set_index(["label", "seed", "simtime"])
+        .drop(columns=["run_id", "run_index"])
+        .unstack(["label"])
+        .droplevel(0, axis=1)
+    )
+
+    groups = [g.group_name for g in run_map.values() if g.attr["alpha"] > 0.7]
+    groups.sort(key=lambda x: run_map.attr(x, "alpha"))
+
+    with run_map.pdf_page("mse_ts.pdf") as pdf:
+        for seed in ts_per_seed.index.get_level_values("seed").unique():
+            print(f"seed: {seed}")
+            _df = ts_per_seed.loc[seed, ["0.9_60_25", "1_999_25"]]
+            fig, ax = _Plot.check_ax()
+            sns.lineplot(data=_df)
+            ax.set_title(f"Time series of MSE for seed {seed}")
+            pdf.savefig(fig)
+            plt.close(fig)
+
+            f, ax = _Plot.check_ax()
+            sns.ecdfplot(
+                _df,
+                ax=ax,
+            )
+            ax.set_title(f"ECDF pedestrian count")
+            ax.set_xlabel("Pedestrian count")
+            ax.get_legend().set_title(None)
+            sns.move_legend(ax, "upper left")
+            pdf.savefig(f)
+            plt.close(f)
+
+            fig, ax = _Plot.check_ax()
+            OppAnalysis.calculate_equality_tests(_df, ax=ax)
+            ax.set_title(f"Test for seed {seed}")
+            pdf.savefig(fig)
+            plt.close(fig)
+
+    print("hi")
+
+
+def cells_with_biggest_error_diff(
+    run_map: RunMap,
+    cmp_groups: list["str"],
+    seed_idx: int,
+    abs_err_filter: float = 1.0,
+    lbl_f=lambda x: x.group_name,
+):
+    """Find cells which have the most number of errors over all time steps and
+    agents. Further compare two runs and return cells where the number of errors
+    entries differe the most
+    """
+    df = []
+
+    for g in cmp_groups:
+        _i = pd.IndexSlice
+        sim: Simulation = run_map[g].simulations[seed_idx]
+        _df = sim.get_dcdMap().count_p[_i[:, :, :, 1:], ["err"]]
+        _df["err"] = np.abs(_df["err"])
+        _df.columns = ["abs_err"]
+        _df = _df[_df["abs_err"] >= abs_err_filter]
+        _df["lbl"] = lbl_f(run_map[g])
+        df.append(_df)
+    df = pd.concat(df, axis=0)
+    df = df.sort_values("abs_err", ascending=False)
+
+    # [x, y](err_count_run1, err_count_run2, err_count_abs_diff)
+    # Number of errors >= abs_err_filter of each cell over all agents and time steps
+    err_count_matrix = (
+        df.reset_index()
+        .set_index(["lbl", "x", "y"])
+        .drop(columns=["simtime", "ID"])
+        .groupby(["lbl", "x", "y"])
+        .count()
+        .unstack("lbl")
+        .fillna(0)
+        .droplevel(0, axis=1)
+    )
+    # err_count_matrix["err_count_abs_diff"] = np.abs(err_count_matrix.iloc[:, 0] - err_count_matrix.iloc[:, 1])
+    err_count_matrix[
+        f"[{err_count_matrix.columns[0]} - {err_count_matrix.columns[1]}]"
+    ] = (err_count_matrix.iloc[:, 0] - err_count_matrix.iloc[:, 1])
+    # collect grid for color mesh plots
+    meta: DcdMetaData = (
+        run_map[cmp_groups[0]].simulations[seed_idx].get_dcdMap().metadata
+    )
+    mgrid = meta.mgrid()
+    # add missing cell counts (defaults to zero)
+    missing_index = meta.grid_index_2d(real_coords=True).difference(
+        err_count_matrix.index
+    )
+    err_count_matrix = pd.concat(
+        [
+            pd.DataFrame(0, columns=err_count_matrix.columns, index=missing_index),
+            err_count_matrix,
+        ],
+        axis=0,
+    ).sort_index()
+
+    return err_count_matrix, mgrid
+
+
+class MyCm(LinearSegmentedColormap):
+    def __init__(
+        self,
+        name: str,
+        segmentdata: Mapping[str, Sequence[Tuple[float, float, float]]],
+        N: int = ...,
+        gamma: float = ...,
+    ) -> None:
+        super().__init__(name, segmentdata, N, gamma)
+
+    def __call__(self, X, alpha=None, bytes=False):
+        print(X)
+        return super().__call__(X, alpha, bytes)
+
+    def from_list(name, colors, N=256, gamma=1.0):
+        """
+        Create a `LinearSegmentedColormap` from a list of colors.
+
+        Parameters
+        ----------
+        name : str
+            The name of the colormap.
+        colors : array-like of colors or array-like of (value, color)
+            If only colors are given, they are equidistantly mapped from the
+            range :math:`[0, 1]`; i.e. 0 maps to ``colors[0]`` and 1 maps to
+            ``colors[-1]``.
+            If (value, color) pairs are given, the mapping is from *value*
+            to *color*. This can be used to divide the range unevenly.
+        N : int
+            The number of rgb quantization levels.
+        gamma : float
+        """
+        if not np.iterable(colors):
+            raise ValueError("colors must be iterable")
+
+        if (
+            isinstance(colors[0], Sized)
+            and len(colors[0]) == 2
+            and not isinstance(colors[0], str)
+        ):
+            # List of value, color pairs
+            vals, colors = zip(*colors)
+        else:
+            vals = np.linspace(0, 1, len(colors))
+
+        r, g, b, a = to_rgba_array(colors).T
+        cdict = {
+            "red": np.column_stack([vals, r, r]),
+            "green": np.column_stack([vals, g, g]),
+            "blue": np.column_stack([vals, b, b]),
+            "alpha": np.column_stack([vals, a, a]),
+        }
+
+        return MyCm(name, cdict, N, gamma)
+
+
+def get_clipped_area():
+    return slice(22 * 5.0, 50 * 5.0), slice(8 * 5.0, 63 * 5.0)
+
+
+def get_legal_cells(
+    scenario: VaderScenarioPlotHelper, xy_slices: Tuple[slice, slice], c=5.0
+):
+
+    _covered = []
+    _free = []
+    _x, _y = xy_slices
+    obs: List[Polygon] = [
+        scenario.scenario.shape_to_list(s["shape"], to_shapely=True)
+        for s in scenario.scenario.obstacles
+    ]
+    for x in np.arange(_x.start, _x.stop, c):
+        for y in np.arange(_y.start, _y.stop, c):
+            idx = (x, y)
+            cell = Polygon([[x, y], [x + c, y], [x + c, y + c], [x, y + c], [x, y]])
+            for _o in obs:
+                if _o.covers(cell):
+                    _covered.append(idx)
+                    break
+            if _covered[-1] != idx:
+                _free.append(idx)
+
+    _covered = pd.MultiIndex.from_tuples(_covered, names=["x", "y"])
+    _free = pd.MultiIndex.from_tuples(_free, names=["x", "y"])
+
+    return _free, _covered
+
+
+def add_cell_patches(ax: plt.axes, xy, c=5.0, **kwds):
+    for x, y in xy:
+        # x = x+c/2
+        # y = y+c/2
+        cell = Polygon([[x, y], [x + c, y], [x + c, y + c], [x, y + c], [x, y]])
+        patch = patches.Polygon(
+            list(cell.exterior.coords),
+            edgecolor="black",
+            fill=False,
+            closed=True,
+            **kwds,
+        )
+        ax.add_patch(patch)
+    return ax
+
+
+def write_cell_tex(run_map: RunMap):
+    scenario = VaderScenarioPlotHelper(
+        "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
+    )
+    _free, _covered = get_legal_cells(scenario, get_clipped_area())
+    PlotUtil.cell_to_tex(_free, c=5.0, fd=run_map.path("cell_tikz.tex"), attr=["cell"])
+
+
+def create_od_matrix(run_map: RunMap):
+    scenario = VaderScenarioPlotHelper(
+        "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
+    )
+    od_target_changer = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "./S3_targetChanger_OD.csv"),
+        delimiter=";",
+    )
+    od_target_changer["next Targets"] = od_target_changer["next Targets"].apply(
+        lambda x: [int(i.strip()[1:]) for i in x.split(",")]
+    )
+    od_target_changer["Source"] = od_target_changer["Source"].apply(
+        lambda x: int(str(x)[1:])
+    )
+    od = (
+        od_target_changer.iloc[:, [0, -1]]
+        .set_axis(["origin", "destination"], axis=1)
+        .to_dict("records")
+    )
+    od = {i["origin"]: i["destination"] for i in od}
+    od_2 = {s["id"] - 1000: s["targetIds"] for s in scenario.scenario.sources}
+    for k, val in od_2.items():
+        val = [v - 2000 for v in val]
+        if k not in od:
+            od[k] = val
+    p = []
+    col = {}
+    for idx, k in enumerate(np.sort(list(od.keys()))):
+        for v in od[k]:
+            col[k] = idx
+            p.append(dict(origin=idx, destination=v))
+
+    p = pd.DataFrame.from_records(p)
+    p["c"] = 1
+    p = p.pivot_table(columns="destination", index="origin", fill_value=0)
+    p = p.div(p.sum(axis=1), axis=0).droplevel(0, axis=1)
+    p = p.rename(columns=col)
+    col_format = [([c], FrameUtl.siunitx(precision=2)) for c in p.columns]
+    FrameUtl.save_as_tex_table(
+        p.reset_index(),
+        run_map.path("s3_od_matrix.tex"),
+        selected_only=False,
+        col_format=col_format,
+        str_replace=lambda x: x.replace(
+            r"\num[round-precision=2]{0.0}", r"$\cdot$"
+        ).replace("origin", ""),
+    )
+    print("hi")
+
+
+def plot_test(run_map: RunMap):
+
+    seeds = run_map["1_999_25"].seeds()
+    scenario = VaderScenarioPlotHelper(
+        "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
+    )
+    # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
+    _free, _covered = get_legal_cells(scenario, get_clipped_area())
+    w_reds = plt.get_cmap("Reds")(np.linspace(0, 1, 256))
+    w_reds[0] = [1.0, 1.0, 1.0, 1.0]
+    colors = [
+        (
+            LinearSegmentedColormap.from_list("wReds", w_reds),
+            Normalize(vmin=0, vmax=6000),
+        ),
+        (
+            LinearSegmentedColormap.from_list("wReds", w_reds),
+            Normalize(vmin=0, vmax=6000),
+        ),
+        (("bwr"), TwoSlopeNorm(vmin=-700, vcenter=0, vmax=700)),
+    ]
+
+    x_s, y_s = get_clipped_area()
+
+    with run_map.pdf_page("error_location.pdf") as pdf:
+        for run in ["0.9_60_25"]:  # [ k for k in run_map.keys() if k != "1_999_25"]:
+            with empty_fig(
+                f"Comparing number of erros for run {run}(yDist) with 1_999_25(ymf)"
+            ) as f:
+                pdf.savefig(f)
+
+            for idx, seed in enumerate(seeds):
+                df, mgrid = cells_with_biggest_error_diff(
+                    run_map,
+                    [run, "1_999_25"],
+                    seed_idx=idx,
+                    abs_err_filter=1.0,
+                )
+                print(f"run: {run}\n{df.max()}")
+                gx, gy = mgrid
+                col_names = df.columns
+                fig, axes = plt.subplots(1, 3, figsize=(16, 9))
+                h = scenario.scenario.bound["height"]
+                h = np.floor(h / 5.0) * 5.0
+                for idx, ax in enumerate(axes):
+                    z = (
+                        df.loc[pd.IndexSlice[:, :], [df.columns[idx]]]
+                        .unstack("y")
+                        .to_numpy()
+                        .T
+                    )
+                    extent = (0.0, z.shape[1] * 5.0, 0.0, z.shape[0] * 5.0)
+                    im = ax.imshow(
+                        z,
+                        origin="lower",
+                        extent=extent,
+                        norm=colors[idx][1],
+                        cmap=colors[idx][0],
+                    )
+                    ax.grid(False)
+                    ax.set_title(col_names[idx])
+                    add_cell_patches(ax, _free)
+                    scenario.add_patches(ax)
+                    ax.set_xlim(x_s.start, x_s.stop)
+                    ax.set_ylim(y_s.start, y_s.stop)
+                    ax.set_aspect(1)
+                    ax.format_coord = partial(xyz_fmt, col=df.columns[idx], df=df)
+                    add_colorbar(im)
+                    # print("hi")
+
+                fig.suptitle(
+                    f"Comparing locations and number of reported errors for seed '{seed}'"
+                )
+                fig.tight_layout()
+                pdf.savefig(fig)
+                plt.close(fig)
+
+
+def add_colorbar(im, aspect=20, pad_fraction=0.5, **kwargs):
+    """Add a vertical color bar to an image plot."""
+    divider = axes_grid1.make_axes_locatable(im.axes)
+    width = axes_grid1.axes_size.AxesY(im.axes, aspect=1.0 / aspect)
+    pad = axes_grid1.axes_size.Fraction(pad_fraction, width)
+    current_ax = plt.gca()
+    cax = divider.append_axes("right", size=width, pad=pad)
+    plt.sca(current_ax)
+    return im.axes.figure.colorbar(im, cax=cax, **kwargs)
+
+
+def xyz_fmt(x, y, col, df: pd.DataFrame):
+    try:
+        z = df.loc[pd.IndexSlice[np.floor(x / 5) * 5, np.floor(y / 5) * 5], col]
+    except KeyError:
+        z = np.Infinity
+
+    return f"x={x:.5f} y={y:.5f} z={z:.5f}"
+
+
+def plot_cell_count_err_stats2(run_map: RunMap):
+    seeds = run_map["1_999_25"].seeds()
+
+    with run_map.pdf_page("count_comparison_per_seed.pdf") as pdf:
+        for idx, seed in enumerate(seeds):
+            df = []
+            df = cells_with_biggest_error_diff(
+                run_map,
+                ["0.95_80_25", "1_999_25"],
+                seed_idx=idx,
+                abs_err_filter=1.0,
+            )
+
+            for g in ["0.95_80_25", "1_999_25"]:
+                sim: Simulation = run_map[g].simulations[idx]
+                _df = sim.get_dcdMap().cell_count_measure()
+                _df["lbl"] = g
+                df.append(_df)
+
+            # df = pd.concat(df, axis=0, ignore_index=True)
+            cmap = plt.get_cmap("YlOrRd")
+            ydist = df[0]
+            ydist["lbl"] = "ydist"
+            ydist = ydist[ydist["abserr"] >= 1.0]
+            ymf = df[1]
+            ymf["lbl"] = "ymf"
+            ymf = ymf[ymf["abserr"] >= 1.0]
+            fig, ax = plt.subplots(1, 2, figsize=(16, 9))
+            a1: plt.Axes = ax[0]
+            h = a1.hist2d("x", "y", data=ydist, bins=[84, 79], cmap=cmap, vmax=600)
+            fig.colorbar(h[3], ax=a1)
+            a2: plt.Axes = ax[1]
+            h = a2.hist2d("x", "y", data=ymf, bins=[84, 79], cmap=cmap, vmax=600)
+            fig.colorbar(h[3], ax=a2)
+            adf = pd.concat(df, axis=0)
+            adf["coord"] = adf["x"].astype(str) + "-" + adf["y"].astype(str)
+            adf = adf.set_index(["lbl", "coord"])
+            adf_c = (
+                adf.groupby(["lbl", "coord"])
+                .count()
+                .iloc[:, [0]]
+                .set_axis(["count"], axis=1)
+                .unstack("lbl")
+                .fillna(0)
+                .droplevel(0, axis=1)
+            )
+            adf_c["diff_abs"] = np.abs(adf_c["ydist"] - adf_c["ymf"])
+            adf_c = adf_c.sort_values("diff_abs", ascending=False)
+            print("hi")
+
+
+def plot_count_stats2(run_map: RunMap):
+    """check difference between ydist and ymf for ONE seed
+    count value is aggregated over the whole map (one value per map)
+    """
+
+    seeds = run_map["1_999_25"].seeds()
+
+    with run_map.pdf_page("count_comparison_per_seed.pdf") as pdf:
+        for idx, seed in enumerate(seeds):
+            df = []
+            for g in ["0.95_80_25", "1_999_25"]:
+                sim: Simulation = run_map[g].simulations[idx]
+                _df = (
+                    sim.get_dcdMap()
+                    .map_count_measure()
+                    .loc[:, ["map_glb_count", "map_mean_count"]]
+                )
+                _df["lbl"] = g
+                df.append(_df)
+
+            df = pd.concat(df, axis=0)
+            df = df.reset_index().set_index(["lbl", "simtime"]).sort_index()
+            # map_glb_count is equal
+            # make long form
+            df = df.unstack("lbl")
+            col = ["gt_del", "gt", list(df.columns)[-2][1], list(df.columns)[-1][1]]
+            df = df.set_axis(col, axis=1).drop(columns=col[0]).dropna()
+
+            fig, ax = _Plot.check_ax()
+            OppAnalysis.calculate_equality_tests(df, ax=ax)
+            ax.set_title(f"Stat test for seed {seed}")
+            pdf.savefig(fig)
+            plt.close(fig)
+
+            fig, ax = _Plot.check_ax()
+            ax.set_title("Summary Statistics for seed {seed}")
+            df_desc = df.describe().applymap("{:.6f}".format).reset_index()
+            ax.axis("off")
+            tbl = ax.table(
+                cellText=df_desc.values, colLabels=df_desc.columns, loc="center"
+            )
+            tbl.scale(1, 2)
+            fig.tight_layout()
+            pdf.savefig(fig)
+            plt.close(fig)
+
+            fig, ax = _Plot.check_ax()
+            sns.lineplot(data=df)
+            ax.set_title(f"Time series of count for seed {seed}")
+            pdf.savefig(fig)
+            plt.close(fig)
+
+            f, ax = _Plot.check_ax()
+            sns.ecdfplot(
+                df,
+                ax=ax,
+            )
+            ax.set_title(f"Count ECDF for seed {seed}")
+            ax.set_xlabel("Pedestrian count")
+            ax.get_legend().set_title(None)
+            sns.move_legend(ax, "upper left")
+            pdf.savefig(f)
+            plt.close(f)
+
+            print("hi")
+
+
+def msce_comparision_paper(
+    run_map: RunMap,
+    filter_run: SimGroupFilter = lambda _: True,
+    compare_with="1_999_25",
+    output_path="mce_stats_for_alg.pdf",
+    value_axes_label="Mean Squared Cell Error (MSCE)",
+):
+    data, groups = _get_mse_data_per_variation_ts(run_map)
+
+    palette = sns.color_palette("colorblind", n_colors=2)
+    _lbl = {
+        "0.9_60_25": dict(label="S3:8 (0.9, 60)", color=palette[0], zorder=5),
+        compare_with: dict(label="S3:17 (1.0, 999)", color=palette[1], zorder=5),
+        # "default":dict(label="S3:0-7/9-16", color=(.7, .7, .7, 1.), zorder=3),
+        "default": dict(label=None, color=(0.7, 0.7, 0.7, 1.0), zorder=3),
+    }
+
+    with plt.rc_context(_Plot.paper_rc()):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
+        cid = 0
+        for idx, c in enumerate(["0.9_60_25", compare_with]):
+            lbl = f"({c.split('_')[0]}, {c.split('_')[1]})"
+            ax1.plot(data.index, data[c], **_lbl[c])
+        ax1.set_xlabel("Time in seconds")
+        ax1.set_ylabel("Mean Suqared Map Error (MSME)")
+        ax1.legend()
+
+        cid = 0
+        for idx, c in enumerate(data.columns):
+            x = data[c].sort_values()
+            y = np.linspace(0.0, 1.0, len(x))
+            _kw = _lbl[c] if c in _lbl else _lbl["default"]
+            ax2.plot(x, y, **_kw)
+        ax2.set_xlabel("Mean Suqared Map Error (MSME)")
+        ax2.set_ylabel("ECDF")
+        ax2.legend()
+        fig.tight_layout()
+        fig.savefig(run_map.path("msme_example.pdf"))
 
 
 def describtive_two_way_comparison_msce(
@@ -378,28 +1015,7 @@ def describtive_two_way_comparison_msce(
     output_path="mce_stats_for_alg.pdf",
     value_axes_label="Mean Squared Cell Error (MSCE)",
 ):
-    data, data_mean_by_run_id = _get_mse_data(run_map)
-    data = data.reset_index().merge(
-        run_map.id_to_label_series(enumerate_run=True).reset_index(), on="run_id"
-    )
-
-    groups = [g.group_name for g in run_map.values() if filter_run(g)]
-    groups.sort(
-        key=lambda x: (int(run_map.attr(x, "alpha")), int(run_map.attr(x, "stepDist")))
-    )
-    if compare_with not in groups:
-        groups.append(compare_with)
-
-    # MSCE mean cell error for one timestep created from MSE of each cell
-    data = (
-        data.set_index(["label", "simtime", "seed"])
-        .loc[:, ["cell_mse"]]
-        .groupby(["label", "simtime"])
-        .mean()
-        .unstack(["label"])
-        .droplevel(0, axis=1)
-    )
-    data = data[groups]
+    data, groups = _get_mse_data_per_variation_ts(run_map, filter_run, compare_with)
     # split groups into triplets containging ground truth 'compare_with' and one of the other runs
     col_combination = [(c, compare_with) for c in groups if c != compare_with]
 
@@ -482,10 +1098,51 @@ def describtive_two_way_comparison_count(
             )
 
 
+def _get_mse_data_per_variation_ts(
+    run_map: RunMap,
+    filter_run: SimGroupFilter = lambda _: True,
+    compare_with="1_999_25",
+):
+    data, data_mean_by_run_id = _get_mse_data(run_map)
+    data = data.reset_index().merge(
+        run_map.id_to_label_series(enumerate_run=True).reset_index(), on="run_id"
+    )
+
+    groups = [g.group_name for g in run_map.values() if filter_run(g)]
+    groups.sort(
+        key=lambda x: (int(run_map.attr(x, "alpha")), int(run_map.attr(x, "stepDist")))
+    )
+    if compare_with not in groups:
+        groups.append(compare_with)
+
+    # MSCE mean cell error for one timestep created from MSE of each cell
+    data = (
+        data.set_index(["label", "simtime", "seed"])
+        .loc[:, ["cell_mse"]]
+        .groupby(["label", "simtime"])
+        .mean()
+        .unstack(["label"])
+        .droplevel(0, axis=1)
+    )
+    data = data[groups]
+    return data, groups
+
+
 def _get_mse_data(run_map: RunMap):
 
+    scenario = VaderScenarioPlotHelper(
+        "../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario"
+    )
+    _free, _covered = get_legal_cells(scenario, get_clipped_area())
+
     data = OppAnalysis.get_mse_cell_data_for_study(
-        run_map, hdf_path="cell_mse.h5", cell_count=84 * 79, pool_size=20
+        # run_map, hdf_path="cell_mse.h5", cell_count=84 * 79, pool_size=20
+        # run_map, hdf_path="cell_mse.h5", cell_count=(52-20) * (70-17), cell_slice=get_clipped_area(), pool_size=20
+        run_map,
+        hdf_path="cell_mse.h5",
+        cell_count=-1,
+        cell_slice=_free,
+        pool_size=20,
     )
     data_mean_by_run_id = data.groupby(by="run_id").mean().to_frame()
     seeds = run_map.id_to_label_series(lbl_f=lbl_f_alpha_dist, enumerate_run=True)
@@ -556,10 +1213,16 @@ def main(run_map: RunMap):
     styles = StyleMap(markersize=3, marker="o", linestyle="none")
     data, data_mean_by_run_id = _get_mse_data(run_map)
 
-    # plot_mse_yDist_to_ymf_box_plot(
-    #     study, run_map, data_mean_by_run_id, "cell_mse_box_plot.pdf"
-    # )
-    plot_all(run_map, styles, data, data_mean_by_run_id)
+    # mse_combi_plot(data_mean_by_run_id, run_map)
+    plot_mse_yDist_to_ymf_box_plot(
+        run_map, data_mean_by_run_id, figure_name="box_plot.pdf"
+    )
+    plot_mse_yDist_to_ymf(
+        data_mean_by_run_id, run_map, figure_name="msme_bar_chart.pdf"
+    )
+
+    # plot_mse_yDist_to_ymf(data_mean_by_run_id, run_map, "mse_diff.pdf")
+    # plot_all(run_map, styles, data, data_mean_by_run_id)
 
 
 if __name__ == "__main__":
@@ -573,11 +1236,14 @@ if __name__ == "__main__":
             get_run_map_N20,
             src_path="/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_6/",
         ),
-        output_path="/mnt/data1tb/results/_density_map/03b_dynamic_output/",
+        output_path="/mnt/data1tb/results/_density_map/03c_dynamic_output/",
     )
-
-    main(run_map)
-    plot_per_seed_stats(run_map)
-    describtive_two_way_comparison_msce(run_map)
-    describtive_two_way_comparison_count(run_map)
+    # create_od_matrix(run_map)
+    # write_cell_tex(run_map)
+    # plot_test(run_map)
+    # main(run_map)
+    # plot_per_seed_stats(run_map)
+    # describtive_two_way_comparison_msce(run_map)
+    msce_comparision_paper(run_map)
+    # describtive_two_way_comparison_count(run_map)
     print("done")
