@@ -28,24 +28,34 @@ extends = _default, D2D_General, DcDMap, stationary_n1
 
 %contains: test1.out
 0.05 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell:14;50ms;1;(5, 2, 1.3) m;0;
+0.05 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;50ms;1;(5, 2, 1.3) m;0;
 0.1 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.1 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
 0.1 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;100ms;2;(5, 2, 1.3) m;0;
+0.1 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;100ms;2;(5, 2, 1.3) m;0;
+0.15 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;150ms;3;(5, 2, 1.3) m;0;
 0.15 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;150ms;3;(5, 2, 1.3) m;0;
 0.2 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.2 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
 0.2 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;200ms;4;(5, 2, 1.3) m;0;
+0.2 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;200ms;4;(5, 2, 1.3) m;0;
+0.25 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;250ms;5;(5, 2, 1.3) m;0;
 0.25 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;250ms;5;(5, 2, 1.3) m;0;
 0.3 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.3 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
 0.3 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;300ms;6;(5, 2, 1.3) m;0;
+0.3 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;300ms;6;(5, 2, 1.3) m;0;
+0.35 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;350ms;7;(5, 2, 1.3) m;0;
 0.35 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;350ms;7;(5, 2, 1.3) m;0;
 0.4 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.4 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
 0.4 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;400ms;8;(5, 2, 1.3) m;0;
+0.4 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;400ms;8;(5, 2, 1.3) m;0;
+0.45 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;450ms;9;(5, 2, 1.3) m;0;
 0.45 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;450ms;9;(5, 2, 1.3) m;0;
 0.5 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.5 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
+0.5 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;500ms;10;(5, 2, 1.3) m;0;
 0.5 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell:14;500ms;10;(5, 2, 1.3) m;0;
 %contains: stdout
 <!> Simulation time limit reached -- at t=0.5s
