@@ -55,7 +55,7 @@ void IncidentAgeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
   if (auto packet = dynamic_cast<Packet *>(object)) {
     auto data = packet->peekData<DetourAppPacket>();
     simtime_t delta = simTime() - data->getFirstHopTime();
-    ASSERT(delta > 0);
+    ASSERT(delta >= 0);  // delta == 0 if packet comes with loopback
     fire(this, t, delta, details);
   }
 }
