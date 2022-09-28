@@ -169,10 +169,6 @@ network World
             @display("p=449.2425,384.90375;i=block/table2_s;is=s");
         }
 
-        //# submodule vector to store all pedestrians and vehicles - will be filled dynamically during simulations
-        // pNode[0]: ApplicationLayerPedestrian;
-        // vNode[0]: ApplicationLayerVehicle;
-
 
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++ if hasCellularCoreNetwork;
