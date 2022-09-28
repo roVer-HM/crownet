@@ -136,7 +136,7 @@ network World
             parameters:
                 @display("p=523.74,148.995");
         }
-        gloablDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
+        globalDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
 

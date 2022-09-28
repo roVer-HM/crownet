@@ -22,5 +22,5 @@ simple FileWriterRegister like IFileWriterRegister
     parameters:
     	@class(crownet::FileWriterRegister);
        	object register = default({neighborhoodWriter: crownet::NeighborhoodEventWriter{filePath: "beacons.csv"}});
-       	string globalMapModule = default("gloablDensityMap");
+       	string globalMapModule = default("globalDensityMap");
 }
