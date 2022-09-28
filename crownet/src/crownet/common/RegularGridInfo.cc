@@ -60,6 +60,14 @@ const int RegularGridInfo::getCellId(inet::Coord position) const{
     return getCellId((int)position.x, (int)position.y);
 }
 
+
+const bool RegularGridInfo::posInCenteredCell(const inet::Coord& cellCenter, const inet::Coord& pos ) const {
+    return pos.x >= cellCenter.x-cellSize.x/2 &&
+            pos.x < cellCenter.x+cellSize.x/2 &&
+            pos.y >= cellCenter.y-cellSize.y/2 &&
+            pos.y < cellCenter.y+cellSize.y/2;
+}
+
 double RegularGridInfo::cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2) const {
     inet::Coord c1 {cell1.x()*cellSize.x + cellSize.x/2, cell1.y()*cellSize.y + cellSize.y/2};
     inet::Coord c2 {cell2.x()*cellSize.x + cellSize.x/2, cell2.y()*cellSize.y + cellSize.y/2};

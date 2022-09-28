@@ -9,6 +9,7 @@
 #include "crownet/crownet.h"
 #include "inet/common/geometry/common/Coord.h"
 #include "crownet/applications/beacon/BeaconReceptionInfo.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/iterator/FilterIterator.h"
 #include <list>
 
@@ -39,6 +40,14 @@ public:
     static NeighborhoodTablePred_t inRadius_pred(const inet::Coord& pos, const double dist ){
         NeighborhoodTablePred_t f = [pos, dist](const NeighborhoodTableValue_t& val) -> bool {
             return pos.distance(val.second->getPositionCurrent()) < dist;
+        };
+        return f;
+    }
+
+    static NeighborhoodTablePred_t currentCell_pred(const inet::Coord& pos, const RegularGridInfo& grid){
+        NeighborhoodTablePred_t f = [pos, grid](const NeighborhoodTableValue_t& tblEntry) -> bool {
+
+            return grid.posInCenteredCell(tblEntry.second->getPositionCurrent(), pos);
         };
         return f;
     }

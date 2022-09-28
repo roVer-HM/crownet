@@ -41,6 +41,7 @@ public:
 
     const int getCellId(const int x, const int y)const;
     const int getCellId(inet::Coord position) const;
+    const bool posInCenteredCell(const inet::Coord& cellCenter, const inet::Coord& pos ) const;
 
     double cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2)const;
     double maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;

@@ -18,6 +18,7 @@
 #include <omnetpp/cobject.h>
 #include "inet/common/InitStages.h"
 #include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "crownet/common/MobilityProviderMixin.h"
@@ -52,6 +53,7 @@ public:
 
 protected:
     IBaseNeighborhoodTable* globalTable;
+    std::shared_ptr<OsgCoordinateConverter> converter;
     double dist = 0;
     int ownerId = 0;
 };

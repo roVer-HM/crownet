@@ -22,6 +22,7 @@ simple EntropyNeigborhoodTableClient like  INeighborhoodTable {
 	    @class(crownet::EntropyNeigborhoodTableClient);
 	    string globalTable = default("gloablDensityMap"); // implemented by gloablDensityMap
 	    string mobilityModule = default("^.mobility"); //assume sibling      
+        string coordConverterModule = default("coordConverter");
 	    double distance = default (100.0);
 }
  

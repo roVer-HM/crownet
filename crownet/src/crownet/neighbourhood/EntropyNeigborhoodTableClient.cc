@@ -31,6 +31,9 @@ void EntropyNeigborhoodTableClient::initialize(int stage) {
     MobilityProviderMixin<cSimpleModule>::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
         globalTable = getModuleFromPar<IBaseNeighborhoodTable>(par("globalTable"), this);
+        converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
+                        par("coordConverterModule"), this)
+                        ->getConverter();
         dist = par("distance");
     }
 }
@@ -56,7 +59,13 @@ const int EntropyNeigborhoodTableClient::getSize(){
 // iterator default to all elements in map
 NeighborhoodTableIter_t
 EntropyNeigborhoodTableClient::iter() {
-    auto pred = INeighborhoodTable::inRadius_pred(getPosition(), dist);
+    NeighborhoodTablePred_t pred;
+    if (dist > 0.0){
+        pred = INeighborhoodTable::inRadius_pred(getPosition(), dist);
+    } else {
+        auto grid = converter->getGridDescription();
+        pred = INeighborhoodTable::currentCell_pred(getPosition(), grid);
+    }
     return globalTable->iter(pred);
 }
 
