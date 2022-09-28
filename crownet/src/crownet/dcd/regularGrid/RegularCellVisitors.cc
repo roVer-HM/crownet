@@ -116,9 +116,11 @@ YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell
     double age_sum = 0.0;
     double age_min = std::numeric_limits<double>::max();
     double distance_sum = 0.0;
+    double dist_min = std::numeric_limits<double>::max();
     double now = this->time.dbl(); // current time the visitor is called.
 
     double age = .0;
+    double dist = .0;
     int count = 0;
     for (const auto& e : cell.validIter()) {
         /*
@@ -132,7 +134,6 @@ YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell
             age_min = age;
         }
         age_sum += age;
-        ++count;
 
         /*
          * In the case of a local entry the 'sourceEntry' and 'ownerEntry'
@@ -140,10 +141,18 @@ YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell
          * is correct.
          * TODO EntryDist for localEntry is ZERO {0, 0, 0}
          */
-        distance_sum += e.second->getEntryDist().sourceEntry;
+        dist = e.second->getEntryDist().sourceEntry;
+        if (dist < dist_min){
+            dist_min = dist;
+        }
+        distance_sum += dist;
+        ++count;
     }
+    // normalize over the age (min)difference
     age_sum = age_sum - count*age_min;
-    return sum_data{age_sum, age_min, distance_sum};
+    // dist sum must not be updated because the some of the distance step function is
+    // the correct normalization value.
+    return sum_data{age_sum, age_min, distance_sum, dist_min, count};
 }
 
 RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) const {
@@ -156,8 +165,47 @@ RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) co
     double ymfPlusDist = 0.0;
     for (const auto& e : cell.validIter()) {
       double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
-      ymfPlusDist = alpha * (age)/d.age_sum +
-              (1-alpha) * e.second->getEntryDist().sourceEntry/d.dist_sum;
+      double dist = e.second->getEntryDist().sourceEntry;
+
+      // set rank to maximum value (=1.0) if the sum equals to zero. (i.e. there is only one element in validIter)
+      double ageRank = (d.age_sum == 0) ? 1.0 : age/d.age_sum;
+      double distRank = (d.dist_sum == 0) ? 1.0 : dist/d.dist_sum;
+
+      ymfPlusDist = alpha * ageRank + (1-alpha) * distRank;
+      e.second->setSelectionRank(ymfPlusDist);
+
+      if (ret == nullptr) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+        continue;
+      }
+
+      if (ymfPlusDist < ret_ymfPlusDist) {
+        ret = e.second;
+        ret_ymfPlusDist = ymfPlusDist;
+      }
+    }
+    return ret;
+}
+
+
+RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell) const {
+
+    sum_data d = getSums(cell);
+    double now = this->time.dbl(); // current time the visitor is called.
+
+    RegularCell::entry_t_ptr ret = nullptr;
+    double ret_ymfPlusDist = 0.0;
+    double ymfPlusDist = 0.0;
+    for (const auto& e : cell.validIter()) {
+      double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
+      double dist = getDistValue(e.second->getEntryDist().sourceEntry);
+
+      // set rank to maximum value (=1.0) if the sum equals to zero. (i.e. there is only one element in validIter)
+      double ageRank = (d.age_sum == 0.0) ? 1.0 : (age)/d.age_sum; // 1.0 if one or all are the same (i.e all are the samllest)
+      double distRank = ( d.dist_sum == 0.0) ? 1.0 : dist/d.dist_sum; // 1.0 if one value
+
+      ymfPlusDist = alpha * ageRank + (1-alpha) * distRank;
       e.second->setSelectionRank(ymfPlusDist);
       if (ret == nullptr) {
         ret = e.second;
@@ -173,40 +221,50 @@ RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell) co
     return ret;
 }
 
-RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell) const {
+const double YmfPlusDistStepVisitor::getDistValue(const double dist) const {
+        return (dist <= stepDist) ? stepDist : dist;
+}
 
-    sum_data d = getSums(cell);
+YmfPlusDistVisitor::sum_data YmfPlusDistStepVisitor::getSums(const RegularCell& cell) const {
+    double age_sum = 0.0;
+    double age_min = std::numeric_limits<double>::max();
+    double distance_sum = 0.0;
+    double dist_min = std::numeric_limits<double>::max();
     double now = this->time.dbl(); // current time the visitor is called.
 
-    RegularCell::entry_t_ptr ret = nullptr;
-    double ret_ymfPlusDist = 0.0;
-    double ymfPlusDist = 0.0;
+    double age = .0;
+    double dist = .0;
+    int count = 0;
     for (const auto& e : cell.validIter()) {
-      double age = (now - e.second->getMeasureTime().dbl()) - d.age_min;
-      double dist = e.second->getEntryDist().sourceEntry;
-      if (zeroStep){
-          // set dist to zero if distance is smaller than threshold
-          dist = (dist <= stepDist) ? 0 : dist;
-      } else {
-          // set dist to threshold if distance is smaller than threshold
-          dist = (dist <= stepDist) ? stepDist : dist;
-      }
+        /*
+         * Collect the sum of age difference relative to the
+         * youngest measure (i.e. smallest age). For this
+         * sum up all ages and find the smallest age at the same
+         * time. Subtract count*age_min after the fact from age_sum.
+         */
+        age = now - e.second->getMeasureTime().dbl();
+        if(age < age_min){
+            age_min = age;
+        }
+        age_sum += age;
 
-      ymfPlusDist = alpha * (age)/d.age_sum +
-              (1-alpha) * dist/d.dist_sum;
-      e.second->setSelectionRank(ymfPlusDist);
-      if (ret == nullptr) {
-        ret = e.second;
-        ret_ymfPlusDist = ymfPlusDist;
-        continue;
-      }
 
-      if (ymfPlusDist < ret_ymfPlusDist) {
-        ret = e.second;
-        ret_ymfPlusDist = ymfPlusDist;
-      }
+        /*
+         * sum up step function result not only distance
+         */
+
+        dist = getDistValue(e.second->getEntryDist().sourceEntry);
+        if (dist < dist_min){
+            dist_min = dist;
+        }
+        distance_sum += dist;
+        ++count;
     }
-    return ret;
+    // normalize over the age (min)difference
+    age_sum = age_sum - count*age_min;
+    // dist sum must not be updated because the some of the distance step function is
+    // the correct normalization value.
+    return sum_data{age_sum, age_min, distance_sum, dist_min, count};
 }
 
 RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell) const {

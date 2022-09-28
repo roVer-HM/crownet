@@ -9,3 +9,9 @@ repos:
     - id: nbstripout
       files: ".ipynb"
 
+-   repo: https://github.com/python/black
+    rev: 20.8b1
+    hooks:
+    -   id: black
+        args: ["--fast"]
+
