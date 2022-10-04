@@ -31,7 +31,10 @@
 #include "traci/Position.h"
 #include "inet/common/geometry/common/RotationMatrix.h"
 #include "crownet/common/RegularGridInfo.h"
+#include "crownet/common/crownet_m.h"
 
+using namespace omnetpp;
+using namespace inet;
 
 namespace crownet {
 
@@ -92,11 +95,22 @@ class OsgCoordinateConverter {
 
   inet::GeoCoord getScenePosition() const;
 
+  void setAreaOfInterest(AreaOfInterest* aoi);
+  // check if point is inside of AOI
+  const bool aoiContains(const traci::TraCIPosition& p) const;
+  const bool aoiContains(const inet::Coord& c) const;
+  // Is true when at least part of the cell is inside of AOI
+  const bool aoiIntersectsCell(const GridCellID& cellId) const;
+  const bool aoiIntersectsCell(const int x, const int y) const;
+
+
   double getBoundaryWidth() const;
   double getBoundaryHeight() const;
   inet::Coord getBoundary() const;
   inet::Coord getGridSize() const {return getBoundary();} // alias for boundary.
   inet::Coord getOffset() const;
+  const traci::Boundary getSimBound() const {return simBound;}
+  const traci::Boundary getAreaOfInterestBound() const {return areaOfIntrest;}
 
   RegularGridInfo getGridDescription() const;
   RegularGridInfo getGridDescription(const inet::Coord& cellSize) const;
@@ -107,8 +121,10 @@ class OsgCoordinateConverter {
 
 
   // always apply TCS->OCS
-  const omnetpp::cFigure::Point toCanvas(double x, double y, const bool isGeo=false);
-
+  const omnetpp::cFigure::Point toCanvas(double x, double y, const bool isGeo=false) const;
+  const omnetpp::cFigure::Point toCanvas(traci::TraCIPosition pos) const;
+  cRectangleFigure* toCanvas(const traci::Boundary&, const char *name=nullptr) const ;
+  cRectangleFigure* toCanvas(const GridCellID& cellID) const;
 
   template <typename T>
   osgEarth::GeoPoint convert2DOsgEarth(const T& c) const {
@@ -209,6 +225,7 @@ class OsgCoordinateConverter {
   traci::TraCIPosition zoneOriginOffset;  // TCS base
   traci::Boundary simBound;               // TCS base
   inet::Coord cellSize;
+  traci::Boundary areaOfIntrest;          // TCS base
   osgEarth::SpatialReference* c_srs;
   Projection zoneOffsetProjection;
 };

@@ -14,6 +14,7 @@
 #include "inet/common/InitStages.h"
 #include "inet/common/geometry/common/GeographicCoordinateSystem.h"
 #include "crownet/common/converter/OsgCoordinateConverter.h"
+#include "crownet/common/crownet_m.h"
 #include "traci/Listener.h"
 
 namespace crownet {
