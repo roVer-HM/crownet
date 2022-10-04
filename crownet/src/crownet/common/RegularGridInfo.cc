@@ -33,20 +33,46 @@ RegularGridInfo::RegularGridInfo(const inet::Coord& gridSize, const inet::Coord&
     vec.push_back(traci::TraCIPosition{0.0, 0.0, 0.0});
     vec.push_back(upperRight);
     simBound = traci::Boundary(vec);
+    areaOfIntrest = traci::Boundary(vec);
 }
-
-RegularGridInfo::RegularGridInfo(const traci::Boundary simBound, const inet::Coord& gridSize, const inet::Coord& cellSize)
-  : gridSize(gridSize), cellSize(cellSize), simBound(simBound){
+RegularGridInfo::RegularGridInfo(const inet::Coord& gridSize, const inet::Coord& cellSize, const traci::Boundary aoi)
+  : gridSize(gridSize), areaOfIntrest(aoi), cellSize(cellSize){
 
     cellCount.x = std::floor(gridSize.x/cellSize.x);
     cellCount.y = std::floor(gridSize.y/cellSize.y);
     cellCount.z = 0.0;
+
+    std::vector<traci::TraCIPosition> vec;
+    traci::TraCIPosition upperRight{0.0, 0.0, 0.0};
+    upperRight.x = gridSize.x;
+    upperRight.y = gridSize.y;
+    vec.push_back(traci::TraCIPosition{0.0, 0.0, 0.0});
+    vec.push_back(upperRight);
+    simBound = traci::Boundary(vec);
+}
+
+RegularGridInfo::RegularGridInfo(const traci::Boundary simBound, const inet::Coord& gridSize, const inet::Coord& cellSize)
+  : RegularGridInfo(simBound, gridSize, cellSize, simBound){
+}
+
+RegularGridInfo::RegularGridInfo(const traci::Boundary simBound, const inet::Coord& gridSize, const inet::Coord& cellSize, const traci::Boundary aoi)
+  : gridSize(gridSize), simBound(simBound), areaOfIntrest(aoi), cellSize(cellSize){
+
+    cellCount.x = std::floor(gridSize.x/cellSize.x);
+    cellCount.y = std::floor(gridSize.y/cellSize.y);
+    cellCount.z = 0.0;
+}
+const AoiIterator RegularGridInfo::aoiIter() const{
+    return AoiIterator(*this);
 }
 
 const inet::Coord RegularGridInfo::getCellCenter(const int x, const int y) const{
     return inet::Coord(x * cellSize.x + cellSize.x/2, y * cellSize.y + cellSize.y/2, 0.0);
 }
 
+const GridCellID RegularGridInfo::getGridCellId(const traci::TraCIPosition& p) const{
+    return GridCellID(floor(p.x/cellSize.x), floor(p.y/cellSize.y));
+}
 
 const int RegularGridInfo::getCellId(const int x, const int y)const{
     // row major order
