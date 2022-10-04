@@ -42,6 +42,7 @@ import crownet.common.ICoordConverter;
 import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
 import crownet.common.util.IFileWriterRegister;
+import crownet.common.DensityMapSceneCanvasVisualizer;
 import crownet.mobility.BonnMotionServer;
 
 import artery.storyboard.IStoryboard;
@@ -152,6 +153,9 @@ network World
         }
         bonnMotionServer: <default("")> like BonnMotionServer if typename != "" {
             @display("p=449.2425,384.90375;i=block/table2_s;is=s");
+        }
+        mapVisualizer: DensityMapSceneCanvasVisualizer {
+            @display("p=539.5425,328.46625;is=s");
         }
 
 
