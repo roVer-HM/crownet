@@ -45,17 +45,17 @@ public:
     void setAreaOfIntrest(const traci::Boundary b) {areaOfIntrest = b;}
     const AoiIterator aoiIter() const;
 
+    const inet::Coord getCellCenter(const GridCellID& cell) const {return getCellCenter(cell.x(), cell.y());}
     const inet::Coord getCellCenter(const int x, const int y) const;
-    const inet::Coord getOppCellCenter(inet::Coord position) const;
 
     const GridCellID getGridCellId(const traci::TraCIPosition& p) const;
+    const GridCellID getCellId(const int cellId) const;
     const int getCellId(const int x, const int y)const;
-    const int getCellId(inet::Coord position) const;
+    const int getCellId(const traci::TraCIPosition& p) const;
     const bool posInCenteredCell(const inet::Coord& cellCenter, const inet::Coord& pos ) const;
 
     double cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2)const;
     double maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;
-    int maxIdCellDist(const GridCellID& cell1, const GridCellID&  cell2) const;
 
 
 private:

@@ -149,14 +149,9 @@ TEST_F(GridCellIdKeyProvider_F, dist4){
     EXPECT_DOUBLE_EQ(dist1, 60.0);
     double dist2 = s->maxCellDist(GridCellID(2,3), GridCellID(2,8));
     EXPECT_DOUBLE_EQ(dist1, 60.0); // still 60. because longest range (x or y) is used
-    int dist3 = s->maxIdCellDist(GridCellID(2,3), GridCellID(4,5));
-    EXPECT_EQ(dist3, 2);
 
     double dist4 = r->maxCellDist(GridCellID(2,2), GridCellID(3,3));
     EXPECT_EQ(dist4, 20.0);
-    // one id off in both cases! but one id has a longer cellSize
-    int dist5 = r->maxIdCellDist(GridCellID(2,2), GridCellID(3,3));
-    EXPECT_EQ(dist5, 1);
 }
 
 

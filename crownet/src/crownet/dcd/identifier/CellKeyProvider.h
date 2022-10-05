@@ -34,7 +34,6 @@ class CellKeyProvider {
   virtual inet::Coord  getGridSize() const = 0;
   virtual double cellCenterDist(const C& cell1, const C&  cell2) = 0;
   virtual double maxCellDist(const C& cell1, const C&  cell2) const = 0;
-  virtual int maxIdCellDist(const C& cell1, const C&  cell2) const = 0;
 
   virtual EntryDist getEntryDist(const C& source, const C& owner, const C& entry)=0;
   virtual EntryDist getExactDist(const inet::Coord source, const inet::Coord owner, const C& entry)=0;
@@ -64,8 +63,6 @@ class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
   virtual double cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2) override;
   virtual double maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const override
       { return gridInfo.maxCellDist(cell1, cell2);}
-  virtual int maxIdCellDist(const GridCellID& cell1, const GridCellID&  cell2) const override
-      { return gridInfo.maxIdCellDist(cell1, cell2);}
 
   virtual EntryDist getEntryDist(const GridCellID& source, const GridCellID& owner, const GridCellID& entry) override;
   virtual EntryDist getExactDist(const inet::Coord source, const inet::Coord owner, const GridCellID& entry) override;

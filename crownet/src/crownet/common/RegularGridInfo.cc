@@ -82,10 +82,15 @@ const int RegularGridInfo::getCellId(const int x, const int y)const{
     return y*cellCount.x + x;
 }
 
-const int RegularGridInfo::getCellId(inet::Coord position) const{
-    return getCellId((int)position.x, (int)position.y);
+const int RegularGridInfo::getCellId(const traci::TraCIPosition& p) const{
+    auto id = getGridCellId(p);
+    return getCellId(id.x(), id.y());
 }
 
+const GridCellID RegularGridInfo::getCellId(const int cellId) const{
+    auto _id = abs(cellId);
+    return GridCellID(_id % (int)cellCount.x, (int)floor(_id/cellCount.x));
+}
 
 const bool RegularGridInfo::posInCenteredCell(const inet::Coord& cellCenter, const inet::Coord& pos ) const {
     return pos.x >= cellCenter.x-cellSize.x/2 &&
@@ -102,10 +107,6 @@ double RegularGridInfo::cellCenterDist(const GridCellID& cell1, const GridCellID
 
 double RegularGridInfo::maxCellDist(const GridCellID& cell1, const GridCellID&  cell2) const {
     return std::max(std::abs(cell1.x() - cell2.x()) * cellSize.x, std::abs(cell1.y() - cell2.y()) * cellSize.y);
-}
-
-int RegularGridInfo::maxIdCellDist(const GridCellID& cell1, const GridCellID&  cell2) const {
-    return std::max(std::abs(cell1.x() - cell2.x()), std::abs(cell1.y() - cell2.y()));
 }
 
 
