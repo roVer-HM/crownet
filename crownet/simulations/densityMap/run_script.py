@@ -40,17 +40,32 @@ class SimulationRun(BaseRunner):
         result_dir, _, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        HdfExtractor.extract_packet_loss(
-            join(result_dir, "packet_loss.h5"), "beacon", sql, app=sql.m_app0()
-        )
-        HdfExtractor.extract_packet_loss(
-            join(result_dir, "packet_loss.h5"), "map", sql, app=sql.m_app1()
-        )
+        # search config in sca file for apps extract packet loss
+        # only for apps present.
+        app_selector = sql.get_app_selector()
+
+        if "beacon" in app_selector:
+            HdfExtractor.extract_packet_loss(
+                join(result_dir, "packet_loss.h5"),
+                "beacon",
+                sql,
+                app=app_selector["beacon"],
+            )
+        if "map" in app_selector:
+            HdfExtractor.extract_packet_loss(
+                join(result_dir, "packet_loss.h5"), "map", sql, app=app_selector["map"]
+            )
         HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
 
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
-        sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        try:
+            sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        except ValueError:
+            print(
+                "No suqc context found. Try creating Simulation object without context. Some features of the Simulation analysis might be not supported."
+            )
+            sim = Simulation.from_output_dir(self.result_base_dir())
         OppAnalysis.append_err_measures_to_hdf(sim)
 
     @process_as({"prio": 970, "type": "post"})
@@ -64,13 +79,13 @@ class SimulationRun(BaseRunner):
             print(f"multiple selections found: {sel}")
         OppAnalysis.create_common_plots(result_dir, builder, sql, selection=sel[0])
 
-    @process_as({"prio": 960, "type": "post"})
-    def remove_density_map_csv(self):
-        _, builder, _ = OppAnalysis.builder_from_output_folder(
-            data_root=self.result_base_dir()
-        )
-        for f in builder.map_paths:
-            os.remove(f)
+    # @process_as({"prio": 960, "type": "post"})
+    # def remove_density_map_csv(self):
+    #     _, builder, _ = OppAnalysis.builder_from_output_folder(
+    #         data_root=self.result_base_dir()
+    #     )
+    #     for f in builder.map_paths:
+    #         os.remove(f)
 
     @process_as({"prio": 900, "type": "post"})
     def vadere_position(self):
@@ -84,7 +99,13 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
-    settings = []
+    settings = [
+        "post-processing",
+        "--qoi",
+        "all",
+        "--resultdir",
+        "results/S1_bonn_motion_dev_20221005-12:17:58",
+    ]
 
     if len(sys.argv) == 1:
         # default behavior of script
