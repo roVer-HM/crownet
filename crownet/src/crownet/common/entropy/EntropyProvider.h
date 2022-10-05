@@ -20,6 +20,7 @@ public:
     virtual void initialize(cRNG* rng) = 0;
     virtual double getValue(inet::Coord position, simtime_t time) = 0 ;
     virtual bool selectCell(const int x, const int y, simtime_t time) = 0;
+    virtual bool selectCell(const GridCellID& cellId, simtime_t time) {return selectCell(cellId.x(), cellId.y(), time);}
 
 public:
   virtual ~EntropyProvider() = default;

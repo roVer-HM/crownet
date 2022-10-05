@@ -22,6 +22,7 @@
 #include "crownet/common/IDensityMapHandler.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "crownet/common/MobilityProviderMixin.h"
+#include "crownet/common/GlobalEntropyMap.h"
 
 
 using namespace omnetpp;
@@ -44,7 +45,8 @@ public:
     virtual void setOwnerId(int ownerId) override {this->ownerId = ownerId;}
     virtual const int getOwnerId() const override {return ownerId;}
     virtual const int getSize() override;
-
+    virtual const NeighborhoodTableValue_t updateGetGlobalValue(const inet::Coord& pos);
+    virtual const bool currentCellOnly() const;
 
     // default to distance based iterator because this class accesses the global table.
     virtual NeighborhoodTableIter_t iter() override;
@@ -52,11 +54,12 @@ public:
 
 
 protected:
-    IBaseNeighborhoodTable* globalTable;
+    GlobalEntropyMap* globalTable;
     std::shared_ptr<OsgCoordinateConverter> converter;
     double dist = 0;
     int ownerId = 0;
 };
+
 
 
 }
