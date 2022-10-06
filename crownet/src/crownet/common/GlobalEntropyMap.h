@@ -58,7 +58,6 @@ protected:
  cMessage *entropyTimer = nullptr;
  simtime_t entropyTimerInterval;
  EntropyProvider *entropyProvider = nullptr;
- RegularGridInfo grid;
 
 };
 

@@ -46,8 +46,6 @@ void GlobalEntropyMap::initialize(int stage) {
       entropyProvider = (EntropyProvider*)(par("entropyProvider").objectValue()->dup());
       take(entropyProvider);
       entropyProvider->initialize(getRNG(par("entropyRngGenerator").intValue()));
-  } else if (stage == INITSTAGE_LAST) {
-      grid = converter->getGridDescription();
   }
 }
 
@@ -56,7 +54,7 @@ void GlobalEntropyMap::visitNode(const std::string& traciNodeId, omnetpp::cModul
   // convert to traci 2D position
   const auto &pos = mobility->getCurrentPosition();
   const auto &posTraci = converter->position_cast_traci(pos);
-  const int cellid = -1*grid.getCellId(posTraci);
+  const int cellid = -1*cellKeyProvider->getCellKey1D(posTraci);
   if (_table.find(cellid) == _table.end()){
       // value for cell not calculated jet. Call getValue to set the value
       // base on the last update time.
@@ -129,8 +127,8 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
         BeaconReceptionInfo* info = new BeaconReceptionInfo();
         info->setNodeId(sourceId);
         info->setReceivedTimeCurrent(-1.0); // ensure time is before 'time'
-        auto cellId = grid.getCellId(sourceId);
-        info->setPositionCurrent(grid.getCellCenter(cellId));
+        auto cellCenter = cellKeyProvider->cellCenter(sourceId);
+        info->setPositionCurrent(cellCenter);
         take(info);
         _table[sourceId] = info;
     }
@@ -147,11 +145,12 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
 }
 
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const GridCellID& cellId){
-    return getValue(-1*grid.getCellId(cellId.x(), cellId.y()));
+    auto id = -1*cellKeyProvider->getCellKey1D(cellId);
+    return getValue(id);
 }
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const inet::Coord& pos){
-    const auto posTraci = converter->position_cast_traci(pos);
-    return getValue(grid.getGridCellId(posTraci));
+    auto id = -1*cellKeyProvider->getCellKey1D(pos);
+    return getValue(id);
 }
 
 void GlobalEntropyMap::updateEntropy(){

@@ -11,15 +11,27 @@
 
 namespace crownet {
 
-GridCellID GridCellIDKeyProvider::getCellKey(const traci::TraCIPosition& pos) {
-  int x_id = floor(pos.x / getCellSize().x);
-  int y_id = floor(pos.y / getCellSize().y);
-  return GridCellID(x_id, y_id);
+const GridCellID GridCellIDKeyProvider::getCellKey(const traci::TraCIPosition& pos) const{
+    return gridInfo.getCellKey(pos);
 }
 
-GridCellID GridCellIDKeyProvider::getCellKey(const inet::Coord& pos){
+const GridCellID GridCellIDKeyProvider::getCellKey(const inet::Coord& pos) const{
     return getCellKey(converter->position_cast_traci(pos));
 }
+const GridCellID GridCellIDKeyProvider::getCellKey(const int cellKey1D) const {
+    return gridInfo.getCellKey(cellKey1D);
+}
+
+const int GridCellIDKeyProvider::getCellKey1D(const traci::TraCIPosition& pos) const{
+    return gridInfo.getCellKey1D(pos);
+}
+const int GridCellIDKeyProvider::getCellKey1D(const inet::Coord& pos) const{
+    return getCellKey1D(converter->position_cast_traci(pos));
+}
+const int GridCellIDKeyProvider::getCellKey1D(const GridCellID& cellKey) const {
+    return gridInfo.getCellKey1D(cellKey);
+}
+
 
 bool GridCellIDKeyProvider::changedCell(const traci::TraCIPosition& pos1, const traci::TraCIPosition& pos2){
     auto id1 = getCellKey(pos1);
@@ -32,12 +44,27 @@ bool GridCellIDKeyProvider::changedCell(const inet::Coord& pos1, const inet::Coo
 }
 
 
-traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const traci::TraCIPosition& pos){
+const traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const traci::TraCIPosition& pos){
     return getCellPosition(getCellKey(pos));
 }
 
-traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const GridCellID& gridCell){
+const traci::TraCIPosition GridCellIDKeyProvider::getCellPosition(const GridCellID& gridCell){
     return traci::TraCIPosition{gridCell.x()*converter->getCellSize().x, gridCell.y()*converter->getCellSize().y};
+}
+
+const inet::Coord GridCellIDKeyProvider::cellCenter(const traci::TraCIPosition& pos) const{
+    return cellCenter(getCellKey(pos));
+}
+const inet::Coord GridCellIDKeyProvider::cellCenter(const inet::Coord& pos) const{
+    return cellCenter(getCellKey(pos));
+}
+const inet::Coord GridCellIDKeyProvider::cellCenter(const GridCellID& cellKey) const{
+    auto traciPos =  gridInfo.getCellCenter(cellKey);
+    return converter->position_cast_inet(traciPos);
+}
+const inet::Coord GridCellIDKeyProvider::cellCenter(const int cellKey1D) const{
+    auto traciPos = gridInfo.getCellCenter(getCellKey(cellKey1D));
+    return converter->position_cast_inet(traciPos);
 }
 
 
@@ -67,9 +94,7 @@ EntryDist GridCellIDKeyProvider::getExactDist(const inet::Coord source, const in
     /*
      *  source, owner are opp coordinates (origin upper left) and GridId based cells are in traci coordinates (origin lower left).
      */
-    inet::Coord oppEntryCenter = converter->moveCoordinateSystemTraCi_Opp(
-            gridInfo.getCellCenter(entry.x(), entry.y())
-            );
+    inet::Coord oppEntryCenter = cellCenter(entry);
 
     EntryDist entryDist;
     entryDist.sourceEntry = source.distance(oppEntryCenter);
@@ -82,9 +107,7 @@ EntryDist GridCellIDKeyProvider::getExactDist(const inet::Coord source, const in
     /*
      *  source, owner are opp coordinates (origin upper left) and GridId based cells are in traci coordinates (origin lower left).
      */
-    inet::Coord oppEntryCenter = converter->moveCoordinateSystemTraCi_Opp(
-            gridInfo.getCellCenter(entry.x(), entry.y())
-            );
+    inet::Coord oppEntryCenter = cellCenter(entry);
 
     EntryDist entryDist;
     entryDist.sourceEntry = sourceEntry;

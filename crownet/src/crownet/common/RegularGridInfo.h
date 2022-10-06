@@ -45,13 +45,16 @@ public:
     void setAreaOfIntrest(const traci::Boundary b) {areaOfIntrest = b;}
     const AoiIterator aoiIter() const;
 
-    const inet::Coord getCellCenter(const GridCellID& cell) const {return getCellCenter(cell.x(), cell.y());}
-    const inet::Coord getCellCenter(const int x, const int y) const;
+    const traci::TraCIPosition getCellCenter(const GridCellID& cell) const {return getCellCenter(cell.x(), cell.y());}
+    const traci::TraCIPosition getCellCenter(const int x, const int y) const;
 
-    const GridCellID getGridCellId(const traci::TraCIPosition& p) const;
-    const GridCellID getCellId(const int cellId) const;
-    const int getCellId(const int x, const int y)const;
-    const int getCellId(const traci::TraCIPosition& p) const;
+    const GridCellID getCellKey(const traci::TraCIPosition& pos) const;
+    const GridCellID getCellKey(const int cellKey1D) const;
+
+    const int getCellKey1D(const GridCellID& cellKey) const;
+    const int getCellKey1D(const traci::TraCIPosition& pos) const;
+    const int getCellKey1D(const int x, const int y) const;
+
     const bool posInCenteredCell(const inet::Coord& cellCenter, const inet::Coord& pos ) const;
 
     double cellCenterDist(const GridCellID& cell1, const GridCellID&  cell2)const;
@@ -76,11 +79,11 @@ struct AoiIterator {
 
 
     AoiIterator(const RegularGridInfo& grid){
-        m_ptr = grid.getGridCellId(grid.getAreaOfIntrest().lowerLeftPosition());
+        m_ptr = grid.getCellKey(grid.getAreaOfIntrest().lowerLeftPosition());
         aoi.x_min = m_ptr.x();
         aoi.y_min = m_ptr.y();
-        aoi.x_max = grid.getGridCellId(grid.getAreaOfIntrest().upperRightPosition()).x()-1;
-        aoi.y_max = grid.getGridCellId(grid.getAreaOfIntrest().upperRightPosition()).y()-1;
+        aoi.x_max = grid.getCellKey(grid.getAreaOfIntrest().upperRightPosition()).x()-1;
+        aoi.y_max = grid.getCellKey(grid.getAreaOfIntrest().upperRightPosition()).y()-1;
     }
 
 

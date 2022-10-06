@@ -66,30 +66,36 @@ const AoiIterator RegularGridInfo::aoiIter() const{
     return AoiIterator(*this);
 }
 
-const inet::Coord RegularGridInfo::getCellCenter(const int x, const int y) const{
-    return inet::Coord(x * cellSize.x + cellSize.x/2, y * cellSize.y + cellSize.y/2, 0.0);
+const traci::TraCIPosition RegularGridInfo::getCellCenter(const int x, const int y) const{
+    return traci::TraCIPosition(x * cellSize.x + cellSize.x/2, y * cellSize.y + cellSize.y/2, 0.0);
 }
 
-const GridCellID RegularGridInfo::getGridCellId(const traci::TraCIPosition& p) const{
-    return GridCellID(floor(p.x/cellSize.x), floor(p.y/cellSize.y));
+const GridCellID RegularGridInfo::getCellKey(const traci::TraCIPosition& pos) const{
+    int x_id = (int)floor(pos.x / cellSize.x);
+    int y_id = (int)floor(pos.y / cellSize.y);
+    return GridCellID(x_id, y_id);
 }
 
-const int RegularGridInfo::getCellId(const int x, const int y)const{
+const GridCellID RegularGridInfo::getCellKey(const int cellKey1D) const { //todo Test
+    int _id = (int)abs(cellKey1D);
+    int x_id = (int)floor(_id % (int)cellCount.x);
+    int y_id = (int)floor(_id / (int)cellCount.x);
+    return GridCellID(x_id, y_id);
+}
+
+const int RegularGridInfo::getCellKey1D(const traci::TraCIPosition& pos) const{
+    auto id = getCellKey(pos);
+    return getCellKey1D(id.x(), id.y());
+}
+const int RegularGridInfo::getCellKey1D(const int x, const int y) const{
     // row major order
     if (x < 0 || x >= cellCount.x){
         throw omnetpp::cRuntimeError("Cell Id out of bound");
     }
     return y*cellCount.x + x;
 }
-
-const int RegularGridInfo::getCellId(const traci::TraCIPosition& p) const{
-    auto id = getGridCellId(p);
-    return getCellId(id.x(), id.y());
-}
-
-const GridCellID RegularGridInfo::getCellId(const int cellId) const{
-    auto _id = abs(cellId);
-    return GridCellID(_id % (int)cellCount.x, (int)floor(_id/cellCount.x));
+const int RegularGridInfo::getCellKey1D(const GridCellID& cellKey) const{
+    return getCellKey1D(cellKey.x(), cellKey.y());
 }
 
 const bool RegularGridInfo::posInCenteredCell(const inet::Coord& cellCenter, const inet::Coord& pos ) const {

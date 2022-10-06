@@ -24,6 +24,10 @@ bool operator== (const libsumo::TraCIPosition&  p1, const libsumo::TraCIPosition
     return p1.x == p2.x && p1.y == p2.y && p1.z == p2.z;
 }
 
+bool cmp (const libsumo::TraCIPosition&  p1, const libsumo::TraCIPosition&  p2){
+    return p1.x == p2.x && p1.y == p2.y && p1.z == p2.z;
+}
+
 class RegularGridInfoTest_F : public BaseOppTest {
 public:
     RegularGridInfoTest_F(){
@@ -136,41 +140,36 @@ TEST_F(RegularGridInfoTest_F, aoiIter){
 
 
 TEST_F(RegularGridInfoTest_F, getCellCenter1){
-    EXPECT_EQ(ss.getCellCenter(GridCellID(1,1)), inet::Coord(15., 15.));
-    EXPECT_EQ(rr.getCellCenter(GridCellID(1,1)), inet::Coord(15., 30.));
+    EXPECT_TRUE(cmp(ss.getCellCenter(GridCellID(1,1)), traci::TraCIPosition(15., 15.)));
+    EXPECT_TRUE(cmp(rr.getCellCenter(GridCellID(1,1)), traci::TraCIPosition(15., 30.)));
 }
 
 TEST_F(RegularGridInfoTest_F, getCellCenter2){
-    EXPECT_EQ(ss.getCellCenter(1,1), inet::Coord(15., 15.));
-    EXPECT_EQ(rr.getCellCenter(1,1), inet::Coord(15., 30.));
+    EXPECT_TRUE(cmp(ss.getCellCenter(1,1), traci::TraCIPosition(15., 15.)));
+    EXPECT_TRUE(cmp(rr.getCellCenter(1,1), traci::TraCIPosition(15., 30.)));
 }
 
 TEST_F(RegularGridInfoTest_F, getCellCenter3){
-    EXPECT_EQ(ss.getCellCenter(1,1), inet::Coord(15., 15.));
-    EXPECT_EQ(rr.getCellCenter(1,1), inet::Coord(15., 30.));
+    EXPECT_TRUE(cmp(ss.getCellCenter(1,1), traci::TraCIPosition(15., 15.)));
+    EXPECT_TRUE(cmp(rr.getCellCenter(1,1), traci::TraCIPosition(15., 30.)));
 }
 
-TEST_F(RegularGridInfoTest_F, getGridCellId){
-    EXPECT_EQ(ss.getGridCellId(traci::TraCIPosition(52., 53.)), GridCellID(5,5));
-    EXPECT_EQ(rr.getGridCellId(traci::TraCIPosition(52., 53.)), GridCellID(5,2));
+TEST_F(RegularGridInfoTest_F, getCellKey){
+    EXPECT_EQ(ss.getCellKey(traci::TraCIPosition(52., 53.)), GridCellID(5,5));
+    EXPECT_EQ(rr.getCellKey(traci::TraCIPosition(52., 53.)), GridCellID(5,2));
 }
 
 TEST_F(RegularGridInfoTest_F, getCellId1){
-    EXPECT_EQ(ss.getCellId(12), GridCellID(2,1));
-    EXPECT_EQ(ss.getCellId(-12), GridCellID(2,1));
-    EXPECT_EQ(rr.getCellId(12), GridCellID(2,1));
-    EXPECT_EQ(rr.getCellId(-12), GridCellID(2,1));
+    EXPECT_EQ(ss.getCellKey(12), GridCellID(2,1));
+    EXPECT_EQ(ss.getCellKey(-12), GridCellID(2,1));
+    EXPECT_EQ(rr.getCellKey(12), GridCellID(2,1));
+    EXPECT_EQ(rr.getCellKey(-12), GridCellID(2,1));
 }
 
 TEST_F(RegularGridInfoTest_F, getCellId2){
-    EXPECT_EQ(ss.getCellId(2, 1), 12);
-    EXPECT_EQ(rr.getCellId(2, 1), 12);
+    EXPECT_EQ(ss.getCellKey1D(2, 1), 12);
+    EXPECT_EQ(rr.getCellKey1D(2, 1), 12);
 }
-
-//TEST_F(RegularGridInfoTest_F, getCellId3){
-//    EXPECT_EQ(ss.getCellId(inet::Coord(2., 1.)), 12);
-//    EXPECT_EQ(rr.getCellId(inet::Coord(2., 1.)), 12);
-//}
 
 TEST_F(RegularGridInfoTest_F, posInCenteredCell){
     EXPECT_TRUE(ss.posInCenteredCell(inet::Coord(15., 15.), inet::Coord(17., 11.)));
