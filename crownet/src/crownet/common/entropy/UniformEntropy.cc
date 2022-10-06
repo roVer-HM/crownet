@@ -24,7 +24,11 @@ void UniformEntropy::initialize(cRNG* rng) {
     rnd =  std::make_shared<cUniform>(rng, getMinValue(), getMaxValue());
 }
 
-double UniformEntropy::getValue(inet::Coord position, simtime_t time){
+double UniformEntropy::getValue(const inet::Coord& position, const simtime_t& time, const double old_value){
+    return rnd->draw();
+}
+
+double UniformEntropy::getRndValue(){
     return rnd->draw();
 }
 

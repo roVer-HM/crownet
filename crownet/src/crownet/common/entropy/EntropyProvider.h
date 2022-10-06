@@ -18,9 +18,10 @@ class EntropyProvider : public ::omnetpp::cOwnedObject {
 
 public:
     virtual void initialize(cRNG* rng) = 0;
-    virtual double getValue(inet::Coord position, simtime_t time) = 0 ;
+    virtual double getValue(const inet::Coord& position, const simtime_t& time, const double old_value) = 0 ;
     virtual bool selectCell(const int x, const int y, simtime_t time) = 0;
     virtual bool selectCell(const GridCellID& cellId, simtime_t time) {return selectCell(cellId.x(), cellId.y(), time);}
+    virtual double getRndValue() = 0;
 
 public:
   virtual ~EntropyProvider() = default;

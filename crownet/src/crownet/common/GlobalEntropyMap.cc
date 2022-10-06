@@ -138,7 +138,7 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
         // This allows lazy update of ground truth when the value is requested. The
         // current time is not needed because lastUpdateTime will be set by the event trigger.
         auto pos = ret->getPositionCurrent();
-        ret->setBeaconValueCurrent(entropyProvider->getValue(pos, lastUpdateTime));
+        ret->setBeaconValueCurrent(entropyProvider->getValue(pos, lastUpdateTime, ret->getBeaconValueCurrent()));
         ret->setReceivedTimeCurrent(lastUpdateTime);
     }
     return *_table.find(sourceId);

@@ -21,23 +21,25 @@
 
 namespace crownet {
 
-class PolynomialEntropy :  public PolynomialEntropy_Base
+class RndOffsetPolynomialEntropy :  public RndOffsetPolynomialEntropy_Base
 
 {
 public:
     virtual void initialize(cRNG* rng) override;
-    virtual double getValue(inet::Coord position, simtime_t time) override;
+    virtual double getValue(const inet::Coord& position, const simtime_t& time, const double old_value) override;
     virtual bool selectCell(const int x, const int y, simtime_t time) override;
+    virtual double getRndValue() override;
 
 private:
     std::shared_ptr<cUniform> rnd;
+    std::map<std::pair<double, double>, double> rndOffset;
 private:
-  void copy(const PolynomialEntropy& other);
+  void copy(const RndOffsetPolynomialEntropy& other);
 public:
-    virtual ~PolynomialEntropy() = default;
-    PolynomialEntropy(const char *name=nullptr): PolynomialEntropy_Base(name){};
-    PolynomialEntropy(const PolynomialEntropy& other) : PolynomialEntropy_Base(other){ copy(other);}
-    virtual PolynomialEntropy *dup() const override {return new PolynomialEntropy(*this);}
+    virtual ~RndOffsetPolynomialEntropy() = default;
+    RndOffsetPolynomialEntropy(const char *name=nullptr): RndOffsetPolynomialEntropy_Base(name){};
+    RndOffsetPolynomialEntropy(const RndOffsetPolynomialEntropy& other) : RndOffsetPolynomialEntropy_Base(other){ copy(other);}
+    virtual RndOffsetPolynomialEntropy *dup() const override {return new RndOffsetPolynomialEntropy(*this);}
 
 
 

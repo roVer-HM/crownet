@@ -13,24 +13,29 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "PolynomialEntropy.h"
+#include "RndOffsetPolynomialEntropy.h"
 #include <omnetpp/regmacros.h>
 
 namespace crownet {
 
-Register_Class(PolynomialEntropy);
+Register_Class(RndOffsetPolynomialEntropy);
 
-void PolynomialEntropy::initialize(cRNG* rng) {
-    rnd =  std::make_shared<cUniform>(rng, 0.0, 1.0);
+void RndOffsetPolynomialEntropy::initialize(cRNG* rng) {
+    rnd =  std::make_shared<cUniform>(rng, getMinValue(), getMaxValue());
 }
 
-double PolynomialEntropy::getValue(inet::Coord position, simtime_t time){
+double RndOffsetPolynomialEntropy::getValue(const inet::Coord& position, const simtime_t& time, const double old_value){
+    auto id = std::make_pair(position.x, position.y);
+    if (rndOffset.find(id) == rndOffset.end()){
+        rndOffset[id] = getRndValue();
+    }
+    double alpha_0 = rndOffset[id];
     double ret = 0.0;
     double t=time.dbl(); // in seconds
     for(int n=0; n < getCoefficientsArraySize(); n++){
         double alpha_n= getCoefficients(n);
         if(n==0){
-            ret += alpha_n;
+            ret += alpha_n + alpha_0;
         } else if (alpha_n != 0.0){
             ret += alpha_n*pow(t, n);
         }
@@ -38,13 +43,18 @@ double PolynomialEntropy::getValue(inet::Coord position, simtime_t time){
     return ret;
 }
 
-bool PolynomialEntropy::selectCell(const int x, const int y, simtime_t time){
+bool RndOffsetPolynomialEntropy::selectCell(const int x, const int y, simtime_t time){
     // doubleRand() [0, 1)
     return rnd->getRNG()->doubleRand() < getCellSelectionPropability() ;
 }
 
-void PolynomialEntropy::copy(const PolynomialEntropy& other){
+double RndOffsetPolynomialEntropy::getRndValue(){
+    return rnd->draw();
+}
+
+void RndOffsetPolynomialEntropy::copy(const RndOffsetPolynomialEntropy& other){
     this->rnd = other.rnd;
+    this->rndOffset = other.rndOffset;
 }
 
 }

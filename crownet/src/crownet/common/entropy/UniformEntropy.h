@@ -26,8 +26,9 @@ class UniformEntropy :  public UniformEntropy_Base
 {
 public:
     virtual void initialize(cRNG* rng) override;
-    virtual double getValue(inet::Coord position, simtime_t time) override;
+    virtual double getValue(const inet::Coord& position, const simtime_t& time, const double old_value) override;
     virtual bool selectCell(const int x, const int y, simtime_t time) override;
+    virtual double getRndValue() override;
 
 private:
     std::shared_ptr<cUniform> rnd;
