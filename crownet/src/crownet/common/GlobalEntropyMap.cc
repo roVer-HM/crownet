@@ -46,6 +46,7 @@ void GlobalEntropyMap::initialize(int stage) {
       entropyProvider = (EntropyProvider*)(par("entropyProvider").objectValue()->dup());
       take(entropyProvider);
       entropyProvider->initialize(getRNG(par("entropyRngGenerator").intValue()));
+      mapDataType = "entropyData";
   }
 }
 

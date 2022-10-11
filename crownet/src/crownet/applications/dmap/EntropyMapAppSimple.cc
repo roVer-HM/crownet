@@ -27,6 +27,7 @@ void EntropyMapAppSimple::initialize(int stage) {
     if (stage == INITSTAGE_LOCAL) {
         entropyClient = inet::getModuleFromPar<EntropyNeigborhoodTableClient>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         entropyClient->setOwnerId(hostId);
+        mapDataType = "entropyData";
     }
 }
 
