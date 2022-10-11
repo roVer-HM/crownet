@@ -33,6 +33,7 @@ class SimulationRun(BaseRunner):
             data_root=self.result_base_dir()
         )
         builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+        # builder.set_imputation_strategy(DeleteMissingImputation())
         builder.build(self.ns.get("hdf_override", "False"))
 
     @process_as({"prio": 990, "type": "post"})
@@ -73,19 +74,26 @@ class SimulationRun(BaseRunner):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-        sel = list(OppAnalysis.find_selection_method(builder))
-        if len(sel) > 1:
-            print(f"multiple selections found: {sel}")
-        OppAnalysis.create_common_plots(result_dir, builder, sql, selection=sel[0])
+        OppAnalysis.create_common_plots_all(result_dir, builder, sql)
+        if sql.is_count_map():
+            print("build count based default plots")
+            builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+            sel = list(OppAnalysis.find_selection_method(builder))
+            if len(sel) > 1:
+                print(f"multiple selections found: {sel}")
+            OppAnalysis.create_common_plots_density(
+                result_dir, builder, sql, selection=sel[0]
+            )
+        else:
+            print("build entropy map based plots")
 
-    # @process_as({"prio": 960, "type": "post"})
-    # def remove_density_map_csv(self):
-    #     _, builder, _ = OppAnalysis.builder_from_output_folder(
-    #         data_root=self.result_base_dir()
-    #     )
-    #     for f in builder.map_paths:
-    #         os.remove(f)
+    @process_as({"prio": 960, "type": "post"})
+    def remove_density_map_csv(self):
+        _, builder, _ = OppAnalysis.builder_from_output_folder(
+            data_root=self.result_base_dir()
+        )
+        for f in builder.map_paths:
+            os.remove(f)
 
     @process_as({"prio": 900, "type": "post"})
     def vadere_position(self):
@@ -99,13 +107,16 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
-    settings = [
-        "post-processing",
-        "--qoi",
-        "all",
-        "--resultdir",
-        "results/S1_bonn_motion_dev_20221005-12:17:58",
-    ]
+    settings = []
+    # settings = [
+    #     "post-processing",
+    #     "--qoi",
+    #     "all",
+    #     "--override-hdf",
+    #     "--resultdir",
+    #     # "results/S1_bonn_motion_dev_20221007-13:43:08",
+    #     "results/S1_bonn_motion_dev_20221010-08:51:11",
+    # ]
 
     if len(sys.argv) == 1:
         # default behavior of script
