@@ -1042,8 +1042,8 @@ def describtive_two_way_comparison_count(
     run_map: RunMap,
     filter_run: SimGroupFilter = lambda _: True,
     compare_with="1_999_25",
-    output_path="count_stats_for_alg.pdf",
-    value_axes_label="pedestrian count",
+    output_path="count_stats_for_alg_x.pdf",
+    value_axes_label="Pedestrian count",
 ):
 
     maps = OppAnalysis.merge_maps_for_run_map(
@@ -1086,16 +1086,16 @@ def describtive_two_way_comparison_count(
         for cols in col_combination:
             title = f"Comparision {' - '.join(cols)}"
             print(f"build {title}")
-
-            OppAnalysis.plot_descriptive_comparison(
-                data.loc[:, cols],
-                lbl_dict=lbl_dict,
-                run_map=run_map,
-                out_name=output_path,
-                pdf_file=pdf_file,
-                palette=palette,
-                value_axes_label=value_axes_label,
-            )
+            with plt.rc_context(_Plot.plt_rc_same(rc={"font.size": 20})):
+                OppAnalysis.plot_descriptive_comparison(
+                    data.loc[:, cols],
+                    lbl_dict=lbl_dict,
+                    run_map=run_map,
+                    out_name=output_path,
+                    pdf_file=pdf_file,
+                    palette=palette,
+                    value_axes_label=value_axes_label,
+                )
 
 
 def _get_mse_data_per_variation_ts(
@@ -1213,16 +1213,23 @@ def main(run_map: RunMap):
     styles = StyleMap(markersize=3, marker="o", linestyle="none")
     data, data_mean_by_run_id = _get_mse_data(run_map)
 
-    # mse_combi_plot(data_mean_by_run_id, run_map)
-    plot_mse_yDist_to_ymf_box_plot(
-        run_map, data_mean_by_run_id, figure_name="box_plot.pdf"
-    )
-    plot_mse_yDist_to_ymf(
-        data_mean_by_run_id, run_map, figure_name="msme_bar_chart.pdf"
-    )
+    with plt.rc_context(
+        _Plot.plt_rc_same(
+            rc={
+                "font.size": 14,
+            }
+        )
+    ):
+        # mse_combi_plot(data_mean_by_run_id, run_map)
+        # plot_mse_yDist_to_ymf_box_plot(
+        #     run_map, data_mean_by_run_id, figure_name="box_plot.pdf"
+        # )
+        plot_mse_yDist_to_ymf(
+            data_mean_by_run_id, run_map, figure_name="msme_bar_chart.pdf"
+        )
 
-    # plot_mse_yDist_to_ymf(data_mean_by_run_id, run_map, "mse_diff.pdf")
-    # plot_all(run_map, styles, data, data_mean_by_run_id)
+        # plot_mse_yDist_to_ymf(data_mean_by_run_id, run_map, "mse_diff.pdf")
+        # plot_all(run_map, styles, data, data_mean_by_run_id)
 
 
 if __name__ == "__main__":
@@ -1241,9 +1248,11 @@ if __name__ == "__main__":
     # create_od_matrix(run_map)
     # write_cell_tex(run_map)
     # plot_test(run_map)
-    # main(run_map)
+    main(run_map)
     # plot_per_seed_stats(run_map)
     # describtive_two_way_comparison_msce(run_map)
-    msce_comparision_paper(run_map)
-    # describtive_two_way_comparison_count(run_map)
+    # msce_comparision_paper(run_map)
+    describtive_two_way_comparison_count(
+        run_map, filter_run=lambda x: x.lbl == "0.9_60_25"
+    )
     print("done")
