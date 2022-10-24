@@ -20,9 +20,6 @@ from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
 import roveranalyzer.simulators.vadere.vadere_variation_helper as v
 
-import mf_1d_bm as base_scenario
-
-s_5_20_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d20m.scenario")
 t = UnitValue.s(1500.0)
 
 
@@ -161,5 +158,8 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
 
 
 if __name__ == "__main__":
-    main("traces_mf_1d_bm.d", fix_trace_seed=0)
+    # fixed mobility seed (index 0)
+    # main("traces_mf_1d_bm.d", fix_trace_seed=0)
+    # use all mobility seeds (index < 0)
+    main("traces_mf_1d_bm.d", fix_trace_seed=-1)
     # generate_traces("traces_mf_1d_bm.d")

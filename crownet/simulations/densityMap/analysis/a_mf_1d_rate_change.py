@@ -1,19 +1,18 @@
+from ast import AsyncFunctionDef
 import os
-from typing import Dict
 from roveranalyzer.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
 from roveranalyzer.analysis.omnetpp import CellOccupancy, HdfExtractor, OppAnalysis
 from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
-from roveranalyzer.utils.dataframe import FrameConsumer
 from roveranalyzer.utils.plot import (
     PlotUtil,
+    fill_between,
     mult_locator,
     paper_rc,
     check_ax,
     plt_rc_same,
-    tight_ax_grid,
 )
 from a_mf_1d import SimFactory, ts_x, ts_y
-from itertools import chain
+from functools import partial
 from copy import deepcopy
 from omnetinireader.config_parser import ObjectValue
 import pandas as pd
@@ -54,8 +53,8 @@ class SimF(SimFactory):
         return ret
 
 
-def get_run_map_single_run(output_dir) -> RunMap:
-    run1 = SuqcStudy("/mnt/data1tb/results/mf_1d_bm_rate_chage/")
+def get_run_map_single_run(output_dir, data_root) -> RunMap:
+    run1 = SuqcStudy(data_root)
     sim_factory = SimF()
     run_map = run1.update_run_map(
         RunMap(output_dir),
@@ -259,11 +258,12 @@ def _remove_target_cells(df: pd.DataFrame) -> pd.DataFrame:
     return df.loc[masked_index].copy(deep=True)
 
 
-def create_cell_occupation_ratio(run_map: RunMap):
+def create_cell_occupation_ratio(run_map: RunMap, same_mobility_seed: bool = True):
+    g_name = list(run_map.keys())[0]
     ret = CellOccupancy.sg_create_cell_occupation_info(
-        run_map["S4-0"],
+        run_map=g_name,
         interval_bin_size=100.0,
-        same_mobility_seed=True,
+        same_mobility_seed=same_mobility_seed,
         frame_c=_remove_target_cells,
     )
     CellOccupancy.plot_cell_occupation_info(
@@ -271,54 +271,79 @@ def create_cell_occupation_ratio(run_map: RunMap):
     )
 
 
+def filter_single_rate(sim_group: SimulationGroup, rate) -> bool:
+    return sim_group.attr["gt_change_rate"] == rate
+
+
 def create_cell_knowledge_ratio(run_map: RunMap):
     h5 = BaseHdfProvider(run_map.path("cell_knowledge_ratio.h5"))
+    change_rate = [g.attr["gt_change_rate"] for g in run_map.values()][0]
     if not h5.hdf_file_exists:
+        # only use one change rate because knowledge_ratio does not depend on it
         CellOccupancy.run_create_cell_knowledge_ratio(
-            run_map, hdf_path="cell_knowledge_ratio.h5", frame_c=_remove_target_cells
+            run_map,
+            hdf_path="cell_knowledge_ratio.h5",
+            sim_group_filter=partial(filter_single_rate, rate=change_rate),
+            frame_c=_remove_target_cells,
         )
 
-    # df = CellOccupancy.sim_create_cell_value_knowledge_ratio(run_map["S4-20"][0], _remove_target_cells)
-    fig, axes = tight_ax_grid(2, 2, figsize=(16, 9))
-    fig2, axes2 = tight_ax_grid(2, 2, figsize=(16, 9))
-    axes = list(chain(*axes))
-    axes2 = list(chain(*axes2))
+    fig, ax_k_ratio = check_ax()
+    fig2, ax_k_ratio_zoom = check_ax()
 
-    for idx, rate in enumerate(
-        np.unique([g.attr["gt_change_rate"] for g in run_map.values()])
-    ):
-        ax: plt.Axes = axes[idx]
-        ax2: plt.Axes = axes2[idx]
-        for g_name, g in run_map.items():
-            if g.attr["gt_change_rate"] != rate:
-                continue
-            with h5.query as ctx:
-                df = ctx.select(
-                    key="knowledge_ratio", where=f"rep in {g.ids()}", columns=["a_c"]
-                )
-                df = df.groupby("simtime").agg(["mean", "std"]).droplevel(0, axis=1)
-                ax.plot(df.index, df["mean"], label=g.lbl)
-                ax.legend()
-                ax.set_title(f"Cell knowledge ratio $a_C$ with change rate {rate} [s]")
+    sim_groups = [g for g in run_map.values() if filter_single_rate(g, change_rate)]
+    sim_groups.sort(key=lambda x: x.attr["transmission_interval_ms"])
 
-                ax2.set_ylim(0.9, 1.0)
-                ax2.set_xlim(400, 525)
-                ax2.plot(df.index, df["mean"], label=g.lbl)
-                ax2.legend()
-                ax2.set_title(f"Cell knowledge ratio $a_C$ with change rate {rate} [s]")
+    for g in sim_groups:
+        with h5.query as ctx:
+            data = ctx.select(
+                key="knowledge_ratio", where=f"rep in  {g.ids()}", columns=["a_c"]
+            )
+        df = (
+            data.reset_index(["rep", "m_seed"], drop=True)
+            .groupby(["simtime"])["a_c"]
+            .agg(["mean", "std"])
+        )
+        lbl = f"Map $\Delta t = {g.attr['transmission_interval_ms']}\,ms$"
+        # fill_between(ax_k_ratio, data=df, label=lbl)
+        ax_k_ratio.plot(df.index, df["mean"], label=lbl)
+
+        # fill_between(ax_k_ratio_zoom, data=df, label=lbl )
+        ax_k_ratio_zoom.plot(df.index, df["mean"], label=lbl)
+
+    ax_k_ratio.legend()
+    ax_k_ratio.set_title(f"Cell knowledge over time")
+    ax_k_ratio_zoom.legend()
+    ax_k_ratio_zoom.set_title(f"Cell knowledge over time (zoomed)")
+    ax_k_ratio_zoom.set_ylim(0.9, 1.0)
+    ax_k_ratio_zoom.set_xlim(400, 525)
 
     fig.tight_layout()
     fig.savefig(run_map.path("cell_knowledge_ratio.pdf"))
     fig2.savefig(run_map.path("cell_knowledge_ratio_zoom.pdf"))
-    print("break")
 
 
 if __name__ == "__main__":
 
-    output_dir = "/mnt/data1tb/results/_density_map/04_rate_output/"
-    run_map = RunMap.load_or_create(get_run_map_single_run, output_dir)
-    get_msce_err(run_map)
-    # save_msce_interval_info(run_map)
-    # create_cell_occupation_ratio(run_map)
+    # same mobility seed
+    # output_dir = "/mnt/data1tb/results/_density_map/04_rate_output/"
+    # run_map = RunMap.load_or_create(partial(get_run_map_single_run, data_root="/mnt/data1tb/results/mf_1d_bm_rate_chage/"), output_dir)
     # create_cell_knowledge_ratio(run_map)
+    # create_cell_occupation_ratio(run_map, same_mobility_seed=True)
+
+    # with mobility seed variation
+    output_dir = "/mnt/data1tb/results/_density_map/04b_rate_output/"
+    run_map = RunMap.load_or_create(
+        partial(
+            get_run_map_single_run,
+            data_root="/mnt/data1tb/results/mf_1d_bm_rate_chage_1/",
+        ),
+        output_dir,
+    )
+    create_cell_knowledge_ratio(run_map)
+    create_cell_occupation_ratio(run_map, same_mobility_seed=False)
+
+    # create_cell_occupation_ratio(run_map, same_mobility_seed=False)
+    # create_cell_knowledge_ratio(run_map)
+    # get_msce_err(run_map)
+    # save_msce_interval_info(run_map)
     print("main done")
