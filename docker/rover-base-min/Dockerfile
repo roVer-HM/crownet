@@ -14,7 +14,7 @@ RUN apt-get update && \
        openssh-client \
        git git-lfs \
        python3.8 python3.7 python python3 python3-pip \
-       python3.8-venv python3-venv \
+       python3.8-venv python3-venv python3.8-tk python3-tk \
        curl wget \
        vim \
        openjdk-11-jre \
