@@ -1,7 +1,7 @@
 # CrowNet base container
 #
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-min:latest
 
 LABEL description "CrowNet base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"
@@ -35,9 +35,9 @@ RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -p 6000 sam-dev.cs.hm.edu >> ~/.ssh/k
 # install google test library
 RUN mkdir download
 WORKDIR /download
-RUN wget https://github.com/google/googletest/archive/release-1.10.0.tar.gz
-RUN tar -xvf release-1.10.0.tar.gz
-WORKDIR /download/googletest-release-1.10.0/
+RUN wget https://github.com/google/googletest/archive/release-1.12.0.tar.gz
+RUN tar -xvf release-1.12.0.tar.gz
+WORKDIR /download/googletest-release-1.12.0/
 RUN cmake CMakeLists.txt
 RUN make install
 WORKDIR /

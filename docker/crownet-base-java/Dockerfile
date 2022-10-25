@@ -1,4 +1,4 @@
-# vadere Crowd Simulator
+# Java base container with vadere Crowd Simulator
 #
 # see https://gitlab.lrz.de/vadere/vadere
 #
@@ -7,12 +7,12 @@
 # - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
 
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-min:latest
 
 # Specify the version/tag of vadere to be put in the container:
 ENV RELEASE master
 
-LABEL description "vadere Crowd Simulator (as used in roVer)"
+LABEL description "vadere Crowd Simulator (as used in crownet)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all dependencies

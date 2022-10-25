@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 
-echo "Welcome to the corwd-guidance Docker Dev-Container.(Uses code in ${CROWNET_HOME}/flowcontrol)"
+echo "Welcome to the crowd-guidance Docker Dev-Container.(Uses code in ${CROWNET_HOME}/flowcontrol)"
 echo ""
 
 

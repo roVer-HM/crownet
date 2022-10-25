@@ -1,9 +1,9 @@
-# roVer base container
+# crownet base container
 #
 
 FROM ubuntu:20.04
 
-LABEL description "roVer base container"
+LABEL description "crownet base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"
 
 
