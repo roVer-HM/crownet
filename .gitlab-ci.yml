@@ -3,6 +3,7 @@ variables:
  GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vadere submodule)
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this.
  OPP_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
+ VADERE_CONT_TAG: '220826-1432'       # tag of vadere container to be used
  OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${OPP_CONT_TAG} exec'
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
@@ -42,7 +43,7 @@ build-for-sim:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker pull ${CI_REGISTRY}/rover/crownet/omnetpp:${OPP_CONT_TAG}
     - docker pull $CI_REGISTRY/rover/crownet/sumo
-    - docker pull $CI_REGISTRY/rover/crownet/vadere
+    - docker pull $CI_REGISTRY/rover/crownet/vadere:$(VADERE_CONT_TAG)
     - docker pull $CI_REGISTRY/rover/crownet/flowcontrol
     # ## build all models
     - "${OPP} make makefiles"
