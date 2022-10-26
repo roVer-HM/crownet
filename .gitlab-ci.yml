@@ -43,7 +43,7 @@ build-for-sim:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker pull ${CI_REGISTRY}/rover/crownet/omnetpp:${OPP_CONT_TAG}
     - docker pull $CI_REGISTRY/rover/crownet/sumo
-    - docker pull $CI_REGISTRY/rover/crownet/vadere:$(VADERE_CONT_TAG)
+    - docker pull $CI_REGISTRY/rover/crownet/vadere:${VADERE_CONT_TAG}
     - docker pull $CI_REGISTRY/rover/crownet/flowcontrol
     # ## build all models
     - "${OPP} make makefiles"
