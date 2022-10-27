@@ -4,6 +4,8 @@ variables:
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this.
  OPP_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
  VADERE_CONT_TAG: '220826-1432'       # tag of vadere container to be used
+ CONTROL_CONT_TAG: '220527-1453'      # tag of control container to be used
+ SUMO_CONT_TAG: '210618-1625'         # tag of sumo container to be used
  OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${OPP_CONT_TAG} exec'
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
@@ -42,9 +44,9 @@ build-for-sim:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker pull ${CI_REGISTRY}/rover/crownet/omnetpp:${OPP_CONT_TAG}
-    - docker pull $CI_REGISTRY/rover/crownet/sumo
+    - docker pull $CI_REGISTRY/rover/crownet/sumo:${SUMO_CONT_TAG}
     - docker pull $CI_REGISTRY/rover/crownet/vadere:${VADERE_CONT_TAG}
-    - docker pull $CI_REGISTRY/rover/crownet/flowcontrol
+    - docker pull $CI_REGISTRY/rover/crownet/flowcontrol:${CONTROL_CONT_TAG}
     # ## build all models
     - "${OPP} make makefiles"
     - "${OPP} make MODE=${MODE}"
