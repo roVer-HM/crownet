@@ -1,7 +1,12 @@
 from ast import AsyncFunctionDef
 import os
 from roveranalyzer.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
-from roveranalyzer.analysis.omnetpp import CellOccupancy, HdfExtractor, OppAnalysis
+from roveranalyzer.analysis.omnetpp import (
+    CellOccupancy,
+    CellOccupancyInfo,
+    HdfExtractor,
+    OppAnalysis,
+)
 from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
 from roveranalyzer.utils.plot import (
     PlotUtil,
@@ -66,11 +71,30 @@ def get_run_map_single_run(output_dir, data_root) -> RunMap:
 
 
 def plot_packet_loss_ratio_over_time(run_map: RunMap):
-    loss = OppAnalysis.run_get_packet_loss(run_map)
-    fig, ax = check_ax()
-    sn.lineplot(data=loss.reset_index(), x="time", y="lost_relative", hue="rep")
-    ax.set_title("Relative packet loss over time for each simulation")
-    fig.savefig(run_map.path("packet_loss_time_series.pdf"))
+    # loss = OppAnalysis.run_get_packet_loss(run_map)
+    loss = pd.read_hdf(run_map.path("loss2.h5"))
+    # fig, ax = check_ax()
+    # sn.lineplot(data=loss.reset_index(), x="time", y="lost_relative", hue="rep")
+    # ax.set_title("Relative packet loss over time for each simulation")
+    # fig.savefig(run_map.path("packet_loss_time_series.pdf"))
+
+    data = msce_with_lbl(run_map)
+    data = data.reset_index().set_index(["simtime", "label", "run_id"])
+    ax = data.loc[_i[:, :, 10], ["cell_mse"]].reset_index().plot("simtime", "cell_mse")
+
+    lbl_to_rate = pd.DataFrame(
+        [(n, g.attr["gt_change_rate"]) for n, g in run_map.items()],
+        columns=["label", "rate"],
+    )
+    data = (
+        data.join(lbl_to_rate.set_index("label"), on="label")
+        .reset_index()
+        .set_index(["simtime", "label", "rate"])
+        .sort_index()
+    )
+    o = CellOccupancy.sim_create_cell_occupation_info(run_map.get_sim_by_id(10))
+    # o = CellOccupancyInfo.from_hdf(run_map.path("cell_occupation.h5"))
+    print("hi")
 
 
 def msce_with_lbl(run_map: RunMap) -> pd.DataFrame:
@@ -104,6 +128,7 @@ def msce_plot(run_map: RunMap, data, g_name, _ff):
 
 
 def save_msce_interval_info(run_map: RunMap):
+    """Plot interval with errors"""
     data = msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label"])
 
@@ -169,7 +194,73 @@ def plot_msce_interval_info(sim: Simulation, lbl, group_name, t_slice: slice):
     print("break")
 
 
-def get_msce_err(run_map: RunMap):
+def plot_msce_err_details(run_map: RunMap):
+    data = msce_with_lbl(run_map)
+    data = data.reset_index().set_index(["simtime", "label"])
+
+    lbl_to_rate = pd.DataFrame(
+        [(n, g.attr["gt_change_rate"]) for n, g in run_map.items()],
+        columns=["label", "rate"],
+    )
+    data = (
+        data.join(lbl_to_rate.set_index("label"), on="label")
+        .reset_index()
+        .set_index(["simtime", "label", "rate"])
+        .sort_index()
+    )
+    rates = lbl_to_rate["rate"].unique()
+    ax_param = {
+        0.01: [lambda ax: ax.set_ylim(0.0, 0.40)],
+        0.1: [lambda ax: ax.set_ylim(0.0, 40.0)],
+        0.5: [],
+        1.0: [],
+        # 0.5: [lambda ax: ax.set_ylim(0.0, 250)],
+        # 1.0: [lambda ax: ax.set_ylim(0.0, 1000)],
+    }
+    top_std = (
+        data.groupby(["label", "rate", "run_id"])["cell_mse"]
+        .max()
+        .groupby(["label", "rate"])
+        .nlargest(5)
+        .droplevel([0, 1], axis=0)
+        .reset_index()
+        .set_index(["rate", "label"])
+    )
+    top_std["seed_id"] = top_std["run_id"] % 20
+    top_std.to_csv(run_map.path("msme_detail_top3.csv"))
+
+    with run_map.pdf_page("msme_detail.pdf") as pdf:
+        for rate in rates:
+            df = data.loc[_i[:, :, rate], :]
+            sg = [run_map[_l] for _l in df.index.get_level_values("label").unique()]
+            sg.sort(key=lambda x: x.attr["transmission_interval_ms"])
+            # top3std = df.groupby(["label", "run_id"])["cell_mse"].std().groupby("label").nlargest(3).droplevel(0, axis=0).reset_index()
+            # top3std["seed_index"]  = top3std["run_id"] % 20
+            with plt.rc_context(plt_rc_same(rc={"legend.fontsize": "small"})):
+                fig, axes = plt.subplots(len(sg), 1, figsize=(16, 32))
+                for ax, g in zip(axes, sg):
+                    _df = (
+                        df.loc[_i[:, g.group_name], ["run_index", "cell_mse"]]
+                        .copy()
+                        .reset_index()
+                    )
+                    ax.set_title(g.lbl)
+                    for f in ax_param[rate]:
+                        f(ax)
+                    for run_idx, d in _df.groupby("run_index"):
+                        ax.plot(d["simtime"], d["cell_mse"], label=run_idx)
+
+                axes[-1].legend(ncol=7, loc="lower center", bbox_to_anchor=(0.5, -0.7))
+                fig.suptitle(
+                    f"MSME details over all runs (seed combinations) with change rate {rate}"
+                )
+                print("foo")
+                fig.tight_layout(rect=(0.0, 0.05, 1.0, 0.99))
+                pdf.savefig(fig)
+                plt.close(fig)
+
+
+def plot_msce_err(run_map: RunMap):
 
     data = msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label"])
@@ -188,8 +279,10 @@ def get_msce_err(run_map: RunMap):
     ax_param = {
         0.01: [lambda ax: ax.set_ylim(0.0, 0.20)],
         0.1: [lambda ax: ax.set_ylim(0.0, 20.0)],
-        0.5: [lambda ax: ax.set_ylim(0.0, 250)],
-        1.0: [lambda ax: ax.set_ylim(0.0, 1000)],
+        0.5: [],
+        1.0: [],
+        # 0.5: [lambda ax: ax.set_ylim(0.0, 250)],
+        # 1.0: [lambda ax: ax.set_ylim(0.0, 1000)],
     }
 
     with plt.rc_context(plt_rc_same(rc={"legend.fontsize": "small"})):
@@ -239,7 +332,8 @@ def get_msce_err(run_map: RunMap):
         fig.tight_layout(pad=1.05, rect=(0, 0, 0.98, 0.98))
         for ax in axes:
             ax.legend(loc="center left", fontsize="large", bbox_to_anchor=(1.03, 0.4))
-        fig.savefig(run_map.path("msme_over_time_zoom.pdf"))
+        fig.savefig(run_map.path("msme_over_time.pdf"))
+        # fig.savefig(run_map.path("msme_over_time_zoom.pdf"))
 
 
 def _remove_target_cells(df: pd.DataFrame) -> pd.DataFrame:
@@ -259,12 +353,13 @@ def _remove_target_cells(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_cell_occupation_ratio(run_map: RunMap, same_mobility_seed: bool = True):
-    g_name = list(run_map.keys())[0]
-    ret = CellOccupancy.sg_create_cell_occupation_info(
-        run_map=g_name,
+    ret = CellOccupancy.run_create_cell_occupation_info(
+        run_map,
+        hdf_path="cell_occupation.h5",
         interval_bin_size=100.0,
         same_mobility_seed=same_mobility_seed,
         frame_c=_remove_target_cells,
+        pool_size=30,
     )
     CellOccupancy.plot_cell_occupation_info(
         ret, run_map.path("cell_occupation_info.pdf")
@@ -329,6 +424,7 @@ if __name__ == "__main__":
     # run_map = RunMap.load_or_create(partial(get_run_map_single_run, data_root="/mnt/data1tb/results/mf_1d_bm_rate_chage/"), output_dir)
     # create_cell_knowledge_ratio(run_map)
     # create_cell_occupation_ratio(run_map, same_mobility_seed=True)
+    # plot_msce_err(run_map)
 
     # with mobility seed variation
     output_dir = "/mnt/data1tb/results/_density_map/04b_rate_output/"
@@ -339,11 +435,11 @@ if __name__ == "__main__":
         ),
         output_dir,
     )
-    create_cell_knowledge_ratio(run_map)
-    create_cell_occupation_ratio(run_map, same_mobility_seed=False)
-
-    # create_cell_occupation_ratio(run_map, same_mobility_seed=False)
     # create_cell_knowledge_ratio(run_map)
-    # get_msce_err(run_map)
+    # create_cell_occupation_ratio(run_map, same_mobility_seed=False)
+    # plot_msce_err(run_map)
+    # plot_msce_err_details(run_map)
+    plot_packet_loss_ratio_over_time(run_map)
+
     # save_msce_interval_info(run_map)
     print("main done")
