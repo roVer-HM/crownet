@@ -78,9 +78,6 @@ if __name__ == "__main__":
     sources = dists[dists["condition"] == "Uninformed"]
 
     sources = sources.drop(columns="condition").set_index("population")
-    sources = sources.div(sources.sum(axis=1), axis=0) * 10
-    sources = 1/sources
-
     sources = sources.reset_index()
 
 
@@ -103,7 +100,6 @@ if __name__ == "__main__":
 
             sources_ = sources[sources["population"] == stat]
             sources_ = sources_.set_index("population").values.round(3).tolist()[0]
-            work_around_ = work_around[work_around["population"] == stat]
 
             df = dists[dists["condition"] == condition]
             df = df[df["population"] == stat]

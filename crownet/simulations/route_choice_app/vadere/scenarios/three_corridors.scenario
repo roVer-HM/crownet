@@ -403,28 +403,28 @@
       } ],
       "measurementAreas" : [ {
         "shape" : {
-          "x" : 3.0,
-          "y" : 22.0,
-          "width" : 4.5,
-          "height" : 3.0,
+          "x" : 4.0,
+          "y" : 23.0,
+          "width" : 2.5,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "id" : 1
       }, {
         "shape" : {
-          "x" : 18.0,
-          "y" : 22.0,
-          "width" : 4.5,
-          "height" : 3.0,
+          "x" : 19.0,
+          "y" : 23.0,
+          "width" : 2.5,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "id" : 3
       }, {
         "shape" : {
-          "x" : 10.5,
-          "y" : 22.0,
-          "width" : 4.5,
-          "height" : 3.0,
+          "x" : 11.5,
+          "y" : 23.0,
+          "width" : 2.5,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "id" : 2
