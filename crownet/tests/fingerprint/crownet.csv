@@ -2,11 +2,11 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              3f8c-e0c5/tplx, PASS, vadere:latest;omnetpp:6.0
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              67cf-82e1/tplx, PASS, omnetpp:6.0
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              b046-99cb/tplx, PASS, omnetpp:6.0
-/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              2764-fc1c/tplx, PASS, vadere:latest;omnetpp:6.0
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              e4b2-5c63/tplx, PASS, sumo:latest;omnetpp:6.0
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              70bb-3510/tplx, PASS, sumo:latest;omnetpp:6.0
-/simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              9523-1dce/tplx, PASS, vadere:latest;omnetpp:6.0
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              4e16-b95a/tplx, PASS, vadere:220826-1432;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              67cf-82e1/tplx, PASS, omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              e84f-4f69/tplx, PASS, omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              983c-0692/tplx, PASS, vadere:220826-1432;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              719d-ee00/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              db87-fa9f/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              ce35-10bd/tplx, PASS, vadere:220826-1432;omnetpp:6.0.1
 

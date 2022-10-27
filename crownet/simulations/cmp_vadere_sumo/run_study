@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# simulation studies to be run
+declare -a STUDIES=("study.py")
+
+ENV_ACTIVATE="out/crownet_user/bin/activate"
+
+if [[ -z "${CROWNET_HOME}" ]]; then
+    echo "Environment variable CROWNET_HOME is not set - please set it to the folder in which you cloned the CrowNet repository."
+    exit 1
+fi
+
+if [[ ! -f "${CROWNET_HOME}/${ENV_ACTIVATE}" ]]; then
+    echo "Missing environment activation script: $CROWNET_HOME/$ENV_ACTIVATE"
+    echo "Please run \"omnetpp exec make analysis-all\" in $CROWNET_HOME to create the environments."
+    exit 1
+fi
+
+source $CROWNET_HOME/$ENV_ACTIVATE
+
+pushd .
+cd ./study
+for study in "${STUDIES[@]}"
+do
+    python3 $study
+done
+popd
+
+# TODO: Analysis should better be performed as part of the postprocessing
+python3 ./analysis.py

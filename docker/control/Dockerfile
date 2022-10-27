@@ -3,7 +3,7 @@
 # see https://sam-dev.cs.hm.edu/rover/flowcontrol
 #
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/rover-base-min:latest
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-min:latest
 
 # Specify the version/tag of the flow controller to be put in the container. defaut master
 ARG BRANCH

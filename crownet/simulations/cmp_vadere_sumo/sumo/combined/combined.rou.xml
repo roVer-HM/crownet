@@ -22,19 +22,21 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     
-    <person id="1" depart="0.00">
+	<vType id="type1" vClass="pedestrian" speedFactor="normc(1.0,0.186,0.357,1.571)" maxSpeed="1.34"/>
+    
+    <person id="1" depart="0.00" type="type1">
         <walk edges="gneE3 gneE8"/>
     </person>
     
-    <person id="2" depart="0.00">
+    <person id="2" depart="0.00" type="type1">
         <walk edges="gneE3 gneE8"/>
     </person>
     
-    <person id="3" depart="0.00">
+    <person id="3" depart="0.00" type="type1">
         <walk edges="gneE5 gneE6"/>
     </person>
     
-    <person id="4" depart="0.00">
+    <person id="4" depart="0.00" type="type1">
         <walk edges="gneE5 gneE6"/>
     </person>
     

@@ -1,4 +1,4 @@
-# OMNeT++ Simulator (as used within the roVer project)
+# OMNeT++ Simulator (as used within the crownet project)
 #
 # Within roVer, we use two different containers:
 #   1) omnetpp (command line, no GUI, for simulation campaigns)
@@ -10,7 +10,7 @@
 
 
 # FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0.1
 
 WORKDIR /opt/omnetpp/omnetpp
 

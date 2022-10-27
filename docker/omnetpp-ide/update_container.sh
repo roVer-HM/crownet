@@ -1,9 +1,9 @@
 #!/bin/bash
 CONTAINER='omnetpp-ide'
 #VERSION_TAG="latest"
-VERSION_TAG="6.0"
+VERSION_TAG="6.0.1"
 # change base name to update version.
-BASE_NAME="omnetpp-6.0"
+BASE_NAME="omnetpp-6.0.1"
 
 # IDE download
 URL_BASE="https://github.com/omnetpp/omnetpp/releases/download/$BASE_NAME/"

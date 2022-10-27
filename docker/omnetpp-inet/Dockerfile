@@ -6,8 +6,8 @@
 # - VEINS             (in /models/veins)
 
 
-# based on the latest omnet container of the rover project
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
+# based on the latest omnet container of the crownet project
+FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0.1
 
 # Specify the version/tag of inet to be put in the container:
 ENV INETRELEASE hm_master
@@ -16,7 +16,7 @@ ENV VEINSRELEASE hm_master
 # Note: Remember to update the description below when changing versions/tags
 
 
-LABEL description "OMNeT++ Simulation Framework including inet, simu5g and veins models (roVer project)"
+LABEL description "OMNeT++ Simulation Framework including inet, simu5g and veins models (crownet project)"
 LABEL maintainer  "wischhof@ieee.org"
 
 #################### INET #############################################################################
@@ -39,7 +39,8 @@ RUN --mount=type=ssh git \
         pull ssh://git@sam-dev.cs.hm.edu:6000/rover/inet.git $INETRELEASE
 
 # configure and compile
-RUN make makefiles && \
+RUN source setenv && \
+    make makefiles && \
     make MODE=release CONFIGNAME=gcc-release -j $(nproc) all && \
     make MODE=debug CONFIGNAME=gcc-debug -j $(nproc) all && \
     find . -type f -name '*.o' -exec rm {} +

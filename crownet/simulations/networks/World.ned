@@ -34,8 +34,10 @@ import simu5g.common.binder.Binder;
 import simu5g.common.carrierAggregation.CarrierAggregation;
 import simu5g.nodes.Ue;
 import simu5g.nodes.eNodeB;
+import simu5g.nodes.NR.gNodeB;
 import simu5g.world.radio.LteChannelControl;
 import simu5g.nodes.PgwStandard;
+import simu5g.nodes.Upf;
 import crownet.nodes.IMobileUe;
 import crownet.nodes.UnequippedHost;
 import crownet.common.ICoordConverter;
@@ -43,6 +45,8 @@ import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
 import crownet.common.util.IFileWriterRegister;
 import crownet.mobility.BonnMotionServer;
+import crownet.nodes.ApplicationLayerPedestrian;
+import crownet.nodes.ApplicationLayerVehicle;
 
 import artery.storyboard.IStoryboard;
 import artery.utility.IdentityRegistry;
@@ -60,8 +64,10 @@ network World
         bool hasCellularCoreNetwork = default(hasCellular);
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
+        bool useNR = default(false);
         int numMisc = default(0);
         int numEnb = default(1);
+        int numGnb = default(1);
 
         traci.core.typename = default("VadereCore");
         traci.core.version = default(-1);
@@ -82,7 +88,7 @@ network World
 
 		// implements IGeographicCoordinateSystem
         coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
-            @display("p=308.14874,207.69;i=block/table2;is=s");
+            @display("p=524.8687,319.43625;i=block/table2;is=s");
         }
         visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=523.74,89.17125;is=s");
@@ -106,17 +112,26 @@ network World
         carrierAggregation: CarrierAggregation if hasCellular {
             @display("p=411.99374,319.43625;is=s");
         }
-        eNB[numEnb]: eNodeB if hasCellular {
+        eNB[numEnb]: eNodeB if hasCellular && useNR == false {
             @display("p=39.50625,54.18");
         }
+        gNB[numGnb]: gNodeB if hasCellular && useNR == true {
+            @display("p=39.50625,54.18");
+        }
+        upf: Upf if hasCellular && useNR == true {
+            @display("p=308.14874,190.75874;is=s");
+        }
+        iUpf: Upf if hasCellular && useNR == true {
+            @display("p=308.14874,252.84;is=s");
+        }
         server: StandardHost if hasCellularCoreNetwork {
-            @display("p=308.14874,148.995;is=s;i=device/server");
+            @display("p=308.14874,31.605;is=s;i=device/server");
         }
         router: Router if hasCellularCoreNetwork {
-            @display("p=308.14874,110.6175;is=s;i=device/smallrouter");
+            @display("p=308.14874,89.17125;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandard if hasCellularCoreNetwork {
-            @display("p=307.02,42.892498;is=l");
+        pgw: PgwStandard if hasCellularCoreNetwork && useNR == false {
+            @display("p=308.14874,136.57875;is=s");
         }
         // WLAN
         radioMedium: <default("Ieee80211ScalarRadioMedium")> like IRadioMedium if hasWlan {
@@ -126,7 +141,7 @@ network World
         // TraCI
         traci: <default("Manager")> like TraCiManager if typename != "" {
             parameters:
-                @display("p=523.74,31.605");
+                @display("p=523.74,31.605;i=abstract/table;is=s");
         }
         identiyRegistry: IdentityRegistry {
             @display("p=523.74,259.6125;i=block/table2;is=s");
@@ -134,18 +149,18 @@ network World
         // Misc
         storyboard: <default("Storyboard")> like IStoryboard if hasStoryboard {
             parameters:
-                @display("p=523.74,148.995");
+                @display("p=523.74,148.995;i=abstract/people;is=s");
         }
         gloablDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
-            @display("p=308.14874,268.6425;i=block/table2;is=s");
+            @display("p=625.3275,31.605;i=block/table2;is=s");
         }
 
         flowController: <default("")> like IControlManager if typename != "" {
-            @display("p=308.14874,319.43625;i=block/table2;is=s");
+            @display("p=411.99374,391.67624;i=block/table2;is=s");
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {
 
-            @display("p=308.14874,406.35;is=vs");
+            @display("p=523.74,396.19125;is=vs");
         }
         fileWriterRegister: <default("")> like IFileWriterRegister if typename != "" {
             @display("p=308.14874,506.35;is=vs");
@@ -157,14 +172,22 @@ network World
 
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++ if hasCellularCoreNetwork;
-        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasCellularCoreNetwork;
+        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasCellularCoreNetwork && useNR == false;
+        router.pppg++ <--> Eth10G <--> upf.filterGate if hasCellularCoreNetwork && useNR == true;
+        upf.pppg++ <--> Eth10G <--> iUpf.pppg++ if hasCellularCoreNetwork && useNR == true;
+
         for i=0..numEnb-1 {
-            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasCellularCoreNetwork;
+            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasCellularCoreNetwork && hasCellular && useNR == false;
+        }
+        for i=0..numGnb-1 {
+            iUpf.pppg++ <--> Eth10G <--> gNB[i].ppp if hasCellular && useNR == true;
         }
 
 		//# X2 connections (full mesh)
         for i=0..numEnb-1, for j=0..numEnb-1 {
             eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j;
         }
-
+        for i=0..numGnb-1, for j=0..numGnb-1 {
+            gNB[i].x2++ <--> Eth10G <--> gNB[j].x2++ if i < j;
+        }
 }

@@ -688,7 +688,7 @@
         },
         "spawnNumber" : 0,
         "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
+        "startTime" : 0.5,
         "endTime" : 300.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
