@@ -99,7 +99,8 @@ if __name__ == "__main__":
         for stat in ["Students", "Fans"]:
 
             sources_ = sources[sources["population"] == stat]
-            sources_ = sources_.set_index("population").values.round(3).tolist()[0]
+            sources_ = sources_.set_index("population").round(3)
+            sources_ = [sources_["routeC"].values[0], sources_["routeB"].values[0], sources_["routeA"].values[0]]
 
             df = dists[dists["condition"] == condition]
             df = df[df["population"] == stat]
