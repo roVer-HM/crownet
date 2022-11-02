@@ -404,27 +404,27 @@
       "measurementAreas" : [ {
         "shape" : {
           "x" : 4.0,
-          "y" : 22.5,
+          "y" : 25.0,
           "width" : 2.5,
-          "height" : 2.5,
+          "height" : 25.0,
           "type" : "RECTANGLE"
         },
         "id" : 1
       }, {
         "shape" : {
           "x" : 19.0,
-          "y" : 22.5,
+          "y" : 25.0,
           "width" : 2.5,
-          "height" : 2.5,
+          "height" : 116.0,
           "type" : "RECTANGLE"
         },
         "id" : 3
       }, {
         "shape" : {
           "x" : 11.5,
-          "y" : 22.5,
+          "y" : 25.0,
           "width" : 2.5,
-          "height" : 2.5,
+          "height" : 84.0,
           "type" : "RECTANGLE"
         },
         "id" : 2
