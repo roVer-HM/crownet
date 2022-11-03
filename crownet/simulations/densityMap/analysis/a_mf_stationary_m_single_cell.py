@@ -180,7 +180,7 @@ def run_map_from_4_8(output_path: str, *args, **kwargs) -> RunMap:
 
 
 def read_map_data(run_map: RunMap):
-    return OppAnalysis.merge_maps_for_run_map(
+    return OppAnalysis.run_get_merge_maps(
         run_map=run_map,
         data=["map_glb_count", "map_mean_count"],
         frame_consumer=FrameUtl.FrameConsumerList.get(
@@ -194,7 +194,7 @@ def read_map_data(run_map: RunMap):
 
 def read_map_data_by_run(run_map: RunMap) -> pd.DataFrame:
     fc_list = FrameUtl.FrameConsumerList.get(_prepare_collected, _process_relative_err)
-    return OppAnalysis.collect_maps_for_run_map(
+    return OppAnalysis.run_collect_maps(
         run_map=run_map,
         data=["map_glb_count", "map_mean_count"],
         frame_consumer=fc_list,

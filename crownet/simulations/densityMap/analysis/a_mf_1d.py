@@ -322,7 +322,7 @@ def get_average_density_maps(
     # get average density map from scenario map
 
     kwargs = [dict(sim_group=sim_group) for sim_group in run_map.values()]
-    maps = run_kwargs_map(OppAnalysis.merge_maps, kwargs, pool_size=10)
+    maps = run_kwargs_map(OppAnalysis.sg_get_merge_maps, kwargs, pool_size=10)
     maps = pd.concat(maps, axis=0, verify_integrity=True)
 
     if hdf_path is not None:
@@ -332,7 +332,7 @@ def get_average_density_maps(
 
 
 def plot_default_stats(run_map: RunMap):
-    maps = OppAnalysis.merge_maps_for_run_map(run_map)
+    maps = OppAnalysis.run_get_merge_maps(run_map)
 
     # all X_0.08
     for ped_f in ["X_0.08", "X_0.04"]:

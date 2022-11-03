@@ -1046,7 +1046,7 @@ def describtive_two_way_comparison_count(
     value_axes_label="Pedestrian count",
 ):
 
-    maps = OppAnalysis.merge_maps_for_run_map(
+    maps = OppAnalysis.run_get_merge_maps(
         run_map, pool_size=20, hdf_path=run_map.path("maps.h5")
     )
 
@@ -1135,7 +1135,7 @@ def _get_mse_data(run_map: RunMap):
     )
     _free, _covered = get_legal_cells(scenario, get_clipped_area())
 
-    data = OppAnalysis.get_mse_cell_data_for_study(
+    data = OppAnalysis.run_get_msce_data(
         # run_map, hdf_path="cell_mse.h5", cell_count=84 * 79, pool_size=20
         # run_map, hdf_path="cell_mse.h5", cell_count=(52-20) * (70-17), cell_slice=get_clipped_area(), pool_size=20
         run_map,

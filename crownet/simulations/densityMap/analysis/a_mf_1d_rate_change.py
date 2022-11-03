@@ -47,7 +47,7 @@ def _remove_target_cells(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _get_msce_with_lbl(run_map: RunMap) -> pd.DataFrame:
-    data = OppAnalysis.get_mse_cell_data_for_study(
+    data = OppAnalysis.run_get_msce_data(
         run_map,
         hdf_path="cell_mse_no_missing.h5",
         cell_count=1,  # will be ignored for entropy maps
