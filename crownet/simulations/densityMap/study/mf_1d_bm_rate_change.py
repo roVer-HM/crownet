@@ -65,7 +65,14 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
 
     iat = ["25"]
     alg = [lambda: mapCfgYmfDist.copy("alpha", "1.0", "stepDist", 999.0)]
-    map_generation_time = [100, 300, 700, 1000, 5000, 10000]
+    # map_generation_time = [100, 300, 700, 1000, 5000, 10000]
+    map_generation_time = [
+        20000,
+        40000,
+        80000,
+        100000,
+        5 * t.value * 1000,
+    ]  # last entry to simulate no communication.
     ground_truth_rate = [
         lambda: entropy_provider.copy("coefficients", [0.0, 0.01]),
         lambda: entropy_provider.copy("coefficients", [0.0, 0.1]),
@@ -85,6 +92,7 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
                     "*.bonnMotionServer.traceFile": f"trace/trace_mf_1d_m_const_2x5m_d20m_iat_{v[0]}_SEED.bonnMotion",
                     "*.globalDensityMap.entropyInterval": UnitValue(1.0, "s"),
                     "*.globalDensityMap.entropyProvider": v[3](),
+                    "**.numBands": "50",
                 },
             }
         )
