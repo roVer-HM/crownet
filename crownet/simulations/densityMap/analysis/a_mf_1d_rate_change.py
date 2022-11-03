@@ -1,20 +1,19 @@
-from ast import AsyncFunctionDef
+from __future__ import annotations
 import os
+from typing import List
 from roveranalyzer.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
 from roveranalyzer.analysis.omnetpp import (
     CellOccupancy,
-    CellOccupancyInfo,
-    HdfExtractor,
     OppAnalysis,
 )
 from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
+from roveranalyzer.utils import logging
 from roveranalyzer.utils.plot import (
     PlotUtil,
-    fill_between,
-    mult_locator,
-    paper_rc,
     check_ax,
+    mult_locator,
     plt_rc_same,
+    matplotlib_set_latex_param,
 )
 from a_mf_1d import SimFactory, ts_x, ts_y
 from functools import partial
@@ -26,6 +25,42 @@ import seaborn as sn
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, MultipleLocator, AutoMinorLocator
 from pandas import IndexSlice as _i
+
+
+def _remove_target_cells(df: pd.DataFrame) -> pd.DataFrame:
+    # remove cells under target area
+    xy = df.index.to_frame()
+    mask = np.repeat(False, xy.shape[0])
+    # for x in [400, 405, 410]: # remove target cells
+    for x in [400, 405, 410, 0, 5, 10]:  # remove source/target cells
+        y = 180.0
+        mask = mask | (xy["x"] == x) & (xy["y"] == y)
+
+    # for x in [0.0, 5.0, 10.0]:    # remove target cells
+    for x in [0.0, 5.0, 10.0, 400, 405, 410]:  # remove source/target cells
+        y = 205.0
+        mask = mask | (xy["x"] == x) & (xy["y"] == y)
+
+    ret = df[~mask].copy(deep=True)
+    print(f"remove {df.shape[0]-ret.shape[0]} rows")
+    return ret
+
+
+def _get_msce_with_lbl(run_map: RunMap) -> pd.DataFrame:
+    data = OppAnalysis.get_mse_cell_data_for_study(
+        run_map,
+        hdf_path="cell_mse_no_missing.h5",
+        cell_count=1,  # will be ignored for entropy maps
+        cell_slice_fc=_remove_target_cells,  # remove source/destination cells
+        pool_size=24,
+    )
+    data = data.to_frame()
+    data = data.join(run_map.id_to_label_series(enumerate_run=True), on="run_id")
+    return data
+
+
+def _filter_single_rate(sim_group: SimulationGroup, rate) -> bool:
+    return sim_group.attr["gt_change_rate"] == rate
 
 
 class SimF(SimFactory):
@@ -58,27 +93,32 @@ class SimF(SimFactory):
         return ret
 
 
-def get_run_map_single_run(output_dir, data_root) -> RunMap:
-    run1 = SuqcStudy(data_root)
-    sim_factory = SimF()
-    run_map = run1.update_run_map(
-        RunMap(output_dir),
-        sim_per_group=20,
-        id_offset=0,
-        sim_group_factory=sim_factory,
-    )
+def get_run_map_single_run(output_dir, data_root: str | List[str]) -> RunMap:
+    if isinstance(data_root, str):
+        data_root = [data_root]
+
+    run_map = RunMap(output_dir)
+    for r in data_root:
+        run1 = SuqcStudy(r)
+        sim_factory = SimF()
+        run_map = run1.update_run_map(
+            RunMap(output_dir),
+            sim_per_group=20,
+            id_offset=run_map.max_id + 1,
+            sim_group_factory=sim_factory,
+        )
     return run_map
 
 
 def plot_packet_loss_ratio_over_time(run_map: RunMap):
     # loss = OppAnalysis.run_get_packet_loss(run_map)
-    loss = pd.read_hdf(run_map.path("loss2.h5"))
+    # loss = pd.read_hdf(run_map.path("loss2.h5"))
     # fig, ax = check_ax()
     # sn.lineplot(data=loss.reset_index(), x="time", y="lost_relative", hue="rep")
     # ax.set_title("Relative packet loss over time for each simulation")
     # fig.savefig(run_map.path("packet_loss_time_series.pdf"))
 
-    data = msce_with_lbl(run_map)
+    data = _get_msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label", "run_id"])
     ax = data.loc[_i[:, :, 10], ["cell_mse"]].reset_index().plot("simtime", "cell_mse")
 
@@ -97,39 +137,9 @@ def plot_packet_loss_ratio_over_time(run_map: RunMap):
     print("hi")
 
 
-def msce_with_lbl(run_map: RunMap) -> pd.DataFrame:
-    data = OppAnalysis.get_mse_cell_data_for_study(
-        run_map,
-        hdf_path="cell_mse_no_missing.h5",
-        cell_count=1,  # will be ignored for entropy maps
-        pool_size=24,
-    )
-    data = data.to_frame()
-    data = data.join(run_map.id_to_label_series(enumerate_run=True), on="run_id")
-    return data
-
-
-def msce_plot(run_map: RunMap, data, g_name, _ff):
-    fig, ax = check_ax()
-    ax: plt.Axes
-    g = run_map[g_name]
-    box = data.loc[_i[:, g_name], ["cell_mse"]]
-    ax.scatter("simtime", "cell_mse", data=box.reset_index(), marker=".")
-    for _f in _ff:
-        _f(ax)
-    ax.set_xlim(0, 1500)
-    mult_locator(ax.xaxis, 200, 100)
-    lbl = g.lbl
-    print(f"create figure {lbl}")
-    ax.set_title(f"Cell error over time for {lbl} (all seeds)")
-    ax.set_xlabel("time in [s]")
-    ax.set_ylabel("mean squared cell error (MSCE)")
-    return fig, ax
-
-
 def save_msce_interval_info(run_map: RunMap):
-    """Plot interval with errors"""
-    data = msce_with_lbl(run_map)
+    """Plot interval with errors. Fixed. Error due to value encoding in map packets (16 bit in 1/100)"""
+    data = _get_msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label"])
 
     slice_05_a = slice(1248.0, 1382.0)
@@ -140,7 +150,7 @@ def save_msce_interval_info(run_map: RunMap):
         g = run_map[g_name]
         print(f"create figure: {g_name}")
         for sim in g:
-            plot_msce_interval_info(sim, g.lbl, g_name, slice_05_a)
+            _plot_msce_interval_info(sim, g.lbl, g_name, slice_05_a)
 
     slice_1_a = slice(622.0, 726.0)
     slice_1_b = slice(1272.0, 1282.0)
@@ -151,11 +161,11 @@ def save_msce_interval_info(run_map: RunMap):
         g = run_map[g_name]
         print(f"create figure: {g_name}")
         for sim in g:
-            plot_msce_interval_info(sim, g.lbl, g_name, slice_1_a)
-            plot_msce_interval_info(sim, g.lbl, g_name, slice_1_b)
+            _plot_msce_interval_info(sim, g.lbl, g_name, slice_1_a)
+            _plot_msce_interval_info(sim, g.lbl, g_name, slice_1_b)
 
 
-def plot_msce_interval_info(sim: Simulation, lbl, group_name, t_slice: slice):
+def _plot_msce_interval_info(sim: Simulation, lbl, group_name, t_slice: slice):
     hdf = sim.base_hdf(group_name="cell_measures")
     with hdf.query as ctx:
         data = ctx.select(
@@ -194,8 +204,9 @@ def plot_msce_interval_info(sim: Simulation, lbl, group_name, t_slice: slice):
     print("break")
 
 
-def plot_msce_err_details(run_map: RunMap):
-    data = msce_with_lbl(run_map)
+def plot_msme_err_details(run_map: RunMap):
+    """MSME for each seed separately"""
+    data = _get_msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label"])
 
     lbl_to_rate = pd.DataFrame(
@@ -260,9 +271,10 @@ def plot_msce_err_details(run_map: RunMap):
                 plt.close(fig)
 
 
-def plot_msce_err(run_map: RunMap):
+def plot_msme_err(run_map: RunMap):
+    """MSME over all seeds"""
 
-    data = msce_with_lbl(run_map)
+    data = _get_msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label"])
 
     err_bars = data.groupby(["simtime", "label"])["cell_mse"].agg(["mean", "std"])
@@ -336,24 +348,8 @@ def plot_msce_err(run_map: RunMap):
         # fig.savefig(run_map.path("msme_over_time_zoom.pdf"))
 
 
-def _remove_target_cells(df: pd.DataFrame) -> pd.DataFrame:
-    # remove cells under target area
-    xy = df.index.to_frame()
-    mask = np.repeat(False, xy.shape[0])
-    for x in [400, 405, 410]:
-        y = 180.0
-        mask = mask | (xy["x"] == x) & (xy["y"] == y)
-
-    for x in [0.0, 5.0, 10.0]:
-        y = 205.0
-        mask = mask | (xy["x"] == x) & (xy["y"] == y)
-
-    masked_index = df.index[~mask]
-    return df.loc[masked_index].copy(deep=True)
-
-
-def create_cell_occupation_ratio(run_map: RunMap, same_mobility_seed: bool = True):
-    ret = CellOccupancy.run_create_cell_occupation_info(
+def _get_cell_occupation_ratio(run_map: RunMap, same_mobility_seed: bool = False):
+    return CellOccupancy.run_create_cell_occupation_info(
         run_map,
         hdf_path="cell_occupation.h5",
         interval_bin_size=100.0,
@@ -361,16 +357,21 @@ def create_cell_occupation_ratio(run_map: RunMap, same_mobility_seed: bool = Tru
         frame_c=_remove_target_cells,
         pool_size=30,
     )
-    CellOccupancy.plot_cell_occupation_info(
-        ret, run_map.path("cell_occupation_info.pdf")
-    )
 
 
-def filter_single_rate(sim_group: SimulationGroup, rate) -> bool:
-    return sim_group.attr["gt_change_rate"] == rate
+def plot_cell_occupation_ratio(run_map: RunMap, same_mobility_seed: bool = False):
+    ret = _get_cell_occupation_ratio(run_map, same_mobility_seed)
+    CellOccupancy.plot_cell_occupation_info(ret, run_map, "cell_occupation_info.pdf")
 
 
-def create_cell_knowledge_ratio(run_map: RunMap):
+def plot_occupation_intervals(run_map: RunMap):
+    """Mean occupation intervals over all mobility seeds"""
+    data = _get_cell_occupation_ratio(run_map)
+    # todo
+
+
+def _get_create_cell_knowledge_ratio(run_map: RunMap):
+    """Get cell knowledge ratio based on one change_rate sim group."""
     h5 = BaseHdfProvider(run_map.path("cell_knowledge_ratio.h5"))
     change_rate = [g.attr["gt_change_rate"] for g in run_map.values()][0]
     if not h5.hdf_file_exists:
@@ -378,14 +379,18 @@ def create_cell_knowledge_ratio(run_map: RunMap):
         CellOccupancy.run_create_cell_knowledge_ratio(
             run_map,
             hdf_path="cell_knowledge_ratio.h5",
-            sim_group_filter=partial(filter_single_rate, rate=change_rate),
+            sim_group_filter=partial(_filter_single_rate, rate=change_rate),
             frame_c=_remove_target_cells,
         )
+    return h5, change_rate
 
+
+def plot_cell_knowledge_ratio(run_map: RunMap):
+    h5, change_rate = _get_create_cell_knowledge_ratio(run_map)
     fig, ax_k_ratio = check_ax()
     fig2, ax_k_ratio_zoom = check_ax()
 
-    sim_groups = [g for g in run_map.values() if filter_single_rate(g, change_rate)]
+    sim_groups = [g for g in run_map.values() if _filter_single_rate(g, change_rate)]
     sim_groups.sort(key=lambda x: x.attr["transmission_interval_ms"])
 
     for g in sim_groups:
@@ -418,28 +423,26 @@ def create_cell_knowledge_ratio(run_map: RunMap):
 
 
 if __name__ == "__main__":
-
-    # same mobility seed
-    # output_dir = "/mnt/data1tb/results/_density_map/04_rate_output/"
-    # run_map = RunMap.load_or_create(partial(get_run_map_single_run, data_root="/mnt/data1tb/results/mf_1d_bm_rate_chage/"), output_dir)
-    # create_cell_knowledge_ratio(run_map)
-    # create_cell_occupation_ratio(run_map, same_mobility_seed=True)
-    # plot_msce_err(run_map)
+    matplotlib_set_latex_param()
+    logging.set_level("INFO")
 
     # with mobility seed variation
+    # output_dir = "/mnt/data1tb/results/_density_map/04d_rate_output/"
     output_dir = "/mnt/data1tb/results/_density_map/04b_rate_output/"
     run_map = RunMap.load_or_create(
         partial(
             get_run_map_single_run,
+            # data_root="/mnt/data1tb/results/mf_1d_bm_rate_change/",
             data_root="/mnt/data1tb/results/mf_1d_bm_rate_chage_1/",
         ),
         output_dir,
     )
-    # create_cell_knowledge_ratio(run_map)
-    # create_cell_occupation_ratio(run_map, same_mobility_seed=False)
-    # plot_msce_err(run_map)
-    # plot_msce_err_details(run_map)
+    plot_cell_knowledge_ratio(run_map)
+    plot_cell_occupation_ratio(run_map, same_mobility_seed=False)
+    plot_msme_err(run_map)
+    plot_msme_err_details(run_map)
     plot_packet_loss_ratio_over_time(run_map)
+    plot_occupation_intervals(run_map)
 
     # save_msce_interval_info(run_map)
     print("main done")
