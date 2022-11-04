@@ -103,17 +103,6 @@ void MECBeaconApp::handleProcessedMessage(cMessage *msg)
            return;
        }
     }
-    else
-    {
-        if (strcmp(msg->getName(), "sendBeacons") == 0)
-        {
-            retrieveAllBeaconsFromService();
-
-            scheduleAt(simTime() + strategy->getInterval(period_), new cMessage("sendBeacons"));
-            delete msg;
-            return;
-        }
-    }
     MecAppBase::handleProcessedMessage(msg);
 }
 
@@ -254,7 +243,15 @@ void MECBeaconApp::handleSelfMessage(cMessage *msg)
 {
     EV << "MECBeaconApp::handleMessage " << msg->getName() << endl;
 
-    if(strcmp(msg->getName(), "connectMp1") == 0)
+    if (strcmp(msg->getName(), "sendBeacons") == 0)
+    {
+        retrieveAllBeaconsFromService();
+
+        scheduleAt(simTime() + strategy->getInterval(period_), new cMessage("sendBeacons"));
+        delete msg;
+        return;
+    }
+    else if(strcmp(msg->getName(), "connectMp1") == 0)
     {
         connect(mp1Socket_, mp1Address, mp1Port);
     }
