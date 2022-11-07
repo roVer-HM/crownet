@@ -56,7 +56,6 @@ import select
 import logging
 import atexit
 from optparse import OptionParser
-import threading
 
 if sys.version_info[0] < 3:
     from thread import allocate_lock
@@ -68,6 +67,7 @@ else:
 _API_VERSION = 20
 _LAUNCHD_VERSION = b'sumo-launchd.py 20.00'
 _CMD_GET_VERSION = 0x00
+_CMD_SETORDER = 0x03
 _CMD_FILE_SEND = 0x75
 
 class UnusedPortLock:
@@ -444,6 +444,17 @@ def handle_get_version(conn):
     response = struct.pack("!iBBBiBBii", 4+1+1+1+4 + 1+1+4+4+len(_LAUNCHD_VERSION), 1+1+1+4, _CMD_GET_VERSION, 0x00, 0x00, 1+1+4+4+len(_LAUNCHD_VERSION), _CMD_GET_VERSION, _API_VERSION, len(_LAUNCHD_VERSION)) + _LAUNCHD_VERSION
     conn.send(response)
 
+def handle_set_order(conn):
+    """
+    process a "set order" command received on the connection
+    """
+
+    logging.warn('Got CMD_SETORDER - handling currently not implemented in veins_launchd - ignored (ok if only a single connection to sumo is active)')
+
+    # Send OK response
+    response = struct.pack("!iBBBi", 4+1+1+1+4, 1+1+1+4, _CMD_SETORDER, 0x00, 0x00)
+    conn.send(response)
+
 
 def read_launch_config(conn):
     """
@@ -481,6 +492,9 @@ def read_launch_config(conn):
         # handle get version command
         handle_get_version(conn)
         # ...and try reading the launch config again
+        return read_launch_config(conn)
+    elif cmd_id == _CMD_SETORDER:
+        handle_set_order(conn)
         return read_launch_config(conn)
     elif cmd_id != _CMD_FILE_SEND:
         raise RuntimeError("Expected CMD_FILE_SEND (0x%x), but got 0x%x" % (_CMD_FILE_SEND, cmd_id))
@@ -538,7 +552,7 @@ def wait_for_connections(sumo_command, shlex, sumo_port, bind_address, do_daemon
    
     if do_kill:
         check_kill_daemon(pidfile)   
-       
+    
     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     listener.bind((bind_address, sumo_port))
@@ -550,9 +564,9 @@ def wait_for_connections(sumo_command, shlex, sumo_port, bind_address, do_daemon
         daemonize(pidfile)
 
     try:
-        while True :
+        while True:
             conn, addr = listener.accept()
-            print(f"Connection from {addr[0]} on port {addr[1]}")
+            logging.debug("Connection from %s on port %d" % addr)
             start_new_thread(handle_connection, (sumo_command, shlex, conn, addr, keep_temp))
     
     except SystemExit:
@@ -569,39 +583,6 @@ def wait_for_connections(sumo_command, shlex, sumo_port, bind_address, do_daemon
         logging.info("Shutting down.")
         listener.close()
 
-def single_connection(sumo_command, shlex, sumo_port, bind_address, do_daemonize, do_kill, pidfile, keep_temp):
-    
-    if do_kill:
-        check_kill_daemon(pidfile)   
-       
-    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    listener.bind((bind_address, sumo_port))
-    listener.listen(5)
-    logging.info("Listening on port %d" % sumo_port)
-
-    if do_daemonize:
-        logging.info("Detaching to run as daemon")
-        daemonize(pidfile)
-
-    try:
-        conn, addr = listener.accept()
-        print(f"Connection from {addr[0]} on port {addr[1]}")
-        handle_connection(sumo_command, shlex, conn, addr, keep_temp)
-    
-    except SystemExit:
-        logging.warning("Killed.")
-    
-    except KeyboardInterrupt:
-        logging.warning("Keyboard interrupt.")
-    
-    except:
-        raise
-    
-    finally:
-        # clean up
-        logging.info("Shutting down.")
-        listener.close()
 
 def check_kill_daemon(pidfile):
     # check pidfile, see if the daemon is still running
@@ -686,7 +667,6 @@ def main():
     parser.add_option("-k", "--kill", dest="kill", default=False, action="store_true", help="send SIGTERM to running daemon first [default: no]")
     parser.add_option("-P", "--pidfile", dest="pidfile", default=os.path.join(tempfile.gettempdir(), "sumo-launchd.pid"), help="if running as a daemon, write pid to PIDFILE [default: %default]", metavar="PIDFILE")
     parser.add_option("-t", "--keep-temp", dest="keep_temp", default=False, action="store_true", help="keep all temporary files [default: no]")
-    parser.add_option("--single-run", dest="single_run", default=False, action="store_true", help="only serve one client")
     (options, args) = parser.parse_args()
     _LOGLEVELS = (logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG)
     loglevel = _LOGLEVELS[max(0, min(1 + options.count_verbose - options.count_quiet, len(_LOGLEVELS)-1))]
@@ -702,12 +682,9 @@ def main():
 
     if args:
         logging.warning("Superfluous command line arguments: \"%s\"" % " ".join(args))
-    
-    if options.single_run:
-        single_connection(options.command, options.shlex, options.port, options.bind, options.daemonize, options.kill, options.pidfile, options.keep_temp)
-    else:
-        # this is where we'll spend our time
-        wait_for_connections(options.command, options.shlex, options.port, options.bind, options.daemonize, options.kill, options.pidfile, options.keep_temp)
+
+    # this is where we'll spend our time
+    wait_for_connections(options.command, options.shlex, options.port, options.bind, options.daemonize, options.kill, options.pidfile, options.keep_temp)
 
 
 # Start main() when run interactively

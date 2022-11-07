@@ -4,7 +4,7 @@ SHORTNAME=sumo
 CONTNAME=$SHORTNAME
 
 if [[ -z "$1" || "$1" == "exec" ]]; then
-    TAG_DIGEST=:latest
+    TAG_DIGEST=latest
     CONTNAME=$SHORTNAME
 else
     TAG_DIGEST=$1
