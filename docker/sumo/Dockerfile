@@ -8,12 +8,12 @@ FROM ubuntu:18.04
 
 # Specify the version/tag of sumo to be put in the container:
 # ENV RELEASE master
-ENV RELEASE v1_9_2
+ENV RELEASE v1_14_1
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)
 ENV VEINS_RELEASE hm_master
 
-LABEL description "SUMO - Simulation of Urban MObility (as used in roVer)"
+LABEL description "SUMO - Simulation of Urban MObility (as used in CrowNet)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # install all dependencies

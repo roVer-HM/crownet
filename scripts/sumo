@@ -12,7 +12,7 @@ else
     CONTNAME=$SHORTNAME
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$SHORTNAME$TAG_DIGEST
+IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$SHORTNAME:$TAG_DIGEST
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
