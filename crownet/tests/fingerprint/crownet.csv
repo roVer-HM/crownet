@@ -10,3 +10,10 @@
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              db87-fa9f/tplx, PASS, sumo:latest;omnetpp:6.0.1
 /simulations/simple_detoure_suqc_traffic/,           -f omnetpp.ini -c fmiat1_25 -r 0,   200s,              ce35-10bd/tplx, PASS, vadere:220826-1432;omnetpp:6.0.1
 
+# Vulnerable Road User (VRU) Multi Access Edge Computing (MEC) scenarios
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    242b-0408/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_v2pp2v -r 0,                      20s,    e2f5-fa84/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio -r 0,                        20s,    80d2-5758/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_lgarea -r 0,                 20s,    aa26-e31b/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_singlearea -r 0,             20s,    7771-d21c/tplx, PASS, sumo:latest;omnetpp:6.0.1
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_D2D -r 0,                         20s,    2146-fe70/tplx, PASS, sumo:latest;omnetpp:6.0.1
