@@ -12,7 +12,7 @@ FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-java:latest
 # Specify the version/tag of vadere to be put in the container. defaut master
 ARG BRANCH
 
-LABEL description "vadere Crowd Simulator (as used in crownet)"
+LABEL description "vadere Crowd Simulator (as used in CrowNet)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # clone the vadere sources (version/tag is specified in the git command at the end)
