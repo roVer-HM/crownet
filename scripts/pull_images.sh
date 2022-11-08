@@ -12,7 +12,7 @@ REGISTRY="sam-dev.cs.hm.edu:5023/rover/crownet"
 TAG_UBUNTU="20.04"
 TAG_OMNETPP="6.0.1"
 TAG_SUMO="v1_14_1"
-TAG_VADERE="220826-1432"
+TAG_VADERE="221108-1613"
 TAG_CONTROL="220527-1453"
 
 docker image pull ubuntu
