@@ -11,7 +11,7 @@ condition_names = {"A1": "Congestion info\n + arrow\n",
                    "B2": "Arrow \n+ top down view\n",
                    "B3": "Arrow \n+ team spirit\n",
                    "B4": "Arrow \n+ top down view\n+ team spirit\n",
-                   "Uninformed": "No congestion\ninformation\n"
+                   "Uninformed": "Prior to \ninformation\n"
                    }
 
 
@@ -61,7 +61,7 @@ compliance_rate = "Compliance rate c"
 probs = np.linspace(0, 1.0, 10)
 
 def move_no_info_to_first_col(df):
-    col = df.pop("No congestion\ninformation\n")
+    col = df.pop("Prior to \ninformation\n")
     df.insert(0, col.name, col)
     return df
 
@@ -316,7 +316,7 @@ def plot_stationary_behavior(density, nr_of_seeds = 10):
               ylabel="Density\n[$ped/m^2$]",
               xlabel = "Simulation time [s]",
               xticks = [0,250,500,750,1000,1250])
-    plt.suptitle(f"Density in front of short corridor\nNo congestion information")
+    plt.suptitle(f"Density (short corridor)\nNo congestion information")
     plt.savefig(f"figs/SteadyFlowDensitySeeds{nr_of_seeds}.pdf", bbox_inches= "tight")
     plt.show()
 
@@ -333,7 +333,7 @@ def plot_velocities_densities_short_corridor(densities, velocities):
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
         plt.title(f"{stats_}")
-        plt.ylabel("Density [$ped/m^2$] \n in the short corridor")
+        plt.ylabel("Density [$ped/m^2$] \n (short route)")
         plt.ylim(bottom= -0.05, top=1.7)
         plt.savefig(f"figs/DensityShortCorridor{stats_}.pdf", bbox_inches="tight")
         plt.show()
