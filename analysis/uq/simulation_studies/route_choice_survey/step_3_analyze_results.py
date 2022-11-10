@@ -329,8 +329,6 @@ def plot_velocities_densities_short_corridor(densities, velocities):
 
     for stats_, data_ in densities.groupby(level="stat"):
         data_ = data_.reset_index().pivot(values="Corridor1", columns="condition")
-        #x = [data_[column].dropna().values for column in data_]
-        #res = stats.kruskal(*x)
         data_ = move_no_info_to_first_col(data_)
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")
@@ -345,8 +343,6 @@ def plot_velocities_densities_short_corridor(densities, velocities):
 
     for stats_, data_ in velocities.groupby(level="stat"):
         data_ = data_.reset_index().pivot(values="Corridor1", columns="condition")
-        #x = [data_[column].dropna().values for column in data_]
-        #res = stats.kruskal(*x)
         data_ = move_no_info_to_first_col(data_)
         data_.boxplot()
         plt.xticks(rotation=90, ha="right", rotation_mode = "anchor")

@@ -17,16 +17,10 @@ from suqc.request import CoupledDictVariation
 sys.path.append(os.path.abspath(""))
 
 run_local = True
-###############################################################################################################
-# Usecase: Set yourself the parameters you want to change. Do this by defining a list of dictionaries with the
-# corresponding parameter. Again, the Vadere output is deleted after all scenarios run.
-
-scenario = "three_corridors" #TODO test "three_corridors" or "route_choice_real_world"
-#scenario = "route_choice_real_world"
 
 def run_controller(controller, qoi, par_var):
 
-    simulation_dir = "/mnt/data1TB/route_choice_survey"
+    simulation_dir = "/mnt/data1TB/route_choice_survey" #TODO: change to an existing dir in your file system with at least 50GB storage
 
     if os.environ["CROWNET_HOME"] is None:
         raise SystemError(
@@ -39,18 +33,20 @@ def run_controller(controller, qoi, par_var):
 
     output_folder = os.path.join(simulation_dir, controller)
 
+    scenario = "three_corridors"
+
     model = VadereControlCommand() \
         .create_vadere_container() \
         .experiment_label("output") \
         .with_control("control.py") \
         .control_argument("controller-type", controller) \
-        .vadere_tag("220816-1012") \
-        .control_tag("220527-1453")
+        .vadere_tag("psychology_pub_vadere") \
+        .control_tag("psychology_pub_flowcontrol")
 
 
     setup = CoupledDictVariation(
         ini_path=path2ini,
-        config=f"env_{scenario}", #TODO scenario defined in omnetpp.ini must be the same as in VadereControlCommand
+        config=f"env_{scenario}",
         parameter_dict_list=par_var,
         qoi=qoi,
         model=model,
@@ -82,7 +78,6 @@ if __name__ == "__main__":
 
 
     work_around = dists[dists["condition"] == "Uninformed"].drop(columns="condition").set_index("population").reset_index()
-
 
 
     # where to store raw simulation output (*.traj, ..), note: collected quantities of interest are stored in cwd
