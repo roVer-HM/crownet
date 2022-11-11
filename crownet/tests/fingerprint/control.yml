@@ -27,7 +27,7 @@ control001_aid:
     exec: python3
     type: shell
     omnetpp: 6.0.1
-    vadere: 220826-1432
+    vadere: 221108-1613
     control: 220527-1453
 
 control001_udp:
@@ -49,7 +49,7 @@ control001_udp:
     exec: python3
     type: shell
     omnetpp: 6.0.1
-    vadere: 220826-1432
+    vadere: 221108-1613
     control: 220527-1453
 
 
@@ -72,7 +72,7 @@ control001_udp_only:
     exec: python3
     type: shell
     omnetpp: 6.0.1
-    vadere: 220826-1432
+    vadere: 221108-1613
     control: 220527-1453
 
 
