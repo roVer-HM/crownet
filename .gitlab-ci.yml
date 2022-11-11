@@ -1,16 +1,23 @@
 variables:
+ # CI parameters and options
  GIT_SUBMODULE_STRATEGY: recursive    # clone submodules
  GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vadere submodule)
- CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this.
+ CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this
+ DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
+ 
+ # Tags of all containers required for building and testing
+ # Note: Tags here must include ALL container tags required in the fingerprint
+ #       *.csv and *.yml files.
  OPP_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
- VADERE_CONT_TAG: '220826-1432'       # tag of vadere container to be used
+ VADERE_CONT_TAG: '221108-1613'       # tag of vadere container to be used
  CONTROL_CONT_TAG: '220527-1453'      # tag of control container to be used
- SUMO_CONT_TAG: '210618-1625'         # tag of sumo container to be used
+ SUMO_CONT_TAG: 'v1_15_0'             # tag of sumo container to be used
+ 
+ # Paths and aliases
  OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${OPP_CONT_TAG} exec'
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
- DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
 
 
 stages:
