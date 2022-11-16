@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    
-    <person id="1" depart="0.00">
-        <walk edges="-e_C_p0 -e_p1_C"/>
-    </person>
-    
-    <person id="2" depart="0.00">
-        <walk edges="-e_C_p0 -e_p1_C"/>
-    </person>
-    
-    <person id="3" depart="0.00">
-        <walk edges="-e_C_p0 -e_p1_C"/>
-    </person>
-    
-    <vType id="type1" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70"/>
 
-    <vehicle id="4" type="type1" depart="5.0" color="1,0,0">
+	<vType id="pedType1" maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)" jmCrossingGap="0" jmIgnoreFoeProb="1" jmTimegapMinor="0" jmIgnoreKeepClearTime="0"/>
+    
+    <person id="1" type="pedType1" depart="0.0">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <person id="2" type="pedType1" depart="1.0">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <person id="3" type="pedType1" depart="2.0">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <person id="4" type="pedType1" depart="3.0">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <person id="5" type="pedType1" depart="4.0">
+        <walk edges="-e_C_p0 -e_p1_C"/>
+    </person>
+    
+    <vType id="type1" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70" jmCrossingGap="0" jmIgnoreFoeProb="1" jmTimegapMinor="0" jmIgnoreKeepClearTime="0"/>
+
+    <vehicle id="6" type="type1" depart="5.0" color="1,0,0">
       <route edges="e_v0_C e_C_v1"/>
     </vehicle>
            
-    <vehicle id="5" type="type1" depart="10.0" color="1,0,0">
-      <route edges="e_v0_C e_C_v1"/>
+    <vehicle id="7" type="type1" depart="9.0" color="1,0,0">
+      <route edges="-e_C_v1 -e_v0_C"/>
     </vehicle>
                
 </routes>

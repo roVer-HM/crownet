@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2022-05-06 16:11:51 by Eclipse SUMO duarouter Version 1.13.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="crossing.net.xml"/>
+        <route-files value="sc1_30_y.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="sc1_30_y.rou.xml"/>
+        <alternatives-output value="sc1_30_y.rou.alt.xml"/>
+    </output>
+
+    <report>
+        <ignore-errors value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pedType1" maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)"/>
+    <person id="0" type="pedType1" depart="0.00">
+        <walk edges="284925760#0 -284925761#1"/>
+    </person>
+    <person id="1" type="pedType1" depart="0.50">
+        <walk edges="1026502407#1 1026502406#1"/>
+    </person>
+    <person id="2" type="pedType1" depart="1.00">
+        <walk edges="284925761#0"/>
+    </person>
+    <person id="3" type="pedType1" depart="1.50">
+        <walk edges="293561756#1 -30909845#2"/>
+    </person>
+    <person id="4" type="pedType1" depart="2.00">
+        <walk edges="1026502410 293561756#1 -284925761#1"/>
+    </person>
+    <person id="5" type="pedType1" depart="2.50">
+        <walk edges="1026502406#1 284925759#0"/>
+    </person>
+    <person id="6" type="pedType1" depart="3.00">
+        <walk edges="-284925761#1 1026502406#1"/>
+    </person>
+    <person id="7" type="pedType1" depart="3.50">
+        <walk edges="284925760#0 284925759#0"/>
+    </person>
+    <person id="8" type="pedType1" depart="4.00">
+        <walk edges="1026502406#1 284925760#0"/>
+    </person>
+    <person id="9" type="pedType1" depart="4.50">
+        <walk edges="293561756#0 293561756#1 -284925761#1"/>
+    </person>
+    <person id="10" type="pedType1" depart="5.00">
+        <walk edges="293561756#0 293561756#1 -284925761#1 284925761#0"/>
+    </person>
+    <person id="11" type="pedType1" depart="5.50">
+        <walk edges="1026502408 -30909845#2"/>
+    </person>
+    <person id="12" type="pedType1" depart="6.00">
+        <walk edges="30909845#1 1026502408"/>
+    </person>
+    <person id="13" type="pedType1" depart="6.50">
+        <walk edges="-30909845#2"/>
+    </person>
+    <person id="14" type="pedType1" depart="7.00">
+        <walk edges="293561756#1 284925760#0"/>
+    </person>
+    <person id="15" type="pedType1" depart="7.50">
+        <walk edges="293561756#0 293561756#1 -284925761#1 284925761#0"/>
+    </person>
+    <person id="16" type="pedType1" depart="8.00">
+        <walk edges="284925759#0 30909845#1"/>
+    </person>
+    <person id="17" type="pedType1" depart="8.50">
+        <walk edges="1026502408 284925759#0"/>
+    </person>
+    <person id="18" type="pedType1" depart="9.00">
+        <walk edges="293561756#0 293561756#1 284925760#0"/>
+    </person>
+    <person id="19" type="pedType1" depart="9.50">
+        <walk edges="293561756#1 284925759#0"/>
+    </person>
+    <person id="20" type="pedType1" depart="10.00">
+        <walk edges="284925761#0 -284925761#1"/>
+    </person>
+    <person id="21" type="pedType1" depart="10.50">
+        <walk edges="1026502406#1 1026502407#1"/>
+    </person>
+    <person id="22" type="pedType1" depart="11.00">
+        <walk edges="-284925761#1 1026502406#1"/>
+    </person>
+    <person id="23" type="pedType1" depart="11.50">
+        <walk edges="-30909845#2 30909845#1 1026502407#1"/>
+    </person>
+    <person id="24" type="pedType1" depart="12.00">
+        <walk edges="284925760#0 1026502408"/>
+    </person>
+    <person id="25" type="pedType1" depart="12.50">
+        <walk edges="1026502408 1026502406#1"/>
+    </person>
+    <person id="26" type="pedType1" depart="13.00">
+        <walk edges="1026502407#1 30909845#1"/>
+    </person>
+    <person id="27" type="pedType1" depart="13.50">
+        <walk edges="284925760#0"/>
+    </person>
+    <person id="28" type="pedType1" depart="14.00">
+        <walk edges="1026502406#1 -284925761#1 284925761#0"/>
+    </person>
+    <person id="29" type="pedType1" depart="14.50">
+        <walk edges="-30909845#2 30909845#1 1026502408"/>
+    </person>
+</routes>

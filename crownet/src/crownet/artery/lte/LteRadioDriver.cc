@@ -19,6 +19,7 @@
 #include "inet/linklayer/common/InterfaceTag_m.h"
 #include "inet/linklayer/common/MacAddressTag_m.h"
 #include "inet/linklayer/common/UserPriorityTag_m.h"
+#include "inet/common/TimeTag_m.h"
 #include "inet/linklayer/ieee80211/mac/Ieee80211Mac.h"
 #include "crownet/artery/lte/GeoNetTag_m.h"
 
@@ -99,14 +100,16 @@ void LteRadioDriver::handleMessage(omnetpp::cMessage* msg) {
 void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
   auto request =
       check_and_cast<artery::GeoNetRequest*>(msg->removeControlInfo());
-  auto packet = new inet::Packet(
-      "INET GeoNet over LTE",
-      inet::makeShared<inet::cPacketChunk>(check_and_cast<cPacket*>(msg)));
+  // tag: TimeTag must bee added to the chunk inside the packet
+  auto chunk = inet::makeShared<inet::cPacketChunk>(check_and_cast<cPacket*>(msg));
+  chunk->addTag<inet::CreationTimeTag>()->setCreationTime(simTime());
+  auto packet = new inet::Packet("INET GeoNet over LTE", chunk);
 
   // tag: MacAddressReq
   auto addr_tag = packet->addTag<inet::MacAddressReq>();
   addr_tag->setDestAddress(convert(request->destination_addr));
   addr_tag->setSrcAddress(convert(request->source_addr));
+
 
   // tag: DispatchProtocolReq
   auto pDispatch_tag = packet->addTagIfAbsent<inet::DispatchProtocolReq>();
@@ -151,12 +154,13 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
   //  delete request;
   //
   numSent++;
+  emit(inet::packetSentSignal, packet);
   send(packet, "lowerLayerOut");
 }
 
 void LteRadioDriver::handleDataIndication(omnetpp::cMessage* msg) {
   auto packet = check_and_cast<inet::Packet*>(msg);
-
+  emit(inet::packetReceivedSignal, packet);
   auto chunk = packet->peekData<inet::cPacketChunk>();
   auto gn_packet = chunk->getPacket()->dup();
 

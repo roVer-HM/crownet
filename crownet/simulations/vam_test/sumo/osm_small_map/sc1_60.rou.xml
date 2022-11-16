@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2022-05-06 16:12:26 by Eclipse SUMO duarouter Version 1.13.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="crossing.net.xml"/>
+        <route-files value="sc1_60_y.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="sc1_60_y.rou.xml"/>
+        <alternatives-output value="sc1_60_y.rou.alt.xml"/>
+    </output>
+
+    <report>
+        <ignore-errors value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pedType1" maxSpeed="1.40" speedFactor="normc(1.00,0.19,0.14,1.43)"/>
+    <person id="0" type="pedType1" depart="0.00">
+        <walk edges="284925760#0 -284925761#1"/>
+    </person>
+    <person id="1" type="pedType1" depart="0.50">
+        <walk edges="1026502407#1 1026502406#1"/>
+    </person>
+    <person id="2" type="pedType1" depart="1.00">
+        <walk edges="284925761#0"/>
+    </person>
+    <person id="3" type="pedType1" depart="1.50">
+        <walk edges="293561756#1 -30909845#2"/>
+    </person>
+    <person id="4" type="pedType1" depart="2.00">
+        <walk edges="1026502410 293561756#1 -284925761#1"/>
+    </person>
+    <person id="5" type="pedType1" depart="2.50">
+        <walk edges="1026502406#1 284925759#0"/>
+    </person>
+    <person id="6" type="pedType1" depart="3.00">
+        <walk edges="-284925761#1 1026502406#1"/>
+    </person>
+    <person id="7" type="pedType1" depart="3.50">
+        <walk edges="284925760#0 284925759#0"/>
+    </person>
+    <person id="8" type="pedType1" depart="4.00">
+        <walk edges="1026502406#1 284925760#0"/>
+    </person>
+    <person id="9" type="pedType1" depart="4.50">
+        <walk edges="293561756#0 293561756#1 -284925761#1"/>
+    </person>
+    <person id="10" type="pedType1" depart="5.00">
+        <walk edges="293561756#0 293561756#1 -284925761#1 284925761#0"/>
+    </person>
+    <person id="11" type="pedType1" depart="5.50">
+        <walk edges="1026502408 -30909845#2"/>
+    </person>
+    <person id="12" type="pedType1" depart="6.00">
+        <walk edges="30909845#1 1026502408"/>
+    </person>
+    <person id="13" type="pedType1" depart="6.50">
+        <walk edges="-30909845#2"/>
+    </person>
+    <person id="14" type="pedType1" depart="7.00">
+        <walk edges="293561756#1 284925760#0"/>
+    </person>
+    <person id="15" type="pedType1" depart="7.50">
+        <walk edges="293561756#0 293561756#1 -284925761#1 284925761#0"/>
+    </person>
+    <person id="16" type="pedType1" depart="8.00">
+        <walk edges="284925759#0 30909845#1"/>
+    </person>
+    <person id="17" type="pedType1" depart="8.50">
+        <walk edges="1026502408 284925759#0"/>
+    </person>
+    <person id="18" type="pedType1" depart="9.00">
+        <walk edges="293561756#0 293561756#1 284925760#0"/>
+    </person>
+    <person id="19" type="pedType1" depart="9.50">
+        <walk edges="293561756#1 284925759#0"/>
+    </person>
+    <person id="20" type="pedType1" depart="10.00">
+        <walk edges="284925761#0 -284925761#1"/>
+    </person>
+    <person id="21" type="pedType1" depart="10.50">
+        <walk edges="1026502406#1 1026502407#1"/>
+    </person>
+    <person id="22" type="pedType1" depart="11.00">
+        <walk edges="-284925761#1 1026502406#1"/>
+    </person>
+    <person id="23" type="pedType1" depart="11.50">
+        <walk edges="-30909845#2 30909845#1 1026502407#1"/>
+    </person>
+    <person id="24" type="pedType1" depart="12.00">
+        <walk edges="284925760#0 1026502408"/>
+    </person>
+    <person id="25" type="pedType1" depart="12.50">
+        <walk edges="1026502408 1026502406#1"/>
+    </person>
+    <person id="26" type="pedType1" depart="13.00">
+        <walk edges="1026502407#1 30909845#1"/>
+    </person>
+    <person id="27" type="pedType1" depart="13.50">
+        <walk edges="284925760#0"/>
+    </person>
+    <person id="28" type="pedType1" depart="14.00">
+        <walk edges="1026502406#1 -284925761#1 284925761#0"/>
+    </person>
+    <person id="29" type="pedType1" depart="14.50">
+        <walk edges="-30909845#2 30909845#1 1026502408"/>
+    </person>
+    <person id="30" type="pedType1" depart="15.00">
+        <walk edges="30909845#1 284925760#0"/>
+    </person>
+    <person id="31" type="pedType1" depart="15.50">
+        <walk edges="284925759#0 -284925761#1 284925761#0"/>
+    </person>
+    <person id="32" type="pedType1" depart="16.00">
+        <walk edges="293561756#1 293561756#0"/>
+    </person>
+    <person id="33" type="pedType1" depart="16.50">
+        <walk edges="1026502406#1 -284925761#1"/>
+    </person>
+    <person id="34" type="pedType1" depart="17.00">
+        <walk edges="1026502407#1"/>
+    </person>
+    <person id="35" type="pedType1" depart="17.50">
+        <walk edges="1026502406#1 30909845#1"/>
+    </person>
+    <person id="36" type="pedType1" depart="18.00">
+        <walk edges="293561756#1 1026502407#1"/>
+    </person>
+    <person id="37" type="pedType1" depart="18.50">
+        <walk edges="284925760#0 1026502408"/>
+    </person>
+    <person id="38" type="pedType1" depart="19.00">
+        <walk edges="293561756#1 1026502410"/>
+    </person>
+    <person id="39" type="pedType1" depart="19.50">
+        <walk edges="1026502407#1 1026502406#1"/>
+    </person>
+    <person id="40" type="pedType1" depart="20.00">
+        <walk edges="284925759#0 1026502407#1"/>
+    </person>
+    <person id="41" type="pedType1" depart="20.50">
+        <walk edges="284925760#0 293561756#1"/>
+    </person>
+    <person id="42" type="pedType1" depart="21.00">
+        <walk edges="1026502408 1026502406#1"/>
+    </person>
+    <person id="43" type="pedType1" depart="21.50">
+        <walk edges="30909845#1 284925759#0"/>
+    </person>
+    <person id="44" type="pedType1" depart="22.00">
+        <walk edges="-30909845#2 30909845#1 -284925761#1"/>
+    </person>
+    <person id="45" type="pedType1" depart="22.50">
+        <walk edges="-30909845#2 30909845#1 284925760#0"/>
+    </person>
+    <person id="46" type="pedType1" depart="23.00">
+        <walk edges="293561756#0 1026502410"/>
+    </person>
+    <person id="47" type="pedType1" depart="23.50">
+        <walk edges="-284925761#1 1026502408"/>
+    </person>
+    <person id="48" type="pedType1" depart="24.00">
+        <walk edges="30909845#1 284925759#0"/>
+    </person>
+    <person id="49" type="pedType1" depart="24.50">
+        <walk edges="30909845#1 293561756#1"/>
+    </person>
+    <person id="50" type="pedType1" depart="25.00">
+        <walk edges="-284925761#1 284925761#0"/>
+    </person>
+    <person id="51" type="pedType1" depart="25.50">
+        <walk edges="284925761#0 -284925761#1 284925759#0"/>
+    </person>
+    <person id="52" type="pedType1" depart="26.00">
+        <walk edges="1026502407#1 284925760#0"/>
+    </person>
+    <person id="53" type="pedType1" depart="26.50">
+        <walk edges="-30909845#2 30909845#1 293561756#1 1026502410"/>
+    </person>
+    <person id="54" type="pedType1" depart="27.00">
+        <walk edges="1026502410 293561756#1 30909845#1"/>
+    </person>
+    <person id="55" type="pedType1" depart="27.50">
+        <walk edges="293561756#1 1026502407#1"/>
+    </person>
+    <person id="56" type="pedType1" depart="28.00">
+        <walk edges="284925759#0 1026502406#1"/>
+    </person>
+    <person id="57" type="pedType1" depart="28.50">
+        <walk edges="293561756#1"/>
+    </person>
+    <person id="58" type="pedType1" depart="29.00">
+        <walk edges="1026502407#1 284925760#0"/>
+    </person>
+    <person id="59" type="pedType1" depart="29.50">
+        <walk edges="284925760#0 -30909845#2"/>
+    </person>
+</routes>

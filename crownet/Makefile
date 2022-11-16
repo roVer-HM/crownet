@@ -12,6 +12,7 @@ GOOGLE_MOCK_LIB = gmock
 GOOGLE_TEST_INCLUDE = /usr/local/include
 GOOLGE_ARGS = ""
 
+
 TARGT_NAME := CROWNET
 
 ifeq ("$(MODE)","debug")
@@ -25,9 +26,10 @@ else
 endif
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
+ADD_CXXFLAGS := CXXFLAGS+='-std=c++17'
 
 all: checkmakefiles
-	cd src && $(MAKE) -j $(NUM_CPUS)
+	cd src && $(MAKE) $(ADD_CXXFLAGS) -j $(NUM_CPUS)
 
 .PHONY: build-lib build-exec
 
@@ -47,8 +49,9 @@ cleanall: checkmakefiles
 PROJECTS_VARS := -KARTERY_PROJ=../../artery \
 				 -KINET_PROJ=../../inet4 \
 			 	 -K5G_PROJ=../../simu5g \
-				 -KVEINS_PROJ=../../veins
-				 -KVEINS_INET_PROJ=../../veins/subprojects/veins_inet
+				 -KVEINS_PROJ=../../veins \
+				 -KVEINS_INET_PROJ=../../veins/subprojects/veins_inet \
+				 -KCXXFLAGS=-std=c++17
 
 ARTERY_ := 	-I$$\(ARTERY_PROJ\)/src \
 			-I$$\(ARTERY_PROJ\)/src/traci/sumo \
@@ -126,10 +129,10 @@ makefiles-so:
 	touch  src/__make_sharedlib
 
 src/libCROWNET$(_D) : makefiles-so
-	cd src &&  $(MAKE) -j $(NUM_CPUS)
+	cd src &&  $(MAKE) $(ADD_CXXFLAGS) -j $(NUM_CPUS)
 
 src/CROWNET$(D): makefiles
-	cd src &&  $(MAKE) -j $(NUM_CPUS)
+	cd src &&  $(MAKE) $(ADD_CXXFLAGS) -j $(NUM_CPUS)
 
 build-lib: src/libCROWNET$(_D)
 
@@ -169,6 +172,7 @@ makefiles-test: src/libCROWNET$(_D)
 		-K5G_PROJ=../../../../simu5g \
 		-KVEINS_PROJ=../../../../veins \
 		-KVEINS_INET_PROJ=../../../../veins/subprojects/veins_inet \
+		-KCXXFLAGS=-std=c++17 \
 		-I. \
 		-I$$\(CROWNET_PORJ\)/src \
 		-L$$\(CROWNET_PORJ\)/src \
