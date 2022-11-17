@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+
+    <vType id="ped_pedestrian" vClass="pedestrian"/>
+    <vType id="car_vh" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70"/>
+    
+    <vehicle id="veh0" type="car_vh" depart="0.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+    
+    
+    <person id="ped0" depart="0.00" type="ped_pedestrian">
+        <walk from="-82790717#5" to="19683461#0"/>
+    </person>
+    <person id="ped1" depart="0.00" type="ped_pedestrian">
+        <walk from="-82790717#5" to="19683461#0"/>
+    </person>
+    <person id="ped2" depart="0.00" type="ped_pedestrian">
+        <walk from="-82790717#5" to="19683461#0"/>
+    </person>
+    
+    <vehicle id="veh1" type="car_vh" depart="5.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+    
+    <!--  Walking in Bayernpark -->
+    <person id="ped5" depart="10.00" type="ped_pedestrian">
+        <walk edges="83347522#0 -82790717#5 82790717#2 82790717#1 83347522#0 -82790717#5 82790717#2 82790717#1 83347522#0 -82790717#5 82790717#2 82790717#1"/>
+    </person>
+    
+    <person id="ped3" depart="20.00" type="ped_pedestrian">
+        <walk from="-82790717#5" to="19683461#0"/>
+    </person>
+    <person id="ped4" depart="30.00" type="ped_pedestrian">
+        <walk from="-82790717#5" to="19683461#0"/>
+    </person>
+    
+    <vehicle id="veh2" type="car_vh" depart="35.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+    <vehicle id="veh3" type="car_vh" depart="40.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+    <vehicle id="veh4" type="car_vh" depart="42.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+    <vehicle id="veh5" type="car_vh" depart="44.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+    <vehicle id="veh6" type="car_vh" depart="46.00">
+        <route edges="-88714905#7 -88714905#3 -88714905#2 -26632541#3"/>
+    </vehicle>
+   
+</routes>
