@@ -38,7 +38,9 @@ import simu5g.nodes.mec.UALCMP.UALCMP;
 
 network World
 {
-    @display("bgb=1380.5399,1027.62");
+    parameters:
+        @display("bgb=1380.5399,1027.62");
+        int numTraci = default(1);
 
     submodules:
         coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
@@ -50,7 +52,7 @@ network World
         net_visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=150.526,513.438;is=s");
         }
-        traci: <default("Manager")> like TraCiManager if typename != "" {
+        traci[numTraci]: <default("Manager")> like TraCiManager {
             parameters:
                 @display("p=150.526,148.464");
         }
