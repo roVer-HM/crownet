@@ -19,6 +19,7 @@ from roveranalyzer.analysis.common import (
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
 from roveranalyzer.analysis import adf_test
+from roveranalyzer.simulators.vadere.plots.scenario import VaderScenarioPlotHelper
 from roveranalyzer.utils.parallel import run_kwargs_map
 import roveranalyzer.utils.plot as PlotUtl
 import roveranalyzer.utils.dataframe as FrameUtl
@@ -605,6 +606,17 @@ def conv_err():
     print("np.power(spa_conv, 2).sum()/(84*79)")
     print(np.power(spa_conv, 2).sum() / (84 * 79))
     print("")
+
+
+def write_cell_tex(run_map: RunMap):
+    scenario = VaderScenarioPlotHelper(
+        "../study/traces_mf_1d_bm.d/mf_1d_m_const_2x5m_d20m_iat_25.out/BASIS_mf_1d_m_const_2x5m_d20m_iat_25.out.scenario"
+    )
+    area = (slice(15.0, 400.0, 5.0), slice(180.0, 210.0, 5.0))
+    _free, _covered = PlotUtl.PlotUtil.get_vadere_legal_cells(scenario, xy_slices=area)
+    PlotUtl.PlotUtil.cell_to_tex(
+        _free, c=5.0, fd=run_map.path("cell_tikz.tex"), attr=["cell"]
+    )
 
 
 if __name__ == "__main__":

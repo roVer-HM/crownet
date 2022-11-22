@@ -647,7 +647,10 @@ class MyCm(LinearSegmentedColormap):
 
 
 def get_clipped_area():
-    return slice(22 * 5.0, 50 * 5.0), slice(8 * 5.0, 63 * 5.0)
+    cell_size = 5.0
+    return slice(22 * cell_size, 50 * cell_size, cell_size), slice(
+        8 * cell_size, 63 * cell_size, cell_size
+    )
 
 
 def get_legal_cells(
@@ -698,7 +701,7 @@ def write_cell_tex(run_map: RunMap):
     scenario = VaderScenarioPlotHelper(
         "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
     )
-    _free, _covered = get_legal_cells(scenario, get_clipped_area())
+    _free, _covered = PlotUtil.get_vadere_legal_cells(scenario, get_clipped_area())
     PlotUtil.cell_to_tex(_free, c=5.0, fd=run_map.path("cell_tikz.tex"), attr=["cell"])
 
 
