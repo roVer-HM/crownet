@@ -39,47 +39,47 @@ import simu5g.nodes.mec.UALCMP.UALCMP;
 network World
 {
     parameters:
-        @display("bgb=1380.5399,1027.62");
+        @display("bgb=748.50604,837.172");
         int numTraci = default(1);
 
     submodules:
-        coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
-            @display("p=150.526,371.16;i=block/table2;is=s");
+        coordConverter[numTraci]: <default("OsgCoordConverterVadere")> like ICoordConverter {
+            @display("p=150,337;i=block/table2;is=s");
         }
         visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
-            @display("p=150.526,558.802;is=s");
+            @display("p=150,524;is=s");
         }
         net_visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
-            @display("p=150.526,513.438;is=s");
+            @display("p=150,479;is=s");
         }
         traci[numTraci]: <default("Manager")> like TraCiManager {
             parameters:
                 @display("p=150.526,148.464");
         }
         identiyRegistry: IdentityRegistry {
-            @display("p=150.526,237.13;i=block/table2;is=s");
+            @display("p=150,203;i=block/table2;is=s");
         }
         physicalEnvironment: PhysicalEnvironment {
-            @display("p=150.526,325.79602;is=s");
+            @display("p=150,295;is=s");
         }
 
         carrierAggregation: CarrierAggregation {
-            @display("p=150.526,466.01202;is=s");
+            @display("p=150,432;is=s");
         }
         configurator: Ipv4NetworkConfigurator {
             @display("p=150.526,68.046005");
         }
         channelControl: LteChannelControl {
-            @display("p=148.464,284.556;is=s");
+            @display("p=148,250;is=s");
         }
         binder: Binder {
-            @display("p=150.526,418.586;is=s");
+            @display("p=150,384;is=s");
         }
         gNodeB1: gNodeB {
-            @display("p=657.778,494.88;is=l");
+            @display("p=282,221;is=l");
         }
         upf: Upf {
-            @display("p=657.778,344.354");
+            @display("p=293,376");
         }
     connections:
         upf.pppg++ <--> Eth10G <--> gNodeB1.ppp;

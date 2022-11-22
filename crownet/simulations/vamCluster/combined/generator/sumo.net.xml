@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<net version="1.0" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+   <location netOffset="-689432.88,-5336004.59" convBoundary="0,0,400,400" origBoundary="11.547408,48.148799,11.560712,48.159432" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+   <edge id="1" from="jun100_50" to="jun100_350" priority="-1">
+       <lane id="lan1_0" index="0" speed="1.40" length="300.0" width="2.50" shape="100,50 100,350"/>
+   </edge>
+   <edge id="2" from="jun100_350" to="jun300_350" priority="-1">
+       <lane id="lan2_0" index="0" speed="1.40" length="200.0" width="2.50" shape="100,350 300,350"/>
+   </edge>
+   <edge id="3" from="jun300_350" to="jun300_300" priority="-1">
+       <lane id="lan3_0" index="0" speed="1.40" length="50.0" width="2.50" shape="300,350 300,300"/>
+   </edge>
+   <edge id="4" from="jun300_350" to="jun350_350" priority="-1">
+       <lane id="lan4_0" index="0" speed="1.40" length="50.0" width="2.50" shape="300,350 350,350"/>
+   </edge>
+   <junction id="jun100_50" type="priority" x="100" y="50" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+   <junction id="jun100_350" type="priority" x="100" y="350" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+   <junction id="jun300_350" type="priority" x="300" y="350" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+   <junction id="jun300_300" type="priority" x="300" y="300" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+   <junction id="jun350_350" type="priority" x="350" y="350" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+   <connection from="1" to="2" fromLane="0" toLane="0" dir="l" state="m"/>
+   <connection from="2" to="3" fromLane="0" toLane="0" dir="l" state="m"/>
+   <connection from="2" to="4" fromLane="0" toLane="0" dir="l" state="m"/>
+</net>
