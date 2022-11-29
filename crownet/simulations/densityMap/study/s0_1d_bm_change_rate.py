@@ -92,7 +92,7 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
                     "*.bonnMotionServer.traceFile": f"trace/trace_mf_1d_m_const_2x5m_d20m_iat_{v[0]}_SEED.bonnMotion",
                     "*.globalDensityMap.entropyInterval": UnitValue(1.0, "s"),
                     "*.globalDensityMap.entropyProvider": v[3](),
-                    "**.numBands": "50",
+                    "**.numBands": "25",
                 },
             }
         )
@@ -125,11 +125,13 @@ def main(trace_dir: str, fix_trace_seed: int = -1):
     #
     ini_file = os.path.abspath("../omnetpp.ini")
     base_dir = os.path.abspath("/mnt/data1tb/results/")
+    # env_name = get_env_name(base_dir, __file__.replace(".py", ""))
+    env_name = get_env_name(base_dir, "s0-002")
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name=get_env_name(base_dir, __file__.replace(".py", "")),
+        env_name=env_name,
         opp_config="final_bonn_motion_entropy",
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""),  # use omnet internal mobility models

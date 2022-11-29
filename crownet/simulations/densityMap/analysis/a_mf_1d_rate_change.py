@@ -875,39 +875,52 @@ def create_variation_tbl(run_map: RunMap):
 
 
 if __name__ == "__main__":
+    # mf_1d_bm_rate_chage_1 -> s0-001  (RB25,100ms,0.01-10s,1.0)
+    # mf_1d_bm_rate_change -> s0-003 (RB50,100ms,0.01-10s,1.0)
+    # mf_1d_bm_rate_change_1 -> s0-004   (RB50, 20s,0.01-7500s,1.0)
+    # mf_1d_bm_rate_chage -> s0-006 (RB25,100ms,0.01-10s,1.0,ONE mSeed)
+    # s = SuqcStudy("/mnt/data1tb/results/mf_1d_bm_rate_change")
+    # s.rename_data_root("/mnt/data1tb/results/s0-003")
+    # run_map = RunMap.load_or_create(
+    #     partial(get_run_map_single_run, data_root="/mnt/data1tb/results/s0-001"),
+    #      "/mnt/data1tb/results/_density_map/foo/"
+    # )
     matplotlib_set_latex_param()
-    logging.set_level("INFO")
+    # logging.set_level("INFO")
 
-    # with mobility seed variation
-    output_dir = "/mnt/data1tb/results/_density_map/04e_rate_output/"
-    # output_dir = "/mnt/data1tb/results/_density_map/04d_rate_output/"
-    # output_dir = "/mnt/data1tb/results/_density_map/04c_rate_output/"
-    # output_dir = "/mnt/data1tb/results/_density_map/04b_rate_output/"
+    # # with mobility seed variation
+    # output_dir = "/mnt/data1tb/results/_density_map/s0-001_mixedRBs/"
+    output_dir = "/mnt/data1tb/results/_density_map/s0-002_25RBs/"
     run_map = RunMap.load_or_create(
         partial(
             get_run_map_single_run,
-            data_root=[
-                "/mnt/data1tb/results/mf_1d_bm_rate_change/",
-                "/mnt/data1tb/results/mf_1d_bm_rate_change_1/",
-            ]
-            # data_root="/mnt/data1tb/results/mf_1d_bm_rate_change_1/",
-            # data_root="/mnt/data1tb/results/mf_1d_bm_rate_change/",
-            # data_root="/mnt/data1tb/results/mf_1d_bm_rate_chage_1/",
+            # data_root=[# RB25/50_mixed_test
+            #     "/mnt/data1tb/results/s0-001/",
+            #     "/mnt/data1tb/results/s0-004/",
+            # ],
+            data_root=[  # RB25
+                "/mnt/data1tb/results/s0-001/",
+                "/mnt/data1tb/results/s0-002/",
+            ],
+            # data_root=[# RB50
+            #     "/mnt/data1tb/results/s0-003/",
+            #     "/mnt/data1tb/results/s0-004/",
+            # ]
         ),
         output_dir,
     )
-    # create_variation_tbl(run_map)
-    # plot_cell_knowledge_ratio(run_map)
+    create_variation_tbl(run_map)
+    plot_cell_knowledge_ratio(run_map)
 
-    # plot_cell_occupation_ratio(run_map)
+    plot_cell_occupation_ratio(run_map)
     plot_msme_err_paper(run_map)
-    # plot_msme_err_detail_paper(run_map)
+    plot_msme_err_detail_paper(run_map)
 
-    # plot_cell_occupation_ratio_paper(run_map)
-    # plot_msme_err(run_map)
-    # plot_msme_err_details(run_map)
+    plot_cell_occupation_ratio_paper(run_map)
+    plot_msme_err(run_map)
+    plot_msme_err_details(run_map)
 
-    # plot_packet_loss_ratio_over_time(run_map)
-    # plot_occupation_intervals(run_map)
+    # # plot_packet_loss_ratio_over_time(run_map)
+    plot_occupation_intervals(run_map)
 
     print("main done")
