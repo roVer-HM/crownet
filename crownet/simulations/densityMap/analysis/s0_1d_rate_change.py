@@ -303,6 +303,26 @@ def plot_msme_err_details(run_map: RunMap):
                 plt.close(fig)
 
 
+def _plot_msme_err_detail_paper(ax_epsilon: plt.Axes, data, groups, colors):
+    for (g_name, c) in list(zip(groups, colors)):
+        _df = data[f"diff_{g_name}"]
+        g = run_map[g_name]
+        lbl = f"{g.group_name}: $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
+        ax_epsilon.plot(_df.index.get_level_values(0), _df, label=lbl, color=c)
+
+    ax_epsilon.set_xlabel("Simulation time in seconds")
+    ax_epsilon.set_ylabel("residual MSME ratio comp. to S0-0")
+    ax_epsilon.set_ylim(0, 1200)
+    ax_epsilon.xaxis.set_major_locator(MultipleLocator(200))
+    ax_epsilon.set_ylim(-0.2, 1.4)
+    ax_epsilon.legend(
+        loc="upper right",
+        bbox_to_anchor=(1.03, 1.03),
+        handletextpad=0.2,
+        columnspacing=0.5,
+    )
+
+
 def plot_msme_err_detail_paper(run_map: RunMap):
     """MSME for each seed separately"""
     data = _get_msce_with_lbl(run_map)
@@ -334,35 +354,108 @@ def plot_msme_err_detail_paper(run_map: RunMap):
 
     with plt.rc_context(
         paper_rc(
-            tick_labelsize="x-large",
-            rc={"legend.fontsize": "x-large", "axes.titlesize": "large"},
+            tick_labelsize="large",
+            rc={"legend.fontsize": "x-large", "axes.labelsize": "large"},
         )
     ):
         ax_epsilon: plt.Axes
         fig, ax_epsilon = plt.subplots(nrows=1, ncols=1, figsize=(5, 5), sharex=True)
-        for (g_name, c) in list(zip(groups, colors)):
-            _df = data[f"diff_{g_name}"]
-            g = run_map[g_name]
-            lbl = f"{g.group_name}: $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
-            ax_epsilon.plot(_df.index.get_level_values(0), _df, label=lbl, color=c)
-
-        ax_epsilon.set_xlabel("Simulation time in seconds")
-        ax_epsilon.set_ylabel("residual MSME ratio comp. to S0-0")
-        ax_epsilon.set_ylim(0, 1200)
-        ax_epsilon.xaxis.set_major_locator(MultipleLocator(200))
-        ax_epsilon.set_ylim(-0.2, 1.4)
-        ax_epsilon.legend(
-            loc="upper right",
-            bbox_to_anchor=(1.03, 1.03),
-            handletextpad=0.2,
-            columnspacing=0.5,
-        )
+        _plot_msme_err_detail_paper(ax_epsilon, data, groups, colors)
         fig.tight_layout()
         fig.savefig(run_map.path("s0-epsilon.pdf"))
 
 
-def plot_msme_err_epsilon_paper(run_map: RunMap):
+def plot_s0(run_map: RunMap):
     pass
+
+
+def _plot_msme_err_paper(
+    ax_ts: plt.Axes, ax_ts2: plt.Axes, err_bars: pd.DataFrame, rate, alpha
+):
+    # inset zoom....
+    ax_zoom = ax_ts2.inset_axes([0.4, 0.05, 0.30, 0.35])
+    df = err_bars.loc[_i[:1200, :, rate]].copy().reset_index()
+    _data = list(run_map.iter(lambda x: x.attr["gt_change_rate"] == rate))
+
+    colors = sns.color_palette("colorblind", n_colors=11)
+    for idx, (_, g) in enumerate(_data):
+        _m = df["label"] == g.group_name
+        _d = df.loc[_m]
+        lbl = f"{g.group_name}: $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
+        ax_ts.plot(
+            _d["simtime"],
+            _d["mean"],
+            label=lbl,
+            color=colors[idx],
+        )
+        ax_ts.fill_between(
+            _d["simtime"],
+            _d["mean"] - _d["std"],
+            _d["mean"] + _d["std"],
+            alpha=alpha,
+            color=colors[idx],
+        )
+        if idx < 6:
+            ax_ts2.plot(
+                _d["simtime"],
+                _d["mean"],
+                label=lbl,
+                color=colors[idx],
+            )
+            ax_zoom.plot(
+                _d["simtime"],
+                _d["mean"],
+                label=lbl,
+                color=colors[idx],
+            )
+
+    ax_ts.set_ylabel("MSME")
+    ax_ts.set_ylim(0.0, 2.0)
+    ax_ts.xaxis.set_major_locator(MultipleLocator(200))
+    ax_ts.set_xlabel("Simtime in seconds")
+    ax_ts2.set_ylabel("MSME")
+    ax_ts2.set_ylim(0.0, 0.125)
+    ax_ts2.xaxis.set_major_locator(MultipleLocator(200))
+    ax_ts2.set_xlabel("Simtime in seconds")
+    ax_ts2.hlines(
+        (24.0035 * rate) ** 2,
+        xmin=0.0,
+        xmax=1200,
+        color="red",
+        label="mean mobility error",
+    )
+    ax_zoom.hlines(
+        (24.0035 * rate) ** 2,
+        xmin=0.0,
+        xmax=1200,
+        color="red",
+        label="mean mobility error",
+    )
+
+    # sub region of the original image
+    x1, x2, y1, y2 = 490, 700, 0.054, 0.059
+    ax_zoom.set_xlim(x1, x2)
+    ax_zoom.set_ylim(y1, y2)
+    ax_zoom.set_xticklabels([])
+    ax_zoom.set_yticklabels([])
+    for spine in ax_zoom.spines.values():
+        spine.set_edgecolor("black")
+
+    ax_ts2.indicate_inset_zoom(ax_zoom, edgecolor="black", linewidth=2.0)
+
+    h, l = ax_ts2.get_legend_handles_labels()
+    lbl = [_lbl.split(":")[0].split("-")[-1] for _lbl in l[:-1]]
+    _lbl = ",".join(lbl)
+    ax_ts2.text(
+        0.02,
+        0.95,
+        f"Zoomed with scenario:\nS0-{_lbl}",
+        horizontalalignment="left",
+        verticalalignment="top",
+        fontsize="xx-large",
+        transform=ax_ts2.transAxes,
+    )
+    return h, l
 
 
 def plot_msme_err_paper(run_map: RunMap):
@@ -384,89 +477,7 @@ def plot_msme_err_paper(run_map: RunMap):
         paper_rc(rc={"legend.fontsize": "x-large", "axes.titlesize": "x-large"})
     ):
         fig, (ax_ts, ax_ts2) = plt.subplots(1, 2, figsize=(20, 6))
-        # inset zoom....
-        ax_zoom = ax_ts2.inset_axes([0.4, 0.05, 0.30, 0.35])
-        df = err_bars.loc[_i[:1200, :, rate]].copy().reset_index()
-        _data = list(run_map.iter(lambda x: x.attr["gt_change_rate"] == rate))
-
-        colors = sns.color_palette("colorblind", n_colors=11)
-        for idx, (_, g) in enumerate(_data):
-            _m = df["label"] == g.group_name
-            _d = df.loc[_m]
-            lbl = f"{g.group_name}: $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
-            ax_ts.plot(
-                _d["simtime"],
-                _d["mean"],
-                label=lbl,
-                color=colors[idx],
-            )
-            ax_ts.fill_between(
-                _d["simtime"],
-                _d["mean"] - _d["std"],
-                _d["mean"] + _d["std"],
-                alpha=alpha,
-                color=colors[idx],
-            )
-            if idx < 6:
-                ax_ts2.plot(
-                    _d["simtime"],
-                    _d["mean"],
-                    label=lbl,
-                    color=colors[idx],
-                )
-                ax_zoom.plot(
-                    _d["simtime"],
-                    _d["mean"],
-                    label=lbl,
-                    color=colors[idx],
-                )
-
-        ax_ts.set_ylabel("MSME")
-        ax_ts.set_ylim(0.0, 2.0)
-        ax_ts.xaxis.set_major_locator(MultipleLocator(200))
-        ax_ts.set_xlabel("Simtime in seconds")
-        ax_ts2.set_ylabel("MSME")
-        ax_ts2.set_ylim(0.0, 0.125)
-        ax_ts2.xaxis.set_major_locator(MultipleLocator(200))
-        ax_ts2.set_xlabel("Simtime in seconds")
-        ax_ts2.hlines(
-            (24.0035 * rate) ** 2,
-            xmin=0.0,
-            xmax=1200,
-            color="red",
-            label="mean mobility error",
-        )
-        ax_zoom.hlines(
-            (24.0035 * rate) ** 2,
-            xmin=0.0,
-            xmax=1200,
-            color="red",
-            label="mean mobility error",
-        )
-
-        # sub region of the original image
-        x1, x2, y1, y2 = 490, 700, 0.054, 0.059
-        ax_zoom.set_xlim(x1, x2)
-        ax_zoom.set_ylim(y1, y2)
-        ax_zoom.set_xticklabels([])
-        ax_zoom.set_yticklabels([])
-        for spine in ax_zoom.spines.values():
-            spine.set_edgecolor("black")
-
-        ax_ts2.indicate_inset_zoom(ax_zoom, edgecolor="black", linewidth=2.0)
-
-        h, l = ax_ts2.get_legend_handles_labels()
-        lbl = [_lbl.split(":")[0].split("-")[-1] for _lbl in l[:-1]]
-        _lbl = ",".join(lbl)
-        ax_ts2.text(
-            0.05,
-            0.95,
-            f"Zoomed with scenario:\nS0-{_lbl}",
-            horizontalalignment="left",
-            verticalalignment="top",
-            fontsize="xx-large",
-            transform=ax_ts2.transAxes,
-        )
+        h, l = _plot_msme_err_paper(ax_ts, ax_ts2, err_bars, rate, alpha)
         _h = h[-1]
         _l = l[-1]
 
@@ -490,6 +501,91 @@ def plot_msme_err_paper(run_map: RunMap):
         )
         fig.tight_layout(rect=(0.0, 0.15, 1.0, 1.0))
         fig.savefig(run_map.path("s0-msme.pdf"))
+
+
+def plot_s0_summary_paper(run_map: RunMap):
+    data = _get_msce_with_lbl(run_map)
+    data = data.reset_index().set_index(["simtime", "label"])
+
+    err_bars = data.groupby(["simtime", "label"])["cell_mse"].agg(["mean", "std"])
+    lbl_to_rate = pd.DataFrame(
+        [(n, g.attr["gt_change_rate"]) for n, g in run_map.items()],
+        columns=["label", "rate"],
+    )
+    err_bars = err_bars.join(lbl_to_rate.set_index("label"), on="label", how="left")
+    err_bars = (
+        err_bars.reset_index().set_index(["simtime", "label", "rate"]).sort_index()
+    )
+    rate = 0.01
+    alpha = 0.15
+
+    ## difff
+
+    data_diff = _get_msce_with_lbl(run_map)
+    data_diff = data_diff.reset_index().set_index(["simtime", "label"])
+
+    lbl_to_rate = pd.DataFrame(
+        [(n, g.attr["gt_change_rate"]) for n, g in run_map.items()],
+        columns=["label", "rate"],
+    )
+    data_diff = (
+        data_diff.join(lbl_to_rate.set_index("label"), on="label")
+        .reset_index()
+        .set_index(["simtime", "label", "rate"])
+        .sort_index()
+    )
+    rate = 0.01
+    seed = 16
+    groups = ["S0-0", "S0-12", "S0-16", "S0-20"]
+    _c = sns.color_palette("colorblind", n_colors=11)
+    colors = [_c[0], _c[3], _c[4], _c[5]]
+    data_diff = (
+        data_diff.loc[:1200, groups, :]
+        .groupby(["simtime", "label"])["cell_mse"]
+        .mean()
+        .unstack("label")
+    )
+    for c in data_diff.columns:
+        data_diff[f"diff_{c}"] = (data_diff[c] - data_diff["S0-0"]) / data_diff["S0-0"]
+    with plt.rc_context(
+        paper_rc(rc={"legend.fontsize": "x-large", "axes.titlesize": "x-large"})
+    ):
+        fig, axes = plt.subplots(2, 2, figsize=(20, 13))
+        (ax_ts, ax_ts2, ax_ratio, ax_diff) = list(chain(*axes))
+        h, l = _plot_msme_err_paper(ax_ts, ax_ts2, err_bars, rate, alpha)
+        plot_cell_knowledge_ratio(run_map, ax_ratio, savefig=False)
+        ax_ratio.get_legend().remove()
+        ax_ratio.set_title("")
+        ax_ratio.set_ylabel("Cell knowledge ratio $k_C$")
+        ax_ratio.set_xlabel("Simulation time in second")
+        ax_ratio.set_xlim(0, 1200)
+        ax_ratio.xaxis.set_major_locator(MultipleLocator(200))
+        _plot_msme_err_detail_paper(ax_diff, data_diff, groups, colors)
+
+        _h = h[-1]
+        _l = l[-1]
+
+        h, l = ax_ts.get_legend_handles_labels()
+        _mid = int(np.ceil(len(h) / 2))
+        _idx = [(i, i + _mid) for i in range(_mid)]
+        _idx = list(chain(*_idx))
+        if len(_idx) > len(h):
+            del _idx[-1]
+        h = list(np.array(h)[_idx])
+        l = list(np.array(l)[_idx])
+        # for a in fig.get_axes():
+        #     if a.get_legend() is not None:
+        #         a.get_legend().remove()
+        fig.legend(
+            handles=[*h, _h],
+            labels=[*l, _l],
+            ncol=6,
+            framealpha=0.0,
+            loc="lower center",
+        )
+        fig.tight_layout(rect=(0.0, 0.12, 1.0, 1.0), h_pad=6)
+        fig.savefig(run_map.path("s0-summary.pdf"))
+        print("Hi")
 
 
 def plot_msme_err(run_map: RunMap):
@@ -797,10 +893,12 @@ def _get_create_cell_knowledge_ratio(run_map: RunMap):
     return h5, change_rate
 
 
-def plot_cell_knowledge_ratio(run_map: RunMap):
+def plot_cell_knowledge_ratio(
+    run_map: RunMap, ax_k_ratio=None, ax_k_ratio_zoom=None, savefig=True
+):
     h5, change_rate = _get_create_cell_knowledge_ratio(run_map)
-    fig, ax_k_ratio = check_ax()
-    fig2, ax_k_ratio_zoom = check_ax()
+    fig, ax_k_ratio = check_ax(ax_k_ratio)
+    fig2, ax_k_ratio_zoom = check_ax(ax_k_ratio_zoom)
 
     sim_groups = [g for g in run_map.values() if _filter_single_rate(g, change_rate)]
     sim_groups.sort(key=lambda x: x.attr["transmission_interval_ms"])
@@ -829,9 +927,10 @@ def plot_cell_knowledge_ratio(run_map: RunMap):
     ax_k_ratio_zoom.set_ylim(0.9, 1.0)
     ax_k_ratio_zoom.set_xlim(400, 525)
 
-    fig.tight_layout()
-    fig.savefig(run_map.path("cell_knowledge_ratio.pdf"))
-    fig2.savefig(run_map.path("cell_knowledge_ratio_zoom.pdf"))
+    if savefig:
+        fig.tight_layout()
+        fig.savefig(run_map.path("cell_knowledge_ratio.pdf"))
+        fig2.savefig(run_map.path("cell_knowledge_ratio_zoom.pdf"))
 
 
 def create_variation_tbl(run_map: RunMap):
@@ -909,18 +1008,19 @@ if __name__ == "__main__":
         ),
         output_dir,
     )
-    create_variation_tbl(run_map)
-    plot_cell_knowledge_ratio(run_map)
+    plot_s0_summary_paper(run_map)
+    # create_variation_tbl(run_map)
+    # plot_cell_knowledge_ratio(run_map)
 
-    plot_cell_occupation_ratio(run_map)
-    plot_msme_err_paper(run_map)
-    plot_msme_err_detail_paper(run_map)
+    # plot_cell_occupation_ratio(run_map)
+    # plot_msme_err_paper(run_map)
+    # plot_msme_err_detail_paper(run_map)
 
-    plot_cell_occupation_ratio_paper(run_map)
-    plot_msme_err(run_map)
-    plot_msme_err_details(run_map)
+    # plot_cell_occupation_ratio_paper(run_map)
+    # plot_msme_err(run_map)
+    # plot_msme_err_details(run_map)
 
-    # # plot_packet_loss_ratio_over_time(run_map)
-    plot_occupation_intervals(run_map)
+    # # # plot_packet_loss_ratio_over_time(run_map)
+    # plot_occupation_intervals(run_map)
 
     print("main done")
