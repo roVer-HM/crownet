@@ -4,7 +4,7 @@
 
     <input>
         <net-file value="mf_base.net.xml"/>
-        <route-files value="rou_veh_ped.xml"/>
+        <route-files value="rou_ped.xml"/>
 	    <additional-files value="mf_base.polygon.xml"/>
     </input>
 

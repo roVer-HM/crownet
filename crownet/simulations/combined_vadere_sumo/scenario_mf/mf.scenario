@@ -552,6 +552,38 @@
                     "startingWithRedLight": false,
                     "nextSpeed": -1.0
                 }
+,                {
+                    "id": 2001,
+                    "absorbing": true,
+                    "shape": {
+                        "type": "POLYGON",
+                        "points": [
+                            {
+                                "x": 412.70395,
+                                "y": 248.52543000000009
+                            },
+                            {
+                                "x": 414.89591920000004,
+                                "y": 248.52543000000009
+                            },
+                            {
+                                "x": 414.89591920000004,
+                                "y": 246.46497900000008
+                            },
+                            {
+                                "x": 412.70395,
+                                "y": 246.46497900000008
+                            }
+                        ]
+                    },
+                    "waitingTime": 0.0,
+                    "waitingTimeYellowPhase": 0.0,
+                    "parallelWaiters": 0,
+                    "individualWaiting": true,
+                    "deletionDistance": 0.1,
+                    "startingWithRedLight": false,
+                    "nextSpeed": -1.0
+                }
             ],
             "targetChangers": [],
             "absorbingAreas": [],
@@ -583,17 +615,60 @@
                     },
                     "interSpawnTimeDistribution": "constant",
                     "distributionParameters": {
-                        "updateFrequency": 60.0
+                        "updateFrequency": 40.0
                     },
-                    "spawnNumber": 2,
-                    "maxSpawnNumberTotal": 6,
+                    "spawnNumber": 5,
+                    "maxSpawnNumberTotal": 20,
                     "startTime": 0.0,
-                    "endTime": 90.0,
+                    "endTime": 400,
                     "spawnAtRandomPositions": false,
                     "spawnAtGridPositionsCA": false,
                     "useFreeSpaceOnly": true,
                     "targetIds": [
                         2000
+                    ],
+                    "groupSizeDistribution": [
+                        1.0
+                    ],
+                    "dynamicElementType": "PEDESTRIAN",
+                    "attributesPedestrian": null
+                }
+,                {
+                    "id": 3001,
+                    "shape": {
+                        "type": "POLYGON",
+                        "points": [
+                            {
+                                "x": 232.74142,
+                                "y": 464.22057000000007
+                            },
+                            {
+                                "x": 235.5933394,
+                                "y": 464.22057000000007
+                            },
+                            {
+                                "x": 235.5933394,
+                                "y": 462.4226208000001
+                            },
+                            {
+                                "x": 232.74142,
+                                "y": 462.4226208000001
+                            }
+                        ]
+                    },
+                    "interSpawnTimeDistribution": "constant",
+                    "distributionParameters": {
+                        "updateFrequency": 40.0
+                    },
+                    "spawnNumber": 5,
+                    "maxSpawnNumberTotal": 20,
+                    "startTime": 0.0,
+                    "endTime": 400,
+                    "spawnAtRandomPositions": false,
+                    "spawnAtGridPositionsCA": false,
+                    "useFreeSpaceOnly": true,
+                    "targetIds": [
+                        2001
                     ],
                     "groupSizeDistribution": [
                         1.0
