@@ -973,42 +973,62 @@ def plot_count_stats2(run_map: RunMap):
 
 def msce_comparision_paper(
     run_map: RunMap,
-    filter_run: SimGroupFilter = lambda _: True,
     compare_with="1_999_25",
-    output_path="mce_stats_for_alg.pdf",
-    value_axes_label="Mean Squared Cell Error (MSCE)",
+    output_path="msme_example.pdf",
 ):
-    data, groups = _get_mse_data_per_variation_ts(run_map)
+    data, _ = _get_mse_data_per_variation_ts(run_map)
 
     palette = sns.color_palette("colorblind", n_colors=2)
     _lbl = {
         "0.9_60_25": dict(label="S3:8 (0.9, 60)", color=palette[0], zorder=5),
         compare_with: dict(label="S3:17 (1.0, 999)", color=palette[1], zorder=5),
-        # "default":dict(label="S3:0-7/9-16", color=(.7, .7, .7, 1.), zorder=3),
         "default": dict(label=None, color=(0.7, 0.7, 0.7, 1.0), zorder=3),
     }
 
     with plt.rc_context(_Plot.paper_rc()):
+        # fig, ax1, ax2 = plt.subplot_mosaic("ab", figsize=(20,6))
+
+        # fig, ax = plt.subplot_mosaic("aabc", figsize=(20,6))
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
-        cid = 0
-        for idx, c in enumerate(["0.9_60_25", compare_with]):
-            lbl = f"({c.split('_')[0]}, {c.split('_')[1]})"
+        bbox = ax2.bbox._bbox
+        x_length = bbox.xmax - bbox.x0
+        bbox_new = Bbox(
+            [[bbox.x0, bbox.y0 + 0.036], [bbox.x0 + 0.6 * x_length, bbox.ymax + 0.036]]
+        )
+        ax2.bbox._bbox = bbox_new
+        for c in ["0.9_60_25", compare_with]:
             ax1.plot(data.index, data[c], **_lbl[c])
         ax1.set_xlabel("Time in seconds")
         ax1.set_ylabel("Mean Suqared Map Error (MSME)")
         ax1.legend()
 
-        cid = 0
-        for idx, c in enumerate(data.columns):
+        # zoom axes
+        x1, x2, y1, y2 = 0.018, 0.025, 0.5, 1.0
+        ax_zoom = ax2.inset_axes([1.05, 0.0, 0.7, 1.0], transform=ax2.transAxes)
+
+        for c in data.columns:
             x = data[c].sort_values()
             y = np.linspace(0.0, 1.0, len(x))
             _kw = _lbl[c] if c in _lbl else _lbl["default"]
             ax2.plot(x, y, **_kw)
+            ax_zoom.plot(x, y, **_kw)
         ax2.set_xlabel("Mean Suqared Map Error (MSME)")
         ax2.set_ylabel("ECDF")
-        ax2.legend()
-        fig.tight_layout()
-        fig.savefig(run_map.path("msme_example.pdf"))
+        ax2.set_xlim(0.0, 0.025)
+        ax2.legend(loc="upper left")
+        ax_zoom.set_xlim(x1, x2)
+        ax_zoom.set_ylim(y1, y2)
+        ax_zoom.yaxis.tick_right()
+        ax_zoom.tick_params(axis="y", direction="in")
+        for spine in ax_zoom.spines.values():
+            spine.set_edgecolor("black")
+        ax2.indicate_inset_zoom(ax_zoom, edgecolor="black", alpha=1.0, linewidth=2.0)
+
+        if output_path is not None:
+            if not os.path.isabs(output_path):
+                output_path = run_map.path(output_path)
+            fig.tight_layout()
+            fig.savefig(output_path)
 
 
 def describtive_two_way_comparison_msce(
@@ -1251,11 +1271,11 @@ if __name__ == "__main__":
     # create_od_matrix(run_map)
     # write_cell_tex(run_map)
     # plot_test(run_map)
-    main(run_map)
+    # main(run_map)
     # plot_per_seed_stats(run_map)
     # describtive_two_way_comparison_msce(run_map)
-    # msce_comparision_paper(run_map)
-    describtive_two_way_comparison_count(
-        run_map, filter_run=lambda x: x.lbl == "0.9_60_25"
-    )
+    msce_comparision_paper(run_map, output_path="msme_example2.pdf")
+    # describtive_two_way_comparison_count(
+    #     run_map, filter_run=lambda x: x.lbl == "0.9_60_25"
+    # )
     print("done")
