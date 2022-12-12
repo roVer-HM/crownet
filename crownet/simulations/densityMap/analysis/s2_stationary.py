@@ -1,15 +1,11 @@
 from __future__ import annotations
-from fileinput import filename
-from math import nan
-from multiprocessing import pool
 import re
 import itertools
-from sqlite3 import converters
+import sys
 from matplotlib.transforms import Affine2D
 from matplotlib.lines import Line2D
 from shapely.geometry import Point, Polygon
 from roveranalyzer.analysis.common import (
-    NamedSimulationGroupFactory,
     RunMap,
     Simulation,
     RunMap,
@@ -27,7 +23,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sn
 import scipy.stats as st
-from scipy.stats import mannwhitneyu, kstest
+from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -133,49 +129,6 @@ def _read_groups(
         g.attr["area_lbl_long"] = area[_k][1]
         g.attr["area_str"] = area[_k][1][4:]
 
-    return run_map
-
-
-def run_map_with_2_step_ramp_up(output_path: str, *args, **kwargs) -> RunMap:
-    """Simulation of one variation with multiple steps to reach 100% of the set
-    pedestrians to see if a drop in the count accuracy persists.
-    """
-    run_map = RunMap(output_path)
-    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_5/")
-    run_map = study.update_run_map(
-        run_map,
-        20,
-        id_offset=0,
-        sim_group_factory=NamedSimulationGroupFactory(["yDist", "ymf"]),
-    )
-    return run_map
-
-
-def run_map_from_6(output_path: str, *args, **kwargs) -> RunMap:
-    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_6/")
-    return _read_groups(study, RunMap(output_path), id_offset=0)
-
-
-def run_map_from_6_7(output_path: str, *args, **kwargs) -> RunMap:
-    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_6/")
-    study2 = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_7/")
-    run_map: RunMap = _read_groups(study, RunMap(output_path), id_offset=0)
-    return _read_groups(
-        study2,
-        run_map,
-        id_offset=run_map.max_id + 1,
-        group_strategy=SimGroupAppendStrategy.DROP_NEW,
-    )
-
-
-def run_map_from_4_8(output_path: str, *args, **kwargs) -> RunMap:
-    """Simulation run of ydist and ymf heuristic with multiple numbers of pedestrians as well as constant densities."""
-    run_map = RunMap(output_path)
-    study = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_8/")
-    run_map = _read_groups(study, run_map, id_offset=0)
-
-    study2 = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_4/")
-    run_map = _read_groups(study2, run_map, id_offset=run_map.max_id + 1)
     return run_map
 
 
@@ -518,37 +471,10 @@ def plot_convergence_per_num(
         "Convergence time of simulations over number of pedestrians and area size"
     )
 
-    # create x axis tick labels based on data
     l = np.sort(df["num"].unique()).astype(int)
     ax.xaxis.set_major_locator(FixedLocator(l))
     ax.set_xticklabels(l, rotation=90, ha="center")
     ax.set_ylim(-1, df[df["conv_mask"]]["convergence_time"].max() + 5)
-    # fix legend layout and position
-    # h, l = ax.get_legend_handles_labels()
-    # _del_idx = [l.index(_l) for _l in ["alg", "count", "area"]]
-    # for idx in _del_idx[::-1]:
-    #     del h[idx]
-    #     del l[idx]
-    # fig.legend(h, l, loc="lower center", ncol=len(h), fontsize="x-small")
-    # ax.get_legend().remove()
-
-    # table
-    # _max_count = df_run.set_index(["num", "alg", "type"])["count"].groupby("num").sum().iloc[0]/2
-    # df_run = df_run.set_index(["num", "alg", "type"])["count"].groupby(["num", "alg", "type"]).count().unstack(["alg", "type"], fill_value=0).sort_index(axis=1)
-    # _m = (df_run[("yDist", "correct")] == _max_count) & (df_run[("ymf", "correct")] == _max_count)
-    # df_run = df_run[~_m]
-    # tbl_cols =  [f"{c}\n{cc}" for c, cc in  df_run.columns]
-    # tbl_cols.insert(0, "ped.\nnum")
-    # tbl = ax.table(
-    #     cellText=df_run.reset_index().values,
-    #     cellLoc="center",
-    #     colLabels=tbl_cols,
-    #     bbox=(0.45, 0.35, 0.5, 0.5),
-    # )
-    # tbl.scale(1, 5)
-    # tbl.set_zorder(999)  # on top
-    # tbl_t = ax.text(0.45, 0.88, "Erroneous runs with N=40 simulations per ped. number and algorithm", transform=ax.transAxes, backgroundcolor="white")
-    # tbl_t.set_zorder(999)
 
     print(f">>>plot: {ax.get_title()}")
     print(
@@ -556,79 +482,6 @@ def plot_convergence_per_num(
     )
     fig.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
     fig.savefig(run_map.path("convergence_time_per_run_over_ped_number.pdf"))
-
-
-# def plot_convergence_per_num_old(
-#     run_map: RunMap,
-#     convergence_error=0.05,
-#     event_time: float = 40.0,
-#     ax: plt.Axes | None = None,
-# ):
-
-#     df, df_run= _filter_convergence_time(run_map, convergence_error, event_time)
-
-#     df = df.reset_index()
-#     # create small x-axis offset to prevent overlapping data
-#     df["ped_count"] = df["num"]
-#     df = df.set_index(["num", "alg", "run"]).sort_index()
-#     df.loc[pd.IndexSlice[:, "ymf", :], ["ped_count"]] += 0.3
-#     df.loc[pd.IndexSlice[:, "yDist", :], ["ped_count"]] -= 0.3
-
-#     # create scatter plot
-#     df = df.rename(
-#         columns=dict(
-#             ped_count="Number of pedestrians", convergence_time="Convergence time"
-#         )
-#     )
-#     fig, ax = check_ax(ax)
-#     ax = sn.scatterplot(
-#         ax=ax,
-#         data=df.reset_index(),
-#         x="Number of pedestrians",
-#         y="Convergence time",
-#         hue="alg",
-#         style="area",
-#         size="count",
-#     )
-
-#     # create x axis tick labels based on data
-#     l = np.sort(df.index.get_level_values("num").unique()).astype(int)
-#     ax.xaxis.set_major_locator(FixedLocator(l))
-#     ax.set_xticklabels(l, rotation=90, ha="center")
-#     ax.set_ylim(-1, df[df["conv_mask"]]["Convergence time"].max() + 5)
-#     # fix legend layout and position
-#     h, l = ax.get_legend_handles_labels()
-#     _del_idx = [l.index(_l) for _l in ["alg", "count", "area"]]
-#     for idx in _del_idx[::-1]:
-#         del h[idx]
-#         del l[idx]
-#     fig.legend(h, l, loc="lower center", ncol=len(h), fontsize="x-small")
-#     ax.get_legend().remove()
-#     # save figure
-#     ax.set_title("Convergence time for mean density map for each simulation run")
-
-#     # table
-#     _max_count = df_run.set_index(["num", "alg", "type"])["count"].groupby("num").sum().iloc[0]/2
-#     df_run = df_run.set_index(["num", "alg", "type"])["count"].groupby(["num", "alg", "type"]).count().unstack(["alg", "type"], fill_value=0).sort_index(axis=1)
-#     _m = (df_run[("yDist", "correct")] == _max_count) & (df_run[("ymf", "correct")] == _max_count)
-#     df_run = df_run[~_m]
-#     tbl_cols =  [f"{c}\n{cc}" for c, cc in  df_run.columns]
-#     tbl_cols.insert(0, "ped.\nnum")
-#     tbl = ax.table(
-#         cellText=df_run.reset_index().values,
-#         cellLoc="center",
-#         colLabels=tbl_cols,
-#         bbox=(0.45, 0.35, 0.5, 0.5),
-#     )
-#     # [c.set_height(2) for c in tbl.get_celld().values()]
-#     tbl.scale(1, 5)
-#     tbl.set_zorder(999)  # on top
-#     tbl_t = ax.text(0.45, 0.88, "Erroneous runs with N=40 simulations per ped. number and algorithm", transform=ax.transAxes, backgroundcolor="white")
-#     tbl_t.set_zorder(999)
-
-
-#     fig.tight_layout(rect=(0., 0.05, 1., 1.))
-#     fig.savefig(run_map.path("convergence_time_per_run_over_ped_number.pdf"))
 
 
 def main(run_map: RunMap):
@@ -644,9 +497,12 @@ def main(run_map: RunMap):
     plot_merged_relative_pedestrian_count_ts_by_area(map, run_map)
     # plot_positions(run_map)
     plot_all_absolute_pedestrian_count_ts(map)
-    plot_convergence_per_density(run_map, event_time=51.0, convergence_error=0.05)
-    plot_convergence_per_num(run_map, event_time=51.0, convergence_error=0.05)
+    # plot_convergence_per_density(run_map, event_time=51.0, convergence_error=0.05)
+    # plot_convergence_per_num(run_map, event_time=51.0, convergence_error=0.05)
+    plot_convergence_per_density(run_map, event_time=50.0, convergence_error=0.05)
+    plot_convergence_per_num(run_map, event_time=50.0, convergence_error=0.05)
     plot_relative_count_stat(run_map)
+    plot_single_position(run_map)
 
 
 def plot_all_absolute_pedestrian_count_ts(map: pd.DataFrame):
@@ -1023,7 +879,7 @@ def plot_merged_relative_pedestrian_count_ts_by_density(
                 ax.text(
                     0.97,
                     0.97,
-                    f"density: {density:.4e} $\\frac{{ped}}{{m^2}}$\nPLOS: {1./density:.2f} $\\frac{{m^2}}{{ped}}$",
+                    f"density: {density:.4e} $\\frac{{ped}}{{m^2}}$",
                     transform=ax.transAxes,
                     horizontalalignment="right",
                     verticalalignment="top",
@@ -1248,49 +1104,34 @@ def plot_relative_count_stat(run_map: RunMap):
     )
 
 
-def update_hdf_files():
-    # study = SuqcRun("/mnt/data1tb/results/mf_stationary_m_single_cell_3/")
-    # study = SuqcRun("/mnt/data1tb/results/mf_1d_1/")
-    pass
-    # for sim in study.get_simulations():
-    #     _b = sim.builder
-    #     group_version = _b.count_p.get_attribute(attr_key="group_version", group="cell_measure", default=1)
-    #     if group_version < 2:
-    #         print(f"update cell_measure for {sim.data_root}")
-    #         new_cell_metric = sim.get_dcdMap().cell_count_measure(load_cached_version=False)
-    #         _b.count_p.override_frame(group="cell_measure", frame=new_cell_metric)
-    #         _b.count_p.repack_hdf(keep_old_file=False)
-    #         _b.count_p.set_attribute(attr_key="group_version", value=2, group="cell_measure")
-    #     else:
-    #         print(f"group is up to date. No changes needed for {sim.data_root}")
+def run_map_random_rampup(output_path: str, *args, **kwargs) -> RunMap:
+    study = SuqcStudy("/mnt/data1tb/results/s2-001/")
+    study2 = SuqcStudy("/mnt/data1tb/results/s2-002/")
+    run_map: RunMap = _read_groups(study, RunMap(output_path), id_offset=0)
+    return _read_groups(
+        study2,
+        run_map,
+        id_offset=run_map.max_id + 1,
+        group_strategy=SimGroupAppendStrategy.DROP_NEW,
+    )
 
 
 if __name__ == "__main__":
 
-    # run_map: RunMap = RunMap.load_or_create(
-    #     create_f=run_map_from_4_8,
-    #     output_path="/mnt/data1tb/results/_density_map/02_stationary_output/",
-    # )
-
-    # run_map: RunMap = RunMap.load_or_create(
-    #     create_f=run_map_with_2_step_ramp_up,
-    #     output_path="/mnt/data1tb/results/mf_stationary_m_single_cell_5/",
-    # )
-
-    # run_map: RunMap = RunMap.load_or_create(
-    #     create_f=run_map_from_6,
-    #     output_path="/mnt/data1tb/results/_density_map/02a_stationary_output/",
-    # )
+    #  mf_stationary_m_single_cell_6 ->  s2-001 (Random rampup)
+    #  mf_stationary_m_single_cell_7 ->  s2-002 (Random rampup, missing densities for s2-001)
+    # s = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_6")
+    # s.rename_data_root("/mnt/data1tb/results/s2-001", revert=False)
+    # s = SuqcStudy("/mnt/data1tb/results/mf_stationary_m_single_cell_7")
+    # s.rename_data_root("/mnt/data1tb/results/s2-002", revert=False)
+    # sys.exit(0)
 
     run_map: RunMap = RunMap.load_or_create(
-        create_f=run_map_from_6_7,
-        output_path="/mnt/data1tb/results/_density_map/02b_stationary_output/",
+        create_f=run_map_random_rampup,
+        output_path="/mnt/data1tb/results/_density_map/s2-001.2_stationary/",
     )
 
-    # plot_convergence_per_density(run_map, event_time=50.0, convergence_error=0.05)
-    # plot_convergence_per_num(run_map, event_time=50.0, convergence_error=0.05)
     # main(run_map)
-    # plot_relative_count_stat(run_map)
     plot_merged_relative_pedestrian_count_ts_by_density(None, run_map)
-    # plot_single_position(run_map)
+    plot_single_position(run_map)
     print("done")
