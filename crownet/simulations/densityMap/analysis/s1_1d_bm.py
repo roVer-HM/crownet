@@ -7,6 +7,7 @@ from itertools import combinations
 import json
 import os
 from re import I
+import sys
 from typing import Tuple, List
 from matplotlib import pyplot as plt
 import numpy as np
@@ -273,18 +274,6 @@ def make_vader_ts_figure(
     if _ax is None:
         fig.savefig(output_path)
     return fig, ax
-
-
-def get_run_map_single_run(output_dir) -> RunMap:
-    run_ymfd_1 = SuqcStudy("/mnt/data1tb/results/mf_1d_bm_1/")
-    sim_factory = SimFactory()
-    run_map = run_ymfd_1.update_run_map(
-        RunMap(output_dir),
-        sim_per_group=20,
-        id_offset=0,
-        sim_group_factory=sim_factory,
-    )
-    return run_map
 
 
 def get_run_map_split(output_dir) -> RunMap:
@@ -619,13 +608,27 @@ def write_cell_tex(run_map: RunMap):
     )
 
 
+def get_run_map_single_run(output_dir) -> RunMap:
+    run_ymfd_1 = SuqcStudy("/mnt/data1tb/results/s1-001/")
+    sim_factory = SimFactory()
+    run_map = run_ymfd_1.update_run_map(
+        RunMap(output_dir),
+        sim_per_group=20,
+        id_offset=0,
+        sim_group_factory=sim_factory,
+    )
+    return run_map
+
+
 if __name__ == "__main__":
 
-    # output_dir = "/mnt/data1tb/results/_density_map/01_1d_output/"
-    # run_map = RunMap.load_or_create(get_run_map_split, output_dir)
+    # 01a_1d_output ->  s1-001 (N=20, same mobility seed)
+    # s = SuqcStudy("/mnt/data1tb/results/mf_1d_bm_1")
+    # s.rename_data_root("/mnt/data1tb/results/s1-001", revert=False)
+    # sys.exit(0)
 
-    output_dir = "/mnt/data1tb/results/_density_map/01a_1d_output/"
+    output_dir = "/mnt/data1tb/results/_density_map/s1-001_1d_bm/"
     run_map = RunMap.load_or_create(get_run_map_single_run, output_dir)
     # plot_default_stats(run_map)
     process_1d_scenario(run_map)
-    # extract_tex_tables(run_map.path("stat.csv"), run_map)
+    extract_tex_tables(run_map.path("stat.csv"), run_map)
