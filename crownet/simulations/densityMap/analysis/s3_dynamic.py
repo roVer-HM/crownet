@@ -3,8 +3,10 @@ from cProfile import label
 from cmath import exp
 import cmath
 from functools import partial
+import logging
 import os
 from itertools import chain
+import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits import axes_grid1
 from shapely.geometry import Polygon
@@ -421,19 +423,20 @@ def plot_mse_yDist_to_ymf_box_plot(
     # create mean cell mse for each run_id over time.
     # data = data.groupby("run_id").mean()
     # add label of the form '({alpha}, {dist}) to data
+    keep_cols = ["run_index", "label", "err_to_ymf"]
     data = (
-        data.reset_index()
-        .drop(columns=["seed", "run_id", "run_id_ymf", "cell_mse", "ymf_cell_mse"])
+        data.reset_index()[keep_cols]
         .set_index(["run_index", "label"])
         .unstack(["label"])
     )
     sorted_index = data.mean().sort_values().index
     data = data[sorted_index]
     data.columns = data.columns.droplevel(0)
+    data = data.rename({"(1,999)": "YMF"}, axis=1)
 
     with plt.rc_context(_Plot.paper_rc(tick_labelsize="x-large")):
         # data.reset_index().set_index(['run_id', 'label']).boxplot(by=["label"])
-        fig, ax = check_ax(ax, figsize=(8, 8))
+        fig, ax = check_ax(ax, figsize=(8, 6.5))
         # ax.set_title(
         #     f"Cell MSE difference between ymfDist and ymf (sorted by mean) N={len(data.iloc[:,0])}"
         # )
@@ -441,7 +444,7 @@ def plot_mse_yDist_to_ymf_box_plot(
         ax.set_xlabel(f"Variation (alpha, cut off distance)", fontsize="xx-large")
         ax.set_ylabel("MSME diff", labelpad=-8, fontsize="large")
         ax.axhline(y=0, color="red")
-        ax.axvline(x=np.argmax(data.columns == "(1,999)") + 1, color="red")
+        ax.axvline(x=np.argmax(data.columns == "YMF") + 1, color="red")
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center")
         ax.legend(
             handles=[
@@ -458,29 +461,6 @@ def plot_mse_yDist_to_ymf_box_plot(
             fig.savefig(run_map.path(figure_name))
         else:
             return fig, ax
-
-
-def plot_all(
-    run_map: RunMap,
-    styles: StyleMap,
-    data: pd.DataFrame,
-    data_mean_by_run_id: pd.DataFrame,
-):
-
-    plot_mse_all(data_mean_by_run_id, run_map, styles, figure_name="cell_mse.pdf")
-    plot_mse_for_seed(
-        data_mean_by_run_id["cell_mse"],
-        run_map,
-        styles,
-        figure_name="cell_mse_for_seed.pdf",
-    )
-    plot_mse_yDist_to_ymf(data_mean_by_run_id, run_map, "mse_diff.pdf")
-    # plot_mse_cell_over_time(run_map, data, "cell_mse_over_time.pdf")
-    # plot_count_error(run_map, "count_error_over_time.pdf")
-    plot_mse_yDist_to_ymf_box_plot(
-        run_map, data_mean_by_run_id, "cell_mse_box_plot.pdf"
-    )
-    plot_test(run_map)
 
 
 def plot_per_seed_stats(run_map: RunMap):
@@ -757,7 +737,7 @@ def create_od_matrix(run_map: RunMap):
 
 def plot_test(run_map: RunMap):
 
-    seeds = run_map["1_999_25"].seeds()
+    seeds = run_map["1_999_25"].mobility_seeds()
     scenario = VaderScenarioPlotHelper(
         "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
     )
@@ -1166,6 +1146,7 @@ def _get_mse_data(run_map: RunMap):
         cell_count=-1,
         cell_slice=_free,
         pool_size=20,
+        # pool_size=1,
     )
     data_mean_by_run_id = data.groupby(by="run_id").mean().to_frame()
     seeds = run_map.id_to_label_series(lbl_f=lbl_f_alpha_dist, enumerate_run=True)
@@ -1188,21 +1169,6 @@ def _get_mse_data(run_map: RunMap):
         data_mean_by_run_id["cell_mse"] - data_mean_by_run_id["ymf_cell_mse"]
     )
     return data, data_mean_by_run_id
-
-
-def get_run_map_N20(output_path: str, *args, **kwargs) -> RunMap:
-    """One simulation run with 20 seeds"""
-    study1 = SuqcStudy(kwargs["src_path"])
-    run_map: RunMap = RunMap(output_dir=output_path)
-
-    run_map = study1.update_run_map(
-        run_map,
-        sim_per_group=20,
-        id_offset=0,
-        sim_group_factory=sim_group_bonnmotion,
-        allow_new_groups=True,
-    )
-    return run_map
 
 
 def get_run_map_N20_split(output_path: str, *args, **kwargs) -> RunMap:
@@ -1243,39 +1209,58 @@ def main(run_map: RunMap):
             }
         )
     ):
-        # mse_combi_plot(data_mean_by_run_id, run_map)
-        # plot_mse_yDist_to_ymf_box_plot(
-        #     run_map, data_mean_by_run_id, figure_name="box_plot.pdf"
-        # )
-        plot_mse_yDist_to_ymf(
-            data_mean_by_run_id, run_map, figure_name="msme_bar_chart.pdf"
+        plot_mse_all(data_mean_by_run_id, run_map, styles, figure_name="cell_mse.pdf")
+        plot_mse_for_seed(
+            data_mean_by_run_id["cell_mse"],
+            run_map,
+            styles,
+            figure_name="cell_mse_for_seed.pdf",
+        )
+        plot_mse_yDist_to_ymf(data_mean_by_run_id, run_map, "mse_diff.pdf")
+        plot_mse_cell_over_time(run_map, data, "cell_mse_over_time.pdf")
+        plot_count_error(run_map, "count_error_over_time.pdf")
+        plot_mse_yDist_to_ymf_box_plot(
+            run_map, data_mean_by_run_id, "cell_mse_box_plot.pdf"
+        )
+        plot_test(run_map)
+        write_cell_tex(run_map)
+        describtive_two_way_comparison_count(
+            run_map, filter_run=lambda x: x.lbl == "0.9_60_25"
         )
 
-        # plot_mse_yDist_to_ymf(data_mean_by_run_id, run_map, "mse_diff.pdf")
-        # plot_all(run_map, styles, data, data_mean_by_run_id)
+
+def get_run_map_N20(output_path: str, *args, **kwargs) -> RunMap:
+    """One simulation run with 20 seeds"""
+    study1 = SuqcStudy(kwargs["src_path"])
+    run_map: RunMap = RunMap(output_dir=output_path)
+
+    run_map = study1.update_run_map(
+        run_map,
+        sim_per_group=20,
+        id_offset=0,
+        sim_group_factory=sim_group_bonnmotion,
+        allow_new_groups=True,
+    )
+    return run_map
 
 
 if __name__ == "__main__":
-    # run_map = RunMap.load_or_create(get_run_map_N20_split, output_path="/mnt/data1tb/results/_density_map/03_dynamic_output/")
-    # run_map = RunMap.load_or_create(
-    #     partial(get_run_map_N20, src_path="/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_5/"),
-    #     output_path="/mnt/data1tb/results/_density_map/03a_dynamic_output/",
-    # )
+
+    #  mf_dynamic_m_single_cell_iat25_6 ->  s3-001 (all seeds, fixed targetChanger, map ttl=15.0 )
+    # s = SuqcStudy("/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_6")
+    # s.rename_data_root("/mnt/data1tb/results/s3-001", revert=False)
+    # sys.exit(0)
+
     run_map = RunMap.load_or_create(
         partial(
             get_run_map_N20,
-            src_path="/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_6/",
+            # src_path="/mnt/data1tb/results/mf_dynamic_m_single_cell_iat25_6/",
+            src_path="/mnt/data1tb/results/s3-001/",
         ),
-        output_path="/mnt/data1tb/results/_density_map/03c_dynamic_output/",
+        output_path="/mnt/data1tb/results/_density_map/s3-001_dynamic/",
     )
+
     # create_od_matrix(run_map)
-    # write_cell_tex(run_map)
-    # plot_test(run_map)
-    # main(run_map)
-    # plot_per_seed_stats(run_map)
-    # describtive_two_way_comparison_msce(run_map)
+    main(run_map)
     msce_comparision_paper(run_map, output_path="msme_example2.pdf")
-    # describtive_two_way_comparison_count(
-    #     run_map, filter_run=lambda x: x.lbl == "0.9_60_25"
-    # )
     print("done")
