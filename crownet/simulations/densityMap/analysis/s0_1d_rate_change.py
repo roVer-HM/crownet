@@ -1,6 +1,7 @@
 from __future__ import annotations
 from itertools import chain
 import os
+import re
 from typing import List
 from roveranalyzer.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
 from roveranalyzer.analysis.omnetpp import (
@@ -26,7 +27,7 @@ from roveranalyzer.utils.plot import (
 )
 
 from matplotlib.patches import Patch
-from a_mf_1d import SimFactory, ts_x, ts_y
+from s1_1d_bm import SimFactory, ts_x, ts_y
 from functools import partial
 from copy import deepcopy
 from omnetinireader.config_parser import ObjectValue
@@ -100,13 +101,13 @@ class SimF(SimFactory):
 
         attr[
             "lbl"
-        ] = f"{self._base_lbl}-{self.group_num}: Map $\Delta t = {map_t}$ Change rate= {attr['gt_change_rate']}"
+        ] = f"{self._base_lbl}:{self.group_num}: Map $\Delta t = {map_t}$ Change rate= {attr['gt_change_rate']}"
         attr[
             "lbl_short"
-        ] = f"{self._base_lbl}-{self.group_num}-{map_t}-{attr['gt_change_rate']} "
+        ] = f"{self._base_lbl}:{self.group_num}-{map_t}-{attr['gt_change_rate']} "
         attr["ts"] = ts
         kwds["attr"] = attr
-        ret = SimulationGroup(group_name=f"{self._base_lbl}-{self.group_num}", **kwds)
+        ret = SimulationGroup(group_name=f"{self._base_lbl}:{self.group_num}", **kwds)
         self.group_num += 1
         return ret
 
@@ -307,17 +308,17 @@ def _plot_msme_err_detail_paper(ax_epsilon: plt.Axes, data, groups, colors):
     for (g_name, c) in list(zip(groups, colors)):
         _df = data[f"diff_{g_name}"]
         g = run_map[g_name]
-        lbl = f"{g.group_name}: $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
+        lbl = f"{g.group_name}  $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
         ax_epsilon.plot(_df.index.get_level_values(0), _df, label=lbl, color=c)
 
     ax_epsilon.set_xlabel("Simulation time in seconds")
-    ax_epsilon.set_ylabel("residual MSME ratio comp. to S0-0")
+    ax_epsilon.set_ylabel("residual MSME ratio comp. to S0:0")
     ax_epsilon.set_ylim(0, 1200)
     ax_epsilon.xaxis.set_major_locator(MultipleLocator(200))
     ax_epsilon.set_ylim(-0.2, 1.4)
     ax_epsilon.legend(
         loc="upper right",
-        bbox_to_anchor=(1.03, 1.03),
+        bbox_to_anchor=(1.0, 1.03),
         handletextpad=0.2,
         columnspacing=0.5,
     )
@@ -340,7 +341,7 @@ def plot_msme_err_detail_paper(run_map: RunMap):
     )
     rate = 0.01
     seed = 16
-    groups = ["S0-0", "S0-12", "S0-16", "S0-20"]
+    groups = ["S0:0", "S0:12", "S0:16", "S0:20"]
     _c = sns.color_palette("colorblind", n_colors=11)
     colors = [_c[0], _c[3], _c[4], _c[5]]
     data = (
@@ -350,7 +351,7 @@ def plot_msme_err_detail_paper(run_map: RunMap):
         .unstack("label")
     )
     for c in data.columns:
-        data[f"diff_{c}"] = (data[c] - data["S0-0"]) / data["S0-0"]
+        data[f"diff_{c}"] = (data[c] - data["S0:0"]) / data["S0:0"]
 
     with plt.rc_context(
         paper_rc(
@@ -381,7 +382,7 @@ def _plot_msme_err_paper(
     for idx, (_, g) in enumerate(_data):
         _m = df["label"] == g.group_name
         _d = df.loc[_m]
-        lbl = f"{g.group_name}: $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
+        lbl = f"{g.group_name}  $\\Delta t_{{Map}} = {g.attr['transmission_interval_ms']/1000}\,s$"
         ax_ts.plot(
             _d["simtime"],
             _d["mean"],
@@ -444,12 +445,13 @@ def _plot_msme_err_paper(
     ax_ts2.indicate_inset_zoom(ax_zoom, edgecolor="black", linewidth=2.0)
 
     h, l = ax_ts2.get_legend_handles_labels()
-    lbl = [_lbl.split(":")[0].split("-")[-1] for _lbl in l[:-1]]
+    _m = re.compile("S0:(\d+)")
+    lbl = [_m.match(_lbl).groups()[0] for _lbl in l[:-1] if _m.match(_lbl)]
     _lbl = ",".join(lbl)
     ax_ts2.text(
         0.02,
         0.95,
-        f"Zoomed with scenario:\nS0-{_lbl}",
+        f"Zoomed with scenario:\nS0:{_lbl}",
         horizontalalignment="left",
         verticalalignment="top",
         fontsize="xx-large",
@@ -536,7 +538,7 @@ def plot_s0_summary_paper(run_map: RunMap):
     )
     rate = 0.01
     seed = 16
-    groups = ["S0-0", "S0-12", "S0-16", "S0-20"]
+    groups = ["S0:0", "S0:12", "S0:16", "S0:20"]
     _c = sns.color_palette("colorblind", n_colors=11)
     colors = [_c[0], _c[3], _c[4], _c[5]]
     data_diff = (
@@ -546,7 +548,7 @@ def plot_s0_summary_paper(run_map: RunMap):
         .unstack("label")
     )
     for c in data_diff.columns:
-        data_diff[f"diff_{c}"] = (data_diff[c] - data_diff["S0-0"]) / data_diff["S0-0"]
+        data_diff[f"diff_{c}"] = (data_diff[c] - data_diff["S0:0"]) / data_diff["S0:0"]
     with plt.rc_context(
         paper_rc(rc={"legend.fontsize": "x-large", "axes.titlesize": "x-large"})
     ):
@@ -970,7 +972,6 @@ def create_variation_tbl(run_map: RunMap):
         .replace(r"\{", r"{")
         .replace(r"\}", r"}"),
     )
-    print("hi")
 
 
 if __name__ == "__main__":
@@ -1009,7 +1010,7 @@ if __name__ == "__main__":
         output_dir,
     )
     plot_s0_summary_paper(run_map)
-    # create_variation_tbl(run_map)
+    create_variation_tbl(run_map)
     # plot_cell_knowledge_ratio(run_map)
 
     # plot_cell_occupation_ratio(run_map)
