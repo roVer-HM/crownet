@@ -23,7 +23,7 @@ outputscalarmanager-class="omnetpp::envir::SqliteOutputScalarManager"
 #**.scalar-recording = false
 
 record-eventlog = true
-#*.gloablDensityMap.**.module-eventlog-recording = true
+#*.globalDensityMap.**.module-eventlog-recording = true
 #*.misc[*].app[*].**.module-eventlog-recording = true
 **.module-eventlog-recording = false
 
@@ -33,9 +33,9 @@ extends = _default, D2D_General, DcDMap, stationary_n5
 *.coordConverter.xBound = 30.0m
 *.coordConverter.yBound = 30.0m
 **.cellSize = 3.0m
-*.gloablDensityMap.typename = "GlobalDensityMap"
-*.gloablDensityMap.writeMapInterval = 500ms
-*.gloablDensityMap.useSignalMapInit = false
+*.globalDensityMap.typename = "GlobalDensityMap"
+*.globalDensityMap.writeMapInterval = 500ms
+*.globalDensityMap.useSignalMapInit = false
 
 *.fileWriterRegister.typename = "FileWriterRegister"
 *.misc[*].nTable.maxAge = 3s
