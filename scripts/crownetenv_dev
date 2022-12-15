@@ -1,0 +1,16 @@
+# setup of roVer environment (aliases and path)
+#
+# Note: Include this script in the startup file of your shell,
+#       e.g. by adding "source [path to this script]/roverenv" at the end of ~/.bashrc
+
+CROWNET_IMAGE_REG="sam-dev.cs.hm.edu:5023" 
+CROWNET_IMAGE_BASE="${CROWNET_IMAGE_REG}/rover/crownet"
+CROWNET_IMAGE_DEFAULT_TAG="latest"
+
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+CROWNET_HOME="$(dirname $MYDIR)"
+export CROWNET_IMAGE_REG
+export CROWNET_IMAGE_BASE
+export CROWNET_IMAGE_DEFAULT_TAG
+export CROWNET_HOME
+export PATH=$PATH:$MYDIR

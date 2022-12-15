@@ -3,8 +3,13 @@
 SHORTNAME=flowcontrol
 CONTNAME=$SHORTNAME
 
+if [ -z "${CROWNET_IMAGE_DEFAULT_TAG}" ]; then
+      echo "Variabel 'CROWNET_IMAGE_DEFAULT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      exit -1
+fi
+
 if [[ -z "$1" || "$1" == "exec" || "$1" == "loc" ]]; then
-      TAG_DIGEST=:latest
+      TAG_DIGEST=":${CROWNET_IMAGE_DEFAULT_TAG}"
       CONTNAME=$SHORTNAME
 else
       TAG_DIGEST=:$1
@@ -12,7 +17,12 @@ else
       CONTNAME=$SHORTNAME
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$SHORTNAME$TAG_DIGEST
+if [ -z "$CROWNET_IMAGE_BASE" ]; then
+      echo "Variabel 'CROWNET_IMAGE_BASE' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      exit -1
+fi
+
+IMAGENAME=$CROWNET_IMAGE_BASE/$SHORTNAME$TAG_DIGEST
 
 echo "container> used image: $IMAGENAME"
 

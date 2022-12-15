@@ -8,6 +8,9 @@ variables:
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
  DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
+ CROWNET_IMAGE_REG: 'sam-dev.cs.hm.edu:5023' 
+ CROWNET_IMAGE_BASE: '${CROWNET_IMAGE_REG}/rover/crownet'
+ CROWNET_IMAGE_DEFAULT_TAG: 'latest'
 
 
 stages:

@@ -6,9 +6,14 @@
 #
 # All further arguments are passed to the docker build command, e.g. in order to set additional build arguments.
 #
+if [ -z "$CROWNET_IMAGE_REG" ]; then
+      echo "Variabel 'CROWNET_IMAGE_REG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      exit -1
+fi
+
 IMAGE_SHORT="$1"
 RANDOM=$(date +%s)
-REGISTRY='sam-dev.cs.hm.edu:5023'
+REGISTRY=${CROWNET_IMAGE_REG}
 IMAGE_LONG="$REGISTRY/rover/crownet/$IMAGE_SHORT"
 VERSION_TAG="$2"
 DATE_TAG="$(date "+%y%m%d-%H%M")"
@@ -21,9 +26,13 @@ if [ -z "$IMAGE_SHORT" ]; then
     exit -1
 fi
 
+if [ -z "${CROWNET_IMAGE_DEFAULT_TAG}" ]; then
+      echo "Variabel 'CROWNET_IMAGE_DEFAULT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      exit -1
+fi
 if [ -z "$VERSION_TAG" ]; then
-    echo "No version tag specified - using default tag \"latest\"."
-    VERSION_TAG="latest"
+    echo "No version tag specified - using default tag \"${CROWNET_IMAGE_DEFAULT_TAG}\"."
+    VERSION_TAG="$CROWNET_IMAGE_DEFAULT_TAG"
 fi
 
 TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG -t ghcr.io/rover-hm/$IMAGE_SHORT:$VERSION_TAG -t ghcr.io/rover-hm/$IMAGE_SHORT:$DATE_TAG"

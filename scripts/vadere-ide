@@ -4,8 +4,13 @@ SHORTNAME=vadere
 COMMAND=idea.sh
 CONTNAME=vadere-ide
 
+if [ -z "${CROWNET_IMAGE_DEFAULT_TAG}" ]; then
+      echo "Variabel 'CROWNET_IMAGE_DEFAULT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      exit -1
+fi
+
 if [[ -z "$1" || "$1" == "exec" ]]; then
-      VERSION=latest
+      VERSION=$CROWNET_IMAGE_DEFAULT_TAG
       CONTNAME=$CONTNAME:$VERSION
 else
       SHORTNAME=$SHORTNAME-$1
@@ -22,7 +27,12 @@ if [[ "$2" == "exec" ]]; then
       # COMMAND="$3 $4 $5 $6 $7 $8 $9"
 fi
 
-IMAGENAME=sam-dev.cs.hm.edu:5023/rover/crownet/$CONTNAME
+if [ -z "$CROWNET_IMAGE_BASE" ]; then
+      echo "Variabel 'CROWNET_IMAGE_BASE' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      exit -1
+fi
+
+IMAGENAME=$CROWNET_IMAGE_BASE/$CONTNAME
 
 echo "container> used image: $IMAGENAME"
 
