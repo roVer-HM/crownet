@@ -2,21 +2,21 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint,    expectedResult, tags
-/simulations/openair/,                  -f omnetpp.ini -c S1 		-r 0,    80s,              9870-bfdf/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S1-UA 	-r 0,    80s,              0281-b9c8/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S1-25 	-r 0,    80s,              403b-cdf2/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S1-25-UA 	-r 0,    80s,              0281-b9c8/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S2 		-r 0,    20s,              cdfd-5b0c/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S2-UA 	-r 0,    20s,              4110-fdda/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S2-25 	-r 0,    80s,              e1ca-efcb/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              9709-ee2e/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              5f5c-848b/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              4647-2f8b/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              b0eb-e86c/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              dffd-d0b7/tplx,  PASS,   omnetpp:6.0
+/simulations/openair/,                  -f omnetpp.ini -c S1 		-r 0,    80s,              9870-bfdf/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S1-UA 	-r 0,    80s,              0281-b9c8/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S1-25 	-r 0,    80s,              403b-cdf2/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S1-25-UA 	-r 0,    80s,              0281-b9c8/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S2 		-r 0,    20s,              cdfd-5b0c/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S2-UA 	-r 0,    20s,              4110-fdda/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S2-25 	-r 0,    80s,              e1ca-efcb/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              9709-ee2e/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              5f5c-848b/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              4647-2f8b/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              b0eb-e86c/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              dffd-d0b7/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
 
 # D2D scenarios
-/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              ef03-ffeb/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              0ef2-4015/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              ce48-3de0/tplx,  PASS,   omnetpp:6.0
-/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              9fd4-a067/tplx,  PASS,   omnetpp:6.0
+/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              ef03-ffeb/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              0ef2-4015/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              ce48-3de0/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
+/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              9fd4-a067/tplx,  PASS,   omnetpp:pub_ieeeAccess_DPMM
