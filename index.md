@@ -45,7 +45,7 @@ The documentation can be found in our [Github project](https://github.com/roVer-
 
 ### Contributions
 
-We welcome contributions from anyone, who is interested in extending or improving the software framework. Please submit a pull-request via github.
+We welcome contributions from anyone, who is interested in extending or improving the software framework. Please submit a pull-request via github..
 
 ###  Contact
 
