@@ -23,7 +23,7 @@ import traci.Manager;
 import traci.TraCiManager;
 
 
-network WorldMultimobility extends World
+network MultimobilityWorld extends World
 {
     parameters:
         int numAdditionalTraci = default(1);
