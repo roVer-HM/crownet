@@ -76,10 +76,10 @@ network World
             @display("p=150,384;is=s");
         }
         gNodeB1: gNodeB {
-            @display("p=282,221;is=l");
+            @display("p=451,211;is=l");
         }
         upf: Upf {
-            @display("p=293,376");
+            @display("p=451,107");
         }
     connections:
         upf.pppg++ <--> Eth10G <--> gNodeB1.ppp;
