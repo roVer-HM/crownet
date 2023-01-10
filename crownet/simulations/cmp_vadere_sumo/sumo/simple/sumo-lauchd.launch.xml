@@ -1,5 +1,0 @@
-<launch>
-<copy file="simple.net.xml"/>
-<copy file="simple.rou.xml"/>
-<copy file="simple.sumo.cfg" type="config"/>
-</launch>

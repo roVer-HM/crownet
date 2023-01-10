@@ -10,18 +10,18 @@ COMMAND_LINE_OPTIONS="-n $DIR/../simulations:$DIR:$INET_DIR:$SIMU5G_DIR:$ARTERY_
 
 # use  executable first
 if [ -x $DIR/CROWNET -o -x $DIR/CROWNET.exe ]; then
-  echo "A"
+  # echo "A"
   $DIR/CROWNET $COMMAND_LINE_OPTIONS $*
 elif [ -x $DIR/CROWNET_dbg -o -x $DIR/CROWNET_dbg.exe ]; then
-  echo "D"
+  # echo "D"
   $DIR/CROWNET_dbg $COMMAND_LINE_OPTIONS $*
 elif [ -f $DIR/libCROWNET.so -o -f $DIR/libCROWNET.dll -o -f $DIR/libCROWNET.dylib ]; then
-  echo "B"
+  # echo "B"
   opp_run -l $DIR/CROWNET $COMMAND_LINE_OPTIONS $*
 elif [ -f $DIR/libCROWNET_dbg.so -o -f $DIR/libCROWNET_dbg.dll -o -f $DIR/libCROWNET_dbg.dylib ]; then
-  echo "C"
+  # echo "C"
   exec opp_run -l $DIR/CROWNET_dbg $COMMAND_LINE_OPTIONS $*
 else
-  echo "no executbale found!"
+  echo "no executable found!"
   exit -1
 fi

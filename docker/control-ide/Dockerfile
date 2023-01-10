@@ -12,7 +12,7 @@ FROM sam-dev.cs.hm.edu:5023/rover/crownet/flowcontrol:latest
 # Specify the version/tag of flowcontrol to be put in the container:
 ENV RELEASE master
 
-LABEL description "FlowControl Simulator (as used in roVer)"
+LABEL description "FlowControl Simulator (as used in crownet)"
 LABEL maintainer  "christina_maria.mayr@hm.edu"
 
 # add ide (pycharm)

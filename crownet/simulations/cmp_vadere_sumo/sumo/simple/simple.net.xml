@@ -33,7 +33,7 @@
 
 <net version="1.0" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
 
-    <location netOffset="0.00,0.00" convBoundary="163.00,178.00,163.00,578.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
+    <location netOffset="0.00,0.00" convBoundary="0,0,400,600" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
 
     <edge id="gneE1" from="gneJ1" to="gneJ0" priority="-1">
         <lane id="gneE1_0" index="0" speed="1.40" length="398.00" width="2.50" shape="161.75,578.00 161.75,180.00"/>

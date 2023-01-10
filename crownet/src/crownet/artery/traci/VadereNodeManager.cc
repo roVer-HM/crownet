@@ -97,6 +97,10 @@ void VadereNodeManager::traciStep() {
   const auto& departed = sim_cache->get<VAR_DEPARTED_VEHICLES_IDS>();
   EV_DETAIL << "TraCI: " << departed.size() << " persons departed" << endl;
   for (const auto& id : departed) {
+    if (!(omnetpp::simTime() > 0)) {
+        throw cRuntimeError("Must not create a dynamic node at simulation time 0.0! It will not be recognized as a dynamic node by simu5G.");
+    }
+
     addMovingObject(id);
   }
 

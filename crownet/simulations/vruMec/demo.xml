@@ -1,0 +1,10 @@
+<config>
+	<!-- NR -->
+    <interface hosts="gNodeB*" names="cellular" address="10.x.x.x" netmask="255.0.0.0"/>
+    
+    <multicast-group hosts="vNode[*]" interfaces="cellular" address="224.0.0.10"/>
+    <multicast-group hosts="pNode[*]" interfaces="cellular" address="224.0.0.10"/>
+    
+    <!-- Misc -->
+    <interface hosts="**" address="192.168.x.x" netmask="255.255.255.0"/>
+</config>

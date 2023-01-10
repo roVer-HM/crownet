@@ -1,0 +1,7 @@
+# ignore result files
+*.csv
+*_tmp.gcsv
+# ignore generated plots
+*.png
+*.svg
+*.pdf

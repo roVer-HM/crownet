@@ -445,9 +445,11 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             if "omnetpp" in sim["tags"]:
                 arg_list.add("--omnet-tag", sim["tags"]["omnetpp"])
 
+            # also set vadere and control container tags - if specified
             if "vadere" in sim["tags"]:
                 arg_list.add("--vadere-tag", sim["tags"]["vadere"])
-
+            if "control" in sim["tags"]:
+                arg_list.add("--control-tag", sim["tags"]["control"])
             if "flowcontrol" in sim["tags"]:
                 arg_list.add("--control-tag", sim["tags"]["flowcontrol"])
 

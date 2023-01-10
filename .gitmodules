@@ -10,6 +10,7 @@
 [submodule "analysis/roveranalyzer"]
 	path = analysis/roveranalyzer
 	url = ../roveranalyzer.git
+	branch = cmp_vadere_sumo_update
 [submodule "artery"]
 	path = artery
 	url = ../artery.git
