@@ -119,6 +119,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
   std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
+  std::string mapDataType; //todo switch for PedestrianVsEntropy data
   std::string m_mobilityModule;
   std::shared_ptr<ActiveWriter> fileWriter;
 

@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "GlobalEntropyMap.h"
+#include "crownet/common/GlobalEntropyMap.h"
 #include <inet/common/ModuleAccess.h>
 #include "crownet/crownet.h"
 
@@ -38,14 +38,36 @@ void GlobalEntropyMap::initialize(int stage) {
       // setup entropy
       entropyTimer = new cMessage("entropyInterval");
       entropyTimerInterval = par("entropyInterval").doubleValue();
+      setLastUpdatedAt(-1.0);
       if (entropyTimerInterval > 0) {
-            scheduleAt(simTime() + 1.0, entropyTimer);
+            scheduleAt(simTime(), entropyTimer); // schedule now
       }
 
       entropyProvider = (EntropyProvider*)(par("entropyProvider").objectValue()->dup());
       take(entropyProvider);
       entropyProvider->initialize(getRNG(par("entropyRngGenerator").intValue()));
+      mapDataType = "entropyData";
   }
+}
+
+void GlobalEntropyMap::visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) {
+  const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));
+  // convert to traci 2D position
+  const auto &pos = mobility->getCurrentPosition();
+  const auto &posTraci = converter->position_cast_traci(pos);
+  const int cellid = -1*cellKeyProvider->getCellKey1D(posTraci);
+  if (_table.find(cellid) == _table.end()){
+      // value for cell not calculated jet. Call getValue to set the value
+      // base on the last update time.
+      getValue(cellid);
+  }
+
+  // visitNode is called for *all* nodes thus this 'local' map of the global
+  // module represents the global (ground truth) of the simulation.
+  // only update position, rest will be done in the update method
+  auto e = dcdMapGlobal->getEntry<GridGlobalEntry>(posTraci);
+  e->nodeIds.insert(mod->getId());
+  e->touch(simTime()); // ensure entry is valid.
 }
 
 void GlobalEntropyMap::handleMessage(cMessage *msg){
@@ -76,17 +98,18 @@ void GlobalEntropyMap::updateMaps() {
     // loaded completely!
     dcdMapGlobal->visitCells(ResetVisitor{lastUpdate});
     dcdMapGlobal->clearNeighborhood();
+    // log agent cell position. Will update _table with missing entires
+    acceptNodeVisitor(this);
 
     for(const auto& e: _table){
         const auto info = e.second;
         const auto &posTraci = converter->position_cast_traci(info->getPositionCurrent());
         // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
-        //            for each cell so the additive setup works here!
+        //            for each cell so setValue will write once.
         auto ee = dcdMapGlobal->getEntry<GridGlobalEntry>(posTraci);
-        ee->incrementCount(simTime(), info->getBeaconValueCurrent()); // increment by value.
-        ee->nodeIds.insert((int)info->getNodeId());
+        ee->setValue(now, info->getBeaconValueCurrent());
+        // do not add nodeId because the ID is a dummy from the Entropy provider.
     }
-
     // global map: local selector
     valueVisitor->setTime(simTime());
     dcdMapGlobal->computeValues(valueVisitor);
@@ -98,56 +121,61 @@ void GlobalEntropyMap::updateMaps() {
     }
 }
 
+NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
+    auto lastUpdateTime = getLastUpdatedAt();
+    if (_table.find(sourceId) == _table.end()){
+        // no value for cell found. Create new entry and set defaults
+        BeaconReceptionInfo* info = new BeaconReceptionInfo();
+        info->setNodeId(sourceId);
+        info->setReceivedTimeCurrent(-1.0); // ensure time is before 'time'
+        auto cellCenter = cellKeyProvider->cellCenter(sourceId);
+        info->setPositionCurrent(cellCenter);
+        take(info);
+        _table[sourceId] = info;
+    }
+    auto ret = _table[sourceId];
+    if (ret->getReceivedTimeCurrent() < lastUpdateTime){
+        // if value ret not updated at lastUpdateTime perform update at lastUpdateTime.
+        // This allows lazy update of ground truth when the value is requested. The
+        // current time is not needed because lastUpdateTime will be set by the event trigger.
+        auto pos = ret->getPositionCurrent();
+        ret->setBeaconValueCurrent(entropyProvider->getValue(pos, lastUpdateTime, ret->getBeaconValueCurrent()));
+        ret->setReceivedTimeCurrent(lastUpdateTime);
+    }
+    return *_table.find(sourceId);
+}
+
+NeighborhoodTableValue_t GlobalEntropyMap::getValue(const GridCellID& cellId){
+    auto id = -1*cellKeyProvider->getCellKey1D(cellId);
+    return getValue(id);
+}
+NeighborhoodTableValue_t GlobalEntropyMap::getValue(const inet::Coord& pos){
+    auto id = -1*cellKeyProvider->getCellKey1D(pos);
+    return getValue(id);
+}
+
 void GlobalEntropyMap::updateEntropy(){
     auto now = simTime();
     auto prevUpdate = getLastUpdatedAt();
-    RegularGridInfo grid = converter->getGridDescription();
     if (now > prevUpdate){
-        for(int x = 0; x < grid.getCellCount().x ; x++) {
-            for(int y = 0; y < grid.getCellCount().y; y++){
-                if (entropyProvider->selectCell(x, y, now)){
-                    auto pos = grid.getCellCenter(x, y);
-                    double value = entropyProvider->getValue(pos, now);
-                    if (value > 0.0){
-                        // dummy id based on current cell.
-                        int sourceId = -1*grid.getCellId(x, y);
-
-                        // reuse object if present.
-                        if (_table.find(sourceId) == _table.end()){
-                            BeaconReceptionInfo* info = new BeaconReceptionInfo();
-                            info->setNodeId(sourceId);
-                            take(info);
-                            _table[sourceId] = info;
-                        }
-                        _table[sourceId]->setPositionCurrent(pos);
-                        _table[sourceId]->setReceivedTimeCurrent(now);
-                        _table[sourceId]->setBeaconValueCurrent(value);
-                    }
-                }
-            }
-        }
-        // remove old values
-        for( auto it=_table.cbegin(); it !=_table.cend();){
-            if (it->second->getReceivedTimeCurrent() < now){
-                delete it->second;
-                it = _table.erase(it);
-            } else {
-                ++it;
-            }
+        setLastUpdatedAt(now); //set lastUpdated time to current time.
+        for(const auto& entry: _table){
+            //only update values already entered once
+            getValue(entry.first);
         }
     }
     std::cout << LOG_MOD2 << _table.size() << " entries in Entropy table." << endl;
-    setLastUpdatedAt(now);
+
 }
 
 
 // iterator default to all elements in map
 NeighborhoodTableIter_t GlobalEntropyMap::iter() {
-    return IBaseNeighborhoodTable::all(&_table);
+    return NeighborhoodTableLazyIter_t(&_table, IBaseNeighborhoodTable::all_pred(), this);
 }
 
 NeighborhoodTableIter_t GlobalEntropyMap::iter(NeighborhoodTablePred_t predicate){
-    return NeighborhoodTableIter_t(&_table, predicate);
+    return NeighborhoodTableLazyIter_t(&_table, predicate, this);
 }
 
 }

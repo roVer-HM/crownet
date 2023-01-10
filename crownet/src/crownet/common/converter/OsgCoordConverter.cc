@@ -46,8 +46,8 @@ void OsgCoordConverterLocal::initialize(int stage) {
           inet::Coord{par("xBound").doubleValue(), par("yBound").doubleValue()},
                       par("srs_code").stdstringValue());
       _converter->setCellSize(par("cellSize").doubleValue());
-//      sceneOrientation = inet::Quaternion::NIL;
-//      scenePosition = _converter->getScenePosition();
+      auto areaOfIntrest = dynamic_cast<AreaOfInterest*>(par("areaOfInterest").objectValue());
+      _converter->setAreaOfInterest(areaOfIntrest);
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
     }
@@ -95,6 +95,9 @@ void OsgCoordConverterVadere::initialize(int stage) {
       _converter = std::make_shared<OsgCoordinateConverter>(
                 ref.offset, netBound, ref.epsg_code);
       _converter->setCellSize(par("cellSize").doubleValue());
+      auto areaOfIntrest = dynamic_cast<AreaOfInterest*>(par("areaOfInterest").objectValue());
+      _converter->setAreaOfInterest(areaOfIntrest);
+
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
   } else if (stage == inet::INITSTAGE_LAST){
@@ -147,6 +150,9 @@ void OsgCoordConverterSumo::initialize(int stage) {
 
       _converter = std::make_shared<OsgCoordinateConverter>(offset, netBoundary, projParameter);
       _converter->setCellSize(par("cellSize").doubleValue());
+      auto areaOfIntrest = dynamic_cast<AreaOfInterest*>(par("areaOfInterest").objectValue());
+      _converter->setAreaOfInterest(areaOfIntrest);
+
       emit(simBoundSignal, this);
       emit(simOffsetSignal, this);
   }

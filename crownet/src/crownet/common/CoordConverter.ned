@@ -27,6 +27,7 @@ simple CoordConverterBase like ICoordConverter {
         @statistic[simOffsetX](source="xCoord(simOffset(simOffsetSig))"; record=last);
         @statistic[simOffsetY](source="yCoord(simOffset(simOffsetSig))"; record=last);
         double cellSize @unit(m) = default(5.0m);
+        object areaOfInterest = default({}); // empty defaults to whole grid area
 }
 
 // locally defined converter. Use configuration of parameters

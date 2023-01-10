@@ -46,6 +46,7 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppInterval = &par("mainAppInterval");
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
+      mapDataType = "pedestrianCount";
 
 
     } else if (stage == INITSTAGE_APPLICATION_LAYER){
@@ -134,7 +135,8 @@ void BaseDensityMapApp::initWriter(){
       fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
       // todo cellsize in x and y
       fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-      fBuilder.addMetadata("VERSION", std::string("0.2")); // todo!!!
+      fBuilder.addMetadata("VERSION", std::string("0.3")); // todo!!!
+      fBuilder.addMetadata("DATATYPE", mapDataType);
       fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
       fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
       std::stringstream s;

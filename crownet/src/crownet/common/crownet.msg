@@ -30,3 +30,12 @@ class RegularGridInfo {
 }
 
 
+
+class AreaOfInterest extends cOwnedObject {
+	double x;
+	double y;
+	double width;
+	double height;   
+}
+
+

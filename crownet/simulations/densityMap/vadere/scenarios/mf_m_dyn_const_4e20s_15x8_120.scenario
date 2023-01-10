@@ -1751,7 +1751,7 @@
           } ]
         },
         "reachDistance" : 0.0,
-        "changeAlgorithmType" : "SELECT_LIST",
+        "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 2129, 2130, 2124, 2127 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       } ],

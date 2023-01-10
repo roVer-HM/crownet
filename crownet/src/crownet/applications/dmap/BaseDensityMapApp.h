@@ -98,6 +98,7 @@ protected:
  std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
+ std::string mapDataType; //todo switch for PedestrianVsEntropy data
 
 
 

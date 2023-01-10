@@ -52,5 +52,6 @@ simple GlobalEntropyMap extends GlobalDensityMap like INeighborhoodTable
     	double entropyInterval @unit(s) = default(8.0s);
     	int entropyRngGenerator = 1; // default 0 used by all modules 
     	object entropyProvider;
+    	
 }
 

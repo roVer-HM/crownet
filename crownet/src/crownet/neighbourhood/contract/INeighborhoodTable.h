@@ -9,17 +9,13 @@
 #include "crownet/crownet.h"
 #include "inet/common/geometry/common/Coord.h"
 #include "crownet/applications/beacon/BeaconReceptionInfo.h"
-#include "crownet/common/iterator/FilterIterator.h"
+#include "crownet/common/converter/OsgCoordConverter.h"
+#include "crownet/neighbourhood/NeighborhoodTableFilterIterator.h"
+
 #include <list>
 
 namespace crownet {
 
-
-
-using NeighborhoodTable_t = std::map<int, BeaconReceptionInfo*>;
-using NeighborhoodTablePred_t = std::function<bool(const NeighborhoodTable_t::value_type&)>;
-using NeighborhoodTableValue_t = NeighborhoodTable_t::value_type;
-using NeighborhoodTableIter_t = FilterIterator<NeighborhoodTable_t, NeighborhoodTable_t::iterator, NeighborhoodTableValue_t, NeighborhoodTablePred_t>;
 class NeighborhoodEntryListner;
 
 class IBaseNeighborhoodTable{
@@ -39,6 +35,14 @@ public:
     static NeighborhoodTablePred_t inRadius_pred(const inet::Coord& pos, const double dist ){
         NeighborhoodTablePred_t f = [pos, dist](const NeighborhoodTableValue_t& val) -> bool {
             return pos.distance(val.second->getPositionCurrent()) < dist;
+        };
+        return f;
+    }
+
+    static NeighborhoodTablePred_t currentCell_pred(const inet::Coord& pos, const RegularGridInfo& grid){
+        NeighborhoodTablePred_t f = [pos, grid](const NeighborhoodTableValue_t& tblEntry) -> bool {
+
+            return grid.posInCenteredCell(tblEntry.second->getPositionCurrent(), pos);
         };
         return f;
     }

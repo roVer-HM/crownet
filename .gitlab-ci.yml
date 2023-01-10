@@ -8,13 +8,16 @@ variables:
  # Tags of all containers required for building and testing
  # Note: Tags here must include ALL container tags required in the fingerprint
  #       *.csv and *.yml files.
- OPP_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
- VADERE_CONT_TAG: '221108-1613'       # tag of vadere container to be used
- CONTROL_CONT_TAG: '220527-1453'      # tag of control container to be used
- SUMO_CONT_TAG: 'v1_15_0'             # tag of sumo container to be used
+ CROWNET_OPP_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
+ CROWNET_VADERE_CONT_TAG: '221108-1613'       # tag of vadere container to be used
+ CROWNET_CONTROL_CONT_TAG: '220527-1453'      # tag of control container to be used
+ CROWNET_SUMO_CONT_TAG: 'v1_15_0'             # tag of sumo container to be used
+
+ CROWNET_IMAGE_REG: '${CI_REGISTRY}'
+ CROWNET_IMAGE_BASE: '${CROWNET_IMAGE_REG}/rover/crownet'
  
  # Paths and aliases
- OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${OPP_CONT_TAG} exec'
+ OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec'
  ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
@@ -50,10 +53,10 @@ build-for-sim:
   script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker pull ${CI_REGISTRY}/rover/crownet/omnetpp:${OPP_CONT_TAG}
-    - docker pull $CI_REGISTRY/rover/crownet/sumo:${SUMO_CONT_TAG}
-    - docker pull $CI_REGISTRY/rover/crownet/vadere:${VADERE_CONT_TAG}
-    - docker pull $CI_REGISTRY/rover/crownet/flowcontrol:${CONTROL_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}
     # ## build all models
     - "${OPP} make makefiles"
     - "${OPP} make MODE=${MODE}"

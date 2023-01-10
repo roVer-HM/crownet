@@ -54,6 +54,7 @@ from roveranalyzer.dockerrunner.dockerrunner import (
     DockerReuse,
     stop_containers,
 )
+from roveranalyzer.dockerrunner import DockerCfg
 from roveranalyzer.utils.dirdiff import (
     csv_to_diffdict,
     diffdict_to_csv,
@@ -64,6 +65,8 @@ from roveranalyzer.utils import levels, logger, set_format, set_level
 import docker
 from requests.exceptions import ReadTimeout
 
+print("Docker Cfg:")
+DockerCfg.print_settings()
 
 # FIXME this is a hard coded path!!! must be specified from command line or dicovered automatically
 class TestGlobal:
@@ -441,12 +444,14 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # set omnetpp container tag - if specified
             if "omnetpp" in sim["tags"]:
                 arg_list.add("--omnet-tag", sim["tags"]["omnetpp"])
-            
+
             # also set vadere and control container tags - if specified
             if "vadere" in sim["tags"]:
                 arg_list.add("--vadere-tag", sim["tags"]["vadere"])
             if "control" in sim["tags"]:
                 arg_list.add("--control-tag", sim["tags"]["control"])
+            if "flowcontrol" in sim["tags"]:
+                arg_list.add("--control-tag", sim["tags"]["flowcontrol"])
 
             # set debug logging for test
             if self.args.verbose > 0:

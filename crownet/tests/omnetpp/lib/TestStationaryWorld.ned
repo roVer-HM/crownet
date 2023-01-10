@@ -98,7 +98,7 @@ network TestStationaryWorld
         pgw: PgwStandard if hasCellularCoreNetwork {
             @display("p=307.02,42.892498;is=l");
         }
-        gloablDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
+        globalDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
         misc[numMisc]: <default("")> like INetworkNode if numMisc > 0 {

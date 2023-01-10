@@ -61,7 +61,8 @@ OsgCoordinateConverter::OsgCoordinateConverter(
     std::string srs_code)
     : zoneOriginOffset(zoneOriginOffset),
       simBound(simBound),
-      c_srs(osgEarth::SpatialReference::get(srs_code)) {
+      areaOfIntrest(simBound),
+      c_srs(osgEarth::SpatialReference::get(srs_code)){
 
     zoneOffsetProjection.setTranslation(inet::Coord(zoneOriginOffset.x, zoneOriginOffset.y, zoneOriginOffset.z));
 }
@@ -75,12 +76,11 @@ OsgCoordinateConverter::OsgCoordinateConverter(inet::Coord zoneOriginOffset,
   zoneOffsetProjection.setTranslation(inet::Coord(zoneOriginOffset.x, zoneOriginOffset.y, zoneOriginOffset.z));
 
   std::vector<traci::TraCIPosition> vec;
-  traci::TraCIPosition upperRight{0.0, 0.0, 0.0};
-  upperRight.x = _simBound.x;
-  upperRight.y = _simBound.y;
+  traci::TraCIPosition upperRight{_simBound.x, _simBound.y, 0.0};
   vec.push_back(traci::TraCIPosition{0.0, 0.0, 0.0});
   vec.push_back(upperRight);
   simBound = traci::Boundary(vec);
+  areaOfIntrest = traci::Boundary(vec);
 
   this->c_srs = osgEarth::SpatialReference::get(srs_code);
 }
@@ -114,6 +114,7 @@ RegularGridInfo OsgCoordinateConverter::getGridDescription(const inet::Coord& ce
     info.setGridSize(gridSize);
     info.setCellSize(cellSize);
     info.setCellCount(inet::Coord{std::floor(gridSize.x / cellSize.x), std::floor(gridSize.y / cellSize.y), 0.0});
+    info.setAreaOfIntrest(areaOfIntrest);
     return info;
 }
 
@@ -178,14 +179,73 @@ inet::GeoCoord OsgCoordinateConverter::getScenePosition() const{
     return convertToGeoInet(origin);
 }
 
+void OsgCoordinateConverter::setAreaOfInterest(AreaOfInterest* aoi) {
+    if (aoi != nullptr){
+        std::vector<traci::TraCIPosition> vec;
+        traci::TraCIPosition upperRight{aoi->getX()+aoi->getWidth(), aoi->getY()+aoi->getHeight(), 0.0};
+        vec.push_back(traci::TraCIPosition{aoi->getX(), aoi->getY(), 0.0});
+        vec.push_back(upperRight);
+        auto _aoi = traci::Boundary(vec);
+        if (_aoi.lowerLeftPosition().x >= simBound.lowerLeftPosition().x &&
+                _aoi.lowerLeftPosition().y >= simBound.lowerLeftPosition().y &&
+                _aoi.upperRightPosition().x <= simBound.upperRightPosition().x &&
+                _aoi.upperRightPosition().y <= simBound.upperRightPosition().y
+        ){
+            areaOfIntrest = _aoi;
+        } else {
+            throw cRuntimeError("AreaOfIntrest (AOI) outside of simulation bound");
+        }
+    }
+}
+
+const bool OsgCoordinateConverter::aoiContains(const traci::TraCIPosition& p) const {
+    return areaOfIntrest.lowerLeftPosition().x <= p.x &&
+            areaOfIntrest.upperRightPosition().x <= p.x &&
+            areaOfIntrest.lowerLeftPosition().y <= p.y &&
+            areaOfIntrest.upperRightPosition().y <= p.y;
+}
+const bool OsgCoordinateConverter::aoiContains(const inet::Coord& c) const {
+    return aoiContains(position_cast_traci(c));
+}
+
+const bool OsgCoordinateConverter::aoiIntersectsCell(const GridCellID& cellId) const {
+    return aoiIntersectsCell(cellId.x(), cellId.y());
+}
+
+const bool OsgCoordinateConverter::aoiIntersectsCell(const int x, const int y) const {
+    return aoiContains(traci::TraCIPosition(x*cellSize.x, y*cellSize.y)) ||
+            aoiContains(traci::TraCIPosition((x+1)*cellSize.x, y*cellSize.y)) ||
+            aoiContains(traci::TraCIPosition((x+1)*cellSize.x, (y+1)*cellSize.y)) ||
+            aoiContains(traci::TraCIPosition(x*cellSize.x, (y+1)*cellSize.y));
+}
+
+
 // always apply TCS->OCS
-const omnetpp::cFigure::Point OsgCoordinateConverter::toCanvas(double x, double y, const bool isGeo){
+const omnetpp::cFigure::Point OsgCoordinateConverter::toCanvas(double x, double y, const bool isGeo) const{
     if (isGeo){
         throw cRuntimeError("not implemented");
     } else {
         auto p = moveCoordinateSystemTraCi_Opp(inet::Coord(x, y));
         return cFigure::Point(p.x, p.y);
     }
+}
+const omnetpp::cFigure::Point OsgCoordinateConverter::toCanvas(traci::TraCIPosition pos) const{
+    return toCanvas(pos.x, pos.y, false);
+}
+
+cRectangleFigure* OsgCoordinateConverter::toCanvas(const traci::Boundary& _bound, const char *name) const {
+    auto l1 = toCanvas(_bound.lowerLeftPosition());
+    auto l2 = toCanvas(_bound.upperRightPosition());
+    auto *rect = new cRectangleFigure(name);
+    rect->setBounds(cFigure::Rectangle(l1.x, l2.y, abs(l2.x-l1.x), abs(l2.y-l1.y)));
+    return rect;
+}
+
+cRectangleFigure* OsgCoordinateConverter::toCanvas(const GridCellID& cellID) const {
+    auto p = toCanvas(cellID.x()*cellSize.x, (cellID.y()+1)*cellSize.y, false);
+    auto *rect = new cRectangleFigure();
+    rect->setBounds(cFigure::Rectangle(p.x, p.y, cellSize.x, cellSize.y));
+    return rect;
 }
 
 

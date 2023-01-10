@@ -18,25 +18,77 @@ import xml.etree.ElementTree as ET
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Create random positions based on Vadere or Sumo bounds for stationary nodes")
-    p.add_argument("--vadere", help="Vadere scenario file to extract bounds", default="", type=str)
-    p.add_argument("--sumo", help="Sumo network file to extract bounds", default="", type=str)
-    p.add_argument("-n", "--number-of-positions", help="number of nodes to create", default=100, type=int)
-    p.add_argument("-N", "--number-of-runs", help="Number of runs to crated", default=1, type=int)
-    p.add_argument("-o", "--output", help="output file", required=True)
-    p.add_argument("--seed", help="set seed for random generator. If -1 use random seed", default=None, type=int)
-    p.add_argument("--config-name", help="Name used for generated configs", default="misc_pos", type=str)
-    p.add_argument("--seed-type", choices=["pos", "order"], default="pos", help="use seed to randomize positions 'pos' or keep position and change order only 'order'")
-    p.add_argument("--const-density", type=float, default=None, help="give density to use instead of number of nodes. (-n will be ignored)")
-    p.add_argument("--offset", nargs=4, default=[0., 0., 1., 1.], help="percentage offset of bound given by vadere/sumo with x, y, width, height in percent")
-    p.add_argument("-y", "--yes", action="store_true", default=False, help="Do not ask for user input. Override existing file")
-    p.add_argument("-a", "--append", action="store_true", default=False, help="Do not ask for user input. Append to existing file")
-
+    p = argparse.ArgumentParser(
+        description="Create random positions based on Vadere or Sumo bounds for stationary nodes"
+    )
+    p.add_argument(
+        "--vadere", help="Vadere scenario file to extract bounds", default="", type=str
+    )
+    p.add_argument(
+        "--sumo", help="Sumo network file to extract bounds", default="", type=str
+    )
+    p.add_argument(
+        "-n",
+        "--number-of-positions",
+        help="number of nodes to create",
+        default=100,
+        type=int,
+    )
+    p.add_argument(
+        "-N", "--number-of-runs", help="Number of runs to crated", default=1, type=int
+    )
+    p.add_argument(
+        "--output-dir", dest="output", help="output directory", required=True
+    )
+    p.add_argument(
+        "--seed",
+        help="set seed for random generator. If -1 use random seed",
+        default=None,
+        type=int,
+    )
+    p.add_argument(
+        "--config-name",
+        help="Name used for generated configs",
+        default="misc_pos",
+        type=str,
+    )
+    p.add_argument(
+        "--seed-type",
+        choices=["pos", "order"],
+        default="pos",
+        help="use seed to randomize positions 'pos' or keep position and change order only 'order'",
+    )
+    p.add_argument(
+        "--const-density",
+        type=float,
+        default=None,
+        help="give density to use instead of number of nodes. (-n will be ignored)",
+    )
+    p.add_argument(
+        "--offset",
+        nargs=4,
+        default=[0.0, 0.0, 1.0, 1.0],
+        help="percentage offset of bound given by vadere/sumo with x, y, width, height in percent",
+    )
+    p.add_argument(
+        "-y",
+        "--yes",
+        action="store_true",
+        default=False,
+        help="Do not ask for user input. Override existing file",
+    )
+    p.add_argument(
+        "-a",
+        "--append",
+        action="store_true",
+        default=False,
+        help="Do not ask for user input. Append to existing file",
+    )
 
     return p.parse_args()
 
-class OppIniWriter:
 
+class OppIniWriter:
     @classmethod
     def from_sumo(cls, ns: argparse.Namespace, path, seed=None):
         try:
@@ -52,7 +104,7 @@ class OppIniWriter:
             if len(bound) != 4:
                 raise ValueError(f"Expected 4 items in bound got {bound}")
             bound = np.array([float(i.strip()) for i in bound])
-            bound = np.array([bound[2]-bound[0], bound[3]-bound[1]])
+            bound = np.array([bound[2] - bound[0], bound[3] - bound[1]])
 
             proj = Project.from_proj(loc.attrib["projParameter"])
 
@@ -70,18 +122,22 @@ class OppIniWriter:
         try:
             # bound [[min_xy], [width/height]]
             bound = s["scenario"]["topography"]["attributes"]["bounds"]
-            bound = np.array([[0., 0.], [bound["width"], bound["height"]]])
+            bound = np.array([[0.0, 0.0], [bound["width"], bound["height"]]])
             full_bound = np.copy(bound)
-            _offset = np.reshape([float(i) for i in ns.offset], (2,2))
+            _offset = np.reshape([float(i) for i in ns.offset], (2, 2))
 
             # bound [[min_xy], [max_xy]] form here
-            bound[0] = full_bound[1]*_offset[0]
-            bound[1] = bound[0] + full_bound[1]*_offset[1]
-            if any(bound[0] > full_bound[1]) or  any(bound[1] > full_bound[1] ):
-                raise ValueError(f"given relative offset (x,y,width,height) is wrong  base_bound: {full_bound} got: {_offset}")
+            bound[0] = full_bound[1] * _offset[0]
+            bound[1] = bound[0] + full_bound[1] * _offset[1]
+            if any(bound[0] > full_bound[1]) or any(bound[1] > full_bound[1]):
+                raise ValueError(
+                    f"given relative offset (x,y,width,height) is wrong  base_bound: {full_bound} got: {_offset}"
+                )
 
             ref = s["scenario"]["topography"]["attributes"]["referenceCoordinateSystem"]
-            offset = np.array([float(ref["translation"]["x"]), float(ref["translation"]["y"])])
+            offset = np.array(
+                [float(ref["translation"]["x"]), float(ref["translation"]["y"])]
+            )
             if seed is None:
                 _r = random.Random(time.time())
                 seed = _r.randint(-2147483648, 2147483647)
@@ -89,25 +145,34 @@ class OppIniWriter:
         except Exception as e:
             raise RuntimeError(f"cannot parse scenario file {e}")
 
-
-    def __init__(self, ns: argparse.Namespace, source_crs, offset, bound, seed=42) -> None:
+    def __init__(
+        self, ns: argparse.Namespace, source_crs, offset, bound, seed=42
+    ) -> None:
         self.nodes = {}
         self._node_count = 0
         self.crs = Project.WSG84_lat_lon
-        self.to_lat_lon : Project = Project(source_crs=source_crs, dest_crs=Project.WSG84_lat_lon)
+        self.to_lat_lon: Project = Project(
+            source_crs=source_crs, dest_crs=Project.WSG84_lat_lon
+        )
         self.offset = offset
         self.bound: np.array = bound
         self.seed = seed
         self.ns = ns
         if self.ns.const_density is not None:
-            area = np.multiply(*(self.bound[1]-self.bound[0]))
-            self.number_of_positions = ceil(self.ns.const_density*area)
-            print(f"Create {self.number_of_positions} agents for a density of {self.ns.const_density}peds/m^2")
+            area = np.multiply(*(self.bound[1] - self.bound[0]))
+            self.number_of_positions = ceil(self.ns.const_density * area)
+            print(
+                f"Create {self.number_of_positions} agents for a density of {self.ns.const_density}peds/m^2"
+            )
         else:
-            self.number_of_positions =  self.ns.number_of_positions
+            self.number_of_positions = self.ns.number_of_positions
         self.number_of_runs = self.ns.number_of_runs
+        _rnd = random.Random(self.seed)
+        self.run_seeds = [
+            _rnd.randint(0, 2147483647) for _ in range(self.number_of_runs)
+        ]
 
-    def add_point(self, x: float, y:float, run):
+    def add_point(self, x: float, y: float, run):
         _p = np.array([x, y])
         if all(_p >= 0) and all(_p <= self.bound[1]) and all(_p >= self.bound[0]):
             _d = Point(self.offset + _p)
@@ -119,14 +184,14 @@ class OppIniWriter:
             raise ValueError("Out of bound")
 
     def to_geo_frame(self, epsg=Project.OpenStreetMaps, run=0):
-        
+
         nodes = self.nodes[run]
         geo = [Point(x, y) for _, x, y in nodes]
-        df = pd.DataFrame(nodes, columns=["id","x", "y"])
+        df = pd.DataFrame(nodes, columns=["id", "x", "y"])
         df = gpd.GeoDataFrame(df, geometry=geo, crs=Project.UTM_32N)
-        df = df.to_crs(epsg=epsg.replace("EPSG:", "")) # Google
+        df = df.to_crs(epsg=epsg.replace("EPSG:", ""))  # Google
         return df
-    
+
     def write_config(self, writer, config="", run=0):
         _df = self.to_geo_frame(Project.WSG84_lat_lon, run=run)
 
@@ -139,41 +204,68 @@ class OppIniWriter:
             writer.write("\n")
         writer.write(f"*.numMisc = {len(nodes)}\n")
         for id, row in _df.iterrows():
-            writer.write(f"*.misc[{id}].mobility.initialLatitude = {row.geometry.y}deg\n")
-            writer.write(f"*.misc[{id}].mobility.initialLongitude = {row.geometry.x}deg\n")
+            writer.write(
+                f"*.misc[{id}].mobility.initialLatitude = {row.geometry.y}deg\n"
+            )
+            writer.write(
+                f"*.misc[{id}].mobility.initialLongitude = {row.geometry.x}deg\n"
+            )
         writer.write("\n")
-    
-    def write_all_configs(self, writer, config_template):
-        writer.write(f"# Generated with python3 random.Random(seed={self.seed})\n")
+
+    def write_configs(self):
+        config_name = self.ns.config_name.replace(".", "-")
+        os.makedirs(self.ns.output, exist_ok=True)
+        for run in self.nodes.keys():
+            seed = self.run_seeds[run]
+            num = len(self.nodes[run])
+            out = os.path.join(self.ns.output, f"{config_name}_{num}_{run}_{seed}.ini")
+            print(f"write: {out}")
+            with open(out, "w", encoding="utf-8") as fd:
+                self.write_run(fd, config_name, run, seed)
+
+    def write_run(self, writer, config_template, run, seed):
+        writer.write(f"# Generated with python3 random.Random(seed={seed})\n")
         writer.write(f"# Mode: {self.ns.seed_type})")
         writer.write("\n\n")
-        for run in self.nodes.keys():
-            self.write_config(writer, f"[Config {config_template}_{run}]", run=run)
-            writer.write("\n")
+        self.write_config(
+            writer,
+            f"[Config {config_template}_{len(self.nodes[run])}_{run}_{seed}]",
+            run=run,
+        )
+        writer.write("\n")
 
     def uniform_pos(self, num_nodes, num_runs=1):
         """
         Crate random positions.
         """
-        rnd = random.Random(self.seed)
         self._node_count = 0  # todo: side effect?
         for run in range(num_runs):
+            rnd = random.Random(self.run_seeds[run])
             for _ in range(num_nodes):
-                self.add_point(x=rnd.uniform(*self.bound[:, 0]), y=rnd.uniform(*self.bound[:, 1]), run=run)
+                self.add_point(
+                    x=rnd.uniform(*self.bound[:, 0]),
+                    y=rnd.uniform(*self.bound[:, 1]),
+                    run=run,
+                )
             self._node_count = 0
 
     def uniform_order(self, num_nodes, num_runs=1):
         """
-        Create random positions. Keep the positions constant between different runs and only change 
+        Create random positions. Keep the positions constant between different runs and only change
         the order of the nodes such that different nodes will be removed during the simulation
         """
-        rnd = random.Random(self.seed)
+        rnd = random.Random(self.run_seeds[0])
         self._node_count = 0  # todo: side effect?
         for _ in range(num_nodes):
-            self.add_point(x=rnd.uniform(*self.bound[:, 0]), y=rnd.uniform(*self.bound[:, 1]), run=0)
+            self.add_point(
+                x=rnd.uniform(*self.bound[:, 0]),
+                y=rnd.uniform(*self.bound[:, 1]),
+                run=0,
+            )
         for run in range(1, num_runs):
-            _points = list(self.nodes[0]) # copy initial set
-            rnd.shuffle(_points) # in place shuffle
+            rnd = random.Random(self.run_seeds[run])
+            _points = list(self.nodes[0])  # copy initial set
+            rnd.shuffle(_points)  # in place shuffle
             self.nodes[run] = _points
 
     def uniform(self, num_nodes, num_runs=1):
@@ -183,8 +275,11 @@ class OppIniWriter:
         else:
             return self.uniform_pos(num_nodes, num_runs)
 
+
 def override_yes_no_append():
-    print("do you want to override (yes) the file or append (a) to it? (n) or for exit ")
+    print(
+        "do you want to override (yes) the file or append (a) to it? (n) or for exit "
+    )
     print("[yes/n/a] [ENTER]")
     choice = input().lower()
     if choice == "yes":
@@ -194,40 +289,41 @@ def override_yes_no_append():
     else:
         return None
 
+
 def main_pos(w: OppIniWriter, ns: argparse.Namespace):
     w.uniform(w.number_of_positions, w.number_of_runs)
+
 
 def main_density(w: OppIniWriter, ns: argparse.Namespace):
     pass
 
+
 ns = parse_args()
 if ns.vadere != "":
-    w : OppIniWriter = OppIniWriter.from_vadere(ns, ns.vadere, seed=ns.seed)
+    w: OppIniWriter = OppIniWriter.from_vadere(ns, ns.vadere, seed=ns.seed)
 elif ns.sumo != "":
-    w : OppIniWriter = OppIniWriter.from_sumo(ns, ns.sumo, seed=ns.seed)
+    w: OppIniWriter = OppIniWriter.from_sumo(ns, ns.sumo, seed=ns.seed)
 
-mode = "w"
-if os.path.exists(ns.output):
-    if ns.yes:
-        mode = "w"
-    elif ns.append:
-        mode = "a"
-    else:
-        print("Output file already exist!")
-        mode = override_yes_no_append()
-        if mode is None:
-            print("Abort. Do nothing.")
-            sys.exit(0)
+# mode = "w"
+# if os.path.exists(ns.output):
+#     if ns.yes:
+#         mode = "w"
+#     elif ns.append:
+#         mode = "a"
+#     else:
+#         print("Output file already exist!")
+#         mode = override_yes_no_append()
+#         if mode is None:
+#             print("Abort. Do nothing.")
+#             sys.exit(0)
 
 w.uniform(w.number_of_positions, w.number_of_runs)
+w.write_configs()
 
+# with open(ns.output, mode=mode, encoding="utf-8") as out:
+#     if mode == "w":
+#         print(f"write to {os.path.abspath(ns.output)}")
+#     elif mode == "a":
+#         print(f"append to {os.path.abspath(ns.output)}")
 
-with open(ns.output, mode=mode, encoding="utf-8") as out:
-    if mode == "w":
-        print(f"write to {os.path.abspath(ns.output)}")
-    elif mode == "a":
-        print(f"append to {os.path.abspath(ns.output)}")
-        
-    w.write_all_configs(out, ns.config_name.replace(".", "-"))
-
-
+#     w.write_run(out, ns.config_name.replace(".", "-"))

@@ -33,6 +33,7 @@ class SimulationRun(BaseRunner):
             data_root=self.result_base_dir()
         )
         builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+        # builder.set_imputation_strategy(DeleteMissingImputation())
         builder.build(self.ns.get("hdf_override", "False"))
 
     @process_as({"prio": 990, "type": "post"})
@@ -40,17 +41,32 @@ class SimulationRun(BaseRunner):
         result_dir, _, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        HdfExtractor.extract_packet_loss(
-            join(result_dir, "packet_loss.h5"), "beacon", sql, app=sql.m_app0()
-        )
-        HdfExtractor.extract_packet_loss(
-            join(result_dir, "packet_loss.h5"), "map", sql, app=sql.m_app1()
-        )
+        # search config in sca file for apps extract packet loss
+        # only for apps present.
+        app_selector = sql.get_app_selector()
+
+        if "beacon" in app_selector:
+            HdfExtractor.extract_packet_loss(
+                join(result_dir, "packet_loss.h5"),
+                "beacon",
+                sql,
+                app=app_selector["beacon"],
+            )
+        if "map" in app_selector:
+            HdfExtractor.extract_packet_loss(
+                join(result_dir, "packet_loss.h5"), "map", sql, app=app_selector["map"]
+            )
         HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
 
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
-        sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        try:
+            sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
+        except ValueError:
+            print(
+                "No suqc context found. Try creating Simulation object without context. Some features of the Simulation analysis might be not supported."
+            )
+            sim = Simulation.from_output_dir(self.result_base_dir())
         OppAnalysis.append_err_measures_to_hdf(sim)
 
     @process_as({"prio": 970, "type": "post"})
@@ -58,11 +74,18 @@ class SimulationRun(BaseRunner):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-        sel = list(OppAnalysis.find_selection_method(builder))
-        if len(sel) > 1:
-            print(f"multiple selections found: {sel}")
-        OppAnalysis.create_common_plots(result_dir, builder, sql, selection=sel[0])
+        OppAnalysis.create_common_plots_all(result_dir, builder, sql)
+        if sql.is_count_map():
+            print("build count based default plots")
+            builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+            sel = list(OppAnalysis.find_selection_method(builder))
+            if len(sel) > 1:
+                print(f"multiple selections found: {sel}")
+            OppAnalysis.create_common_plots_density(
+                result_dir, builder, sql, selection=sel[0]
+            )
+        else:
+            print("build entropy map based plots")
 
     @process_as({"prio": 960, "type": "post"})
     def remove_density_map_csv(self):
@@ -85,6 +108,15 @@ class SimulationRun(BaseRunner):
 if __name__ == "__main__":
 
     settings = []
+    # settings = [
+    #     "post-processing",
+    #     "--qoi",
+    #     "all",
+    #     "--override-hdf",
+    #     "--resultdir",
+    #     # "results/S1_bonn_motion_dev_20221007-13:43:08",
+    #     "results/S1_bonn_motion_dev_20221010-08:51:11",
+    # ]
 
     if len(sys.argv) == 1:
         # default behavior of script

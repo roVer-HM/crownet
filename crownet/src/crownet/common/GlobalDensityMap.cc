@@ -132,7 +132,8 @@ void GlobalDensityMap::initializeMap(){
         fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
         // todo cellsize in x and y
         fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-        fBuilder.addMetadata("VERSION", std::string("0.2")); // todo!!!
+        fBuilder.addMetadata("VERSION", std::string("0.3")); // todo!!!
+        fBuilder.addMetadata("DATATYPE", mapDataType);
         fBuilder.addMetadata<std::string>(
             "MAP_TYPE",
             "global");  // The global density map is the ground
@@ -173,6 +174,7 @@ void GlobalDensityMap::initialize(int stage) {
       if (vectorNodeModule != ""){
           dynamicNodeVisitorAcceptors.push_back(this);
       }
+      mapDataType = "pedestrianCount";
 
       cModule* _traciModuleListener = findModuleByPath(par("traciModuleListener").stringValue());
       if (_traciModuleListener){

@@ -1635,7 +1635,7 @@
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 2122, 2121 ],
-        "probabilityToChangeTarget" : [ 0.6, 0.4 ]
+        "probabilityToChangeTarget" : [ ]
       }, {
         "id" : 2,
         "shape" : {
@@ -1751,9 +1751,9 @@
           } ]
         },
         "reachDistance" : 0.0,
-        "changeAlgorithmType" : "SELECT_LIST",
+        "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 2129, 2130, 2124, 2127 ],
-        "probabilityToChangeTarget" : [ 1.0 ]
+        "probabilityToChangeTarget" : [ ]
       } ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
@@ -1924,7 +1924,7 @@
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 61,
+        "id" : 1131,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {

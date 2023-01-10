@@ -30,7 +30,10 @@ Define_Module(EntropyNeigborhoodTableClient);
 void EntropyNeigborhoodTableClient::initialize(int stage) {
     MobilityProviderMixin<cSimpleModule>::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        globalTable = getModuleFromPar<IBaseNeighborhoodTable>(par("globalTable"), this);
+        globalTable = getModuleFromPar<GlobalEntropyMap>(par("globalTable"), this);
+        converter = inet::getModuleFromPar<OsgCoordConverterProvider>(
+                        par("coordConverterModule"), this)
+                        ->getConverter();
         dist = par("distance");
     }
 }
@@ -53,11 +56,23 @@ const int EntropyNeigborhoodTableClient::getSize(){
     return count;
 }
 
+const NeighborhoodTableValue_t EntropyNeigborhoodTableClient::updateGetGlobalValue(const inet::Coord& pos){
+    return globalTable->getValue(pos);
+}
+
+const bool EntropyNeigborhoodTableClient::currentCellOnly() const{
+    return dist <= 0.0;
+}
+
 // iterator default to all elements in map
 NeighborhoodTableIter_t
 EntropyNeigborhoodTableClient::iter() {
-    auto pred = INeighborhoodTable::inRadius_pred(getPosition(), dist);
-    return globalTable->iter(pred);
+    NeighborhoodTablePred_t pred;
+    if (dist > 0.0){
+        pred = INeighborhoodTable::inRadius_pred(getPosition(), dist);
+        return globalTable->iter(pred);
+    }
+    return globalTable->iter();
 }
 
 NeighborhoodTableIter_t

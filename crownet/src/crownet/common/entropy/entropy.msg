@@ -31,3 +31,11 @@ class UniformEntropy extends EntropyProvider {
     double maxValue;
     double cellSelectionPropability; 
 }
+
+class RndOffsetPolynomialEntropy extends EntropyProvider {
+    @customize(true);
+    double coefficients[];
+    double cellSelectionPropability = 1.0; 
+    double minValue;
+    double maxValue;
+}

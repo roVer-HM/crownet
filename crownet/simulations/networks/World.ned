@@ -44,6 +44,7 @@ import crownet.common.ICoordConverter;
 import crownet.common.IGlobalDensityMap;
 import crownet.control.IControlManager;
 import crownet.common.util.IFileWriterRegister;
+import crownet.common.DensityMapSceneCanvasVisualizer;
 import crownet.mobility.BonnMotionServer;
 import crownet.nodes.ApplicationLayerPedestrian;
 import crownet.nodes.ApplicationLayerVehicle;
@@ -151,8 +152,8 @@ network World
             parameters:
                 @display("p=523.74,148.995;i=abstract/people;is=s");
         }
-        gloablDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
-            @display("p=625.3275,31.605;i=block/table2;is=s");
+        globalDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
+            @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
 
         flowController: <default("")> like IControlManager if typename != "" {
@@ -167,6 +168,9 @@ network World
         }
         bonnMotionServer: <default("")> like BonnMotionServer if typename != "" {
             @display("p=449.2425,384.90375;i=block/table2_s;is=s");
+        }
+        mapVisualizer: DensityMapSceneCanvasVisualizer {
+            @display("p=539.5425,328.46625;is=s");
         }
 
 
