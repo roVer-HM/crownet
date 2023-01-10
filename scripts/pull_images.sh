@@ -4,10 +4,17 @@
 
 # define version tags
 TAG_UBUNTU="20.04"
-TAG_OMNETPP="6.0.1"
-TAG_SUMO="v1_15_0"
-TAG_VADERE="221108-1613"
-TAG_CONTROL="220527-1453"
+# Container tag defined 
+# TAG_OMNETPP="6.0.1"
+# TAG_SUMO="v1_15_0"
+# TAG_VADERE="221108-1613"
+# TAG_CONTROL="220527-1453"
+
+TAG_ERR="Container tag variable not set."
+[[ -z "$CROWNET_OPP_CONT_TAG" ]] && echo "Omnet $TAG_ERR" && exit -1
+[[ -z "$CROWNET_SUMO_CONT_TAG" ]] && echo "Sumo $TAG_ERR" && exit -1
+[[ -z "$CROWNET_VADERE_CONT_TAG" ]] && echo "Vadere $TAG_ERR" && exit -1
+[[ -z "$CROWNET_CONTROL_CONT_TAG" ]] && echo "Control $TAG_ERR" && exit -1
 
 docker image pull ubuntu
 docker image pull ubuntu:$TAG_UBUNTU
@@ -26,16 +33,17 @@ echo "access image repo: $CROWNET_IMAGE_REG"
 docker login "$CROWNET_IMAGE_REG"
 
 docker image pull "${CROWNET_IMAGE_BASE}/omnetpp"
-docker image pull "${CROWNET_IMAGE_BASE}/omnetpp:${TAG_OMNETPP}"
+docker image pull "${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}"
 docker image pull "${CROWNET_IMAGE_BASE}/omnetpp-ide"
 
 docker image pull "${CROWNET_IMAGE_BASE}/sumo"
-docker image pull "${CROWNET_IMAGE_BASE}/sumo:${TAG_SUMO}"
+docker image pull "${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}"
 
 docker image pull "${CROWNET_IMAGE_BASE}/vadere"
-docker image pull "${CROWNET_IMAGE_BASE}/vadere:${TAG_VADERE}"
+docker image pull "${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}"
 docker image pull "${CROWNET_IMAGE_BASE}/vadere-ide"
 
 docker image pull "${CROWNET_IMAGE_BASE}/flowcontrol"
+docker image pull "${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}"
 docker image pull "${CROWNET_IMAGE_BASE}/flowcontrol-ide"
 

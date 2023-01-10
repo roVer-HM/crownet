@@ -26,13 +26,9 @@ if [ -z "$IMAGE_SHORT" ]; then
     exit -1
 fi
 
-if [ -z "${CROWNET_IMAGE_DEFAULT_TAG}" ]; then
-      echo "Variabel 'CROWNET_IMAGE_DEFAULT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
-      exit -1
-fi
 if [ -z "$VERSION_TAG" ]; then
-    echo "No version tag specified - using default tag \"${CROWNET_IMAGE_DEFAULT_TAG}\"."
-    VERSION_TAG="$CROWNET_IMAGE_DEFAULT_TAG"
+    echo "No version tag specified - using latest."
+    VERSION_TAG="latest"
 fi
 
 TAG_OPTIONS="-t $IMAGE_LONG:$VERSION_TAG -t $IMAGE_LONG:$DATE_TAG -t ghcr.io/rover-hm/$IMAGE_SHORT:$VERSION_TAG -t ghcr.io/rover-hm/$IMAGE_SHORT:$DATE_TAG"

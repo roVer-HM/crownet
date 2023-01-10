@@ -4,12 +4,14 @@
 #       e.g. by adding "source [path to this script]/roverenv" at the end of ~/.bashrc
 CROWNET_IMAGE_REG="ghcr.io" 
 CROWNET_IMAGE_BASE="${CROWNET_IMAGE_REG}/rover-hm"
-CROWNET_IMAGE_DEFAULT_TAG="latest"
 
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CROWNET_HOME="$(dirname $MYDIR)"
 export CROWNET_IMAGE_REG
 export CROWNET_IMAGE_BASE
-export CROWNET_IMAGE_DEFAULT_TAG
 export CROWNET_HOME
-export PATH=$PATH:$MYDIR
+export CROWNET_OPP_CONT_TAG="6.0.1"                # tag of OMNeT++ container to be used
+export CROWNET_VADERE_CONT_TAG="221108-1613"       # tag of vadere container to be use
+export CROWNET_CONTROL_CONT_TAG="220527-1453"      # tag of control container to be used
+export CROWNET_SUMO_CONT_TAG="v1_15_0"             # tag of sumo container to be used
+export PATH=$PATH:$CROWNET_HOME

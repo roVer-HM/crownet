@@ -19,13 +19,13 @@ SHORTNAME=omnetpp
 COMMAND=omnetpp
 CONTNAME=omnetpp
 
-if [ -z "${CROWNET_IMAGE_DEFAULT_TAG}" ]; then
-      echo "Variabel 'CROWNET_IMAGE_DEFAULT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+if [ -z "${CROWNET_OPP_CONT_TAG}" ]; then
+      echo "Variabel 'CROWNET_OPP_CONT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
       exit -1
 fi
 
 if [[ -z "$1" || "$1" == "exec" || "$1" == "execs" ]]; then
-      VERSION=$CROWNET_IMAGE_DEFAULT_TAG
+      VERSION=$CROWNET_OPP_CONT_TAG
       CONTNAME=$SHORTNAME:$VERSION
 else
       VERSION=omnetpp-$1
