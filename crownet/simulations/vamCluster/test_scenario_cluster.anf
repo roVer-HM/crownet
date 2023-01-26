@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<analysis version="2">
+    <inputs>
+        <input pattern="results/test_scenario_cluster/test_scenario_cluster-0-20230105-12:08:17-2606788/0.vec"/>
+    </inputs>
+    <charts/>
+</analysis>
