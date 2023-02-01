@@ -10,7 +10,8 @@ if [ -z "${CROWNET_VADERE_CONT_TAG}" ]; then
 fi
 
 if [[ -z "$1" || "$1" == "exec" ]]; then
-      VERSION=$CROWNET_VADERE_CONT_TAG
+      #VERSION=$CROWNET_VADERE_CONT_TAG
+      VERSION=latest
       CONTNAME=$CONTNAME:$VERSION
 else
       SHORTNAME=$SHORTNAME-$1

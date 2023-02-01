@@ -14,4 +14,4 @@ export CROWNET_OPP_CONT_TAG="6.0.1"                # tag of OMNeT++ container to
 export CROWNET_VADERE_CONT_TAG="221108-1613"       # tag of vadere container to be use
 export CROWNET_CONTROL_CONT_TAG="220527-1453"      # tag of control container to be used
 export CROWNET_SUMO_CONT_TAG="v1_15_0"             # tag of sumo container to be used
-export PATH=$PATH:$CROWNET_HOME
+export PATH="${PATH}:${CROWNET_HOME}/scripts"
