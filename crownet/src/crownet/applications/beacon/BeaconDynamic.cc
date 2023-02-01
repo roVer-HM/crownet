@@ -22,7 +22,7 @@ void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
         nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
-
+        tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
         maxBandwith = par("maxBandwith");
@@ -33,7 +33,7 @@ void BeaconDynamic::initialize(int stage) {
 Packet *BeaconDynamic::createPacket() {
     const auto &beacon = makeShared<DynamicBeaconPacket>();
 
-    beacon->setSequencenumber(localInfo->nextSequenceNumber());
+    beacon->setSequenceNumber(localInfo->nextSequenceNumber());
     beacon->setSourceId(getHostId());
     uint32_t time = simtime_to_timestamp_32_ms();
     beacon->setTimestamp(time);
@@ -46,22 +46,26 @@ Packet *BeaconDynamic::createPacket() {
 
     auto packet = buildPacket(beacon);
 
-    // process local for own location entry in neighborhood table.
-    auto tmp = packet->dup();
-    handleDataArrived(tmp);
-    delete tmp;
-
+    // no direct call to handleDataArrived needed. Packet is delivered back to sender at the same time.
     return packet;
 }
 
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
 
+
     auto pSrcId = packet->peekAtFront<DynamicBeaconPacket>()->getSourceId();
-    auto info = nTable->getOrCreateEntry(pSrcId);
-    // process new beacon
-    info->processInbound(packet, hostId, simTime());
-    nTable->processInfo(info);
+    std::cout << simTime().dbl() << " eventNr. " << getSimulation()->getEventNumber() << " hostID" << hostId << "<---" << pSrcId << std::endl;
+
+    auto infoTag = packet->findTagForUpdate<AppInfoTag>();
+    if (infoTag == nullptr){
+        throw cRuntimeError("No AppInfoTag found. Application needs an ApplicationMeter to manage AppInfoObjects.");
+    }
+    auto info = dynamic_cast<BeaconReceptionInfo*>(infoTag->getAppInfoForUpdate());
+    if (info == nullptr){
+        throw cRuntimeError("Provided AppInfo object cannot be cast to BeaconReceptionInfo");
+    }
+    tablePktProcessor->processInfo(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

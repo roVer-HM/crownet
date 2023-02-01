@@ -24,20 +24,24 @@ public:
 
 
     // override for granular handling of packet types
-    virtual void processInbound(Packet *inbound, const uint32_t rcvStationId,
+    virtual void processInbound(const Ptr<const Chunk> dataInbound, const uint32_t rcvStationId,
             const simtime_t arrivalTime) override;
 
     // converts simtime_t time into unit32_t representation (ms)
-    using BeaconReceptionInfo_Base::setSentTimeCurrent;
-    virtual void setSentTimeCurrent(omnetpp::simtime_t time);
+    virtual uint32_t get32BitTimestamp(omnetpp::simtime_t time) const;
 
     virtual std::string str() const override;
+    virtual std::string infoStrShort() const;
 
     bool isUpdated() const {return updated;}
 
-    bool checkCurrentTtlReached(const omnetpp::simtime_t& ttl);
-    // will return true if there is no prio packet info
-    bool checkPrioTtlReached(const omnetpp::simtime_t& ttl);
+    bool checkCurrentTtlReached(const omnetpp::simtime_t& ttl) const ;
+    void clearApplicationData();
+
+    void initAppData();
+
+    // more than one valid beacon arrived.
+    bool hasPrio() const;
 
 protected:
 

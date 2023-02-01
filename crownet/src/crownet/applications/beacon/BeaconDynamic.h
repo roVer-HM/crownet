@@ -31,6 +31,7 @@ public:
 
 private:
     INeighborhoodTable* nTable = nullptr;
+    INeighborhoodTablePacketProcessor* tablePktProcessor = nullptr;
     double minSentFrequency;
     double maxSentFrequyncy;
     double maxBandwith;

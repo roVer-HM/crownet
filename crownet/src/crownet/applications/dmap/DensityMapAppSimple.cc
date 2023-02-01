@@ -76,7 +76,7 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
     // remove beacon value from cell entry and remove source (nodeId) from neighborhood
     Enter_Method_Silent();
     if (isRunning()){
-        EV_INFO << LOG_MOD << hostId << " remove:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
+        EV_INFO << LOG_MOD << hostId << " remove:" << info->infoStrShort() << endl;
         auto cellId = dcdMap->getNeighborCell((int)info->getNodeId());
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
         // TTL reached thus use the current simulation time and not the
@@ -102,13 +102,13 @@ void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, 
             throw cRuntimeError("Beacon info object does not contain prio values");
         }
         // get and check prio position
-        auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionPrio());
+        auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getPrioData()->getPosition());
         auto savedCellId = dcdMap->getNeighborCell((int)info->getNodeId());
         if (cellId != savedCellId){
             //todo add info to error message
             throw cRuntimeError("BeaconReceptionInfo reports different cell id than saved in density map");
         }
-        EV_INFO << LOG_MOD << hostId << " leave-cell:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
+        EV_INFO << LOG_MOD << hostId << " leave-cell:" << info->infoStrShort() << endl;
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source
@@ -119,8 +119,8 @@ void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, 
         // decrement old cell by 1, update time and distance measure
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
         cellEntryLocal->decrementCount(
-                info->getSentSimTimeCurrent(),
-                info->getReceivedTimeCurrent(),
+                info->getCurrentData()->getCreationTime(),
+                info->getCurrentData()->getReceivedTime(),
                 1.0
         );
         cellEntryLocal->setEntryDist(std::move(dist));
@@ -137,12 +137,12 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
     Enter_Method_Silent();
     if (isRunning()){
         // get and check current position
-        auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionCurrent());
+        auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getCurrentData()->getPosition());
         if (dcdMap->isInNeighborhood((int)info->getNodeId())){
             //todo add info to error message
             throw cRuntimeError("Node already in neighborhood");
         }
-        EV_INFO << LOG_MOD << hostId << " enter-cell:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
+        EV_INFO << LOG_MOD << hostId << " enter-cell:" << info->infoStrShort() << endl;
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source
@@ -153,8 +153,8 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
         // increment new cell by 1, update time and distance measure
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
         cellEntryLocal->incrementCount(
-                info->getSentSimTimeCurrent(),
-                info->getReceivedTimeCurrent(),
+                info->getCurrentData()->getCreationTime(),
+                info->getCurrentData()->getReceivedTime(),
                 1.0
         );
         cellEntryLocal->setEntryDist(std::move(dist));
@@ -177,15 +177,16 @@ void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table,
             throw cRuntimeError("Beacon info object does not contain prio values");
         }
         // get and check position for cellId
-        auto cellId_prio = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionPrio());
-        auto cellId_current = dcdMap->getCellKeyProvider()->getCellKey(info->getPositionCurrent());
+        auto cellId_prio = dcdMap->getCellKeyProvider()->getCellKey(info->getPrioData()->getPosition());
+        auto cellId_current = dcdMap->getCellKeyProvider()->getCellKey(info->getCurrentData()->getPosition());
+
         auto savedCellId = dcdMap->getNeighborCell((int)info->getNodeId());
         if ((cellId_prio != cellId_current) || (cellId_current !=savedCellId)){
             //todo add info to error message
             throw cRuntimeError("Nodes prio and current cell do not match or current position "
                     "and saved cell in map do not match");
         }
-        EV_INFO << LOG_MOD << hostId << " stay-in-cell:" << cObjectPrinter::shortBeaconInfoShortPrinter(info) << endl;
+        EV_INFO << LOG_MOD << hostId << " stay-in-cell:" << info->infoStrShort() << endl;
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source
@@ -196,8 +197,8 @@ void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table,
         // update time stamps and distance
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId_current);
         cellEntryLocal->touch(
-            info->getSentSimTimeCurrent(),
-            info->getReceivedTimeCurrent()
+            info->getCurrentData()->getCreationTime(),
+            info->getCurrentData()->getReceivedTime()
         );
         cellEntryLocal->setEntryDist(std::move(dist));
     }

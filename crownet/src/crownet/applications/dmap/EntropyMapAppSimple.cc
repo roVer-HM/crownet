@@ -56,18 +56,18 @@ void EntropyMapAppSimple::updateLocalMap() {
         const auto &posTraci = converter->position_cast_traci(getPosition());
         const auto info = entropyClient->updateGetGlobalValue(getPosition());
         auto ee = dcdMap->getEntry<GridEntry>(posTraci);
-        ee->setValue(now, info.second->getBeaconValueCurrent());
+        ee->setValue(now, info.second->getCurrentData()->getBeaconValue());
 
     } else {
         // interator has filters for distance
         for(const auto& e : entropyClient->iter()){
             ++count;
             const auto info = e.second;
-            const auto &posTraci = converter->position_cast_traci(info->getPositionCurrent());
+            const auto &posTraci = converter->position_cast_traci(info->getCurrentData()->getPosition());
                     // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
                     //            for each cell so the additive setup works here!
             auto ee = dcdMap->getEntry<GridEntry>(posTraci);
-            ee->setValue(now, info->getBeaconValueCurrent()); // entropy sever ensures that ther is at most on
+            ee->setValue(now, info->getCurrentData()->getBeaconValue()); // entropy sever ensures that ther is at most on
                                                              // entry per cell. Thus increment works here.
          }
     }

@@ -59,7 +59,6 @@ public:
 class cObjectPrinter {
 public:
     static cObjectPrinter shortBeaconInfoShortPrinter;
-
 public:
     cObjectPrinter(std::vector<std::string> fields): fields(fields), fieldIds(), sepCount(fields.size()){}
     // number of columns needed

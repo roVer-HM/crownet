@@ -8,7 +8,7 @@ namespace crownet{
             {
                 std::cout << "nTable[" << it->first << "]" <<
                         " -- nodeId: " << it->second->getNodeId() <<
-                        " -- timeSend: " << it->second->getSentTimePrio() << "\n";
+                        " -- timeSend: " << it->second->getCurrentData()->getCreationTime() << "\n";
             }
         }
 

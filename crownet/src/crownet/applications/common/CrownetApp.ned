@@ -103,6 +103,8 @@ module BeaconApp extends CrownetApp {
  		socket.typename = default("UdpSocketManager");
  		socket.destPort = default(30001);
         socket.localPort = default(30001);	
+        packetMeterIn.typename = "ApplicationPacketMeterIn";
+        packetMeterIn.appInfoClass = default("crownet::BeaconReceptionInfo");
 }		
 
 

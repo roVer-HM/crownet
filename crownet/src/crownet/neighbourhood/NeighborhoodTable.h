@@ -23,6 +23,7 @@ class NeighborhoodTableSizeFilter;
 
 class NeighborhoodTable : public MobilityProviderMixin<cSimpleModule>
                           , public INeighborhoodTable
+                          , public INeighborhoodTablePacketProcessor
 {
 public:
 
@@ -36,11 +37,12 @@ public:
     virtual void handleMessage(cMessage *msg) override;
 
     virtual bool ttlReached(BeaconReceptionInfo*) override;
-    virtual bool processInfo(BeaconReceptionInfo *packet) override;
-    virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
     virtual void checkAllTimeToLive() override;
     virtual const int getSize() override;
 
+    virtual bool processInfo(BeaconReceptionInfo *packet) override;
+    virtual void saveInfo(BeaconReceptionInfo* info) override;
+    virtual const BeaconReceptionInfo* find(int sourceId) const override;
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }
@@ -65,6 +67,8 @@ public:
         return NeighborhoodTableIter_t(&_table, predicate);
     }
 
+protected:
+    virtual void removeInfo(BeaconReceptionInfo* info);
 
 
 protected:

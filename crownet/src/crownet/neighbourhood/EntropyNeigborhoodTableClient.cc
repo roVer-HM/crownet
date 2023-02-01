@@ -42,10 +42,6 @@ void EntropyNeigborhoodTableClient::handleMessage(cMessage *msg) {
     throw cRuntimeError("EntropyNeigborhoodTableClient does not hanlde messages");
 }
 
-BeaconReceptionInfo* EntropyNeigborhoodTableClient::getOrCreateEntry(const int sourceId)
-{
-    throw cRuntimeError("Not implemented in EntropyNeigborhoodTableClient");
-}
 
 
 const int EntropyNeigborhoodTableClient::getSize(){

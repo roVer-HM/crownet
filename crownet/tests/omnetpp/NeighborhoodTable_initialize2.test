@@ -23,7 +23,7 @@ namespace NeighborhoodTable_initialize2{
         {
             std::cout << "nTable[" << it->first << "]" <<
                     " -- nodeId: " << it->second->getNodeId() <<
-                    " -- timeSend: " << it->second->getSentTimePrio() << "\n";
+                    " -- timeSend: " << it->second->getCurrentData()->getCreationTime() << "\n";
         }
         }
     };

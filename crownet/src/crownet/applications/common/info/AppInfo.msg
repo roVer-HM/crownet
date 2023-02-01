@@ -20,6 +20,7 @@
 import inet.common.INETDefs;
 import inet.networklayer.contract.ipv4.Ipv4Address;
 import inet.common.Units;
+import inet.common.TagBase;
 
 namespace crownet;
 
@@ -45,6 +46,11 @@ class AppInfoLocal extends AppInfoBase {
 
 
 
+class AppInfoTag extends inet::TagBase
+{
+	AppInfoBase* appInfo;    
+}
+
 enum PktType
 {
     UNDEF    = 0;
@@ -52,33 +58,44 @@ enum PktType
     CTRL_PKT = 2;
 };
 
-class AppInfoReception extends AppInfoBase {
+class PacketInfo  extends cOwnedObject {
+	uint32_t sourceId;
+	uint32_t  creationTimeStamp;
+	simtime_t creationTime @editable;
+	simtime_t receivedTime @editable;
+    uint32_t sequenceNumber;
+    bool outOfOrder=false;
+}
+cplusplus(PacketInfo){{
+  public:
+  	const simtime_t delay()const {return receivedTime-creationTime;}
+}}
+
+class AppRxInfo extends AppInfoBase{
+    // Application level statistics 
+    nodeId = -1; //
+  	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
+	simtime_t jitter = 0.0;
+}
+
+
+class AppRxInfoPerSource extends AppInfoBase {
  	@customize(true);
 
- 	uint16_t initialSequencenumber= 0;
-    uint16_t maxSequencenumber= 0;
+ 	uint16_t initialSequenceNumber= 0;
+    uint16_t maxSequenceNumber= 0;
     uint32_t sequencecycle= 0;
 	uint32_t packetsReceivedCount= 0;
 	// (max_sequencenumber - initial_sequencenumber) - packets_received_count
 	// todo include sequencecycle in packet_loss_count? look at RTCP protocol!!
 	int packetsLossCount = 0; 
 	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
-
-
 	simtime_t jitter = 0.0;
-	simtime_t receivedTimeCurrent = 0.0;
-	uint32_t  sentTimeCurrent = 0; 
-	simtime_t sentSimTimeCurrent = 0;
-	uint16_t  packetsReceivedCountCurrent = 0;
 	
-	simtime_t receivedTimePrio = 0.0;
-	uint32_t  sentTimePrio = 0; 
-	simtime_t sentSimTimePrio = 0;
-	uint16_t  packetsReceivedCountPrio = 0;
+	// packet info for generic network metrics. May contain invlaid data packets such
+	// as old or out of order data. 
+	PacketInfo *prioPkt @owned;
+	PacketInfo *currentPkt @owend;
+	
 };
-cplusplus(AppInfoReception){{
-  public:
-  	bool hasPrio()const {return packetsReceivedCount > 1;}
-}}
-
 

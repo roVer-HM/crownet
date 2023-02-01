@@ -38,8 +38,6 @@ public:
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
 
-    virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
-    virtual bool processInfo(BeaconReceptionInfo *packet) override {return true;} //todo
     virtual void checkAllTimeToLive() override {}; // do nothing as client
     virtual bool ttlReached(BeaconReceptionInfo*) override {return true;}// do nothing as client
     virtual void setOwnerId(int ownerId) override {this->ownerId = ownerId;}

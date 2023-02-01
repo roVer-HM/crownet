@@ -102,12 +102,12 @@ void GlobalEntropyMap::updateMaps() {
     acceptNodeVisitor(this);
 
     for(const auto& e: _table){
-        const auto info = e.second;
-        const auto &posTraci = converter->position_cast_traci(info->getPositionCurrent());
+        const auto currentData = e.second->getCurrentData();
+        const auto &posTraci = converter->position_cast_traci(currentData->getPosition());
         // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
         //            for each cell so setValue will write once.
         auto ee = dcdMapGlobal->getEntry<GridGlobalEntry>(posTraci);
-        ee->setValue(now, info->getBeaconValueCurrent());
+        ee->setValue(now, currentData->getBeaconValue());
         // do not add nodeId because the ID is a dummy from the Entropy provider.
     }
     // global map: local selector
@@ -126,21 +126,22 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
     if (_table.find(sourceId) == _table.end()){
         // no value for cell found. Create new entry and set defaults
         BeaconReceptionInfo* info = new BeaconReceptionInfo();
+        info->initAppData();
         info->setNodeId(sourceId);
-        info->setReceivedTimeCurrent(-1.0); // ensure time is before 'time'
+        info->getCurrentDataForUpdate()->setReceivedTime(-1.0); // ensure time is before 'time'
         auto cellCenter = cellKeyProvider->cellCenter(sourceId);
-        info->setPositionCurrent(cellCenter);
+        info->getCurrentDataForUpdate()->setPosition(cellCenter);
         take(info);
         _table[sourceId] = info;
     }
     auto ret = _table[sourceId];
-    if (ret->getReceivedTimeCurrent() < lastUpdateTime){
+    if (ret->getCurrentData()->getReceivedTime() < lastUpdateTime){
         // if value ret not updated at lastUpdateTime perform update at lastUpdateTime.
         // This allows lazy update of ground truth when the value is requested. The
         // current time is not needed because lastUpdateTime will be set by the event trigger.
-        auto pos = ret->getPositionCurrent();
-        ret->setBeaconValueCurrent(entropyProvider->getValue(pos, lastUpdateTime, ret->getBeaconValueCurrent()));
-        ret->setReceivedTimeCurrent(lastUpdateTime);
+        auto pos = ret->getCurrentData()->getPosition();
+        ret->getCurrentDataForUpdate()->setBeaconValue(entropyProvider->getValue(pos, lastUpdateTime, ret->getCurrentData()->getBeaconValue()));
+        ret->getCurrentDataForUpdate()->setReceivedTime(lastUpdateTime);
     }
     return *_table.find(sourceId);
 }

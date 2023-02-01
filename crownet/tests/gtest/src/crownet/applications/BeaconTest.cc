@@ -24,7 +24,7 @@ class BeaconInfoTest : public BaseOppTest {
         setSimTime(t);
 
         const auto& chunk = makeShared<DynamicBeaconPacket>();
-        chunk->setSequencenumber(seq);
+        chunk->setSequenceNumber(seq);
         chunk->setSourceId(id);
         // mod 32
         uint32_t time = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
@@ -45,7 +45,8 @@ class BeaconInfoTest : public BaseOppTest {
         if (time == simtime_t::ZERO){
             time = simTime();
         }
-        info.processInbound(pkt, id, time);
+        auto data = pkt->peekData();
+        info.processInbound(data, id, time);
         delete pkt;
     }
 };
@@ -62,21 +63,21 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
     BeaconReceptionInfo info;
     auto id = packet1->peekAtFront<DynamicBeaconPacket>()->getSourceId();
     info.setNodeId(id);
-    info.processInbound(packet1, 55, simTime());
+    info.processInbound(packet1->peekData(), 55, simTime());
 
-    EXPECT_EQ(info.getInitialSequencenumber(), 1);
-    EXPECT_EQ(info.getMaxSequencenumber(), 1);
+    EXPECT_EQ(info.getInitialSequenceNumber(), 1);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 1);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 1);
     EXPECT_EQ(info.getPacketsLossCount(), 0);
-    EXPECT_EQ(info.getPositionCurrent(), inet::Coord(1.2, 3.4));
-    EXPECT_EQ(info.getEpsilonCurrent(), inet::Coord(0.0, 0.0));
-    EXPECT_EQ(info.getNumberOfNeighboursCurrent(), 5);
+    EXPECT_EQ(info.getCurrentData()->getPosition(), inet::Coord(1.2, 3.4));
+    EXPECT_EQ(info.getCurrentData()->getEpsilon(), inet::Coord(0.0, 0.0));
+    EXPECT_EQ(info.getCurrentData()->getNumberOfNeighbours(), 5);
 
     EXPECT_EQ(info.getJitter().dbl(), 0.030/16);
 
-    EXPECT_EQ(info.getSentTimeCurrent(), 1000); //ms
-    EXPECT_EQ(info.getReceivedTimeCurrent(), simTime());
+    EXPECT_EQ(info.getCurrentPkt()->getCreationTimeStamp(), 1000); //ms
+    EXPECT_EQ(info.getCurrentPkt()->getReceivedTime(), simTime());
 
     EXPECT_FALSE(info.hasPrio());
 
@@ -87,31 +88,31 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
 
     setSimTime(1.520); // + 20ms
 
-    info.processInbound(packet2, 55, simTime());
+    info.processInbound(packet2->peekData(), 55, simTime());
 
-    EXPECT_EQ(info.getInitialSequencenumber(), 1);
-    EXPECT_EQ(info.getMaxSequencenumber(), 3);
+    EXPECT_EQ(info.getInitialSequenceNumber(), 1);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 3);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 2);
     EXPECT_EQ(info.getPacketsLossCount(), 1);
-    EXPECT_EQ(info.getPositionCurrent(), inet::Coord(5.6, 7.8));
-    EXPECT_EQ(info.getEpsilonCurrent(), inet::Coord(0.0, 0.0));
-    EXPECT_EQ(info.getNumberOfNeighboursCurrent(), 10);
+    EXPECT_EQ(info.getCurrentData()->getPosition(), inet::Coord(5.6, 7.8));
+    EXPECT_EQ(info.getCurrentData()->getEpsilon(), inet::Coord(0.0, 0.0));
+    EXPECT_EQ(info.getCurrentData()->getNumberOfNeighbours(), 10);
 
     auto jitter = SimTime(0.030/16);
     jitter = jitter + (SimTime(0.01) - jitter)/16;
     EXPECT_EQ(info.getJitter().dbl(), jitter.dbl() );
 
-    EXPECT_EQ(info.getSentTimeCurrent(), 1500); //ms
-    EXPECT_EQ(info.getReceivedTimeCurrent(), simTime());
+    EXPECT_EQ(info.getCurrentPkt()->getCreationTimeStamp(), 1500); //ms
+    EXPECT_EQ(info.getCurrentPkt()->getReceivedTime(), simTime());
 
     EXPECT_TRUE(info.hasPrio());
 
-    EXPECT_EQ(info.getReceivedTimePrio().dbl(),  1.030);
-    EXPECT_EQ(info.getSentSimTimePrio().dbl(),  1.000);
-    EXPECT_EQ(info.getPositionPrio(), inet::Coord(1.2, 3.4));
-    EXPECT_EQ(info.getEpsilonPrio(), inet::Coord(0.0, 0.0));
-    EXPECT_EQ(info.getNumberOfNeighboursPrio(), 5);
+    EXPECT_EQ(info.getPrioPkt()->getReceivedTime().dbl(),  1.030);
+    EXPECT_EQ(info.getPrioPkt()->getCreationTime().dbl(),  1.000);
+    EXPECT_EQ(info.getPrioData()->getPosition(), inet::Coord(1.2, 3.4));
+    EXPECT_EQ(info.getPrioData()->getEpsilon(), inet::Coord(0.0, 0.0));
+    EXPECT_EQ(info.getPrioData()->getNumberOfNeighbours(), 5);
 
 
     delete packet1;
@@ -124,16 +125,16 @@ TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap1) {
     uint16_t start = 0xFFFC; // 0xFFFF-3
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 0);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0);
     for(int i=0; i < 7; i++){
         auto pkt = createAtTime(1.0*i, ++start);
         setSimTime(1.0*i + 0.020);
-        info.processInbound(pkt, 30, simTime());
+        info.processInbound(pkt->peekData(), 30, simTime());
         delete pkt;
     }
     EXPECT_EQ(info.getSequencecycle(), 1<<16);
     EXPECT_EQ(info.getPacketsReceivedCount(), 7);
-    EXPECT_EQ(info.getMaxSequencenumber(), 3);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 3);
 }
 
 TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap2) {
@@ -149,14 +150,14 @@ TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap2) {
     BeaconReceptionInfo info;
     auto pkt = createAtTime(1.0, 0x10);
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0x10);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0x10);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 1);
 
     // old packet before
     pkt = createAtTime(1.0, 0xFFEF+1); // seq = 0xFFF0
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0xFFEF+1); // increased!
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0xFFEF+1); // increased!
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 2);
 
@@ -176,14 +177,14 @@ TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap3) {
     BeaconReceptionInfo info;
     auto pkt = createAtTime(1.0, 0x10-1); // seq = 10
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0x10-1);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0x10-1);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 1);
 
     // old packet before
     pkt = createAtTime(1.0, 0xFFEF+1); // seq = 0xFFF0 (old packet from before wrap)
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0x10-1); // same as before
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0x10-1); // same as before
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 2);
 
@@ -203,14 +204,14 @@ TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap4) {
     BeaconReceptionInfo info;
     auto pkt = createAtTime(1.0, 0xFFEF - 1);
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0xFFEF-1);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0xFFEF-1);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 1);
 
     // old packet before
     pkt = createAtTime(1.0, 0x10 -1); // seq = 0xFFF0
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0xFFEF-1); // same as before packet ignored.
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0xFFEF-1); // same as before packet ignored.
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 2);
 }
@@ -227,14 +228,14 @@ TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap5) {
     BeaconReceptionInfo info;
     auto pkt = createAtTime(1.0, 0xFFEF +1);
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0xFFEF +1);
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0xFFEF +1);
     EXPECT_EQ(info.getSequencecycle(), 0);
     EXPECT_EQ(info.getPacketsReceivedCount(), 1);
 
     // old packet before
     pkt = createAtTime(1.0, 0x10 -1); // seq = 0xFFF0
     process(info, pkt);
-    EXPECT_EQ(info.getMaxSequencenumber(), 0x10-1); // new one
+    EXPECT_EQ(info.getMaxSequenceNumber(), 0x10-1); // new one
     EXPECT_EQ(info.getSequencecycle(), 1 << 16);
     EXPECT_EQ(info.getPacketsReceivedCount(), 2);
 }
