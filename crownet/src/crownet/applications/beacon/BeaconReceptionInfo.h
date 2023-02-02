@@ -24,7 +24,7 @@ public:
 
 
     // override for granular handling of packet types
-    virtual void processInbound(const Ptr<const Chunk> dataInbound, const uint32_t rcvStationId,
+    virtual void processInbound(const Packet *packetIn, const int rcvStationId,
             const simtime_t arrivalTime) override;
 
     // converts simtime_t time into unit32_t representation (ms)

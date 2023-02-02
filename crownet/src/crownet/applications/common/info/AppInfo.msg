@@ -22,28 +22,12 @@ import inet.networklayer.contract.ipv4.Ipv4Address;
 import inet.common.Units;
 import inet.common.TagBase;
 
-namespace crownet;
-
-
 cplusplus {{
+#include "inet/common/packet/Packet.h"
 using namespace inet;
 }}
 
-
-class AppInfoBase  extends cOwnedObject {
-    uint32_t nodeId = 0;
-};
-
-
-class AppInfoLocal extends AppInfoBase {    
-    @customize(true);
-    simtime_t walltimeStart @editable; // editable needed for ned object paramters. Fix in 6-pre13
-	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
-    uint32_t baseTimestamp = 0;
-    uint16_t sequencenumber = 0;
-    uint16_t sequencecycle = 0;
-};
-
+namespace crownet;
 
 
 class AppInfoTag extends inet::TagBase
@@ -71,15 +55,39 @@ cplusplus(PacketInfo){{
   	const simtime_t delay()const {return receivedTime-creationTime;}
 }}
 
-class AppRxInfo extends AppInfoBase{
+
+class AppInfoBase  extends cOwnedObject {
+    uint32_t nodeId = 0;
+};
+
+
+class AppInfoLocal extends AppInfoBase {    
+    @customize(true);
+    simtime_t walltimeStart @editable; // editable needed for ned object paramters. Fix in 6-pre13
+	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
+    uint32_t baseTimestamp = 0;
+    uint16_t sequencenumber = 0;
+    uint16_t sequencecycle = 0;
+};
+
+class AppRxInfoBase extends AppInfoBase {
+    
+}
+cplusplus(AppRxInfoBase){{
+  public:
+  	virtual void processInbound(const Packet *packetIn, const int rcvStationId,
+            const simtime_t arrivalTime) {/*do nothing*/};
+}}
+
+
+class AppRxInfo extends AppRxInfoBase{
     // Application level statistics 
     nodeId = -1; //
   	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
 	simtime_t jitter = 0.0;
 }
 
-
-class AppRxInfoPerSource extends AppInfoBase {
+class AppRxInfoPerSource extends AppRxInfoBase {
  	@customize(true);
 
  	uint16_t initialSequenceNumber= 0;

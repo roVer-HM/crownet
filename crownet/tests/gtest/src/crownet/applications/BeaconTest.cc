@@ -45,8 +45,7 @@ class BeaconInfoTest : public BaseOppTest {
         if (time == simtime_t::ZERO){
             time = simTime();
         }
-        auto data = pkt->peekData();
-        info.processInbound(data, id, time);
+        info.processInbound(pkt, id, time);
         delete pkt;
     }
 };
@@ -63,7 +62,7 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
     BeaconReceptionInfo info;
     auto id = packet1->peekAtFront<DynamicBeaconPacket>()->getSourceId();
     info.setNodeId(id);
-    info.processInbound(packet1->peekData(), 55, simTime());
+    info.processInbound(packet1, 55, simTime());
 
     EXPECT_EQ(info.getInitialSequenceNumber(), 1);
     EXPECT_EQ(info.getMaxSequenceNumber(), 1);
@@ -88,7 +87,7 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
 
     setSimTime(1.520); // + 20ms
 
-    info.processInbound(packet2->peekData(), 55, simTime());
+    info.processInbound(packet2, 55, simTime());
 
     EXPECT_EQ(info.getInitialSequenceNumber(), 1);
     EXPECT_EQ(info.getMaxSequenceNumber(), 3);
@@ -129,7 +128,7 @@ TEST_F(BeaconInfoTest, BeaconRcvSequenceWrap1) {
     for(int i=0; i < 7; i++){
         auto pkt = createAtTime(1.0*i, ++start);
         setSimTime(1.0*i + 0.020);
-        info.processInbound(pkt->peekData(), 30, simTime());
+        info.processInbound(pkt, 30, simTime());
         delete pkt;
     }
     EXPECT_EQ(info.getSequencecycle(), 1<<16);

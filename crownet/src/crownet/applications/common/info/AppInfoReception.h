@@ -21,10 +21,6 @@ public:
     AppRxInfoPerSource(const char *name=nullptr) : AppRxInfoPerSource_Base(name) {}
 
 
-    // override for granular handling of packet types
-    virtual void processInbound(const Ptr<const Chunk> dataInbound, const uint32_t rcvStationId,
-            const simtime_t arrivalTime) = 0;
-
     virtual PacketInfo* swapAndGetCurrentPktInfo();
     virtual void calculatedMetrics();
     virtual void calcJitter();

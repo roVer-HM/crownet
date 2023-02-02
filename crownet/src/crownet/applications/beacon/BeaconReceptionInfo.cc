@@ -47,11 +47,11 @@ std::string BeaconReceptionInfo::infoStrShort() const{
     return s.str();
 }
 
-void BeaconReceptionInfo::processInbound(const Ptr<const Chunk> dataInbound,
-        const uint32_t rcvStationId,
+void BeaconReceptionInfo::processInbound(const Packet *packetIn,
+        const int rcvStationId,
         const simtime_t arrivalTime){
 
-    auto beacon = dynamicPtrCast<const DynamicBeaconPacket>(dataInbound);
+    auto beacon = dynamicPtrCast<const DynamicBeaconPacket>(packetIn->peekData());
     auto info = swapAndGetCurrentPktInfo();
     info->setSourceId(beacon->getSourceId());
     auto creationSimTime = timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime());

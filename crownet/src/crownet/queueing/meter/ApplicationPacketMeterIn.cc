@@ -58,7 +58,7 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
 
     // process source level statistics
     AppRxInfoPerSource* info = getOrCreate(sourceId);
-    info->processInbound(data, hostId, simTime());
+    info->processInbound(packet, hostId, simTime());
     if (appendAppInfoTag){
         packet->addTagIfAbsent<AppInfoTag>()->setAppInfo(info);
     }
