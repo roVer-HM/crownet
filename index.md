@@ -23,7 +23,7 @@ CrowNet is a novel simulation framework based on open-source components that all
 The source code can be found [here](https://github.com/roVer-HM/crownet).
 
 ### Research project
-CrowNet has been developed as part of the [roVer](https://www.hm.edu/allgemein/forschung_entwicklung/forschungsprojekte/projektdetails/wischhof/wischhof_koester_rover.de.html) research project at [Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html).
+CrowNet has been developed as part of the [roVer](https://www.hm.edu/forschung/forschungsprojekte/projektdetails/wischhof/wischhof_koester_rover.de.html) research project at [Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html).
 roVer is a project funded by the [Federal Ministry of Education and Research](https://www.bmbf.de/) (Grant number: 13FH669IX6).
 
 
