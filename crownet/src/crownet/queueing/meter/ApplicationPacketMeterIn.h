@@ -17,7 +17,7 @@
 #define CROWNET_QUEUEING_METER_APPLICATIONPACKETMETERIN_H_
 
 #include "crownet/queueing/meter/GenericPacketMeter.h"
-#include "crownet/applications/common/info/AppInfoReception.h"
+#include "crownet/applications/common/info/AppRxInfoPerSource.h"
 
 namespace crownet {
 
@@ -38,6 +38,8 @@ protected:
 
     bool appendAppInfoTag = false;
     cObjectFactory* appInfoFactor = nullptr;
+    double emaSmoothingJitter;
+    double emaSmoothingPacketSize;
     SourceAppInfoMap appInfos;
 };
 

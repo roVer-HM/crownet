@@ -61,8 +61,7 @@ void BeaconReceptionInfo::processInbound(const Packet *packetIn,
     info->setReceivedTime(arrivalTime);
 
     // includes duplicates and out of order!
-    ++packetsReceivedCount;
-    calculatedMetrics();
+    computeMetrics(packetIn);
 
 
     if (currentPkt->getOutOfOrder()){

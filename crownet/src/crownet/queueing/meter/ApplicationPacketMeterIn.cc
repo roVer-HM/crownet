@@ -17,7 +17,7 @@
 #include "inet/common/TimeTag_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/common/util/FilePrinter.h"
-
+#include "crownet/applications/common/info/AppRxInfoPerSource.h"
 
 namespace crownet {
 
@@ -38,23 +38,28 @@ void ApplicationPacketMeterIn::initialize(int stage)
     GenericPacketMeter::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
         hostId = getContainingNode(this)->getId();
-//        appLevelInfo = new AppInfoReception();
-//        take(appLevelInfo);
-//        appLevelInfo->setNodeId(hostId);
 
         appendAppInfoTag = par("appendAppInfoTag").boolValue();
         appInfoFactor = cObjectFactory::get(par("appInfoClass").stringValue());
+
+
+        appLevelInfo = dynamic_cast<AppRxInfoPerSource*>(appInfoFactor->createOne());
+        if (appLevelInfo == nullptr){
+            throw cRuntimeError("Cannot cast appInfoFactor instance to AppInfoBase. Does your AppInfoClass extends AppInfoBase?");
+        }
+        appLevelInfo->setNodeId(-1);
     }
 }
 
 void ApplicationPacketMeterIn::meterPacket(Packet *packet)
 {
-    // todo how to handle self messages? akak hostId == sourceId
+    // todo how to handle self messages? aka hostId == sourceId
     GenericPacketMeter::meterPacket(packet);
     auto data = packet->peekData();
     int sourceId = data->getTag<HostIdTag>()->getHostId();
 
     // process application level statistics
+    appLevelInfo->processInbound(packet, hostId, simTime());
 
     // process source level statistics
     AppRxInfoPerSource* info = getOrCreate(sourceId);
@@ -70,9 +75,11 @@ AppRxInfoPerSource* ApplicationPacketMeterIn::getOrCreate(int sourceId){
         // no data from this host id. create new
         auto newInfo = dynamic_cast<AppRxInfoPerSource*>(appInfoFactor->createOne());
         if (newInfo == nullptr){
-            throw cRuntimeError("Cannot cast appInfoFactor instace to AppInfoBase. Does your AppInfoClass extends AppInfoBase?");
+            throw cRuntimeError("Cannot cast appInfoFactor instance to AppInfoBase. Does your AppInfoClass extends AppInfoBase?");
         }
         newInfo->setNodeId(sourceId);
+        newInfo->setEma_smoothing_jitter(emaSmoothingJitter);
+        newInfo->setEma_smoothing_packet_size(emaSmoothingPacketSize);
         take(newInfo);
         appInfos[sourceId] = newInfo;
     }

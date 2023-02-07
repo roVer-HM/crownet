@@ -62,6 +62,7 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
     BeaconReceptionInfo info;
     auto id = packet1->peekAtFront<DynamicBeaconPacket>()->getSourceId();
     info.setNodeId(id);
+    info.setEma_smoothing_jitter(1./16.);
     info.processInbound(packet1, 55, simTime());
 
     EXPECT_EQ(info.getInitialSequenceNumber(), 1);

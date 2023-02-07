@@ -22,18 +22,14 @@ import inet.common.packet.chunk.Chunk;
 import inet.applications.base.ApplicationPacket;
 import inet.common.geometry.Geometry;
 
-import crownet.applications.common.info.AppInfo;
+import crownet.applications.common.info.AppRxInfoPerSource;
 
 cplusplus {{
-#include "crownet/applications/common/info/AppInfoReception.h"
+#include "crownet/applications/common/info/AppRxInfoPerSource.h"
+#include "crownet/applications/common/info/AppInfo_m.h"
 }}
 
-
-
-
 namespace crownet;
-
-
 
 class BeaconBase extends inet::ApplicationPacket {
     

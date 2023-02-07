@@ -1,51 +1,24 @@
 /*
- * AppInfoReception.cc
+ * Bar.cc
  *
- *  Created on: Aug 27, 2021
+ *  Created on: Feb 7, 2023
  *      Author: vm-sts
  */
 
-#include "AppInfoReception.h"
+#include "AppRxInfoPerSource.h"
 
 namespace crownet {
+
 
 AppRxInfoPerSource::~AppRxInfoPerSource() {
     // TODO Auto-generated destructor stub
 }
 
-PacketInfo* AppRxInfoPerSource::swapAndGetCurrentPktInfo(){
-
-    PacketInfo* p;
-    if (prioPkt == nullptr){
-        p = new PacketInfo();
-        take(p);
-    } else {
-        // reuse object
-        p = prioPkt;
-        prioPkt = nullptr;
-    }
-    //move current packet back
-    prioPkt = currentPkt;
-    currentPkt = p;
-    return currentPkt;
-}
-
-void AppRxInfoPerSource::calculatedMetrics(){
-    calcJitter();
-    checkOutOfOrder();
+void AppRxInfoPerSource::computeMetrics(const Packet *packetIn){
+    AppRxInfo::computeMetrics(packetIn);
+    checkOutOfOrder(); // must be before calcPacketLoss()
     calcPacketLoss();
 }
-
-void AppRxInfoPerSource::calcJitter(){
-    // jitter
-    simtime_t delay_delta = ((prioPkt == nullptr) ? 0 : prioPkt->delay())- currentPkt->delay();
-    if (delay_delta < 0)
-        delay_delta = -delay_delta;
-
-    jitter = jitter + (delay_delta -jitter) / 16;
-
-}
-
 void AppRxInfoPerSource::calcPacketLoss(){
     // [0-----------------------------------------------0xFFFF]
     // [**************^--<maxSeqNo>  <initSeqNo>--^***********]
@@ -63,8 +36,10 @@ void AppRxInfoPerSource::calcPacketLoss(){
     }
     //todo negativ?
     packetsLossCount = (sequencecycle + inCyclePackageSendCount) - packetsReceivedCount;
-}
+    packetsLossCount = std::max(0, packetsLossCount);
 
+
+}
 void AppRxInfoPerSource::checkOutOfOrder(){
     // packet order
     if (packetsReceivedCount == 1){
@@ -75,13 +50,13 @@ void AppRxInfoPerSource::checkOutOfOrder(){
         currentPkt->setOutOfOrder(false);
     } else {
         // update sequncenumber and cycle
-       
+
         if(currentPkt->getSequenceNumber() > maxSequenceNumber){
             if (currentPkt->getSequenceNumber() > 0xFFEF && maxSequenceNumber < 0x10){
                 // [0-----0x10---------------------------0xFFEF-----0xFFFF]
                 //     ^--<maxSeqNo>          <currentPktSeqNo>--^
                 //  Large gap between maxSeqNo and currentPktSeqNo.
-                //  Assume that a large SeqNo is an old packet because maxSeqNo cycled recently to small value          
+                //  Assume that a large SeqNo is an old packet because maxSeqNo cycled recently to small value
                 currentPkt->setOutOfOrder(true);
             } else {
                 maxSequenceNumber = currentPkt->getSequenceNumber();
@@ -102,6 +77,5 @@ void AppRxInfoPerSource::checkOutOfOrder(){
         }
     }
 }
-
 
 } /* namespace crownet */

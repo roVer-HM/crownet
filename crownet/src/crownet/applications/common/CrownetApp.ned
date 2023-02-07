@@ -67,8 +67,8 @@ module CrownetApp like IApp, IAppConfig
         packetMeterOut.out --> shaper.in;
         shaper.out --> socket.in;
 
-		socket.toApp --> packetMeterIn.in;
-		packetMeterIn.out --> app.in;
+        socket.toApp --> packetMeterIn.in;
+        packetMeterIn.out --> app.in;
 
         scheduler.out --> app.scheduleIn;
 
@@ -95,25 +95,27 @@ module CrownetAidApp extends CrownetApp
 }
 
 
-module BeaconApp extends CrownetApp {
- 	parameters:
- 	    @BeaconApp;
- 		@display("i=block/broadcast;is=s");
- 		app.typename = default("BeaconDynamic");
- 		socket.typename = default("UdpSocketManager");
- 		socket.destPort = default(30001);
-        socket.localPort = default(30001);	
+module BeaconApp extends CrownetApp
+{
+    parameters:
+        @BeaconApp;
+        @display("i=block/broadcast;is=s");
+        app.typename = default("BeaconDynamic");
+        socket.typename = default("UdpSocketManager");
+        socket.destPort = default(30001);
+        socket.localPort = default(30001);
         packetMeterIn.typename = "ApplicationPacketMeterIn";
         packetMeterIn.appInfoClass = default("crownet::BeaconReceptionInfo");
-}		
+}
 
 
-module DensityMapApp extends CrownetApp {
- 	parameters:
- 	    @MapApp;
- 		@display("i=block/users;is=s"); 
- 		app.typename = default("DensityMapAppSimple");
- 		socket.typename = default("UdpSocketManager");
+module DensityMapApp extends CrownetApp
+{
+    parameters:
+        @MapApp;
+        @display("i=block/users;is=s");
+        app.typename = default("DensityMapAppSimple");
+        socket.typename = default("UdpSocketManager");
         socket.destPort = default(30002);
         socket.localPort = default(30002);
 }
