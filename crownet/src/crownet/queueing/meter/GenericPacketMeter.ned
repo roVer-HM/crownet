@@ -25,8 +25,6 @@ simple GenericPacketMeter extends PacketMeterBase like IPacketMeter
  	parameters:
  	    @display("i=block/star");
         @class(crownet::GenericPacketMeter);
-        // the statistical value is the data rate of the incoming packets
-        @statistic[incomingDataRateXX](title="incoming data rateXX"; interval=10s; source=throughput(merge(packetPushedIn, packetPulledIn)); record=vector; unit=bps; interpolationmode=none);
         
         
         // %p packet count; %l bit count;  %r packet rate; %R data rate
