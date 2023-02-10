@@ -165,7 +165,7 @@ void GlobalEntropyMap::updateEntropy(){
             getValue(entry.first);
         }
     }
-    std::cout << LOG_MOD2 << _table.size() << " entries in Entropy table." << endl;
+    EV_INFO << LOG_MOD2 << _table.size() << " entries in Entropy table." << endl;
 
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <omnetpp/clog.h>
 #include "inet/common/INETDefs.h"
 #include "crownet/common/ModuleAccess.h"
 #include "inet/common/geometry/Geometry_m.h"
