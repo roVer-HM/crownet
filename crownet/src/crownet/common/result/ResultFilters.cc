@@ -19,6 +19,8 @@
 #include "inet/common/packet/Packet.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
+#include "crownet/applications/common/info/InfoTags_m.h"
+
 #include "crownet/common/converter/OsgCoordConverter.h"
 
 using namespace inet;
@@ -94,11 +96,83 @@ void HostIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
 Register_ResultFilter("rcvdSequenceId", RcvdSequenceIdFilter);
 void RcvdSequenceIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
-  if (auto packet = dynamic_cast<Packet *>(object)) {
-      for(auto& region : packet->peekData()->getAllTags<SequenceIdTag>()){
-          fire(this, t, (double)(region.getTag()->getSequenceNumber()), details);
-      }
-  }
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, (double)tag->getPacketInfo()->getMaxSequenceNumber(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcJitter", RcvdPerSrcJitter);
+void RcvdPerSrcJitter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, tag->getPacketInfo()->getJitter().dbl(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcAvgSize", RcvdPerSrcAvgSize);
+void RcvdPerSrcAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, tag->getPacketInfo()->getAvg_packet_size().get(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcCount", RcvdPerSrcCount);
+void RcvdPerSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, (long)tag->getPacketInfo()->getPacketsReceivedCount(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcLossCount", RcvdPerSrcLossCount);
+void RcvdPerSrcLossCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, (long)tag->getPacketInfo()->getPacketsLossCount(), details);
+
+        }
+    }
+}
+
+Register_ResultFilter("rcvdAvgSize", RcvdAvgSize);
+void RcvdAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, tag->getApplicaitonLevelInfo()->getAvg_packet_size().get(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdCount", RcvdCount);
+void RcvdCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
+            fire(this, t, (long)tag->getApplicaitonLevelInfo()->getPacketsReceivedCount(), details);
+        }
+    }
+}
+
+
+Register_ResultFilter("rcvdSrcCount", RcvdSrcCount);
+void RcvdSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxSourceCountTag>()){
+            fire(this, t, (long)tag->getRxSourceCount(), details);
+        }
+    }
 }
 
 Register_ResultFilter("simBound", SimBoundFilter);
