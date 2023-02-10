@@ -25,10 +25,14 @@ uint32_t BeaconReceptionInfo::get32BitTimestamp(omnetpp::simtime_t time) const {
 
 std::string BeaconReceptionInfo::str() const {
     std::stringstream s;
+    s.precision(4);
     auto age = simTime() - currentData->getReceivedTime();
     s << "{id: " << getNodeId() \
-            << " a_t:" << currentData->getReceivedTime().ustr()  \
-            << " age:" << age.ustr() << "}";
+            << " tx_t:" << currentData->getReceivedTime().ustr()  \
+            << " age:" << age.ustr() << " jitter:" << jitter.ustr() \
+            << " avg_s:" << avg_packet_size.str() \
+            << " count:" << packetsReceivedCount \
+            << " loss_r:" <<  packetLossRate << "}";
     return s.str();
 }
 
@@ -47,18 +51,23 @@ std::string BeaconReceptionInfo::infoStrShort() const{
     return s.str();
 }
 
+void BeaconReceptionInfo::updateCurrentPktInfo(const Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime){
+    auto beacon = dynamicPtrCast<const DynamicBeaconPacket>(packetIn->peekData());
+    swapAndGetCurrentPktInfo();
+
+    currentPkt->setSourceId(beacon->getSourceId());
+    auto creationSimTime = timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime());
+    currentPkt->setCreationTime(creationSimTime);
+    currentPkt->setCreationTimeStamp(beacon->getTimestamp());
+    currentPkt->setSequenceNumber(beacon->getSequenceNumber());
+    currentPkt->setReceivedTime(arrivalTime);
+}
+
 void BeaconReceptionInfo::processInbound(const Packet *packetIn,
         const int rcvStationId,
         const simtime_t arrivalTime){
-
     auto beacon = dynamicPtrCast<const DynamicBeaconPacket>(packetIn->peekData());
-    auto info = swapAndGetCurrentPktInfo();
-    info->setSourceId(beacon->getSourceId());
-    auto creationSimTime = timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime());
-    info->setCreationTime(creationSimTime);
-    info->setCreationTimeStamp(beacon->getTimestamp());
-    info->setSequenceNumber(beacon->getSequenceNumber());
-    info->setReceivedTime(arrivalTime);
+    updateCurrentPktInfo(packetIn, rcvStationId, arrivalTime);
 
     // includes duplicates and out of order!
     computeMetrics(packetIn);

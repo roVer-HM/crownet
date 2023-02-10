@@ -118,5 +118,8 @@ module DensityMapApp extends CrownetApp
         socket.typename = default("UdpSocketManager");
         socket.destPort = default(30002);
         socket.localPort = default(30002);
+        packetMeterIn.typename = "ApplicationPacketMeterIn";
+        packetMeterIn.appInfoClass = default("crownet::AppRxInfoPerSource");
+        
 }
 

@@ -18,6 +18,7 @@
 #include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/common/util/FilePrinter.h"
 #include "crownet/applications/common/info/AppRxInfoPerSource.h"
+#include "crownet/applications/common/info/InfoTags_m.h"
 
 namespace crownet {
 
@@ -30,7 +31,11 @@ ApplicationPacketMeterIn::ApplicationPacketMeterIn() {
 }
 
 ApplicationPacketMeterIn::~ApplicationPacketMeterIn() {
-    // TODO Auto-generated destructor stub
+    delete appLevelInfo;
+    for(auto &e: appInfos){
+        delete e.second;
+    }
+    appInfos.clear();
 }
 
 void ApplicationPacketMeterIn::initialize(int stage)
@@ -42,12 +47,20 @@ void ApplicationPacketMeterIn::initialize(int stage)
         appendAppInfoTag = par("appendAppInfoTag").boolValue();
         appInfoFactor = cObjectFactory::get(par("appInfoClass").stringValue());
 
+        emaSmoothingJitter = par("ema_smoothing_jitter");
+        emaSmoothingPacketSize = par("ema_smoothing_packet_size");
 
         appLevelInfo = dynamic_cast<AppRxInfoPerSource*>(appInfoFactor->createOne());
+        take(appLevelInfo);
         if (appLevelInfo == nullptr){
             throw cRuntimeError("Cannot cast appInfoFactor instance to AppInfoBase. Does your AppInfoClass extends AppInfoBase?");
         }
-        appLevelInfo->setNodeId(-1);
+        appLevelInfo->setNodeId(0);
+        appLevelInfo->setEma_smoothing_jitter(emaSmoothingJitter);
+        appLevelInfo->setEma_smoothing_packet_size(emaSmoothingPacketSize);
+
+        WATCH_PTR(appLevelInfo);
+        WATCH_PTRMAP(appInfos);
     }
 }
 
@@ -56,7 +69,7 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     // todo how to handle self messages? aka hostId == sourceId
     GenericPacketMeter::meterPacket(packet);
     auto data = packet->peekData();
-    int sourceId = data->getTag<HostIdTag>()->getHostId();
+    int sourceId = data->getAllTags<HostIdTag>().front().getTag()->getHostId();
 
     // process application level statistics
     appLevelInfo->processInbound(packet, hostId, simTime());
@@ -65,8 +78,28 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     AppRxInfoPerSource* info = getOrCreate(sourceId);
     info->processInbound(packet, hostId, simTime());
     if (appendAppInfoTag){
-        packet->addTagIfAbsent<AppInfoTag>()->setAppInfo(info);
+        auto tag = packet->addTagIfAbsent<AppRxInfoPerSourceTag>();
+        tag->setPacketInfo(info);
+        tag->setApplicaitonLevelInfo(appLevelInfo);
     }
+    packet->addTagIfAbsent<RxSourceCountTag>()->setRxSourceCount(getNumberOfSenders());
+}
+
+const AppRxInfo* ApplicationPacketMeterIn::getAppRxInfo(const int id) const {
+    if (id < 0){
+        return appLevelInfo;
+    } else {
+      const auto iter = appInfos.find(id);
+      if (iter == appInfos.end()){
+          throw cRuntimeError("No AppInfo object for nodeId %d", id);
+      } else {
+          return iter->second;
+      }
+    }
+}
+
+const int ApplicationPacketMeterIn::getNumberOfSenders() const {
+    return appInfos.size();
 }
 
 AppRxInfoPerSource* ApplicationPacketMeterIn::getOrCreate(int sourceId){

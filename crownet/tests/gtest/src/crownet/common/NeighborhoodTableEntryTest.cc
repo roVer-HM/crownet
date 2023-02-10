@@ -67,7 +67,7 @@ TEST_F(BeaconReceptionInfoTest, string) {
     setSimTime(1.0);
 
     BeaconReceptionInfo e0 = build(0, 5, 1, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
-    std::string expected = "{id: 0 a_t:1s age:0s}";
+    std::string expected = "{id: 0 tx_t:1s age:0s jitter:0s avg_s:0 B count:0 loss_r:0}";
     std::string result = e0.str();
     EXPECT_EQ(result, expected);
 }

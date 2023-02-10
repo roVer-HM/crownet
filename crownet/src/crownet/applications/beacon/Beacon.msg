@@ -39,8 +39,7 @@ class BaseDynamicBeacon extends BeaconBase {
     
     chunkLength = b(16+32+32); // fixed
     
-    // sequencenNmber defined in inet::ApplicationPacket
-// 	uint16_t sequencenumber; 	// 16bit
+    // sequencenNmber (16bit) defined in inet::ApplicationPacket
  	uint32_t sourceId;			// 32bit
  	uint32_t timestamp;			// 32bit
 }

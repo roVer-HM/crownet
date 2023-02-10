@@ -5,8 +5,10 @@
  *      Author: vm-sts
  */
 
+#include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/applications/beacon/BeaconDynamic.h"
 #include "crownet/applications/beacon/Beacon_m.h"
+#include "crownet/applications/common/info/InfoTags_m.h"
 #include "crownet/crownet.h"
 
 namespace crownet {
@@ -33,11 +35,12 @@ void BeaconDynamic::initialize(int stage) {
 Packet *BeaconDynamic::createPacket() {
     const auto &beacon = makeShared<DynamicBeaconPacket>();
 
-    beacon->setSequenceNumber(localInfo->nextSequenceNumber());
+    auto seqNo = localInfo->nextSequenceNumber();
+    beacon->setSequenceNumber(seqNo);
+    beacon->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     beacon->setSourceId(getHostId());
     uint32_t time = simtime_to_timestamp_32_ms();
     beacon->setTimestamp(time);
-
 
     beacon->setPos(getPosition());
     beacon->setEpsilon({0.0, 0.0, 0.0});
@@ -52,16 +55,11 @@ Packet *BeaconDynamic::createPacket() {
 
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
-
-
-    auto pSrcId = packet->peekAtFront<DynamicBeaconPacket>()->getSourceId();
-    std::cout << simTime().dbl() << " eventNr. " << getSimulation()->getEventNumber() << " hostID" << hostId << "<---" << pSrcId << std::endl;
-
-    auto infoTag = packet->findTagForUpdate<AppInfoTag>();
+    auto infoTag = packet->findTagForUpdate<AppRxInfoPerSourceTag>();
     if (infoTag == nullptr){
         throw cRuntimeError("No AppInfoTag found. Application needs an ApplicationMeter to manage AppInfoObjects.");
     }
-    auto info = dynamic_cast<BeaconReceptionInfo*>(infoTag->getAppInfoForUpdate());
+    auto info = dynamic_cast<BeaconReceptionInfo*>(infoTag->getPacketInfoForUpdate());
     if (info == nullptr){
         throw cRuntimeError("Provided AppInfo object cannot be cast to BeaconReceptionInfo");
     }

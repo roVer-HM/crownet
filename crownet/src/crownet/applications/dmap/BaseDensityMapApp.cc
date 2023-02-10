@@ -179,7 +179,9 @@ const inet::b BaseDensityMapApp::getMinPdu(){
 
 Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
     auto header = makeShared<MapHeader>();
+    auto seqNo = localInfo->nextSequenceNumber();
     header->setSequenceNumber(localInfo->nextSequenceNumber());
+    header->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     header->setVersion(MapType::SPARSE);
     header->setSourceCellIdX(dcdMap->getOwnerCell().x());
     header->setSourceCellIdY(dcdMap->getOwnerCell().y());

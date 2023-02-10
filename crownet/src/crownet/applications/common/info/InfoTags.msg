@@ -13,15 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-
 import inet.common.INETDefs;
 import inet.common.TagBase;
-import AppInfo;
+import AppRxInfoPerSource;
 
 
 
 cplusplus {{
-  #include "AppRxInfo.h"  
+  #include "AppRxInfoPerSource.h"  
   #include "inet/common/packet/Packet.h"
   using namespace inet;
 }}
@@ -30,14 +29,15 @@ namespace crownet;
 
 
 
-class AppRxInfoPerSource extends AppRxInfo{
-    @customize(true);
-   
-  	uint16_t initialSequenceNumber= 0;
-    uint16_t maxSequenceNumber= 0;
-    uint32_t sequencecycle= 0;
-	int packetsLossCount = 0; 
-	double packetLossRate = 0.0;
+class AppRxInfoPerSourceTag extends inet::TagBase
+{
+    @descriptor(readonly);
+	AppRxInfoPerSource* packetInfo;    
+	AppRxInfo* applicaitonLevelInfo;    
 }
 
-
+class RxSourceCountTag extends inet::TagBase
+{
+    @descriptor(readonly);
+    int rxSourceCount = 0;
+}

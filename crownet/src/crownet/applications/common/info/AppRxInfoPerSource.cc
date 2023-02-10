@@ -9,6 +9,7 @@
 
 namespace crownet {
 
+Register_Class(AppRxInfoPerSource);
 
 AppRxInfoPerSource::~AppRxInfoPerSource() {
     // TODO Auto-generated destructor stub
@@ -37,6 +38,7 @@ void AppRxInfoPerSource::calcPacketLoss(){
     //todo negativ?
     packetsLossCount = (sequencecycle + inCyclePackageSendCount) - packetsReceivedCount;
     packetsLossCount = std::max(0, packetsLossCount);
+    packetLossRate = packetsLossCount/packetsReceivedCount;
 
 
 }

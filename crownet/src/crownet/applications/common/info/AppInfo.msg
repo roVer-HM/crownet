@@ -30,11 +30,6 @@ using namespace inet;
 namespace crownet;
 
 
-class AppInfoTag extends inet::TagBase
-{
-	AppInfoBase* appInfo;    
-}
-
 enum PktType
 {
     UNDEF    = 0;
@@ -86,9 +81,9 @@ cplusplus(AppRxInfoBase){{
 class AppRxInfo extends AppRxInfoBase{
     @customize(true);
     // Application level statistics 
-    nodeId = -1; //
+    nodeId = 0; //
     // packet stream metrics
-    uint32_t packetsReceivedCount = 0;
+    uint32_t packetsReceivedCount = 0;  
     uint32_t packetsOctetCount = 0;
 	simtime_t jitter = 0.0;  //exp smoothing with gain=1/16
 	inet::b avg_packet_size = inet::b(0); //exp smoothing with gain=1/16
@@ -100,6 +95,7 @@ class AppRxInfo extends AppRxInfoBase{
 	// May contain invlaid data packets such as old or out of order data. 
 	PacketInfo *prioPkt @owned;
 	PacketInfo *currentPkt @owned;
-	
+	simtime_t lastPktSwap @editable;
 }
+
 

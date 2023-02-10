@@ -6,6 +6,9 @@
  */
 
 #include "AppRxInfo.h"
+#include "inet/common/TimeTag_m.h"
+#include "crownet/applications/common/AppCommon_m.h"
+
 
 namespace crownet {
 
@@ -13,6 +16,12 @@ namespace crownet {
 AppRxInfo::~AppRxInfo() {
     // TODO Auto-generated destructor stub
 }
+
+void AppRxInfo::processInbound(const Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime){
+    updateCurrentPktInfo(packetIn, rcvStationId, arrivalTime);
+    computeMetrics(packetIn);
+}
+
 
 void AppRxInfo::computeMetrics(const Packet *packetIn){
     packetsReceivedCount++;
@@ -22,20 +31,34 @@ void AppRxInfo::computeMetrics(const Packet *packetIn){
 }
 
 PacketInfo* AppRxInfo::swapAndGetCurrentPktInfo(){
-
-    PacketInfo* p;
-    if (prioPkt == nullptr){
-        p = new PacketInfo();
-        take(p);
-    } else {
-        // reuse object
-        p = prioPkt;
-        prioPkt = nullptr;
+    auto now = simTime();
+    if (lastPktSwap < now){
+        PacketInfo* p;
+        if (prioPkt == nullptr){
+            p = new PacketInfo();
+            take(p);
+        } else {
+            // reuse object
+            p = prioPkt;
+            prioPkt = nullptr;
+        }
+        //move current packet back
+        prioPkt = currentPkt;
+        currentPkt = p;
+        lastPktSwap = simTime();
     }
-    //move current packet back
-    prioPkt = currentPkt;
-    currentPkt = p;
     return currentPkt;
+}
+
+void AppRxInfo::updateCurrentPktInfo(const Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime){
+    auto data = packetIn->peekData();
+    swapAndGetCurrentPktInfo();
+
+    currentPkt->setCreationTime(
+            data->getAllTags<CreationTimeTag>().front().getTag()->getCreationTime());
+    currentPkt->setSequenceNumber(
+            data->getAllTags<SequenceIdTag>().front().getTag()->getSequenceNumber());
+    currentPkt->setReceivedTime(arrivalTime);
 }
 
 void AppRxInfo::calcJitter(){

@@ -18,20 +18,26 @@
 
 #include "crownet/queueing/meter/GenericPacketMeter.h"
 #include "crownet/applications/common/info/AppRxInfoPerSource.h"
+#include "crownet/applications/common/info/AppRxInfoProvider.h"
 
 namespace crownet {
 
 using SourceAppInfoMap = std::map<int, AppRxInfoPerSource*>;
 
-class ApplicationPacketMeterIn : public GenericPacketMeter {
+class ApplicationPacketMeterIn : public GenericPacketMeter, public AppRxInfoProvider {
 public:
     ApplicationPacketMeterIn();
     virtual ~ApplicationPacketMeterIn();
+
+
 protected:
     virtual void initialize(int stage) override;
     virtual void meterPacket(inet::Packet *packet) override;
     virtual AppRxInfoPerSource* getOrCreate(int sourceId);
-
+public:
+    // AppRxInfoProvider
+    virtual const AppRxInfo* getAppRxInfo( int id = -1) const override;
+    virtual const int getNumberOfSenders() const override;
 protected:
     int hostId;
     AppRxInfoPerSource* appLevelInfo = nullptr;
