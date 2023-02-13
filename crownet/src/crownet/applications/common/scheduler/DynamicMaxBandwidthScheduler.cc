@@ -5,8 +5,9 @@
  *      Author: vm-sts
  */
 
+#include "DynamicMaxBandwidthScheduler.h"
+
 #include "crownet/crownet.h"
-#include "crownet/applications/common/scheduler/DynamicMaxBandwithScheduler.h"
 #include "crownet/applications/common/info/AppRxInfoProvider.h"
 #include "crownet/applications/common/info/AppRxInfo.h"
 
@@ -23,26 +24,26 @@ std::ostream& operator<<(std::ostream& os, const txInterval& i){
     return os;
 }
 
-simsignal_t DynamicMaxBandwithScheduler::txInterval_s = cComponent::registerSignal("txInterval_s");
-simsignal_t DynamicMaxBandwithScheduler::txDetInterval_s = cComponent::registerSignal("txDetInterval_s");
+simsignal_t DynamicMaxBandwidthScheduler::txInterval_s = cComponent::registerSignal("txInterval_s");
+simsignal_t DynamicMaxBandwidthScheduler::txDetInterval_s = cComponent::registerSignal("txDetInterval_s");
 
-Define_Module(DynamicMaxBandwithScheduler)
+Define_Module(DynamicMaxBandwidthScheduler)
 
-DynamicMaxBandwithScheduler::DynamicMaxBandwithScheduler() {
+DynamicMaxBandwidthScheduler::DynamicMaxBandwidthScheduler() {
     // TODO Auto-generated constructor stub
 
 }
 
-DynamicMaxBandwithScheduler::~DynamicMaxBandwithScheduler() {
+DynamicMaxBandwidthScheduler::~DynamicMaxBandwidthScheduler() {
     cancelClockEvent(generationTimer);
 }
 
-void DynamicMaxBandwithScheduler::initialize(int stage)
+void DynamicMaxBandwidthScheduler::initialize(int stage)
 {
     IntervalScheduler::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         minTransmissionIntervall = par("generationInterval");
-        maxApplicationBandwith = bps(par("maxApplicationBandwith").doubleValueInUnit("bps"));
+        maxApplicationBandwith = bps(par("maxApplicationBandwidth").doubleValueInUnit("bps"));
         rndIntervalLowerBound = par("rndIntervalLowerBound").doubleValue();
         rndIntervalUpperBound = par("rndIntervalUpperBound").doubleValue();
         estimatedAvgPaketSize = b(par("estimatedAvgPaketSize"));
@@ -57,7 +58,7 @@ void DynamicMaxBandwithScheduler::initialize(int stage)
     }
 }
 
-void DynamicMaxBandwithScheduler::scheduleGenerationTimer(){
+void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
 
     if (txIntervalDataPrio.timestamp < 0.0){
         // first scheduling
@@ -72,7 +73,7 @@ void DynamicMaxBandwithScheduler::scheduleGenerationTimer(){
     }
 }
 
-void DynamicMaxBandwithScheduler::handleMessage(cMessage *message){
+void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
     auto now = simTime();
     if (message == generationTimer){
         updateTxIntervalDataCurrent();
@@ -105,7 +106,7 @@ void DynamicMaxBandwithScheduler::handleMessage(cMessage *message){
     updateDisplayString();
 }
 
-void DynamicMaxBandwithScheduler::updateTxIntervalDataCurrent(){
+void DynamicMaxBandwidthScheduler::updateTxIntervalDataCurrent(){
     auto now = simTime();
     if (txIntervalDataCurrent.timestamp >= now){
         /*do nothing already updated*/
@@ -119,18 +120,18 @@ void DynamicMaxBandwithScheduler::updateTxIntervalDataCurrent(){
 
 }
 
-void DynamicMaxBandwithScheduler::computeInterval(txInterval& tx){
+void DynamicMaxBandwidthScheduler::computeInterval(txInterval& tx){
     simtime_t C = (tx.avg_pkt_size / appBandwidth).get(); // b/bps --> s
     tx.dInterval = std::max(getMinTransmissionInterval(), tx.pmembers*C);
     // RFC 3550 p.30 (e-1.5)
     tx.rndInterval = rndInterval(tx.dInterval)/1.2182;
 }
 
-simtime_t DynamicMaxBandwithScheduler::getMinTransmissionInterval() const{
+simtime_t DynamicMaxBandwidthScheduler::getMinTransmissionInterval() const{
     return (hasSent) ? minTransmissionIntervall : minTransmissionIntervall/2;
 }
 
-simtime_t DynamicMaxBandwithScheduler::rndInterval(simtime_t dInterval){
+simtime_t DynamicMaxBandwidthScheduler::rndInterval(simtime_t dInterval){
     return uniform(rndIntervalLowerBound*dInterval, rndIntervalUpperBound*dInterval);
 }
 

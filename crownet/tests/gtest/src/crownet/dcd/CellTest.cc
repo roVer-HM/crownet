@@ -292,7 +292,7 @@ TEST_F(RegularCellTest, printVisitorAll) {
       cell.accept<CellPrinterAll<RegularCell>, std::string>(printAll);
 
   std::string ret =
-      "{cell_id: [5,4] owner_id: 42}\n"
+      "{cell_id: [5, 4] owner_id: 42}\n"
       "  14 --> Count: 2| meas_t: 3| recv_t: 3| valid: 1\n"
       "  15 --> Count: 1| meas_t: 1| recv_t: 1| valid: 1\n"
       "  16 --> Count: 2| meas_t: 1| recv_t: 1| valid: 1\n"
@@ -313,7 +313,7 @@ TEST_F(RegularCellTest, printVisitorValid) {
       cell.accept<CellPrinterValid<RegularCell>, std::string>(printValid);
 
   std::string ret =
-      "{cell_id: [5,4] owner_id: 42}(valid only)\n"
+      "{cell_id: [5, 4] owner_id: 42}(valid only)\n"
       "  14 --> Count: 2| meas_t: 3| recv_t: 3| valid: 1\n"
       "  15 --> Count: 1| meas_t: 1| recv_t: 1| valid: 1\n"
       "  17 --> Count: 1| meas_t: 2| recv_t: 2| valid: 1\n"

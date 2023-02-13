@@ -5,8 +5,8 @@
  *      Author: vm-sts
  */
 
-#ifndef CROWNET_APPLICATIONS_COMMON_SCHEDULER_DYNAMICMAXBANDWITHSCHEDULER_H_
-#define CROWNET_APPLICATIONS_COMMON_SCHEDULER_DYNAMICMAXBANDWITHSCHEDULER_H_
+#ifndef CROWNET_APPLICATIONS_COMMON_SCHEDULER_DYNAMICMAXBANDWIDTHSCHEDULER_H_
+#define CROWNET_APPLICATIONS_COMMON_SCHEDULER_DYNAMICMAXBANDWIDTHSCHEDULER_H_
 
 #include "inet/queueing/base/PacketProcessorBase.h"
 #include "inet/common/clock/ClockUserModuleMixin.h"
@@ -33,12 +33,12 @@ std::ostream& operator<<(std::ostream& os, const txInterval& i);
 
 
 
-class DynamicMaxBandwithScheduler: public IntervalScheduler {
+class DynamicMaxBandwidthScheduler: public IntervalScheduler {
 
 
 public:
-    DynamicMaxBandwithScheduler();
-    virtual ~DynamicMaxBandwithScheduler();
+    DynamicMaxBandwidthScheduler();
+    virtual ~DynamicMaxBandwidthScheduler();
     static simsignal_t txInterval_s;
     static simsignal_t txDetInterval_s;
 
@@ -76,4 +76,4 @@ protected:
 
 } /* namespace crownet */
 
-#endif /* CROWNET_APPLICATIONS_COMMON_SCHEDULER_DYNAMICMAXBANDWITHSCHEDULER_H_ */
+#endif /* CROWNET_APPLICATIONS_COMMON_SCHEDULER_DYNAMICMAXBANDWIDTHSCHEDULER_H_ */

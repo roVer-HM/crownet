@@ -17,12 +17,12 @@ package crownet.applications.common.scheduler;
 
 import crownet.applications.common.scheduler.IntervalScheduler;
 
-simple DynamicMaxBandwithScheduler extends IntervalScheduler {
+simple DynamicMaxBandwidthScheduler extends IntervalScheduler {
     parameters:
-      	@class(crownet::DynamicMaxBandwithScheduler);      
+      	@class(crownet::DynamicMaxBandwidthScheduler);      
 		double rndIntervalLowerBound = default(0.5);
 		double rndIntervalUpperBound = default(1.5);
-		int maxApplicationBandwith @unit(bps) = default(1kbps); // if numberPackets is -1 this must be set.
+		int maxApplicationBandwidth @unit(bps) = default(1kbps); // if numberPackets is -1 this must be set.
 		int estimatedAvgPaketSize @unit(b) = default(50B);		
 		
 		string appRxInfoProviderModule = default("^.packetMeterIn");
