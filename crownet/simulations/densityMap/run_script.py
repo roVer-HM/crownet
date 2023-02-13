@@ -74,7 +74,7 @@ class SimulationRun(BaseRunner):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        OppAnalysis.create_common_plots_all(result_dir, builder, sql)
+        OppAnalysis.plot_served_blocks_ul_all(result_dir, builder, sql)
         if sql.is_count_map():
             print("build count based default plots")
             builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
