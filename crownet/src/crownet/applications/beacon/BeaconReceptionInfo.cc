@@ -36,6 +36,21 @@ std::string BeaconReceptionInfo::str() const {
     return s.str();
 }
 
+std::string BeaconReceptionInfo::logShort() const {
+    std::stringstream s;
+    if (getCurrentData() == nullptr){
+            s << "Beacon[id:" << getNodeId() << ", no-data!]";
+        } else {
+            auto d = getCurrentData();
+            auto p = getPrioData();
+            auto prioSeq = (p == nullptr) ? 0 : p->getSequenceNumber();
+            s << "Beacon[id:" << getNodeId() << ", SeqNo.:" << prioSeq << "|" << d->getSequenceNumber() \
+                        << ", rxTime: " << d->getReceivedTime().ustr() \
+                        << ", pos.:" << d->getPosition() << "]";
+        }
+    return s.str();
+}
+
 std::string BeaconReceptionInfo::infoStrShort() const{
     std::stringstream s;
     s << "nodeId: " << getNodeId();

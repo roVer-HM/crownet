@@ -34,6 +34,7 @@ public:
 
     virtual std::string str() const override;
     virtual std::string infoStrShort() const;
+    virtual std::string logShort() const;
 
     bool isUpdated() const {return updated;}
 

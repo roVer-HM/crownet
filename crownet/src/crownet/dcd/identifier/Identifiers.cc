@@ -19,6 +19,10 @@ std::string GridCellID::str() const {
   return os.str();
 }
 
+std::ostream& operator<<(std::ostream& os, const GridCellID& i){
+    return os << "[" << i.x() << ", " << i.y() << "]";
+}
+
 bool GridCellID::operator<(const GridCellID& rhs) const {
   return id.first < rhs.id.first ||
          (!(rhs.id.first < id.first) && id.second < rhs.id.second);
