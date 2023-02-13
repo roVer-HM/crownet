@@ -118,13 +118,17 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
      * Case4 Old info object (already seen node, preChange was called getOrCreate) ttl reached:
      *       info will be dropped. No call to map. The preChange already decrement the map no increment necessary.
      */
+    //ensure info object is in table.
     Enter_Method_Silent();
+
+    EV_INFO << "processInfo[id: " << ownerId << "] " << info->logShort() << endl;
     if (!info->isUpdated()){
         // out of order packet do not process again
         return true;
     }
-    //ensure info object is in table.
+    // only save correctly ordered info objects into neighborhood table
     saveInfo(info);
+
     if (ttlReached(info)){
         // information to old do not propagate to density map
         if (info->hasPrio()){
