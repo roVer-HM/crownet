@@ -249,6 +249,11 @@ bool BaseDensityMapApp::mergeReceivedMap(Packet *packet) {
 
   simtime_t _received = simTime();
   auto header = packet->popAtFront<MapHeader>();
+  if (header->getSourceId() == getHostId()){
+      // self map packet. ignore it
+      EV_INFO << getHostId() << "received own density map. Ignore it." << endl;
+      return true;
+  }
   if (header->getVersion() == MapType::SPARSE){
       auto p = packet->popAtFront<SparseMapPacket>();
       auto packetCreationTime = p->getTag<CreationTimeTag>()->getCreationTime();
