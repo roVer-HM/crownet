@@ -48,7 +48,7 @@ void DynamicMaxBandwithScheduler::initialize(int stage)
         estimatedAvgPaketSize = b(par("estimatedAvgPaketSize"));
         appRxInfoProvider = getModuleFromPar<AppRxInfoProvider>(par("appRxInfoProviderModule"), this);
 
-        last_tx = 0.0;
+        last_tx = 0.0; // set to current time.
         hasSent = false;
         appBandwidth = maxApplicationBandwith;
 
@@ -83,9 +83,12 @@ void DynamicMaxBandwithScheduler::handleMessage(cMessage *message){
             EV_INFO << LOG_MOD << "Transmit now" << endl;
             // sent data now because updated transmission time lies in the past
             scheduleApp(message);
+            if (hasSent){
+                //ignore first send action as last_tx is not defined jet.
+                emit(txInterval_s, simTime() - last_tx);
+                emit(txDetInterval_s, txIntervalDataCurrent.dInterval);
+            }
             hasSent = true;
-            emit(txInterval_s, simTime() - last_tx);
-
             last_tx = simTime();
             // overide prio txIntervalDataPrio with current interval
             txIntervalDataPrio = txIntervalDataCurrent;
