@@ -20,7 +20,7 @@ include ../lib/default_testConfig.ini
 extends = _default, D2D_General, DcDMap, stationary_n1
 *.misc[*].app[1].scheduler.generationInterval = 100ms
 *.misc[*].app[1].scheduler.numberPackets = -1
-*.misc[*].app[1].scheduler.amoutOfData = 1000B
+*.misc[*].app[1].scheduler.amountOfData = 1000B
 # update interval bigger than sim time. Do not sent data in this case
 *.misc[*].app[1].app.localMapUpdateInterval = 300ms
 

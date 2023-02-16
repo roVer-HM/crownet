@@ -1,0 +1,41 @@
+%description:
+MultiBeaconTest
+
+%file: package.ned 
+// 
+// empty: no namespace
+//
+
+%inifile: omnetpp.ini
+[General]
+network = crownet.test.omnetpp.lib.TestStationaryWorld
+cmdenv-express-mode = false
+cmdenv-log-prefix = ""
+*.misc[*].app[*].app.cmdenv-log-level = debug
+*.misc[*].app[*].app.packetMeterIn.cmdenv-log-level = debug
+#**.cmdenv-log-level = off
+sim-time-limit= 500ms
+ned-path = ../../lib
+include ../lib/default_testConfig.ini
+**.vector-recording = false
+**.scalar-recording = false
+**.routingRecorder.enabled = false
+
+[Config final]
+extends = _default, D2D_General, MultiBeacon, stationary_n1
+*.misc[*].app[1].scheduler.generationInterval = 100ms
+*.misc[*].app[1].scheduler.numberPackets = -1
+*.misc[*].app[1].scheduler.amountOfData = 1000B
+# update interval bigger than sim time. Do not sent data in this case
+*.misc[*].app[1].app.localMapUpdateInterval = 300ms
+
+%postrun-command: grep -E "^.*burstCreationTime = 28.814045629ms.*$" test.out > test1.out
+
+%contains: test1.out
+PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 28.814045629ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t: N/A age: N/A jitter:50.877852us avg_s:54 b count:1 loss_r:0}
+PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 28.814045629ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t: N/A age: N/A jitter:50.877852us avg_s:54 b count:1 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 28.814045629ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:28.814045629ms age:0s jitter:98.575838us avg_s:54 b count:2 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 28.814045629ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:28.814045629ms age:0s jitter:143.2927us avg_s:54 b count:3 loss_r:0}
+
+%contains: stdout
+<!> Simulation time limit reached -- at t=0.5s

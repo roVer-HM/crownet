@@ -72,9 +72,9 @@ class AppRxInfoBase extends AppInfoBase {
 }
 cplusplus(AppRxInfoBase){{
   public:
-  	virtual void processInbound(const Packet *packetIn, const int rcvStationId,
+  	virtual void processInbound(Packet *packetIn, const int rcvStationId,
             const simtime_t arrivalTime) {/*do nothing*/};
-    virtual void computeMetrics(const Packet *packetIn) {/*do nothing*/};
+    virtual void computeMetrics(Packet *packetIn) {/*do nothing*/};
 }}
 
 

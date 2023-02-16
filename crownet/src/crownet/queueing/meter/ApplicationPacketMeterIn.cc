@@ -70,13 +70,15 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     GenericPacketMeter::meterPacket(packet);
     auto data = packet->peekData();
     int sourceId = data->getAllTags<HostIdTag>().front().getTag()->getHostId();
-
-    // process application level statistics
-    appLevelInfo->processInbound(packet, hostId, simTime());
+    auto now = simTime();
 
     // process source level statistics
     AppRxInfoPerSource* info = getOrCreate(sourceId);
-    info->processInbound(packet, hostId, simTime());
+    info->processInbound(packet, hostId, now);
+
+    // process application level statistics
+    appLevelInfo->processInbound(packet, hostId, now);
+
     if (appendAppInfoTag){
         auto tag = packet->addTagIfAbsent<AppRxInfoPerSourceTag>();
         tag->setPacketInfo(info);

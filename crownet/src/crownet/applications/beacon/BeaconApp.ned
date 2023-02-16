@@ -30,7 +30,6 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         @class(crownet::BeaconDynamic);   
         // Aid app override defaults
         packetName = default("BeaconDynamic");
-		packetLength = default(300B);
 		allEmptyDestAddress = false;
 
 		

@@ -15,7 +15,7 @@ AppRxInfoPerSource::~AppRxInfoPerSource() {
     // TODO Auto-generated destructor stub
 }
 
-void AppRxInfoPerSource::computeMetrics(const Packet *packetIn){
+void AppRxInfoPerSource::computeMetrics(Packet *packetIn){
     AppRxInfo::computeMetrics(packetIn);
     checkOutOfOrder(); // must be before calcPacketLoss()
     calcPacketLoss();

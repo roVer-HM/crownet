@@ -24,6 +24,7 @@ public:
 
     //CrownetPacketSourceBase
     virtual Packet *createPacket() override;
+    virtual BurstInfo getBurstInfo(inet::b) const override;
 
 
     // FSM

@@ -9,6 +9,7 @@
 #define CROWNET_APPLICATIONS_COMMON_INFO_APPRXINFOX_H_
 
 #include "crownet/applications/common/info/AppInfo_m.h"
+#include "crownet/common/BurstIdSet.h"
 
 namespace crownet {
 
@@ -18,18 +19,21 @@ public:
     virtual ~AppRxInfo();
 
     // override for granular handling of packet types
-    virtual void processInbound(const Packet *packetIn, const int rcvStationId,
+    virtual void processInbound(Packet *packetIn, const int rcvStationId,
             const simtime_t arrivalTime) override;
-    virtual void updateCurrentPktInfo(const Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime);
+    virtual void updateCurrentPktInfo(Packet *packetIn, const int rcvStationId,
+            const simtime_t arrivalTime);
     virtual PacketInfo* swapAndGetCurrentPktInfo();
 
 
-    virtual void computeMetrics(const Packet *packetIn) override;
+    virtual void computeMetrics(Packet *packetIn) override;
 
 
     virtual void calcJitter();
-    virtual void calcAvgPacketSize(const Packet *packetIn);
+    virtual void calcAvgPacketSize(Packet *packetIn);
 
+private:
+    BurstIdSet burstIdSet;
 };
 
 } /* namespace crownet */

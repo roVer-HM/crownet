@@ -57,6 +57,7 @@ protected:
  virtual Packet *createPacket() override;
  virtual Ptr<Chunk>  buildHeader();
  virtual Ptr<Chunk>  buildPayload(b maxData);
+ virtual BurstInfo getBurstInfo(inet::b) const override;
 
  // FSM
  virtual FsmState fsmSetup(cMessage *msg) override;
@@ -83,7 +84,7 @@ protected:
 
  // AppStatusInfo
  virtual const bool canProducePacket() override;
- virtual const inet::b getMinPdu() override;
+ virtual const inet::b getMinPdu() const override;
 protected:
 
  std::shared_ptr<GridCellIDKeyProvider> cellProvider;

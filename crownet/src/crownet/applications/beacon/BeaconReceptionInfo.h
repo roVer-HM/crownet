@@ -24,9 +24,9 @@ public:
 
 
     // override for granular handling of packet types
-    virtual void processInbound(const Packet *packetIn, const int rcvStationId,
+    virtual void processInbound(Packet *packetIn, const int rcvStationId,
             const simtime_t arrivalTime) override;
-    virtual void updateCurrentPktInfo(const Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime) override;
+    virtual void updateCurrentPktInfo(Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime) override;
 
 
     // converts simtime_t time into unit32_t representation (ms)

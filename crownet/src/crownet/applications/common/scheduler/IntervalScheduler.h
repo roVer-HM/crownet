@@ -30,7 +30,7 @@ class IntervalScheduler : public AppSchedulerBase {
 protected:
    cPar *generationIntervalParameter = nullptr;
    cPar *numberPackets = nullptr;
-   cPar *amoutOfData = nullptr;
+   cPar *amountOfData = nullptr;
 
 
    ClockEvent *generationTimer = nullptr;

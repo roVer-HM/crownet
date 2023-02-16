@@ -10,6 +10,7 @@
 #include "crownet/applications/beacon/Beacon_m.h"
 #include "crownet/applications/common/info/InfoTags_m.h"
 #include "crownet/crownet.h"
+#include <cmath>
 
 namespace crownet {
 
@@ -23,12 +24,20 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
+
+
         nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
         maxBandwith = par("maxBandwith");
     }
+}
+
+BurstInfo BeaconDynamic::getBurstInfo(inet::b data) const{
+    DynamicBeaconPacket p;
+    int pkt_count = (int)std::floor((double)data.get()/p.getChunkLength().get());
+    return BurstInfo{pkt_count, inet::b(pkt_count*p.getChunkLength().get())};
 }
 
 

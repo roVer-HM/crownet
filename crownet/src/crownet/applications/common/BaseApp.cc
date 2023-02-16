@@ -183,14 +183,70 @@ void BaseApp::producePackets(inet::b maxData){
     Enter_Method("producePacket");
 
     scheduledData = maxData;
-    while(canProducePacket() && scheduledData.get() > 0){
+    // burst Info will calculate number of packets that are
+    // the application is able to produce which is equal to or
+    // less than maxData.
+    BurstInfo burstInfo = getBurstInfo(maxData);
+    simtime_t cTime = simTime();
+    std::vector<Packet*> pkts;
+    inet::b burstSize = inet::b(0);
+    for(int i =0; i < burstInfo.pkt_count; i++){
         auto packet = createPacket();
+        pkts.push_back(packet);
+        burstSize += packet->getDataLength();
         scheduledData -= packet->getDataLength();
+        if (scheduledData.get() < 0){
+            throw cRuntimeError("To much data produced.");
+        }
+    }
+
+    int i = 0;
+    for(auto packet : pkts){
+        auto t = packet->addRegionTagIfAbsent<BurstTag>();
+        t->setBurstCreationTime(cTime);
+        t->setBurstPktCount(pkts.size());
+        t->setBurstSize(burstSize);
+        t->setBurstIndex(i);
+        i++;
         EV_INFO << "Producing packet" << EV_FIELD(packet) << EV_ENDL;
         handlePacketProcessed(packet);
         pushOrSendPacket(packet, outputGate, consumer);
         updateDisplayString();
     }
+}
+
+void BaseApp::producePackets(int number){
+
+    // packet mode. Assume infinite resources
+    scheduledData = inet::b(-1);
+    std::vector<Packet *>pkts;
+    inet::b burstSize = inet::b(0);
+    simtime_t cTime = simTime();
+
+    for(int i=0; i<number; i++){
+        if (canProducePacket()){
+            auto p = createPacket();
+             burstSize += p->getDataLength();
+             pkts.push_back(p);
+        }
+     }
+    EV_INFO << pkts.size() << "/" << number << " packets created for transmission" << endl;
+
+    int i = 0;
+    for(auto p : pkts){
+        auto t = p->addRegionTagIfAbsent<BurstTag>();
+        t->setBurstCreationTime(cTime);
+        t->setBurstPktCount(pkts.size());
+        t->setBurstSize(burstSize);
+        t->setBurstIndex(i);
+        i++;
+        EV_INFO << "Producing packet" << EV_FIELD(p) << EV_ENDL;
+        handlePacketProcessed(p);
+        pushOrSendPacket(p, outputGate, consumer);
+        updateDisplayString();
+    }
+    // packet mode. All resources used.
+    scheduledData = inet::b(0);
 }
 
 const inet::b BaseApp::getAvailablePduLenght() {
@@ -213,10 +269,10 @@ const FsmState BaseApp::getState() {
     return fsmRoot.getState();
 }
 
-const inet::b BaseApp::getMaxPdu(){
+const inet::b BaseApp::getMaxPdu() const {
     return maxPduLength;
 }
-const inet::b BaseApp::getMinPdu(){
+const inet::b BaseApp::getMinPdu() const {
     if (minPduLength.get() <=  0.0){
         throw cRuntimeError("Provide minimum  Pdu size > 0 in configuration or override method.");
     }

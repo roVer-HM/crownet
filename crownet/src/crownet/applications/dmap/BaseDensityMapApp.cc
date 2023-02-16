@@ -171,10 +171,36 @@ const bool BaseDensityMapApp::canProducePacket(){
     }
 }
 
-const inet::b BaseDensityMapApp::getMinPdu(){
+const inet::b BaseDensityMapApp::getMinPdu() const {
     // todo check number of occupied cells and select the corresponding header type
     return b(8*(24 + 6)); // SparseMapPacket header
 }
+
+BurstInfo BaseDensityMapApp::getBurstInfo(inet::b scheduled) const{
+    MapHeader h;
+    SparseMapPacket p;
+    int max_cells_per_pkt = ((getMaxPdu() - h.getChunkLength())/p.getCellSize()).get();
+
+    int num_cells_available = dcdMap->getCellKeyStream()->size(simTime());
+
+    int num_pkt_needed = (int)std::ceil((double)num_cells_available/max_cells_per_pkt);
+    int num_pkt_possible = (int)std::ceil(((double)scheduled.get()/getMaxPdu().get()));
+
+    inet::b burst_size;
+    int pkt_num;
+    if (num_pkt_needed <= num_pkt_possible){
+        // send num_pkt_needed *NEEDED* packets where the last one is most likly not full.
+        // Thus pkt_num times header plus all cells available.
+        burst_size = inet::b(num_pkt_needed*h.getChunkLength().get() + num_cells_available*p.getCellSize().get());
+        pkt_num = num_pkt_needed;
+    } else {
+        // send num_pkt_possible *FULL* packets
+        burst_size = inet::b(num_pkt_possible*(h.getChunkLength().get() + max_cells_per_pkt*p.getCellSize().get()));
+        pkt_num = num_pkt_possible;
+    }
+    return BurstInfo{pkt_num, burst_size};
+}
+
 
 
 Ptr<Chunk>  BaseDensityMapApp::buildHeader(){

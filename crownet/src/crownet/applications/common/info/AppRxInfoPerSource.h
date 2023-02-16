@@ -18,7 +18,7 @@ public:
     virtual ~AppRxInfoPerSource();
     AppRxInfoPerSource(const char *name=nullptr): AppRxInfoPerSource_Base(name){};
 
-    virtual void computeMetrics(const Packet *packetIn) override;
+    virtual void computeMetrics(Packet *packetIn) override;
     virtual void calcPacketLoss();
     virtual void checkOutOfOrder();
 

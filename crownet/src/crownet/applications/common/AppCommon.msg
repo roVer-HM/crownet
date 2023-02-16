@@ -16,6 +16,12 @@
 import inet.common.INETDefs;
 import inet.common.geometry.Geometry;
 import inet.common.TagBase;
+import inet.common.Units;
+
+cplusplus {{
+#include "inet/common/packet/Packet.h"
+using namespace inet;
+}}
 
 class CurrentLocationTag extends inet::TagBase
 {
@@ -36,3 +42,14 @@ class HopCount extends inet::TagBase
 {
  	int hops;   
 }
+
+
+class BurstTag extends inet::TagBase
+{
+    simtime_t burstCreationTime;
+    long burstIndex;
+    int burstPktCount;
+    inet::b burstSize;
+    bool skipStatsProcessing = false;
+}
+class BurstSkipTag extends inet::TagBase{}
