@@ -30,6 +30,7 @@ public:
      * was not sent during the given time.
      */
     virtual const bool hasNext(const time_t& now) = 0;
+    virtual const int size(const time_t& now) const =0;
 
     /**
      * Return next cellId or cell. If hasNext() returns false this method throws an exception.
