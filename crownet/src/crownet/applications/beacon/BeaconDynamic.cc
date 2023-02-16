@@ -30,7 +30,7 @@ void BeaconDynamic::initialize(int stage) {
         tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
-        maxBandwith = par("maxBandwith");
+        maxBandwidth = par("maxBandwidth");
     }
 }
 

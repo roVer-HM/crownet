@@ -35,7 +35,7 @@ private:
     INeighborhoodTablePacketProcessor* tablePktProcessor = nullptr;
     double minSentFrequency;
     double maxSentFrequyncy;
-    double maxBandwith;
+    double maxBandwidth;
 };
 
 } /* namespace crownet */

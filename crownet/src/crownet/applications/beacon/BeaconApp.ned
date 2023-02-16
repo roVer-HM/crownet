@@ -35,7 +35,7 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
 		
 		double minSentFrequency @unit(Hz)= default(0.5Hz);
 		double maxSentFrequency @unit(Hz)= default(10Hz);
-        double maxBandwith @unit(Bytes) = default(2000B);
+        double maxBandwidth @unit(Bytes) = default(2000B);
         
         // App logic
         string neighborhoodTableMobdule  = default("mobility");

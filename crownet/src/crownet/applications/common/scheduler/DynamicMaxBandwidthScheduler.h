@@ -1,5 +1,5 @@
 /*
- * DynamicMaxBandwithScheduler.h
+ * DynamicMaxBandwidthScheduler.h
  *
  *  Created on: Feb 7, 2023
  *      Author: vm-sts
@@ -64,7 +64,7 @@ protected:
     txInterval txIntervalDataCurrent;
 
     simtime_t minTransmissionIntervall;
-    bps maxApplicationBandwith;
+    bps maxApplicationBandwidth;
     b estimatedAvgPaketSize;
     AppRxInfoProvider* appRxInfoProvider = nullptr;
 

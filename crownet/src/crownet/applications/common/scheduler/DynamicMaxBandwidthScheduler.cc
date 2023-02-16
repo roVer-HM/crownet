@@ -1,5 +1,5 @@
 /*
- * DynamicMaxBandwithScheduler.cc
+ * DynamicMaxBandwidthScheduler.cc
  *
  *  Created on: Feb 7, 2023
  *      Author: vm-sts
@@ -43,7 +43,7 @@ void DynamicMaxBandwidthScheduler::initialize(int stage)
     IntervalScheduler::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         minTransmissionIntervall = par("generationInterval");
-        maxApplicationBandwith = bps(par("maxApplicationBandwidth").doubleValueInUnit("bps"));
+        maxApplicationBandwidth = bps(par("maxApplicationBandwidth").doubleValueInUnit("bps"));
         rndIntervalLowerBound = par("rndIntervalLowerBound").doubleValue();
         rndIntervalUpperBound = par("rndIntervalUpperBound").doubleValue();
         estimatedAvgPaketSize = b(par("estimatedAvgPaketSize"));
@@ -51,7 +51,7 @@ void DynamicMaxBandwidthScheduler::initialize(int stage)
 
         last_tx = 0.0; // set to current time.
         hasSent = false;
-        appBandwidth = maxApplicationBandwith;
+        appBandwidth = maxApplicationBandwidth;
 
         WATCH(txIntervalDataPrio);
         WATCH(txIntervalDataCurrent);
@@ -69,7 +69,7 @@ void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
         EV_INFO << "first  scheduling using: " << txIntervalDataPrio << endl;
         scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrio.rndInterval), generationTimer);
     } else {
-        throw cRuntimeError("DynamicMaxBandwithScheduler is scheduled in handleMessage. Only use scheduleGenerationTimer at startup");
+        throw cRuntimeError("DynamicMaxBandwidthScheduler is scheduled in handleMessage. Only use scheduleGenerationTimer at startup");
     }
 }
 

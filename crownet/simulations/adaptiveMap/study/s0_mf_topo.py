@@ -75,39 +75,6 @@ source_end_time = 400.0
 source_id_range = range(1117, 1131)
 
 
-def par_var_with_vadere():
-    return "final_dynamic_m_vadere", [
-        {
-            "omnet": {
-                "sim-time-limit": t,
-                "**.vadereScenarioPath": scenario_exp_25,  # iter arrival time of 25s (for each source)
-                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
-            },
-            "vadere": {
-                **{
-                    f"sources.[id=={id}].endTime": source_end_time
-                    for id in source_id_range
-                },
-            },
-        },
-        {
-            "omnet": {
-                "sim-time-limit": t,
-                "**.vadereScenarioPath": scenario_exp_15,  # iter arrival time of 5s (for each source)
-                "*.pNode[*].app[1].scheduler.generationInterval": "4000ms + uniform(0s, 50ms)",
-                "*.pNode[*].app[0].scheduler.generationInterval": "700ms + uniform(0s, 50ms)",
-            },
-            "vadere": {
-                **{
-                    f"sources.[id=={id}].endTime": source_end_time
-                    for id in source_id_range
-                },
-            },
-        },
-    ]
-
-
 def par_var_bonn_motion():
     return "final_dynamic_m_bonn_motion", [
         {
