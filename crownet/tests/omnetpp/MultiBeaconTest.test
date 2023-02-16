@@ -23,6 +23,9 @@ include ../lib/default_testConfig.ini
 
 [Config final]
 extends = _default, D2D_General, MultiBeacon, stationary_n1
+*.misc[*].app[*].packetMeterIn.cmdenv-log-level = debug
+**.cmdenv-log-level = off
+
 *.misc[*].app[1].scheduler.generationInterval = 100ms
 *.misc[*].app[1].scheduler.numberPackets = -1
 *.misc[*].app[1].scheduler.amountOfData = 1000B

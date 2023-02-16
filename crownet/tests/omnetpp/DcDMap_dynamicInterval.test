@@ -18,6 +18,9 @@ include ../lib/default_testConfig.ini
 
 [Config final]
 extends = _default, D2D_General, DcDMapDynamicInterval, stationary_n1
+*.misc[*].app[*].app.cmdenv-log-level = debug
+*.misc[*].app[*].scheduler.cmdenv-log-level = debug
+**.cmdenv-log-level = off
 
 %postrun-command: grep -E "^0.*TestStationaryWorld\.misc\[0\].app\[1\].(scheduler|app)" test.out > test1.out
 

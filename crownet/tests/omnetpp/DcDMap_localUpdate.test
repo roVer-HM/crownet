@@ -29,6 +29,7 @@ record-eventlog = true
 
 [Config final]
 extends = _default, D2D_General, DcDMap, stationary_n5
+**.cmdenv-log-level = off
 *.coordConverter.typename = "OsgCoordConverterLocal"
 *.coordConverter.xBound = 30.0m
 *.coordConverter.yBound = 30.0m

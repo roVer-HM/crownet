@@ -18,6 +18,9 @@ include ../lib/default_testConfig.ini
 
 [Config final]
 extends = _default, D2D_General, DcDMap, stationary_n1
+*.misc[*].app[*].app.cmdenv-log-level = debug
+*.misc[*].app[*].scheduler.cmdenv-log-level = debug
+**.cmdenv-log-level = off
 
 *.coordConverter.typename = "OsgCoordConverterLocal"
 *.coordConverter.xBound = 30.0m
