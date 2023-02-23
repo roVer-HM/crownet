@@ -10,6 +10,7 @@ from roveranalyzer.simulators.crownet.runner import (
 from matplotlib.backends.backend_pdf import PdfPages
 from roveranalyzer.utils.plot import FigureSaverPdfPages
 from roveranalyzer.analysis import VadereAnalysis, OppAnalysis, HdfExtractor
+from roveranalyzer.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
 
 
 class SimulationRun(BaseRunner):
@@ -77,17 +78,17 @@ class SimulationRun(BaseRunner):
             data_root=self.result_base_dir()
         )
         with PdfPages(self.result_dir("servedBlocks.pdf")) as pdf:
-            OppAnalysis.plot_served_blocks_ul_all(
+            PlotEnb.plot_served_blocks_ul_all(
                 self.result_base_dir(), builder, sql, FigureSaverPdfPages(pdf)
             )
         with PdfPages(self.result_dir("appTx.pdf")) as pdf:
-            OppAnalysis.plot_txinterval_all(
+            PlotAppTxInterval.plot_txinterval_all(
                 self.result_base_dir(),
                 sql=sql,
                 app="Beacon",
                 saver=FigureSaverPdfPages(pdf),
             )
-            OppAnalysis.plot_txinterval_all(
+            PlotAppTxInterval.plot_txinterval_all(
                 self.result_base_dir(),
                 sql=sql,
                 app="Map",
@@ -99,7 +100,7 @@ class SimulationRun(BaseRunner):
             sel = list(OppAnalysis.find_selection_method(builder))
             if len(sel) > 1:
                 print(f"multiple selections found: {sel}")
-            OppAnalysis.create_common_plots_density(
+            PlotDpmMap.create_common_plots_density(
                 result_dir, builder, sql, selection=sel[0]
             )
         else:

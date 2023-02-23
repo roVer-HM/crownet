@@ -23,6 +23,7 @@ from matplotlib.colors import (
 import seaborn as sn
 from collections.abc import Sized, Sequence
 from typing import Callable, Dict, List, Tuple, Any
+from roveranalyzer.analysis.plot import PlotDpmMap
 from roveranalyzer.analysis.common import (
     Simulation,
     RunMap,
@@ -39,7 +40,12 @@ from roveranalyzer.simulators.vadere.plots.scenario import (
 )
 from roveranalyzer.utils import dataframe
 from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import PlotUtil, StyleMap, check_ax, empty_fig
+from roveranalyzer.utils.plot import (
+    PlotUtil,
+    StyleMap,
+    empty_fig,
+    matplotlib_set_latex_param,
+)
 import roveranalyzer.utils.plot as _Plot
 import roveranalyzer.utils.dataframe as FrameUtl
 from matplotlib.ticker import MaxNLocator
@@ -50,7 +56,6 @@ import matplotlib.pyplot as plt
 from scipy.stats import mannwhitneyu, kstest
 from matplotlib.backends.backend_pdf import PdfPages
 from omnetinireader.config_parser import OppConfigFileBase, ObjectValue
-from roveranalyzer.utils.plot import check_ax, matplotlib_set_latex_param
 
 # load global settings
 matplotlib_set_latex_param()
@@ -436,7 +441,7 @@ def plot_mse_yDist_to_ymf_box_plot(
 
     with plt.rc_context(_Plot.paper_rc(tick_labelsize="x-large")):
         # data.reset_index().set_index(['run_id', 'label']).boxplot(by=["label"])
-        fig, ax = check_ax(ax, figsize=(8, 6.5))
+        fig, ax = PlotUtil.check_ax(ax, figsize=(8, 6.5))
         # ax.set_title(
         #     f"Cell MSE difference between ymfDist and ymf (sorted by mean) N={len(data.iloc[:,0])}"
         # )
@@ -482,13 +487,13 @@ def plot_per_seed_stats(run_map: RunMap):
         for seed in ts_per_seed.index.get_level_values("seed").unique():
             print(f"seed: {seed}")
             _df = ts_per_seed.loc[seed, ["0.9_60_25", "1_999_25"]]
-            fig, ax = _Plot.check_ax()
+            fig, ax = PlotUtil.check_ax()
             sns.lineplot(data=_df)
             ax.set_title(f"Time series of MSE for seed {seed}")
             pdf.savefig(fig)
             plt.close(fig)
 
-            f, ax = _Plot.check_ax()
+            f, ax = PlotUtil.check_ax()
             sns.ecdfplot(
                 _df,
                 ax=ax,
@@ -500,8 +505,8 @@ def plot_per_seed_stats(run_map: RunMap):
             pdf.savefig(f)
             plt.close(f)
 
-            fig, ax = _Plot.check_ax()
-            OppAnalysis.calculate_equality_tests(_df, ax=ax)
+            fig, ax = PlotUtil.check_ax()
+            PlotDpmMap.calculate_equality_tests(_df, ax=ax)
             ax.set_title(f"Test for seed {seed}")
             pdf.savefig(fig)
             plt.close(fig)
@@ -912,13 +917,13 @@ def plot_count_stats2(run_map: RunMap):
             col = ["gt_del", "gt", list(df.columns)[-2][1], list(df.columns)[-1][1]]
             df = df.set_axis(col, axis=1).drop(columns=col[0]).dropna()
 
-            fig, ax = _Plot.check_ax()
-            OppAnalysis.calculate_equality_tests(df, ax=ax)
+            fig, ax = PlotUtil.check_ax()
+            PlotDpmMap.calculate_equality_tests(df, ax=ax)
             ax.set_title(f"Stat test for seed {seed}")
             pdf.savefig(fig)
             plt.close(fig)
 
-            fig, ax = _Plot.check_ax()
+            fig, ax = PlotUtil.check_ax()
             ax.set_title("Summary Statistics for seed {seed}")
             df_desc = df.describe().applymap("{:.6f}".format).reset_index()
             ax.axis("off")
@@ -930,13 +935,13 @@ def plot_count_stats2(run_map: RunMap):
             pdf.savefig(fig)
             plt.close(fig)
 
-            fig, ax = _Plot.check_ax()
+            fig, ax = PlotUtil.check_ax()
             sns.lineplot(data=df)
             ax.set_title(f"Time series of count for seed {seed}")
             pdf.savefig(fig)
             plt.close(fig)
 
-            f, ax = _Plot.check_ax()
+            f, ax = PlotUtil.check_ax()
             sns.ecdfplot(
                 df,
                 ax=ax,
@@ -1030,7 +1035,7 @@ def describtive_two_way_comparison_msce(
             title = f"Comparision {' - '.join(cols)}"
             print(f"build {title}")
 
-            OppAnalysis.plot_descriptive_comparison(
+            PlotDpmMap.plot_descriptive_comparison(
                 data.loc[:, cols],
                 lbl_dict=lbl_dict,
                 run_map=run_map,
@@ -1090,7 +1095,7 @@ def describtive_two_way_comparison_count(
             title = f"Comparision {' - '.join(cols)}"
             print(f"build {title}")
             with plt.rc_context(_Plot.plt_rc_same(rc={"font.size": 20})):
-                OppAnalysis.plot_descriptive_comparison(
+                PlotDpmMap.plot_descriptive_comparison(
                     data.loc[:, cols],
                     lbl_dict=lbl_dict,
                     run_map=run_map,

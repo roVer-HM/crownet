@@ -19,6 +19,7 @@ from roveranalyzer.analysis.common import (
     SuqcStudy,
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
+from roveranalyzer.analysis.plot import PlotDpmMap
 from roveranalyzer.analysis import adf_test
 from roveranalyzer.simulators.vadere.plots.scenario import VaderScenarioPlotHelper
 from roveranalyzer.utils.parallel import run_kwargs_map
@@ -350,7 +351,7 @@ def plot_default_stats(run_map: RunMap):
         lbl_dict["gt"] = "Ground Truth"
 
         print(f"create stat plots for {ped_f}")
-        OppAnalysis.plot_descriptive_comparison(
+        PlotDpmMap.plot_descriptive_comparison(
             g1_maps,
             lbl_dict,
             run_map,
