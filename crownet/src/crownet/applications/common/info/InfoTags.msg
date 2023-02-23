@@ -33,7 +33,6 @@ class AppRxInfoPerSourceTag extends inet::TagBase
 {
     @descriptor(readonly);
 	AppRxInfoPerSource* packetInfo;    
-	AppRxInfo* applicaitonLevelInfo;    
 }
 
 class RxSourceCountTag extends inet::TagBase

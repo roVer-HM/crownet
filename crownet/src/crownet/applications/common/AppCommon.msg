@@ -23,6 +23,8 @@ cplusplus {{
 using namespace inet;
 }}
 
+namespace crownet;
+
 class CurrentLocationTag extends inet::TagBase
 {
     inet::Coord location;
@@ -43,6 +45,35 @@ class HopCount extends inet::TagBase
  	int hops;   
 }
 
+class RxPerSrcJitterTag extends inet::TagBase
+{
+    simtime_t jitter;
+}
+
+class RxPerSrcAvgSizeTag extends inet::TagBase
+{
+    inet::b size;
+}
+
+class RxPerSrcPktCountTag extends inet::TagBase
+{
+    int count;
+}
+
+class RxPerSrcPktLossCountTag extends inet::TagBase
+{
+    int count;
+}
+
+class RxPerAppAvgSizeTag extends inet::TagBase
+{
+    inet::b size;
+}
+
+class RxPerAppPktCountTag extends inet::TagBase
+{
+    int count;
+}
 
 class BurstTag extends inet::TagBase
 {

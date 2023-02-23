@@ -69,15 +69,6 @@ class BeaconReceptionInfo extends AppRxInfoPerSource {
     
     BeaconData *prioData @owned;
     BeaconData *currentData @owned;
-//    
-//    inet::Coord positionCurrent;
-//    inet::Coord epsilonCurrent;   
-//    uint16_t numberOfNeighboursCurrent; 
-//    double beaconValueCurrent = 1.0;
-//    
-//    inet::Coord positionPrio;
-//    inet::Coord epsilonPrio;   
-//    uint16_t numberOfNeighboursPrio; 
-//    double beaconValuePrio = 1.0;
+
 };
 

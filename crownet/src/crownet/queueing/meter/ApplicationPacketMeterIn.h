@@ -42,7 +42,7 @@ protected:
     int hostId;
     AppRxInfoPerSource* appLevelInfo = nullptr;
 
-    bool appendAppInfoTag = false;
+    bool appendAppInfo = false;
     cObjectFactory* appInfoFactor = nullptr;
     double emaSmoothingJitter;
     double emaSmoothingPacketSize;

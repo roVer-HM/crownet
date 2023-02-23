@@ -20,8 +20,10 @@ class BeaconReceptionInfo :
 public:
     virtual ~BeaconReceptionInfo();
     BeaconReceptionInfo(const char *name=nullptr)
-        : FilePrinterMixin<BeaconReceptionInfo_Base>(name){}
+        : FilePrinterMixin<BeaconReceptionInfo_Base>(name){ }
+    BeaconReceptionInfo(const BeaconReceptionInfo& other);
 
+    virtual BeaconReceptionInfo *dup() const override {return new BeaconReceptionInfo(*this);} ;
 
     // override for granular handling of packet types
     virtual void processInbound(Packet *packetIn, const int rcvStationId,
@@ -36,20 +38,20 @@ public:
     virtual std::string infoStrShort() const;
     virtual std::string logShort() const;
 
-    bool isUpdated() const {return updated;}
+    bool isUpdated() const {return currentPkt != nullptr && !currentPkt->getOutOfOrder();}
 
     bool checkCurrentTtlReached(const omnetpp::simtime_t& ttl) const ;
-    void clearApplicationData();
 
     void initAppData();
 
-    // more than one valid beacon arrived.
+    // Set currentData of 'other' as prioData of this object.
+    void updatePrioAppData(const BeaconReceptionInfo* other);
     bool hasPrio() const;
+private:
+    void copy(const BeaconReceptionInfo& other);
 
 protected:
 
-    // true object was passed to density map
-    bool updated;
 
 };
 

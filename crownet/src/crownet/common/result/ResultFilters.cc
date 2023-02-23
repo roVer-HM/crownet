@@ -93,13 +93,13 @@ void HostIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
   }
 }
 
+
 Register_ResultFilter("rcvdSequenceId", RcvdSequenceIdFilter);
 void RcvdSequenceIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, (double)tag->getPacketInfo()->getMaxSequenceNumber(), details);
-        }
+        double x = (double)packet->peekData()->getAllTags<SequenceIdTag>().front().getTag()->getSequenceNumber();
+        fire(this, t, x, details);
     }
 }
 
@@ -107,8 +107,8 @@ Register_ResultFilter("rcvdPerSrcJitter", RcvdPerSrcJitter);
 void RcvdPerSrcJitter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, tag->getPacketInfo()->getJitter().dbl(), details);
+        if (auto tag = packet->findTag<RxPerSrcJitterTag>()){
+            fire(this, t, tag->getJitter().dbl(), details);
         }
     }
 }
@@ -117,8 +117,8 @@ Register_ResultFilter("rcvdPerSrcAvgSize", RcvdPerSrcAvgSize);
 void RcvdPerSrcAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, tag->getPacketInfo()->getAvg_packet_size().get(), details);
+        if (auto tag = packet->findTag<RxPerSrcAvgSizeTag>()){
+            fire(this, t, tag->getSize().get(), details);
         }
     }
 }
@@ -127,8 +127,8 @@ Register_ResultFilter("rcvdPerSrcCount", RcvdPerSrcCount);
 void RcvdPerSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, (long)tag->getPacketInfo()->getPacketsReceivedCount(), details);
+        if (auto tag = packet->findTag<RxPerSrcPktCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
         }
     }
 }
@@ -137,8 +137,8 @@ Register_ResultFilter("rcvdPerSrcLossCount", RcvdPerSrcLossCount);
 void RcvdPerSrcLossCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, (long)tag->getPacketInfo()->getPacketsLossCount(), details);
+        if (auto tag = packet->findTag<RxPerSrcPktLossCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
 
         }
     }
@@ -148,8 +148,8 @@ Register_ResultFilter("rcvdAvgSize", RcvdAvgSize);
 void RcvdAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, tag->getApplicaitonLevelInfo()->getAvg_packet_size().get(), details);
+        if (auto tag = packet->findTag<RxPerAppAvgSizeTag>()){
+            fire(this, t, tag->getSize().get(), details);
         }
     }
 }
@@ -158,8 +158,8 @@ Register_ResultFilter("rcvdCount", RcvdCount);
 void RcvdCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
-        if (auto tag = packet->findTag<AppRxInfoPerSourceTag>()){
-            fire(this, t, (long)tag->getApplicaitonLevelInfo()->getPacketsReceivedCount(), details);
+        if (auto tag = packet->findTag<RxPerAppPktCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
         }
     }
 }

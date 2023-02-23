@@ -17,8 +17,10 @@
 using namespace inet;
 using namespace crownet::queueing;
 
+
 namespace crownet {
 
+class INeighborhoodTable;
 class AppRxInfoProvider;
 
 struct txInterval{
@@ -67,6 +69,7 @@ protected:
     bps maxApplicationBandwidth;
     b estimatedAvgPaketSize;
     AppRxInfoProvider* appRxInfoProvider = nullptr;
+    INeighborhoodTable* nTable = nullptr;
 
     double rndIntervalLowerBound;
     double rndIntervalUpperBound;

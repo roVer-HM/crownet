@@ -12,9 +12,15 @@
 
 namespace crownet {
 
+AppRxInfo::~AppRxInfo(){
 
-AppRxInfo::~AppRxInfo() {
-    // TODO Auto-generated destructor stub
+}
+AppRxInfo::AppRxInfo(const AppRxInfo& other) : AppRxInfo_Base(other){
+    copy(other);
+}
+
+void AppRxInfo::copy(const AppRxInfo& other){
+    this->burstIdSet = other.burstIdSet;
 }
 
 void AppRxInfo::processInbound(Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime){

@@ -15,8 +15,10 @@ namespace crownet {
 
 class AppRxInfo : public AppRxInfo_Base {
 public:
-    AppRxInfo(const char *name=nullptr): AppRxInfo_Base(name){};
     virtual ~AppRxInfo();
+    AppRxInfo(const char *name=nullptr): AppRxInfo_Base(name){};
+    AppRxInfo(const AppRxInfo& other);
+    virtual AppRxInfo *dup() const override {return new AppRxInfo(*this);};
 
     // override for granular handling of packet types
     virtual void processInbound(Packet *packetIn, const int rcvStationId,
@@ -31,6 +33,10 @@ public:
 
     virtual void calcJitter();
     virtual void calcAvgPacketSize(Packet *packetIn);
+
+
+private:
+    void copy(const AppRxInfo& other);
 
 private:
     BurstIdSet burstIdSet;

@@ -35,6 +35,10 @@ Define_Module(NeighborhoodTable);
 NeighborhoodTable::~NeighborhoodTable(){
     if (ttl_msg != nullptr)
         cancelAndDelete(ttl_msg);
+    for(auto e : _table){
+        delete(e.second);
+    }
+    _table.clear();
 }
 
 // cSimpleModule
@@ -74,15 +78,25 @@ void NeighborhoodTable::handleMessage(cMessage *msg){
 }
 
 void NeighborhoodTable::saveInfo(BeaconReceptionInfo* info) {
-    if (_table.find(info->getNodeId()) == _table.end()){
-        // node info object from this source found. Add to table
+    auto it = _table.find(info->getNodeId());
+    if (it  == _table.end()){
+        // new node info object from this source found. Add to table
+        // nothing present for this node id ==> set prio data to nullptr.
+        info->updatePrioAppData(nullptr);
         _table[info->getNodeId()] = info;
         tableSize = _table.size();
         setLastUpdatedAt(simTime());
         emit(neighborhoodTableChangedSignal, this);
+    } else {
+        auto old_info = it->second;
+        // set currentData of old_info as prioData of new info.
+        info->updatePrioAppData(old_info);
+        _table.erase(it);
+        _table[info->getNodeId()] = info;
+        setLastUpdatedAt(simTime());
+        delete old_info;
+        // no neighborhoodTableChangedSignal as size did not change
     }
-    // if key exist do nothing. Info objects is the same, the get reused.
-    // todo test this?
 }
 
 const BeaconReceptionInfo* NeighborhoodTable::find(int sourceId) const {
@@ -94,14 +108,26 @@ const BeaconReceptionInfo* NeighborhoodTable::find(int sourceId) const {
 }
 
 void NeighborhoodTable::removeInfo(BeaconReceptionInfo* info){
+    // check if map cleanup is needed
+    if (info->hasPrio()){
+        // received packet is to old at reception but a previous packet still exists.
+        // Because packets are created in a strict order the previous packet must have
+        // reached the ttl also. Map cleanup needed because previous packet exists.
+        emitRemoved(info);
+    } else {
+        // no previous packet exits just drop it. No map cleanup needed.
+        emitDropped(info);
+    }
+    // remove from NT
     auto it = _table.find(info->getNodeId());
     if (it != _table.end()){
-        emitRemoved(it->second);
-        it->second->clearApplicationData();
+        auto old_info = it->second;
         it = _table.erase(it);
-        //only erase, do not delete object is managed elsewere.
+        tableSize = _table.size();
         setLastUpdatedAt(simTime());
         emit(neighborhoodTableChangedSignal, this);
+        delete old_info;
+        delete info;
     } else {
         // do nothing object not in map
     }
@@ -120,26 +146,22 @@ bool NeighborhoodTable::processInfo(BeaconReceptionInfo *info){
      */
     //ensure info object is in table.
     Enter_Method_Silent();
+    take(info);
 
     EV_INFO << "processInfo[id: " << ownerId << "] " << info->logShort() << endl;
     if (!info->isUpdated()){
         // out of order packet do not process again
+        EV_INFO << "processInfo[id: " << ownerId << "] out of order. Drop info object." << endl;
+        drop(info);
+        delete info;
         return true;
     }
     // only save correctly ordered info objects into neighborhood table
     saveInfo(info);
 
+
     if (ttlReached(info)){
         // information to old do not propagate to density map
-        if (info->hasPrio()){
-            // received packet is to old at reception but a previous packet still exists.
-            // Because packets are created in a strict order the previous packet must have
-            // reached the ttl also. Map cleanup needed because previous packet exists.
-            emitRemoved(info);
-        } else {
-            // no previous packet exits just drop it. No map cleanup needed.
-            emitDropped(info);
-        }
         removeInfo(info);
     } else {
         // new info, already seen and cell change or already seen and same cell
@@ -178,9 +200,9 @@ void NeighborhoodTable::checkAllTimeToLive(){
         // Received + maxAge := time at which entry must be removed.
         if (ttlReached(it->second)){
             emitRemoved(it->second);
-            it->second->clearApplicationData();
-            // not manged by NT. just clear application data and remove not delete
+            auto obj = it->second;
             it = _table.erase(it);
+            delete obj;
             setLastUpdatedAt(now);
         } else {
             ++it;
@@ -202,7 +224,12 @@ Register_ResultFilter("tableSize", NeighborhoodTableSizeFilter);
 void NeighborhoodTableSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                             cObject *object, cObject *details) {
     if (auto table = dynamic_cast<NeighborhoodTable*>(object)){
-        fire(this, t, (double)table->_table.size(), details);
+        auto size = table->_table.size();
+        if (t>last_receivedSignal && size != lastSize){
+            fire(this, t, (double)size, details);
+            last_receivedSignal = t;
+            lastSize = size;
+        }
     }
 };
 

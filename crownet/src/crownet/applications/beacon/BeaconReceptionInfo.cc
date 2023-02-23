@@ -16,6 +16,14 @@ BeaconReceptionInfo::~BeaconReceptionInfo() {
     // TODO Auto-generated destructor stub
 }
 
+BeaconReceptionInfo::BeaconReceptionInfo(const BeaconReceptionInfo& other)
+    :  FilePrinterMixin<BeaconReceptionInfo_Base>(other){
+    copy(other);
+}
+
+void BeaconReceptionInfo::copy(const BeaconReceptionInfo& other){}
+
+
 uint32_t BeaconReceptionInfo::get32BitTimestamp(omnetpp::simtime_t time) const {
     // mod 32
     // simtime_t in ms (uint64_t) sentTim only has unit32_t thus time mod 32
@@ -101,35 +109,19 @@ void BeaconReceptionInfo::processInbound(Packet *packetIn,
 
     if (currentPkt->getOutOfOrder()){
         // do not update Beacon Data.
-        updated = false; // payload info was not updated
     } else {
-
-        BeaconData* newData;
-        if (prioData == nullptr){
-            newData = new BeaconData();
-            take(newData);
-        } else {
-            // reuse object
-            newData = prioData;
-            prioData = nullptr;
+        if (currentData == nullptr){
+            initAppData();
         }
-//        newData->setBeaconValue(beacon->getTimestamp());
-        newData->setBeaconValue(1.0); // Always 1 for this kind of beacon
-        newData->setPosition(beacon->getPos());
-        newData->setEpsilon(beacon->getEpsilon());
-        newData->setNumberOfNeighbours(beacon->getNumberOfNeighbours());
-        newData->setSourceId(beacon->getSourceId());
-//        newData->setCreationTime(beacon->getTimestamp());
-        newData->setCreationTime(timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime()));
-        newData->setCreationTimeStamp(beacon->getTimestamp());
-        newData->setSequenceNumber(beacon->getSequenceNumber());
-        newData->setReceivedTime(arrivalTime);
-
-        // move data
-        prioData = currentData;
-        currentData = newData;
-
-        updated = true; // new data
+        currentData->setBeaconValue(1.0); // Always 1 for this kind of beacon
+        currentData->setPosition(beacon->getPos());
+        currentData->setEpsilon(beacon->getEpsilon());
+        currentData->setNumberOfNeighbours(beacon->getNumberOfNeighbours());
+        currentData->setSourceId(beacon->getSourceId());
+        currentData->setCreationTime(timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime()));
+        currentData->setCreationTimeStamp(beacon->getTimestamp());
+        currentData->setSequenceNumber(beacon->getSequenceNumber());
+        currentData->setReceivedTime(arrivalTime);
     }
 }
 
@@ -137,17 +129,21 @@ bool BeaconReceptionInfo::checkCurrentTtlReached(const omnetpp::simtime_t& ttl) 
     return (currentData->getCreationTime() + ttl) < simTime();
 }
 
+
+
 void BeaconReceptionInfo::initAppData() {
     setCurrentData(new BeaconData());
 }
 
-bool BeaconReceptionInfo::hasPrio() const {
-    return prioData != nullptr;
+void BeaconReceptionInfo::updatePrioAppData(const BeaconReceptionInfo* other){
+    delete removePrioData();
+    if (other != nullptr){
+        setPrioData(other->getCurrentData()->dup());
+    }
 }
 
-void BeaconReceptionInfo::clearApplicationData() {
-    delete removePrioData();
-    delete removeCurrentData();
+bool BeaconReceptionInfo::hasPrio() const {
+    return prioData != nullptr;
 }
 
 

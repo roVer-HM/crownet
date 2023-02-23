@@ -44,7 +44,7 @@ void ApplicationPacketMeterIn::initialize(int stage)
     if (stage == INITSTAGE_LOCAL){
         hostId = getContainingNode(this)->getId();
 
-        appendAppInfoTag = par("appendAppInfoTag").boolValue();
+        appendAppInfo = par("appendAppInfo").boolValue();
         appInfoFactor = cObjectFactory::get(par("appInfoClass").stringValue());
 
         emaSmoothingJitter = par("ema_smoothing_jitter");
@@ -79,11 +79,22 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     // process application level statistics
     appLevelInfo->processInbound(packet, hostId, now);
 
-    if (appendAppInfoTag){
+
+    if (appendAppInfo){
+        // append copy of current statistic object for application internal processing
         auto tag = packet->addTagIfAbsent<AppRxInfoPerSourceTag>();
-        tag->setPacketInfo(info);
-        tag->setApplicaitonLevelInfo(appLevelInfo);
+        auto info_copy = info->dup();
+        tag->setPacketInfo(info_copy);
     }
+    packet->addTagIfAbsent<RxPerSrcJitterTag>()->setJitter(info->getJitter());
+    packet->addTagIfAbsent<RxPerSrcAvgSizeTag>()->setSize(info->getAvg_packet_size());
+    packet->addTagIfAbsent<RxPerSrcPktCountTag>()->setCount(info->getPacketsReceivedCount());
+    packet->addTagIfAbsent<RxPerSrcPktLossCountTag>()->setCount(info->getPacketsLossCount());
+
+    packet->addTagIfAbsent<RxPerAppAvgSizeTag>()->setSize(appLevelInfo->getAvg_packet_size());
+    packet->addTagIfAbsent<RxPerAppPktCountTag>()->setCount(appLevelInfo->getPacketsReceivedCount());
+
+
     packet->addTagIfAbsent<RxSourceCountTag>()->setRxSourceCount(getNumberOfSenders());
 }
 

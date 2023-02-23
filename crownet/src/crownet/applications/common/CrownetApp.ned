@@ -106,6 +106,7 @@ module BeaconApp extends CrownetApp
         socket.localPort = default(30001);
         packetMeterIn.typename = "ApplicationPacketMeterIn";
         packetMeterIn.appInfoClass = default("crownet::BeaconReceptionInfo");
+        packetMeterIn.appendAppInfo = default(true);
 }
 
 
@@ -120,6 +121,6 @@ module DensityMapApp extends CrownetApp
         socket.localPort = default(30002);
         packetMeterIn.typename = "ApplicationPacketMeterIn";
         packetMeterIn.appInfoClass = default("crownet::AppRxInfoPerSource");
-        
+        packetMeterIn.appendAppInfo = default(false); // not needed in map app
 }
 

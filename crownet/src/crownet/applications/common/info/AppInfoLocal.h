@@ -16,6 +16,7 @@ class AppInfoLocal: public AppInfoLocal_Base {
 public:
     virtual ~AppInfoLocal() = default;
     AppInfoLocal(): AppInfoLocal_Base() {}
+    AppInfoLocal(const AppInfoLocal& other): AppInfoLocal_Base(other){};
 
     virtual AppInfoLocal_Base *dup() const override {
         return new AppInfoLocal(*this);

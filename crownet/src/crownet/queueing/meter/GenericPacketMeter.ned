@@ -44,8 +44,8 @@ simple ApplicationPacketMeterIn extends GenericPacketMeter
         // class name of application info object that handles 
         // application-source level statistics
         string appInfoClass;
-        // add stat results to packet for application internal processing
-        bool appendAppInfoTag = default(true);
+        // add copy of stat object to packet for application internal processing
+        bool appendAppInfo = default(true);
         // average computation based on RTPC (RFC 3350 page 31, 40)
        	double ema_smoothing_jitter = default(1/16);
 		double ema_smoothing_packet_size = default(1/16);

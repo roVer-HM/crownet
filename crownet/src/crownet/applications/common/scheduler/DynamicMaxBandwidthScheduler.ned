@@ -26,6 +26,7 @@ simple DynamicMaxBandwidthScheduler extends IntervalScheduler {
 		int estimatedAvgPaketSize @unit(b) = default(50B);		
 		
 		string appRxInfoProviderModule = default("^.packetMeterIn");
+		string neighborhoodTableModule = default(""); // empty string -> do not use NT. Use rxAppInfo object count.
 		
 		@signal[txInterval_s](type=simtime_t);
 		@statistic[txInterval](title="Transmission interval with random  portion between scheduling calls"; unit=s; source=txInterval_s; record=vector; interpolationmode=none);

@@ -10,6 +10,8 @@
 #include "crownet/crownet.h"
 #include "crownet/applications/common/info/AppRxInfoProvider.h"
 #include "crownet/applications/common/info/AppRxInfo.h"
+#include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+
 
 using namespace inet;
 
@@ -48,6 +50,12 @@ void DynamicMaxBandwidthScheduler::initialize(int stage)
         rndIntervalUpperBound = par("rndIntervalUpperBound").doubleValue();
         estimatedAvgPaketSize = b(par("estimatedAvgPaketSize"));
         appRxInfoProvider = getModuleFromPar<AppRxInfoProvider>(par("appRxInfoProviderModule"), this);
+        if (par("neighborhoodTableModule").stdstringValue() == ""){
+            EV_INFO << "Do not use neighborhood table." << endl;
+            nTable = nullptr;
+        } else {
+            nTable = getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableModule"), this);
+        }
 
         last_tx = 0.0; // set to current time.
         hasSent = false;
@@ -114,7 +122,11 @@ void DynamicMaxBandwidthScheduler::updateTxIntervalDataCurrent(){
     }
     txIntervalDataCurrent.timestamp = now;
     // ensure to count at least one self.
-    txIntervalDataCurrent.pmembers = std::max(1, appRxInfoProvider->getNumberOfSenders());
+    if (nTable){
+        txIntervalDataCurrent.pmembers = std::max(1, nTable->getSize());
+    } else {
+        txIntervalDataCurrent.pmembers = std::max(1, appRxInfoProvider->getNumberOfSenders());
+    }
     txIntervalDataCurrent.avg_pkt_size = appRxInfoProvider->getAppRxInfo()->getAvg_packet_size();
     computeInterval(txIntervalDataCurrent);
 

@@ -87,6 +87,10 @@ public:
  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                             cObject *object, cObject *details) override;
  using cObjectResultFilter::receiveSignal;
+private:
+ simtime_t last_receivedSignal = -1.0;
+ int lastSize = -1;
+
 };
 
 } /* namespace crownet */

@@ -106,13 +106,17 @@ TEST_F(BeaconInfoTest, BeaconRcvJitter) {
     EXPECT_EQ(info.getCurrentPkt()->getCreationTimeStamp(), 1500); //ms
     EXPECT_EQ(info.getCurrentPkt()->getReceivedTime(), simTime());
 
-    EXPECT_TRUE(info.hasPrio());
+    EXPECT_FALSE(info.hasPrio());
 
     EXPECT_EQ(info.getPrioPkt()->getReceivedTime().dbl(),  1.030);
     EXPECT_EQ(info.getPrioPkt()->getCreationTime().dbl(),  1.000);
-    EXPECT_EQ(info.getPrioData()->getPosition(), inet::Coord(1.2, 3.4));
+    EXPECT_EQ(info.getPrioData(), nullptr);
+
+    info.updatePrioAppData(&info);
+    EXPECT_EQ(info.getPrioData()->getPosition(), inet::Coord(5.6, 7.8));
     EXPECT_EQ(info.getPrioData()->getEpsilon(), inet::Coord(0.0, 0.0));
-    EXPECT_EQ(info.getPrioData()->getNumberOfNeighbours(), 5);
+    EXPECT_EQ(info.getPrioData()->getNumberOfNeighbours(), 10);
+    EXPECT_TRUE(info.hasPrio());
 
 
     delete packet1;
