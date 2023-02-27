@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<net version="1.0" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+   <location netOffset="-689432.88,-5336004.59" convBoundary="0,0,400.0,400.0" origBoundary="11.547408,48.148799,11.560712,48.159432" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+   <edge id="1" from="jun100.0_50.0" to="jun100.0_350.0" priority="-1">
+       <lane id="lan1_0" index="0" speed="1.4" length="300.0" width="2.50" shape="100.0,50.0 100.0,350.0"/>
+   </edge>
+   <junction id="jun100.0_50.0" type="priority" x="100.0" y="50.0" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+   <junction id="jun100.0_350.0" type="priority" x="100.0" y="350.0" incLanes="" intLanes="">
+       <request index="0" response="0" foes="0"/>
+   </junction>
+</net>
