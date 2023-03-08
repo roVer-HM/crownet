@@ -1,16 +1,41 @@
 #!/usr/bin/env python3
 import sys, os
 
-from os.path import join
+import pandas as pd
+import numpy as np
 from roveranalyzer.analysis.common import Simulation
+from roveranalyzer.analysis.plot.app_misc import PlotAppMisc
 from roveranalyzer.simulators.crownet.runner import (
     BaseRunner,
     process_as,
 )
 from matplotlib.backends.backend_pdf import PdfPages
-from roveranalyzer.utils.plot import FigureSaverPdfPages
+from roveranalyzer.utils.plot import FigureSaverPdfPages, FigureSaverSimple
 from roveranalyzer.analysis import VadereAnalysis, OppAnalysis, HdfExtractor
 from roveranalyzer.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
+
+from roveranalyzer.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
+
+load_matplotlib_style(STYLE_SIMPLE_169)
+
+
+def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
+    # remove cells under target area
+    xy = df.index.to_frame()
+    mask = np.repeat(False, xy.shape[0])
+    # for x in [400, 405, 410]: # remove target cells
+    for x in [400, 405, 410, 0, 5, 10]:  # remove source/target cells
+        y = 180.0
+        mask = mask | (xy["x"] == x) & (xy["y"] == y)
+
+    # for x in [0.0, 5.0, 10.0]:    # remove target cells
+    for x in [0.0, 5.0, 10.0, 400, 405, 410]:  # remove source/target cells
+        y = 205.0
+        mask = mask | (xy["x"] == x) & (xy["y"] == y)
+
+    ret = df[~mask].copy(deep=True)
+    print(f"remove {df.shape[0]-ret.shape[0]} rows")
+    return ret
 
 
 class SimulationRun(BaseRunner):
@@ -39,28 +64,6 @@ class SimulationRun(BaseRunner):
         # builder.set_imputation_strategy(DeleteMissingImputation())
         builder.build(self.ns.get("hdf_override", "False"))
 
-    # @process_as({"prio": 990, "type": "post"})
-    # def extract_hdf(self):
-    #     result_dir, _, sql = OppAnalysis.builder_from_output_folder(
-    #         data_root=self.result_base_dir()
-    #     )
-    #     # search config in sca file for apps extract packet loss
-    #     # only for apps present.
-    #     app_selector = sql.get_app_selector()
-
-    #     if "beacon" in app_selector:
-    #         HdfExtractor.extract_packet_loss(
-    #             join(result_dir, "packet_loss.h5"),
-    #             "beacon",
-    #             sql,
-    #             app=app_selector["beacon"],
-    #         )
-    #     if "map" in app_selector:
-    #         HdfExtractor.extract_packet_loss(
-    #             join(result_dir, "packet_loss.h5"), "map", sql, app=app_selector["map"]
-    #         )
-    #     HdfExtractor.extract_trajectories(join(result_dir, "trajectories.h5"), sql)
-
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
         try:
@@ -72,39 +75,91 @@ class SimulationRun(BaseRunner):
             sim = Simulation.from_output_dir(self.result_base_dir())
         OppAnalysis.append_err_measures_to_hdf(sim)
 
+    @process_as({"prio": 975, "type": "post"})
+    def create_rcvd_stats(self):
+        sim = Simulation(self.result_base_dir(), label="")
+        HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h"), sim.sql)
+
     @process_as({"prio": 970, "type": "post"})
     def create_common_plots(self):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        with PdfPages(self.result_dir("servedBlocks.pdf")) as pdf:
+        with PdfPages(self.result_dir("fig_out/app_data.pdf")) as pdf:
             PlotEnb.plot_served_blocks_ul_all(
-                self.result_base_dir(), builder, sql, FigureSaverPdfPages(pdf)
+                self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
             )
-        with PdfPages(self.result_dir("appTx.pdf")) as pdf:
-            PlotAppTxInterval.plot_txinterval_all(
-                self.result_base_dir(),
-                sql=sql,
-                app="Beacon",
-                saver=FigureSaverPdfPages(pdf),
-            )
-            PlotAppTxInterval.plot_txinterval_all(
-                self.result_base_dir(),
-                sql=sql,
-                app="Map",
-                saver=FigureSaverPdfPages(pdf),
-            )
+            if sql.vector_exists(
+                sql.m_beacon(), sql.OR(["txInterval:vector", "txInterval:vector"])
+            ):
+                PlotAppTxInterval.plot_txinterval_all(
+                    self.result_base_dir(),
+                    sql=sql,
+                    app="Beacon",
+                    saver=FigureSaverPdfPages(pdf),
+                )
+
+            if sql.vector_exists(
+                sql.m_map(), sql.OR(["txInterval:vector", "txInterval:vector"])
+            ):
+                PlotAppTxInterval.plot_txinterval_all(
+                    self.result_base_dir(),
+                    sql=sql,
+                    app="Map",
+                    saver=FigureSaverPdfPages(pdf),
+                )
         if sql.is_count_map():
             print("build count based default plots")
             builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-            sel = list(OppAnalysis.find_selection_method(builder))
-            if len(sel) > 1:
-                print(f"multiple selections found: {sel}")
             PlotDpmMap.create_common_plots_density(
-                result_dir, builder, sql, selection=sel[0]
+                result_dir, builder, sql, selection=builder.get_selected_alg()
             )
         else:
             print("build entropy map based plots")
+
+    @process_as({"prio": 965, "type": "post"})
+    def add_plots(self):
+        result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
+            data_root=self.result_base_dir()
+        )
+        saver = FigureSaverSimple(
+            override_base_path=self.result_dir("fig_out"), figure_type=".png"
+        )
+        sim: Simulation(self.result_base_dir(), label="")
+        # agent count data
+        print("app misc")
+        PlotAppMisc.plot_number_of_agents(sim, saver=saver)
+
+        # application data
+        PlotAppMisc.plot_system_level_tx_rate_based_on_application_layer_data(
+            sim=sim, saver=saver
+        )
+
+        # app tx data
+        PlotAppTxInterval.plot_txinterval_all(
+            data_root=sim.data_root, sql=sim.sql, app="Beacon", saver=saver
+        )
+        PlotAppTxInterval.plot_txinterval_all(
+            data_root=sim.data_root, sql=sim.sql, app="Map", saver=saver
+        )
+
+        PlotAppMisc.plot_application_delay_jitter(sim, saver=saver)
+
+        # map specifics
+        print("map misc")
+        dmap = sim.get_dcdMap()
+        dmap.plot_map_count_diff(savefig=saver.with_name("Map_count.png"))
+
+        # remove source cells.
+        msce = dmap.cell_count_measure(columns=["cell_mse"])
+        msce = _corridor_filter_target_cells(msce).reset_index()
+
+        # msce time series
+        PlotDpmMap.plot_msce_ts(msce, savefig=saver.with_name("Map_msce_ts.png"))
+        # msce ecdf
+        PlotDpmMap.plot_msce_ecdf(
+            msce["cell_mse"], savefig=saver.with_name("Map_msce_ecdf.png")
+        )
 
     @process_as({"prio": 960, "type": "post"})
     def remove_density_map_csv(self):
