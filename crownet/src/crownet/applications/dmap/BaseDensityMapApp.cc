@@ -206,7 +206,7 @@ BurstInfo BaseDensityMapApp::getBurstInfo(inet::b scheduled) const{
 Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
     auto header = makeShared<MapHeader>();
     auto seqNo = localInfo->nextSequenceNumber();
-    header->setSequenceNumber(localInfo->nextSequenceNumber());
+    header->setSequenceNumber(seqNo);
     header->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     header->setVersion(MapType::SPARSE);
     header->setSourceCellIdX(dcdMap->getOwnerCell().x());
@@ -367,5 +367,7 @@ void BaseDensityMapApp::computeValues() {
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
 }
+
+
 
 } // namespace crownet

@@ -90,12 +90,13 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     packet->addTagIfAbsent<RxPerSrcAvgSizeTag>()->setSize(info->getAvg_packet_size());
     packet->addTagIfAbsent<RxPerSrcPktCountTag>()->setCount(info->getPacketsReceivedCount());
     packet->addTagIfAbsent<RxPerSrcPktLossCountTag>()->setCount(info->getPacketsLossCount());
+    packet->addTagIfAbsent<RxPerSrcTotalSentCountTag>()->setCount(info->getTotalSentPacketCount());
 
     packet->addTagIfAbsent<RxPerAppAvgSizeTag>()->setSize(appLevelInfo->getAvg_packet_size());
     packet->addTagIfAbsent<RxPerAppPktCountTag>()->setCount(appLevelInfo->getPacketsReceivedCount());
 
 
-    packet->addTagIfAbsent<RxSourceCountTag>()->setRxSourceCount(getNumberOfSenders());
+    packet->addTagIfAbsent<RxSourceCountTag>()->setRxSourceCount(getNeighborhoodSize());
 }
 
 const AppRxInfo* ApplicationPacketMeterIn::getAppRxInfo(const int id) const {
@@ -111,7 +112,7 @@ const AppRxInfo* ApplicationPacketMeterIn::getAppRxInfo(const int id) const {
     }
 }
 
-const int ApplicationPacketMeterIn::getNumberOfSenders() const {
+const int ApplicationPacketMeterIn::getNeighborhoodSize() {
     return appInfos.size();
 }
 

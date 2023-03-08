@@ -19,6 +19,8 @@
 
 #include "inet/mobility/contract/IMobility.h"
 #include "crownet/applications/dmap/BaseDensityMapApp.h"
+#include "crownet/neighbourhood/contract/INeighborhoodSizeProvider.h"
+
 
 using namespace omnetpp;
 using namespace inet;
@@ -27,6 +29,7 @@ namespace crownet {
 
 class DensityMapAppSimple : public BaseDensityMapApp
                             , public NeighborhoodEntryListner
+                            , public NeighborhoodSizeProvider
 
 {
 public:
@@ -54,7 +57,8 @@ protected:
  virtual void neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
  virtual void neighborhoodEntryStayInCell(INeighborhoodTable* table, BeaconReceptionInfo* info)override;
 
-
+ //
+ virtual const int getNeighborhoodSize() override;
 private:
   // application
  INeighborhoodTable *nTable  = nullptr;

@@ -85,6 +85,8 @@ protected:
  // AppStatusInfo
  virtual const bool canProducePacket() override;
  virtual const inet::b getMinPdu() const override;
+
+
 protected:
 
  std::shared_ptr<GridCellIDKeyProvider> cellProvider;

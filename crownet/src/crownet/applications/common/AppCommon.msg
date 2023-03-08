@@ -59,6 +59,10 @@ class RxPerSrcPktCountTag extends inet::TagBase
 {
     int count;
 }
+class RxPerSrcTotalSentCountTag extends inet::TagBase
+{
+    int count;
+}
 
 class RxPerSrcPktLossCountTag extends inet::TagBase
 {

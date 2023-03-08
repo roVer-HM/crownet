@@ -85,6 +85,7 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
         @statistic[rcvdPktPerSrcJitter](title="received jitter per source"; source="rcvdPerSrcJitter(packetReceived)"; record=vector; interpolationmode=none);
         @statistic[rcvdPktPerSrcAvgSize](title="received average packet bits per source"; unit=b; source="rcvdPerSrcAvgSize(packetReceived)"; record=vector; interpolationmode=none);
         @statistic[rcvdPktPerSrcCount](title="received communaltive packet count per source"; unit=b; source="rcvdPerSrcCount(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPerSrcTotalCount](title="total count of packets send by source"; source="rcvdPerSrcTotalCount(packetReceived)"; record=vector; interpolationmode=none);
         @statistic[rcvdPktPerSrcLossCount](title="received communaltive packet loss count per source"; unit=b; source="rcvdPerSrcLossCount(packetReceived)"; record=vector; interpolationmode=none);
 		@statistic[rcvdPktPerSrcSeqNo](title="received packet sequence number per source"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
         @statistic[rcvdPktAvgSize](title="received average packet bits"; unit=b; source="rcvdAvgSize(packetReceived)"; record=vector; interpolationmode=none);

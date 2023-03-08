@@ -31,6 +31,8 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         // Aid app override defaults
         packetName = default("BeaconDynamic");
 		allEmptyDestAddress = false;
+		attachSequenceIdTag = default(false); // set by app logic
+		
 
 		
 		double minSentFrequency @unit(Hz)= default(0.5Hz);

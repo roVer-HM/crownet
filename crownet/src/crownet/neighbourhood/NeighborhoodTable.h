@@ -10,6 +10,7 @@
 #include <omnetpp/cobject.h>
 #include "inet/common/InitStages.h"
 #include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+#include "crownet/neighbourhood/contract/INeighborhoodSizeProvider.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/common/MobilityProviderMixin.h"
@@ -23,6 +24,7 @@ class NeighborhoodTableSizeFilter;
 
 class NeighborhoodTable : public MobilityProviderMixin<cSimpleModule>
                           , public INeighborhoodTable
+                          , public NeighborhoodSizeProvider
                           , public INeighborhoodTablePacketProcessor
 {
 public:
@@ -49,6 +51,7 @@ public:
     const NeighborhoodTable_t& getTable() const { return _table; }
     const cMessage* getTitleMessage() const { return ttl_msg;}
     virtual const int getOwnerId() const override { return ownerId;}
+    virtual const int getNeighborhoodSize() override {return getSize();}
 
 
     //setter

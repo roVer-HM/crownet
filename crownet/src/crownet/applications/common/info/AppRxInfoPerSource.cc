@@ -41,6 +41,7 @@ void AppRxInfoPerSource::calcPacketLoss(){
         inCyclePackageSendCount = maxSequenceNumber - initialSequenceNumber + 1;
     }
     //todo negativ?
+    totalSentPacketCount = sequencecycle + inCyclePackageSendCount;
     packetsLossCount = (sequencecycle + inCyclePackageSendCount) - packetsReceivedCount;
     packetsLossCount = std::max(0, packetsLossCount);
     packetLossRate = packetsLossCount/packetsReceivedCount;

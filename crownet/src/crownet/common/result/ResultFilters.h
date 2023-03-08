@@ -100,6 +100,13 @@ class RcvdPerSrcCount : public cObjectResultFilter {
   using cObjectResultFilter::receiveSignal;
 };
 
+class RcvdPerSrcTotalCount : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
 class RcvdPerSrcLossCount : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,

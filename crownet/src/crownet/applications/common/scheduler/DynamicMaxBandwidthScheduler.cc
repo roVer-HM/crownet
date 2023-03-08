@@ -50,11 +50,11 @@ void DynamicMaxBandwidthScheduler::initialize(int stage)
         rndIntervalUpperBound = par("rndIntervalUpperBound").doubleValue();
         estimatedAvgPaketSize = b(par("estimatedAvgPaketSize"));
         appRxInfoProvider = getModuleFromPar<AppRxInfoProvider>(par("appRxInfoProviderModule"), this);
-        if (par("neighborhoodTableModule").stdstringValue() == ""){
+        if (par("neighborhoodSizeProvider").stdstringValue() == ""){
             EV_INFO << "Do not use neighborhood table." << endl;
-            nTable = nullptr;
+            ntSizeProvider = appRxInfoProvider;
         } else {
-            nTable = getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableModule"), this);
+            ntSizeProvider = getModuleFromPar<NeighborhoodSizeProvider>(par("neighborhoodSizeProvider"), this);
         }
 
         last_tx = 0.0; // set to current time.
@@ -122,11 +122,7 @@ void DynamicMaxBandwidthScheduler::updateTxIntervalDataCurrent(){
     }
     txIntervalDataCurrent.timestamp = now;
     // ensure to count at least one self.
-    if (nTable){
-        txIntervalDataCurrent.pmembers = std::max(1, nTable->getSize());
-    } else {
-        txIntervalDataCurrent.pmembers = std::max(1, appRxInfoProvider->getNumberOfSenders());
-    }
+    txIntervalDataCurrent.pmembers = std::max(1, ntSizeProvider->getNeighborhoodSize());
     txIntervalDataCurrent.avg_pkt_size = appRxInfoProvider->getAppRxInfo()->getAvg_packet_size();
     computeInterval(txIntervalDataCurrent);
 

@@ -68,6 +68,18 @@ void DensityMapAppSimple::initLocalMap(){
 
 }
 
+const int DensityMapAppSimple::getNeighborhoodSize() {
+    computeValues();
+    int pedCount = 1; // add ego count
+    for (const auto& el : dcdMap->valid()){
+        // todo: check if same enb as this node -> assume all cells are in this enb
+        auto val_ptr = el.second.val();
+        if (val_ptr){
+            pedCount += (int)val_ptr->getCount();
+        }
+    }
+    return pedCount;
+}
 
 void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info){
     // Note: Implementation assumes additive cell entry values. Each beacon provides an additive portion of the

@@ -37,7 +37,7 @@ protected:
 public:
     // AppRxInfoProvider
     virtual const AppRxInfo* getAppRxInfo( int id = -1) const override;
-    virtual const int getNumberOfSenders() const override;
+    virtual const int getNeighborhoodSize() override;
 protected:
     int hostId;
     AppRxInfoPerSource* appLevelInfo = nullptr;

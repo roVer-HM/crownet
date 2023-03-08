@@ -37,6 +37,7 @@ class AppRxInfoPerSource extends AppRxInfo{
     uint16_t maxSequenceNumber= 0;
     uint32_t sequencecycle= 0;
 	int packetsLossCount = 0; 
+	int totalSentPacketCount = 0; 
 	double packetLossRate = 0.0;
 }
 

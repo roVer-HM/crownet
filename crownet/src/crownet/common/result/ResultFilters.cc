@@ -133,6 +133,16 @@ void RcvdPerSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     }
 }
 
+Register_ResultFilter("rcvdPerSrcTotalCount", RcvdPerSrcTotalCount);
+void RcvdPerSrcTotalCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerSrcTotalSentCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
+        }
+    }
+}
+
 Register_ResultFilter("rcvdPerSrcLossCount", RcvdPerSrcLossCount);
 void RcvdPerSrcLossCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
