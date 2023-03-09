@@ -71,7 +71,9 @@ def par_var_bonn_motion():
                 # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_SEED.bonnMotion",
                 "*.misc[*].app[1].scheduler.generationInterval": "2000ms",
                 "*.misc[*].app[0].scheduler.generationInterval": "500ms",
-                "*.misc[*].app[*].scheduler.typename": "DynamicMaxBandwidthScheduler",
+                "*.misc[*].app[*].scheduler.typename": QString(
+                    "DynamicMaxBandwidthScheduler"
+                ),
             }
         },
     ]
@@ -85,7 +87,7 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
         for scheduler in ["DynamicMaxBandwidthScheduler", "IntervalScheduler"]:
             _run = deepcopy(run)  # copy
             _run["omnet"]["*.misc[*].app[1].app.mapCfg"] = mapCfgYmfDist.copy()
-            _run["omnet"]["*.misc[*].app[*].scheduler.typename"] = scheduler
+            _run["omnet"]["*.misc[*].app[*].scheduler.typename"] = QString(scheduler)
             if scheduler == "IntervalScheduler":
                 _run["omnet"][
                     "*.misc[*].app[1].scheduler.generationInterval"
@@ -100,10 +102,10 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
                 _run2 = deepcopy(_run)
                 _run1["omnet"][
                     "*.misc[*].app[*].scheduler.neighborhoodSizeProvider"
-                ] = "^.^.nTable"
+                ] = QString("^.^.nTable")
                 _run2["omnet"][
                     "*.misc[*].app[*].scheduler.neighborhoodSizeProvider"
-                ] = "^.^.app[1].app"
+                ] = QString("^.^.app[1].app")
                 par_var_tmp.append(_run1)
                 par_var_tmp.append(_run2)
 

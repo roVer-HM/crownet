@@ -78,13 +78,14 @@ class SimulationRun(BaseRunner):
     @process_as({"prio": 975, "type": "post"})
     def create_rcvd_stats(self):
         sim = Simulation(self.result_base_dir(), label="")
-        HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h"), sim.sql)
+        HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
 
     @process_as({"prio": 970, "type": "post"})
     def create_common_plots(self):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
+        os.makedirs(self.result_dir("fig_out"))
         with PdfPages(self.result_dir("fig_out/app_data.pdf")) as pdf:
             PlotEnb.plot_served_blocks_ul_all(
                 self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
@@ -122,10 +123,10 @@ class SimulationRun(BaseRunner):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
+        sim = Simulation(self.result_base_dir(), label="")
         saver = FigureSaverSimple(
             override_base_path=self.result_dir("fig_out"), figure_type=".png"
         )
-        sim: Simulation(self.result_base_dir(), label="")
         # agent count data
         print("app misc")
         PlotAppMisc.plot_number_of_agents(sim, saver=saver)
