@@ -6,7 +6,7 @@
 	url = ../veins.git
 [submodule "vadere"]
 	path = vadere
-	url = https://gitlab.lrz.de/vadere/vadere.git
+	url = ../vadere.git
 [submodule "analysis/roveranalyzer"]
 	path = analysis/roveranalyzer
 	url = ../roveranalyzer.git
@@ -19,7 +19,7 @@
 	url = ../flowcontrol.git
 [submodule "analysis/suq-controller"]
 	path = analysis/suq-controller
-	url = https://gitlab.lrz.de/vadere/suq-controller.git
+	url = ../suq-controller.git
 [submodule "Simu5G"]
 	path = simu5g
 	url = ../Simu5G.git
