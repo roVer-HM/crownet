@@ -8,6 +8,7 @@ from roveranalyzer.simulators.crownet.runner import (
     process_as,
 )
 from roveranalyzer.analysis import VadereAnalysis, OppAnalysis, HdfExtractor
+from roveranalyzer.analysis.plot import PlotDpmMap, PlotEnb
 
 
 class SimulationRun(BaseRunner):
@@ -74,14 +75,14 @@ class SimulationRun(BaseRunner):
         result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
             data_root=self.result_base_dir()
         )
-        OppAnalysis.create_common_plots_all(result_dir, builder, sql)
+        PlotEnb.plot_served_blocks_ul_all(result_dir, builder, sql)
         if sql.is_count_map():
             print("build count based default plots")
             builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
             sel = list(OppAnalysis.find_selection_method(builder))
             if len(sel) > 1:
                 print(f"multiple selections found: {sel}")
-            OppAnalysis.create_common_plots_density(
+            PlotDpmMap.create_common_plots_density(
                 result_dir, builder, sql, selection=sel[0]
             )
         else:

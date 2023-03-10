@@ -29,7 +29,7 @@ void IntervalScheduler::initialize(int stage)
     AppSchedulerBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         numberPackets = &par("numberPackets");
-        amoutOfData = &par("amoutOfData");
+        amountOfData = &par("amountOfData");
 
         maxNumberPackets = par("maxNumberPackets").intValue();
         maxData = b(par("maxData").intValue());
@@ -87,7 +87,7 @@ void IntervalScheduler::handleMessage(cMessage *message)
 void IntervalScheduler::scheduleApp(cMessage *message){
     Enter_Method("scheduleApp");
     auto numPacket = numberPackets->intValue();
-    auto data = b(amoutOfData->intValue());
+    auto data = b(amountOfData->intValue());
     if (numPacket > 0){
         // schedule packet based
         if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){

@@ -13,16 +13,6 @@ class MockNeighborhoodTable : public NeighborhoodTable{
     MOCK_METHOD0(checkAllTimeToLive, void());
     MockNeighborhoodTable(){}
 
-    BeaconReceptionInfo build(int id, int t1, int t2, inet::Coord c1, inet::Coord c2){
-
-        BeaconReceptionInfo info;
-        info.setNodeId(id);
-        info.setSentTimeCurrent(t1);
-        info.setReceivedTimeCurrent(t2);
-        info.setPositionCurrent(c1);
-        info.setEpsilonCurrent(c2);
-        return info;
-    }
 };
 
 TEST(NeighborhoodTableBase, Test_constructor) {
@@ -35,25 +25,29 @@ TEST(NeighborhoodTableBase, Test_constructor) {
 class NeighborhoodTableTest : public BaseOppTest {
  public:
     NeighborhoodTableTest() {}
-    BeaconReceptionInfo build(int id, int t1, int t2, inet::Coord c1, inet::Coord c2){
 
-        BeaconReceptionInfo info;
-        info.setNodeId(id);
-        info.setSentTimeCurrent(t1);
-        info.setReceivedTimeCurrent(t2);
-        info.setPositionCurrent(c1);
-        info.setEpsilonCurrent(c2);
+    BeaconReceptionInfo*  apply(NeighborhoodTable& table, int nodeId, simtime_t t1, simtime_t t2, inet::Coord c1, inet::Coord c2){
+        BeaconReceptionInfo* info = new BeaconReceptionInfo();
+        info->setNodeId(nodeId);
+        info->initAppData();
+        updateInfo(info, t1, t2, c1, c2);
+
+        table.saveInfo(info);
         return info;
     }
 
-    BeaconReceptionInfo*  apply(BeaconReceptionInfo* info, simtime_t t1, simtime_t t2, inet::Coord c1, inet::Coord c2){
-        info->setSentTimeCurrent((uint32_t)t1.inUnit(SimTimeUnit::SIMTIME_MS));
-        info->setSentSimTimeCurrent(t1);
-        info->setReceivedTimeCurrent(t2);
-        info->setPositionCurrent(c1);
-        info->setEpsilonCurrent(c2);
-        return info;
+    void updateInfo( BeaconReceptionInfo* info, simtime_t t1, simtime_t t2, inet::Coord c1, inet::Coord c2){
+        auto data = info->getCurrentDataForUpdate();
+        data->setCreationTimeStamp((uint32_t)t1.inUnit(SimTimeUnit::SIMTIME_MS));
+        data->setCreationTime(t1);
+        data->setReceivedTime(t2);
+        data->setPosition(c1);
+        data->setEpsilon(c2);
+
     }
+
+
+    std::map<int, BeaconReceptionInfo*> infoMap;
 };
 
 TEST_F(NeighborhoodTableTest, checkAllTimeToLive) {
@@ -64,13 +58,13 @@ TEST_F(NeighborhoodTableTest, checkAllTimeToLive) {
   nTable.setMaxAge(maxAge);
 
   //valid, must be present after checkTimeToLive() call
-  apply(nTable.getOrCreateEntry(0), now - maxAge + 2, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
-  apply(nTable.getOrCreateEntry(1), now - maxAge + 1, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0));
-  apply(nTable.getOrCreateEntry(2), now - maxAge + 0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0));
+  apply(nTable, 0, now - maxAge + 2, now - maxAge + 2, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
+  apply(nTable, 1, now - maxAge + 1, now - maxAge + 1, inet::Coord(1.0,0.0), inet::Coord(0.0,0.0));
+  apply(nTable, 2, now - maxAge + 0, now - maxAge + 0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0));
 
   //invalid, must be removed by checkTimeToLive() call
-  apply(nTable.getOrCreateEntry(3), now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0));
-  apply(nTable.getOrCreateEntry(4), now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
+  apply(nTable, 3, now - maxAge - 1, now - maxAge - 1, inet::Coord(1.0,1.0), inet::Coord(0.0,0.0));
+  apply(nTable, 4, now - maxAge - 2, now - maxAge - 2, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
 
   nTable.checkAllTimeToLive();
   EXPECT_TRUE(5 > nTable.getTable().size());
@@ -87,21 +81,23 @@ TEST_F(NeighborhoodTableTest, handleBeacon) {
   NeighborhoodTable nTable;
 
   // add new entry
-  BeaconReceptionInfo* b0 = apply(nTable.getOrCreateEntry(0), 1.0, 2.0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
+  BeaconReceptionInfo* b0 = apply(nTable, 0, 1.0, 2.0, inet::Coord(0.0,0.0), inet::Coord(0.0,0.0));
   EXPECT_EQ(nTable.getTable().size(), 1);
-  EXPECT_EQ(nTable.getTable().find(0)->second->getSentTimePrio(), b0->getSentTimePrio());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getCurrentData()->getCreationTime(), b0->getCurrentData()->getCreationTime());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getPrioData(), nullptr);
 
   // add new entry
-  BeaconReceptionInfo* b1  = apply(nTable.getOrCreateEntry(1), 1.0, 3.0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0));
+  BeaconReceptionInfo* b1  = apply(nTable, 1, 1.0, 3.0, inet::Coord(0.0,1.0), inet::Coord(0.0,0.0));
   EXPECT_EQ(nTable.getTable().size(), 2);
-  EXPECT_EQ(nTable.getTable().find(0)->second->getSentTimePrio(), b0->getSentTimePrio());
-  EXPECT_EQ(nTable.getTable().find(1)->second->getSentTimePrio(), b1->getSentTimePrio());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getCurrentData()->getCreationTime(), b0->getCurrentData()->getCreationTime());
+  EXPECT_EQ(nTable.getTable().find(1)->second->getCurrentData()->getCreationTime(), b1->getCurrentData()->getCreationTime());
 
   // add entry from existing node id (override old value because new value is younger)
-  BeaconReceptionInfo* b2 = apply(nTable.getOrCreateEntry(0), 2.0, 4.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
+  BeaconReceptionInfo* b2 = nTable.getForUpdate(0);
+  updateInfo(b2, 2.0, 4.0, inet::Coord(2.0,0.0), inet::Coord(0.0,0.0));
   EXPECT_EQ(nTable.getTable().size(), 2); // size must not increase
-  EXPECT_EQ(nTable.getTable().find(0)->second->getSentTimePrio(), b2->getSentTimePrio());
-  EXPECT_EQ(nTable.getTable().find(1)->second->getSentTimePrio(), b1->getSentTimePrio());
+  EXPECT_EQ(nTable.getTable().find(0)->second->getCurrentData()->getCreationTime(), b2->getCurrentData()->getCreationTime());
+  EXPECT_EQ(nTable.getTable().find(1)->second->getCurrentData()->getCreationTime(), b1->getCurrentData()->getCreationTime());
 
 }
 

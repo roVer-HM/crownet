@@ -19,8 +19,6 @@ from roveranalyzer.utils.dataframe import (
 )
 from roveranalyzer.utils.plot import (
     PlotUtil,
-    check_ax,
-    mult_locator,
     paper_rc,
     plt_rc_same,
     matplotlib_set_latex_param,
@@ -131,13 +129,6 @@ def get_run_map_single_run(output_dir, data_root: str | List[str]) -> RunMap:
 
 
 def plot_packet_loss_ratio_over_time(run_map: RunMap):
-    # loss = OppAnalysis.run_get_packet_loss(run_map)
-    # loss = pd.read_hdf(run_map.path("loss2.h5"))
-    # fig, ax = check_ax()
-    # sn.lineplot(data=loss.reset_index(), x="time", y="lost_relative", hue="rep")
-    # ax.set_title("Relative packet loss over time for each simulation")
-    # fig.savefig(run_map.path("packet_loss_time_series.pdf"))
-
     data = _get_msce_with_lbl(run_map)
     data = data.reset_index().set_index(["simtime", "label", "run_id"])
     ax = data.loc[_i[:, :, 10], ["cell_mse"]].reset_index().plot("simtime", "cell_mse")
@@ -872,7 +863,7 @@ def plot_occupation_intervals(run_map: RunMap):
     lbl = {True: "Occupied", False: "Empty"}
     for _occup in [True, False]:
         with plt.rc_context(paper_rc()):
-            fig, ax = check_ax()
+            fig, ax = PlotUtil.check_ax()
             ax.hist(intervals.loc[_i[:, :, _occup, :], ["delta"]], bins=100)
             ax.set_title(f"{lbl[_occup]} interval length distribution")
             ax.set_ylabel("Count")
@@ -899,8 +890,8 @@ def plot_cell_knowledge_ratio(
     run_map: RunMap, ax_k_ratio=None, ax_k_ratio_zoom=None, savefig=True
 ):
     h5, change_rate = _get_create_cell_knowledge_ratio(run_map)
-    fig, ax_k_ratio = check_ax(ax_k_ratio)
-    fig2, ax_k_ratio_zoom = check_ax(ax_k_ratio_zoom)
+    fig, ax_k_ratio = PlotUtil.check_ax(ax_k_ratio)
+    fig2, ax_k_ratio_zoom = PlotUtil.check_ax(ax_k_ratio_zoom)
 
     sim_groups = [g for g in run_map.values() if _filter_single_rate(g, change_rate)]
     sim_groups.sort(key=lambda x: x.attr["transmission_interval_ms"])
@@ -916,10 +907,8 @@ def plot_cell_knowledge_ratio(
             .agg(["mean", "std"])
         )
         lbl = f"Map $\Delta t = {g.attr['transmission_interval_ms']}\,ms$"
-        # fill_between(ax_k_ratio, data=df, label=lbl)
         ax_k_ratio.plot(df.index, df["mean"], label=lbl)
 
-        # fill_between(ax_k_ratio_zoom, data=df, label=lbl )
         ax_k_ratio_zoom.plot(df.index, df["mean"], label=lbl)
 
     ax_k_ratio.legend()

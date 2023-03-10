@@ -99,7 +99,7 @@ class Cell {
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
   const entry_t_ptr val() const {return cell_value;}
-  const time_t lastSent(){ return last_sent; }
+  const time_t lastSent() const { return last_sent; }
 
   // setter
   void put(entry_t_ptr&& m);

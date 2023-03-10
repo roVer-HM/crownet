@@ -34,7 +34,7 @@ public:
 
     static NeighborhoodTablePred_t inRadius_pred(const inet::Coord& pos, const double dist ){
         NeighborhoodTablePred_t f = [pos, dist](const NeighborhoodTableValue_t& val) -> bool {
-            return pos.distance(val.second->getPositionCurrent()) < dist;
+            return pos.distance(val.second->getCurrentData()->getPosition()) < dist;
         };
         return f;
     }
@@ -42,7 +42,7 @@ public:
     static NeighborhoodTablePred_t currentCell_pred(const inet::Coord& pos, const RegularGridInfo& grid){
         NeighborhoodTablePred_t f = [pos, grid](const NeighborhoodTableValue_t& tblEntry) -> bool {
 
-            return grid.posInCenteredCell(tblEntry.second->getPositionCurrent(), pos);
+            return grid.posInCenteredCell(tblEntry.second->getCurrentData()->getPosition(), pos);
         };
         return f;
     }
@@ -69,8 +69,6 @@ class INeighborhoodTable : public IBaseNeighborhoodTable{
 public:
     virtual ~INeighborhoodTable() = default;
 
-    virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) = 0;
-    virtual bool processInfo(BeaconReceptionInfo *packet) = 0;
     // update table and remove old entries. Update local entry
     virtual void checkAllTimeToLive() = 0;
     virtual bool ttlReached(BeaconReceptionInfo*)=0;
@@ -92,6 +90,16 @@ public:
 
 protected:
     std::list<NeighborhoodEntryListner*> listeners;
+};
+
+class INeighborhoodTablePacketProcessor {
+public:
+    virtual ~INeighborhoodTablePacketProcessor() = default;
+    virtual void saveInfo(BeaconReceptionInfo* info) = 0;
+    virtual const BeaconReceptionInfo* find(int sourceId) const = 0;
+    virtual const BeaconReceptionInfo* get(int sourceId) const;
+    virtual BeaconReceptionInfo* getForUpdate(int sourceId) const;
+    virtual bool processInfo(BeaconReceptionInfo *info) = 0;
 };
 
 

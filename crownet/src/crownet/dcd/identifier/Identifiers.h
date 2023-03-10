@@ -45,6 +45,8 @@ class GridCellID : public CellIdentifiere {
  private:
   std::pair<int, int> id;
 };
+std::ostream& operator<<(std::ostream& os, const GridCellID& i);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

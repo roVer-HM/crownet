@@ -22,18 +22,14 @@ import inet.common.packet.chunk.Chunk;
 import inet.applications.base.ApplicationPacket;
 import inet.common.geometry.Geometry;
 
-import crownet.applications.common.info.AppInfo;
+import crownet.applications.common.info.AppRxInfoPerSource;
 
 cplusplus {{
-#include "crownet/applications/common/info/AppInfoReception.h"
+#include "crownet/applications/common/info/AppRxInfoPerSource.h"
+#include "crownet/applications/common/info/AppInfo_m.h"
 }}
 
-
-
-
 namespace crownet;
-
-
 
 class BeaconBase extends inet::ApplicationPacket {
     
@@ -43,7 +39,7 @@ class BaseDynamicBeacon extends BeaconBase {
     
     chunkLength = b(16+32+32); // fixed
     
- 	uint16_t sequencenumber; 	// 16bit
+    // sequencenNmber (16bit) defined in inet::ApplicationPacket
  	uint32_t sourceId;			// 32bit
  	uint32_t timestamp;			// 32bit
 }
@@ -60,16 +56,19 @@ class DynamicBeaconPacket extends BaseDynamicBeacon
     // alignment 4bit
 }
 
-class BeaconReceptionInfo extends AppInfoReception {
+
+class BeaconData extends PacketInfo {
+    inet::Coord position;
+    inet::Coord epsilon;   
+    uint16_t numberOfNeighbours; 
+    double beaconValue= 1.0;
+}
+
+class BeaconReceptionInfo extends AppRxInfoPerSource {
     @customize(true);
-    inet::Coord positionCurrent;
-    inet::Coord epsilonCurrent;   
-    uint16_t numberOfNeighboursCurrent; 
-    double beaconValueCurrent = 1.0;
     
-    inet::Coord positionPrio;
-    inet::Coord epsilonPrio;   
-    uint16_t numberOfNeighboursPrio; 
-    double beaconValuePrio = 1.0;
+    BeaconData *prioData @owned;
+    BeaconData *currentData @owned;
+
 };
 

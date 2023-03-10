@@ -30,6 +30,8 @@ public:
 
     virtual const cell_key_t nextCellId(const time_t& now) override;
     virtual Cell& nextCell(const time_t& now) override;
+    virtual const int size(const time_t& now) const override;
+
 
 
     virtual void update(const time_t& time) override {/*nothing*/};

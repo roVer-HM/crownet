@@ -24,6 +24,7 @@ public:
 
     //CrownetPacketSourceBase
     virtual Packet *createPacket() override;
+    virtual BurstInfo getBurstInfo(inet::b) const override;
 
 
     // FSM
@@ -31,9 +32,10 @@ public:
 
 private:
     INeighborhoodTable* nTable = nullptr;
+    INeighborhoodTablePacketProcessor* tablePktProcessor = nullptr;
     double minSentFrequency;
     double maxSentFrequyncy;
-    double maxBandwith;
+    double maxBandwidth;
 };
 
 } /* namespace crownet */

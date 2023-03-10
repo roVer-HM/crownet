@@ -19,6 +19,8 @@
 #include "inet/common/packet/Packet.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
+#include "crownet/applications/common/info/InfoTags_m.h"
+
 #include "crownet/common/converter/OsgCoordConverter.h"
 
 using namespace inet;
@@ -91,14 +93,96 @@ void HostIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
   }
 }
 
+
 Register_ResultFilter("rcvdSequenceId", RcvdSequenceIdFilter);
 void RcvdSequenceIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
-  if (auto packet = dynamic_cast<Packet *>(object)) {
-      for(auto& region : packet->peekData()->getAllTags<SequenceIdTag>()){
-          fire(this, t, (double)(region.getTag()->getSequenceNumber()), details);
-      }
-  }
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        double x = (double)packet->peekData()->getAllTags<SequenceIdTag>().front().getTag()->getSequenceNumber();
+        fire(this, t, x, details);
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcJitter", RcvdPerSrcJitter);
+void RcvdPerSrcJitter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerSrcJitterTag>()){
+            fire(this, t, tag->getJitter().dbl(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcAvgSize", RcvdPerSrcAvgSize);
+void RcvdPerSrcAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerSrcAvgSizeTag>()){
+            fire(this, t, tag->getSize().get(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcCount", RcvdPerSrcCount);
+void RcvdPerSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerSrcPktCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcTotalCount", RcvdPerSrcTotalCount);
+void RcvdPerSrcTotalCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerSrcTotalSentCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdPerSrcLossCount", RcvdPerSrcLossCount);
+void RcvdPerSrcLossCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerSrcPktLossCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
+
+        }
+    }
+}
+
+Register_ResultFilter("rcvdAvgSize", RcvdAvgSize);
+void RcvdAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerAppAvgSizeTag>()){
+            fire(this, t, tag->getSize().get(), details);
+        }
+    }
+}
+
+Register_ResultFilter("rcvdCount", RcvdCount);
+void RcvdCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxPerAppPktCountTag>()){
+            fire(this, t, (long)tag->getCount(), details);
+        }
+    }
+}
+
+
+Register_ResultFilter("rcvdSrcCount", RcvdSrcCount);
+void RcvdSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                                     cObject *object, cObject *details) {
+    if (auto packet = dynamic_cast<Packet *>(object)) {
+        if (auto tag = packet->findTag<RxSourceCountTag>()){
+            fire(this, t, (long)tag->getRxSourceCount(), details);
+        }
+    }
 }
 
 Register_ResultFilter("simBound", SimBoundFilter);

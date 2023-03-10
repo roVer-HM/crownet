@@ -16,117 +16,134 @@ BeaconReceptionInfo::~BeaconReceptionInfo() {
     // TODO Auto-generated destructor stub
 }
 
-void BeaconReceptionInfo::setSentTimeCurrent(omnetpp::simtime_t time){
+BeaconReceptionInfo::BeaconReceptionInfo(const BeaconReceptionInfo& other)
+    :  FilePrinterMixin<BeaconReceptionInfo_Base>(other){
+    copy(other);
+}
+
+void BeaconReceptionInfo::copy(const BeaconReceptionInfo& other){}
+
+
+uint32_t BeaconReceptionInfo::get32BitTimestamp(omnetpp::simtime_t time) const {
     // mod 32
     // simtime_t in ms (uint64_t) sentTim only has unit32_t thus time mod 32
-    sentTimeCurrent = (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
+    return (uint32_t)(simTime().inUnit(SimTimeUnit::SIMTIME_MS) & ((uint64_t)(1) << 32)-1);
 }
 
 
 std::string BeaconReceptionInfo::str() const {
     std::stringstream s;
-    auto age = simTime() - getReceivedTimeCurrent();
-    s << "{id: " << getNodeId() \
-            << " a_t:" << getReceivedTimeCurrent().ustr()  \
-            << " age:" << age.ustr() << "}";
+    s.precision(4);
+    auto d = getCurrentData();
+    if (d){
+        auto age = simTime() - currentData->getReceivedTime();
+        s << "{id: " << getNodeId() \
+                << " tx_t:" << currentData->getReceivedTime().ustr()  \
+                << " age:" << age.ustr() << " jitter:" << jitter.ustr() \
+                << " avg_s:" << avg_packet_size.str() \
+                << " count:" << packetsReceivedCount \
+                << " loss_r:" <<  packetLossRate << "}";
+    } else {
+        s << "{id: " << getNodeId() \
+                << " tx_t: N/A"  \
+                << " age: N/A" << " jitter:" << jitter.ustr() \
+                << " avg_s:" << avg_packet_size.str() \
+                << " count:" << packetsReceivedCount \
+                << " loss_r:" <<  packetLossRate << "}";
+
+    }
     return s.str();
 }
 
-void BeaconReceptionInfo::processInbound(Packet *inbound,
-        const uint32_t rcvStationId,
-        const simtime_t arrivalTime){
-
-    auto beacon = inbound->popAtFront<DynamicBeaconPacket>();
-    // includes duplicates and out of order!
-    ++packetsReceivedCount;
-
-    // calculate interarrival jitter (includes duplicates and out of order!)
-    if (clockRate != 0) {
-        // timesmap unit32_t field in ms
-        simtime_t d =  SimTime(beacon->getTimestamp() - sentTimeCurrent, SimTimeUnit::SIMTIME_MS) - (arrivalTime - receivedTimeCurrent);
-        if (d < 0)
-            d = -d;
-        jitter = jitter + (d - jitter) / 16;
-    }
-
-    bool oldPacket = false;
-
-    if (packetsReceivedCount == 1){
-        // first packet. Initialize object
-        initialSequencenumber = beacon->getSequencenumber();
-        maxSequencenumber = initialSequencenumber;
-        sequencecycle = 0;
-        oldPacket = false;
-
-    } else {
-        // update sequncenumber and cycle
-        if (beacon->getSequencenumber() > maxSequencenumber){
-            // ignore late packets from previous wrap if packet_seq > 0xFFEF and max_seq < 0x10
-            if (!(beacon->getSequencenumber() > 0xFFEF && maxSequencenumber < 0x10)){
-                maxSequencenumber = beacon->getSequencenumber();
-                oldPacket = false;
-            } else {
-                oldPacket = true; // ignore data due to out of date
-            }
+std::string BeaconReceptionInfo::logShort() const {
+    std::stringstream s;
+    if (getCurrentData() == nullptr){
+            s << "Beacon[id:" << getNodeId() << ", no-data!]";
         } else {
-            if (beacon->getSequencenumber() < 0x10 && maxSequencenumber > 0xFFEF){
-                maxSequencenumber = beacon->getSequencenumber();
-                sequencecycle += 0x00010000;
-                oldPacket = false;
-            } else {
-                oldPacket = true; // ignore data due to out of date
-            }
+            auto d = getCurrentData();
+            auto p = getPrioData();
+            auto prioSeq = (p == nullptr) ? 0 : p->getSequenceNumber();
+            s << "Beacon[id:" << getNodeId() << ", SeqNo.:" << prioSeq << "|" << d->getSequenceNumber() \
+                        << ", rxTime: " << d->getReceivedTime().ustr() \
+                        << ", pos.:" << d->getPosition() << "]";
         }
-    }
+    return s.str();
+}
 
-    if (maxSequencenumber < initialSequencenumber){
-        packetsLossCount = 0xFFFF - initialSequencenumber + maxSequencenumber + 1;
+std::string BeaconReceptionInfo::infoStrShort() const{
+    std::stringstream s;
+    s << "nodeId: " << getNodeId();
+    if (getCurrentData() == nullptr){
+        s << ", no-data! ";
     } else {
-        packetsLossCount = maxSequencenumber - initialSequencenumber + 1;
+        auto d = getCurrentData();
+        s << ", rxTime: " << d->getReceivedTime().ustr() \
+                << ", maxSeqNo.:" << getMaxSequenceNumber() \
+                << ", pos.:" << d->getPosition() \
+                << ", No.Neighbours: " << d->getNumberOfNeighbours();
     }
-    packetsLossCount = packetsLossCount + sequencecycle - packetsReceivedCount;
+    return s.str();
+}
+
+void BeaconReceptionInfo::updateCurrentPktInfo(Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime){
+    auto beacon = dynamicPtrCast<const DynamicBeaconPacket>(packetIn->peekData());
+    swapAndGetCurrentPktInfo();
+
+    currentPkt->setSourceId(beacon->getSourceId());
+    auto creationSimTime = timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime());
+    currentPkt->setCreationTime(creationSimTime);
+    currentPkt->setCreationTimeStamp(beacon->getTimestamp());
+    currentPkt->setSequenceNumber(beacon->getSequenceNumber());
+    currentPkt->setReceivedTime(arrivalTime);
+}
+
+void BeaconReceptionInfo::processInbound(Packet *packetIn,
+        const int rcvStationId,
+        const simtime_t arrivalTime){
+    auto beacon = dynamicPtrCast<const DynamicBeaconPacket>(packetIn->peekData());
+    updateCurrentPktInfo(packetIn, rcvStationId, arrivalTime);
+
+    // includes duplicates and out of order!
+    computeMetrics(packetIn);
 
 
-    if (oldPacket){
-        // do not update payload info.
-        updated = false; // payload info was not updated
+    if (currentPkt->getOutOfOrder()){
+        // do not update Beacon Data.
     } else {
-        // save previous values
-        receivedTimePrio = receivedTimeCurrent;
-        sentTimePrio = sentTimeCurrent;
-        sentSimTimePrio = sentSimTimeCurrent;
-        packetsReceivedCountPrio = packetsReceivedCountCurrent;
-        positionPrio = positionCurrent;
-        epsilonPrio = epsilonCurrent;
-        numberOfNeighboursPrio = numberOfNeighboursCurrent;
-        beaconValuePrio = beaconValueCurrent;
-
-        // update timestamp
-        sentTimeCurrent = beacon->getTimestamp();
-        sentSimTimeCurrent = timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime());
-        receivedTimeCurrent = arrivalTime;
-
-        // only update beacon data if the packet is the news received. Do not
-        // use data from old out of order packets.
-        positionCurrent = beacon->getPos();
-        epsilonCurrent = beacon->getEpsilon();
-        numberOfNeighboursCurrent = beacon->getNumberOfNeighbours();
-        beaconValueCurrent = 1.0; // Always 1 for this kind of beacon
-
-        updated = true; // new data
+        if (currentData == nullptr){
+            initAppData();
+        }
+        currentData->setBeaconValue(1.0); // Always 1 for this kind of beacon
+        currentData->setPosition(beacon->getPos());
+        currentData->setEpsilon(beacon->getEpsilon());
+        currentData->setNumberOfNeighbours(beacon->getNumberOfNeighbours());
+        currentData->setSourceId(beacon->getSourceId());
+        currentData->setCreationTime(timestamp_32_ms_to_simtime(beacon->getTimestamp(), simTime()));
+        currentData->setCreationTimeStamp(beacon->getTimestamp());
+        currentData->setSequenceNumber(beacon->getSequenceNumber());
+        currentData->setReceivedTime(arrivalTime);
     }
 }
 
-bool BeaconReceptionInfo::checkCurrentTtlReached(const omnetpp::simtime_t& ttl){
-    return getSentSimTimeCurrent() + ttl < simTime();
+bool BeaconReceptionInfo::checkCurrentTtlReached(const omnetpp::simtime_t& ttl) const {
+    return (currentData->getCreationTime() + ttl) < simTime();
 }
 
-bool BeaconReceptionInfo::checkPrioTtlReached(const omnetpp::simtime_t& ttl){
-    if (hasPrio()){
-        return getSentSimTimePrio() + ttl < simTime();
-    } else {
-        return true;
+
+
+void BeaconReceptionInfo::initAppData() {
+    setCurrentData(new BeaconData());
+}
+
+void BeaconReceptionInfo::updatePrioAppData(const BeaconReceptionInfo* other){
+    delete removePrioData();
+    if (other != nullptr){
+        setPrioData(other->getCurrentData()->dup());
     }
+}
+
+bool BeaconReceptionInfo::hasPrio() const {
+    return prioData != nullptr;
 }
 
 

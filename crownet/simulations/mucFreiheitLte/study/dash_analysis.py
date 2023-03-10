@@ -16,6 +16,7 @@ from roveranalyzer.simulators.opp.provider.hdf.DcDGlobalPosition import DcdGloba
 import seaborn as sb
 import pandas as pd
 from pyproj import Proj
+from roveranalyzer.analysis.plot import PlotDpmMap
 from roveranalyzer.analysis.dashapp import OppModel
 from roveranalyzer.analysis.omnetpp import PlotUtil
 from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdProviders
@@ -23,7 +24,7 @@ from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D
 from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
 from roveranalyzer.simulators.vadere.plots import scenario
 from roveranalyzer.utils.general import DataSource
-from roveranalyzer.utils.plot import Style, check_ax
+from roveranalyzer.utils.plot import Style
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
@@ -212,11 +213,11 @@ def count_diff(path, sims: Dict[str, Simulation]):
     tbl_fig.suptitle("Sample Variation")
 
     data = {i[0].name: i for i in data}
-    fig1 = OppAnalysis.diff_plot(s, data["count_diff"])
-    fig2 = OppAnalysis.err_box_plot(s, data["err_box"])
-    fig3 = OppAnalysis.err_hist_plot(s, data["err_hist"])
+    fig1 = PlotDpmMap.diff_plot(s, data["count_diff"])
+    fig2 = PlotDpmMap.err_box_plot(s, data["err_box"])
+    fig3 = PlotDpmMap.err_hist_plot(s, data["err_hist"])
 
-    PlotUtil.fig_to_pdf(path, [tbl_fig, fig1, fig2, fig3])
+    PlotDpmMap.fig_to_pdf(path, [tbl_fig, fig1, fig2, fig3])
 
 
 def make_pics(s: SuqcStudy):

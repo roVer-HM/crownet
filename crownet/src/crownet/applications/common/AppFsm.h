@@ -32,6 +32,11 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) = 0;
 };
 
+struct BurstInfo {
+    int pkt_count;
+    inet::b burst_size;
+};
+
 class AppStatusInfo {
 public:
     virtual ~AppStatusInfo() = default;
@@ -47,9 +52,10 @@ public:
     virtual const inet::b getScheduleData() = 0;
     // return available length for the next packet taking into account max MTU and
     // provided data budget.
+    virtual BurstInfo getBurstInfo(inet::b) const { return BurstInfo{1, inet::b(-1)};}
     virtual const inet::b getAvailablePduLenght() = 0;
-    virtual const inet::b getMinPdu() = 0;
-    virtual const inet::b getMaxPdu() = 0;
+    virtual const inet::b getMinPdu() const = 0;
+    virtual const inet::b getMaxPdu() const = 0;
     virtual const simtime_t getStartTime() = 0;
     virtual const simtime_t getStopTime() = 0;
 };

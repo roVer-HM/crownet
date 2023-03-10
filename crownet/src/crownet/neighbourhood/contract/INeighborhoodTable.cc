@@ -62,4 +62,16 @@ void INeighborhoodTable::emitStayInCell(BeaconReceptionInfo* info){
     }
 }
 
+const BeaconReceptionInfo* INeighborhoodTablePacketProcessor::get(int sourceId) const {
+    auto info = find(sourceId);
+    if (info == nullptr){
+        cRuntimeError("No Info object for source id %i", sourceId);
+    }
+    return info;
+}
+BeaconReceptionInfo* INeighborhoodTablePacketProcessor::getForUpdate(int sourceId) const{
+    return const_cast<BeaconReceptionInfo*>(const_cast<INeighborhoodTablePacketProcessor*>(this)->get(sourceId));
+}
+
+
 }

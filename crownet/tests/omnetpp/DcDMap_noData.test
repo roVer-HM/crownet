@@ -18,6 +18,9 @@ include ../lib/default_testConfig.ini
 
 [Config final]
 extends = _default, D2D_General, DcDMap, stationary_n1
+*.misc[*].app[*].app.cmdenv-log-level = debug
+*.misc[*].app[*].scheduler.cmdenv-log-level = debug
+**.cmdenv-log-level = off
 
 *.coordConverter.typename = "OsgCoordConverterLocal"
 *.coordConverter.xBound = 30.0m
@@ -25,7 +28,7 @@ extends = _default, D2D_General, DcDMap, stationary_n1
 **.cellSize = 3.0m
 
 *.misc[*].app[1].scheduler.numberPackets = -1
-*.misc[*].app[1].scheduler.amoutOfData = 1000B
+*.misc[*].app[1].scheduler.amountOfData = 1000B
 # update interval bigger than sim time. Do not sent data in this case
 *.misc[*].app[1].app.localMapUpdateInterval = 1000s
 *.misc[*].app[0].scheduler.generationInterval = 1000s

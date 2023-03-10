@@ -101,6 +101,7 @@ class IEntry : public crownet::FilePrinter {
   //  bool operator<(const Cell<C, N, T>& rhs) const;
   //  bool operator>(const Cell<C, N, T>& rhs) const;
   bool operator==(const IEntry<K, T>& rhs) const;
+  std::string logShort()const;
 
  protected:
   double count = 0.0;
@@ -112,6 +113,7 @@ class IEntry : public crownet::FilePrinter {
   EntryDist entryDist;
   std::string selected_in;
 };
+
 
 
 
@@ -418,6 +420,13 @@ bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
          (this->measurement_time == rhs.measurement_time) &&
          (this->received_time == rhs.received_time) &&
          (this->_valid == rhs._valid);
+}
+
+template <typename K, typename T>
+std::string IEntry<K, T>::logShort() const{
+    std::stringstream s;
+    s << "Entry{" << this->count << ", " << this->measurement_time <<", " << this->received_time << ", " << this->source << "}";
+    return s.str();
 }
 
 ///////////////////////////////////////////////////

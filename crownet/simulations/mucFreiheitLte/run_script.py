@@ -13,6 +13,7 @@ from roveranalyzer.simulators.crownet.runner import (
 import roveranalyzer.simulators.crownet.dcd as DensityMap
 import roveranalyzer.simulators.opp as OMNeT
 from roveranalyzer.analysis import OppAnalysis, HdfExtractor
+from roveranalyzer.analysis.plot import PlotDpmMap
 from roveranalyzer.utils.general import Project
 
 
@@ -68,7 +69,7 @@ class SimulationRun(BaseRunner):
         sel = list(OppAnalysis.find_selection_method(builder))
         if len(sel) > 1:
             print(f"multiple selections found: {sel}")
-        OppAnalysis.create_common_plots_density(
+        PlotDpmMap.create_common_plots_density(
             result_dir, builder, sql, selection=sel[0]
         )
 

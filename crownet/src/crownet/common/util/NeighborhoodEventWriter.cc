@@ -64,32 +64,34 @@ void NeighborhoodEventWriter::writeData(INeighborhoodTable* table, BeaconRecepti
     simtime_t rcvdTime;
     simtime_t sentTime;
     Coord position;
+    auto currentData = info->getCurrentData();
+    auto prioData = info->getPrioData();
     if (event == "dropped") {
         beaconValue = 0;
     } else if (event == "leave_cell"){
         // current time but old position
         beaconValue = -1;
-        rcvdTime = info->getReceivedTimeCurrent();
-        sentTime = info->getSentSimTimeCurrent();
-        position = info->getPositionPrio();
+        rcvdTime = currentData->getReceivedTime();
+        sentTime = currentData->getCreationTime();
+        position = prioData->getPosition();
     } else if (event == "enter_cell") {
         // current time and current position
         beaconValue = 1;
-        rcvdTime = info->getReceivedTimeCurrent();
-        sentTime = info->getSentSimTimeCurrent();
-        position = info->getPositionCurrent();
+        rcvdTime = currentData->getReceivedTime();
+        sentTime = currentData->getCreationTime();
+        position = currentData->getPosition();
     } else if (event == "stay_in_cell") {
         // current time and current position no change of beacon value
         beaconValue = 0;
-        rcvdTime = info->getReceivedTimeCurrent();
-        sentTime = info->getSentSimTimeCurrent();
-        position = info->getPositionCurrent();
+        rcvdTime = currentData->getReceivedTime();
+        sentTime = currentData->getCreationTime();
+        position = currentData->getPosition();
     } else if (event == "ttl_reached"){
         // current time and current position (last known values but older than TTL)
         beaconValue = -1;
-        rcvdTime = info->getReceivedTimeCurrent();
-        sentTime = info->getSentSimTimeCurrent();
-        position = info->getPositionCurrent();
+        rcvdTime = currentData->getReceivedTime();
+        sentTime = currentData->getCreationTime();
+        position = currentData->getPosition();
     } else { //pre_changed, ttl_reached
         throw cRuntimeError("wrong event: %s", event.c_str());
     }
@@ -100,7 +102,7 @@ void NeighborhoodEventWriter::writeData(INeighborhoodTable* table, BeaconRecepti
     write() << table->getOwnerId() << sep << event_number << sep << event << sep << simTime().dbl() << sep \
             << rcvdTime << sep << sentTime << sep << info->getNodeId() << sep << position.x << sep << position.y << sep \
             << beaconValue << sep << info->getPacketsReceivedCount() << sep << info->getPacketsLossCount() << sep \
-            << info->getMaxSequencenumber() << sep << cellPos.x << sep << cellPos.y << endl;
+            << info->getMaxSequenceNumber() << sep << cellPos.x << sep << cellPos.y << endl;
 }
 
 }

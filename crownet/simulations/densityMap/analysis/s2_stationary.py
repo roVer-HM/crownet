@@ -14,8 +14,9 @@ from roveranalyzer.analysis.common import (
     SimGroupAppendStrategy,
 )
 from roveranalyzer.analysis.omnetpp import OppAnalysis
+from roveranalyzer.analysis.plot import PlotDpmMap
 from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import check_ax, matplotlib_set_latex_param
+from roveranalyzer.utils.plot import PlotUtil, matplotlib_set_latex_param
 import roveranalyzer.utils.dataframe as FrameUtl
 import roveranalyzer.utils.plot as PlotUtl
 from matplotlib.ticker import MaxNLocator, FixedLocator
@@ -451,7 +452,7 @@ def plot_convergence_per_num(
 
     df = df.reset_index()
 
-    fig, ax = check_ax(ax)
+    fig, ax = PlotUtil.check_ax(ax)
     ax = sn.scatterplot(
         ax=ax,
         data=df.reset_index(),
@@ -1043,7 +1044,7 @@ def plot_count_stats(run_map: RunMap):
 
     for g, _df in data.groupby("num"):
         print(g)
-        OppAnalysis.plot_descriptive_comparison(
+        PlotDpmMap.plot_descriptive_comparison(
             _df.copy(deep=True).reset_index("num", drop=True),
             lbl_dict={},
             run_map=run_map,
@@ -1095,7 +1096,7 @@ def plot_relative_count_stat(run_map: RunMap):
 
     # simplify label names
     lbl_dict = {c: c.replace("count_", "") for c in data.columns[1:]}
-    OppAnalysis.plot_descriptive_comparison(
+    PlotDpmMap.plot_descriptive_comparison(
         data,
         lbl_dict=lbl_dict,
         stat_col_combination=stat_combination,

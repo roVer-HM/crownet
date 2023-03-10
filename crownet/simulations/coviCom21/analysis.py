@@ -4,39 +4,41 @@ import matplotlib
 from matplotlib.lines import Line2D
 
 from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdHdfBuilder
-from roveranalyzer.simulators.crownet.dcd.interactive import InteractiveAreaPlot, InteractiveValueOverDistance
+from roveranalyzer.simulators.crownet.dcd.interactive import (
+    InteractiveAreaPlot,
+    InteractiveValueOverDistance,
+)
 from roveranalyzer.utils.path import get_or_create
 
-matplotlib.use('TkAgg')
+matplotlib.use("TkAgg")
 
 
 from roveranalyzer.simulators.opp.scave import ScaveTool, OppSql, SqlOp
+
 # from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
 from roveranalyzer.utils import PathHelper, from_pickle
 from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, DcdMap2DMulti
 from itertools import product
 import matplotlib.pyplot as plt
-from roveranalyzer.utils import check_ax
+from roveranalyzer.utils import PlotUtil
 import pandas as pd
 import numpy as np
 
 # ROOT = "/mnt/results200gb"
 ROOT = "/mnt/data/coviCom/"
 
-runs = [{"run": "vadere00_60_20210214-21:23:26", "run_no": 0, "run_name": "mf_s60_0"},
-        {"run": "vadere00_60_20210214-21:51:11", "run_no": 1, "run_name": "mf_s60_1"},
-        {"run": "vadere00_60_20210214-22:24:09", "run_no": 2, "run_name": "mf_s60_2"},
-
-        {"run": "vadere00_120_20210215-10:25:46", "run_no": 0, "run_name": "mf_s120_0"},
-        {"run": "vadere00_120_20210215-12:02:03", "run_no": 1, "run_name": "mf_s120_1"},
-        {"run": "vadere00_120_20210215-14:06:42", "run_no": 2, "run_name": "mf_s120_2"},
-        ]
+runs = [
+    {"run": "vadere00_60_20210214-21:23:26", "run_no": 0, "run_name": "mf_s60_0"},
+    {"run": "vadere00_60_20210214-21:51:11", "run_no": 1, "run_name": "mf_s60_1"},
+    {"run": "vadere00_60_20210214-22:24:09", "run_no": 2, "run_name": "mf_s60_2"},
+    {"run": "vadere00_120_20210215-10:25:46", "run_no": 0, "run_name": "mf_s120_0"},
+    {"run": "vadere00_120_20210215-12:02:03", "run_no": 1, "run_name": "mf_s120_1"},
+    {"run": "vadere00_120_20210215-14:06:42", "run_no": 2, "run_name": "mf_s120_2"},
+]
 
 
 def read_data(path, *args, **kwargs):
-    global_map_path = path.glob(
-        "global.csv", recursive=False, expect=1
-    )
+    global_map_path = path.glob("global.csv", recursive=False, expect=1)
     node_map_paths = path.glob("dcdMap_*.csv")
     scenario_path = path.glob("vadere.d/*.scenario", expect=1)
 
@@ -62,9 +64,16 @@ def read_param(root_path, run=0, *args, **kwargs):
 def read_app_data(root_path, run=0, *args, **kwargs):
     inputs = f"{root_path}/vars_rep_{run}.vec"
     scave = ScaveTool()
-    scave_f = scave.filter_builder() \
-        .gOpen().module("*.pNode[*].aid.densityMapApp").OR().module("*.pNode[*].aid.beaconApp").gClose() \
-        .AND().name("rcvdPkLifetime:vector")
+    scave_f = (
+        scave.filter_builder()
+        .gOpen()
+        .module("*.pNode[*].aid.densityMapApp")
+        .OR()
+        .module("*.pNode[*].aid.beaconApp")
+        .gClose()
+        .AND()
+        .name("rcvdPkLifetime:vector")
+    )
     _df = scave.load_df_from_scave(input_paths=inputs, scave_filter=scave_f)
     return _df
 
@@ -74,8 +83,9 @@ def analyse_interactive(dcd, what):
 
         time = 2
         id = 0
-        fig, ax = dcd.plot_area(time_step=time, node_id=id,
-                                pcolormesh_dic=dict(vmin=0, vmax=4))
+        fig, ax = dcd.plot_area(
+            time_step=time, node_id=id, pcolormesh_dic=dict(vmin=0, vmax=4)
+        )
         i = InteractiveAreaPlot(dcd, ax)
     else:
 
@@ -90,8 +100,12 @@ def make_density_plot(path, dcd):
     time = [140]
     ids = [0]
     for time, id in list(product(time, ids)):
-        f, ax = dcd.plot_area(time_step=time, node_id=id, make_interactive=False,
-                              pcolormesh_dic=dict(vmin=0, vmax=4))
+        f, ax = dcd.plot_area(
+            time_step=time,
+            node_id=id,
+            make_interactive=False,
+            pcolormesh_dic=dict(vmin=0, vmax=4),
+        )
         print(f"create out/density_map_{id}_t{time}.png")
         ax.set_title("")
         f.savefig(path.join(f"out/density_map_{id}_t{time}.png"))
@@ -129,11 +143,13 @@ def make_delay_plot(dcd, para, delay, save_path):
         df = df.dropna()
 
     ax_twin = ax.twinx()
-    ax_twin.plot("time", "value", data=df, color='r', label="Packet delays")
+    ax_twin.plot("time", "value", data=df, color="r", label="Packet delays")
     ax_twin.set_ylim(0, 100)
-    ax_twin.set_ylabel(f"Mean delay [s] ($w_z = {time_per_bin}s$)", **font_dict["ylabel"])
+    ax_twin.set_ylabel(
+        f"Mean delay [s] ($w_z = {time_per_bin}s$)", **font_dict["ylabel"]
+    )
     handles, labels = ax.get_legend_handles_labels()
-    handles.append(Line2D([0], [0], color='r', linewidth=1))
+    handles.append(Line2D([0], [0], color="r", linewidth=1))
     labels.append("Packet delay")
     ax.legend().remove()
     ax_twin.legend().remove()
@@ -141,7 +157,7 @@ def make_delay_plot(dcd, para, delay, save_path):
     f1.legends.clear()
     ax.tick_params(axis="x", labelsize=dcd.font_dict["tick_size"])
     ax.tick_params(axis="y", labelsize=dcd.font_dict["tick_size"])
-    f1.legend(handles, labels, prop=font_dict["legend"], bbox_to_anchor=(.895, 0.87))
+    f1.legend(handles, labels, prop=font_dict["legend"], bbox_to_anchor=(0.895, 0.87))
     f1.savefig(save_path)
     df["value"].describe().to_csv(f"{save_path}_delay.txt")
 
@@ -159,22 +175,45 @@ def get_env(run):
 def make_figures():
     for run in runs:
         p, ext_root = get_env(run)
-        dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False, path=p)
-        para = get_or_create(pickle_path=p.join("paramters.p"), generator_fn=read_param, override=False,
-                             root_path=ext_root, run=run["run_no"])
-        app_delay = get_or_create(pickle_path=p.join("rcvdPkLifetimeVec.p"), generator_fn=read_app_data, override=False,
-                                  root_path=ext_root, run=run["run_no"])
+        dcd = get_or_create(
+            pickle_path=p.join("analysis.p"),
+            generator_fn=read_data,
+            override=False,
+            path=p,
+        )
+        para = get_or_create(
+            pickle_path=p.join("paramters.p"),
+            generator_fn=read_param,
+            override=False,
+            root_path=ext_root,
+            run=run["run_no"],
+        )
+        app_delay = get_or_create(
+            pickle_path=p.join("rcvdPkLifetimeVec.p"),
+            generator_fn=read_app_data,
+            override=False,
+            root_path=ext_root,
+            run=run["run_no"],
+        )
 
         # plots
-        make_delay_plot(dcd, para, app_delay, save_path=f"{ROOT}/{run['run_name']}_count_delay.pdf")
+        make_delay_plot(
+            dcd, para, app_delay, save_path=f"{ROOT}/{run['run_name']}_count_delay.pdf"
+        )
 
 
 def make_sample_map():
     run = runs[3]
     p, ext_root = get_env(run)
-    dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.plot_area(time_step=96, node_id=0, title="Decentralized Crowed Density Map",
-                            pcolormesh_dic=dict(vmin=0, vmax=4))
+    dcd = get_or_create(
+        pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False
+    )
+    fig, ax = dcd.plot_area(
+        time_step=96,
+        node_id=0,
+        title="Decentralized Crowed Density Map",
+        pcolormesh_dic=dict(vmin=0, vmax=4),
+    )
     fig.savefig(f"{ROOT}/{run['run_name']}_sample_map.pdf")
 
 
@@ -182,9 +221,15 @@ def make_grid_map():
     run = runs[0]
     time = 96
     p, ext_root = get_env(run)
-    dcd = get_or_create(pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False)
-    fig, ax = dcd.plot_area(time_step=time, node_id=0, title="Decentralized Crowed Density Map",
-                            pcolormesh_dic=dict(vmin=0, vmax=4, edgecolors="black"))
+    dcd = get_or_create(
+        pickle_path=p.join("analysis.p"), generator_fn=read_data, override=False
+    )
+    fig, ax = dcd.plot_area(
+        time_step=time,
+        node_id=0,
+        title="Decentralized Crowed Density Map",
+        pcolormesh_dic=dict(vmin=0, vmax=4, edgecolors="black"),
+    )
     ax.set_title("")
     fig.delaxes(fig.axes[1])
     ax.set_xticks(dcd.meta.X)
@@ -197,17 +242,35 @@ def delay_distance():
     p60, ext_root60 = get_env(run_60)
     run_120 = runs[3]
     p120, ext_root120 = get_env(run_120)
-    dcd_60 = get_or_create(pickle_path=p60.join("analysis.p"), generator_fn=read_data, override=False, path=p60)
-    dcd_120 = get_or_create(pickle_path=p120.join("analysis.p"), generator_fn=read_data, override=False, path=p120)
+    dcd_60 = get_or_create(
+        pickle_path=p60.join("analysis.p"),
+        generator_fn=read_data,
+        override=False,
+        path=p60,
+    )
+    dcd_120 = get_or_create(
+        pickle_path=p120.join("analysis.p"),
+        generator_fn=read_data,
+        override=False,
+        path=p120,
+    )
 
     time = 66
     delay_t = "measurement_age"
     fig, ax = check_ax()
-    fig, ax = dcd_120.plot_delay_over_distance(time, -1, delay_t, remove_null=True, label="S2 (overload situation)", ax=ax)
-    fig, ax = dcd_60.plot_delay_over_distance(time, -1, delay_t, remove_null=True,
-                                              label="S1", ax=ax,
-                                              ax_prop=dict(title="Measurement Age over Distance for $t=66\,s$"))
-    fig.legend(prop=dcd_60.font_dict["legend"], bbox_to_anchor=(.41, 0.87))
+    fig, ax = dcd_120.plot_delay_over_distance(
+        time, -1, delay_t, remove_null=True, label="S2 (overload situation)", ax=ax
+    )
+    fig, ax = dcd_60.plot_delay_over_distance(
+        time,
+        -1,
+        delay_t,
+        remove_null=True,
+        label="S1",
+        ax=ax,
+        ax_prop=dict(title="Measurement Age over Distance for $t=66\,s$"),
+    )
+    fig.legend(prop=dcd_60.font_dict["legend"], bbox_to_anchor=(0.41, 0.87))
     ax.tick_params(axis="x", labelsize=dcd_60.font_dict["tick_size"])
     ax.tick_params(axis="y", labelsize=dcd_60.font_dict["tick_size"])
     ax.lines[0].set_linestyle("None")
@@ -218,13 +281,20 @@ def delay_distance():
     ax.set_ylabel(f"Age in [s] ", **dcd_120.font_dict["ylabel"])
     ax.set_title("")
 
-    fig2, ax2 = check_ax(figsize=(4, 9))
+    fig2, ax2 = PlotUtil.check_ax(figsize=(4, 9))
     # ax2.set_title("Distance distribution of \n NT entries to owner", fontsize=14)
     ax2.set_title("")
     local_ = dcd_120.map.index.get_level_values("ID") == dcd_120.map["source"]
     df_hist_120 = dcd_120.map.loc[(dcd_120.map["count"] != 0) & local_]
-    ax2.hist(df_hist_120["owner_dist"], density=True, histtype="step", label="S2 (overload situation)")
-    ax2.set_xlabel(f"Cell distance (euklid) to owners location [m]", **dcd_120.font_dict["xlabel"])
+    ax2.hist(
+        df_hist_120["owner_dist"],
+        density=True,
+        histtype="step",
+        label="S2 (overload situation)",
+    )
+    ax2.set_xlabel(
+        f"Cell distance (euklid) to owners location [m]", **dcd_120.font_dict["xlabel"]
+    )
 
     local_ = dcd_60.map.index.get_level_values("ID") == dcd_60.map["source"]
     df_hist_60 = dcd_60.map.loc[(dcd_60.map["count"] != 0) & local_]
@@ -258,8 +328,10 @@ if __name__ == "__main__":
     )
     opp_vec = OppSql(vec_path=os.path.join(sim_path, "vars_rep_0.vec"))
     delay = opp_vec.vec_data(
-        moduleName=SqlOp.OR(["World.pNode[%].densityMap.app", "World.pNode[%].beacon.app"]),
-        vectorName="rcvdPkLifetime:vector"
+        moduleName=SqlOp.OR(
+            ["World.pNode[%].densityMap.app", "World.pNode[%].beacon.app"]
+        ),
+        vectorName="rcvdPkLifetime:vector",
     )
     print(delay.describe())
     print(delay.head())
@@ -279,4 +351,3 @@ if __name__ == "__main__":
     # aa[2].plot("time", "value", data=delay, color='r', label="Packet delays")
 
     # plt.show()
-

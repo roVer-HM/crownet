@@ -10,6 +10,7 @@
 #include <omnetpp/cobject.h>
 #include "inet/common/InitStages.h"
 #include "crownet/neighbourhood/contract/INeighborhoodTable.h"
+#include "crownet/neighbourhood/contract/INeighborhoodSizeProvider.h"
 #include "crownet/common/converter/OsgCoordConverter.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/common/MobilityProviderMixin.h"
@@ -23,6 +24,8 @@ class NeighborhoodTableSizeFilter;
 
 class NeighborhoodTable : public MobilityProviderMixin<cSimpleModule>
                           , public INeighborhoodTable
+                          , public NeighborhoodSizeProvider
+                          , public INeighborhoodTablePacketProcessor
 {
 public:
 
@@ -36,17 +39,19 @@ public:
     virtual void handleMessage(cMessage *msg) override;
 
     virtual bool ttlReached(BeaconReceptionInfo*) override;
-    virtual bool processInfo(BeaconReceptionInfo *packet) override;
-    virtual BeaconReceptionInfo* getOrCreateEntry(const int sourceId) override;
     virtual void checkAllTimeToLive() override;
     virtual const int getSize() override;
 
+    virtual bool processInfo(BeaconReceptionInfo *packet) override;
+    virtual void saveInfo(BeaconReceptionInfo* info) override;
+    virtual const BeaconReceptionInfo* find(int sourceId) const override;
 
     //getter
     const simtime_t& getMaxAge() const { return maxAge; }
     const NeighborhoodTable_t& getTable() const { return _table; }
     const cMessage* getTitleMessage() const { return ttl_msg;}
     virtual const int getOwnerId() const override { return ownerId;}
+    virtual const int getNeighborhoodSize() override {return getSize();}
 
 
     //setter
@@ -65,6 +70,8 @@ public:
         return NeighborhoodTableIter_t(&_table, predicate);
     }
 
+protected:
+    virtual void removeInfo(BeaconReceptionInfo* info);
 
 
 protected:
@@ -83,6 +90,10 @@ public:
  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                             cObject *object, cObject *details) override;
  using cObjectResultFilter::receiveSignal;
+private:
+ simtime_t last_receivedSignal = -1.0;
+ int lastSize = -1;
+
 };
 
 } /* namespace crownet */

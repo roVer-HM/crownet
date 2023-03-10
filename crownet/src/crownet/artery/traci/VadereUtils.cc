@@ -46,9 +46,9 @@ std::vector<VadereCache> getCachePaths(const std::string vadereCachePath,
     size_t p1 = file.rfind('/');
     size_t p2 = file.find('_', p1);
     size_t p3 = file.find('.', p1);
-    std::cout << file << std::endl;
+    EV_INFO << file << std::endl;
     std::string cacheIdentifier = file.substr(p2, p3 - p2);
-    std::cout << p1 << ',' << p2 << ',' << p3 << std::endl;
+    EV_INFO << p1 << ',' << p2 << ',' << p3 << std::endl;
     c.first = cacheIdentifier;
     c.second = file;
     cachePaths.push_back(c);

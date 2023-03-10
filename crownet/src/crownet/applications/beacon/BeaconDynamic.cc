@@ -5,9 +5,12 @@
  *      Author: vm-sts
  */
 
+#include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/applications/beacon/BeaconDynamic.h"
 #include "crownet/applications/beacon/Beacon_m.h"
+#include "crownet/applications/common/info/InfoTags_m.h"
 #include "crownet/crownet.h"
+#include <cmath>
 
 namespace crownet {
 
@@ -21,23 +24,32 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
 
+
+        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
-        maxBandwith = par("maxBandwith");
+        maxBandwidth = par("maxBandwidth");
     }
+}
+
+BurstInfo BeaconDynamic::getBurstInfo(inet::b data) const{
+    DynamicBeaconPacket p;
+    int pkt_count = (int)std::floor((double)data.get()/p.getChunkLength().get());
+    return BurstInfo{pkt_count, inet::b(pkt_count*p.getChunkLength().get())};
 }
 
 
 Packet *BeaconDynamic::createPacket() {
     const auto &beacon = makeShared<DynamicBeaconPacket>();
 
-    beacon->setSequencenumber(localInfo->nextSequenceNumber());
+    auto seqNo = localInfo->nextSequenceNumber();
+    beacon->setSequenceNumber(seqNo);
+    beacon->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     beacon->setSourceId(getHostId());
     uint32_t time = simtime_to_timestamp_32_ms();
     beacon->setTimestamp(time);
-
 
     beacon->setPos(getPosition());
     beacon->setEpsilon({0.0, 0.0, 0.0});
@@ -46,22 +58,21 @@ Packet *BeaconDynamic::createPacket() {
 
     auto packet = buildPacket(beacon);
 
-    // process local for own location entry in neighborhood table.
-    auto tmp = packet->dup();
-    handleDataArrived(tmp);
-    delete tmp;
-
+    // no direct call to handleDataArrived needed. Packet is delivered back to sender at the same time.
     return packet;
 }
 
 
 FsmState BeaconDynamic::handleDataArrived(Packet *packet){
-
-    auto pSrcId = packet->peekAtFront<DynamicBeaconPacket>()->getSourceId();
-    auto info = nTable->getOrCreateEntry(pSrcId);
-    // process new beacon
-    info->processInbound(packet, hostId, simTime());
-    nTable->processInfo(info);
+    auto infoTag = packet->findTagForUpdate<AppRxInfoPerSourceTag>();
+    if (infoTag == nullptr){
+        throw cRuntimeError("No AppInfoTag found. Application needs an ApplicationMeter to manage AppInfoObjects.");
+    }
+    auto info = dynamic_cast<BeaconReceptionInfo*>(infoTag->getPacketInfoForUpdate());
+    if (info == nullptr){
+        throw cRuntimeError("Provided AppInfo object cannot be cast to BeaconReceptionInfo");
+    }
+    tablePktProcessor->processInfo(info);
 
     return FsmRootStates::WAIT_ACTIVE;
 }

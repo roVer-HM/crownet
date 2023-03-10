@@ -5,6 +5,7 @@
  *      Author: sts
  */
 
+#include "crownet/crownet.h"
 #include "crownet/common/util/FileWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
@@ -38,7 +39,6 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
       } else {
           _path = p.parent_path().string() + "/" + fileName + ".csv";
       }
-      std::cout << _path << endl;
       return _path;
     } else {
       throw cRuntimeError("output-scalar-file not found");
@@ -57,6 +57,7 @@ void BaseFileWriter::initialize(){
         throw cRuntimeError("Path is not set");
     }
     filePath = getAbsOutputPath(filePath);
+    EV_INFO << "create file: " << filePath << endl;
     file = std::ofstream(filePath);
     init = true;
     onInit();

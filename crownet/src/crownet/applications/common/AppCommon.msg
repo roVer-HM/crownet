@@ -16,6 +16,14 @@
 import inet.common.INETDefs;
 import inet.common.geometry.Geometry;
 import inet.common.TagBase;
+import inet.common.Units;
+
+cplusplus {{
+#include "inet/common/packet/Packet.h"
+using namespace inet;
+}}
+
+namespace crownet;
 
 class CurrentLocationTag extends inet::TagBase
 {
@@ -36,3 +44,47 @@ class HopCount extends inet::TagBase
 {
  	int hops;   
 }
+
+class RxPerSrcJitterTag extends inet::TagBase
+{
+    simtime_t jitter;
+}
+
+class RxPerSrcAvgSizeTag extends inet::TagBase
+{
+    inet::b size;
+}
+
+class RxPerSrcPktCountTag extends inet::TagBase
+{
+    int count;
+}
+class RxPerSrcTotalSentCountTag extends inet::TagBase
+{
+    int count;
+}
+
+class RxPerSrcPktLossCountTag extends inet::TagBase
+{
+    int count;
+}
+
+class RxPerAppAvgSizeTag extends inet::TagBase
+{
+    inet::b size;
+}
+
+class RxPerAppPktCountTag extends inet::TagBase
+{
+    int count;
+}
+
+class BurstTag extends inet::TagBase
+{
+    simtime_t burstCreationTime;
+    long burstIndex;
+    int burstPktCount;
+    inet::b burstSize;
+    bool skipStatsProcessing = false;
+}
+class BurstSkipTag extends inet::TagBase{}

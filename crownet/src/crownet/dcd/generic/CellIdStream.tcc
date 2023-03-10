@@ -68,4 +68,19 @@ InsertionOrderedCellIdStream<C, N, T>::nextCell(const time_t& now){
     return map->getCell(id);
 }
 
+template <typename C, typename N, typename T>
+const int InsertionOrderedCellIdStream<C, N, T>::size(const time_t& now) const {
+    int count = 0;
+    for(const auto &p : *map){
+        const auto &cell = p.second;
+        if (cell.lastSent() < now && // cell was not already sent
+                cell.hasValid() && // cell has at least on valid entry
+                cell.val() &&  // cell has an selected/calculated
+                cell.val()->valid()){ // cell has an selected/calculated and its valid
+            count++;
+        }
+    }
+    return count;
+}
+
 

@@ -77,6 +77,65 @@ class HostIdFilter : public cObjectResultFilter {
   using cObjectResultFilter::receiveSignal;
 };
 
+class RcvdPerSrcJitter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+
+class RcvdPerSrcAvgSize : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+
+class RcvdPerSrcCount : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+class RcvdPerSrcTotalCount : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+class RcvdPerSrcLossCount : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+
+class RcvdCount : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+class RcvdSrcCount : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
+class RcvdAvgSize : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
 class RcvdSequenceIdFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,

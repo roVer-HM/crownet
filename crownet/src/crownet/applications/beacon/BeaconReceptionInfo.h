@@ -20,29 +20,38 @@ class BeaconReceptionInfo :
 public:
     virtual ~BeaconReceptionInfo();
     BeaconReceptionInfo(const char *name=nullptr)
-        : FilePrinterMixin<BeaconReceptionInfo_Base>(name){}
+        : FilePrinterMixin<BeaconReceptionInfo_Base>(name){ }
+    BeaconReceptionInfo(const BeaconReceptionInfo& other);
 
+    virtual BeaconReceptionInfo *dup() const override {return new BeaconReceptionInfo(*this);} ;
 
     // override for granular handling of packet types
-    virtual void processInbound(Packet *inbound, const uint32_t rcvStationId,
+    virtual void processInbound(Packet *packetIn, const int rcvStationId,
             const simtime_t arrivalTime) override;
+    virtual void updateCurrentPktInfo(Packet *packetIn, const int rcvStationId, const simtime_t arrivalTime) override;
+
 
     // converts simtime_t time into unit32_t representation (ms)
-    using BeaconReceptionInfo_Base::setSentTimeCurrent;
-    virtual void setSentTimeCurrent(omnetpp::simtime_t time);
+    virtual uint32_t get32BitTimestamp(omnetpp::simtime_t time) const;
 
     virtual std::string str() const override;
+    virtual std::string infoStrShort() const;
+    virtual std::string logShort() const;
 
-    bool isUpdated() const {return updated;}
+    bool isUpdated() const {return currentPkt != nullptr && !currentPkt->getOutOfOrder();}
 
-    bool checkCurrentTtlReached(const omnetpp::simtime_t& ttl);
-    // will return true if there is no prio packet info
-    bool checkPrioTtlReached(const omnetpp::simtime_t& ttl);
+    bool checkCurrentTtlReached(const omnetpp::simtime_t& ttl) const ;
+
+    void initAppData();
+
+    // Set currentData of 'other' as prioData of this object.
+    void updatePrioAppData(const BeaconReceptionInfo* other);
+    bool hasPrio() const;
+private:
+    void copy(const BeaconReceptionInfo& other);
 
 protected:
 
-    // true object was passed to density map
-    bool updated;
 
 };
 

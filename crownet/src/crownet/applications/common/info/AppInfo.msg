@@ -20,12 +20,36 @@
 import inet.common.INETDefs;
 import inet.networklayer.contract.ipv4.Ipv4Address;
 import inet.common.Units;
+import inet.common.TagBase;
+
+cplusplus {{
+#include "inet/common/packet/Packet.h"
+using namespace inet;
+}}
 
 namespace crownet;
 
 
-cplusplus {{
-using namespace inet;
+enum PktType
+{
+    UNDEF    = 0;
+    DATA_PKT = 1;
+    CTRL_PKT = 2;
+};
+
+class PacketInfo  extends cOwnedObject {
+	uint32_t sourceId;
+	//
+	uint32_t  creationTimeStamp;
+	simtime_t creationTime @editable;
+	//
+	simtime_t receivedTime @editable;
+    uint32_t sequenceNumber;
+    bool outOfOrder=false;
+}
+cplusplus(PacketInfo){{
+  public:
+  	const simtime_t delay()const {return receivedTime-creationTime;}
 }}
 
 
@@ -43,42 +67,35 @@ class AppInfoLocal extends AppInfoBase {
     uint16_t sequencecycle = 0;
 };
 
-
-
-enum PktType
-{
-    UNDEF    = 0;
-    DATA_PKT = 1;
-    CTRL_PKT = 2;
-};
-
-class AppInfoReception extends AppInfoBase {
- 	@customize(true);
-
- 	uint16_t initialSequencenumber= 0;
-    uint16_t maxSequencenumber= 0;
-    uint32_t sequencecycle= 0;
-	uint32_t packetsReceivedCount= 0;
-	// (max_sequencenumber - initial_sequencenumber) - packets_received_count
-	// todo include sequencecycle in packet_loss_count? look at RTCP protocol!!
-	int packetsLossCount = 0; 
-	int clockRate = 1000; // timestamp in ms (assume all are syncronized.)
-
-
-	simtime_t jitter = 0.0;
-	simtime_t receivedTimeCurrent = 0.0;
-	uint32_t  sentTimeCurrent = 0; 
-	simtime_t sentSimTimeCurrent = 0;
-	uint16_t  packetsReceivedCountCurrent = 0;
-	
-	simtime_t receivedTimePrio = 0.0;
-	uint32_t  sentTimePrio = 0; 
-	simtime_t sentSimTimePrio = 0;
-	uint16_t  packetsReceivedCountPrio = 0;
-};
-cplusplus(AppInfoReception){{
+class AppRxInfoBase extends AppInfoBase {
+    
+}
+cplusplus(AppRxInfoBase){{
   public:
-  	bool hasPrio()const {return packetsReceivedCount > 1;}
+  	virtual void processInbound(Packet *packetIn, const int rcvStationId,
+            const simtime_t arrivalTime) {/*do nothing*/};
+    virtual void computeMetrics(Packet *packetIn) {/*do nothing*/};
 }}
+
+
+class AppRxInfo extends AppRxInfoBase{
+    @customize(true);
+    // Application level statistics 
+    nodeId = 0; //
+    // packet stream metrics
+    uint32_t packetsReceivedCount = 0;  
+    uint32_t packetsOctetCount = 0;
+	simtime_t jitter = 0.0;  //exp smoothing with gain=1/16
+	inet::b avg_packet_size = inet::b(0); //exp smoothing with gain=1/16
+	// average computation based on RTPC (RFC 3350 page 31, 40)
+	double ema_smoothing_jitter = 1/16;
+	double ema_smoothing_packet_size = 1/16;
+	
+	// packet info for generic network metrics. 
+	// May contain invlaid data packets such as old or out of order data. 
+	PacketInfo *prioPkt @owned;
+	PacketInfo *currentPkt @owned;
+	simtime_t lastPktSwap @editable;
+}
 
 

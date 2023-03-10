@@ -25,10 +25,30 @@ simple GenericPacketMeter extends PacketMeterBase like IPacketMeter
  	parameters:
  	    @display("i=block/star");
         @class(crownet::GenericPacketMeter);
+        
+        
         // %p packet count; %l bit count;  %r packet rate; %R data rate
         displayStringTextFormat = default("%r | %R");
         object meter = default(crownet::EmaPacketMeter{alpha: 1/16});
 //		object meter = default(crownet::TemaPacketMeter{beta: 15/16});
         bool markPackets = default(false);
           
+}
+
+simple ApplicationPacketMeterIn extends GenericPacketMeter
+{
+    parameters:
+        @display("i=block/star");
+        @class(crownet::ApplicationPacketMeterIn);
+        
+        // class name of application info object that handles 
+        // application-source level statistics
+        string appInfoClass;
+        // add copy of stat object to packet for application internal processing
+        bool appendAppInfo = default(true);
+        // average computation based on RTPC (RFC 3350 page 31, 40)
+       	double ema_smoothing_jitter = default(1/16);
+		double ema_smoothing_packet_size = default(1/16);
+        
+        
 }

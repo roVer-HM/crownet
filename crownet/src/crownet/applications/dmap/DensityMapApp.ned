@@ -33,6 +33,7 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         // Aid app override defaults
         packetName = default("DcDMap");
         allEmptyDestAddress = false;
+        attachSequenceIdTag = default(false); // set by app logic
         
         // App logic
         string coordConverterModule;

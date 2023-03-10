@@ -30,13 +30,14 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         @class(crownet::BeaconDynamic);   
         // Aid app override defaults
         packetName = default("BeaconDynamic");
-		packetLength = default(300B);
 		allEmptyDestAddress = false;
+		attachSequenceIdTag = default(false); // set by app logic
+		
 
 		
 		double minSentFrequency @unit(Hz)= default(0.5Hz);
 		double maxSentFrequency @unit(Hz)= default(10Hz);
-        double maxBandwith @unit(Bytes) = default(2000B);
+        double maxBandwidth @unit(Bytes) = default(2000B);
         
         // App logic
         string neighborhoodTableMobdule  = default("mobility");

@@ -74,14 +74,24 @@ simple BaseApp extends CrownetActivePacketSourceBase like IBaseApp
 		// send stats
         @signal[packetSent](type=inet::Packet);
         @statistic[packetSent](title="packets sent"; source=packetSent; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @statistic[sentDataRate](title="outgoing data rate"; unit=bps; source="throughput(packetSent)"; record=vector; interpolationmode=none);
+        
         // received stats
         @signal[packetReceived](type=inet::Packet);
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-        @statistic[throughput](title="throughput"; unit=bps; source="throughput(packetReceived)"; record=vector);
+        @statistic[rcvdDataRate](title="incomming data rate"; unit=bps; source="throughput(packetReceived)"; record=vector; interpolationmode=none);
         @statistic[rcvdPkLifetime](title="received packet lifetime"; source="dataAge(packetReceived)"; unit=s; record=stats,vector; interpolationmode=none);
-        @statistic[rcvdPkSeqNo](title="received packet sequence number"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
         @statistic[rcvdPkHostId](title="received host id"; source="rcvdHostId(packetReceived)"; record=vector; interpolationmode=none);
-        
+        @statistic[rcvdPktPerSrcJitter](title="received jitter per source"; source="rcvdPerSrcJitter(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPktPerSrcAvgSize](title="received average packet bits per source"; unit=b; source="rcvdPerSrcAvgSize(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPktPerSrcCount](title="received communaltive packet count per source"; unit=b; source="rcvdPerSrcCount(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPerSrcTotalCount](title="total count of packets send by source"; source="rcvdPerSrcTotalCount(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPktPerSrcLossCount](title="received communaltive packet loss count per source"; unit=b; source="rcvdPerSrcLossCount(packetReceived)"; record=vector; interpolationmode=none);
+		@statistic[rcvdPktPerSrcSeqNo](title="received packet sequence number per source"; source="rcvdSequenceId(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPktAvgSize](title="received average packet bits"; unit=b; source="rcvdAvgSize(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdPktCount](title="received communaltive packet count"; unit=b; source="rcvdCount(packetReceived)"; record=vector; interpolationmode=none);
+        @statistic[rcvdSrcCount](title="number of different sources received"; unit=int; source="rcvdSrcCount(packetReceived)"; record=vector; interpolationmode=none);
+
         
         // queueing statitics
         @signal[packetPulled](type=inet::Packet);

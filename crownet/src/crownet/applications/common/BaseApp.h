@@ -147,11 +147,12 @@ class BaseApp : public DataArrivedHandler,
   virtual const simtime_t getStopTime() override {return stopTime;}
   virtual void setScheduleData(inet::b data) override {scheduledData = data;}
   virtual const inet::b getScheduleData() override {return scheduledData;}
-  virtual const inet::b getMinPdu() override;
-  virtual const inet::b getMaxPdu() override;
+  virtual const inet::b getMinPdu() const override;
+  virtual const inet::b getMaxPdu() const override;
 public:
   // ICrownetActivePacketSource
   virtual void producePackets(inet::b maxData) override;
+  virtual void producePackets(int number) override;
   virtual void handleCanPushPacketChanged(cGate *gate) override { throw cRuntimeError("Packet generation managed by scheduler");}
 
 };

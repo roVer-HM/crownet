@@ -119,7 +119,7 @@ std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd&
              density_vals.push_back(x);
              density_vals.push_back(y);
              density_vals.push_back(count);
-             std::cout << "x-y-count: " <<
+             EV_INFO << "x-y-count: " <<
                      x << "-" << y <<"-"<< count << std::endl;
          }
     }
