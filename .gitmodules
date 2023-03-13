@@ -1,25 +1,25 @@
 [submodule "inet"]
 	path = inet4
-	url = ../inet.git
+	url = https://github.com/roVer-HM/inet.git
 [submodule "veins"]
 	path = veins
-	url = ../veins.git
+	url = https://github.com/roVer-HM/veins.git
 [submodule "vadere"]
 	path = vadere
-	url = ../vadere.git
+	url = https://github.com/roVer-HM/vadere.git
 [submodule "analysis/roveranalyzer"]
 	path = analysis/roveranalyzer
-	url = ../roveranalyzer.git
+	url = https://github.com/roVer-HM/roveranalyzer.git
 	branch = cmp_vadere_sumo_update
 [submodule "artery"]
 	path = artery
-	url = ../artery.git
+	url = https://github.com/roVer-HM/artery.git
 [submodule "flowcontrol"]
 	path = flowcontrol
-	url = ../flowcontrol.git
+	url = https://github.com/roVer-HM/flowcontrol.git
 [submodule "analysis/suq-controller"]
 	path = analysis/suq-controller
-	url = ../suq-controller.git
+	url = https://github.com/roVer-HM/suq-controller.git
 [submodule "Simu5G"]
 	path = simu5g
-	url = ../Simu5G.git
+	url = https://github.com/roVer-HM/Simu5G.git
