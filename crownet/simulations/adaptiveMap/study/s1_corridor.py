@@ -58,7 +58,7 @@ mapCfgYmf = ObjectValue.from_args(
     "idStreamType",
     QString("insertionOrder"),
 )
-t = UnitValue.s(600.0)
+t = UnitValue.s(900.0)
 # t = UnitValue.s(2.0)
 
 
@@ -67,7 +67,8 @@ def par_var_bonn_motion():
         {
             "omnet": {
                 "sim-time-limit": t,
-                "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_SEED.bonnMotion",
+                "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_ramp_down_SEED.bonnMotion",
+                # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_SEED.bonnMotion",
                 # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_SEED.bonnMotion",
                 "*.misc[*].app[1].scheduler.generationInterval": "100ms",
                 "*.misc[*].app[0].scheduler.generationInterval": "500ms",
@@ -120,7 +121,8 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
 
 
 def main_bonn_motion():
-    trace_dir = os.path.abspath("corridor_trace_5perSpawn.d")
+    trace_dir = os.path.abspath("corridor_trace_5perSpawn_ramp_down.d")
+    # trace_dir = os.path.abspath("corridor_trace_5perSpawn.d")
     # trace_dir = os.path.abspath("corridor_trace.d")
     opp_config, parameter_variation = create_variation_with_bonn_motion(
         seed_paring=BmTrace.get_seed_paring(trace_dir)
@@ -141,7 +143,8 @@ def main_bonn_motion():
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        env_name=get_env_name(base_dir, __file__.replace(".py", "")),
+        env_name="s1_corridor_ramp_down",
+        # env_name=get_env_name(base_dir, __file__.replace(".py", "")),
         opp_config=opp_config,
         opp_basename="omnetpp.ini",
         mobility_sim=("omnet", ""),  # use omnet internal mobility models
