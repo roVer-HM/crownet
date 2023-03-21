@@ -70,7 +70,7 @@ def par_var_bonn_motion():
                 "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_ramp_down_SEED.bonnMotion",
                 # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_SEED.bonnMotion",
                 # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_SEED.bonnMotion",
-                "*.misc[*].app[1].scheduler.generationInterval": "100ms",
+                "*.misc[*].app[1].scheduler.generationInterval": "2000ms",
                 "*.misc[*].app[0].scheduler.generationInterval": "500ms",
                 "*.misc[*].app[*].scheduler.typename": QString(
                     "DynamicMaxBandwidthScheduler"

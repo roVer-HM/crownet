@@ -22,7 +22,7 @@ from matplotlib.colors import (
 )
 import seaborn as sn
 from collections.abc import Sized, Sequence
-from typing import Callable, Dict, List, Tuple, Any
+from typing import Callable, Dict, List, Mapping, Tuple, Any
 from roveranalyzer.analysis.plot import PlotDpmMap
 from roveranalyzer.analysis.common import (
     Simulation,
