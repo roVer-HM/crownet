@@ -89,7 +89,8 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
 
     par_var_tmp = []
     for run in par_var:
-        for target_bit_rate in [50, 100, 150, 250]:
+        # for target_bit_rate in [50, 100, 150, 250]:
+        for target_bit_rate in [5, 10, 25, 325, 425]:
             _run = deepcopy(run)  # copy
             _run["omnet"][
                 "*.misc[*].app[1].scheduler.maxApplicationBandwidth"
