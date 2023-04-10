@@ -357,3 +357,5 @@ pip install black
 For IDE support see Black [Editor integration](https://black.readthedocs.io/en/stable/editor_integration.html).
 
 ToDo: add git hook to check formatting of python files.
+
+Explain submodules
