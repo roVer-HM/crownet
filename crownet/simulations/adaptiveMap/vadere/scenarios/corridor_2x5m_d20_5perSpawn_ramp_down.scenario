@@ -1,5 +1,5 @@
 {
-  "name" : "mf_1d_m_const_short_2x5m_d20m",
+  "name" : "corridor_2x5m_d20_5perSpawn_ramp_down",
   "description" : "",
   "release" : "2.4",
   "processWriters" : {
@@ -93,7 +93,7 @@
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.3,
+        "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "cacheType" : "NO_CACHE",
@@ -114,7 +114,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1000.0,
+      "finishTime" : 900.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -201,7 +201,7 @@
       "targets" : [ {
         "id" : 202,
         "shape" : {
-          "x" : 300.0,
+          "x" : 400.0,
           "y" : 205.1,
           "width" : 5.0,
           "height" : 4.8,
@@ -221,7 +221,7 @@
       }, {
         "id" : 200,
         "shape" : {
-          "x" : 300.0,
+          "x" : 400.0,
           "y" : 180.1,
           "width" : 5.0,
           "height" : 4.8,
@@ -241,7 +241,7 @@
       }, {
         "id" : 201,
         "shape" : {
-          "x" : 100.0,
+          "x" : 10.0,
           "y" : 180.1,
           "width" : 5.0,
           "height" : 4.8,
@@ -261,7 +261,7 @@
       }, {
         "id" : 203,
         "shape" : {
-          "x" : 100.0,
+          "x" : 10.0,
           "y" : 205.1,
           "width" : 5.0,
           "height" : 4.8,
@@ -286,7 +286,7 @@
       "sources" : [ {
         "id" : 103,
         "shape" : {
-          "x" : 305.0,
+          "x" : 405.0,
           "y" : 205.1,
           "width" : 10.0,
           "height" : 4.8,
@@ -298,22 +298,22 @@
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
           "constraintsTimeStart" : 0.0,
-          "constraintsTimeEnd" : 10000.0,
+          "constraintsTimeEnd" : 800.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 1,
+          "eventElementCount" : 5,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 5.0
+            "updateFrequency" : 20.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 101,
         "shape" : {
-          "x" : 305.0,
+          "x" : 405.0,
           "y" : 180.1,
           "width" : 10.0,
           "height" : 4.8,
@@ -325,7 +325,7 @@
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : 0,
           "constraintsTimeStart" : 0.0,
-          "constraintsTimeEnd" : 10000.0,
+          "constraintsTimeEnd" : 1000.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
@@ -340,7 +340,7 @@
       }, {
         "id" : 100,
         "shape" : {
-          "x" : 90.0,
+          "x" : 0.0,
           "y" : 180.1,
           "width" : 10.0,
           "height" : 4.8,
@@ -352,22 +352,22 @@
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
           "constraintsTimeStart" : 0.0,
-          "constraintsTimeEnd" : 10000.0,
+          "constraintsTimeEnd" : 800.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 1,
+          "eventElementCount" : 5,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 5.0
+            "updateFrequency" : 20.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 102,
         "shape" : {
-          "x" : 90.0,
+          "x" : 0.0,
           "y" : 205.1,
           "width" : 10.0,
           "height" : 4.8,
@@ -379,7 +379,7 @@
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : 0,
           "constraintsTimeStart" : 0.0,
-          "constraintsTimeEnd" : 10000.0,
+          "constraintsTimeEnd" : 1000.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,

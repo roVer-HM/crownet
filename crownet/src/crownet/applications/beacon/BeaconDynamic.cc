@@ -24,13 +24,12 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-
-
         nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
         maxBandwidth = par("maxBandwidth");
+        appendResourceSharingDomainId = par("appendResourceSharingDomainId");
     }
 }
 
@@ -42,7 +41,14 @@ BurstInfo BeaconDynamic::getBurstInfo(inet::b data) const{
 
 
 Packet *BeaconDynamic::createPacket() {
-    const auto &beacon = makeShared<DynamicBeaconPacket>();
+    Ptr<DynamicBeaconPacket> beacon;
+    if (appendResourceSharingDomainId){
+        beacon = makeShared<DynamicBeaconPacketWithSharingDominId>();
+        //todo: assume same domain, i.e. one eNB, for now.
+        dynamicPtrCast<DynamicBeaconPacketWithSharingDominId>(beacon)->setSharingDominId(0);
+    } else {
+        beacon = makeShared<DynamicBeaconPacket>();
+    }
 
     auto seqNo = localInfo->nextSequenceNumber();
     beacon->setSequenceNumber(seqNo);

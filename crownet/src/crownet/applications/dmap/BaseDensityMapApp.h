@@ -102,7 +102,7 @@ protected:
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
  std::string mapDataType; //todo switch for PedestrianVsEntropy data
-
+ bool appendResourceSharingDomainId;
 
 
  RegularDcdMapWatcher* dcdMapWatcher;
