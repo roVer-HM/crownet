@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 RESULTS = "../results"
-STUDY_NAME = "study_simple_velocity_difference_exceed_standard"
+STUDY_NAME = "study_simple_velocity_difference_exceed_standard_fix"
 PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER_NAME = "maxClusterVelocityDifference"
 RECEIVER = "World.vNode[%].middleware.VaService"

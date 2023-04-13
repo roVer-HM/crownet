@@ -634,7 +634,7 @@
                         2000
                     ],
                     "groupSizeDistribution": [
-                        0.2, 0.2, 0.2, 0.4
+                        0.2, 0.2, 0.2, 0.2, 0.2
                     ],
                     "dynamicElementType": "PEDESTRIAN",
                     "attributesPedestrian": null
@@ -677,7 +677,7 @@
                         2001
                     ],
                     "groupSizeDistribution": [
-                         0.2, 0.2, 0.2, 0.4
+                         0.2, 0.2, 0.2, 0.2, 0.2
                     ],
                     "dynamicElementType": "PEDESTRIAN",
                     "attributesPedestrian": null

@@ -36,7 +36,7 @@ def get_vec_files():
         files.extend(glob.glob(f"{RESULTS}/{STUDY_NAME}/{result}/*.vec"))
     return files
     
-def plt_node(filter, color, alpha):
+def plt_node(ax, filter, color, alpha):
     x = [d[0] for d in get_x(cur, filter)]
     y = [d[0] for d in get_y(cur, filter)]
     
@@ -47,40 +47,43 @@ def plt_node(filter, color, alpha):
         coords = utm.from_latlon(y[i] / 10**6, x[i] / 10**6, 32, "U")
         
         u_x.append(coords[0] - 689432)
-        u_y.append(coords[1] - 5336004)
+        u_y.append(400 - (coords[1] - 5336004))
     
-    plt.plot(u_x, u_y, color=color, alpha=alpha)        
+    ax.plot(u_y, u_x, color=color, alpha=alpha)        
      
 if __name__ == "__main__":
     with sqlite3.connect(get_vec_files()[0]) as db:
         cur = db.cursor()
         
-        plt.rcParams["figure.figsize"] = (3,5)
+        fig, ax = plt.subplots(figsize=(7, 2.8))
+        fig.subplots_adjust(bottom=0.15, left=0.1, top=1, right=0.95, hspace=0)
         
         for i in range(30):
             print(i)
-            plt_node(f"%pNode[{i}]%", "orange", 0.5)
+            plt_node(ax, f"%pNode[{i}]%", "orange", 0.5)
         
         for i in range(5):
-            plt_node(f"%vNode[{i}]%", "red", 0.5)
+            plt_node(ax, f"%vNode[{i}]%", "red", 0.7)
             
-        plt.plot([], [], color="red", label="vNode")   
-        plt.plot([], [], color="orange", label="pNode")  
+        ax.plot([], [], color="red", label="vNode trajectory")   
+        ax.plot([], [], color="orange", label="pNode trajectory")
+        ax.plot([], [], color="royalblue", label="vNode obstacle", linewidth=3)
+        ax.plot([], [], color="gray", label="Road", linewidth=3)
         
         im = plt.imread("simple.png")
-        plt.imshow(im, extent=(0, 400, 0, 400), origin='upper', alpha=0.5)
+        ax.imshow(im, extent=(0, 400, 0, 400), origin='upper', alpha=0.35)
         
-        plt.xlim((50, 250))
-        plt.ylim((0, 400))
+        ax.set_xlim(0, 400)
+        ax.set_ylim(75, 230)
         
-        plt.xlabel("x [m]")
-        plt.ylabel("y [m]")
+        plt.xlabel("y [m]")
+        plt.ylabel("x [m]")
         
-        plt.legend()
+        ax.legend(ncol=2, loc="upper center")
         
-        plt.savefig(f"fig/simple_traj.png")    
-        plt.savefig(f"fig/simple_traj.svg")
-        plt.savefig(f"fig/simple_traj.pdf")
+        fig.savefig(f"fig/simple_traj.png")    
+        fig.savefig(f"fig/simple_traj.svg")
+        fig.savefig(f"fig/simple_traj.pdf")
         
         plt.show()
         

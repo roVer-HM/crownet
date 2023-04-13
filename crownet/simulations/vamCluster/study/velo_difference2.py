@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 RESULTS = "../results"
-STUDY_NAME = "study_simple_velocity_difference_exceed_standard"
+STUDY_NAME = "study_simple_velocity_difference_exceed_standard_fix"
 PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER_NAME = "maxClusterVelocityDifference"
 RECEIVER = "World.vNode[%].middleware.VaService"
@@ -157,9 +157,15 @@ def visualize():
         ax = plt.gca()
 
         parameters = sorted(by_param.keys())
+
+        print(parameters)
         
         ax.set_ylim(0, 7000)
         ax.grid(True, axis="both", linestyle="--")
+
+        ax.axhline(5680, linestyle="dashed", label="No clustering", linewidth=2, color="blue")
+        ax.axhline(5680 + 432, color="blue", linestyle="dotted")
+        ax.axhline(5680 - 432, color="blue", linestyle="dotted")
         
         ax.errorbar(
             parameters,
@@ -170,7 +176,10 @@ def visualize():
             # linestyle='None',
             marker='o',
             capsize=5,
+            label="Clustering"
         )
+
+        ax.legend()
         
         for tick in ax.get_xticklabels():
             tick.set_rotation(45)

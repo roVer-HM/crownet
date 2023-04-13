@@ -33,7 +33,9 @@
 
 <net version="1.0" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
 
-    <location netOffset="-691444.68,-5335504.47" convBoundary="658.02,1716.92,1151.23,2379.07" origBoundary="11.548225,48.117927,11.594341,48.171410" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+<!-- <location netOffset="-691444.68,-5335504.47" convBoundary="658.02,1716.92,1151.23,2379.07" origBoundary="11.548225,48.117927,11.594341,48.171410" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+ -->
+    <location netOffset="-691444.68,-5335504.47" convBoundary="620.0,1716.92,1151.23,2379.07" origBoundary="11.548225,48.117927,11.594341,48.171410" projParameter="+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
 
     <type id="highway.bridleway" priority="1" numLanes="1" speed="2.78" allow="pedestrian" oneway="1" width="2.00"/>
     <type id="highway.bus_guideway" priority="1" numLanes="1" speed="27.78" allow="bus" oneway="1"/>
