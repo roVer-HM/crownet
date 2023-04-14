@@ -21,4 +21,4 @@
 	url = ../Simu5G.git
 [submodule "analysis/crownetutils"]
 	path = analysis/crownetutils
-	url = ssh://git@sam-dev.cs.hm.edu:6000/rover/crownetutils.git
+	url = ../crownetutils.git
