@@ -3,21 +3,16 @@ import shutil
 import sys, os
 
 from os.path import join
-from datetime import datetime
-from roveranalyzer.analysis.common import Simulation
-from roveranalyzer.simulators.crownet.runner import (
-    BaseRunner,
+from crownetutils.analysis.common import Simulation
+from crownetutils.dockerrunner.simulationrunner import (
+    BaseSimulationRunner,
     process_as,
-    result_dir_with_opp,
 )
-import roveranalyzer.simulators.crownet.dcd as DensityMap
-import roveranalyzer.simulators.opp as OMNeT
-from roveranalyzer.analysis import OppAnalysis, HdfExtractor
-from roveranalyzer.analysis.plot import PlotDpmMap
-from roveranalyzer.utils.general import Project
+from crownetutils.analysis.omnetpp import OppAnalysis, HdfExtractor
+from crownetutils.analysis.plot import PlotDpmMap
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 

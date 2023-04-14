@@ -8,7 +8,7 @@ from matplotlib.ticker import (
     FixedFormatter,
     LogFormatter,
 )
-from roveranalyzer.analysis.common import (
+from crownetutils.analysis.common import (
     RunContext,
     RunMap,
     Simulation,
@@ -16,13 +16,14 @@ from roveranalyzer.analysis.common import (
     SuqcStudy,
 )
 from itertools import repeat
-from roveranalyzer.simulators.crownet.common.dcd_metadata import DcdMetaData
-from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
-from roveranalyzer.simulators.vadere.plots.scenario import VaderScenarioPlotHelper
-from roveranalyzer.utils.dataframe import numeric_formatter, save_as_tex_table
-from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.utils.plot import PlotUtil_, percentile, with_axis
+from crownetutils.analysis.dpmm.metadata import DpmmMetaData
+from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.analysis.hdf_providers.node_position import NodePositionHdf
+from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
+from crownetutils.utils.dataframe import numeric_formatter, save_as_tex_table
+from crownetutils.utils.parallel import run_kwargs_map
+from crownetutils.analysis.omnetpp import OppAnalysis
+from crownetutils.utils.plot import PlotUtil_, percentile, with_axis
 import pandas as pd
 import numpy as np
 import scipy
@@ -30,7 +31,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as pltPatch
 import matplotlib.lines as pltLines
 
-from roveranalyzer.utils.styles import (
+from crownetutils.utils.styles import (
     load_matplotlib_style,
     STYLE_TEX,
 )
@@ -339,12 +340,12 @@ class ThroughputPlotter(PlotUtil_):
         }
         with plt.rc_context(rc):
             fig, ax = self.check_ax(figsize=(8.9, 8.9 / (16 / 9)))
-            scenario = VaderScenarioPlotHelper(
+            scenario = VadereTopographyPlotter(
                 "../study/corridor_trace_5perSpawn_ramp_down.d/corridor_2x5m_d20_5perSpawn_ramp_down.out/BASIS_corridor_2x5m_d20_5perSpawn_ramp_down.out.scenario"
             )
             # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
             # same top for all. Just use first simulation
-            m: DcdMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
+            m: DpmmMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
             _free, _covered = scenario.get_legal_cells(m.create_full_index_slice())
             self.cell_to_tex(
                 _corridor_filter_target_cells(_free),
@@ -798,12 +799,12 @@ class MemberEstPlotter(PlotUtil_):
         return pd.concat(df, axis=0, verify_integrity=False).sort_index()
 
     def msce_plot(self):
-        scenario = VaderScenarioPlotHelper(
+        scenario = VadereTopographyPlotter(
             "../study/corridor_trace_5perSpawn_ramp_down.d/corridor_2x5m_d20_5perSpawn_ramp_down.out/BASIS_corridor_2x5m_d20_5perSpawn_ramp_down.out.scenario"
         )
         # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
         # same top for all. Just use first simulation
-        m: DcdMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
+        m: DpmmMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
         _free, _covered = scenario.get_legal_cells(m.create_full_index_slice())
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         box_data = []

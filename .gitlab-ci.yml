@@ -18,7 +18,7 @@ variables:
  
  # Paths and aliases
  OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec'
- ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
+ ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
 
@@ -124,7 +124,7 @@ fingerprints:
   tags:
     - crownet-sim
   variables:
-    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
@@ -146,7 +146,7 @@ fingerprints_crownet:
   tags:
     - crownet-sim
   variables:
-    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"

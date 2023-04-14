@@ -1,7 +1,7 @@
 import os
 
 from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
-import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
+import crownetutils.vadere.bonnmotion_traces as BmTrace
 
 
 def main():

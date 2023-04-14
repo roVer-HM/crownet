@@ -2,16 +2,18 @@
 import sys, os
 
 from os.path import join
-from roveranalyzer.analysis.common import Simulation
-from roveranalyzer.simulators.crownet.runner import (
-    BaseRunner,
+from crownetutils.analysis.common import Simulation
+from crownetutils.dockerrunner.simulationrunner import (
+    BaseSimulationRunner,
     process_as,
 )
-from roveranalyzer.analysis import VadereAnalysis, OppAnalysis, HdfExtractor
-from roveranalyzer.analysis.plot import PlotDpmMap, PlotEnb
+from crownetutils.analysis.omnetpp import HdfExtractor, OppAnalysis
+from crownetutils.analysis.plot import PlotDpmMap, PlotEnb
+
+from analysis.crownetutils.crownetutils.analysis.vadere import VadereAnalysis
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 

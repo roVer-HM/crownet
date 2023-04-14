@@ -247,7 +247,7 @@ virtual environments:
 omnetpp exec make analysis-all
 ```
 This will create two virtual environments `out/crownet_user` and `out/crownet_dev`.
-In the first, the three packages `roveranalyzer`, `flowcontrol` and `suqc` are
+In the first, the three packages `crownetutils`, `flowcontrol` and `suqc` are
 installed based on the current branch of the respective sub modules.
 The second environment (`out/crownet_dev`) only installs the respective
 requirements of the three packages. Use the `out/crownet_dev` environment

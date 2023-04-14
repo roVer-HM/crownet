@@ -5,24 +5,16 @@
 # When doing a simulation study (see "study" folder), this script is executed for
 # each simulation run.
 
-import shutil
 import sys, os
 
-from os.path import join
-from datetime import datetime
-from roveranalyzer.analysis.common import Simulation
-from roveranalyzer.simulators.crownet.runner import (
-    BaseRunner,
+from crownetutils.dockerrunner.simulationrunner import (
+    BaseSimulationRunner,
     process_as,
-    result_dir_with_opp,
 )
-import roveranalyzer.simulators.crownet.dcd as DensityMap
-import roveranalyzer.simulators.opp as OMNeT
-from roveranalyzer.analysis import OppAnalysis, HdfExtractor
-from roveranalyzer.utils.general import Project
+from crownetutils.omnetpp.scave import CrownetSql
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
@@ -47,7 +39,7 @@ class SimulationRun(BaseRunner):
         filename = "rcvdPkLifetime.txt"
         data_root = self.result_base_dir()
 
-        sql = OMNeT.CrownetSql(
+        sql = CrownetSql(
             vec_path=f"{data_root}/vars_rep_0.vec",
             sca_path=f"{data_root}/vars_rep_0.sca",
             network="World",

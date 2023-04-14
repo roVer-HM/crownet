@@ -6,14 +6,12 @@ sys.path.append(os.path.abspath(".."))
 
 from datetime import datetime
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
-
-
 
 
 if __name__ == "__main__":
@@ -21,17 +19,17 @@ if __name__ == "__main__":
     settings = [
         "--experiment-label",
         datetime.now().isoformat().replace(":", "").replace("-", ""),
-        #"--delete-existing-containers",
-        #"--create-vadere-container",
-        #"--with-control",
-        #"control.py",
-        #"--config",
-        #"final_control"
-        #"--control-vadere-only",
-        #"--use-timestep-label",
+        # "--delete-existing-containers",
+        # "--create-vadere-container",
+        # "--with-control",
+        # "control.py",
+        # "--config",
+        # "final_control"
+        # "--control-vadere-only",
+        # "--use-timestep-label",
         "--vadere-only",
         "--scenario-file",
-        os.path.join(os.getcwd(), "vadere/scenarios/test001.scenario")
+        os.path.join(os.getcwd(), "vadere/scenarios/test001.scenario"),
     ]
 
     if len(sys.argv) == 1:

@@ -9,6 +9,7 @@ from itertools import chain
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits import axes_grid1
+from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
 from shapely.geometry import Polygon
 from matplotlib import patches
 import re
@@ -23,8 +24,8 @@ from matplotlib.colors import (
 import seaborn as sn
 from collections.abc import Sized, Sequence
 from typing import Callable, Dict, List, Mapping, Tuple, Any
-from roveranalyzer.analysis.plot import PlotDpmMap
-from roveranalyzer.analysis.common import (
+from crownetutils.analysis.plot import PlotDpmMap
+from crownetutils.analysis.common import (
     Simulation,
     RunMap,
     SimulationGroup,
@@ -32,22 +33,20 @@ from roveranalyzer.analysis.common import (
     SuqcStudy,
     RunMap,
 )
-from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.simulators.crownet.common.dcd_metadata import DcdMetaData
-from roveranalyzer.simulators.vadere.plots.scenario import (
+from crownetutils.analysis.omnetpp import OppAnalysis
+from crownetutils.analysis.dpmm.metadata import DpmmMetaData
+from crownetutils.vadere.scenario import (
     Scenario,
-    VaderScenarioPlotHelper,
 )
-from roveranalyzer.utils import dataframe
-from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import (
+from crownetutils.utils.parallel import run_kwargs_map
+from crownetutils.utils.plot import (
     PlotUtil,
     StyleMap,
     empty_fig,
     matplotlib_set_latex_param,
 )
-import roveranalyzer.utils.plot as _Plot
-import roveranalyzer.utils.dataframe as FrameUtl
+import crownetutils.utils.plot as _Plot
+import crownetutils.utils.dataframe as FrameUtl
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import numpy as np
@@ -556,7 +555,7 @@ def cells_with_biggest_error_diff(
         f"[{err_count_matrix.columns[0]} - {err_count_matrix.columns[1]}]"
     ] = (err_count_matrix.iloc[:, 0] - err_count_matrix.iloc[:, 1])
     # collect grid for color mesh plots
-    meta: DcdMetaData = (
+    meta: DpmmMetaData = (
         run_map[cmp_groups[0]].simulations[seed_idx].get_dcdMap().metadata
     )
     mgrid = meta.mgrid()
@@ -639,7 +638,7 @@ def get_clipped_area():
 
 
 def get_legal_cells(
-    scenario: VaderScenarioPlotHelper, xy_slices: Tuple[slice, slice], c=5.0
+    scenario: VadereTopographyPlotter, xy_slices: Tuple[slice, slice], c=5.0
 ):
 
     _covered = []
@@ -683,7 +682,7 @@ def add_cell_patches(ax: plt.axes, xy, c=5.0, **kwds):
 
 
 def write_cell_tex(run_map: RunMap):
-    scenario = VaderScenarioPlotHelper(
+    scenario = VadereTopographyPlotter(
         "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
     )
     _free, _covered = PlotUtil.get_vadere_legal_cells(scenario, get_clipped_area())
@@ -691,7 +690,7 @@ def write_cell_tex(run_map: RunMap):
 
 
 def create_od_matrix(run_map: RunMap):
-    scenario = VaderScenarioPlotHelper(
+    scenario = VadereTopographyPlotter(
         "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
     )
     od_target_changer = pd.read_csv(
@@ -743,7 +742,7 @@ def create_od_matrix(run_map: RunMap):
 def plot_test(run_map: RunMap):
 
     seeds = run_map["1_999_25"].mobility_seeds()
-    scenario = VaderScenarioPlotHelper(
+    scenario = VadereTopographyPlotter(
         "../study/traces_dynamic.d/mf_dyn_exp_25.out/BASIS_mf_dyn_exp_25.out.scenario"
     )
     # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
@@ -1138,7 +1137,7 @@ def _get_mse_data_per_variation_ts(
 
 def _get_mse_data(run_map: RunMap):
 
-    scenario = VaderScenarioPlotHelper(
+    scenario = VadereTopographyPlotter(
         "../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario"
     )
     _free, _covered = get_legal_cells(scenario, get_clipped_area())
