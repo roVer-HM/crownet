@@ -1,4 +1,4 @@
-#include "crownet/common/util/CrownetMobilityVisualizer.h"
+#include "crownet/unity/visualizer/CrownetMobilityVisualizer.h"
 
 namespace crownet {
 
@@ -35,8 +35,7 @@ void CrownetMobilityVisualizer::unsubscribe() {
   // Add your custom unsubscription code if needed
 }
 
-CrownetMobilityVisualizer::MobilityVisualizerBase::MobilityVisualization *
-CrownetMobilityVisualizer::createMobilityVisualization(
+CrownetMobilityVisualizer::MobilityVisualization *CrownetMobilityVisualizer::createMobilityVisualization(
     inet::IMobility *mobility) {
   auto visualization = new MobilityVisualization(mobility);
   return visualization;
