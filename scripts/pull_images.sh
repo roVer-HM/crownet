@@ -39,8 +39,8 @@ docker image pull "${CROWNET_IMAGE_BASE}/omnetpp-ide"
 docker image pull "${CROWNET_IMAGE_BASE}/sumo"
 docker image pull "${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}"
 
-docker image pull "${CROWNET_IMAGE_BASE}/vadere"
-docker image pull "${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}"
+docker image pull "${CROWNET_IMAGE_BASE}/vadere" 
+docker image pull "${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}" 
 docker image pull "${CROWNET_IMAGE_BASE}/vadere-ide"
 
 docker image pull "${CROWNET_IMAGE_BASE}/flowcontrol"

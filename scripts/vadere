@@ -22,8 +22,7 @@ if [ -z "$CROWNET_IMAGE_BASE" ]; then
       exit -1
 fi
 
-IMAGENAME=$CROWNET_IMAGE_BASE/$SHORTNAME$TAG_DIGEST
-
+#IMAGENAME=$CROWNET_IMAGE_BASE/$SHORTNAME$TAG_DIGEST
 echo "container> used image: $IMAGENAME"
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
@@ -41,5 +40,5 @@ if [[ "$2" == "exec" ]]; then
       run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
       exit $?
 fi
-
-run_individual_container $SHORTNAME $CONTNAME $IMAGENAME /init.sh $@
+IMAGENAME=00c1e9f01ccd
+run_individual_container  $SHORTNAME $CONTNAME $IMAGENAME  /init.sh $@

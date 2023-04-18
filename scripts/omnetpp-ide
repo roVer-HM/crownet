@@ -37,6 +37,7 @@ IMAGENAME=$CROWNET_IMAGE_BASE/$CONTNAME
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 
+IMAGENAME=ce532d3c8b6e
 # Start an individual container for each run
 # echo $SHORTNAME $CONTNAME $IMAGENAME $COMMAND
 run_individual_container $SHORTNAME $CONTNAME $IMAGENAME $COMMAND

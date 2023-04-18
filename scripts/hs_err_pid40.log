@@ -1,0 +1,34 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x0000ffff7fa88448, pid=40, tid=246
+#
+# JRE version: OpenJDK Runtime Environment Temurin-17.0.4+8 (17.0.4+8) (build 17.0.4+8)
+# Java VM: OpenJDK 64-Bit Server VM Temurin-17.0.4+8 (17.0.4+8, mixed mode, tiered, compressed oops, compressed class ptrs, g1 gc, linux-aarch64)
+# Problematic frame:
+# C  [libc.so.6+0x36448]
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/usr/share/apport/apport -p%p -s%s -c%c -d%d -P%P -u%u -g%g -- %E" (or dumping to /home/skiunke/Desktop/Thesis/crownet/scripts/core.40)
+#
+# If you would like to submit a bug report, please visit:
+#   https://github.com/adoptium/adoptium-support/issues
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: --add-modules=ALL-SYSTEM -Xmx1024m -Dosgi.instance.area.default=/opt/omnetpp/omnetpp/bin/../ide/../samples /opt/omnetpp/ide//plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar -os linux -ws gtk -arch aarch64 -showsplash -launcher /opt/omnetpp/ide/opp_ide -name OMNeT++ IDE --launcher.library /opt/omnetpp/ide//plugins/org.eclipse.equinox.launcher.gtk.linux.aarch64_1.2.400.v20211117-0650/eclipse_11600.so -startup /opt/omnetpp/ide//plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar --launcher.appendVmargs -exitdata 0 -vm /opt/omnetpp/ide//plugins/org.eclipse.justj.openjdk.hotspot.jre.full.stripped.linux.aarch64_17.0.4.v20220805-1047/jre/bin/java -vmargs --add-modules=ALL-SYSTEM -Xmx1024m -Dosgi.instance.area.default=/opt/omnetpp/omnetpp/bin/../ide/../samples -jar /opt/omnetpp/ide//plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
+
+Host: AArch64, 4 cores, 3G, Ubuntu 20.04.5 LTS
+Time: Sat Apr  1 23:07:35 2023 UTC elapsed time: 133459.738169 seconds (1d 13h 4m 19s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000ffff7a11c930):  JavaThread "AWT-XAWT" daemon [_thread_in_native, id=246, stack(0x0000fffedc6ed000,0x0000fffedc8ed000)]
+
+Stack: [0x0000fffedc6ed000,0x0000fffedc8ed000],  sp=0x0000fffedc8eb1c0,  free space=2040k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libc.so.6+0x36448]
+C  [libc.so.6+0x3660c]
+C

@@ -20,6 +20,7 @@ import artery.storyboard.IStoryboard;
 import traci.Manager;
 import traci.TraCiManager;
 import artery.utility.IdentityRegistry;
+
 import crownet.common.ICoordConverter;
 import inet.networklayer.ipv4.RoutingTableRecorder;
 import inet.node.ethernet.Eth10G;
@@ -32,6 +33,8 @@ import simu5g.nodes.NR.gNodeB;
 import simu5g.nodes.NR.NRUe;
 import simu5g.nodes.mec.MECHost;
 import inet.environment.common.PhysicalEnvironment;
+
+import crownet.common.util.CrownetMobilityVisualizer;
 
 import simu5g.nodes.mec.MECOrchestrator.MecOrchestrator;
 import simu5g.nodes.mec.UALCMP.UALCMP;
@@ -91,6 +94,9 @@ network MecWorld
         mecOrchestrator: MecOrchestrator {
             @display("p=230.09,98.61");
         }
+
+        mobilityVisualizer: CrownetMobilityVisualizer;
+        	
     connections:
         upf.pppg++ <--> Eth10G <--> iUpf.pppg++;
         iUpf.pppg++ <--> Eth10G <--> gNodeB1.ppp;
