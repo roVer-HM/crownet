@@ -1,0 +1,27 @@
+#!/bin/bash
+
+check_container_local_available() {
+        REQUIRED_CONTAINER=$1
+        LOCAL_CONTAINERS=$(docker image list --format "{{.Repository}}:{{.Tag}}")
+	if [[ "${LOCAL_CONTAINERS[*]}" =~ "${REQUIRED_CONTAINER}" ]]; then
+	    echo "  Available:   ${REQUIRED_CONTAINER}"
+	else
+	    echo "(!) Missing:   ${REQUIRED_CONTAINER}"
+	fi
+}
+
+echo ""
+echo "------------------------- IMAGE AVAILABILITY ------------------------------"
+echo "Available?     Container name   "                                             
+echo "---------------------------------------------------------------------------"
+echo "${CROWNET_OPP_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/omnetpp-ide:${CROWNET_OPP_IDE_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/vadere-ide:${CROWNET_VADERE_IDE_CONT_TAG}"
+check_container_local_available "${CROWNET_IMAGE_BASE}/control-ide:${CROWNET_CONTROL_IDE_CONT_TAG}"
+
+echo "---------------------------------------------------------------------------"
+echo ""

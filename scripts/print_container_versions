@@ -1,0 +1,25 @@
+#!/bin/bash
+
+echo ""
+echo "--------------------------CONTAINER VERSIONS-------------------------------"
+echo "container type  simulator        tag"
+echo "---------------------------------------------------------------------------"
+echo "Bash            omnetpp          ${CROWNET_OPP_CONT_TAG}"
+echo "Bash            sumo             ${CROWNET_SUMO_CONT_TAG}" 
+echo "Bash            vadere           ${CROWNET_VADERE_CONT_TAG}" 
+echo "Bash            flowcontrol      ${CROWNET_CONTROL_CONT_TAG}" 
+echo "IDE             omnetpp          ${CROWNET_OPP_IDE_CONT_TAG}"
+echo "IDE             vadere           ${CROWNET_VADERE_IDE_CONT_TAG}"
+echo "IDE             flowcontrol      ${CROWNET_CONTROL_IDE_CONT_TAG}" 
+echo "---------------------------------------------------------------------------"
+echo ""
+
+
+
+
+
+
+
+
+
+
