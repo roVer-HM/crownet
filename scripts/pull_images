@@ -1,0 +1,28 @@
+#!/bin/bash
+
+print_usage() {
+   echo "$(basename "$0") [-h] 
+   Pull all available images from the container registry specified in config/CONTAINER_REGISTRY.config."
+}
+
+
+if [ -z "$CROWNET_HOME" ]; then
+      echo "Variabel 'CROWNET_HOME' not set. Navigate to the project root and run >source setup<"
+      echo "  ''' source setup ''' "
+      echo "  "
+      exit -1
+fi
+
+source ${CROWNET_HOME}/config/CONTAINER_REGISTRY.config
+sh ${CROWNET_HOME}/scripts/print_container_registry
+
+echo "Try to pull images from ${CROWNET_IMAGE_BASE}."
+
+
+if ! [ "$CROWNET_IMAGE_BASE" = "ghcr.io/rover-hm" ]; then
+    echo "Access to the specified container registry ${CROWNET_IMAGE_BASE} might not be public. Login required."
+    docker login ${CROWNET_IMAGE_BASE}
+fi
+
+# pull all [-a] images
+bash $CROWNET_HOME/scripts/pull_and_push_images -s $CROWNET_IMAGE_BASE -t $CROWNET_IMAGE_BASE -a

@@ -1,0 +1,237 @@
+
+
+print_usage() {
+   echo "$(basename "$0") [-h] [-i NON_INTERACTIVE] [-u USE_CURRENT_COMMIT]
+   Source this script to configure crownet
+   where 
+    -i  skip user input (non interactive) OPTIONAL
+    -u  use image version based on the current commit."
+}
+
+
+##################################### MAIN SCRIPT ######################################
+
+# handle flags
+
+skip_user_input='false'
+use_tags_associated_to_commit='false'
+
+unset opt OPTARG OPTIND	
+while getopts 'iuhv' flag
+do
+    case "${flag}" in
+        i) skip_user_input='true';;
+        u) use_tags_associated_to_commit='true';;
+	h) print_usage; return 1;;
+        *) print_usage; return 1;;
+    esac
+done
+
+################################## Part 1 (mandatory) ##################################
+### Scope: add enviromental variables to local system + check crownet configuration ####
+########################################################################################
+
+# source all necessary env variables (crownetenv)
+SCRIPT_PATH=$(readlink -f ${BASH_SOURCE:-$0})
+DIR_PATH=$(dirname $SCRIPT_PATH)
+
+export CROWNET_HOME=$DIR_PATH
+if [[ ! $PATH =~ $CROWNET_HOME ]]; then
+   echo "Add CROWNET_HOME to your system PATH."
+   export PATH="${PATH}:${CROWNET_HOME}/scripts"
+fi
+
+source ${CROWNET_HOME}/config/USER_ENV.config
+
+# source image versions and registry
+if [ "$use_tags_associated_to_commit" = true ]; then
+   cd $CROWNET_HOME
+   COMMIT=$(git rev-parse HEAD | head -c 8) # commit hash (use first 8 characters)
+   echo "(!) INFO: work with the current commit. Overwrite image versions in ${CROWNET_HOME}/config/CONTAINER_VERSION.config with the current commit (= $COMMIT)."
+   echo "(!) INFO: Exclude >omnetpp< -> Keep the omnetpp version, since omnetpp is not part of the crownet repository."
+   echo "(!) INFO: Exclude >sumo< -> Keep the sumo version, since sumo is not part of the crownet repository."
+   bash ${CROWNET_HOME}/scripts/write_config.sh $COMMIT $COMMIT $COMMIT $COMMIT $COMMIT $COMMIT $COMMIT
+fi
+
+source ${CROWNET_HOME}/config/CONTAINER_REGISTRY.config
+source ${CROWNET_HOME}/config/CONTAINER_VERSION.config
+
+# exit here if NON_INTERACTIVE_MODE is used
+if [ "$skip_user_input" = true ]; then
+  # print configuration
+  sh ${CROWNET_HOME}/scripts/print_environment
+  sh ${CROWNET_HOME}/scripts/print_container_registry
+  sh ${CROWNET_HOME}/scripts/print_container_versions
+  return 0
+fi
+
+
+################################# Part 2 (optional) ####################################
+################## Scope: overwrite crownet configuration ##############################
+################## Note: user interaction required #####################################
+########################################################################################
+
+
+echo " ##################### Container version configuration #####################"
+
+CONFIG_FILE="${CROWNET_HOME}/config/CONTAINER_VERSION.config"
+
+echo "Crownet couples several models from different simulators. Each simulator is run in an individual docker container that each has a certain version number (tag):"
+
+sh ${CROWNET_HOME}/scripts/print_container_versions
+
+echo "Overwrite container versions? (y/n)"
+read answer
+
+IS_CHANGED=0
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+	 
+	# ask user
+
+	read -p "CROWNET_OPP_CONT_TAG          New version (use enter to keep current = ${CROWNET_OPP_CONT_TAG}): " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_OPP_CONT_TAG=$NEWVERSION
+	   IS_CHANGED=$((IS_CHANGED+1)) 
+	fi
+
+	read -p "CROWNET_VADERE_CONT_TAG       New version (use enter to keep current = ${CROWNET_VADERE_CONT_TAG}): " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_VADERE_CONT_TAG=$NEWVERSION  
+	   IS_CHANGED=$((IS_CHANGED+1))   
+	fi
+
+	read -p "CROWNET_CONTROL_CONT_TAG      New version (use enter to keep current = ${CROWNET_CONTROL_CONT_TAG}: " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_CONTROL_CONT_TAG=$NEWVERSION 
+	   IS_CHANGED=$((IS_CHANGED+1))    
+	fi
+
+	read -p "CROWNET_SUMO_CONT_TAG         New version (use enter to keep current = ${CROWNET_SUMO_CONT_TAG}): " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_SUMO_CONT_TAG=$NEWVERSION 
+	   IS_CHANGED=$((IS_CHANGED+1))    
+	fi
+	
+	# IDE
+
+	read -p "CROWNET_OPP_IDE_CONT_TAG      New version (use enter to keep current = ${CROWNET_OPP_IDE_CONT_TAG}): " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_OPP_IDE_CONT_TAG=$NEWVERSION  
+	   IS_CHANGED=$((IS_CHANGED+1))   
+	fi
+
+	read -p "CROWNET_VADERE_IDE_CONT_TAG   New version (use enter to keep current = ${CROWNET_VADERE_IDE_CONT_TAG}): " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_VADERE_IDE_CONT_TAG=$NEWVERSION
+	   IS_CHANGED=$((IS_CHANGED+1))     
+	fi
+
+	read -p "CROWNET_CONTROL_IDE_CONT_TAG  New version (use enter to keep current = ${CROWNET_CONTROL_IDE_CONT_TAG}): " NEWVERSION
+	if [ "$NEWVERSION" != "" ]; then
+	   CROWNET_CONTROL_IDE_CONT_TAG=$NEWVERSION 
+	   IS_CHANGED=$((IS_CHANGED+1))    
+	fi
+
+fi 
+
+# Overwrite config file
+	
+if [ ${IS_CHANGED} -gt 0 ]; then
+        
+   	echo "-------------------------------------------------------------------"
+        echo ""      
+	printf 'Number of versions changed: %d out of 7.\n' $IS_CHANGED
+	
+	bash ./scripts/write_config.sh $CROWNET_OPP_CONT_TAG $CROWNET_VADERE_CONT_TAG $CROWNET_CONTROL_CONT_TAG $CROWNET_SUMO_CONT_TAG $CROWNET_OPP_IDE_CONT_TAG $CROWNET_VADERE_IDE_CONT_TAG $CROWNET_CONTROL_IDE_CONT_TAG
+else   
+      	echo "Keep settings specified in ${CONFIG_FILE}."
+
+fi
+
+# ----------------- Associate container registry to your repository  -----------------#
+
+
+echo ""
+echo ""
+echo "##################### Container registry configuration ##########################"
+
+echo "Would you like to associate a container registry for uploading docker images to be shared with others? (y/n)"
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+
+   	echo "Some container registries have been associated to crownet repositories. Which repository are you working on (access must be granted!) ?"
+   	echo "(1) public github repository (registry associated, restricted access): https://github.com/roVer-HM/crownet" 
+   	echo "(2) private gitlab repository (registry associated, restricted access): https://sam-dev.cs.hm.edu/rover/crownet"
+	echo "(3) other repository (registry needs to be associated by the user)"
+	read -p 'Option: ' OPTION
+	echo $OPTION
+
+	case "$OPTION" in
+	   "1") 
+		CROWNET_IMAGE_REG="ghcr.io" 
+		CROWNET_IMAGE_BASE="ghcr.io/rover-hm" 
+	   ;;
+	   "2") 
+		CROWNET_IMAGE_REG="sam-dev.cs.hm.edu:5023" 
+		CROWNET_IMAGE_BASE="sam-dev.cs.hm.edu:5023/rover/crownet" 
+	   ;;
+	   "3") 
+                echo ""
+		echo "Please provide the URL to the container registry to which your repo references. For example for github, use 'ghcr.io/namespace/repo'" 
+		read -p 'registry URL:' CROWNET_IMAGE_BASE
+		echo "Please provide the URL to the registry provider. For example for github, use 'ghcr.io'" 
+		read -p 'host URL:' CROWNET_IMAGE_REG
+                echo ""
+	   ;;
+	esac
+
+
+	echo "Login to the container registry (=${CROWNET_IMAGE_BASE})."
+	
+	docker login $CROWNET_IMAGE_REG
+	
+	if ! [ $? -eq 0 ]; then
+	      echo "Docker login failed. Make sure you have access granted to the container registry >${CROWNET_IMAGE_BASE}< and re-run the setup script."
+	fi
+
+	CONFIG_FILE="${CROWNET_HOME}/config/CONTAINER_REGISTRY.config"
+
+	echo ""
+	echo "Write configuration to ${CONFIG_FILE}."
+	echo "--------------------------------CONFIGURATION START -----------------------------------"
+	echo $(printf '#!/bin/bash') > "${CONFIG_FILE}" 
+	echo "" >> "${CONFIG_FILE}"
+	echo $(printf 'export CROWNET_IMAGE_REG="%s"' $CROWNET_IMAGE_REG) >> "${CONFIG_FILE}" 
+	echo $(printf 'export CROWNET_IMAGE_BASE="%s"' $CROWNET_IMAGE_BASE) >> "${CONFIG_FILE}" 
+	cat "${CONFIG_FILE}"
+	echo "---------------------------------CONFIGURATION END ------------------------------------"
+	echo "Finished writing. See ${CONFIG_FILE} for the new configuration."
+	echo ""
+
+fi
+
+##################################################################################
+
+source ${CROWNET_HOME}/config/CONTAINER_VERSION.config
+source ${CROWNET_HOME}/config/CONTAINER_REGISTRY.config
+source ${CROWNET_HOME}/config/USER_ENV.config
+
+echo "Show settings overview? (y/n)"
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+	echo " "
+	sh ${CROWNET_HOME}/scripts/print_environment
+	sh ${CROWNET_HOME}/scripts/print_container_registry
+	sh ${CROWNET_HOME}/scripts/print_container_versions
+fi
+
+unset -v skip_user_input
+return 0
+
+
+
+
+
+
+
+

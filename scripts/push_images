@@ -1,0 +1,8 @@
+#!/bin/bash
+
+docker push sam-dev.cs.hm.edu:5023/rover/crownet/flowcontrol-ide:c128d302
+docker push sam-dev.cs.hm.edu:5023/rover/crownet/vadere-ide:c128d302
+docker push sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:c128d302
+docker push sam-dev.cs.hm.edu:5023/rover/crownet/sumo:c128d302
+docker push sam-dev.cs.hm.edu:5023/rover/crownet/vadere:c128d302
+docker push sam-dev.cs.hm.edu:5023/rover/crownet/flowcontrol:c128d302
