@@ -34,7 +34,7 @@ import simu5g.nodes.NR.NRUe;
 import simu5g.nodes.mec.MECHost;
 import inet.environment.common.PhysicalEnvironment;
 
-import crownet.common.util.CrownetMobilityVisualizer;
+import crownet.unity.visualizer.CrownetMobilityVisualizer;
 
 import simu5g.nodes.mec.MECOrchestrator.MecOrchestrator;
 import simu5g.nodes.mec.UALCMP.UALCMP;
@@ -45,7 +45,7 @@ network MecWorld
 
     submodules:
         coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
-            @display("p=1301.7375,145.725;i=block/table2;is=s");
+            @display("p=950.58203,144.34;i=block/table2;is=s");
         }
         visualization: <default(firstAvailableOrEmpty("IntegratedCanvasVisualizer"))> like IIntegratedVisualizer if typename != "" {
             @display("p=1301.7375,23.925;is=s");
@@ -55,10 +55,10 @@ network MecWorld
         }
         traci: <default("Manager")> like TraCiManager if typename != "" {
             parameters:
-                @display("p=1301.7375,272.9625");
+                @display("p=756.754,247.44");
         }
         identiyRegistry: IdentityRegistry {
-            @display("p=1301.7375,345.825;i=block/table2;is=s");
+            @display("p=1284.626,501.066;i=block/table2;is=s");
         }
         physicalEnvironment: PhysicalEnvironment {
             @display("p=1159.275,217.5;is=s");
@@ -68,19 +68,19 @@ network MecWorld
             @display("p=1159.275,23.925;is=s");
         }
         configurator: Ipv4NetworkConfigurator {
-            @display("p=1159.275,145.725");
+            @display("p=1070.178,437.144");
         }
         channelControl: LteChannelControl {
             @display("p=1300.65,203.3625;is=s");
         }
         binder: Binder {
-            @display("p=1159.275,84.825;is=s");
+            @display("p=839.234,84.542;is=s");
         }
         gNodeB1: gNodeB {
             @display("p=352.60202,480.446;is=l");
         }
         mecHost: MECHost {
-            @display("p=588.2,762.93");
+            @display("p=839.234,795.932");
         }
         ualcmp: UALCMP {
             @display("p=55.359997,98.61");
@@ -95,8 +95,10 @@ network MecWorld
             @display("p=230.09,98.61");
         }
 
-        mobilityVisualizer: CrownetMobilityVisualizer;
-        	
+        crownetMobilityVisualizer: CrownetMobilityVisualizer {
+
+            @display("p=756.754,597.98004");
+        }
     connections:
         upf.pppg++ <--> Eth10G <--> iUpf.pppg++;
         iUpf.pppg++ <--> Eth10G <--> gNodeB1.ppp;
