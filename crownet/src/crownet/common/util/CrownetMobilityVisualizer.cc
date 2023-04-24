@@ -7,7 +7,9 @@ Define_Module(CrownetMobilityVisualizer);
 void CrownetMobilityVisualizer::initialize(int stage) {
   MobilityVisualizerBase::initialize(stage);
   if (stage == inet::INITSTAGE_LOCAL) {
-    EV << "Test";
+      // initialize of other module in last step
+    std::cout << "Test\n";
+    par('foo')
     // Add your custom initialization code if needed
   }
 }
@@ -38,7 +40,8 @@ void CrownetMobilityVisualizer::unsubscribe() {
 CrownetMobilityVisualizer::MobilityVisualizerBase::MobilityVisualization *
 CrownetMobilityVisualizer::createMobilityVisualization(
     inet::IMobility *mobility) {
-  auto visualization = new MobilityVisualization(mobility);
+  auto visualization =
+      new CrownetMobilityVisualizer::MobilityVisualization(mobility);
   return visualization;
 }
 

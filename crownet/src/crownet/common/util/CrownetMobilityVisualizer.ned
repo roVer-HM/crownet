@@ -1,5 +1,13 @@
 package crownet.common.util;
 
-simple CrownetMobilityVisualizer 
+
+import inet.visualizer.base.MobilityVisualizerBase;
+
+
+
+simple CrownetMobilityVisualizer extends MobilityVisualizerBase
 {
+    @class(crownet::CrownetMobilityVisualizer);
+    parameters:
+        string foo = default("xxx");
 }
