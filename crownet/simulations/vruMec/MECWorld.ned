@@ -34,7 +34,7 @@ import simu5g.nodes.NR.NRUe;
 import simu5g.nodes.mec.MECHost;
 import inet.environment.common.PhysicalEnvironment;
 
-import crownet.unity.visualizer.CrownetMobilityVisualizer;
+import crownet.unity.client.UnityClient;
 
 import simu5g.nodes.mec.MECOrchestrator.MecOrchestrator;
 import simu5g.nodes.mec.UALCMP.UALCMP;
@@ -44,6 +44,8 @@ network MecWorld
     @display("bgb=1380.5399,1027.62");
 
     submodules:
+         client: UnityClient;
+        
         coordConverter: <default("OsgCoordConverterVadere")> like ICoordConverter if typename != "" {
             @display("p=950.58203,144.34;i=block/table2;is=s");
         }
@@ -94,11 +96,10 @@ network MecWorld
         mecOrchestrator: MecOrchestrator {
             @display("p=230.09,98.61");
         }
+        
+       
 
-        crownetMobilityVisualizer: CrownetMobilityVisualizer {
 
-            @display("p=756.754,597.98004");
-        }
     connections:
         upf.pppg++ <--> Eth10G <--> iUpf.pppg++;
         iUpf.pppg++ <--> Eth10G <--> gNodeB1.ppp;
