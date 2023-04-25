@@ -80,7 +80,7 @@ echo "Crownet couples several models from different simulators. Each simulator i
 
 sh ${CROWNET_HOME}/scripts/print_container_versions
 
-echo "Overwrite container versions? (y/n)"
+echo -n "Overwrite container versions? (y/N): "
 read answer
 
 IS_CHANGED=0
@@ -100,7 +100,7 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
 	   IS_CHANGED=$((IS_CHANGED+1))   
 	fi
 
-	read -p "CROWNET_CONTROL_CONT_TAG      New version (use enter to keep current = ${CROWNET_CONTROL_CONT_TAG}: " NEWVERSION
+	read -p "CROWNET_CONTROL_CONT_TAG      New version (use enter to keep current = ${CROWNET_CONTROL_CONT_TAG}): " NEWVERSION
 	if [ "$NEWVERSION" != "" ]; then
 	   CROWNET_CONTROL_CONT_TAG=$NEWVERSION 
 	   IS_CHANGED=$((IS_CHANGED+1))    
@@ -155,7 +155,8 @@ echo ""
 echo ""
 echo "##################### Container registry configuration ##########################"
 
-echo "Would you like to associate a container registry for uploading docker images to be shared with others? (y/n)"
+echo "Would you like to associate a new container registry for uploading docker images to be shared with others?"
+echo -n "(default: ${CROWNET_IMAGE_BASE}) (y/N): "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
 
@@ -216,13 +217,11 @@ source ${CROWNET_HOME}/config/CONTAINER_VERSION.config
 source ${CROWNET_HOME}/config/CONTAINER_REGISTRY.config
 source ${CROWNET_HOME}/config/USER_ENV.config
 
-echo "Show settings overview? (y/n)"
+echo -n "Show settings overview? (y/N):"
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
 	echo " "
-	sh ${CROWNET_HOME}/scripts/print_environment
-	sh ${CROWNET_HOME}/scripts/print_container_registry
-	sh ${CROWNET_HOME}/scripts/print_container_versions
+	sh "${CROWNET_HOME}/scripts/crownet_info"
 fi
 
 unset -v skip_user_input

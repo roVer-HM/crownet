@@ -65,7 +65,7 @@ missing=$(check_containers_local_available)
 
 
 if ! [ "$missing" = "0" ]; then
-   echo "Pull the specified images from a container registry? (y/n)"
+   echo -n "Pull the specified images from a container registry? (y/N): "
    read answer
    if [ "$answer" != "${answer#[Yy]}" ] ;then
    
@@ -133,7 +133,7 @@ if [ "$based_on_current_commit" = false ]; then
         exit -1
 fi 
 
-echo "Build images based on the current commit (=${COMMIT}) (y/n)?"
+echo "Build images based on the current commit (=${COMMIT}) (y/N): "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
    bash $CROWNET_HOME/scripts/build_all_images

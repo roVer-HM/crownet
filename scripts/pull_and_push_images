@@ -53,7 +53,7 @@ fi
 
 
 if [ "$all" = true ]; then
-       printf "Copying all images from $source_reg to $target_reg requires lots of space on the target registry (=$target_reg). Copy all images (y/n)?"
+       printf "Copying all images from $source_reg to $target_reg requires lots of space on the target registry (=$target_reg). Copy all images (y/N): "
        read answer
        if [ "$answer" != "${answer#[Yy]}" ] ;then
 	    all='true'

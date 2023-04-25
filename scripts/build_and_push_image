@@ -89,7 +89,7 @@ if ! [ "$GIT_STATUS" = "" ]; then
    if [ "$NON_INTERACTIVE" = true ]; then
            echo "INFO: Forced to ignore uncommited changes [-f]."
    else
-	   echo "Ignore changes and proceed with image build process (y/n)?"
+	   echo -n "Ignore changes and proceed with image build process (y/N): "
 	   read answer
 	   if [ "$answer" != "${answer#[Yy]}" ] ;then
 	       echo "WARNING: Ignore uncommited changes."
