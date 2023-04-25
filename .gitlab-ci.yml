@@ -13,6 +13,10 @@ variables:
  CROWNET_CONTROL_CONT_TAG: '220527-1453'      # tag of control container to be used
  CROWNET_SUMO_CONT_TAG: 'v1_15_0'             # tag of sumo container to be used
 
+ CROWNET_OPP_IDE_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
+ CROWNET_VADERE_IDE_CONT_TAG: '221108-1613'       # tag of vadere container to be used
+ CROWNET_CONTROL_IDE_CONT_TAG: '220527-1453'      # tag of control container to be used
+
  CROWNET_IMAGE_REG: '${CI_REGISTRY}'
  CROWNET_IMAGE_BASE: '${CROWNET_IMAGE_REG}/rover/crownet'
  
@@ -28,6 +32,7 @@ stages:
   - test
   - uq-integration-test
   - simulation-campaign
+  - deploy
 
 
 cache:
@@ -211,5 +216,22 @@ simulation-campaign:
       - ${CROWNET_HOME}/veins/src
       - ${CROWNET_HOME}/veins/subprojects/veins_inet/src
     expire_in: 4 weeks
+
+
+build_images:
+  stage: deploy
+  when: manual
+  tags:
+    - crownet-sim
+  script:
+    - eval $(ssh-agent -s)
+    - "ls -a /home/gitlab-runner/.ssh/"
+    - "ssh-add /home/gitlab-runner/.ssh/crownet_CI_docker"
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - "cd ${CROWNET_HOME}"
+    - "docker system prune -a -f"
+    - "source setup -i -u"
+    - "bash -x ${CROWNET_HOME}/scripts/build_all_images -p -q"
+    - "bash -x ${CROWNET_HOME}/scripts/pull_and_push_images -s ${CROWNET_IMAGE_BASE} -t ghcr.io/rover-hm -p -k"
 
 

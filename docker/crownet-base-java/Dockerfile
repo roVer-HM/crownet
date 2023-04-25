@@ -1,52 +1,30 @@
 # Java base container with vadere Crowd Simulator
-#
-# see https://gitlab.lrz.de/vadere/vadere
-#
-# TODO:
-# - include drivers for HW-accelerated OpenCL/nvidia
-# - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
+# scope: provide Java and Maven for building and executing Vadere
+# note: Vadere requires openJDK11 (it is not tested for newer versions). Therefore, we set maven=3.6.3 and openJDK=11.
+
+ARG IMAGE_REG
+ARG CROWNET_COMMIT_HASH
+ARG BASE_IMAGE_TAG
+
+FROM ${IMAGE_REG}/crownet-base-min:${BASE_IMAGE_TAG}
+ENV RELEASE $CROWNET_COMMIT_HASH
+
+LABEL description "system requirements for vadere Crowd Simulator (as used in crownet)"
+LABEL maintainer  "christina_maria.mayr@hm.edu"
+
+RUN apt-get install -y wget 
+WORKDIR /opt/vadere/
+
+# install specific java version
+RUN wget https://download.java.net/java/ga/jdk11/openjdk-11_linux-x64_bin.tar.gz -P /opt/vadere/
+RUN tar xzvf /opt/vadere/openjdk-11_linux-x64_bin.tar.gz
+ENV PATH /opt/vadere/jdk-11/bin:$PATH
+
+# install specific maven version
+RUN wget https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.6.3/apache-maven-3.6.3-bin.tar.gz -P /opt/vadere/
+RUN tar xzvf /opt/vadere/apache-maven-3.6.3-bin.tar.gz
+ENV PATH /opt/vadere/apache-maven-3.6.3/bin:$PATH
 
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-min:latest
 
-# Specify the version/tag of vadere to be put in the container:
-ENV RELEASE master
 
-LABEL description "vadere Crowd Simulator (as used in crownet)"
-LABEL maintainer  "wischhof@ieee.org"
-
-# install all dependencies
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-       maven \
-       clinfo mesa-opencl-icd ocl-icd-opencl-dev \
-       liblwjgl-java liblwjgl-java-doc liblwjgl-java-jni && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# clone the vadere sources (version/tag is specified in the git command at the end)
-WORKDIR /tmp/vadere
-# enable lfs (must be done before cloning!) and clone the project
-RUN git lfs install
-
-# invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
-ARG NOCACHE_CLONE=0
-RUN git clone --depth 1 --branch $RELEASE https://gitlab.lrz.de/vadere/vadere.git $RELEASE
-
-# add a symbolic link so vadere is found in the path
-RUN ln -f -s /tmp/vadere/$RELEASE /tmp/vadere/vadere
-
-# pull again (so a cached layer having the clone gets updated)
-WORKDIR /tmp/vadere/vadere
-
-ARG NOCACHE_PULL=0
-RUN git pull
-
-# Nasty workaround to download dependencies from m2
-# https://stackoverflow.com/q/14694139/12079469
-# I just want all third level dependencies of Vadere in the .m2 repo to
-# speed up subsequent builds of vadere.
-RUN mvn clean package -Dmaven.test.skip
-
-WORKDIR /
-RUN rm -rf /tmp/vadere
