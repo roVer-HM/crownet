@@ -16,6 +16,19 @@ void CrownetMobilityVisualizer::receiveSignal(cComponent *source,
                                               inet::simsignal_t signal,
                                               cObject *object,
                                               cObject *details) {
+  if (signal == inet::IMobility::mobilityStateChangedSignal) {
+    if (moduleFilter.matches(check_and_cast<cModule *>(source))) {
+      auto mobility = dynamic_cast<inet::IMobility *>(source);
+      auto mobilityVisualization = getMobilityVisualization(mobility);
+      if (mobilityVisualization == nullptr) {
+        mobilityVisualization = createMobilityVisualization(mobility);
+        addMobilityVisualization(mobility, mobilityVisualization);
+      }
+      EV << mobility->getCurrentPosition();
+      EV << mobility->getId();
+    }
+  }
+
   MobilityVisualizerBase::receiveSignal(source, signal, object, details);
   // Add your custom signal handling code if needed
 }
