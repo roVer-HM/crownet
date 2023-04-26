@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from SALib.sample import saltelli
+from SALib.sample import sobol
 from scipy.stats import qmc, chisquare  # quasi-Monte Carlo for latin hypercube sampling
 
 from uq.PreProcessing.Parameter import *
@@ -117,8 +118,10 @@ class SampleBaseSaltelli(SampleBaseSobol):
         self.check_multiplicator()
         parameter = self.get_parameters_dict()
         sample_size = self.get_saltelli_sample_size()
-        sample = saltelli.sample(parameter,
-                                 N=sample_size)  # do not use skip_values=seed, because this value can not be chosen freely
+        sample = sobol.sample(parameter, N=sample_size)
+        # deprecated removed after SALib 1.5
+        # sample = saltelli.sample(parameter,
+        #                          N=sample_size)  # do not use skip_values=seed, because this value can not be chosen freely
 
         self._check_sample_size_convergence(sample_size, factor=self.get_matrix_multiplicator())
         self.check_number_of_produced_samples(sample)

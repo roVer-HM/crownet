@@ -16,6 +16,8 @@ class ForwardPropagationAnalysis(Analysis):
         df = pd.DataFrame()
         for time_key, qoi in self.qoi_values.get_values().groupby(by=[QuantityOfInterest.TIME_INDEX_NAME],
                                                                   as_index=False):
+            if isinstance(time_key, tuple):
+                time_key = time_key[0]
             qoi = qoi.droplevel(QuantityOfInterest.TIME_INDEX_NAME)
             qoi_independent = qoi.to_numpy()[self.sample_base.get_index_independent_samples()]
             df_ = self.get_statistical_data_for_time(qoi=qoi_independent, time_key=time_key)
@@ -27,6 +29,8 @@ class ForwardPropagationAnalysis(Analysis):
         df = pd.DataFrame()
         for time_key, qoi in self.qoi_values.get_values().groupby(by=[QuantityOfInterest.TIME_INDEX_NAME],
                                                                   as_index=False):
+            if isinstance(time_key, tuple):
+                time_key = time_key[0]
             qoi = qoi.droplevel(QuantityOfInterest.TIME_INDEX_NAME)
             qoi_independent = qoi.to_numpy()[self.sample_base.get_index_independent_samples()]
             df_ = pd.DataFrame([qoi_independent.ravel()],

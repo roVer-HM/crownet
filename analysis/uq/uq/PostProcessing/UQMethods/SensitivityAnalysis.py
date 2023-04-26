@@ -28,6 +28,8 @@ class SensitivityAnalysis(Analysis):
 
         df = pd.DataFrame()
         for time_key, qoi in self.qoi_values.get_values().groupby(by=[QuantityOfInterest.TIME_INDEX_NAME], as_index=False):
+            if isinstance(time_key, tuple):
+                time_key = time_key[0]
             qoi = qoi.droplevel(QuantityOfInterest.TIME_INDEX_NAME)
             df_ = self.get_sensitivity_indices_for_time(qoi=qoi.to_numpy(), time_key=time_key)
             df = pd.concat([df,df_])
@@ -144,6 +146,8 @@ class SurrogateModelBasedSensitivityAnalysis(SensitivityAnalysis):
 
         df = pd.DataFrame()
         for time_key, qoi in self.qoi_values.get_values().groupby(by=[QuantityOfInterest.TIME_INDEX_NAME], as_index=False):
+            if isinstance(time_key, tuple):
+                time_key = time_key[0]
             qoi = qoi.droplevel(QuantityOfInterest.TIME_INDEX_NAME)
 
             #TODO: one surrogate model/time step  -> does not capture dynamics
