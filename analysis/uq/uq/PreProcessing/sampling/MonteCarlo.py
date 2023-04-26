@@ -11,7 +11,6 @@ seed = 42
 
 
 class PseudoMonteCarloSampleBase(SampleBase):
-
     def __init__(self, parameters=List[Parameter], sample_size=100):
         super().__init__(parameters=parameters)
         self.sample_size = sample_size
@@ -43,7 +42,7 @@ class PseudoMonteCarloSampleBase(SampleBase):
         self.sample_size = sample_size
 
     def args(self, sampling):
-        sampling['sample_size'] = len(self.get_samples())
+        sampling["sample_size"] = len(self.get_samples())
         return sampling
 
     def get_index_independent_samples(self):
@@ -72,7 +71,6 @@ class PseudoMonteCarloSampleBase(SampleBase):
 
 
 class SampleBaseSobol(PseudoMonteCarloSampleBase):
-
     def __init__(self, parameters, sample_size=80, is_ignore_convergence=False):
         self.is_ignore_convergence = is_ignore_convergence
         super().__init__(parameters, sample_size=sample_size)
@@ -93,8 +91,10 @@ class SampleBaseSobol(PseudoMonteCarloSampleBase):
         rest = np.log2(sample_size)
         if rest.is_integer() is False:
             pass
-            raise ValueError(f"Convergence of Sobol indices can not be guaranteed. "
-                             f"Choose a sample size of {int(2 ** np.floor(rest) * factor)} or {int(2 ** np.ceil(rest) * factor)}.")
+            raise ValueError(
+                f"Convergence of Sobol indices can not be guaranteed. "
+                f"Choose a sample size of {int(2 ** np.floor(rest) * factor)} or {int(2 ** np.ceil(rest) * factor)}."
+            )
 
     def generate_samples(self):
         self._check_sample_size_convergence(self.sample_size)
@@ -105,10 +105,19 @@ class SampleBaseSobol(PseudoMonteCarloSampleBase):
 
 
 class SampleBaseSaltelli(SampleBaseSobol):
-
-    def __init__(self, parameters, sample_size=80, is_use_for_sensitivity_analysis=True, is_ignore_convergence=False):
+    def __init__(
+        self,
+        parameters,
+        sample_size=80,
+        is_use_for_sensitivity_analysis=True,
+        is_ignore_convergence=False,
+    ):
         self.is_use_for_sensitivity_analysis = is_use_for_sensitivity_analysis
-        super().__init__(parameters=parameters, sample_size=sample_size, is_ignore_convergence=is_ignore_convergence)
+        super().__init__(
+            parameters=parameters,
+            sample_size=sample_size,
+            is_ignore_convergence=is_ignore_convergence,
+        )
 
     def get_sample_sizes_for_convergence(self):
         sizes = 2 ** np.arange(20) * self.get_matrix_multiplicator()
@@ -123,25 +132,29 @@ class SampleBaseSaltelli(SampleBaseSobol):
         # sample = saltelli.sample(parameter,
         #                          N=sample_size)  # do not use skip_values=seed, because this value can not be chosen freely
 
-        self._check_sample_size_convergence(sample_size, factor=self.get_matrix_multiplicator())
+        self._check_sample_size_convergence(
+            sample_size, factor=self.get_matrix_multiplicator()
+        )
         self.check_number_of_produced_samples(sample)
         self.samples = sample
 
     def get_parameters_dict(self):
         parameter = {
             "num_vars": len(self.parameters),
-            'bounds': [[0, 1]] * len(self.parameters)
+            "bounds": [[0, 1]] * len(self.parameters),
         }
         return parameter
 
     def check_number_of_produced_samples(self, sample):
         if sample.shape[0] > self.sample_size:
-            print(f"WARNING Algorithm produced {sample.shape[0]}. "
-                  f"{sample.shape[0] - self.sample_size} samples more than required.")
+            print(
+                f"WARNING Algorithm produced {sample.shape[0]}. "
+                f"{sample.shape[0] - self.sample_size} samples more than required."
+            )
 
     def get_matrix_multiplicator(self):
         # Saltelli's Algorithm
-        matrix_multiplicator = (2 * len(self.parameters) + 2)
+        matrix_multiplicator = 2 * len(self.parameters) + 2
         return matrix_multiplicator
 
     def get_saltelli_sample_size(self):
@@ -154,13 +167,17 @@ class SampleBaseSaltelli(SampleBaseSobol):
 
         if self.sample_size % matrix_multiplicator != 0:
             if self.is_use_for_sensitivity_analysis:
-                raise ValueError(f"{self.sample_size} cross-samples required. "
-                                 f"The corresponding sample size for sensitivity analysis is {self.sample_size / matrix_multiplicator}. "
-                                 f"Make sure that the number of cross-samples is a multiple of {matrix_multiplicator}.")
+                raise ValueError(
+                    f"{self.sample_size} cross-samples required. "
+                    f"The corresponding sample size for sensitivity analysis is {self.sample_size / matrix_multiplicator}. "
+                    f"Make sure that the number of cross-samples is a multiple of {matrix_multiplicator}."
+                )
             else:
-                print(f"WARNING The number of cross-samples is not a multiple of {matrix_multiplicator}. "
-                      f"You can use this sampling for forward propagation only. "
-                      f"However, for that purpose LHS, Sobol samplings should be used (accelerated convergence).")
+                print(
+                    f"WARNING The number of cross-samples is not a multiple of {matrix_multiplicator}. "
+                    f"You can use this sampling for forward propagation only. "
+                    f"However, for that purpose LHS, Sobol samplings should be used (accelerated convergence)."
+                )
 
     def get_independent_samples(self):
         return self.get_samples()[self.get_independent_samples(), :]
@@ -168,11 +185,12 @@ class SampleBaseSaltelli(SampleBaseSobol):
     def get_index_independent_samples(self):
         # there are two independent sampling matrices A and B
         # extract corresponding samples
-        return np.arange(2 * self.sample_size / self.get_matrix_multiplicator(), dtype=int)
+        return np.arange(
+            2 * self.sample_size / self.get_matrix_multiplicator(), dtype=int
+        )
 
 
 class SampleBaseLatinHypercube(PseudoMonteCarloSampleBase):
-
     def __init__(self, parameters=List[Parameter], sample_size=100):
         super().__init__(parameters, sample_size=sample_size)
 
@@ -183,7 +201,6 @@ class SampleBaseLatinHypercube(PseudoMonteCarloSampleBase):
 
 
 class SampleBaseHalton(PseudoMonteCarloSampleBase):
-
     def __init__(self, parameters=List[Parameter], sample_size=100):
         super().__init__(parameters, sample_size=sample_size)
 
