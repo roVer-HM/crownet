@@ -13,7 +13,7 @@ mod_simu5g        := simu5g
 mod_veins         := veins
 mod_veins_inet    := veins/subprojects/veins_inet
 mod_artery        := artery
-mod_roveranalyzer := analysis/roveranalyzer
+mod_crownetutils  := analysis/crownetutils
 mod_flowcontrol   := flowcontrol
 mod_suqc          := analysis/suq-controller
 
@@ -42,10 +42,10 @@ ifeq (, $(shell which opp_configfilepath))
 endif
 
 # python build variables
-roveranalyzer_sdist := $(shell cd $(mod_roveranalyzer); $(PYTHON) setup.py --fullname).tar.gz
+crownetutils_sdist := $(shell cd $(mod_crownetutils); $(PYTHON) setup.py --fullname).tar.gz
 flowcontrol_sdist := $(shell cd $(mod_flowcontrol); $(PYTHON) setup.py --fullname).tar.gz
 suqc_sdist := $(shell cd $(mod_suqc); $(PYTHON) setup.py --fullname).tar.gz
-python_dists := $(addprefix out/, $(roveranalyzer_sdist) $(flowcontrol_sdist) $(suqc_sdist))
+python_dists := $(addprefix out/, $(crownetutils_sdist) $(flowcontrol_sdist) $(suqc_sdist))
 venv_user := crownet_user
 venv_dev  := crownet_dev
 python_venvs := $(addprefix out/, $(venv_user) $(venv_dev))
@@ -126,10 +126,10 @@ python-hint:
 
 #-create source distributions of all python packages---------------------------
 
-out/$(roveranalyzer_sdist): | out
-	cd $(mod_roveranalyzer) && \
+out/$(crownetutils_sdist): | out
+	cd $(mod_crownetutils) && \
 		$(PYTHON) setup.py sdist
-	cp -v $(mod_roveranalyzer)/dist/$(roveranalyzer_sdist) out
+	cp -v $(mod_crownetutils)/dist/$(crownetutils_sdist) out
 
 out/$(flowcontrol_sdist): | out
 	cd $(mod_flowcontrol) && \
@@ -150,7 +150,7 @@ out/$(venv_user): analysis-build | out
 		pip3 install --upgrade pip && \
 		pip3 install wheel && \
 		pip3 install $(flowcontrol_sdist) && \
-		pip3 install $(roveranalyzer_sdist) && \
+		pip3 install $(crownetutils_sdist) && \
 		pip3 install $(suqc_sdist)
 
 out/$(venv_dev): analysis-build | out
@@ -160,7 +160,7 @@ out/$(venv_dev): analysis-build | out
 		pip3 install --upgrade pip && \
 		pip3 install wheel && \
 		pip3 install --editable ../$(mod_flowcontrol) && \
-		pip3 install --editable ../$(mod_roveranalyzer) && \
+		pip3 install --editable ../$(mod_crownetutils) && \
 		pip3 install --editable ../$(mod_suqc)
 
 #------------------------------------------------------------------------------

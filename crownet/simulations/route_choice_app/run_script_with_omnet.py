@@ -3,21 +3,21 @@ import sys, os
 
 sys.path.append(os.path.abspath(".."))
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
 
 if __name__ == "__main__":
 
-    #TODO: discss Setting up network "crownet.simulations.networks.World"...
-#Initializing...
-#<!> Error: check_and_cast(): Cannot cast 'AmcPilot*' to type 'AmcPilotD2D *' -- in module (LteMacEnbD2D) World.eNB[0].cellularNic.mac (id=68), during network initialization
-#/home/christina/repos/crownet/crownet/src/run_crownet: line 27:    23 Segmentation fault      (core dumped) $DIR/CROWNET $COMMAND_LINE_OPTIONS $*
-#Container terminated (ERROR: 139).
+    # TODO: discss Setting up network "crownet.simulations.networks.World"...
+    # Initializing...
+    # <!> Error: check_and_cast(): Cannot cast 'AmcPilot*' to type 'AmcPilotD2D *' -- in module (LteMacEnbD2D) World.eNB[0].cellularNic.mac (id=68), during network initialization
+    # /home/christina/repos/crownet/crownet/src/run_crownet: line 27:    23 Segmentation fault      (core dumped) $DIR/CROWNET $COMMAND_LINE_OPTIONS $*
+    # Container terminated (ERROR: 139).
 
     settings = [
         "vadere-opp-control",

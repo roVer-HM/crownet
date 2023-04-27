@@ -23,7 +23,7 @@ from omnetinireader.config_parser import (
     QString,
     BoolValue,
 )
-import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
+import crownetutils.vadere.bonnmotion_traces as BmTrace
 
 from suqc.utils.SeedManager.SeedManager import SeedManager
 from suqc.utils.general import get_env_name

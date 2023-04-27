@@ -8,7 +8,7 @@ from matplotlib.ticker import (
     FixedFormatter,
     LogFormatter,
 )
-from roveranalyzer.analysis.common import (
+from crownetutils.analysis.common import (
     RunContext,
     RunMap,
     Simulation,
@@ -16,13 +16,13 @@ from roveranalyzer.analysis.common import (
     SuqcStudy,
 )
 from itertools import repeat
-from roveranalyzer.simulators.crownet.common.dcd_metadata import DcdMetaData
-from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
-from roveranalyzer.simulators.vadere.plots.scenario import VaderScenarioPlotHelper
-from roveranalyzer.utils.dataframe import numeric_formatter, save_as_tex_table
-from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.utils.plot import PlotUtil_, percentile, with_axis
+from crownetutils.analysis.dpmm.metadata import DpmmMetaData
+from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
+from crownetutils.utils.dataframe import numeric_formatter, save_as_tex_table
+from crownetutils.utils.parallel import run_kwargs_map
+from crownetutils.analysis.omnetpp import OppAnalysis
+from crownetutils.utils.plot import PlotUtil_, percentile, with_axis
 import pandas as pd
 import numpy as np
 import scipy
@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as pltPatch
 import matplotlib.lines as pltLines
 
-from roveranalyzer.utils.styles import (
+from crownetutils.utils.styles import (
     load_matplotlib_style,
     STYLE_TEX,
 )
@@ -339,12 +339,12 @@ class ThroughputPlotter(PlotUtil_):
         }
         with plt.rc_context(rc):
             fig, ax = self.check_ax(figsize=(8.9, 8.9 / (16 / 9)))
-            scenario = VaderScenarioPlotHelper(
+            scenario = VadereTopographyPlotter(
                 "../study/corridor_trace_5perSpawn_ramp_down.d/corridor_2x5m_d20_5perSpawn_ramp_down.out/BASIS_corridor_2x5m_d20_5perSpawn_ramp_down.out.scenario"
             )
             # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
             # same top for all. Just use first simulation
-            m: DcdMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
+            m: DpmmMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
             _free, _covered = scenario.get_legal_cells(m.create_full_index_slice())
             self.cell_to_tex(
                 _corridor_filter_target_cells(_free),
@@ -453,13 +453,13 @@ class ThroughputPlotter(PlotUtil_):
     def plot_target_rate_ts(self, *, ax: plt.Axes = None):
 
         rc = {
-            "axes.labelsize": "xx-large",
+            "axes.labelsize": "x-large",
             "xtick.labelsize": "x-large",
             "ytick.labelsize": "x-large",
         }
         with plt.rc_context(rc):
             fig, ax = self.check_ax(figsize=(8.9, 1 + 8.9 / (16 / 9)))
-            fig2, ax2 = self.check_ax(figsize=(8.9, 8.9))
+            fig2, ax2 = self.check_ax(figsize=(5.9, 5.9))
             sg_names = list(
                 dict(
                     sorted(
@@ -797,28 +797,33 @@ class MemberEstPlotter(PlotUtil_):
             df.append(_df)
         return pd.concat(df, axis=0, verify_integrity=False).sort_index()
 
-    def msce_plot(self):
-        scenario = VaderScenarioPlotHelper(
+    def _get_msce_over_tp(self, _hdf: BaseHdfProvider, sg: SimulationGroup):
+        scenario = VadereTopographyPlotter(
             "../study/corridor_trace_5perSpawn_ramp_down.d/corridor_2x5m_d20_5perSpawn_ramp_down.out/BASIS_corridor_2x5m_d20_5perSpawn_ramp_down.out.scenario"
         )
+        g = sg.group_name
         # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
         # same top for all. Just use first simulation
-        m: DcdMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
+        m: DpmmMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
         _free, _covered = scenario.get_legal_cells(m.create_full_index_slice())
+        if _hdf.contains_group(g):
+            _df = _hdf.get_dataframe(g)
+        else:
+            _df = OppAnalysis.sg_get_msce_data(
+                sim_group=sg,
+                cell_count=len(_corridor_filter_target_cells(_free)),
+                cell_slice_fc=_corridor_filter_target_cells,
+            )
+            _hdf.write_frame(group=g, frame=_df)
+        return _df
+
+    def msce_plot(self):
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         box_data = []
         pos = []
         for g in ["ConstantRate-", "nTable-500kbps", "map-500kbps"]:
             sg: SimulationGroup = self.run_map[g]
-            if _hdf.contains_group(g):
-                _df = _hdf.get_dataframe(g)
-            else:
-                _df = OppAnalysis.sg_get_msce_data(
-                    sim_group=sg,
-                    cell_count=len(_corridor_filter_target_cells(_free)),
-                    cell_slice_fc=_corridor_filter_target_cells,
-                )
-                _hdf.write_frame(group=g, frame=_df)
+            _df = self._get_msce_over_tp(_hdf, sg)
             df_m = _df.groupby("run_id").agg(
                 ["mean", "std", percentile(25), percentile(75)]
             )
@@ -1178,7 +1183,7 @@ if __name__ == "__main__":
     r1 = RunMap.load_or_create(
         create_f=create_target_rate_run_map,
         output_path="/mnt/data1tb/results/_dyn_tx/s1_corridor_rate_cmp",
-        load_if_present=False,
+        load_if_present=True,
     )
     r1_plotter = ThroughputPlotter(r1)
     r1_plotter.msce_over_target_rate_box()
@@ -1189,7 +1194,7 @@ if __name__ == "__main__":
     r2 = RunMap.load_or_create(
         create_f=create_member_estimate_run_map,
         output_path="/mnt/data1tb/results/_dyn_tx/s1_corridor_member_estimate_cmp",
-        load_if_present=False,
+        load_if_present=True,
     )
     r2_plotter = MemberEstPlotter(r2)
     # for sg in r2.values():

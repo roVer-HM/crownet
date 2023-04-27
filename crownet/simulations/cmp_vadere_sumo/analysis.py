@@ -3,10 +3,10 @@ import datetime
 from matplotlib import pyplot as plt
 from os.path import expanduser
 
-import roveranalyzer.simulators.crownet.analysis.compare as a
-from roveranalyzer.simulators.crownet.analysis.compare import How
+import crownetutils.analysis.mobility_model_compare as a
+from crownetutils.analysis.mobility_model_compare import How
 
-from roveranalyzer.utils.path import PathHelper
+from crownetutils.utils.path import PathHelper
 
 # paths
 

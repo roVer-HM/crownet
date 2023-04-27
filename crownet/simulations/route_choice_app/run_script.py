@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import sys, os
 import time
+
 sys.path.append(os.path.abspath(".."))
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
@@ -24,7 +25,7 @@ if __name__ == "__main__":
         "--output-dir",
         "sim-output-task1",
         "-j",
-        "/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar"
+        "/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar",
     ]
 
     if len(sys.argv) == 1:

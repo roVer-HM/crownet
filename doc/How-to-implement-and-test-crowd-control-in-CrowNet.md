@@ -38,7 +38,7 @@ Choose the virtual enviroment `crownet/out/crownet_dev/bin/python3.8` as project
 ![pycharm_settings_1](img/how_to_implement_and_test_crown_control_in_corwnet/pycharm_settings_1.png)
 
 Next, add the following directories to the project source for navigating easily through the codebase:
-* crownet/analysis/roveranalyzer
+* crownet/analysis/crownetutils
 * crownet/analysis/suq-controller
 * crownet/flowcontrol
 

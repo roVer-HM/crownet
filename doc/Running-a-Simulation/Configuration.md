@@ -57,7 +57,7 @@ settings = [
 ```
 To start the mobility provider, you need to run the `contol.py` script in the `control-ide` editor. 
 Most of the time it is enough to run the script without any arguments, but additional arguments might be required in some cases. 
-For mor information please check the docs of the [roveranalyzer](https://sam-dev.cs.hm.edu/rover/roveranalyzer) or call the tool with the `--help` argument.
+For mor information please check the docs of the [crownetutils](https://sam-dev.cs.hm.edu/rover/crownetutils) or call the tool with the `--help` argument.
 
 
 ### Omnet IDE
