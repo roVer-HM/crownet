@@ -10,7 +10,7 @@ class NetworkController : public cSimpleModule {
 Define_Module(NetworkController);
 
 void NetworkController::initialize() {
-  cModule *module = getModuleByPath("^.UnityClient");
+  cModule *module = getParentModule();
 
   std::cout << "Network Handler initialized";
 }
