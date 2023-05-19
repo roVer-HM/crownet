@@ -14,24 +14,22 @@
 #include <thread>
 
 
-
-
-using namespace nlohmann;
-
 Define_Module(UnityClient);
+std::mutex UnityClient::m_mutex;
+UnityClient* UnityClient::instance = nullptr;
 
 void UnityClient::initialize() {
-
+    UnityClient* unityClient = UnityClient::getInstance();
     std::regex regex("^[[:alpha:]]+$");
-
-    char* HOST = "172.18.0.1";
+    char * HOST = "192.168.178.174";
+    //char* HOST = "172.18.0.1";
     //char *HOST = "unityserver";
     int PORT = 12345;
     int connection_status;
 
     // create default IPv4 TCP socket
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-
+    unityClient->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    printf("Successfully created server socket");
     // set up address and port. Accepts IpV4 connections from any address
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
@@ -50,13 +48,13 @@ void UnityClient::initialize() {
     else {
         server_address.sin_addr.s_addr = inet_addr(HOST);
     }
-
+    printf("Successfully obtained address to connect");
 
 
 
 
     // connect to server
-    connection_status = connect(serverSocket,
+    connection_status = connect(unityClient->serverSocket,
             (struct sockaddr*) &server_address, sizeof(server_address));
 
     if (connection_status == 0) {
@@ -79,8 +77,9 @@ void UnityClient::initialize() {
 }
 
 void UnityClient::finish() {
+    UnityClient* unityClient = UnityClient::getInstance();
     std::cout << "Closed socket connection";
-    close(serverSocket);
+    close(unityClient->serverSocket);
     cSimpleModule::finish();
 }
 
@@ -90,20 +89,27 @@ struct Message {
 };
 
 void UnityClient::sendMessage(int id, inet::Coord coord) {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    json data;
+    UnityClient* unityClient = UnityClient::getInstance();
+
+    nlohmann::json data;
     data["id"] = 1;
-    data["x"] = coord.x;
-    data["y"] = coord.y;
-    data["z"] = coord.z;
+    data["Coordinates"]["X"] = coord.x;
+    data["Coordinates"]["Y"] = coord.y;
+    data["Coordinates"]["Z"] = coord.z;
+
 
     std::string jsonStr = data.dump();
-    const char* dataToSend = jsonStr.c_str();
     jsonStr.append("<|EOM|>");
+    const char* dataToSend = jsonStr.c_str();
 
-    ::send(serverSocket, dataToSend, strlen(dataToSend), 0);
+    std::unique_lock<std::mutex> lock(unityClient->m_mutex);
+        int result = ::send(unityClient->serverSocket, dataToSend, strlen(dataToSend), 0);
+        printf("Message was send");
+        if (result == -1) {
+            perror("Error sending message:");
+        }
 
-    lock.unlock();
+    //lock.unlock();
 }
 
 

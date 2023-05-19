@@ -1,7 +1,7 @@
 import inet.visualizer.base.MobilityVisualizerBase;
-import crownet.unity.controller.mobility.MobilityController;
 import crownet.unity.client.UnityClient;
 import inet.visualizer.contract.IMobilityVisualizer;
+
 package crownet.unity.visualizer;
 
 
@@ -10,5 +10,5 @@ module UnityMobilityVisualizer extends MobilityVisualizerBase like IMobilityVisu
     @class(crownet::UnityMobilityVisualizer);
     submodules:
         unityClient: UnityClient;
-        mobilityController: MobilityController;
+
 }

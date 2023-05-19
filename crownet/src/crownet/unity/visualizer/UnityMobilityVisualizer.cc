@@ -8,11 +8,18 @@ Define_Module(UnityMobilityVisualizer);
 void UnityMobilityVisualizer::initialize(int stage) {
     MobilityVisualizerBase::initialize(stage);
     if (stage == inet::INITSTAGE_LOCAL) {
-        WATCH(test);
+
+            // Get the UnityClient instance
+            UnityClient* unityClient = UnityClient::getInstance();
+
+            // Assign the instance to mobilityController
+         mobilityController = unityClient;
+
         //module = this->getSubmodule("mobilityController");
         //mobilityController = check_and_cast<MobilityController*>(module);
-        module = this->getSubmodule("unityClient");
-        mobilityController = check_and_cast<UnityClient*>(module);
+
+        //module = this->getSubmodule("unityClient");
+        //mobilityController = check_and_cast<UnityClient*>(UnityClient::getInstance());
 
     }
 
@@ -29,13 +36,15 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
                 addMobilityVisualization(mobility, mobilityVisualization);
             }
 
-            std::unique_lock<std::mutex> lock(m_mutex);
-            if (mobilityController != nullptr) {
-                std::cout << mobilityController->getId()  << std::endl;
-                mobilityController->sendMessage(0, mobility->getCurrentPosition());
+
+
+UnityClient::getInstance()->sendMessage(0, mobility->getCurrentPosition());
+                //std::cout << mobilityController->getId()  << std::endl;
+                //mobilityController->sendMessage(0, mobility->getCurrentPosition());
+
                 //mobilityController->sendPosition(mobility->getId(),mobility->getCurrentPosition());
 
-            }
+
 
         }
     }

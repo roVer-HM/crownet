@@ -2,9 +2,17 @@
 #include <omnetpp.h>
 #include "inet/common/geometry/common/Coord.h"
 #include <mutex>
+#include "json.hpp"
+
 using namespace omnetpp;
+using namespace nlohmann;
 
 class UnityClient : public cSimpleModule{
+
+private:
+    static std::mutex m_mutex;
+    int serverSocket;
+    static UnityClient* instance;
 
 protected:
     virtual void initialize() override;
@@ -12,13 +20,16 @@ protected:
     virtual void finish() override;
 
 public:
-    int serverSocket;
     void sendMessage(int id,inet::Coord coord);
-    int x =0;
-    std::mutex m_mutex;
-
-    void test(int id,inet::Coord coord);
-
+    UnityClient(){}
+    static UnityClient* getInstance() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (instance == nullptr) {
+            instance = new UnityClient();  // Create the instance if it doesn't exist
+        }
+        static UnityClient instance;  // Static instance of UnityClient
+        return &instance;
+    }
 
 };
 
