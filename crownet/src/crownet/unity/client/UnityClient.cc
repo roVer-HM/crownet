@@ -13,16 +13,15 @@
 #include "json.hpp"
 #include <thread>
 
-
 Define_Module(UnityClient);
 std::mutex UnityClient::m_mutex;
-UnityClient* UnityClient::instance = nullptr;
+UnityClient *UnityClient::instance = nullptr;
 
 void UnityClient::initialize() {
-    UnityClient* unityClient = UnityClient::getInstance();
+    UnityClient *unityClient = UnityClient::getInstance();
     std::regex regex("^[[:alpha:]]+$");
     //char * HOST = "192.168.178.174";
-    const char * HOST = par("hostAddress").stringValue();
+    const char *HOST = par("hostAddress").stringValue();
     //char* HOST = "172.18.0.1";
     //char *HOST = "unityserver";
     int PORT = par("port").intValue();
@@ -51,26 +50,13 @@ void UnityClient::initialize() {
     }
     printf("Successfully obtained address to connect");
 
-
-
-
     // connect to server
     connection_status = connect(unityClient->serverSocket,
             (struct sockaddr*) &server_address, sizeof(server_address));
 
     if (connection_status == 0) {
         printf("Successfully connected to the server!");
-        // send a byte string to the server
 
-        // char message[] = "Hello, server!";
-        // int message_length = strlen(message);
-        // int bytes_sent = ::send(serverSocket, message, message_length, 0);
-
-//         if (bytes_sent == -1) {
-//             printf("Error sending message to server\n");
-//         } else {
-//             printf("Sent %d bytes to server\n", bytes_sent);
-//         }
     }
 
     cSimpleModule::initialize();
@@ -78,7 +64,7 @@ void UnityClient::initialize() {
 }
 
 void UnityClient::finish() {
-    UnityClient* unityClient = UnityClient::getInstance();
+    UnityClient *unityClient = UnityClient::getInstance();
     std::cout << "Closed socket connection";
     close(unityClient->serverSocket);
     cSimpleModule::finish();
@@ -89,8 +75,9 @@ struct Message {
     int id;
 };
 
-void UnityClient::sendMessage(const std::string& id, const std::string& instruction,inet::Coord coord) {
-    UnityClient* unityClient = UnityClient::getInstance();
+void UnityClient::sendMessage(const std::string &id,
+        const std::string &instruction, inet::Coord coord) {
+    UnityClient *unityClient = UnityClient::getInstance();
 
     nlohmann::json data;
     data["Id"] = id;
@@ -100,19 +87,19 @@ void UnityClient::sendMessage(const std::string& id, const std::string& instruct
     data["Instruction"] = instruction;
 
     std::string jsonStr = data.dump();
-    jsonStr.append("<|EOM|>");
-    const char* dataToSend = jsonStr.c_str();
+    const char *dataToSend = jsonStr.c_str();
+    //jsonStr.append("<|EOM|>");
+
+    uint32_t length = strlen(dataToSend);
+    uint32_t lengthNet = htonl(length);
 
     std::unique_lock<std::mutex> lock(unityClient->m_mutex);
-        int result = ::send(unityClient->serverSocket, dataToSend, strlen(dataToSend), 0);
+    std::cerr << x << std::endl;
+    ::send(unityClient->serverSocket, (void*) &lengthNet, sizeof(lengthNet), 0);
+    ::send(unityClient->serverSocket, dataToSend, length, 0);
 
-        if (result == -1) {
-            perror("Error sending message:");
-        }
+
 }
-
-
-
 
 void UnityClient::handleMessage(omnetpp::cMessage *msg) {
     cSimpleModule::handleMessage(msg);

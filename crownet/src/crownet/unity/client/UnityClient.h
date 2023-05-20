@@ -30,7 +30,6 @@ public:
         static UnityClient instance;  // Static instance of UnityClient
         return &instance;
     }
-
 };
 
 
