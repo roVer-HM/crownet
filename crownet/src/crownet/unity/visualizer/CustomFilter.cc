@@ -15,7 +15,7 @@ namespace inet {
 namespace utils {
 namespace filters {
 
-//Register_ResultFilter("personId", PersonIdFilter);
+Register_ResultFilter("personId", PersonIdFilter);
 
 void PersonIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
         cObject *object, cObject *details) {
