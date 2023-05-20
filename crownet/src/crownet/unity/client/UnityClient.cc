@@ -88,13 +88,12 @@ void UnityClient::sendMessage(const std::string &id,
 
     std::string jsonStr = data.dump();
     const char *dataToSend = jsonStr.c_str();
-    //jsonStr.append("<|EOM|>");
+
 
     uint32_t length = strlen(dataToSend);
     uint32_t lengthNet = htonl(length);
 
     std::unique_lock<std::mutex> lock(unityClient->m_mutex);
-    std::cerr << x << std::endl;
     ::send(unityClient->serverSocket, (void*) &lengthNet, sizeof(lengthNet), 0);
     ::send(unityClient->serverSocket, dataToSend, length, 0);
 
