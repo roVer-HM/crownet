@@ -21,10 +21,11 @@ UnityClient* UnityClient::instance = nullptr;
 void UnityClient::initialize() {
     UnityClient* unityClient = UnityClient::getInstance();
     std::regex regex("^[[:alpha:]]+$");
-    char * HOST = "192.168.178.174";
+    //char * HOST = "192.168.178.174";
+    const char * HOST = par("hostAddress").stringValue();
     //char* HOST = "172.18.0.1";
     //char *HOST = "unityserver";
-    int PORT = 12345;
+    int PORT = par("port").intValue();
     int connection_status;
 
     // create default IPv4 TCP socket
@@ -40,7 +41,7 @@ void UnityClient::initialize() {
     // support or DNS.
     struct hostent *host_entry;
 
-    // if the host contains only characters, we assume it's a hostname. Otherwise we parse the IP4 address.
+    // if the host contains only characters, we assume it's a hostname. Otherwise, we parse the IP4 address.
     if (std::regex_match(HOST, regex)) {
         host_entry = gethostbyname(HOST);
         server_address.sin_addr = *((struct in_addr*) host_entry->h_addr);
@@ -88,15 +89,15 @@ struct Message {
     int id;
 };
 
-void UnityClient::sendMessage(int id, inet::Coord coord) {
+void UnityClient::sendMessage(const std::string& id, const std::string& instruction,inet::Coord coord) {
     UnityClient* unityClient = UnityClient::getInstance();
 
     nlohmann::json data;
-    data["id"] = 1;
+    data["Id"] = id;
     data["Coordinates"]["X"] = coord.x;
     data["Coordinates"]["Y"] = coord.y;
     data["Coordinates"]["Z"] = coord.z;
-
+    data["Instruction"] = instruction;
 
     std::string jsonStr = data.dump();
     jsonStr.append("<|EOM|>");
@@ -104,12 +105,10 @@ void UnityClient::sendMessage(int id, inet::Coord coord) {
 
     std::unique_lock<std::mutex> lock(unityClient->m_mutex);
         int result = ::send(unityClient->serverSocket, dataToSend, strlen(dataToSend), 0);
-        printf("Message was send");
+
         if (result == -1) {
             perror("Error sending message:");
         }
-
-    //lock.unlock();
 }
 
 

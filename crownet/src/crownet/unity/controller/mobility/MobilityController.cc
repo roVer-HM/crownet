@@ -21,6 +21,6 @@ void MobilityController::handleMessage(cMessage *msg) {
 void MobilityController::sendPosition(int id,inet::Coord coord) {
     x+=1;
       std::cout <<  "MobilityController calls:" <<x << std::endl;
-    unityClient->sendMessage(id,coord);
+    //unityClient->sendMessage(id,coord);
 }
 

@@ -20,7 +20,7 @@ protected:
     virtual void finish() override;
 
 public:
-    void sendMessage(int id,inet::Coord coord);
+    void sendMessage(const std::string& id,const std::string& instruction,inet::Coord coord);
     UnityClient(){}
     static UnityClient* getInstance() {
         std::lock_guard<std::mutex> lock(m_mutex);
