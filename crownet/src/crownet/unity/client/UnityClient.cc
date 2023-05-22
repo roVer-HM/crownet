@@ -33,7 +33,7 @@ void UnityClient::initialize() {
     // set up address and port. Accepts IpV4 connections from any address
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(12345);
+    server_address.sin_port = htons(PORT);
 
     // since we are using a hostname instead of an ip address, we need to resolve.
     // gethostbyname() is obsolete, but sufficient as we don't requite IPv6

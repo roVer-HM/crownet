@@ -13,6 +13,8 @@ void UnityMobilityVisualizer::initialize(int stage) {
 
         // Assign the instance to mobilityController
         mobilityController = unityClient;
+
+
     }
 
 }
@@ -31,6 +33,8 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
                     dynamic_cast<artery::VehicleMobility*>(source);
             inet::StationaryMobility *stationaryMobility =
                     dynamic_cast<inet::StationaryMobility*>(source);
+            InetVaderePersonMobility *vaderePersonMobility =
+                    dynamic_cast<InetVaderePersonMobility*>(source);
 
             if (personMobility) {
                 UnityClient::getInstance()->sendMessage(
@@ -50,7 +54,14 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
                         "createStationary",
                         stationaryMobility->getCurrentPosition());
 
-            } else {
+            }
+            else if (vaderePersonMobility) {
+
+                UnityClient::getInstance()->sendMessage(vaderePersonMobility->getPersonId(),"createOrUpdatePerson",vaderePersonMobility->getCurrentPosition());
+
+                       }
+
+            else {
                 // None of the casts were successful
                 std::cerr << "Invalid mobility type" << std::endl;
             }

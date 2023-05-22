@@ -21,7 +21,7 @@ void PersonIdFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
         cObject *object, cObject *details) {
 
     if (auto wrapper = dynamic_cast<artery::PersonMobility*>(object)) {
-        fire(this, t, ((std::string*) &wrapper->getPersonId()), details);
+        fire(this, t, 1.00, details);
     }
 
 }

@@ -11,6 +11,8 @@
 #include "artery/traci/PersonMobility.h"
 #include "artery/inet/InetMobility.h"
 #include "artery/traci/VehicleMobility.h"
+#include "crownet/artery/traci/InetVaderePersonMobility.h"
+
 
 namespace crownet {
 
