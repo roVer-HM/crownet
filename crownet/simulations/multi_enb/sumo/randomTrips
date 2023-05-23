@@ -1,0 +1,51 @@
+#!/bin/bash
+set -e
+
+#${CROWNET_HOME}/scripts/sumo exec python3 /opt/sumo/sumo/tools/randomTrips.py --configuration-file cfg.xml
+
+NAME=$1
+TRIP="${NAME}.trips.xml"
+ROUTE="${NAME}.rou.xml"
+ROUTE_ALT="${NAME}.rou.alt.xml"
+CFG="${NAME}_cfg.xml"
+SIM_CFG="${NAME}.sumo.cfg"
+
+# $boundcomment="siegestor"
+# $bound="1638.,1218,2876.,2330.0"
+
+# BoundComment="U-Bahn MFreiheit"
+# BOUND="2778.48,2302.05,3176.60,2532.12"
+
+# sed "s/\$NAME/${NAME}/g" cfg.xml  > ${CFG}
+# sed "s/\$BoundComment/${BoundComment}/g" -i ${CFG}
+# sed "s/\$BOUND/${BOUND}/g" -i ${CFG}
+
+
+${CROWNET_HOME}/../sumo/tools/randomTrips.py --configuration-file $CFG 
+
+if [ $? -eq 1 ]; then
+    exit -1
+fi
+
+cat > $SIM_CFG << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+    <input>
+        <net-file value="munich.net.xml"/>
+        <route-files value="$NAME.rou.xml"/>
+    </input>
+
+    <time>
+        <step-length value="0.4"/>
+    </time>
+
+    <gui_only>
+        <start value="false"/>
+    </gui_only>
+</configuration>
+EOF
+
+sed "s/\$NAME/${NAME}/g" -i $SIM_CFG
+
+echo "done."
