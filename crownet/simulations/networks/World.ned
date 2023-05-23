@@ -169,7 +169,7 @@ network World
         bonnMotionServer: <default("")> like BonnMotionServer if typename != "" {
             @display("p=449.2425,384.90375;i=block/table2_s;is=s");
         }
-        mapVisualizer: DensityMapSceneCanvasVisualizer {
+        mapVisualizer: <default("DensityMapSceneCanvasVisualizer")> like ISceneVisualizer if typename != "" {
             @display("p=539.5425,328.46625;is=s");
         }
 
