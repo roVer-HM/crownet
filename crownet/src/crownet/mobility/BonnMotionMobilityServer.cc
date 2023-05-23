@@ -49,11 +49,12 @@ void BonnMotionServerFile::loadFile(const char *filename){
     }
     in.close();
 
-    // sort timeLine based on time step
-    std::sort(
+    // sort timeLine based on time step **and** keep order of lines with the same time step!
+    std::stable_sort(
             timeLine.begin(), timeLine.end(),
-            [](const BmTimedLineIndex& left, const BmTimedLineIndex& right){return left.second <= right.second;}
+            [](const BmTimedLineIndex& left, const BmTimedLineIndex& right){return left.second < right.second;}
     );
+
 }
 
 bool BonnMotionServerFile::hasTraceForTime(const simtime_t time) const{
