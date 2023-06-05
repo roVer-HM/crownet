@@ -4,7 +4,7 @@ package crownet.unity.client;
 simple UnityClient{
     
     parameters:
-        string hostAddress = default("192.168.178.63");
-        int port = default(54321);
+        string hostAddress = default("ecal");
+        int port = default(52123);
         
 }
