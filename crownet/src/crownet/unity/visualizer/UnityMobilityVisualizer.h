@@ -2,7 +2,6 @@
 #include "inet/visualizer/base/MobilityVisualizerBase.h"
 #include "omnetpp/cobject.h"
 #include <mutex>
-#include "crownet/unity/controller/mobility/MobilityController.h"
 #include "crownet/unity/client/UnityClient.h"
 #include <numeric>
 #include "artery/traci/PersonMobility.h"

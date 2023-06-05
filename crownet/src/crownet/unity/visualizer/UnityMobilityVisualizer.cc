@@ -38,26 +38,31 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
 
             if (personMobility) {
                 UnityClient::getInstance()->sendMessage(
-                        personMobility->getPersonId(), "createOrUpdatePerson",
+                        personMobility->getPersonId(),source->getParentModule()->getFullPath(), "createOrUpdatePerson",
                         convertPositionToCoord(personMobility->getPosition()));
+
             } else if (vehicleModule) {
                 auto vehicleController = vehicleModule->getVehicleController();
                 UnityClient::getInstance()->sendMessage(
                         vehicleController->getVehicleId(),
+                        source->getParentModule()->getFullPath(),
                         "createOrUpdateVehicle",
                         convertPositionToCoord(
                                 vehicleController->getPosition()));
 
             } else if (stationaryMobility) {
 
-                UnityClient::getInstance()->sendMessage("stationary0",
-                        "createStationary",
+                UnityClient::getInstance()->sendMessage("",
+                        source->getParentModule()->getFullPath(),
+                        "createOrUpdateStationary",
                         stationaryMobility->getCurrentPosition());
 
             }
             else if (vaderePersonMobility) {
 
-                UnityClient::getInstance()->sendMessage(vaderePersonMobility->getPersonId(),"createOrUpdatePerson",vaderePersonMobility->getCurrentPosition());
+                UnityClient::getInstance()->sendMessage(vaderePersonMobility->getPersonId(),
+                        source->getParentModule()->getFullPath(),
+                        "createOrUpdatePerson",vaderePersonMobility->getCurrentPosition());
 
                        }
 
