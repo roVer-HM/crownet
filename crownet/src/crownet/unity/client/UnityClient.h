@@ -20,15 +20,14 @@ protected:
     virtual void finish() override;
 
 public:
-    void sendMessage(const std::string& id,const std::string& instruction,inet::Coord coord);
+    void sendMessage(const std::string& id,const std::string& path,const std::string& instruction,inet::Coord coord);
     UnityClient(){}
     static UnityClient* getInstance() {
         std::lock_guard<std::mutex> lock(m_mutex);
         if (instance == nullptr) {
             instance = new UnityClient();  // Create the instance if it doesn't exist
         }
-        static UnityClient instance;  // Static instance of UnityClient
-        return &instance;
+        return instance;
     }
 };
 

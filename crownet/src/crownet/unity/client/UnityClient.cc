@@ -75,12 +75,13 @@ struct Message {
     int id;
 };
 
-void UnityClient::sendMessage(const std::string &id,
+void UnityClient::sendMessage(const std::string &id, const std::string &path,
         const std::string &instruction, inet::Coord coord) {
     UnityClient *unityClient = UnityClient::getInstance();
 
     nlohmann::json data;
     data["Id"] = id;
+    data["Path"] = path;
     data["Coordinates"]["X"] = coord.x;
     data["Coordinates"]["Y"] = coord.y;
     data["Coordinates"]["Z"] = coord.z;
