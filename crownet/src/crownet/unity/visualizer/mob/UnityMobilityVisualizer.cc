@@ -1,4 +1,4 @@
-#include "crownet/unity/visualizer/UnityMobilityVisualizer.h"
+#include "crownet/unity/visualizer/mob/UnityMobilityVisualizer.h"
 
 namespace crownet {
 
@@ -6,15 +6,14 @@ Define_Module(UnityMobilityVisualizer);
 
 void UnityMobilityVisualizer::initialize(int stage) {
     MobilityVisualizerBase::initialize(stage);
+
+    // instantly remove to remove unsupported signal
+    MobilityVisualizerBase::visualizationSubjectModule->unsubscribe(PRE_MODEL_CHANGE, this);
+
     if (stage == inet::INITSTAGE_LOCAL) {
 
         // Get the UnityClient instance
-        UnityClient *unityClient = UnityClient::getInstance();
-
-        // Assign the instance to mobilityController
-        mobilityController = unityClient;
-
-
+       unityClient = UnityClient::getInstance();
     }
 
 }
@@ -37,13 +36,13 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
                     dynamic_cast<InetVaderePersonMobility*>(source);
 
             if (personMobility) {
-                UnityClient::getInstance()->sendMessage(
+                unityClient->sendMessage(
                         personMobility->getPersonId(),source->getParentModule()->getFullPath(), "createOrUpdatePerson",
                         convertPositionToCoord(personMobility->getPosition()));
 
             } else if (vehicleModule) {
                 auto vehicleController = vehicleModule->getVehicleController();
-                UnityClient::getInstance()->sendMessage(
+                unityClient->sendMessage(
                         vehicleController->getVehicleId(),
                         source->getParentModule()->getFullPath(),
                         "createOrUpdateVehicle",
@@ -52,7 +51,7 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
 
             } else if (stationaryMobility) {
 
-                UnityClient::getInstance()->sendMessage("",
+                unityClient->sendMessage("",
                         source->getParentModule()->getFullPath(),
                         "createOrUpdateStationary",
                         stationaryMobility->getCurrentPosition());
@@ -60,7 +59,7 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
             }
             else if (vaderePersonMobility) {
 
-                UnityClient::getInstance()->sendMessage(vaderePersonMobility->getPersonId(),
+                unityClient->sendMessage(vaderePersonMobility->getPersonId(),
                         source->getParentModule()->getFullPath(),
                         "createOrUpdatePerson",vaderePersonMobility->getCurrentPosition());
 

@@ -19,9 +19,9 @@ class UnityMobilityVisualizer: public inet::visualizer::MobilityVisualizerBase {
 public:    virtual void initialize(int stage) override;
     virtual void receiveSignal(cComponent *source, inet::simsignal_t signal,
             cObject *object, cObject *details) override;
-    virtual void handleParameterChange(const char *name) override {
-        inet::visualizer::MobilityVisualizerBase::handleParameterChange(name);
-    };
+
+
+
     virtual void subscribe() override{
         inet::visualizer::MobilityVisualizerBase::subscribe();
     };
@@ -39,9 +39,7 @@ public:    virtual void initialize(int stage) override;
     virtual MobilityVisualization* createMobilityVisualization(
             inet::IMobility *mobility) override;
 
-
-    cModule *module;
-    UnityClient *mobilityController;
+    UnityClient *unityClient;
     std::mutex m_mutex;
 
 protected:
