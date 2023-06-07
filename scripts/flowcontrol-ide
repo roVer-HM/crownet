@@ -4,13 +4,13 @@ SHORTNAME=flowcontrol
 COMMAND=pycharm.sh
 CONTNAME=flowcontrol-ide
 
-if [ -z "${CROWNET_CONTROL_CONT_TAG}" ]; then
-      echo "Variabel 'CROWNET_CONTROL_CONT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+if [ -z "${CROWNET_CONTROL_IDE_CONT_TAG}" ]; then
+      echo "Variabel 'CROWNET_CONTROL_IDE_CONT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
       exit -1
 fi
 
 if [[ -z "$1" || "$1" == "exec" ]]; then
-      VERSION=$CROWNET_CONTROL_CONT_TAG
+      VERSION=$CROWNET_CONTROL_IDE_CONT_TAG
       CONTNAME=$CONTNAME:$VERSION
 else
       SHORTNAME=$SHORTNAME-$1

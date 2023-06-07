@@ -79,6 +79,14 @@ class ActiveFileWriter : public BaseFileWriter,
   std::shared_ptr<FilePrinter> printer;
 };
 
+class DevNullWriter : public ActiveWriter {
+ public:
+  virtual ~DevNullWriter()=default;
+  DevNullWriter(){};
+  virtual void initWriter() override {};
+  virtual void writeData() override {};
+  virtual void finish() override {};
+};
 
 
 class FileWriterBuilder {

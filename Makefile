@@ -128,16 +128,22 @@ python-hint:
 
 out/$(crownetutils_sdist): | out
 	cd $(mod_crownetutils) && \
-		$(PYTHON) setup.py sdist
+        rm -rf dist/ && \
+        rm -rf *.egg-info && \
+   	   $(PYTHON) setup.py sdist
 	cp -v $(mod_crownetutils)/dist/$(crownetutils_sdist) out
 
 out/$(flowcontrol_sdist): | out
 	cd $(mod_flowcontrol) && \
+        rm -rf dist/ && \
+        rm -rf *.egg-info && \
    	   $(PYTHON) setup.py sdist
 	cp -v $(mod_flowcontrol)/dist/$(flowcontrol_sdist) out
 
 out/$(suqc_sdist): | out
 	cd $(mod_suqc) && \
+        rm -rf dist/ && \
+        rm -rf *.egg-info && \
 	   $(PYTHON) setup.py sdist
 	cp -v $(mod_suqc)/dist/$(suqc_sdist) out
 
