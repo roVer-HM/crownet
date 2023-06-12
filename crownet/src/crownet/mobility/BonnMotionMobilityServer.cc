@@ -13,6 +13,12 @@
 #include "crownet/mobility/BonnMotionMobilityClient.h"
 #include "crownet/common/GlobalDensityMap.h"
 
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <fstream>
+#include <iostream>
+
 #include <list>
 #include <vector>
 #include <fstream>
@@ -26,13 +32,25 @@
 namespace crownet {
 
 void BonnMotionServerFile::loadFile(const char *filename){
-    std::ifstream in(filename, std::ios::in);
-    if (in.fail())
-        throw cRuntimeError("Cannot open file '%s'", filename);
+    std::string fname(filename);
+    std::stringstream inStr;
+    if (fname.compare(fname.size()-3, 3, ".gz") == 0){
+        //gz
+        std::ifstream file(fname.c_str(), std::ios_base::in | std::ios_base::binary);
+        boost::iostreams::filtering_streambuf<boost::iostreams::input> gzIn;
+        gzIn.push(boost::iostreams::gzip_decompressor());
+        gzIn.push(file);
+        boost::iostreams::copy(gzIn, inStr);
+    } else {
+        std::ifstream file(fname.c_str(), std::ios::in);
+        if (file.fail())
+            throw cRuntimeError("Cannot open file '%s'", filename);
+        boost::iostreams::copy(file, inStr);
+    }
 
     std::string line;
     int lineCount = 0;
-    while (std::getline(in, line)) {
+    while (std::getline(inStr, line)) {
         if(line.at(0) == '#'){
             continue; // ignore comets
         }
@@ -47,7 +65,6 @@ void BonnMotionServerFile::loadFile(const char *filename){
         timeLine.push_back(std::make_pair(lineCount, simtime_t(vec[0])));
         ++lineCount;
     }
-    in.close();
 
     // sort timeLine based on time step **and** keep order of lines with the same time step!
     std::stable_sort(
