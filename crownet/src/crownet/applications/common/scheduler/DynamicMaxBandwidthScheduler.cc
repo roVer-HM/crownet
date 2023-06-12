@@ -40,6 +40,20 @@ DynamicMaxBandwidthScheduler::~DynamicMaxBandwidthScheduler() {
     cancelClockEvent(generationTimer);
 }
 
+void DynamicMaxBandwidthScheduler::receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) {
+    if (signalID == servingCell_ && eNBId == 0 && i != 0){
+        // connection regained. Start scheduling again. If generationTimer
+        // is not scheduled
+        if (!generationTimer->isScheduled()){
+            //schedule now.
+            EV_INFO << LOG_MOD << "Resume scheduling as network is up again." << endl;
+            simtime_t next = SimTime::fromRaw(simTime().raw() + 1); // next possible time point.
+            scheduleClockEventAt(SIMTIME_AS_CLOCKTIME(next), generationTimer);
+        }
+    }
+    AppSchedulerBase::receiveSignal(source, signalID, i, details);
+}
+
 void DynamicMaxBandwidthScheduler::initialize(int stage)
 {
     IntervalScheduler::initialize(stage);
@@ -84,6 +98,10 @@ void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
 void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
     auto now = simTime();
     if (message == generationTimer){
+        if(checkNetworkConnectivity && !hasLteConnection()){
+            EV_INFO << LOG_MOD << "Stop scheduling due to lost network connection. Resume when network is up." << endl;
+            return;
+        }
         updateTxIntervalDataCurrent();
         EV_INFO << LOG_MOD << "Prio interval: " << txIntervalDataPrio << endl;
         EV_INFO << LOG_MOD << "Current interval: " << txIntervalDataCurrent << endl;
