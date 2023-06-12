@@ -195,37 +195,7 @@ network World
 //        for i=0..numGnb-1, for j=0..numGnb-1 {
 //            gNB[i].x2++ <--> Eth10G <--> gNB[j].x2++ if i < j;
 //        }
-// 		  4x3
-//        eNB[0].x2++ <--> Eth10G <--> eNB[1].x2++;
-//        eNB[0].x2++ <--> Eth10G <--> eNB[4].x2++;
-//        eNB[0].x2++ <--> Eth10G <--> eNB[5].x2++;
-//        eNB[1].x2++ <--> Eth10G <--> eNB[2].x2++;
-//        eNB[1].x2++ <--> Eth10G <--> eNB[4].x2++;
-//        eNB[1].x2++ <--> Eth10G <--> eNB[5].x2++;
-//        eNB[1].x2++ <--> Eth10G <--> eNB[6].x2++;
-//        eNB[2].x2++ <--> Eth10G <--> eNB[3].x2++;
-//        eNB[2].x2++ <--> Eth10G <--> eNB[5].x2++;
-//        eNB[2].x2++ <--> Eth10G <--> eNB[6].x2++;
-//        eNB[2].x2++ <--> Eth10G <--> eNB[7].x2++;
-//        eNB[3].x2++ <--> Eth10G <--> eNB[6].x2++;
-//        eNB[3].x2++ <--> Eth10G <--> eNB[7].x2++;
-//        eNB[4].x2++ <--> Eth10G <--> eNB[5].x2++;
-//        eNB[4].x2++ <--> Eth10G <--> eNB[8].x2++;
-//        eNB[4].x2++ <--> Eth10G <--> eNB[9].x2++;
-//        eNB[5].x2++ <--> Eth10G <--> eNB[6].x2++;
-//        eNB[5].x2++ <--> Eth10G <--> eNB[8].x2++;
-//        eNB[5].x2++ <--> Eth10G <--> eNB[9].x2++;
-//        eNB[5].x2++ <--> Eth10G <--> eNB[10].x2++;
-//        eNB[6].x2++ <--> Eth10G <--> eNB[7].x2++;
-//        eNB[6].x2++ <--> Eth10G <--> eNB[9].x2++;
-//        eNB[6].x2++ <--> Eth10G <--> eNB[10].x2++;
-//        eNB[6].x2++ <--> Eth10G <--> eNB[11].x2++;
-//        eNB[7].x2++ <--> Eth10G <--> eNB[10].x2++;
-//        eNB[7].x2++ <--> Eth10G <--> eNB[11].x2++;
-//        eNB[8].x2++ <--> Eth10G <--> eNB[9].x2++;
-//        eNB[9].x2++ <--> Eth10G <--> eNB[10].x2++;
-//        eNB[10].x2++ <--> Eth10G <--> eNB[11].x2++;
-//	    5x4
+//		5x3
         eNB[0].x2++ <--> Eth10G <--> eNB[1].x2++;
         eNB[0].x2++ <--> Eth10G <--> eNB[5].x2++;
         eNB[0].x2++ <--> Eth10G <--> eNB[6].x2++;
@@ -261,24 +231,7 @@ network World
         eNB[9].x2++ <--> Eth10G <--> eNB[13].x2++;
         eNB[9].x2++ <--> Eth10G <--> eNB[14].x2++;
         eNB[10].x2++ <--> Eth10G <--> eNB[11].x2++;
-        eNB[10].x2++ <--> Eth10G <--> eNB[15].x2++;
-        eNB[10].x2++ <--> Eth10G <--> eNB[16].x2++;
         eNB[11].x2++ <--> Eth10G <--> eNB[12].x2++;
-        eNB[11].x2++ <--> Eth10G <--> eNB[15].x2++;
-        eNB[11].x2++ <--> Eth10G <--> eNB[16].x2++;
-        eNB[11].x2++ <--> Eth10G <--> eNB[17].x2++;
         eNB[12].x2++ <--> Eth10G <--> eNB[13].x2++;
-        eNB[12].x2++ <--> Eth10G <--> eNB[16].x2++;
-        eNB[12].x2++ <--> Eth10G <--> eNB[17].x2++;
-        eNB[12].x2++ <--> Eth10G <--> eNB[18].x2++;
         eNB[13].x2++ <--> Eth10G <--> eNB[14].x2++;
-        eNB[13].x2++ <--> Eth10G <--> eNB[17].x2++;
-        eNB[13].x2++ <--> Eth10G <--> eNB[18].x2++;
-        eNB[13].x2++ <--> Eth10G <--> eNB[19].x2++;
-        eNB[14].x2++ <--> Eth10G <--> eNB[18].x2++;
-        eNB[14].x2++ <--> Eth10G <--> eNB[19].x2++;
-        eNB[15].x2++ <--> Eth10G <--> eNB[16].x2++;
-        eNB[16].x2++ <--> Eth10G <--> eNB[17].x2++;
-        eNB[17].x2++ <--> Eth10G <--> eNB[18].x2++;
-        eNB[18].x2++ <--> Eth10G <--> eNB[19].x2++;
 }

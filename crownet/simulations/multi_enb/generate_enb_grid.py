@@ -1,12 +1,20 @@
+from dataclasses import dataclass
+import os
+import random
 import xml.etree.ElementTree as ET
 import geopandas as gp
 import numpy as np
-import shapely
+from shapely.geometry import Point
+from shapely.ops import transform
 import io
+from crownetutils.utils.misc import Project
+from crownetutils.utils.path import PathHelper
+from crownetutils.utils.file import open_txt_gz
 
 
-def read_bound_and_cooridnate_system(sumo_net_path, grid):
-    root = ET.parse(sumo_net_path)
+def read_bound_and_cooridnate_system(sim_root: PathHelper, sumo_net_path, prefix="_"):
+    with open_txt_gz(sumo_net_path) as fd:
+        root = ET.parse(fd)
     loc = root.find("location")
     offset = np.array(loc.attrib["netOffset"].split(",")).astype(np.float32) * -1
     bound = (
@@ -15,40 +23,76 @@ def read_bound_and_cooridnate_system(sumo_net_path, grid):
         .reshape((2, 2), order="C")
     )
     proj4 = loc.attrib["projParameter"]
-    num_enbs, dist = grid_by_enb_dist(800, bound, override=np.array([5, 4]))
-    enb_df, misc_df = create_enb_position(num_enbs, dist, offset, proj4)
-    create_enb_config(
-        enb_df,
-        num_enbs,
-        f"/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/enb_{num_enbs[0]}x{num_enbs[1]}.ini",
-    )
-    create_misc_config(
-        misc_df,
-        f"/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/misc_{num_enbs[0]}x{num_enbs[1]}.ini",
-    )
+    num_enbs, dist = grid_by_enb_dist(800, bound, override=np.array([5, 3]))
+    # enb_df, misc_df = create_enb_position(num_enbs, dist, offset, bound, proj4)
+    # # create_enb_config(
+    # #     enb_df,
+    # #     num_enbs,
+    # #     sim_root.join(f"enb{prefix}{num_enbs[0]}x{num_enbs[1]}.ini"),
+    # # )
+    # # create_misc_config(
+    # #     misc_df,
+    # #     sim_root.join(f"misc{prefix}{num_enbs[0]}x{num_enbs[1]}.ini"),
+    # # )
     single_bonnmotion(
         bound,
         dist,
-        f"/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/pnode_{num_enbs[0]}x{num_enbs[1]}.bonnmotion",
+        sim_root.join("traces", f"pnode{prefix}{num_enbs[0]}x{num_enbs[1]}.bonnmotion"),
     )
-    print("hi")
 
 
 def single_bonnmotion(bound, dist, output_path):
-    _to_canvas = np.array([0, bound[1][1]])
+    abs_bound = bound[1] - bound[0]
+
+    lines = []
     speed = 3.5  # m/s
-    start = dist * 1.5
-    end = bound[1] - start
-    start[1] = _to_canvas[1] - start[1]
-    end[1] = _to_canvas[1] - end[1]
-    d = np.linalg.norm(end - start)
-    time = d / speed  # s
+
+    t = np.array([2, 2, 50, 50, 100, 100, 150, 150, 200, 200])
+    for i in range(10):
+        # round trip path
+        path = [
+            [400.0, 400.0],
+            [4800.0, 4000.0],
+            [4800.0, 2800.0],
+            [400.0, 2800.0],
+            [400.0, 400.0],
+        ]
+        path = np.array(path)
+        # path += bound[0]
+        # change direction for half of all traces
+        if i % 2 == 0:
+            path = np.flip(path, axis=0)
+
+        # add random noise to coordinates
+        rnd = np.array([np.random.randint(-20, 20) for _ in range(path.size)]).reshape(
+            (-1, 2)
+        )
+        path += rnd
+
+        # get cumulative time point for each coordinate + random time offset
+        time_offset = t[i] + np.random.randint(0, 10)
+        dist = np.linalg.norm(path - np.roll(path, 1, axis=0), axis=1)
+        time = np.cumsum(dist / speed) + time_offset
+
+        # write bonnmotionline for i'th trace
+        s = io.StringIO()
+        for j in range(path.shape[0]):
+            s.write(f"{time[j]} {path[j][0]} {path[j][1]} ")
+        s.seek(0)
+        lines.append(s.getvalue())
+        print(f"{i}'th trace: {s.getvalue()}")
+        s.close()
+
+    # write out bonnmotion file
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as fd:
-        fd.writelines([f"0.0 {start[0]} {start[1]} {time} {end[0]} {end[1]}"])
+        for l in lines:
+            fd.write(l)
+            fd.write(os.linesep)
 
 
 def grid_by_enb_dist(enb_dist, bound, override=None):
-    abs_bound = bound[0] + bound[1]
+    abs_bound = bound[1] - bound[0]
     enb_num = abs_bound / (2 * enb_dist)
     print(f"To cover bound {abs_bound} {enb_num}  enb's needed.")
     if override is None:
@@ -58,13 +102,12 @@ def grid_by_enb_dist(enb_dist, bound, override=None):
         print(f"override number of base stations with {override}")
         enb_num = override
 
-    d = abs_bound / (2 * (enb_num + 1))
+    d = abs_bound / (2 * (enb_num))
     print(f"using {enb_num} number of enbs. ==> distance between enbs is {d}")
     return enb_num, d
-    print("hi")
 
 
-def create_enb_position(num_enbs, dist, offset, crs):
+def create_enb_position(num_enbs, dist, offset, bound, crs):
     x_dist, y_dist = dist
     pos_enb = []
     pos_misc = []
@@ -72,7 +115,7 @@ def create_enb_position(num_enbs, dist, offset, crs):
         for x in range(num_enbs[0]):
             pos_enb.append([x * (2 * x_dist) + x_dist, y * (2 * y_dist) + y_dist])
 
-    pos_enb = np.array(pos_enb) + offset
+    pos_enb = np.array(pos_enb) + offset + bound[0]
     pos_misc = pos_enb + 10
 
     enb_df = gp.GeoDataFrame(
@@ -203,5 +246,21 @@ def l(iostr, line):
 
 
 if __name__ == "__main__":
-    path = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/munich.net.xml"
-    read_bound_and_cooridnate_system(path, grid=np.array([]))
+    root_dir = PathHelper("/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/")
+    net_file = root_dir.join("sumo/munich/muc_cleaned/muc.net.xml.gz")
+    read_bound_and_cooridnate_system(
+        sim_root=root_dir, sumo_net_path=net_file, prefix="_muc_clean"
+    )
+    # enb_df = gp.GeoDataFrame(
+    #     geometry=gp.points_from_xy([11.6248], [48.1745]), crs="EPSG:4326"
+    # )
+    # utm = enb_df.to_crs("EPSG:32632")
+    # p = Point(utm.geometry[0].x - 5000, utm.geometry[0].y - 3000)
+    # utm2 = gp.GeoDataFrame(geometry=[p], crs="EPSG:32632")
+    # print(utm2.to_crs("EPSG:4326"))
+
+    # enb_df = gp.GeoDataFrame(
+    #     geometry=gp.points_from_xy([11.5555, 11.6248], [48.1491, 48.1745]), crs="EPSG:4326"
+    # )
+    # utm3 = enb_df.to_crs("EPSG:32632")
+    # print("hi")
