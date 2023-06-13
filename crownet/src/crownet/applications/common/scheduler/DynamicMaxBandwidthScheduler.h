@@ -76,6 +76,9 @@ protected:
     double rndIntervalLowerBound;
     double rndIntervalUpperBound;
 
+private:
+    bool isFirstScheduleCall = true;
+
 
 };
 

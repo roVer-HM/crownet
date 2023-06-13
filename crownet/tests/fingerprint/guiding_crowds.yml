@@ -22,7 +22,6 @@ vadere_only_test_1:
   tags:
     exec: python3
     type: shell
-    vadere: 221108-1613
 
 final_test_2:
   wd: simulations/guiding_crowds_test
@@ -39,8 +38,6 @@ final_test_2:
   tags:
     exec: python3
     type: shell
-    omnetpp: 6.0.1
-    vadere: 221108-1613
 
 final_test_3:
   wd: simulations/guiding_crowds_test
@@ -60,9 +57,6 @@ final_test_3:
   tags:
     exec: python3
     type: shell
-    omnetpp: 6.0.1
-    vadere: 221108-1613
-    control: 220527-1453
 
 test_4:
   wd: simulations/guiding_crowds_test
@@ -82,8 +76,6 @@ test_4:
   tags:
     exec: python3
     type: shell
-    vadere: 221108-1613
-    control: 220527-1453
 
 test_5:
   wd: simulations/guiding_crowds_test
@@ -100,4 +92,6 @@ test_5:
   tags:
     exec: python3
     type: shell
-    vadere: 221108-1613
+
+
+

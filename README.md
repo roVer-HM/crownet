@@ -43,13 +43,13 @@ git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.gi
 Install Docker (if not already available on your system):
 ```
 cd crownet/scripts
-source crownetenv
+source setup
 install_docker.sh
 ```
 
-Pull the required Docker images (due to the large size of some of them, this will take some time - depending on your Internet connection):
+Get the required Docker images (due to the large size of some of them, this will take some time - depending on your Internet connection):
 ```
-pull_images.sh
+./get_images
 ```
 
 It is also recommended to include the script 'crownet/scripts/crownetenv' in the startup file

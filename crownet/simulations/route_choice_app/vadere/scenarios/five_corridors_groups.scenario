@@ -1,8 +1,7 @@
 {
-  "name" : "simplified_default_division_groups",
+  "name" : "five_corridors_groups",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "0fb24a9f02b3089b60f0edfe56fdc81f7eb8d94e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -200,7 +199,9 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {
@@ -218,12 +219,28 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "MultiPerceptionModel",
+        "perception" : "SimplePerceptionModel",
         "cognition" : "ProbabilisticCognitionModel",
         "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.perception.AttributesMultiPerceptionModel" : { },
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus"
+            }
+          },
           "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
-            "routeChoices" : [ ]
+            "routeChoices" : [ {
+              "instruction" : "use target [11]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 1.0, 0.0, 0.0 ]
+            }, {
+              "instruction" : "use target [21]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 0.0, 1.0, 0.0 ]
+            }, {
+              "instruction" : "use target [31]",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 0.0, 0.0, 1.0 ]
+            } ]
           }
         }
       }

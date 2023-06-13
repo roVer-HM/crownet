@@ -93,6 +93,5 @@ extends = _default, D2D_General, DcDMapDynamicInterval, stationary_n1
 0.478963900407 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 587.380766363ms
 
 
-
 %contains: stdout
 <!> Simulation time limit reached -- at t=0.5s
