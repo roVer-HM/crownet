@@ -28,7 +28,7 @@ class BonnMotionServerFile : public BonnMotionFile{
 public:
     BonnMotionServerFile(): BonnMotionFile() {}
     std::vector<BmTimedLineIndex> getTimeLine() const;
-    void loadFile(const char *filename);
+    void loadFile(const char *filename, bool is3D);
 
     bool hasTraceForTime(const simtime_t time) const;
     const BmTimedLineIndex getNextTimeLineIndex(const simtime_t time);

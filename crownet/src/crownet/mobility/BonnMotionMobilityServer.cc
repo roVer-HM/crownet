@@ -31,7 +31,7 @@
 
 namespace crownet {
 
-void BonnMotionServerFile::loadFile(const char *filename){
+void BonnMotionServerFile::loadFile(const char *filename, bool is3D){
     std::string fname(filename);
     std::stringstream inStr;
     if (fname.compare(fname.size()-3, 3, ".gz") == 0){
@@ -50,6 +50,7 @@ void BonnMotionServerFile::loadFile(const char *filename){
 
     std::string line;
     int lineCount = 0;
+    int minSize = is3D ? 4 : 3;
     while (std::getline(inStr, line)) {
         if(line.at(0) == '#'){
             continue; // ignore comets
@@ -61,6 +62,18 @@ void BonnMotionServerFile::loadFile(const char *filename){
         double d;
         while (linestream >> d)
             vec.push_back(d);
+
+
+
+
+        if (((int)vec.size() % minSize) != 0 ){
+            throw cRuntimeError("Expected multiple of %i elements in row got %i for line %i",
+                        minSize, (int)vec.size(), lineCount);
+        }
+        if ((int)vec.size() == minSize){
+            throw cRuntimeError("Expected at least %i elements but got %i for line %i in %s mode. (Need at least 2 points for speed interpolation.)",
+                    2*minSize, (int)vec.size(), lineCount, is3D ? "3D" : "2D");
+        }
 
         timeLine.push_back(std::make_pair(lineCount, simtime_t(vec[0])));
         ++lineCount;
@@ -139,8 +152,8 @@ void BonnMotionMobilityServer::initialize(int stage)
         getSystemModule()->subscribe(bonnMotionTargetReached, this);
         node_type = cModuleType::find(par("moduleType"));
         moduleVector = par("vectorNode").stdstringValue();
-        bmFile.loadFile(par("traceFile").stringValue());
         is3D = par("is3D").boolValue();
+        bmFile.loadFile(par("traceFile").stringValue(), is3D);
         m_mobility = par("mobilityModulePath").stdstringValue();
         creationTimer = new cMessage("BonnMotionCreationTimer");
 
