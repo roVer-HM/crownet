@@ -2,7 +2,7 @@
 
 Description of AID service (Stefan) and its usage
 
-![Aid Service](aid.png)
+![Aid Service](../img/aid.png)
 
 ## Common Service Register
 

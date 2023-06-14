@@ -1,4 +1,32 @@
-## StartUp with GUI
+# Simulation with IDE support
+
+## Prepare the IDEs
+### Omnetpp++: Setup the Eclipse-IDE
+The eclipse environment OMNeT++ IDE uses a workspace directory to store its preferences and development artifacts. Do the following steps to create and save a project.
+#### Step 1: Create folder for meta-files
+Create a folder in your repository
+```
+mkdir omnetpp-ws
+```
+#### Step 2: Start the omnetpp container and import the subprojects
+Start the omnetpp container:
+```
+omnetpp-ide
+```
+#### Step 3: Import project with sub modules
+Choose File>Import>General>Existing projects> and import following folders:
+* inet4
+* crownet
+* simu5g
+* artery
+
+When importing the folder veins only import the modules 1 (veins) and 3 (inet).
+* veins
+
+#### Step 4: Close and restart the Environment
+Choose the folder omnetpp-ws to see the project which was just created.
+
+# Run the simulation
 In order for the simulation to run, make sure all the necessary services are running (f.e. in different terminals).
 
  * Open up the omnetpp-ide
@@ -14,7 +42,8 @@ Then in the omnet-ide select your `omnetpp.ini`, right click it and either selec
 
 <!-- ## About the tools -->
 
-## Example with GUI (For development)
+## Example
+
 Let's run the `sumo_crossing_peds_cars` inside `crownet/crownet/simulations/testSim`. This is a simple simulation with two pedestrians and a crossing (without cars). The three persons are walking side by side.
 
 1. Start the omnetpp-ide to take a look at the simulation

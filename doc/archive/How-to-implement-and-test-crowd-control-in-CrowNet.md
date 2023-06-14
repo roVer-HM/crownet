@@ -4,7 +4,20 @@
 
 Crowd management deals with the systematic planning of areas and infrastructures, communication offers and organisational structures in relation to pedestrians and their expected behaviour. ([see e.g.](http://www.basigo.de/wiki/index.php5?title=Sicherheitsbausteine/Crowd_Management/Crowd_Management&oldid=5958)). 
 
-Crowd control means that the state of the crowd is continuously measured, and due that,   the control action is changing continously, e.g. by changing sings dynamically. The CrowNet simulator offers the possibility to simulate how pedestrians are guided through a topography using text messages. Like Advanced Traveller Information Systems (ATIS), we acquire, analyze, and present information to assist surface transportation travellers in moving from a starting location (origin) to their desired destination. With CrowNet, the user can implement and test different control strategies (ATIS), while realistically modelling the pedestrian locomotion and the information dissemination through mobile networks.
+Crowd control means that the state of the crowd is continuously measured, and due to that,   the control action is changing continously, e.g. by changing sings dynamically. The CrowNet simulator offers the possibility to simulate how pedestrians are guided through a topography using text messages. Like Advanced Traveller Information Systems (ATIS), we acquire, analyze, and present information to assist surface transportation travellers in moving from a starting location (origin) to their desired destination. With CrowNet, the user can implement and test different control strategies (ATIS), while realistically modelling the pedestrian locomotion and the information dissemination through mobile networks.
+
+The flowcontrol Python framework that we integrate in CrowNet provides several guiding strategies. One example ist the 
+density based algorithm that redirects pedestrians to the route where the density is the lowest.
+Another example is the simple distribution algorithm where pedestrians are redirected sequentially.
+With flowcontrol also neq guiding strategies can be developed and tested within the CrowNet framework.
+
+
+
+| Density based approach | Simple distribution                                              |
+|------------------------|------------------------------------------------------------------|
+| <img  src="../img/guiding_strategy_2.png">   | <img  src="../img/guiding_strategy_1.png"> |                      
+
+
 
 In the following, we explain hot to run existing and set-up new CrowNet simulations with crowd control.
 
@@ -35,24 +48,24 @@ Start any IDE. Set the crownet root directy as project root. The project root is
 echo $CROWNET_HOME
 ```
 Choose the virtual enviroment `crownet/out/crownet_dev/bin/python3.8` as project interpreter.
-![pycharm_settings_1](img/how_to_implement_and_test_crown_control_in_corwnet/pycharm_settings_1.png)
+![pycharm_settings_1](../img/how_to_implement_and_test_crown_control_in_corwnet/pycharm_settings_1.png)
 
 Next, add the following directories to the project source for navigating easily through the codebase:
 * crownet/analysis/crownetutils
 * crownet/analysis/suq-controller
 * crownet/flowcontrol
 
-![pycharm_settings](img/how_to_implement_and_test_crown_control_in_corwnet/pycharm_settings.png)
+![pycharm_settings](../img/how_to_implement_and_test_crown_control_in_corwnet/pycharm_settings.png)
 
 
 ### Running existing simulations with control
 
 CrowNet Simulations can be run with and without control strategy. If a control strategy should be applied, a `control.py` file must be provided in the simulation directory. Existing CrowNet Simulations can be found in the CrowNet repository under
 `crownet/crownet/simulations`:
-![simulations](img/how_to_implement_and_test_crown_control_in_corwnet/simulations.png)
+![simulations](../img/how_to_implement_and_test_crown_control_in_corwnet/simulations.png)
 
 We will use the simple_detour_suqc_traffic simulation as example:
-![sim_example](img/how_to_implement_and_test_crown_control_in_corwnet/sim_example.png)
+![sim_example](../img/how_to_implement_and_test_crown_control_in_corwnet/sim_example.png)
 
 
 ## Step 1: Test the crowd control strategy without mobile networks
