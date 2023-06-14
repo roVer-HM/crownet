@@ -1,27 +1,53 @@
-# OMNeT++ Simulator (as used within the crownet project)
-#
-# Within roVer, we use two different containers:
-#   1) omnetpp (command line, no GUI, for simulation campaigns)
-#   2) omnetpp-ide (all graphical libs, autostart of IDE)
-#
-# This Dockerfile is used to build the omnetpp-ide container,
-# which extends the omnetpp container with a GUI
 
 
+# Scope: 
+# provide IDE for the OMNeT++ Simulator based on our public omnetpp mirror >https://github.com/roVer-HM/omnetpp.git<. 
 
-# FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:latest
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/omnetpp:6.0.1
+# Requirements/dependencies:
+# 1. the omnetpp image must be available (see >FROM ..<). Use ARG to specify the exact name of the crownet-base-cpp image. Go to ../omnetpp/Dockerfile
+
+# Release control (how to specify an omnetpp release):
+# The omnetpp release is specified by the base image "omnetpp". To build that, go to ../omnetpp/Dockerfile.
+# The release of the IDE is specified through the package release. To change the release, adjust the URL (RUN wget ... /download/omnetpp-6.0.1/omnetpp-6.0.1-linux-x86_64.tgz<)
+
+ARG IMAGE_REG
+ARG BASE_IMAGE_TAG
+
+FROM ${IMAGE_REG}/omnetpp:${BASE_IMAGE_TAG}
+
+ARG CROWNET_COMMIT_HASH
+ENV RELEASE $CROWNET_COMMIT_HASH
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y rsync 
+
+# init script (triggered at container start)
+COPY docker/omnetpp-ide/init.sh /init.sh
+RUN chmod 555 /init.sh
+ENTRYPOINT [ "/init.sh" ]
+
+# waitfor script (in order to wait for non-child processes)
+COPY docker/omnetpp-ide/waitfor.sh /waitfor.sh
+RUN chmod 555 /waitfor.sh
+
+RUN rm -rf /tmp/omnetpp.tgz
+RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.0.1/omnetpp-6.0.1-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
+
+# extract IDE and copy to omnetpp
+WORKDIR /tmp/
+RUN tar -xf omnetpp.tgz --one-top-level=omnetpp --strip-components 1
 
 WORKDIR /opt/omnetpp/omnetpp
+RUN rm -rf /opt/omnetpp/omnetpp/ide
+RUN rsync -aP --chmod=Du=rwx,Dg=rwx,Do=rwx,Fu=rwx,Fg=rwx,Fo=rwx //tmp/omnetpp/ide //opt/omnetpp/omnetpp
 
-# now install the Eclipse IDE base
-ADD ide/ide.tar.gz .
+# update permissions so that the omnetpp directory becomes writable
+#RUN chmod --verbose -R a+rw /opt/omnetpp/omnetpp/ide
 
 # install embeded browser components
 RUN apt-get update -y
 RUN export SWT_GTK3=1
-RUN apt-get install -y gtk3.0
-RUN apt-get install -y libwebkit2gtk-4.0-37
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gtk3.0
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libwebkit2gtk-4.0-37
 
 # installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
 RUN pip3 install cpplint
@@ -32,14 +58,5 @@ RUN pip3 install cpplint
 #        if [ -z "$PID" ]; then echo "error installing plugin. Is ide installed?" && exit 1; fi; \
 #        while [ -e /proc/$PID ]; do sleep 0.1 ; done
 
-# update permissions so that the omnetpp directory becomes writable
-RUN chmod -R a+rw /opt/omnetpp/omnetpp
 
-# init script (triggered at container start)
-COPY init.sh /init.sh
-RUN chmod 555 /init.sh
-ENTRYPOINT [ "/init.sh" ]
 
-# waitfor script (in order to wait for non-child processes)
-COPY waitfor.sh /waitfor.sh
-RUN chmod 555 /waitfor.sh

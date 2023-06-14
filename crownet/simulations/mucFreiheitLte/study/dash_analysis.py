@@ -12,19 +12,19 @@ from hjson import OrderedDict
 from matplotlib import projections
 from matplotlib.backends.backend_pdf import PdfPages
 from pyparsing import col
-from roveranalyzer.simulators.opp.provider.hdf.DcDGlobalPosition import DcdGlobalDensity
+from crownetutils.analysis.dpmm.hdf.dpmm_global_positon_provider import DpmmGlobal
 import seaborn as sb
 import pandas as pd
 from pyproj import Proj
-from roveranalyzer.analysis.plot import PlotDpmMap
-from roveranalyzer.analysis.dashapp import OppModel
-from roveranalyzer.analysis.omnetpp import PlotUtil
-from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdProviders
-from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D
-from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
-from roveranalyzer.simulators.vadere.plots import scenario
-from roveranalyzer.utils.general import DataSource
-from roveranalyzer.utils.plot import Style
+from crownetutils.analysis.plot import PlotDpmMap
+from crownetutils.crownet_dash.dashapp import OppModel
+from crownetutils.analysis.omnetpp import PlotUtil
+from crownetutils.analysis.dpmm.builder import DpmmProviders
+from crownetutils.analysis.dpmm.dpmm import DpmMap
+from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.vadere import scenario
+from crownetutils.utils.misc import DataSource
+from crownetutils.utils.plot import Style
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,27 +32,25 @@ import seaborn as sns
 import os
 import glob
 
-from roveranalyzer.utils import Project
-from roveranalyzer.analysis import OppAnalysis, DensityMap, HdfExtractor, DashBoard
-import roveranalyzer.simulators.crownet.dcd as Dmap
-import roveranalyzer.simulators.opp as OMNeT
-from roveranalyzer.utils.logging import logger, timing, logging
-from roveranalyzer.simulators.vadere.plots.scenario import Scenario
-from roveranalyzer.analysis.flaskapp.application.model import (
+from crownetutils.utils.misc import Project
+from crownetutils.analysis.omnetpp import OppAnalysis
+import crownetutils.analysis.dpmm as Dmap
+from crownetutils.utils.logging import logger, timing, logging
+from crownetutils.crownet_dash.flaskapp.application.model import (
     get_beacon_df,
     get_beacon_entry_exit,
     get_measurements,
     local_measure,
 )
-from roveranalyzer.analysis.common import Simulation, SuqcStudy
-from roveranalyzer.analysis.flaskapp.wsgi import run_app
+from crownetutils.analysis.common import Simulation, SuqcStudy
+from crownetutils.crownet_dash.flaskapp.wsgi import run_app
 from omnetinireader.config_parser import ObjectValue
 
 
 from os.path import join, abspath
 
 
-def main(data_root: str, builder: Dmap.DcdHdfBuilder, sql: OMNeT.CrownetSql):
+def main(data_root: str, builder: DpmmHdfBuilder, sql: OMNeT.CrownetSql):
     beacon_apps = sql.m_app0()
     map_apps = sql.m_app1()
 
@@ -241,20 +239,20 @@ if __name__ == "__main__":
     # _d.extend(data_dict("/mnt/data1tb/results/ymfDistDbg/simulation_runs/outputs/*/final_out",
     # suqc=True, prefix="step_err_ymf"))
 
-    # ymf_dist_dbg_2 = SuqcRun("/mnt/data1tb/results/ymfDistDbg2")
-    # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
-    # ymf_dist_dbg_3 = SuqcRun("/mnt/data1tb/results/ymfDistDbg3")
-    # ymf_dist_dbg_4 = SuqcRun("/mnt/data1tb/results/ymfDistDbg4")
+    # ymf_dist_dbg_2 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg2")
+    # ymf_dist_dbg_3 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg3")
+    # ymf_dist_dbg_3 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg3")
+    # ymf_dist_dbg_4 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg4")
     ymf_dist_dbg_5 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg5")
     ymf_dist_dbg_6 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg6")
     ymf_dist_dbg_7 = SuqcStudy("/mnt/data1tb/results/ymfDistDbg7")
 
-    # dcdMap_muc01 = SuqcRun("/mnt/data1tb/results/dcdMap_muc01")
-    # dcdMap_muc02 = SuqcRun("/mnt/data1tb/results/dcdMap_muc02")
-    # dcdMap_muc04 = SuqcRun("/mnt/data1tb/results/dcdMap_muc04")
-    # dcdMap_muc05 = SuqcRun("/mnt/data1tb/results/dcdMap_muc05")
-    # dcdMap_muc07 = SuqcRun("/mnt/data1tb/results/dcdMap_muc07")
-    # dcdMap_muc08 = SuqcRun("/mnt/data1tb/results/dcdMap_muc08")
+    # dcdMap_muc01 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc01")
+    # dcdMap_muc02 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc02")
+    # dcdMap_muc04 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc04")
+    # dcdMap_muc05 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc05")
+    # dcdMap_muc07 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc07")
+    # dcdMap_muc08 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc08")
     dcdMap_muc08 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc08")
     dcdMap_muc09 = SuqcStudy("/mnt/data1tb/results/dcdMap_muc09")
     # data = dcdMap_muc08.get_simulation_dict(lbl_key=True)
@@ -333,7 +331,7 @@ if __name__ == "__main__":
     store.close()
 
     # own interface (using context manager)
-    hdf: DcdGlobalDensity = DcdGlobalDensity(hdf_path="/tmp/data.h5")
+    hdf: DpmmGlobal = DpmmGlobal(hdf_path="/tmp/data.h5")
     # [[time, x, y], <columns>]
     df = hdf[pd.IndexSlice[:, 120, 100], :]
 

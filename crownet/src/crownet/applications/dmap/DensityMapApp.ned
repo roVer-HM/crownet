@@ -41,6 +41,7 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
         // FSM-mainApp trigger (not used by default ). If < 0 deactivated. Packet creation 
         // is manged by scheduler modules
         double mainAppInterval @unit(s) = default(-1.0s); //  
+        bool appendResourceSharingDomainId = default(false);
         
         object mapCfg = default(crownet::MapCfg{
             writeDensityLog: true,

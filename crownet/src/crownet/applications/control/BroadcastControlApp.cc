@@ -42,8 +42,12 @@ void BroadcastControlApp::initialize(int stage) {
 
 FsmState BroadcastControlApp::handlePayload(const Ptr<const ApplicationPacket> pkt){
     // Possible rebroadcast handled in BaseBroadcast::handleDataArrived
+
+
     if (isControlled()){
+            EV_INFO << getFullPath() << "send packet";
             auto ctrlTag = pkt->getTag<SimpleControlCfg>();
+           // send received information over traci to vadere
             ctrl->send_control(ctrlTag->getModelString(), ctrlTag->getModelData());
     }
     return FsmRootStates::WAIT_ACTIVE;

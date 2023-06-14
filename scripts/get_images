@@ -1,0 +1,161 @@
+#!/bin/bash
+
+check_container() {
+        REQUIRED_CONTAINER=$1
+        LOCAL_CONTAINERS=$(docker image list --format "{{.Repository}}:{{.Tag}}")
+        
+        echo "the local containers are: ${LOCAL_CONTAINERS[*]}"
+         
+        REQUIRED_CONTAINER2=${REQUIRED_CONTAINER#$CROWNET_IMAGE_BASE/}
+        LOCAL_CONTAINERS2=$(docker image list --format "{{.Repository}}:{{.Tag}}" | grep -o '[^/]*$')
+        
+	if [[ "${LOCAL_CONTAINERS[*]}" =~ "${REQUIRED_CONTAINER}" ]]; then
+	    echo >&2 "  Available:   ${REQUIRED_CONTAINER}"
+	else
+		if [[ "${LOCAL_CONTAINERS2[*]}" =~ "${REQUIRED_CONTAINER2}" ]]; then
+		      echo >&2 "(!) Warning: image found for ${REQUIRED_CONTAINER2} but under different registry."
+                    RENAME=$((RENAME+1))
+		else   
+		    echo >&2 "(!) Missing:   ${REQUIRED_CONTAINER}"
+	            MISSING=$((MISSING+1)) 
+		fi
+	fi
+}
+
+check_containers_local_available() {
+
+	MISSING=0
+        RENAME=0
+
+	echo >&2  ""
+	echo >&2  "Check availability of images."
+	echo >&2  ""
+	echo >&2  "------------------------- IMAGE AVAILABILITY ------------------------------"
+	echo >&2  "Local           Container name   "                                             
+	echo >&2  "---------------------------------------------------------------------------"
+	check_container "${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}"
+	check_container "${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}"
+	check_container "${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}"
+	check_container "${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}"
+	check_container "${CROWNET_IMAGE_BASE}/omnetpp-ide:${CROWNET_OPP_IDE_CONT_TAG}"
+	check_container "${CROWNET_IMAGE_BASE}/vadere-ide:${CROWNET_VADERE_IDE_CONT_TAG}"
+	check_container "${CROWNET_IMAGE_BASE}/flowcontrol-ide:${CROWNET_CONTROL_IDE_CONT_TAG}"
+
+	echo >&2 "---------------------------------------------------------------------------"
+        echo >&2 " "
+   
+        MISS=$(($MISSING+$RENAME))
+	if [ "$MISS" -gt 0 ]; then
+           printf >&2 'Not all images are available on your local machine. Missing: %d out of 7.\n' $MISS
+        else
+           echo >&2 "All required images available on your local machine. Not build or pull is necessary." 
+        fi
+
+        echo $MISS
+
+}
+
+##################################### MAIN SCRIPT ######################################
+
+echo "The following images are required for the simulation: "
+sh ${CROWNET_HOME}/scripts/print_container_versions
+
+missing=$(check_containers_local_available)
+
+
+
+if ! [ "$missing" = "0" ]; then
+   echo -n "Pull the specified images from a container registry? (y/N): "
+   read answer
+   if [ "$answer" != "${answer#[Yy]}" ] ;then
+   
+        echo "From which container registry would you like to pull ?"
+   	echo "(1) https://github.com/roVer-HM/crownet (open access)" 
+   	echo "(2) https://sam-dev.cs.hm.edu/rover/crownet (restricted access): "
+	echo "(3) other container registry (access permissions unknown)"
+	read -p 'Option: ' OPTION
+	echo $OPTION
+
+	case "$OPTION" in
+	   "1") 
+		SOURCE_IMAGE_BASE="ghcr.io/rover-hm" 
+	   ;;
+	   "2") 
+		SOURCE_IMAGE_REG="sam-dev.cs.hm.edu:5023" 
+		SOURCE_IMAGE_BASE="sam-dev.cs.hm.edu:5023/rover/crownet"
+		docker login $SOURCE_IMAGE_REG 
+	   ;;
+	   "3") 
+                echo ""
+		echo "Please provide the URL to the container registry to which your repo references. For example for github, use 'ghcr.io/namespace/repo'" 
+		read -p 'registry URL:' SOURCE_IMAGE_BASE
+		echo "Please provide the URL to the registry provider. For example for github, use 'ghcr.io'" 
+		read -p 'host URL:' SOURCE_IMAGE_REG
+                echo ""
+               docker login $SOURCE_IMAGE_REG
+                
+	   ;;
+	esac
+   
+   
+         bash $CROWNET_HOME/scripts/pull_and_push_images -s $SOURCE_IMAGE_BASE -t $CROWNET_IMAGE_BASE
+         if [ $? -eq 0 ]; then
+		echo "All images have been downloaded successfully."
+                exit 0	  
+	 else
+	        echo "Image download failed. Make sure that the images are available under ${SOURCE_IMAGE_BASE}."	
+                fi
+	 fi 
+fi
+
+
+# check if image versions are based on the current commit - then they can be built
+
+cd $CROWNET_HOME
+COMMIT=$(git rev-parse HEAD | head -c 8) # commit hash (use first 8 characters)
+
+based_on_current_commit='true'
+if ! [ "${CROWNET_OPP_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+if ! [ "${CROWNET_VADERE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+if ! [ "${CROWNET_CONTROL_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+if ! [ "${CROWNET_SUMO_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+if ! [ "${CROWNET_OPP_IDE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+if ! [ "${CROWNET_VADERE_IDE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+if ! [ "${CROWNET_CONTROL_IDE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
+
+
+if [ "$based_on_current_commit" = false ]; then
+        echo "(!) ERROR The setup of the images as specified in config/CONTAINER_VERSION.config FAILED."
+        echo "          Images are neither available nor buildable." 
+        echo "          For building the images based on the current commit, specify the versions and re-run the script: "
+        echo "                 source setup -i -u && ./get_images.sh"
+        echo "(!) WARNING: this will change the image versions config/CONTAINER_VERSION.config."
+        exit -1
+fi 
+
+echo "Build images based on the current commit (=${COMMIT}) (y/N): "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+   bash $CROWNET_HOME/scripts/build_all_images
+   exit 0
+fi
+
+echo "(!) Error image setup failed."
+exit -1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

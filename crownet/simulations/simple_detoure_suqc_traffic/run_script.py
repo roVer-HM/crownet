@@ -9,14 +9,13 @@ import numpy
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner, process_as
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner, process_as
 
-import roveranalyzer.simulators.opp as OMNeT
-import roveranalyzer.analysis as omnet
+from crownetutils.omnetpp.scave import CrownetSql
+import crownetutils.analysis as omnet
 
 
-
-class SimulationRun2(BaseRunner):
+class SimulationRun2(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
@@ -28,7 +27,7 @@ class SimulationRun2(BaseRunner):
         df_r["timeStep"] = (
             dt * df_r["timeStep"] - 100.0
         )  # information dissemination starts at 100s
-        df_r.set_index('timeStep', drop=True, inplace=True)
+        df_r.set_index("timeStep", drop=True, inplace=True)
         return df_r
 
     @process_as({"prio": 20, "type": "post"})
@@ -42,11 +41,11 @@ class SimulationRun2(BaseRunner):
         df_r = self.get_degree_informed_dataframe(filepath)
         df_r.to_csv(
             os.path.join(os.path.dirname(filepath), "degree_informed_extract.txt"),
-            sep=" "
+            sep=" ",
         )
 
         # plot
-        df_r['percentageInformed-PID12'].plot()
+        df_r["percentageInformed-PID12"].plot()
         plt.axhline(y=0.95, c="r")
         plt.xlabel("Time [s] (Time = 0s : start of information dissemination)")
         plt.ylabel("Percentage of pedestrians informed [%]")
@@ -66,7 +65,7 @@ class SimulationRun2(BaseRunner):
 
         dt = 0.4
         time95 = 0.0
-        for perc in df_r['percentageInformed-PID12']:
+        for perc in df_r["percentageInformed-PID12"]:
             if perc >= 0.95:
                 break
             time95 += dt
@@ -105,20 +104,17 @@ class SimulationRun2(BaseRunner):
             os.path.join(self.result_base_dir(), "vars_rep_0.sca"),
         )
 
-        sql = OMNeT.CrownetSql(
+        sql = CrownetSql(
             vec_path=f"{data_root}/vars_rep_0.vec",
             sca_path=f"{data_root}/vars_rep_0.sca",
-            network="World_Wlan")
-
-        filepath = os.path.join(self.result_base_dir(), "vadere.d", filename)
-        
-        matrix = omnet.OppAnalysis.get_packet_age(
-            sql = sql,
-            app_path = ".app[0]"
+            network="World_Wlan",
         )
 
-        matrix.to_csv(os.path.join(os.path.dirname(filepath), filename), sep=" ")
+        filepath = os.path.join(self.result_base_dir(), "vadere.d", filename)
 
+        matrix = omnet.OppAnalysis.get_packet_age(sql=sql, app_path=".app[0]")
+
+        matrix.to_csv(os.path.join(os.path.dirname(filepath), filename), sep=" ")
 
 
 if __name__ == "__main__":
@@ -127,18 +123,19 @@ if __name__ == "__main__":
         # default behavior of script
         runner = SimulationRun2(
             os.getcwd(),
-            [   "vadere-opp",
+            [
+                "vadere-opp",
                 "--qoi",
                 "degree_informed_extract.txt",
                 "poisson_parameter.txt",
                 "time_95_informed.txt",
                 "packet_age.txt",
                 "--create-vadere-container",
-                '--override-host-config',
-                '--run-name',
-                'Sample__0_0',
-                '--experiment-label',
-                'output'
+                "--override-host-config",
+                "--run-name",
+                "Sample__0_0",
+                "--experiment-label",
+                "output",
             ],
         )
     else:

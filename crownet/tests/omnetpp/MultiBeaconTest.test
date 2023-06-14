@@ -40,5 +40,6 @@ PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCrea
 PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 28.814045629ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:28.814045629ms age:0s jitter:98.575838us avg_s:54 b count:2 loss_r:0}
 PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 28.814045629ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:28.814045629ms age:0s jitter:143.2927us avg_s:54 b count:3 loss_r:0}
 
+
 %contains: stdout
 <!> Simulation time limit reached -- at t=0.5s

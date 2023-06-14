@@ -3,21 +3,21 @@ from itertools import chain
 import os
 import re
 from typing import List
-from roveranalyzer.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
-from roveranalyzer.analysis.omnetpp import (
+from crownetutils.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
+from crownetutils.analysis.omnetpp import (
     CellOccupancy,
     CellOccupancyInfo,
     OppAnalysis,
 )
-from roveranalyzer.simulators.opp.provider.hdf.IHdfProvider import BaseHdfProvider
-from roveranalyzer.utils import logging
-from roveranalyzer.utils.dataframe import (
+from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.utils.logging import logging
+from crownetutils.utils.dataframe import (
     format_frame,
     numeric_formatter,
     save_as_tex_table,
     siunitx,
 )
-from roveranalyzer.utils.plot import (
+from crownetutils.utils.plot import (
     PlotUtil,
     paper_rc,
     plt_rc_same,

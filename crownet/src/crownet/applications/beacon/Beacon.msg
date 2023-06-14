@@ -48,12 +48,17 @@ class DynamicBeaconPacket extends BaseDynamicBeacon
 {
 	chunkLength = chunkLength + b(2*64 + 3*12 + 16 + 12 + 12 + 4);
 	
-    inet::Coord pos;		//2*64bit
+    inet::Coord pos;		//2*64bit (A.???/A.???)
     inet::Coord epsilon;	//3*12bit (A.119)
     uint16_t numberOfNeighbours; // 16 bit
     uint16_t speed; // 12bit
     uint16_t heading; // 12bit
     // alignment 4bit
+}
+
+class DynamicBeaconPacketWithSharingDominId extends DynamicBeaconPacket {
+    chunkLength = chunkLength + b(16);
+    uint16_t sharingDominId = 0;
 }
 
 

@@ -5,7 +5,7 @@ import sys
 from matplotlib.transforms import Affine2D
 from matplotlib.lines import Line2D
 from shapely.geometry import Point, Polygon
-from roveranalyzer.analysis.common import (
+from crownetutils.analysis.common import (
     RunMap,
     Simulation,
     RunMap,
@@ -13,12 +13,12 @@ from roveranalyzer.analysis.common import (
     SuqcStudy,
     SimGroupAppendStrategy,
 )
-from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.analysis.plot import PlotDpmMap
-from roveranalyzer.utils.parallel import run_kwargs_map
-from roveranalyzer.utils.plot import PlotUtil, matplotlib_set_latex_param
-import roveranalyzer.utils.dataframe as FrameUtl
-import roveranalyzer.utils.plot as PlotUtl
+from crownetutils.analysis.omnetpp import OppAnalysis
+from crownetutils.analysis.plot import PlotDpmMap
+from crownetutils.utils.parallel import run_kwargs_map
+from crownetutils.utils.plot import PlotUtil, matplotlib_set_latex_param
+import crownetutils.utils.dataframe as FrameUtl
+import crownetutils.utils.plot as PlotUtl
 from matplotlib.ticker import MaxNLocator, FixedLocator
 import pandas as pd
 import numpy as np

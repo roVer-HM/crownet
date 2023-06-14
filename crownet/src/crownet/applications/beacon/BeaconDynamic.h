@@ -36,6 +36,7 @@ private:
     double minSentFrequency;
     double maxSentFrequyncy;
     double maxBandwidth;
+    bool appendResourceSharingDomainId;
 };
 
 } /* namespace crownet */

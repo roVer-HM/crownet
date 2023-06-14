@@ -3,10 +3,10 @@ import sys, os
 
 sys.path.append(os.path.abspath(".."))
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner
+#from roveranalyzer.simulators.crownet.runner import BaseRunner
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner, process_as
 
-
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
@@ -25,6 +25,12 @@ if __name__ == "__main__":
         "--override-host-config",
         "--experiment-label",
         "output",
+        '--vadere-tag',
+        'latest',
+        '--control-tag',
+        'latest',
+        '--omnet-tag',
+        '6.0.1',
         "--with-control",
         "control.py",
         "--ctrl.controller-type",
@@ -32,6 +38,22 @@ if __name__ == "__main__":
         "--opp.-c",
         "final",
     ]
+
+python3 run_script.py 
+vadere-opp-control 
+--create-vadere-container 
+--opp.-c final_control 
+--control-use-local 
+--override-host-config 
+--with-control 
+control.py 
+--omnet-tag 
+6.0.1 
+--vadere-tag 
+latest 
+--control-tag 
+latest
+
 
     if len(sys.argv) == 1:
         # default behavior of script
