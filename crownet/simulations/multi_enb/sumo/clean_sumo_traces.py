@@ -727,7 +727,7 @@ def main(sim_dir: SumoSimDir, out_prefix="traj_check"):
         args.append((net, bm, row, fcd))
 
     ret = run_args_map(
-        run, args_iter=args, pool_size=20, raise_on_error=False, append_args=False
+        run, args_iter=args, pool_size=5, raise_on_error=False, append_args=False
     )
     # ret = run(*args[0])
     # ret = [(True, ret)]
@@ -786,30 +786,13 @@ if __name__ == "__main__":
 
     root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned"
 
-    sim_dir = SumoSimDir(
-        sim_root=root,
-        output_root="output/cleaned_network/",
-        fcd_root="fcd_2",
-        bm_root="bonnmotion_2",
-        sumo_cfg_root="cfg2",
-    )
+    # sim_dir = SumoSimDir(sim_root=root, output_root="output/run_60_min")
+    sim_dir = SumoSimDir(sim_root=root, output_root="output/run_60_min_cleaned")
+    sim_dir.create_dirs()
 
-    # with _open(sim_dir.fcd("000__fcd_muc.xml.gz")) as fd:
-    #     fcdxml = ET.parse(fd)
+    # main(sim_dir, out_prefix="traj_check")
 
-    # s = io.StringIO()
-    # print("time;num_nodes", file=s)
-    # for e in fcdxml.findall(".//timestep"):
-    #     t = e.attrib["time"]
-
-    #     num = len(e.getchildren())
-    #     print(f"{t};{num}", file=s)
-
-    # s.seek(0)
-    # print(s.getvalue())
-
-    main(sim_dir, out_prefix="traj_check")
-
-    # steps = load_bm_sumo_steps(sim_dir.out("traj_check", "steps.json"))
-    # update_route(steps, sim_dir)
+    steps = load_bm_sumo_steps(sim_dir.out("traj_check", "steps.json"))
+    update_route(steps, sim_dir)
+    sim_dir.copy_to_clean(out_suffix="_2")
     # print("hi")

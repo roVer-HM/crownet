@@ -100,7 +100,7 @@ def run_simulations(sim_dir: SimDir, net, scenario_prefix=""):
         args.add("--route-files", route)
         args.add("--seed", "1234")
         args.add("--step-length", "0.4")
-        args.add("--end", "600.0")
+        args.add("--end", str(3600))  # 60 min. -> 3600 s
         args.add(
             "--fcd-output", sim_dir.fcd(f"{i:03}_{scenario_prefix}_fcd_muc.xml.gz")
         )
@@ -131,7 +131,9 @@ def convert_fcd_to_bonnmotion(sim_dir: SimDir, net, scenario_prefix=""):
         args.add("--bonnmotion-output", bm)
         args.add("--net-input", net)
         args.add("--person")
-        # args.add("--bonnmotion-omnet-origin")
+        args.add("--bonnmotion-min-trace-length", "2")
+        args.add("--bonnmotion-skip-min-trace-length")
+        args.add("--bonnmotion-omnet-origin")
 
         runners.create_and_run(args.to_list(), sim_dir.out())
 
@@ -165,18 +167,13 @@ def run_diff(root):
 if __name__ == "__main__":
     root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned/"
 
-    sim_dir = SimDir(sim_root=root, output_root="output/cleaned_network_2/")
-    # sim_dir = SimDir(
-    #     sim_root=root,
-    #     output_root="output/cleaned_network_2/",
-    #     fcd_root="fcd_2",
-    #     bm_root="bonnmotion_2",
-    #     sumo_cfg_root="cfg_2",
-    #     )
+    # sim_dir = SimDir(sim_root=root, output_root="output/run_60_min/")
+    sim_dir = SimDir(sim_root=root, output_root="output/run_60_min_cleaned")
+    sim_dir.create_dirs()
     net_file = sim_dir.root("muc.net.xml.gz")
     scenario_prefix = ""
 
-    generate_routes(sim_dir, net_file, scenario_prefix=scenario_prefix, N=50)
+    # generate_routes(sim_dir, net_file, scenario_prefix=scenario_prefix, N=20)
     run_simulations(sim_dir, net_file, scenario_prefix=scenario_prefix)
     convert_fcd_to_bonnmotion(sim_dir, net_file, scenario_prefix=scenario_prefix)
     # run_diff(root)
