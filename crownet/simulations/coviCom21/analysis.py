@@ -3,24 +3,23 @@ import os
 import matplotlib
 from matplotlib.lines import Line2D
 
-from roveranalyzer.simulators.crownet.dcd.dcd_builder import DcdHdfBuilder
-from roveranalyzer.simulators.crownet.dcd.interactive import (
+from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.plot.interactive import (
     InteractiveAreaPlot,
     InteractiveValueOverDistance,
 )
-from roveranalyzer.utils.path import get_or_create
+from crownetutils.utils.path import get_or_create
 
 matplotlib.use("TkAgg")
 
 
-from roveranalyzer.simulators.opp.scave import ScaveTool, OppSql, SqlOp
+from crownetutils.omnetpp.scave import ScaveTool, OppSql, SqlOp
 
-# from roveranalyzer.simulators.opp.opp_analysis import Opp, OppAccessor
-from roveranalyzer.utils import PathHelper, from_pickle
-from roveranalyzer.simulators.crownet.dcd.dcd_map import DcdMap2D, DcdMap2DMulti
+from crownetutils.utils.path import PathHelper
+from crownetutils.analysis.dpmm.dpmm import DpmMap, DpmMapMulti
 from itertools import product
 import matplotlib.pyplot as plt
-from roveranalyzer.utils import PlotUtil
+from crownetutils.utils.plot import PlotUtil
 import pandas as pd
 import numpy as np
 
@@ -42,7 +41,7 @@ def read_data(path, *args, **kwargs):
     node_map_paths = path.glob("dcdMap_*.csv")
     scenario_path = path.glob("vadere.d/*.scenario", expect=1)
 
-    dcd = DcdMap2DMulti.from_paths(
+    dcd = DpmMapMulti.from_paths(
         global_data=global_map_path,
         node_data=node_map_paths,
         real_coords=True,
@@ -112,7 +111,7 @@ def make_density_plot(path, dcd):
         plt.close(f)
 
 
-def make_count_plot(path, dcd: DcdMap2D, para):
+def make_count_plot(path, dcd: DpmMap, para):
     # make count plot
     f1, ax = dcd.plot_map_count_diff()
     maxAge = para.loc[para["name"] == "maxAge", ["value"]].iloc[0].value
@@ -319,8 +318,8 @@ if __name__ == "__main__":
     # main()
 
     sim_path = os.path.abspath("results/vadere_120_20210825-08:40:00")
-    hdf_builder = DcdHdfBuilder.get("dcd_map.h5", sim_path)
-    hdf_builder.single_df_filters.append(DcdHdfBuilder.F_selected_only)
+    hdf_builder = DpmmHdfBuilder.get("dcd_map.h5", sim_path)
+    hdf_builder.single_df_filters.append(DpmmHdfBuilder.F_selected_only)
     # get dcd object (all data)
     dcd = hdf_builder.build(
         # x_slice=slice(1702., 3008.),

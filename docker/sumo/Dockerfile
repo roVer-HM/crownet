@@ -1,14 +1,23 @@
 # syntax = docker/dockerfile:experimental
 #
-# SUMO - Simulation of Urban MObility
-#
-# see https://github.com/eclipse/sumo
+# Scope: 
+# build the SUMO Simulator based on our public omnetpp mirror >https://github.com/roVer-HM/sumo.git<. 
+
+# Requirements/dependencies:
+# none
+
+# Release control (how to specify a SUMO release):
+# Go to >https://github.com/roVer-HM/sumo<. Choose a tag that refers to the desired SUMO release.
+# Then, change >ENV GITHUB_TAG="tag-of-desired-sumo-release"< in THIS Dockerfile.
+# Always use tags instead of branches so that the code can be uniquely assigned to a unique state.
+
+# Common problems:
+# Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/sumo<.
 
 FROM ubuntu:18.04
 
-# Specify the version/tag of sumo to be put in the container:
-# ENV RELEASE master
-ENV RELEASE v1_15_0
+ENV GITHUB_TAG="v1_15_0"
+ENV SUMO_RELEASE=$GITHUB_TAG
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)
 ENV VEINS_RELEASE hm_master
@@ -31,22 +40,17 @@ WORKDIR /opt/sumo
 # enable lfs (must be done before cloning!) and clone the project
 RUN git lfs install
 
-# download public key for sam-dev.cs.hm.edu
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -p 6000 sam-dev.cs.hm.edu >> ~/.ssh/known_hosts
-
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN --mount=type=ssh git \
-        clone --recursive --branch $RELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/sumo.git $RELEASE
+RUN git clone --recursive --branch $SUMO_RELEASE https://github.com/roVer-HM/sumo.git $SUMO_RELEASE
 
 # add a symbolic link so sumo is found in the path
-RUN ln -s /opt/sumo/$RELEASE /opt/sumo/sumo
+RUN ln -s /opt/sumo/$SUMO_RELEASE /opt/sumo/sumo
 
 WORKDIR /opt/sumo/sumo
 
 ARG NOCACHE_PULL=0
-RUN --mount=type=ssh git \
-        pull ssh://git@sam-dev.cs.hm.edu:6000/rover/sumo.git $RELEASE
+RUN git pull https://github.com/roVer-HM/sumo.git $SUMO_RELEASE
 
 # configure and compile
 ENV PATH /opt/sumo/sumo/bin:$PATH
@@ -59,14 +63,14 @@ WORKDIR /opt/sumo/sumo
 RUN rm -rf build/cmake-build
 
 
-COPY veins_launchd /veins_launchd
+COPY docker/sumo/veins_launchd /veins_launchd
 RUN chmod 555 /veins_launchd
 
 # Setup SUMO_HOME
 ENV SUMO_HOME /opt/sumo/sumo
 
 # default init script (triggered at container start)
-COPY init.sh /init.sh
+COPY docker/sumo/init.sh /init.sh
 RUN chmod 555 /init.sh
 CMD [ "/init.sh" ]
 

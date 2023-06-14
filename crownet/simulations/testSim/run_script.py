@@ -4,16 +4,15 @@ import sys, os
 sys.path.append(os.path.abspath(".."))
 
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
 
 if __name__ == "__main__":
-
 
     settings = [
         "vadere-opp-control",
@@ -22,9 +21,9 @@ if __name__ == "__main__":
         "--experiment-label",
         "output",
         "--opp.-c",
-        "test_control001_udp_only", # test_control001_udp_only OR test_control001_aid
+        "test_control001_udp_only",  # test_control001_udp_only OR test_control001_aid
         "--with-control",
-        "control_1.py"
+        "control_1.py",
     ]
 
     if len(sys.argv) == 1:

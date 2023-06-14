@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sh ${CROWNET_HOME}/scripts/print_environment
+sh ${CROWNET_HOME}/scripts/print_container_registry
+sh ${CROWNET_HOME}/scripts/print_container_versions

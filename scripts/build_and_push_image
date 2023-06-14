@@ -1,0 +1,197 @@
+#!/bin/bash
+
+print_usage() {
+  echo "$(basename "$0") [-h] [-i SIMULATOR] [-b PARENT_IMAGE_TAG] [-f NON_INTERACTIVE] [-u UPDATE_LATEST] [-p PUSH] [-q QUIET]
+   Build a docker image of a certain simulator or system setup based on the current crownet commit. 
+   where:
+    -i  name of the required simulator (omnetpp, vadere, sumo, flowcontrol) or system setup (crownet-base-min, *-java, *-cpp) REQUIRED
+    -b  tag of the parent image from which the container inherits OPTIONAL (default: latest)
+    -f  force non-interactive mode OPTIONAL (default: false)
+    -u  update the latest image by creating a copy of the container with the tag >latest< (default: true)
+    -p  push container to the container registry (default: false)
+    -q  show docker build process. (default: true)"
+}
+
+# check and set enviromental variables
+set -e
+
+if [ -z "$CROWNET_HOME" ]; then
+      echo "Variabel 'CROWNET_HOME' not set."
+      exit -1
+fi
+
+if [ -z "$CROWNET_IMAGE_BASE" ]; then
+      echo "Variabel 'CROWNET_IMAGE_BASE' not set."
+      exit -1
+fi
+
+# proceed user input
+## parse arguments from command line
+
+NON_INTERACTIVE='false'
+UPDATE_LATEST='true'
+PUSH_TO_REGISTRY='false'
+QUIET=''
+unset -v IMAGE_NAME
+unset -v BASE_IMAGE_TAG
+	
+while getopts 'i:b:fupqh' flag
+do
+    case "${flag}" in
+        i) IMAGE_NAME=${OPTARG};;
+        b) BASE_IMAGE_TAG=${OPTARG};;
+        f) NON_INTERACTIVE='true';;
+        u) UPDATE_LATEST='false';;
+        p) PUSH_TO_REGISTRY='true';;
+        q) QUIET='--quiet';;
+        *) print_usage; exit 1 ;;
+    esac
+done
+
+## check whether image name is configured correctly
+ALLOWED_IMAGE_NAMES=("crownet-base-min" "crownet-base-java" "crownet-base-cpp" "flowcontrol" "flowcontrol-ide" "omnetpp" "omnetpp-ide" "sumo" "vadere" "vadere-ide")
+
+if [ -z "$IMAGE_NAME" ]; then
+      echo "ERROR: argument  [-i] required." 
+      echo "       Available options for [-i]: ${ALLOWED_IMAGE_NAMES[*]}]."
+      exit -1  
+fi
+
+if ! [[ " ${ALLOWED_IMAGE_NAMES[*]} " =~ " ${IMAGE_NAME} " ]]; then
+      echo "ERROR: Name of the simulator/system setup [-i] not available. Available options for [-i]: ${ALLOWED_IMAGE_NAMES[*]}"
+      exit -1 
+fi 
+
+
+## check whether the tag of parent image is configured or not (default: latest)
+if [ "$IMAGE_NAME" = "crownet-base-min" ] || [ "$IMAGE_NAME" = "sumo" ]; then
+   	echo "INFO: No parent image exists for the image ${IMAGE_NAME}. Ignore parent image tag."
+else  
+	if [ -z "$BASE_IMAGE_TAG" ]; then
+	      BASE_IMAGE_TAG="latest"
+	      echo "INFO: No image tag of the parent image specified. Use BASE_IMAGE_TAG='latest'."
+	fi
+fi
+
+echo "WARNING: Parent image with tag BASE_IMAGE_TAG=${BASE_IMAGE_TAG} must be either available on your local machine or you must have access granted to the container registry >${CROWNET_IMAGE_BASE}<."
+
+
+
+# check repo
+if ! [ "$PWD" = "$CROWNET_HOME" ]; then
+	echo "INFO: Navigate to CROWNET_HOME directory for docker image build."
+	cd $CROWNET_HOME
+fi 
+
+GIT_STATUS=$(git status -s)
+if ! [ "$GIT_STATUS" = "" ]; then
+   echo "WARNING: There are uncommited changes in the repository that might produce non-reproducable image content."
+   if [ "$NON_INTERACTIVE" = true ]; then
+           echo "INFO: Forced to ignore uncommited changes [-f]."
+   else
+	   echo -n "Ignore changes and proceed with image build process (y/N): "
+	   read answer
+	   if [ "$answer" != "${answer#[Yy]}" ] ;then
+	       echo "WARNING: Ignore uncommited changes."
+	    else
+	      echo "Image build process terminated."
+	      exit -1
+	   fi
+   fi
+fi
+
+# configure docker build options
+dockerfilepath="${CROWNET_HOME}/docker/${IMAGE_NAME}/Dockerfile"
+if [ -f "$dockerfilepath" ]; then
+   echo "INFO: Dockerfile for the simulator/system setup (=${IMAGE_NAME}) successfully located (filepath=${dockerfilepath})."
+else 
+   echo "ERROR: Could not locate the Dockerfile ${dockerfilepath} in ${CROWNET_HOME}/docker/* . Check your repository."
+   exit -1
+fi
+
+## specify the image name (the name of the image corresponds to the current commit)
+CROWNET_COMMIT_HASH=$(git rev-parse HEAD | head -c 8)
+IMAGE_1="${CROWNET_IMAGE_BASE}/${IMAGE_NAME}:${CROWNET_COMMIT_HASH}"
+IMAGE_2="${CROWNET_IMAGE_BASE}/${IMAGE_NAME}:latest"
+
+if [ "$UPDATE_LATEST" = true ]; then 
+    tags="-t ${IMAGE_1} -t ${IMAGE_2}"
+    echo "INFO: Two images will be created: " 
+    echo "      1. ${IMAGE_1} " 
+    echo "      2. ${IMAGE_2} (copy of 1) " 
+else
+    tags="-t ${IMAGE_1}"
+    echo "INFO: One image will be created: " 
+    echo "      ${IMAGE_1} " 
+fi
+
+
+## docker build-arg (arguments available during the docker build process)
+
+RELEASE="CROWNET_COMMIT_HASH=${CROWNET_COMMIT_HASH}" 
+
+if [ "$IMAGE_NAME" = "omnetpp" ] || [ "$IMAGE_NAME" = "omnetpp-ide" ] || [ "$IMAGE_NAME" = "sumo" ]; then
+     echo "INFO: The simulator version is specified in the Dockerfile >${CROWNET_HOME}/docker/${IMAGE_NAME}/Dockerfile<."
+fi
+
+BASE_IMAGE_TAG="BASE_IMAGE_TAG=${BASE_IMAGE_TAG}"
+CONTAINER_REG="IMAGE_REG=${CROWNET_IMAGE_BASE}"
+
+## use docker buildkit for secrets and acceleration 
+export DOCKER_BUILDKIT=1
+
+## warn user
+
+case $IMAGE_NAME in
+	"omnetpp")     VERSION=${CROWNET_OPP_CONT_TAG};;
+	"vadere")      VERSION=${CROWNET_VADERE_CONT_TAG};;
+	"flowcontrol") VERSION=${CROWNET_CONTROL_CONT_TAG};;
+	"sumo")        VERSION=${CROWNET_SUMO_CONT_TAG};;
+	"omnetpp-ide") VERSION=${CROWNET_OPP_IDE_CONT_TAG};;
+	"vadere-ide")  VERSION=${CROWNET_VADERE_IDE_CONT_TAG};;
+	"flowcontrol-ide") VERSION=${CROWNET_CONTROL_IDE_CONT_TAG};;
+  *) echo "unknown option" ;;
+esac
+
+
+
+
+
+echo "Start the build process docker build $QUIET --no-cache ${tags} -f $dockerfilepath --ssh=default --build-arg NOCACHE_PULL=$RANDOM --build-arg $CONTAINER_REG --build-arg $RELEASE --build-arg $BASE_IMAGE_TAG . "
+
+docker build $QUIET --no-cache ${tags} -f $dockerfilepath --ssh=default --build-arg NOCACHE_PULL=$RANDOM --build-arg $CONTAINER_REG --build-arg $RELEASE --build-arg $BASE_IMAGE_TAG . 
+
+
+
+# push image to container registry if required
+if [ "$PUSH_TO_REGISTRY" = true ]; then 
+  docker login $CROWNET_IMAGE_REG
+  docker image push $IMAGE_1
+
+   if [ "$UPDATE_LATEST" = true ]; then 
+       docker image push $IMAGE_2
+   fi
+fi
+
+# warn user 
+
+if ! [ "$VERSION" = "$CROWNET_COMMIT_HASH" ] ; then
+   echo "WARNING: The script $CROWNET_HOME/scripts/$IMAGE_NAME will start the docker image >${CROWNET_IMAGE_BASE}/${IMAGE_NAME}:$VERSION<"
+   echo "         To run the newly generated image in the simulation, you need to update your environmental variables. "
+   echo "         You can do this, by changing the following line in $CROWNET_HOME/config/CONTAINER_VERSION.config to:"
+
+     case $IMAGE_NAME in
+	"omnetpp")     echo "              export CROWNET_OPP_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+	"vadere")      echo "              export CROWNET_VADERE_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+	"flowcontrol") echo "              export CROWNET_CONTROL_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+	"sumo")        echo "              export CROWNET_SUMO_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+	"omnetpp-ide") echo "              export CROWNET_OPP_IDE_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+	"vadere-ide")  echo "              export CROWNET_VADERE_IDE_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+	"flowcontrol-ide") echo "               export CROWNET_CONTROL_IDE_CONT_TAG='$CROWNET_COMMIT_HASH'";;
+     *) echo "unknown option" ;;
+     esac
+    echo "         Then update the enviroment by running:"
+    echo "              source ${CROWNET_HOME}/config/CONTAINER_VERSION.config"
+fi
+
+

@@ -7,10 +7,6 @@
 [submodule "vadere"]
 	path = vadere
 	url = https://github.com/roVer-HM/vadere.git
-[submodule "analysis/roveranalyzer"]
-	path = analysis/roveranalyzer
-	url = https://github.com/roVer-HM/roveranalyzer.git
-	branch = cmp_vadere_sumo_update
 [submodule "artery"]
 	path = artery
 	url = https://github.com/roVer-HM/artery.git
@@ -23,3 +19,6 @@
 [submodule "Simu5G"]
 	path = simu5g
 	url = https://github.com/roVer-HM/Simu5G.git
+[submodule "analysis/crownetutils"]
+	path = analysis/crownetutils
+	url = https://github.com/roVer-HM/crownetutils

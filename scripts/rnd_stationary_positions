@@ -8,7 +8,7 @@ import time
 import geopandas as g
 import pandas as pd
 import geopandas as gpd
-from roveranalyzer.utils import Project
+from crownetutils.utils.misc import Project
 from shapely.geometry import Point
 import numpy as np
 import random

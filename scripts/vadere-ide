@@ -10,12 +10,11 @@ if [ -z "${CROWNET_VADERE_CONT_TAG}" ]; then
 fi
 
 if [[ -z "$1" || "$1" == "exec" ]]; then
-      #VERSION=$CROWNET_VADERE_CONT_TAG
-      VERSION=latest
-      CONTNAME=$CONTNAME:$VERSION
+      VERSION=$CROWNET_VADERE_CONT_TAG
+      #CONTNAME=$CONTNAME:$VERSION
 else
       SHORTNAME=$SHORTNAME-$1
-      CONTNAME=$CONTNAME:$1
+      #CONTNAME=$CONTNAME:$1
 fi
 
 if [[ "$1" == "exec" ]]; then
@@ -33,9 +32,10 @@ if [ -z "$CROWNET_IMAGE_BASE" ]; then
       exit -1
 fi
 
-IMAGENAME=$CROWNET_IMAGE_BASE/$CONTNAME
+IMAGENAME=$CROWNET_IMAGE_BASE/$CONTNAME:latest
 
 echo "container> used image: $IMAGENAME"
+echo "container> used image: $CONTNAME"
 
 source "$( cd "$(dirname "$0")" ; pwd -P )"/lib/lib.sh
 

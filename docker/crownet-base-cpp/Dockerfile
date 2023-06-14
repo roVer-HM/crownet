@@ -1,7 +1,12 @@
 # CrowNet base container
 #
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-min:latest
+ARG IMAGE_REG
+ARG CROWNET_COMMIT_HASH
+ARG BASE_IMAGE_TAG
+
+FROM ${IMAGE_REG}/crownet-base-min:${BASE_IMAGE_TAG}
+ENV RELEASE $CROWNET_COMMIT_HASH
 
 LABEL description "CrowNet base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"
