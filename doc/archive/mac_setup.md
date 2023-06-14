@@ -14,7 +14,7 @@ For easier usability it's recommended to add the crownet environment variables t
 
 Furthermore under xquartz -> Preferences -> Security, the "Allow connections from network clients" checkbox must be enabled.
 
-![Image of the network connection checkbox](img/xquartz_security_settings.png)
+![Image of the network connection checkbox](../img/xquartz_security_settings.png)
 
 Inside the xquartz console you can run a gui-container and the window should appear.
 
