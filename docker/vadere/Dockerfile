@@ -1,53 +1,66 @@
 # vadere Crowd Simulator
 #
-# see https://gitlab.lrz.de/vadere/vadere
-#
-# TODO:
-# - include drivers for HW-accelerated OpenCL/nvidia
-# - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
+# With this Dockerfile Vadere is packaged based on the state of the crownet submodule Vadere
+# note: tests and plug-ins are skipped during the build process
 
+# the following parent container contains maven 3.6.3 and openJDK 11.0.8
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-java:latest
+ARG IMAGE_REG
+ARG BASE_IMAGE_TAG
+ARG CROWNET_COMMIT_HASH
 
-# Specify the version/tag of vadere to be put in the container. defaut master
-ARG BRANCH
+FROM ${IMAGE_REG}/crownet-base-java:${BASE_IMAGE_TAG}
+
+ENV RELEASE $CROWNET_COMMIT_HASH
 
 LABEL description "vadere Crowd Simulator (as used in CrowNet)"
-LABEL maintainer  "wischhof@ieee.org"
+LABEL maintainer  "christina_maria.mayr@hm.edu"
+
+# create script to start vadere gui and add it to the path.
+COPY docker/vadere/vadere-gui /usr/local/bin/vadere-gui
+RUN chmod 555 /usr/local/bin/vadere-gui
+
+# init script (triggered at container start)
+COPY docker/vadere/init.sh /init.sh
+RUN chmod 555 /init.sh
+CMD [ "/init.sh" ]
 
 # clone the vadere sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/vadere
-# enable lfs (must be done before cloning!) and clone the project
-RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
-ARG NOCACHE_CLONE=0
-RUN git clone --depth 1 --branch $BRANCH https://gitlab.lrz.de/vadere/vadere.git $BRANCH
+ARG NOCACHE_CLONE=1
 
-# add a symbolic link so vadere is found in the path
-RUN ln -f -s /opt/vadere/$BRANCH /opt/vadere/vadere
+# remove old vadere version
+RUN rm -rf /opt/vadere/vadere
 
-# add a symbolic link to /usr/bin/python3 from /usr/bin/python3.8
-RUN ln -f -s /usr/bin/python3.8 /usr/bin/python3
+# copy vadere from local crownet repository in docker image
+# avoid > COPY vadere/ /opt/vadere/vadere < to reduce the risk of copying private files to the container
 
-# pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/vadere/vadere
+RUN ls -a
 
-ARG NOCACHE_PULL=0
-RUN git pull
+COPY vadere/pom.xml /opt/vadere/vadere/pom.xml 
+COPY vadere/VadereAnnotation /opt/vadere/vadere/VadereAnnotation
+COPY vadere/VadereManager /opt/vadere/vadere/VadereManager
+COPY vadere/VadereSimulator /opt/vadere/vadere/VadereSimulator
+COPY vadere/VadereUtils /opt/vadere/vadere/VadereUtils
+COPY vadere/VadereGui /opt/vadere/vadere/VadereGui
+COPY vadere/VadereMeshing /opt/vadere/vadere/VadereMeshing
+COPY vadere/VadereState /opt/vadere/vadere/VadereState
+COPY vadere/Tools /opt/vadere/vadere/Tools
 
-# configure and compile
-ENV PATH /opt/vadere/vadere/VadereGui/target:$PATH
-RUN mvn clean package -Dmaven.test.skip
+
+# build vadere in docker container
+
+RUN mvn clean
+RUN mvn -Dexec.skip -Dmaven.test.skip=true package
 
 # cleanup class files
 RUN find . -type f -name '*.class' -exec rm {} +
 
-# create script to start vadere gui and add it to the path.
-COPY vadere-gui /usr/local/bin/vadere-gui
-RUN chmod 555 /usr/local/bin/vadere-gui
+# add to path - why?
+ENV PATH /opt/vadere/vadere/VadereGui/target:$PATH
 
-# init script (triggered at container start)
-COPY init.sh /init.sh
-RUN chmod 555 /init.sh
-CMD [ "/init.sh" ]
+
+

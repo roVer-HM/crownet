@@ -126,8 +126,13 @@ void NeighborhoodTable::removeInfo(BeaconReceptionInfo* info){
         tableSize = _table.size();
         setLastUpdatedAt(simTime());
         emit(neighborhoodTableChangedSignal, this);
-        delete old_info;
-        delete info;
+        if (old_info == info){
+            // same object delete only once
+            delete info;
+        } else {
+            delete info;
+            delete old_info;
+        }
     } else {
         // do nothing object not in map
     }

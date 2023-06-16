@@ -5,35 +5,26 @@ variables:
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this
  DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
  
- # Tags of all containers required for building and testing
- # Note: Tags here must include ALL container tags required in the fingerprint
- #       *.csv and *.yml files.
- CROWNET_OPP_CONT_TAG: '6.0.1'                # tag of OMNeT++ container to be used
- CROWNET_VADERE_CONT_TAG: '221108-1613'       # tag of vadere container to be used
- CROWNET_CONTROL_CONT_TAG: '220527-1453'      # tag of control container to be used
- CROWNET_SUMO_CONT_TAG: 'v1_15_0'             # tag of sumo container to be used
+# the image tag env VARIABLES are specified in ${CI_PROJECT_DIR}/config/CONTAINER_VERSION.config
+# the container registry env VARIABLES are specified in ${CI_PROJECT_DIR}/config/CONTAINER_REGISTRY.config 
 
- CROWNET_IMAGE_REG: '${CI_REGISTRY}'
- CROWNET_IMAGE_BASE: '${CROWNET_IMAGE_REG}/rover/crownet'
- 
  # Paths and aliases
- OPP: '${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec'
- ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer'
+ ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils'
  FLOWCONTROL_M: '${CI_PROJECT_DIR}/flowcontrol'
  VADERE_PATH: '${CI_PROJECT_DIR}/vadere'
-
 
 stages:
   - build
   - test
   - uq-integration-test
   - simulation-campaign
+  - deploy
 
-
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - ./out/crownet_user
+# TODO: fix the caching. Currently, old cached versions of (flowcontrol, crownetutils, suq-controller) are used instead of the updated versions despite "omnetpp exec make analysis-clean" 
+# cache:
+#  key: ${CI_COMMIT_REF_SLUG}
+#  paths:
+#    - ./out/crownet_user
 
 # Build all dependencies of the crownet project (default: release mode)
 # This is the base for running simulation campaings on a dedicated
@@ -53,13 +44,14 @@ build-for-sim:
   script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - "source setup -i"
     - docker pull ${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}
     # ## build all models
-    - "${OPP} make makefiles"
-    - "${OPP} make MODE=${MODE}"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make MODE=${MODE}"
     # ## export inet version
     - "cd ${INET_M}"
     - "export INET_VERSION=$(./_scripts/get_version)"
@@ -99,10 +91,15 @@ build-analysis-tools:
   script:
     # ## update required docker images
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - "source setup -i"
     - docker pull $CI_REGISTRY/rover/crownet/omnetpp
     # ## build python project and setup user enviroment
-    - "${OPP} make analysis-build"
-    - "${OPP} make out/crownet_user"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make analysis-clean"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make analysis-build"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make out/crownet_user"
+  artifacts:
+    paths:
+    - ${CROWNET_HOME}/out
 
 # run the unit tests
 gtests:
@@ -110,8 +107,9 @@ gtests:
   tags:
     - crownet-sim
   script:
+    - "source setup -i"
     - "cd ${CROWNET_HOME}/crownet"
-    - "${OPP} make test"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make test"
   artifacts:
     when: always
     paths:
@@ -124,8 +122,9 @@ fingerprints:
   tags:
     - crownet-sim
   variables:
-    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
+    - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
     - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
@@ -146,8 +145,9 @@ fingerprints_crownet:
   tags:
     - crownet-sim
   variables:
-    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/roveranalyzer/'
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
+    - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
     - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
@@ -167,8 +167,9 @@ opp-tests:
   tags:
     - crownet-sim
   script:
+    - "source setup -i"
     - "cd ${CROWNET_HOME}/crownet"
-    - "${OPP} make opp-test"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make opp-test"
   artifacts:
     when: always
     paths:
@@ -183,6 +184,7 @@ uq-test:
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
+    - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq"
     - "pip install -r requirements.txt"
@@ -196,6 +198,7 @@ simulation-campaign:
   rules:
     - if: '$SIM_TRIGGER'
   script:
+    - "source setup -i"
     - "/bin/bash ${CROWNET_HOME}/$SIM_SCRIPT"
     - "echo ${CI_COMMIT_SHA} > ${CROWNET_HOME}/$SIM_SCRIPT-results/commit-hash"
     - "echo ${CI_PIPELINE_IID} > ${CROWNET_HOME}/$SIM_SCRIPT-results/pipeline-id"
@@ -211,5 +214,22 @@ simulation-campaign:
       - ${CROWNET_HOME}/veins/src
       - ${CROWNET_HOME}/veins/subprojects/veins_inet/src
     expire_in: 4 weeks
+
+
+build_images:
+  stage: deploy
+  when: manual
+  tags:
+    - crownet-sim
+  script:
+    - eval $(ssh-agent -s)
+    - "ls -a /home/gitlab-runner/.ssh/"
+    - "ssh-add /home/gitlab-runner/.ssh/crownet_CI_docker"
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - "cd ${CROWNET_HOME}"
+    - "docker system prune -a -f"
+    - "source setup -i -u"
+    - "bash -x ${CROWNET_HOME}/scripts/build_all_images -p -q"
+    - "bash -x ${CROWNET_HOME}/scripts/pull_and_push_images -s ${CROWNET_IMAGE_BASE} -t ghcr.io/rover-hm -p -k"
 
 

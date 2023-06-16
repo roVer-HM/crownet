@@ -1,0 +1,175 @@
+#!/bin/bash
+#
+
+
+print_usage() {
+  echo "$(basename "$0") [-h] [-s SOURCE_REGISTRY] [-t TARGET_REGISTRY] [-a PULL_ALL_IMAGES] [-p push] [-k KEEP_OLD_NAME]
+   This script pulls images from a container registry A and optionally pushes it to the container registry CROWNET_IMAGE_BASE
+   where:
+    -s  source container registry
+    -t  target container registry (default: latest)
+    -a  pull all available images from source registry (default: false)
+    -p  push container to the target registry (default: false)
+    -k  keep copy of image after renaming (default: false)"
+}
+
+set -e
+
+all='false'
+PUSH_TO_REGISTRY='false'
+KEEP_NAME='false'
+unset -v source_reg
+unset -v target_reg
+
+unset opt OPTARG OPTIND		
+while getopts 's:t:apkv' flag
+do
+    case "${flag}" in
+        s) source_reg=${OPTARG};;
+        t) target_reg=${OPTARG};;
+        a) all='true';;
+        p) PUSH_TO_REGISTRY='true';;
+        k) KEEP_NAME='true';;
+	*) print_usage; exit 1 ;;
+    esac
+done
+
+
+if [ -z ${source_reg} ]; then
+       echo 'Missing source container registry [-s]. Use "ghcr.io/rover-hm" to copy the containers from the publicly available crownet repository https://github.com/roVer-HM/crownet.'
+       exit -1    
+fi
+
+if [ -z ${target_reg} ]; then
+       echo 'Missing target container registry [-t]. Use "ghcr.io/github-namespace" to copy to your namespace.   '
+       exit -1
+fi
+
+
+# access to the target_reg is required if pushing is required
+if [ "$PUSH_TO_REGISTRY" = true ]; then 
+  docker login $target_reg
+fi
+
+
+if [ "$all" = true ]; then
+       printf "Copying all images from $source_reg to $target_reg requires lots of space on the target registry (=$target_reg). Copy all images (y/N): "
+       read answer
+       if [ "$answer" != "${answer#[Yy]}" ] ;then
+	    all='true'
+            echo "Copy all images."
+       else
+	    all='false'
+            echo 'Copy images with tags specified in crownet enviromental variables (crownet/source/crownetenv_*.).'
+       fi
+fi
+
+
+# pull containers
+pulled_containers=() 
+missing_containers=() 
+if [ "$all" = "true" ]; then
+	for REPO in omnetpp vadere flowcontrol sumo omnetpp-ide vadere-ide flowcontrol-ide
+	   do  
+	      echo "Pull containers from repo ${source_reg}/${REPO}"
+	      containers_=$(docker image pull --all-tags "${source_reg}/${REPO}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re=$REPO '{ print re "/" $1}')
+	      pulled_containers+=${containers_}  
+	   done
+else
+	TAG_ERR="Container tag variable not set."
+	[[ -z "$CROWNET_OPP_CONT_TAG" ]] && echo "Omnet $TAG_ERR" && exit -1
+	[[ -z "$CROWNET_SUMO_CONT_TAG" ]] && echo "Sumo $TAG_ERR" && exit -1
+	[[ -z "$CROWNET_VADERE_CONT_TAG" ]] && echo "Vadere $TAG_ERR" && exit -1
+	[[ -z "$CROWNET_CONTROL_CONT_TAG" ]] && echo "Control $TAG_ERR" && exit -1
+        # IDEs
+	[[ -z "$CROWNET_OPP_IDE_CONT_TAG" ]] && echo "Omnet IDE $TAG_ERR" && exit -1
+	[[ -z "$CROWNET_VADERE_IDE_CONT_TAG" ]] && echo "Vadere IDE $TAG_ERR" && exit -1
+	[[ -z "$CROWNET_CONTROL_IDE_CONT_TAG" ]] && echo "Control IDE $TAG_ERR" && exit -1
+        
+        IMAGE_LOC="${source_reg}/omnetpp:${CROWNET_OPP_CONT_TAG}"
+        printf "Pull image ${IMAGE_LOC} from container registry. "
+	CONTAINER=$(docker image pull "${IMAGE_LOC}" | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="omnetpp" '{ print re ":" $1 " "}') 
+	echo ""
+	if [ "${CONTAINER}" = "" ]; then missing_containers+="omnetpp "; else pulled_containers+=$CONTAINER; fi
+	
+	IMAGE_LOC="${source_reg}/sumo:${CROWNET_SUMO_CONT_TAG}"
+	printf "Pull image ${IMAGE_LOC} from container registry. "
+	CONTAINER=$(docker image pull "${IMAGE_LOC}" | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="sumo" '{ print re ":" $1 " "}' ) 
+	echo "" 
+	if [ "${CONTAINER}" = "" ]; then missing_containers+="sumo "; else pulled_containers+=$CONTAINER; fi
+		
+	IMAGE_LOC="${source_reg}/vadere:${CROWNET_VADERE_CONT_TAG}"
+	printf "Pull image ${IMAGE_LOC} from container registry. "
+	CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="vadere" '{ print re ":" $1 " "}') 
+	echo ""
+	if [ "${CONTAINER}" = "" ]; then missing_containers+="vadere "; else pulled_containers+=$CONTAINER ; fi 
+        
+        IMAGE_LOC="${source_reg}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}"
+        printf "Pull image ${IMAGE_LOC} from container registry. "
+        CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="flowcontrol" '{ print re ":" $1 " "}') 
+        echo ""
+        if [ "${CONTAINER}" = "" ]; then missing_containers+="flowcontrol "; else pulled_containers+=$CONTAINER; fi 
+        
+        # IDEs make optional
+        IMAGE_LOC="${source_reg}/vadere-ide:${CROWNET_VADERE_IDE_CONT_TAG}"
+        printf "Pull image ${IMAGE_LOC} from container registry. "
+        CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="vadere-ide" '{ print re ":" $1 " "}') 
+        echo ""
+        if [ "${CONTAINER}" = "" ]; then missing_containers+="vadere-ide "; else pulled_containers+=$CONTAINER; fi 
+        
+        IMAGE_LOC="${source_reg}/omnetpp-ide:${CROWNET_OPP_IDE_CONT_TAG}"
+        printf "Pull image ${IMAGE_LOC} from container registry: "
+        CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="omnetpp-ide" '{ print re ":" $1 " "}') 
+        echo ""
+        if [ "${CONTAINER}" = "" ]; then missing_containers+="omnetpp-ide "; else pulled_containers+=$CONTAINER; fi 
+        	
+	IMAGE_LOC="${source_reg}/flowcontrol-ide:${CROWNET_CONTROL_IDE_CONT_TAG}"
+	printf "Pull image ${IMAGE_LOC} from container registry. "
+	CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="flowcontrol-ide" '{print re ":" $1 " "}') 
+	echo ""
+	if [ "${CONTAINER}" = "" ]; then missing_containers+="flowcontrol-ide "; else pulled_containers+=$CONTAINER; fi 
+fi 
+
+# rename containers 
+for c in $pulled_containers
+do     
+       echo "Image: $c"
+       image_old="${source_reg}/${c}"
+       image_new="${target_reg}/${c}"
+       if [ "$image_old" != "$image_new" ]; then
+	       docker tag ${image_old} ${image_new} > /dev/null
+	       echo "Rename:  >${image_old}< to >${image_new}<"
+	       if [ "$KEEP_NAME" = false ]; then
+		  docker rmi ${image_old} > /dev/null
+	       fi 
+       fi	
+done
+
+if ! [ "${missing_containers}" = "" ] ; then
+  echo "Could not pull all images. Cancel push."
+  exit -1
+fi  
+
+
+# push image to container registry if required
+if [ "$PUSH_TO_REGISTRY" = true ]; then 
+  for c in $pulled_containers
+     do
+       echo "Image: $c"     
+       image_new="${target_reg}/${c}" 
+       echo "Push to ${target_reg}: ${image_new}"
+       docker image push $image_new
+     done
+fi
+
+set +e
+exit 0
+
+
+
+
+
+
+
+
+

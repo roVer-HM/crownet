@@ -97,6 +97,7 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
 std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
     Enter_Method_Silent();
 
+
     auto node_module = this->findModuleByPath(cmd.nodeId.c_str());
     IDensityMapHandlerBase<RegularDcdMap>* map_handler =
             check_and_cast<IDensityMapHandlerBase<RegularDcdMap>*>(node_module);

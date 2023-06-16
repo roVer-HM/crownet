@@ -3,6 +3,9 @@
 
 FROM ubuntu:20.04
 
+ARG CROWNET_COMMIT_HASH
+ENV RELEASE $CROWNET_COMMIT_HASH
+
 LABEL description "crownet base container"
 LABEL maintainer "stefan.schuhbaeck@hm.edu"
 

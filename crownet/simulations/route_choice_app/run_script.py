@@ -13,18 +13,25 @@ class SimulationRun(BaseRunner):
 
 if __name__ == "__main__":
 
+
     settings = [
-        "--port",
-        "9999",
-        "--host-name",
-        "localhost",
-        "--client-mode",
-        "--start-server",
-        "--gui-mode",
-        "--output-dir",
-        "sim-output-task1",
-        "-j",
-        "/home/christina/repos/crownet/vadere/VadereManager/target/vadere-server.jar"
+        'vadere-control',
+        '--create-vadere-container',
+        '--experiment-label',
+        'output',
+        '--with-control',
+        'control.py',
+        '--scenario-file',
+        'vadere/scenarios/route_choice_real_world.scenario', #TODO: test 'vadere/scenarios/route_choice_real_world.scenario' or 'vadere/scenarios/three_corridors.scenario'
+        '--ctrl.controller-type',
+        'ClosedLoop', #TODO: 'NoController' or 'ClosedLoop' or 'OpenLoop'
+        '--vadere-tag',
+        'latest',
+        '--control-tag',
+        'latest',
+        '--override-host-config',
+        '--run-name',
+        'test',
     ]
 
     if len(sys.argv) == 1:
@@ -35,3 +42,5 @@ if __name__ == "__main__":
         runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
+
+    print("Write results to ./results/_vadere_controlled_output/")

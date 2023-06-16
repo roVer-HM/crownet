@@ -1,29 +1,29 @@
-
 import os
 import sys
 
 from os.path import join, abspath
-import roveranalyzer.simulators.crownet.dcd as DensityMap
-from roveranalyzer.utils.general import Project
-import roveranalyzer.simulators.opp as OMNeT
+import crownetutils.analysis.dpmm as DensityMap
+from crownetutils.utils.misc import Project
+from crownetutils.omnetpp.scave import CrownetSql
+
 """
 Combined figures to compate ymf and umfPlus.
 """
+
+
 def create_figures(root):
-    p1  = f"{root}/crownet/simulations/mucFreiheitLte/suqc/opp_stationary2/simulation_runs/outputs/Sample_0_0/subwayStationary_multiEnb_out"
-    p2  = f"{root}/crownet/simulations/mucFreiheitLte/suqc/opp_stationary3_ymfPlus/simulation_runs/outputs/Sample_0_0/subwayStationary_multiEnb_out"
+    p1 = f"{root}/crownet/simulations/mucFreiheitLte/suqc/opp_stationary2/simulation_runs/outputs/Sample_0_0/subwayStationary_multiEnb_out"
+    p2 = f"{root}/crownet/simulations/mucFreiheitLte/suqc/opp_stationary3_ymfPlus/simulation_runs/outputs/Sample_0_0/subwayStationary_multiEnb_out"
     vec_name = "vars_rep_0.vec"
     sca_name = "vars_rep_0.sca"
-    sql1 = OMNeT.CrownetSql(p1, join(p1, vec_name), join( p1, sca_name))
-    sql2 = OMNeT.CrownetSql(p2, join(p2, vec_name), join( p2, sca_name))
+    sql1 = OMNeT.CrownetSql(p1, join(p1, vec_name), join(p1, sca_name))
+    sql2 = OMNeT.CrownetSql(p2, join(p2, vec_name), join(p2, sca_name))
 
-    def b(r, sel): 
-        builder = DensityMap.DcdHdfBuilder.get(
-            hdf_path="data.h5",
-            source_path=r
-        ).epsg(Project.UTM_32N)
+    def b(r, sel):
+        builder = DensityMap.DcdHdfBuilder.get(hdf_path="data.h5", source_path=r).epsg(
+            Project.UTM_32N
+        )
         return builder.build_dcdMap(selection=sel)
-
 
     dcd1 = b(p1, "ymf")
     dcd2 = b(p2, "ymfPlusDist")
@@ -56,6 +56,7 @@ def create_figures(root):
     f_path = abspath(f"./count_over_time.png")
     print(f"save file to {f_path}")
     fig.savefig(f_path)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

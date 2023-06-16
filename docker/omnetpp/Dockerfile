@@ -1,20 +1,26 @@
 # syntax = docker/dockerfile:experimental
 #
-# OMNeT++ Simulator (as used within the CrowNet framework)
-#
-# Within CrowNet, we use two different containers:
-#   1) omnetpp (command line, no GUI, for simulation campaigns)
-#   2) omnetpp-ide (all graphical libs, autostart of IDE)
-#
-# This Dockerfile is used to build the omnetpp base container,
-# which is also the base container for omnetpp-ide
+# Scope: 
+# build the OMNeT++ Simulator based on our public omnetpp mirror >https://github.com/roVer-HM/omnetpp.git<. 
+# Note that the OMNeT++ IDE is not included. To build the IDE, go to ../omnetpp-ide/Dockerfile.
 
+# Requirements/dependencies:
+# 1. the crownet-base-cpp image must be available (see >FROM ..<). Use ARG to specify the exact name of the crownet-base-cpp image. Go to ../crownet-base-min/Dockerfile
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/crownet-base-cpp:latest
+# Release control (how to specify an omnetpp release):
+# Go to >https://github.com/roVer-HM/omnetpp.git<. Choose a tag that refers to the desired omnetpp release.
+# Then, change >ENV GITHUB_TAG="tag-of-desired-omnetpp-release"< in THIS Dockerfile.
+# Always use tags instead of branches so that the code can be uniquely assigned to a unique state.
 
-# Specify the version/tag of omnetpp to be put in the container:
-ENV OMNETRELEASE omnetpp-6.0.1
-# Note: Remember to update the description below when changing OMNETRELEASE
+# Common problems:
+# Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/omnetpp.git<.
+
+ARG IMAGE_REG
+ARG BASE_IMAGE_TAG
+FROM ${IMAGE_REG}/crownet-base-cpp:${BASE_IMAGE_TAG}
+
+ENV GITHUB_TAG="omnetpp-6.0.1"
+ENV RELEASE=$GITHUB_TAG
 
 LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0.1)"
 LABEL maintainer  "wischhof@ieee.org"
@@ -22,11 +28,6 @@ LABEL maintainer  "wischhof@ieee.org"
 # Use bash shell
 SHELL ["/bin/bash", "-c"]
 
-# install all packages required to compile omnet
-# Note: Since clang does not emit debug info for types within the standard libraries,
-#       we must include debug info for the installed libraries (versions must match!)
-#       by manually installing the libstdc++6-8-dbg package
-# see rover-base-cpp and rover-base-min
 
 # install additionally needed Python modules
 RUN pip3 install numpy pandas matplotlib posix_ipc scipy
@@ -46,22 +47,21 @@ RUN git lfs install
 
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
-RUN --mount=type=ssh git \
-        clone --depth 1 --branch $OMNETRELEASE ssh://git@sam-dev.cs.hm.edu:6000/rover/omnetpp.git $OMNETRELEASE
+
+RUN git clone --depth 1 --branch $GITHUB_TAG https://github.com/roVer-HM/omnetpp.git $GITHUB_TAG
 
 # add a symbolic link so omnetpp is found in the path
-RUN ln -s /opt/omnetpp/$OMNETRELEASE /opt/omnetpp/omnetpp
+RUN ln -s /opt/omnetpp/$GITHUB_TAG /opt/omnetpp/omnetpp
 
 # pull again (so a cached layer having the clone gets updated)
 WORKDIR /opt/omnetpp/omnetpp
 
 ARG NOCACHE_PULL=0
-RUN --mount=type=ssh git \
-            pull ssh://git@sam-dev.cs.hm.edu:6000/rover/omnetpp.git $OMNETRELEASE
+RUN git pull https://github.com/roVer-HM/omnetpp.git $GITHUB_TAG
 
 # configure and compile
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
-COPY configure.user .
+COPY docker/omnetpp/configure.user .
 RUN  source setenv -f && ./configure && \
      make -j $(nproc) && \
      find . -type f -name '*.o' -exec rm {} + && \
@@ -71,10 +71,10 @@ RUN  source setenv -f && ./configure && \
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
 
 # init script (triggered at container start)
-COPY init.sh /init.sh
+COPY docker/omnetpp/init.sh /init.sh
 RUN chmod 555 /init.sh
 ENTRYPOINT [ "/init.sh" ]
 
 # waitfor script (in order to wait for non-child processes)
-COPY waitfor.sh /waitfor.sh
+COPY docker/omnetpp/waitfor.sh /waitfor.sh
 RUN chmod 555 /waitfor.sh

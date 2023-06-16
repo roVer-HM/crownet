@@ -22,7 +22,7 @@ fi
 
 
 if [ -z "$SILENT" ]; then
-     echo "Welcome to the roVer OMNeT++ Docker Container."
+     echo "Welcome to the roVer Vadere Docker Container."
 
      # check if ptrace_scope is enable  (for debugging it must not be enabled)
      read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)

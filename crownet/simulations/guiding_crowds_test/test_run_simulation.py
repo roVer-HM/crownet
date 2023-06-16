@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-import roveranalyzer.utils.dirdiff as diff
+import crownetutils.utils.dirdiff as diff
 
 timeout_sec = 60
 
@@ -13,13 +13,11 @@ def test_1():
         "test_1",
         "--vadere-only",
         "--scenario-file",
-        os.path.join(os.getcwd(), "vadere/scenarios/test001.scenario")
+        os.path.join(os.getcwd(), "vadere/scenarios/test001.scenario"),
     ]
     subprocess_cmd += settings
 
-    subprocess.check_output(
-        subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
-    )
+    subprocess.check_output(subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE)
 
     output_dir = os.path.abspath("results/vadere_only_test_1/vadere.d/**")
     right = diff.create_dir_diff(output_dir, os.path.abspath("results"))
@@ -43,13 +41,11 @@ def test_2():
         "--delete-existing-containers",
         "--create-vadere-container",
         "--config",
-        "final"
+        "final",
     ]
     subprocess_cmd += settings
 
-    subprocess.check_output(
-        subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
-    )
+    subprocess.check_output(subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE)
 
     output_dir = os.path.abspath("results/final_test_2/vadere.d/**")
     right = diff.create_dir_diff(output_dir, os.path.abspath("results"))
@@ -78,9 +74,7 @@ def test_3():
     ]
     subprocess_cmd += settings
 
-    subprocess.check_output(
-        subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
-    )
+    subprocess.check_output(subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE)
 
     output_dir = os.path.abspath("results/final_control_test_3/vadere.d/**")
     right = diff.create_dir_diff(output_dir, os.path.abspath("results"))
@@ -108,9 +102,7 @@ def test_4():
     ]
     subprocess_cmd += settings
 
-    subprocess.check_output(
-        subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
-    )
+    subprocess.check_output(subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE)
 
     output_dir = os.path.abspath("results/vadere_controlled_test_4/vadere.d/**")
     right = diff.create_dir_diff(output_dir, os.path.abspath("results"))
@@ -133,13 +125,11 @@ def test_5():
         "signs_test_5",
         "--vadere-only",
         "--scenario-file",
-        os.path.join(os.getcwd(), "vadere/scenarios/test001_with_signs.scenario")
+        os.path.join(os.getcwd(), "vadere/scenarios/test001_with_signs.scenario"),
     ]
     subprocess_cmd += settings
 
-    subprocess.check_output(
-        subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE
-    )
+    subprocess.check_output(subprocess_cmd, timeout=timeout_sec, stderr=subprocess.PIPE)
 
     output_dir = os.path.abspath("results/vadere_only_signs_test_5/vadere.d/**")
     right = diff.create_dir_diff(output_dir, os.path.abspath("results"))
