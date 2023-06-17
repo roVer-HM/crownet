@@ -37,6 +37,9 @@ void UnityNetworkVisualizer::setAlpha(const LinkVisualizerBase::LinkVisualizatio
 {
 }
 
+void UnityNetworkVisualizer::receiveSignal(cComponent *source, simsignal_t signal, cObject *object, cObject *details){
+LinkVisualizerBase::receiveSignal(source, signal, object, details);
+}
 
 
 

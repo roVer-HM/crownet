@@ -18,6 +18,7 @@ public:
 
     virtual const LinkVisualization *createLinkVisualization(cModule *source, cModule *destination, cPacket *packet) const override;
     virtual void setAlpha(const LinkVisualization *linkVisualization, double alpha) const override;
+    virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object, cObject *details) override;
 
     virtual void initialize(int stage) override;
 };
