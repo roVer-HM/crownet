@@ -5,6 +5,6 @@ simple UnityClient{
     
     parameters:
         string hostAddress = default("ecal");
-        int port = default(54321);
+        int port = default(12345);
         
 }
