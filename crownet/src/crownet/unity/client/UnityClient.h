@@ -20,7 +20,8 @@ protected:
     virtual void finish() override;
 
 public:
-    void sendMessage(const std::string& id,const std::string& path,const std::string& instruction,inet::Coord coord);
+    void sendMessage(const std::string& sourceId, const std::string& objectType, inet::Coord coordinates = inet::Coord(0, 0, 0), const std::string& targetId = "");
+
     UnityClient(){}
     static UnityClient* getInstance() {
         std::lock_guard<std::mutex> lock(m_mutex);
