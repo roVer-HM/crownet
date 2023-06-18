@@ -36,32 +36,30 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
                     dynamic_cast<InetVaderePersonMobility*>(source);
 
             if (personMobility) {
+                std::cout << "PersonIDxD" <<personMobility->getPersonId();
                 unityClient->sendMessage(
-                        personMobility->getPersonId(),source->getParentModule()->getFullPath(), "createOrUpdatePerson",
+                        source->getFullPath(), "person",
                         convertPositionToCoord(personMobility->getPosition()));
 
             } else if (vehicleModule) {
                 auto vehicleController = vehicleModule->getVehicleController();
                 unityClient->sendMessage(
-                        vehicleController->getVehicleId(),
-                        source->getParentModule()->getFullPath(),
-                        "createOrUpdateVehicle",
+                        source->getFullPath(),
+                        "vehicle",
                         convertPositionToCoord(
                                 vehicleController->getPosition()));
 
             } else if (stationaryMobility) {
-
-                unityClient->sendMessage("",
-                        source->getParentModule()->getFullPath(),
-                        "createOrUpdateStationary",
+                unityClient->sendMessage(source->getFullPath(),
+                        "stationary",
                         stationaryMobility->getCurrentPosition());
 
             }
             else if (vaderePersonMobility) {
 
-                unityClient->sendMessage(vaderePersonMobility->getPersonId(),
-                        source->getParentModule()->getFullPath(),
-                        "createOrUpdatePerson",vaderePersonMobility->getCurrentPosition());
+                unityClient->sendMessage(source->getFullPath(),
+
+                        "person",vaderePersonMobility->getCurrentPosition());
 
                        }
 
