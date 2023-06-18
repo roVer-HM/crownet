@@ -9,6 +9,6 @@ module UnityMobilityVisualizer extends MobilityVisualizerBase like IMobilityVisu
 {
     @class(crownet::UnityMobilityVisualizer);
     submodules:
-        unityClient: UnityClient;
+        //unityClient: UnityClient;
 
 }
