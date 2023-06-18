@@ -38,7 +38,14 @@ const UnityNetworkVisualizer::LinkVisualizerBase::LinkVisualization *UnityNetwor
 void UnityNetworkVisualizer::receiveSignal(cComponent *source, simsignal_t signal, cObject *object, cObject *details){
 LinkVisualizerBase::receiveSignal(source, signal, object, details);
 
-printf("I got called!");
+LtePhyBase * phyEnb = dynamic_cast<LtePhyBase*>(source);
+LteControlInfo * controlInfo = dynamic_cast<LteControlInfo*>(details);
+
+if(phyEnb && controlInfo){
+    std::string srcPath = phyEnb->getFullPath();
+    std::string dstPath = getSimulation()->getModule(getBinder()->getOmnetId(controlInfo->getDestId()))->getFullPath();
+    unityClient->sendMessage(srcPath, "packet",{},dstPath);
+}
 }
 
 

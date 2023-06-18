@@ -3,7 +3,9 @@
 
 #include "inet/visualizer/canvas/base/LinkCanvasVisualizerBase.h"
 #include "crownet/unity/client/UnityClient.h"
-
+#include "stack/phy/packet/LteAirFrame.h"
+#include "common/LteControlInfo.h"
+#include "stack/phy/layer/LtePhyBase.h"
 namespace crownet {
 
 
