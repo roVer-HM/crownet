@@ -17,6 +17,23 @@ Define_Module(UnityClient);
 std::mutex UnityClient::m_mutex;
 UnityClient *UnityClient::instance = nullptr;
 
+static std::string getIdFromPath(const std::string &input) {
+    size_t firstDot = input.find('.');
+    if (firstDot == std::string::npos) {
+        // No dot found, return the original string
+        return input;
+    }
+
+    size_t secondDot = input.find('.', firstDot + 1);
+    if (secondDot == std::string::npos) {
+        // Only one dot found, return the substring after the first dot
+        return input.substr(firstDot + 1);
+    }
+
+    // Two dots found, return the substring between the two
+    return input.substr(firstDot + 1, secondDot - firstDot - 1);
+}
+
 void UnityClient::initialize() {
     UnityClient *unityClient = UnityClient::getInstance();
     std::regex regex("^[[:alpha:]]+$");
@@ -75,17 +92,20 @@ struct Message {
     int id;
 };
 
-void UnityClient::sendMessage(const std::string &id, const std::string &path,
-        const std::string &instruction, inet::Coord coord) {
+void UnityClient::sendMessage(const std::string &sourceId,
+        const std::string &objectType, inet::Coord coordinates,const std::string &targetId) {
     UnityClient *unityClient = UnityClient::getInstance();
 
+
+std::string sourcePath = getIdFromPath(sourceId);
+std::string targetPath = getIdFromPath(targetId);
     nlohmann::json data;
-    data["Id"] = id;
-    data["Path"] = path;
-    data["Coordinates"]["X"] = coord.x;
-    data["Coordinates"]["Y"] = coord.y;
-    data["Coordinates"]["Z"] = coord.z;
-    data["Instruction"] = instruction;
+    data["SourceId"] = sourcePath;
+    data["TargetId"] = targetPath;
+    data["Coordinates"]["X"] = coordinates.x;
+    data["Coordinates"]["Y"] = coordinates.y;
+    data["Coordinates"]["Z"] = coordinates.z;
+    data["ObjectType"] = objectType;
 
     std::string jsonStr = data.dump();
     const char *dataToSend = jsonStr.c_str();
@@ -94,12 +114,14 @@ void UnityClient::sendMessage(const std::string &id, const std::string &path,
     uint32_t length = strlen(dataToSend);
     uint32_t lengthNet = htonl(length);
 
-    std::unique_lock<std::mutex> lock(unityClient->m_mutex);
+    //std::unique_lock<std::mutex> lock(unityClient->m_mutex);
     ::send(unityClient->serverSocket, (void*) &lengthNet, sizeof(lengthNet), 0);
     ::send(unityClient->serverSocket, dataToSend, length, 0);
 
 
 }
+
+
 
 void UnityClient::handleMessage(omnetpp::cMessage *msg) {
     cSimpleModule::handleMessage(msg);
