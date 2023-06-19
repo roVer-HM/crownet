@@ -17,7 +17,7 @@ from flowcontrol.crownetcontrol.controller import Controller
 from flowcontrol.crownetcontrol.traci import constants_vadere as tc
 
 from flowcontrol.strategy.timestepping.timestepping import FixedTimeStepper
-from flowcontrol.strategy.controller.control_algorithm import AlternateTargetAlgorithm, MinimalDensityAlgorithm
+from flowcontrol.strategy.controller.control_algorithm import AlternateTargetAlgorithm, MinimalDensityAlgorithm, AvoidCongestion
 
 
 
@@ -101,7 +101,6 @@ class OpenLoop(NoController, Controller):
 
     def __init__(self, control_alg = None):
         self.target_ids = [11, 21, 31]
-        self.redirected_agents = list()
         self.commandID = 111
         self.redirection_area = None
 
@@ -109,14 +108,10 @@ class OpenLoop(NoController, Controller):
             control_alg= AlternateTargetAlgorithm(alternate_targets=self.target_ids)
         super().__init__(control_alg=control_alg)
 
-    def set_redirection_area(self, area):
-        self.redirection_area = area
-        print(f"Area set to {area}.")
-
 
     def get_stimulus_info(self):
 
-        location = Location(areas=self.redirection_area)
+        location = Location(areas=Rectangle(x=0., y=0., width=25., height=25.))
         recommendation = InformationStimulus(f"use target {self.current_target}")
         s = StimulusInfo(location=location, stimuli=recommendation)
         return s
@@ -134,14 +129,9 @@ class OpenLoop(NoController, Controller):
 
 
     def apply_redirection_measure(self):
-        self.compute_next_corridor_choice()
         recommendation = self.get_stimulus_info()
         self.processor_manager.write("commandId", self.commandID)
-
-        if isinstance(self.con_manager, ServerModeConnection):
-            self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON(), sending_node_id="misc[0].app[0]")
-        else:
-            self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
+        self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
 
     def compute_next_corridor_choice(self):
         self.current_target = self.control_algorithm.get_next_target()
@@ -163,7 +153,7 @@ class ClosedLoop(OpenLoop, Controller):
         targets = [11, 21, 31]
         control_alg = MinimalDensityAlgorithm(alternate_targets=targets)
         super().__init__(control_alg=control_alg)
-        self.target_ids = targets #not very elegant: overwrite target
+        self.target_ids = targets
 
 
     def compute_next_corridor_choice(self):
@@ -172,17 +162,34 @@ class ClosedLoop(OpenLoop, Controller):
 
 
     def apply_redirection_measure(self):
-        self.compute_next_corridor_choice()
         recommendation = self.get_stimulus_info()
         self.processor_manager.write("commandId", self.commandID)
+        self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
 
-        if self.current_target == 31:
+class AvoidShort(OpenLoop,Controller):
 
-            if isinstance(self.con_manager, ServerModeConnection):
-                self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON(), sending_node_id="misc[0].app[0]")
-            else:
-                self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
+    def __init__(self):
+        super().__init__(control_alg=AvoidCongestion(alternative_route_id=31))
+        self.target_ids = [11, 21, 31]
 
+    def compute_next_corridor_choice(self):
+        densities = self.density_over_time[-1]
+        density_short_route = densities[0]
+        density_long_route = densities[2]
+        self.current_target = self.control_algorithm.get_next_target(density_congested_route = density_short_route,
+                                                                      density_alternate_route = density_long_route)
+        if self.current_target is None:
+            self.processor_manager.write("path_choice", "skipped")
+        else:
+            self.processor_manager.write("path_choice", self.current_target)
+
+    def apply_redirection_measure(self):
+
+        self.processor_manager.write("commandId", self.commandID)
+
+        if self.current_target != None:
+            recommendation = self.get_stimulus_info()
+            self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
 
 
 if __name__ == "__main__":
@@ -216,14 +223,6 @@ if __name__ == "__main__":
         "persons", {"pos": tc.VAR_POSITION}, init_sub=True,
     )
     controller = get_controller_from_args(working_dir=os.getcwd(), args=settings)
-
-
-    if "route_choice_real_world.scenario" in settings:
-        area = Rectangle(x=180., y=190., width=20., height=15.)
-    elif "three_corridors.scenario" in settings:
-        area = Rectangle(x=0., y=0., width=25., height=25.)
-    else:
-        raise ValueError("Redirection area undefined for scenario.") #TODO use measurement area instead (necessary for omnet)
 
     controller.register_state_listener("default", sub, set_default=True)
     controller.start_controller()

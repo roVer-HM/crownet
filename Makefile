@@ -157,7 +157,8 @@ out/$(venv_user): analysis-build | out
 		pip3 install wheel && \
 		pip3 install $(flowcontrol_sdist) && \
 		pip3 install $(crownetutils_sdist) && \
-		pip3 install $(suqc_sdist)
+		pip3 install $(suqc_sdist) && \
+		pip3 install -r ../analysis/uq/requirements.txt
 
 out/$(venv_dev): analysis-build | out
 	cd out && \
@@ -167,7 +168,9 @@ out/$(venv_dev): analysis-build | out
 		pip3 install wheel && \
 		pip3 install --editable ../$(mod_flowcontrol) && \
 		pip3 install --editable ../$(mod_crownetutils) && \
-		pip3 install --editable ../$(mod_suqc)
+		pip3 install --editable ../$(mod_suqc) && \
+		pip3 install -r ../analysis/uq/requirements.txt
+
 
 #------------------------------------------------------------------------------
 

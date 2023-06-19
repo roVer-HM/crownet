@@ -6,16 +6,19 @@ sys.path.append(os.path.abspath(".."))
 
 import numpy
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
 from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner, process_as
 
-from crownetutils.omnetpp.scave import CrownetSql
-import crownetutils.analysis as omnet
+from crownetutils.analysis.common import Simulation
+from crownetutils.analysis.omnetpp import OppAnalysis
+
+import matplotlib
+matplotlib.rcParams.update(matplotlib.rcParamsDefault)
+import matplotlib.pyplot as plt
 
 
-class SimulationRun2(BaseSimulationRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
@@ -23,7 +26,8 @@ class SimulationRun2(BaseSimulationRunner):
     def get_degree_informed_dataframe(filepath):
         df_r = pd.read_csv(filepath, delimiter=" ", header=[0], comment="#")
         dt = 0.4  # one time frame = 0.4s
-        df_r = df_r.iloc[249:, :]
+        timeStep = 249
+        df_r = df_r.iloc[timeStep:, :]
         df_r["timeStep"] = (
             dt * df_r["timeStep"] - 100.0
         )  # information dissemination starts at 100s
@@ -40,8 +44,13 @@ class SimulationRun2(BaseSimulationRunner):
         # replace it with file extraction
         df_r = self.get_degree_informed_dataframe(filepath)
         df_r.to_csv(
-            os.path.join(os.path.dirname(filepath), "degree_informed_extract.txt"),
+            os.path.join(self.result_base_dir(), "degree_informed_extract.txt"),
             sep=" ",
+        )
+
+
+        self.wait_for_file(
+            os.path.join(self.result_base_dir(), "degree_informed_extract.txt")
         )
 
         # plot
@@ -50,7 +59,8 @@ class SimulationRun2(BaseSimulationRunner):
         plt.xlabel("Time [s] (Time = 0s : start of information dissemination)")
         plt.ylabel("Percentage of pedestrians informed [%]")
         plt.title("Information degree")
-        plt.savefig(os.path.join(os.path.dirname(filepath), "InformationDegree.png"))
+        plt.savefig(os.path.join(self.result_base_dir(), "vadere.d", "InformationDegree.pdf"))
+
 
     @process_as({"prio": 10, "type": "post"})
     def time_95_informed(self):
@@ -63,16 +73,21 @@ class SimulationRun2(BaseSimulationRunner):
         # replace it with file extraction
         df_r = self.get_degree_informed_dataframe(filepath)
 
-        dt = 0.4
-        time95 = 0.0
-        for perc in df_r["percentageInformed-PID12"]:
-            if perc >= 0.95:
-                break
-            time95 += dt
+        df_r = df_r[df_r['percentageInformed-PID12'] >= 0.95]
 
-        f = open(os.path.join(os.path.dirname(filepath), "time_95_informed.txt"), "x")
-        f.write(f"index timeToInform95PercentAgents\n0 {time95}")
-        f.close()
+        if len(df_r) > 0:
+            time95 = df_r.index.min()
+        else:
+            time95 = numpy.inf
+
+        with open(os.path.join(self.result_base_dir(), "time_95_informed.txt"), "w") as f:
+            f.write(f"index timeToInform95PercentAgents\n0 {time95}")
+
+        self.wait_for_file(
+            os.path.join(self.result_base_dir(), "time_95_informed.txt")
+        )
+
+
 
     @process_as({"prio": 30, "type": "post"})
     def poisson_parameter(self):
@@ -88,14 +103,33 @@ class SimulationRun2(BaseSimulationRunner):
 
         poisson_parameter = numpy.mean(df_r.iloc[:, 1])
 
-        f = open(os.path.join(os.path.dirname(filepath), "poisson_parameter.txt"), "x")
-        f.write(f" PoissonParameter\n0 {poisson_parameter}")
-        f.close()
+        with open(os.path.join(self.result_base_dir(), "vadere.d" , "poisson_parameter.txt"), "w") as f:
+            f.write(f" PoissonParameter\n0 {poisson_parameter}")
+
+        self.wait_for_file(
+            os.path.join(self.result_base_dir(), "vadere.d" , "poisson_parameter.txt"),
+        )
+
+    @process_as({"prio": 50, "type": "post"})
+    def number_of_peds(self):
+
+        file_path = self.wait_for_file(
+            os.path.join(self.result_base_dir(), "vadere.d", "numberPedsInSimulation.txt"),
+        )
+
+        df_r = pd.read_csv(file_path, delimiter=" ", header=[0], comment="#")
+        timeStep = 249
+        df_r = df_r.iloc[timeStep:, :]
+
+        df_r = df_r["NumPeds-PID104"].describe()
+        peds = pd.DataFrame(df_r).transpose().reset_index()
+
+        file_path_new = os.path.join(self.result_base_dir(), "vadere.d" , "number_of_peds.txt")
+        peds.to_csv(file_path_new, sep=" ")
 
     @process_as({"prio": 40, "type": "post"})
     def packet_age(self):
         filename = "packet_age.txt"
-        data_root = self.result_base_dir()
         # wait for files
         self.wait_for_file(
             os.path.join(self.result_base_dir(), "vars_rep_0.vec"),
@@ -104,41 +138,51 @@ class SimulationRun2(BaseSimulationRunner):
             os.path.join(self.result_base_dir(), "vars_rep_0.sca"),
         )
 
-        sql = CrownetSql(
-            vec_path=f"{data_root}/vars_rep_0.vec",
-            sca_path=f"{data_root}/vars_rep_0.sca",
-            network="World_Wlan",
+        sim = Simulation(self.result_base_dir(), label="sim-1")
+
+        packet_age = OppAnalysis.get_rcvd_generic_vec_data(
+            sql=sim.sql,
+            module_name="World_Wlan.pNode[%].app[0]",
+            vector_name="rcvdPkLifetime:vector",
+            value_name="lifetime"
         )
 
-        filepath = os.path.join(self.result_base_dir(), "vadere.d", filename)
+        packet_age = packet_age["lifetime"].describe()
+        packet_age = pd.DataFrame(packet_age).transpose().reset_index()
 
-        matrix = omnet.OppAnalysis.get_packet_age(sql=sql, app_path=".app[0]")
+        packet_age.to_csv(os.path.join(self.result_base_dir(),filename), sep=" ")
 
-        matrix.to_csv(os.path.join(os.path.dirname(filepath), filename), sep=" ")
+        self.wait_for_file(
+            os.path.join(self.result_base_dir(),filename),
+        )
+
 
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 1:
-        # default behavior of script
-        runner = SimulationRun2(
-            os.getcwd(),
-            [
+    settings = [
                 "vadere-opp",
+                "--write-container-log",
                 "--qoi",
                 "degree_informed_extract.txt",
                 "poisson_parameter.txt",
                 "time_95_informed.txt",
                 "packet_age.txt",
+                "number_of_peds.txt",
                 "--create-vadere-container",
                 "--override-host-config",
                 "--run-name",
                 "Sample__0_0",
                 "--experiment-label",
                 "output",
-            ],
-        )
+            ]
+
+    if len(sys.argv) == 1:
+        # default behavior of script
+        runner = SimulationRun(os.getcwd(), settings)
     else:
         # use arguments from command line
-        runner = SimulationRun2(os.path.dirname(os.path.abspath(__file__)))
+        runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
+
     runner.run()
+

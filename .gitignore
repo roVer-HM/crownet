@@ -158,3 +158,6 @@ dist
 /crownet/tests/fingerprint/yml_out.d/
 
 simulation-campaigns/.pydevproject
+
+# ignore user-specific output in the root repo 
+output_*
