@@ -143,6 +143,13 @@ class RcvdSequenceIdFilter : public cObjectResultFilter {
   using cObjectResultFilter::receiveSignal;
 };
 
+class SimBBoxFilter : public cObjectResultFilter {
+ public:
+  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details) override;
+  using cObjectResultFilter::receiveSignal;
+};
+
 class SimBoundFilter : public cObjectResultFilter {
  public:
   virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,

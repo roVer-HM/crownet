@@ -131,6 +131,7 @@ void BaseDensityMapApp::initWriter(){
       fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
       fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
       fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+      fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
       // todo cellsize in x and y
       fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
       fBuilder.addMetadata("VERSION", std::string("0.3")); // todo!!!

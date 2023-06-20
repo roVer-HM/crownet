@@ -138,6 +138,7 @@ void GlobalDensityMap::initializeMap(){
             "MAP_TYPE",
             "global");  // The global density map is the ground
                         // truth. No algorihm needed.
+        fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
         fBuilder.addMetadata<int>("NODE_ID", -1);
         fBuilder.addPath("global");
 
