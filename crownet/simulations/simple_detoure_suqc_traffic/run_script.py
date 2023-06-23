@@ -48,46 +48,55 @@ class SimulationRun(BaseSimulationRunner):
             sep=" ",
         )
 
-
-        self.wait_for_file(
-            os.path.join(self.result_base_dir(), "degree_informed_extract.txt")
-        )
-
         # plot
-        df_r["percentageInformed-PID12"].plot()
+        df_r["percentageInformed-PID20"].plot()
+        df_r["percentageInformed-PID10"].plot()
         plt.axhline(y=0.95, c="r")
         plt.xlabel("Time [s] (Time = 0s : start of information dissemination)")
         plt.ylabel("Percentage of pedestrians informed [%]")
         plt.title("Information degree")
+        plt.legend(["All agents", "Agents in redirection area"])
         plt.savefig(os.path.join(self.result_base_dir(), "vadere.d", "InformationDegree.pdf"))
 
 
     @process_as({"prio": 10, "type": "post"})
-    def time_95_informed(self):
+    def time_95_informed_redirection_area(self):
         filename = "DegreeInformed.txt"
         # wait for file
         filepath = self.wait_for_file(
             os.path.join(self.result_base_dir(), "vadere.d", filename),
         )
-
         # replace it with file extraction
         df_r = self.get_degree_informed_dataframe(filepath)
+        df_small_area = df_r[df_r['percentageInformed-PID10'] >= 0.95]
 
-        df_r = df_r[df_r['percentageInformed-PID12'] >= 0.95]
-
-        if len(df_r) > 0:
-            time95 = df_r.index.min()
+        if len(df_small_area) > 0:
+            time95_small = df_small_area.index.min()
         else:
-            time95 = numpy.inf
+            time95_small = numpy.inf
 
-        with open(os.path.join(self.result_base_dir(), "time_95_informed.txt"), "w") as f:
-            f.write(f"index timeToInform95PercentAgents\n0 {time95}")
+        with open(os.path.join(self.result_base_dir(), "time_95_informed_redirection_area.txt"), "w") as f:
+            f.write(f"index timeToInform95PercentAgents\n0 {time95_small}")
 
-        self.wait_for_file(
-            os.path.join(self.result_base_dir(), "time_95_informed.txt")
+
+    @process_as({"prio": 11, "type": "post"})
+    def time_95_informed_all(self):
+        filename = "DegreeInformed.txt"
+        # wait for file
+        filepath = self.wait_for_file(
+            os.path.join(self.result_base_dir(), "vadere.d", filename),
         )
+        # replace it with file extraction
+        df_r = self.get_degree_informed_dataframe(filepath)
+        df_big_area = df_r[df_r['percentageInformed-PID20'] >= 0.95]
 
+        if len(df_big_area) > 0:
+            time95_big = df_big_area.index.min()
+        else:
+            time95_big = numpy.inf
 
+        with open(os.path.join(self.result_base_dir(), "time_95_informed_all.txt"), "w") as f:
+            f.write(f"index timeToInform95PercentAgents\n0 {time95_big}")
 
     @process_as({"prio": 30, "type": "post"})
     def poisson_parameter(self):
@@ -166,7 +175,8 @@ if __name__ == "__main__":
                 "--qoi",
                 "degree_informed_extract.txt",
                 "poisson_parameter.txt",
-                "time_95_informed.txt",
+                "time_95_informed_redirection_area.txt",
+                "time_95_informed_all.txt",
                 "packet_age.txt",
                 "number_of_peds.txt",
                 "--create-vadere-container",
@@ -185,4 +195,5 @@ if __name__ == "__main__":
         runner = SimulationRun(os.path.dirname(os.path.abspath(__file__)))
 
     runner.run()
+    print("")
 

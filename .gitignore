@@ -156,6 +156,7 @@ build
 dist
 
 /crownet/tests/fingerprint/yml_out.d/
+analysis/uq/simulation_studies/unittest_sim_output/
 
 simulation-campaigns/.pydevproject
 

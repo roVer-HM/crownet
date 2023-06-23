@@ -6,7 +6,7 @@ from shapely.geometry import Polygon
 from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_args
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 from flowcontrol.dataprocessor.dataprocessor import *
-from flowcontrol.strategy.controlaction import InformationStimulus, Rectangle, StimulusInfo, Location
+from flowcontrol.strategy.controlaction import InformationStimulus, Rectangle, StimulusInfo, Location, TimeFrame
 from flowcontrol.strategy.sensor.density import MeasurementArea, DensityMapper
 
 sys.path.append(os.path.abspath(".."))
@@ -18,7 +18,7 @@ from flowcontrol.strategy.timestepping.timestepping import FixedTimeStepper
 from flowcontrol.strategy.controller.control_algorithm import AvoidCongestion
 
 
-class MinimalDensity(Controller):
+class AvoidShort(Controller):
 
     def __init__(self):
 
@@ -85,10 +85,13 @@ class MinimalDensity(Controller):
     def write_data(self):
         self.processor_manager.finish()
 
-    def _get_stimulus_info(self):
+    def _get_stimulus_info(self, sim_time):
         location = Location(areas=Rectangle(x=58.2, y=71.1, width=20., height=15.))
         recommendation = InformationStimulus(f"use target {self.current_target}")
-        s = StimulusInfo(location=location, stimuli=recommendation)
+        start_time = sim_time
+        end_time = start_time + 1.6  # TODO adjust the value here if you adjust the time stepping
+        timeframe = TimeFrame(start_time=sim_time, end_time=end_time)
+        s = StimulusInfo(location=location, stimuli=recommendation, timeframe=timeframe)
         return s
 
     def send_recommendation_if_necessary(self, sim_time):
@@ -106,7 +109,7 @@ class MinimalDensity(Controller):
             print(f"Sim time {sim_time}:\t Recommend route with intermediate target id = {self.current_target}")
             self.processor_manager.write("path_choice", self.current_target)
 
-            recommendation = self._get_stimulus_info()
+            recommendation = self._get_stimulus_info(sim_time)
             self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON(),
                                                     sending_node_id=self.detour_app)
 
@@ -116,7 +119,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         # default settings for control-vadere (no Omnetpp!)
         settings = ["--controller-type",
-                    "MinimalDensity",  #
+                    "AvoidShort",  #
                     "--port",
                     "9997",
                     "--host-name",

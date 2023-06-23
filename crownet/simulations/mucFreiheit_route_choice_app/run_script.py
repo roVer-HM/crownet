@@ -55,7 +55,7 @@ class SimulationRun(BaseSimulationRunner):
         df = OppAnalysis.get_sim_real_time_ratio(omnetpp_log_file_path=opp_out)
         df.to_csv(os.path.join(self.result_base_dir(), "simsec_sec_ratio.csv"), sep = " ")
         df.set_index("sim_time",inplace=True)
-        df["ratio_sim_real"].plot()
+        (1./df["ratio_sim_real"]).plot()
         plt.xlabel("Simulation time in s")
         plt.ylabel("Ratio: simulation time / real time ")
         plt.savefig(os.path.join(self.result_base_dir(), "RatioSimulationTimeRealTime.pdf"))
@@ -274,7 +274,7 @@ if __name__ == "__main__":
         "--with-control",
         "control.py",
         "--ctrl.controller-type",
-        "MinimalDensity",
+        "AvoidShort",
         "--opp.-c",
         "final",
         "--qoi",
