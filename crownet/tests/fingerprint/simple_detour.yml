@@ -16,7 +16,8 @@ simple_detour_wlan:
     - --write-container-log
     - --qoi
     - poisson_parameter.txt
-    - time_95_informed.txt
+    - time_95_informed_redirection_area.txt
+    - time_95_informed_all.txt
     - packet_age.txt
     - number_of_peds.txt
     - --create-vadere-container

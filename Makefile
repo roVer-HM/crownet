@@ -158,8 +158,8 @@ out/$(venv_user): analysis-build | out
 		pip3 install $(flowcontrol_sdist) && \
 		pip3 install $(crownetutils_sdist) && \
 		pip3 install $(suqc_sdist) && \
-		pip3 install -r ../analysis/uq/requirements.txt
-
+                pip3 install -r ../analysis/uq/requirements.txt
+		
 out/$(venv_dev): analysis-build | out
 	cd out && \
 		$(PYTHON) -m  venv $(venv_dev) && \

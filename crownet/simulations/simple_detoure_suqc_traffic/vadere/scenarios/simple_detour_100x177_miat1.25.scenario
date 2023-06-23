@@ -2,7 +2,6 @@
   "name" : "simple_detour_100x177_miat1.25",
   "description" : "",
   "release" : "2.4",
-  "commithash" : "4824caa045264348998e946ae94edd591b283336",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -23,7 +22,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "DegreeInformed.txt",
-      "processors" : [ 12 ]
+      "processors" : [ 10, 20 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "numberPedsGen.txt",
@@ -57,13 +56,15 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedStimulusCountingProcessor",
-      "id" : 12,
+      "id" : 10,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
       "attributes" : {
         "informationFilter" : "E2002_closed",
         "isRegexFilter" : false,
         "stopIfPercentageIsInformed" : 0.95,
-        "numberOfAdditionalTimeFrames" : 10
+        "numberOfAdditionalTimeFrames" : 10000,
+        "measurementAreaId" : 10,
+        "forceSimulationEnd" : false
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfGeneratedPedsProcessor",
@@ -76,8 +77,19 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberPedestrianProcessor",
       "id" : 104
-    }
-    ],
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedStimulusCountingProcessor",
+      "id" : 20,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor",
+      "attributes" : {
+        "informationFilter" : "E2002_closed",
+        "isRegexFilter" : false,
+        "stopIfPercentageIsInformed" : 0.95,
+        "numberOfAdditionalTimeFrames" : 10,
+        "measurementAreaId" : 20,
+        "forceSimulationEnd" : true
+      }
+    } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
   },
@@ -318,10 +330,20 @@
       "measurementAreas" : [ {
         "id" : 10,
         "shape" : {
-          "x" : 0.0,
-          "y" : 0.0,
+          "x" : 0.5,
+          "y" : 90.0,
           "width" : 176.0,
-          "height" : 115.0,
+          "height" : 30.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true
+      }, {
+        "id" : 20,
+        "shape" : {
+          "x" : 0.5,
+          "y" : 0.5,
+          "width" : 176.0,
+          "height" : 119.0,
           "type" : "RECTANGLE"
         },
         "visible" : true

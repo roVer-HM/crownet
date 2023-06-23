@@ -234,7 +234,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1500.0,
+      "finishTime" : 1255.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -536,9 +536,9 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4
+          "updateFrequency" : 2
         },
-        "spawnNumber" : 9,
+        "spawnNumber" : 8,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 2000.0,

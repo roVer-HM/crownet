@@ -8,8 +8,8 @@ from flowcontrol.crownetcontrol.setup.entrypoints import get_controller_from_arg
 from flowcontrol.crownetcontrol.state.state_listener import VadereDefaultStateListener
 from flowcontrol.crownetcontrol.traci.connection_manager import ClientModeConnection, ServerModeConnection
 from flowcontrol.strategy.sensor.density import MeasurementArea, DensityMapper
-from flowcontrol.dataprocessor.dataprocessor import *
-from flowcontrol.strategy.controlaction import InformationStimulus, Rectangle, StimulusInfo, Location
+from flowcontrol.dataprocessor.dataprocessor import DensityMeasurements, Writer, Manager, CorridorRecommendation
+from flowcontrol.strategy.controlaction import InformationStimulus, Rectangle, StimulusInfo, Location, TimeFrame
 
 sys.path.append(os.path.abspath(".."))
 
@@ -22,7 +22,7 @@ from flowcontrol.strategy.controller.control_algorithm import AlternateTargetAlg
 
 
 
-class NoController(Controller):
+class LocalController(Controller):
 
     def __init__(self, control_alg=None):
         super().__init__(
@@ -30,189 +30,120 @@ class NoController(Controller):
             time_stepper=FixedTimeStepper(time_step_size=2.0, start_time=10.0),
             processor_manager=Manager()
         )
-        self.density_over_time = list()
+        self.current_target = "none"
+        self.densities_last = [0., 0., 0.]
 
     def handle_sim_step(self, sim_time, sim_state):
-        self.processor_manager.update_sim_time(sim_time)
         self.measure_state(sim_time)
-        self.compute_next_corridor_choice()
-        self.apply_redirection_measure()
-        self.commandID += 1
+        self.compute_next_corridor_choice(sim_time)
+        self.apply_redirection_measure(sim_time)
+        self.write_dataprocessor_data(sim_time)
         self.time_stepper.forward_time()
 
-    def compute_next_corridor_choice(self):
-        pass
-
     def measure_state(self, sim_time):
-        if isinstance(self.con_manager, ServerModeConnection):
-            cell_dim, cell_size, result = self.con_manager.domains.v_sim.get_density_map(
-                sending_node="gloablDensityMap")  # "misc[0].app[1].app" OR "gloablDensityMap"
-            self.update_density_map(cell_dim, cell_size, result)
-            densities = self.densityMapper.get_density_in_area(distribution="uniform").values()
-        elif isinstance(self.con_manager, ClientModeConnection):
-            densities = list()
-            for a in [101, 102, 103]:
-                __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
-                # density = -11.0 #TODO replace
-                densities.append(density)
-        else:
-            raise ValueError("Cannot handle send_ctl command.")
-        self.density_over_time.append(densities)
+        densities = list()
+        for a in [101, 102, 103]:
+            __, __, density = self.con_manager.domains.v_sim.get_data_processor_value(str(a))
+            densities.append(density)
+        self.densities_last = densities
 
-    def update_density_map(self, cell_dim, cell_size, result):
-        if self.densityMapper is None:
-            obs = self._get_obstacles_as_polygons()
-            measurement_areas = self._get_measurement_areas([1, 2, 3])
-            self.densityMapper = DensityMapper(cell_dimensions=cell_dim, cell_size=cell_size,
-                                               measurement_areas=measurement_areas, obstacles=obs)
-        if result is not None:
-            self.densityMapper.update_density(result)
+    def write_dataprocessor_data(self, sim_time):
 
-    def _get_measurement_areas(self, measurement_area_ids):
-        areas = dict()
-        for measurement_id in measurement_area_ids:
-            polygon = self.con_manager.domains.v_polygon.get_shape(str(measurement_id))
-            areas[measurement_id] = MeasurementArea(polygon=Polygon(np.array(polygon)), id=measurement_id)
-        return areas
-
-    def _get_obstacles_as_polygons(self):
-        obs = self.con_manager.domains.v_sim.get_obstacles()
-        obstacles = list()
-        for __, polygon in obs.items():
-            polygon = Polygon(np.array(polygon))
-            obstacles.append(polygon)
-        return obstacles
-
-    def apply_redirection_measure(self):
-        pass
+        self.processor_manager.update_sim_time(sim_time)
+        self.processor_manager.write("densities_received", *self.densities_last)
+        self.processor_manager.write("path_choice", self.current_target)
 
     def handle_init(self, sim_time, sim_state):
-        self.processor_manager.registerProcessor("commandId", ControlActionCmdId(
-            writer=Writer(os.path.join(self.output_dir, "commandIds.txt"))))
+        density_dp = DensityMeasurements(writer=Writer(os.path.join(self.output_dir, "densities_received.txt")),
+                                         user_defined_header=["shortRoute", "mediumRoute", "longRoute"])
+
+        self.processor_manager.registerProcessor("densities_received", density_dp)
+        self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(
+            Writer(os.path.join(self.output_dir, "path_choice.txt"))))
 
     def write_data(self):
         self.processor_manager.finish()
 
-    def set_redirection_area(self, area):
-        pass
+    def compute_next_corridor_choice(self, sim_time):
+        self.current_target = self.control_algorithm.get_next_target()
 
+    def apply_redirection_measure(self, sim_time):
+        recommendation = self._get_stimulus_info(sim_time)
+        self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
 
-class OpenLoop(NoController, Controller):
-
-    def __init__(self, control_alg = None):
-        self.target_ids = [11, 21, 31]
-        self.commandID = 111
-        self.redirection_area = None
-
-        if control_alg == None:
-            control_alg= AlternateTargetAlgorithm(alternate_targets=self.target_ids)
-        super().__init__(control_alg=control_alg)
-
-
-    def get_stimulus_info(self):
-
+    def _get_stimulus_info(self, sim_time):
         location = Location(areas=Rectangle(x=0., y=0., width=25., height=25.))
         recommendation = InformationStimulus(f"use target {self.current_target}")
-        s = StimulusInfo(location=location, stimuli=recommendation)
+        start_time = sim_time
+        end_time = start_time + 1.6 #TODO adjust the value here if you adjust the time stepping
+        timeframe = TimeFrame(start_time=sim_time, end_time=end_time)
+        s = StimulusInfo(location=location, stimuli=recommendation, timeframe=timeframe)
         return s
 
 
-    def measure_state(self, sim_time):
-        commandIds = self.con_manager.domains.v_sim.get_received_command_ids(22)
-        self.processor_manager.write("sending_times", commandIds)
-        super().measure_state(sim_time)
+class NoController(LocalController, Controller):
 
-    def write_data(self):
-        commandIdsSent = self.processor_manager.get_processor_values("commandId")
-        self.processor_manager.post_loop("sending_times", commandIdsSent)
-        super().write_data()
-
-
-    def apply_redirection_measure(self):
-        recommendation = self.get_stimulus_info()
-        self.processor_manager.write("commandId", self.commandID)
-        self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
-
-    def compute_next_corridor_choice(self):
-        self.current_target = self.control_algorithm.get_next_target()
-        self.processor_manager.write("path_choice", self.current_target)
-
-
-    def handle_init(self, sim_time, sim_state):
-        super().handle_init(sim_time, sim_state)
-        self.con_manager.domains.v_sim.init_control()
-
-        self.processor_manager.registerProcessor("sending_times", SendingTimes(
-            Writer(os.path.join(self.output_dir, "sending_times.txt"))))
-        self.processor_manager.registerProcessor("path_choice", CorridorRecommendation(
-            Writer(os.path.join(self.output_dir, "path_choice.txt"))))
-
-
-class ClosedLoop(OpenLoop, Controller):
     def __init__(self):
-        targets = [11, 21, 31]
-        control_alg = MinimalDensityAlgorithm(alternate_targets=targets)
+        super().__init__(control_alg=None)
+
+    def compute_next_corridor_choice(self, sim_time):
+        pass
+
+    def apply_redirection_measure(self, sim_time):
+        pass
+
+
+class OpenLoop(LocalController, Controller):
+
+    def __init__(self):
+        control_alg = AlternateTargetAlgorithm(alternate_targets=[11, 21, 31])
         super().__init__(control_alg=control_alg)
-        self.target_ids = targets
 
 
-    def compute_next_corridor_choice(self):
-        self.current_target = self.control_algorithm.get_next_target(self.density_over_time[-1])
-        self.processor_manager.write("path_choice", self.current_target)
-
-
-    def apply_redirection_measure(self):
-        recommendation = self.get_stimulus_info()
-        self.processor_manager.write("commandId", self.commandID)
-        self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
-
-class AvoidShort(OpenLoop,Controller):
+class ClosedLoop(LocalController, Controller):
 
     def __init__(self):
-        super().__init__(control_alg=AvoidCongestion(alternative_route_id=31))
-        self.target_ids = [11, 21, 31]
+        control_alg = MinimalDensityAlgorithm(alternate_targets=[11, 21, 31])
+        super().__init__(control_alg=control_alg)
 
-    def compute_next_corridor_choice(self):
-        densities = self.density_over_time[-1]
-        density_short_route = densities[0]
-        density_long_route = densities[2]
-        self.current_target = self.control_algorithm.get_next_target(density_congested_route = density_short_route,
-                                                                      density_alternate_route = density_long_route)
-        if self.current_target is None:
-            self.processor_manager.write("path_choice", "skipped")
+    def compute_next_corridor_choice(self, sim_time):
+        self.current_target = self.control_algorithm.get_next_target(self.densities_last)
+
+class AvoidShort(LocalController,Controller):
+
+    def __init__(self):
+        self.alternative_route_id = 31
+        super().__init__(control_alg=AvoidCongestion(alternative_route_id=self.alternative_route_id))
+
+    def compute_next_corridor_choice(self, sim_time):
+
+        current_target = self.control_algorithm.get_next_target(density_congested_route = self.densities_last[0],
+                                                                    density_alternate_route = self.densities_last[2])
+        if current_target == None:
+            self.current_target = "none"
         else:
-            self.processor_manager.write("path_choice", self.current_target)
+            self.current_target = current_target
 
-    def apply_redirection_measure(self):
+    def apply_redirection_measure(self, sim_time):
 
-        self.processor_manager.write("commandId", self.commandID)
-
-        if self.current_target != None:
-            recommendation = self.get_stimulus_info()
-            self.con_manager.domains.v_sim.send_control(message=recommendation.toJSON())
-
+        if self.current_target == self.alternative_route_id:
+            super().apply_redirection_measure(sim_time)
 
 if __name__ == "__main__":
 
     if len(sys.argv) == 1:
         # default settings for control-vadere (no Omnetpp!)
         settings = ["--controller-type",
-                    "OpenLoop",  #
+                    "AvoidShort",  #
                     "--scenario-file",
                     "three_corridors.scenario",
                     "--port",
                     "9999",
                     "--host-name",
-                    "localhost",
+                    "vadere",
                     "--client-mode",
-                    "--start-server",
-                    "--gui-mode",
                     "--output-dir",
                     "sim-output-task1",
-                    "-j",
-                    "/mnt/data/crownet/vadere/VadereSimulator/target/vadere-server.jar",
-                    "--download-jar-file",
-                    "false"
                     ]
     else:
         settings = sys.argv[1:]
