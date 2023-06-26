@@ -27,29 +27,29 @@ BaseApp::~BaseApp() {
 }
 
 void BaseApp::initialize(int stage) {
-  MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase>::initialize(stage);
-  if (stage == INITSTAGE_LOCAL) {
+    BaseAppMixin::initialize(stage);
+    if (stage == INITSTAGE_LOCAL) {
 
-    startTime = par("startTime").doubleValue();
-    stopTime = par("stopTime").doubleValue();
+        startTime = par("startTime").doubleValue();
+        stopTime = par("stopTime").doubleValue();
 
-    localInfo = (AppInfoLocal*)(par("localInfo").objectValue()->dup());
-    take(localInfo);
-    initLocalAppInfo();
+        localInfo = (AppInfoLocal*)(par("localInfo").objectValue()->dup());
+        take(localInfo);
+        initLocalAppInfo();
 
 
-    if (stopTime > SIMTIME_ZERO && stopTime < startTime){
-      throw cRuntimeError("Invalid startTime/stopTime parameters");
+        if (stopTime > SIMTIME_ZERO && stopTime < startTime){
+          throw cRuntimeError("Invalid startTime/stopTime parameters");
+        }
+        appLifeTime = new cMessage("applicationTimer");
+
+        socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
+        scheduler = inet::getModuleFromPar<IAppScheduler>(par("schedulerModule"), this);
+        maxPduLength = b(par("maxPduLength"));
+        minPduLength = b(par("minPduLength"));
+    } else if (stage == INITSTAGE_APPLICATION_LAYER){
+        handleStartOperation(nullptr);
     }
-    appLifeTime = new cMessage("applicationTimer");
-
-    socketProvider = inet::getModuleFromPar<SocketProvider>(par("socketModule"), this);
-    scheduler = inet::getModuleFromPar<IAppScheduler>(par("schedulerModule"), this);
-    maxPduLength = b(par("maxPduLength"));
-    minPduLength = b(par("minPduLength"));
-  } else if (stage == INITSTAGE_APPLICATION_LAYER){
-      handleStartOperation(nullptr);
-  }
 }
 
 void BaseApp::initLocalAppInfo(){
