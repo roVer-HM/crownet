@@ -94,6 +94,22 @@ void TtlClearLocalVisitor::applyTo(RegularCell& cell){
     }
 }
 
+void ApplyRessourceSharingDomainIdVisitor::applyTo(RegularCell& cell) {
+    // if valid local measurement exist apply that RSD-ID to the calculated value of
+    // this cell as this cell is inside of the RSD domain.
+
+    if(cell.hasValid() && cell.hasLocal()){
+        auto calcualtedValue = cell.val();
+        if (calcualtedValue){
+            int localRSD = cell.getLocal()->getResourceSharingDomainId();
+            calcualtedValue->setResourceSharingDomainId(localRSD);
+        } else {
+            throw cRuntimeError("No computed value or cell '%s' of DPM map of node '%s' present when applying resource sharing domain identifier",
+                    cell.getCellId().str().c_str(), cell.getOwnerId().str().c_str());
+        }
+    }
+}
+
 RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell) const {
   RegularCell::entry_t_ptr ret = nullptr;
   for (const auto& e : cell.validIter()) {

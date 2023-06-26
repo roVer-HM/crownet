@@ -88,6 +88,8 @@ class IEntry : public crownet::FilePrinter {
   virtual void setSelectedIn(std::string viewName);
   virtual std::string getSelectedIn() const;
 
+  virtual void setResourceSharingDomainId(const int rsd);
+  virtual const int getResourceSharingDomainId() const;
 
   virtual std::string csv(std::string delimiter) const;
   virtual std::string str() const;
@@ -112,6 +114,7 @@ class IEntry : public crownet::FilePrinter {
   key_type source = 0;
   EntryDist entryDist;
   std::string selected_in;
+  int resourceSharingDomainId = -1;
 };
 
 
@@ -376,6 +379,17 @@ std::string IEntry<K, T>::getSelectedIn() const {
 }
 
 template <typename K, typename T>
+void IEntry<K, T>::setResourceSharingDomainId(const int rsd){
+    this->resourceSharingDomainId = rsd;
+}
+
+template <typename K, typename T>
+const int IEntry<K, T>::getResourceSharingDomainId() const{
+    return this->resourceSharingDomainId;
+}
+
+
+template <typename K, typename T>
 inline std::string IEntry<K, T>::csv(std::string delimiter) const {
   std::stringstream out;
   out << this->count << delimiter << this->measurement_time << delimiter
@@ -399,18 +413,31 @@ int IEntry<K, T>::columns() const {
 
 template <typename K, typename T>
 void IEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
-  out << this->count << sep << this->measurement_time << sep
-      << this->received_time << sep << this->source << sep << this->selected_in  << sep
-      << this->selectionRank << sep << this->entryDist.sourceHost << sep
-      << this->entryDist.sourceEntry << sep << this->entryDist.hostEntry;
+  out << this->count << sep << \
+          this->measurement_time << sep << \
+          this->received_time << sep << \
+          this->source << sep << \
+          this->selected_in  << sep << \
+          this->selectionRank << sep << \
+          this->entryDist.sourceHost << sep << \
+          this->entryDist.sourceEntry << sep << \
+          this->entryDist.hostEntry << sep << \
+          this->resourceSharingDomainId;
 }
 
 template <typename K, typename T>
 void IEntry<K, T>::writeHeaderTo(std::ostream& out,
                                  const std::string& sep) const {
-  out << "count" << sep << "measured_t" << sep << "received_t" << sep
-      << "source" << sep << "selection" << sep << "selectionRank" << sep
-      << "sourcerHost" << sep << "sourceEntry" << sep << "hostEntry" ;
+  out << "count" << sep << \
+          "measured_t" << sep << \
+          "received_t" << sep << \
+          "source" << sep << \
+          "selection" << sep << \
+          "selectionRank" << sep  << \
+          "sourcerHost" << sep << \
+          "sourceEntry" << sep << \
+          "hostEntry" << sep << \
+          "rsd_id";
 }
 
 template <typename K, typename T>

@@ -47,7 +47,6 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
       mapDataType = "pedestrianCount";
-      appendResourceSharingDomainId = par("appendResourceSharingDomainId");
 
     } else if (stage == INITSTAGE_APPLICATION_LAYER){
         // BaseApp schedules start operation first (see BaseApp::initialize(stage))
@@ -121,6 +120,10 @@ void BaseDensityMapApp::initDcdMap(){
     // do not share valueVisitor between nodes.
     valueVisitor = dcdMapFactory->createValueVisitor(mapCfg);
     cellAgeHandler = std::make_shared<TTLCellAgeHandler>(dcdMap, mapCfg->getCellAgeTTL(), simTime());
+    if (mapCfg->getAppendRessourceSharingDomoinId()){
+        rsdVisitor = std::make_shared<ApplyRessourceSharingDomainIdVisitor>(simTime());
+    }
+
 
 }
 void BaseDensityMapApp::initWriter(){
@@ -219,7 +222,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData){
 
     int maxCellCount;
     int cellSize;
-    if (appendResourceSharingDomainId){
+    if (mapCfg->getAppendRessourceSharingDomoinId()){
         SparseMapPacketWithSharingDomainId dummy{};
         maxCellCount = (int)(maxData.get()/dummy.getCellSize().get());
         cellSize = dummy.getCellSize().get();
@@ -239,16 +242,32 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData){
             auto& cell = stream->nextCell(now);
             cell.sentAt(now);
             auto count_100 = cell.val()->getCount()*100;
+
+            if (mapCfg->getAppendRessourceSharingDomoinId()){
+                LocatedDcDCellWithSharingDomainId c {
+                    (uint16_t)count_100,    //count
+                    (uint16_t)cell.getCellId().x(), // offsetX
+                    (uint16_t)cell.getCellId().y(),  // offsetY
+                    cell.val()->getResourceSharingDomainId()
+                };
+                auto delta_t = now-cell.val()->getMeasureTime();
+                c.setDeltaCreation(delta_t);
+                c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
+                payload->setCells(usedSpace, c);
+
+            } else {
+                LocatedDcDCell c {
+                    (uint16_t)count_100,    //count
+                    (uint16_t)cell.getCellId().x(), // offsetX
+                    (uint16_t)cell.getCellId().y()  // offsetY
+                };
+                auto delta_t = now-cell.val()->getMeasureTime();
+                c.setDeltaCreation(delta_t);
+                c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
+                payload->setCells(usedSpace, c);
+
+            }
             //todo sharing domain id defaults to 0!! Assume one ENB
-            LocatedDcDCell c {
-                (uint16_t)count_100,    //count
-                (uint16_t)cell.getCellId().x(), // offsetX
-                (uint16_t)cell.getCellId().y()  // offsetY
-            };
-            auto delta_t = now-cell.val()->getMeasureTime();
-            c.setDeltaCreation(delta_t);
-            c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
-            payload->setCells(usedSpace, c);
         } else {
             break; // no more data present for transmission.
         }
@@ -375,6 +394,10 @@ void BaseDensityMapApp::computeValues() {
   valueVisitor->setTime(simTime());
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
+  if (mapCfg->getAppendRessourceSharingDomoinId()){
+      rsdVisitor->setTime(simTime());
+      dcdMap->visitCells(*rsdVisitor); //reference to cellAgeHandler needed
+  }
 }
 
 

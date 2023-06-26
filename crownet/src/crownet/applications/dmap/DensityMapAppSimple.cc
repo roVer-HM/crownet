@@ -71,13 +71,28 @@ void DensityMapAppSimple::initLocalMap(){
 const int DensityMapAppSimple::getNeighborhoodSize() {
     computeValues();
     int pedCount = 1; // add ego count
+    int rsdid = getResourceSharingDomainId();
+    if (rsdid <= 0 && mapCfg->getAppendRessourceSharingDomoinId()){
+        EV_INFO << "Node " << this->getHostId() << " is currently not connected. Use previous id for neighborhood estimate" << endl;
+        rsdid = getResourceSharingDomainIdPrev();
+    }
+    if (rsdid <= 0 && mapCfg->getAppendRessourceSharingDomoinId()){
+        EV_INFO << "Node " << this->getHostId() << " not connected (currently or previously). NO neighborhood estimate possible. Return neighborhood estimate: 0" << endl;
+    }
+
     for (const auto& el : dcdMap->valid()){
-        // todo: check if same enb as this node -> assume all cells are in this enb
         auto val_ptr = el.second.val();
         if (val_ptr){
+            if (mapCfg->getAppendRessourceSharingDomoinId() &&
+                    val_ptr->getResourceSharingDomainId() != rsdid){
+                //skip cell as is is not part of the current RSD.
+                continue;
+            }
             pedCount += (int)val_ptr->getCount();
         }
     }
+    EV_INFO << "Node " << this->getHostId() << " in RSD " << rsdid << " with neighborhood estimate:" << pedCount << endl;
+
     return pedCount;
 }
 

@@ -97,12 +97,13 @@ protected:
 
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::shared_ptr<ActiveWriter> fileWriter;
+ //DPMM visitors
  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
  std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
+ std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsdVisitor;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
  std::string mapDataType; //todo switch for PedestrianVsEntropy data
- bool appendResourceSharingDomainId;
 
 
  RegularDcdMapWatcher* dcdMapWatcher;

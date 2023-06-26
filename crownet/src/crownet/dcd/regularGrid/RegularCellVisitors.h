@@ -150,6 +150,26 @@ class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
   RegularCell::node_key_t id;
 };
 
+
+
+/**
+ *  Apply resource sharing domain id (RSD-id) to the computed value of each cell. Only cell
+ *  which are part of the local map (LM) are by definition of the LM in the same RSD as the
+ *  map owner. The LM is constructed solely by 1-hop direct communication, which entails that
+ *  the sender and receiver (i.e. map owner) use the same RSD.
+ */
+class ApplyRessourceSharingDomainIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
+ public:
+    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time)
+      : TimestampedVoidCellVisitor<RegularCell>(time){}
+
+ public:
+    virtual void applyTo(RegularCell& cell) override;
+
+
+};
+
+
 /**
  * Return Youngest Measurement from a RegularCell
  *

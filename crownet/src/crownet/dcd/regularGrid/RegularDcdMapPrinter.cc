@@ -35,7 +35,7 @@ void RegularDcdMapValuePrinter::writeTo(std::ostream& out,
     out << omnetpp::simTime().dbl() << sep;
     val.first.writeTo(out, sep);  // GridCellID (x, y)
     out << sep;
-    val.second.val()->writeTo(out, sep);  // Entry
+    val.second.val()->writeTo(out, sep);  // Entry (more than one column!)
     out << sep;
     out << ownCell << std::endl;
   }
@@ -43,9 +43,20 @@ void RegularDcdMapValuePrinter::writeTo(std::ostream& out,
 
 void RegularDcdMapValuePrinter::writeHeaderTo(std::ostream& out,
                                               const std::string& sep) const {
-  out << "simtime" << sep << "x" << sep << "y" << sep << "count" << sep
-      << "measured_t" << sep << "received_t" << sep << "source" << sep
-      << "selection" << sep << "selectionRank" << sep <<  "sourceHost" << sep << "sourceEntry" << sep << "hostEntry" << sep << "own_cell" << std::endl;
+  out << "simtime" << sep << \
+          "x" << sep << \
+          "y" << sep << \
+          "count" << sep << \
+          "measured_t" << sep << \
+          "received_t" << sep << \
+          "source" << sep << \
+          "selection" << sep << \
+          "selectionRank" << sep << \
+          "sourceHost" << sep << \
+          "sourceEntry" << sep << \
+          "hostEntry" << sep << \
+          "rsd_id" << sep << \
+          "own_cell" << std::endl;
 }
 
 void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
@@ -64,7 +75,7 @@ void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
       out << omnetpp::simTime().dbl() << sep;
       val.first.writeTo(out, sep);  // GridCellID (x, y)
       out << sep;
-      entry->writeTo(out, sep);  // Entry
+      entry->writeTo(out, sep);  // Entry (more than one column!)
       out << sep;
       out << ownCell << std::endl;
     }
@@ -99,10 +110,17 @@ void RegularDcdMapGlobalPrinter::writeTo(std::ostream& out,
 
 void RegularDcdMapGlobalPrinter::writeHeaderTo(std::ostream& out,
                                                const std::string& sep) const {
-  out << "simtime" << sep << "x" << sep << "y"
-     << sep << "count" << sep  << "measured_t" << sep << "received_t"
-     << sep << "source" << sep << "selection" << sep << "selectionRank" << sep
-     << "own_cell" << sep << "node_id" << std::endl;
+  out << "simtime" << sep << \
+          "x" << sep << \
+          "y" << sep << \
+          "count" << sep  << \
+          "measured_t" << sep << \
+          "received_t" << sep << \
+          "source" << sep << \
+          "selection" << sep << \
+          "selectionRank" << sep << \
+          "own_cell" << sep << \
+          "node_id" << std::endl;
 }
 
 }  // namespace crownet

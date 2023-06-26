@@ -113,6 +113,7 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::vector<ITraCiNodeVisitorAcceptor*> dynamicNodeVisitorAcceptors;
   ITraCiNodeVisitorAcceptor* traciModuleListener = nullptr;
 
+  MapCfg *mapCfg;
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
   std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
