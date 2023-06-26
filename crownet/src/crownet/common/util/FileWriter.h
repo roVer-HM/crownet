@@ -16,6 +16,7 @@
 #include "traci/Boundary.h"
 #include "Writer.h"
 #include "FilePrinter.h"
+#include "crownet/applications/dmap/dmap_m.h"
 
 namespace crownet {
 
@@ -129,7 +130,7 @@ public:
 
     ActiveFileWriter *build(std::shared_ptr<FilePrinter> printer);
     template <typename M>
-    ActiveFileWriter *build(std::shared_ptr<M> map, const std::string &mapType);
+    ActiveFileWriter *build(std::shared_ptr<M> map, MapCfg *mapCfg);
 
 };
 

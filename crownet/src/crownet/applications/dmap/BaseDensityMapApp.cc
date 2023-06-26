@@ -134,7 +134,7 @@ void BaseDensityMapApp::initWriter(){
       fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
       // todo cellsize in x and y
       fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-      fBuilder.addMetadata("VERSION", std::string("0.3")); // todo!!!
+      fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
       fBuilder.addMetadata("DATATYPE", mapDataType);
       fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
       fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
@@ -143,7 +143,7 @@ void BaseDensityMapApp::initWriter(){
       fBuilder.addPath(s.str());
 
       fileWriter.reset(fBuilder.build<RegularDcdMap>(
-              dcdMap, mapCfg->getMapTypeLog()));
+              dcdMap, mapCfg));
     } else {
         // do nothing
         fileWriter.reset(new DevNullWriter());

@@ -116,9 +116,9 @@ FileWriterBuilder &FileWriterBuilder::addPath(const std::string &path) {
 
 
 template <>
-ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const std::string &mapType){
+ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, MapCfg *mapCfg){
     ActiveFileWriter *obj = nullptr;
-    if (mapType == "all"){
+    if (strcmp(mapCfg->getMapTypeLog(), "all") == 0){
         obj = new ActiveFileWriter(
                 path,
                 std::make_shared<RegularDcdMapAllPrinter>(map));
