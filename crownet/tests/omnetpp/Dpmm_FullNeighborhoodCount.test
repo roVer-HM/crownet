@@ -1,0 +1,97 @@
+%description:
+DcDMap sends data after neighborhood table is updated. 
+
+%file: package.ned 
+// 
+// empty: no namespace
+//
+
+%inifile: omnetpp.ini
+[General]
+network = crownet.test.omnetpp.lib.TestStationaryWorld
+sim-time-limit= 5s
+ned-path = ../../lib
+include ../lib/default_testConfig.ini
+**.vector-recording = true
+**.scalar-recording = true
+**.routingRecorder.enabled = false
+
+[Config final]
+extends = enb_count_n2, stationary_n8_enb2, m7_handover, _default, D2D_General, FullNeighborhoodCount,
+*.misc[0].app[*].app.cmdenv-log-level = debug
+*.misc[0].app[*].scheduler.cmdenv-log-level = debug
+**.cmdenv-log-level = off
+sim-time-limit= 1800ms
+
+%postrun-command: grep -E "^*TestStationaryWorld\.misc\[0\].app\[1\].app.*RSD" test.out > test1.out
+
+%contains: test1.out
+0.031203929597 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:0
+0.052928021047 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:0
+0.056458078077 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:1
+0.076897687184 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:3
+0.084504578009 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:4
+0.121260769392 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:4
+0.15723465238 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:4
+0.158998594227 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:4
+0.180405866625 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.234064259875 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.251932708749 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.258775989927 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.265498383607 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.295307760026 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.356354791623 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.366935757891 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.368324571388 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.379322529531 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.409143008849 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.414246870467 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.426949727633 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.485752005119 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.546987590718 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.553347144818 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.60060275844 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.6482064115 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.656651729792 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.668222541626 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.708118007223 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.752482476476 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.777725829576 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.797137283861 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.826309594737 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.863428568001 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.905912066172 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.908712059607 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.956725797403 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+0.975846848134 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.049688707708 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.054952427955 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.081841112293 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.099813866505 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.10249696147 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.146257455295 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.176735284765 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.219804016559 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.23142615502 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:5
+1.2732454308 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.317744996308 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.342889139766 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.399615840395 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.426055550324 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.437298200044 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.513180789641 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.513513862407 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.553595423363 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.556527903954 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.620283922393 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.639993706142 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.677804866696 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.693792050965 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.70918785832 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.723587328972 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.788508328211 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+1.792581402566 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:8
+
+
+%contains: stdout
+<!> Simulation time limit reached -- at t=10s
