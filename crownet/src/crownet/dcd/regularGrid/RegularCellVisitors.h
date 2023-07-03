@@ -15,12 +15,12 @@ namespace crownet {
 /**
  * A VoidCellVisitor with access to current time and the underlining density map as a shared pointer.
  */
-using BaseCellVisitor = MapMixin<TimestampMixin<VoidCellVisitor<RegularCell>, typename RegularCell::time_t>, RegularDcdMap>;
+using BaseCellVisitor = MapMixin<TimestampMixin<VoidCellVisitor<RegularCell>>, RegularDcdMap>;
 
 class IncrementerVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   IncrementerVisitor(RegularCell::time_t time)
-      : TimestampedVoidCellVisitor<RegularCell>(time) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time) { }
   virtual void applyTo(RegularCell& cell) override;
 };
 
@@ -29,8 +29,7 @@ class IncrementerVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  */
 class ResetVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
-  ResetVisitor(RegularCell::time_t time)
-      : TimestampedVoidCellVisitor<RegularCell>(time) {}
+  ResetVisitor(RegularCell::time_t time) : TimestampedVoidCellVisitor<RegularCell>(time) { }
   virtual void applyTo(RegularCell& cell) override;
 };
 
@@ -50,7 +49,7 @@ class ResetLocalVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   ClearVisitor(RegularCell::time_t time)
-      : TimestampedVoidCellVisitor<RegularCell>(time) {}
+      : TimestampedVoidCellVisitor<RegularCell>(time) { }
   virtual void applyTo(RegularCell& cell) override;
 };
 
@@ -58,8 +57,11 @@ class ClearVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 class TTLCellAgeHandler : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
 public:
     TTLCellAgeHandler(RegularDcdMapPtr dcdMap, RegularCell::time_t ttl, RegularCell::time_t t = 0.0)
-     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), dcdMap(dcdMap), ttl(ttl){}
- virtual void applyTo(RegularCell& cell) override;
+     : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(t), dcdMap(dcdMap), ttl(ttl){
+        // apply to all cells.
+        this->entryPredicate = CellDataIterator<RegularCell>::getAllDataIter_pred();
+    }
+ virtual void applyIfChanged(RegularCell& cell) override;
  virtual std::string getVisitorName() const override { return "silentCellAgeHandler"; }
 
 protected:
@@ -72,7 +74,8 @@ protected:
  */
 class ClearSelection : public VoidCellVisitor<RegularCell> {
  public:
-  ClearSelection() {}
+  ClearSelection(): VoidCellVisitor<RegularCell>() {}
+  ClearSelection(typename CellDataIterator<RegularCell>::pred_t& pred): VoidCellVisitor<RegularCell>(pred) {}
   virtual void applyTo(RegularCell& cell) override;
 };
 
@@ -84,17 +87,17 @@ class ClearSelection : public VoidCellVisitor<RegularCell> {
  */
 class ClearLocalVisitor : public BaseCellVisitor {
  public:
-  ClearLocalVisitor(){}
-  ClearLocalVisitor(const ClearLocalVisitor& other): BaseCellVisitor(other) {}
+//  ClearLocalVisitor(): BaseCellVisitor(){}
+//  ClearLocalVisitor(const ClearLocalVisitor& other): BaseCellVisitor(other) {}
 //  ClearLocalVisitor(RegularCell::time_t time) : TimestampedVoidCellVisitor<RegularCell>(time) {}
-  virtual cObject *dup() const override { return new ClearLocalVisitor(*this); }
+//  virtual cObject *dup() const override { return new ClearLocalVisitor(*this); }
   virtual void applyTo(RegularCell& cell) override;
 };
 
 
 /**
  *  Clear operation on all cells containing local measurements.
- *  When updating the (local) density map with data from the neighborhood table (NT)
+ *  When updating the (local) density map with data from the neighborhood table (NT),
  *  one has to take into account the moving of nodes between cells. If node 'A' moves
  *  from one cell C_1 to cell C_2 the overall count of C_1 must be decrement by one and
  *  the C_2 must be incremented. However because the NT only contains the current location
@@ -115,14 +118,15 @@ class ClearLocalVisitor : public BaseCellVisitor {
  *  nodes location.
  *
  */
+// TODO: deprecated?
 class TtlClearLocalVisitor : public ClearLocalVisitor{
 public:
-    TtlClearLocalVisitor(): zeroTtl(0.0), keepZeroDistance(-1.0) {};
-    TtlClearLocalVisitor(const TtlClearLocalVisitor& other): ClearLocalVisitor(other) {
-        this->zeroTtl = other.getZeroTtl();
-        this->keepZeroDistance = other.getKeepZeroDistance();
-    }
-    virtual cObject *dup() const override { return new TtlClearLocalVisitor(*this); }
+    TtlClearLocalVisitor(): ClearLocalVisitor(), zeroTtl(0.0), keepZeroDistance(-1.0) {};
+//    TtlClearLocalVisitor(const TtlClearLocalVisitor& other): ClearLocalVisitor(other) {
+//        this->zeroTtl = other.getZeroTtl();
+//        this->keepZeroDistance = other.getKeepZeroDistance();
+//    }
+//    virtual cObject *dup() const override { return new TtlClearLocalVisitor(*this); }
     virtual void applyTo(RegularCell& cell) override;
 
     const simtime_t getZeroTtl() const { return zeroTtl;}
@@ -135,7 +139,7 @@ private:
     double keepZeroDistance; //
 };
 
-
+// TODO: deprecated?
 class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  public:
   ClearCellIdVisitor(RegularCell::node_key_t id, RegularCell::time_t time)
@@ -158,137 +162,42 @@ class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  *  map owner. The LM is constructed solely by 1-hop direct communication, which entails that
  *  the sender and receiver (i.e. map owner) use the same RSD.
  */
-class ApplyRessourceSharingDomainIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
+class ApplyRessourceSharingDomainIdVisitor : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
  public:
-    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time)
-      : TimestampedVoidCellVisitor<RegularCell>(time){}
+    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time = 0.0)
+        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time){}
+    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time, typename CellDataIterator<RegularCell>::pred_t& pred)
+        : IdenpotanceTimestampedVoidCellVisitor(time, pred) {}
 
  public:
+    virtual void applyIfChanged(RegularCell& cell) override;
+
+
+};
+
+class RsdNeighborhoodCountVisitor : public IdenpotanceTimestampedVoidCellVisitor<RegularCell>{
+  public:
+    RsdNeighborhoodCountVisitor(RegularCell::time_t time = 0.0, int rsdid = -1)
+        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time, CellDataIterator<RegularCell>::getValidDataIter_pred()), rsdid(rsdid), count(0){}
+
+    virtual void applyIfChanged(RegularCell& cell) override;
+    virtual void reset(RegularCell::time_t time, int rsdid);
+    virtual int getCount() const {return count;}
+
+  protected:
+    int rsdid;
+    int count;
+
+};
+
+class FullNeighborhoodCountVisitor: public RsdNeighborhoodCountVisitor {
+public:
+    FullNeighborhoodCountVisitor(RegularCell::time_t time = 0.0, int rsdid = -1)
+      : RsdNeighborhoodCountVisitor(time, rsdid){}
+
     virtual void applyTo(RegularCell& cell) override;
-
-
-};
-
-
-/**
- * Return Youngest Measurement from a RegularCell
- *
- * Only look at valid items.
- */
-class YmfVisitor : public TimestampedGetEntryVisitor<RegularCell> {
- public:
-    YmfVisitor(RegularCell::time_t t = 0.0)
-      : TimestampedGetEntryVisitor<RegularCell>(t){}
-  virtual RegularCell::entry_t_ptr applyTo(
-      const RegularCell& cell) const override;
-  virtual std::string getVisitorName() const override { return "ymf"; }
-
-};
-
-
-class YmfPlusDistVisitor : public TimestampedGetEntryVisitor<RegularCell> {
-protected:
-    struct sum_data {
-        double age_sum;
-        double age_min;
-        double dist_sum;
-        double dist_min;
-        int count;
-    };
-public:
-    YmfPlusDistVisitor(double alpha = 0.5, RegularCell::time_t t = 0.0)
-        : TimestampedGetEntryVisitor<RegularCell>(t), alpha(alpha) {}
-    virtual RegularCell::entry_t_ptr applyTo(
-        const RegularCell& cell) const override;
-    virtual sum_data getSums(const RegularCell& cell) const;
-    virtual std::string getVisitorName() const override { return "ymfPlusDist"; }
-
-protected:
-    double alpha;
-};
-
-class YmfPlusDistStepVisitor : public YmfPlusDistVisitor {
-public:
-    YmfPlusDistStepVisitor(double alpha, RegularCell::time_t t, double stepDist)
-        : YmfPlusDistVisitor(alpha, t), stepDist(stepDist) {}
-    virtual RegularCell::entry_t_ptr applyTo(
-        const RegularCell& cell) const override;
-    virtual sum_data getSums(const RegularCell& cell) const override;
-    virtual const double getDistValue(const double dist) const;
-    virtual std::string getVisitorName() const override { return "ymfPlusDistStep"; }
-
-protected:
-    double stepDist;
-};
-
-class LocalSelector : public TimestampedGetEntryVisitor<RegularCell> {
- public:
-    LocalSelector(RegularCell::time_t t = 0.0)
-      : TimestampedGetEntryVisitor<RegularCell>(t) {}
-  virtual RegularCell::entry_t_ptr applyTo(
-      const RegularCell& cell) const override;
-  virtual std::string getVisitorName() const override { return "local"; }
 };
 
 
 
-// class LocalVisitor : public GetCellVisitor<RegularCell> {
-// public:
-//  virtual RegularCell::value_type applyTo(
-//      const RegularCell& cell) const override;
-//};
-
-/**
- * Return mean measurement with all cells weighted equally
- */
-class MeanVisitor : public TimestampedGetEntryVisitor<RegularCell> {
-public:
-    MeanVisitor(RegularCell::time_t t = 0.0) :
-        TimestampedGetEntryVisitor<RegularCell>(t) {}
-    virtual RegularCell::entry_t_ptr applyTo(
-        const RegularCell& cell) const override;
-    virtual std::string getVisitorName() const override { return "mean"; }
-};
-
-class MedianVisitor : public TimestampedGetEntryVisitor<RegularCell> {
-public:
-    MedianVisitor(RegularCell::time_t t = 0.0) :
-        TimestampedGetEntryVisitor<RegularCell>(t) {}
-    virtual RegularCell::entry_t_ptr applyTo(
-        const RegularCell& cell) const override;
-    virtual std::string getVisitorName() const override { return "mean"; }
-};
-
-
-/**
- * Return mean measurement with weighted based on the distance between the
- * cell origin and the Entry owner
- */
-class InvSourceDistVisitor : public TimestampedGetEntryVisitor<RegularCell> {
-public:
-    InvSourceDistVisitor(RegularCell::time_t t = 0.0) :
-        TimestampedGetEntryVisitor<RegularCell>(t) {}
-    virtual RegularCell::entry_t_ptr applyTo(
-        const RegularCell& cell) const override;
-    virtual std::string getVisitorName() const override { return "invSourceDist"; }
-};
-
-
-
-class MaxCountVisitor : public TimestampedGetEntryVisitor<RegularCell> {
- public:
-    MaxCountVisitor(RegularCell::time_t t = 0.0) :
-        TimestampedGetEntryVisitor<RegularCell>(t) {}
-
-  virtual RegularCell::entry_t_ptr applyTo(
-      const RegularCell& cell) const override;
-  virtual std::string getVisitorName() const override { return "maxCount"; }
-
-};
-
-class AlgSmall : public GetEntryVisitor<RegularCell> {
- public:
-  virtual RegularCell::entry_t_ptr applyTo(
-      const RegularCell& cell) const override;
-};
 }  // namespace crownet

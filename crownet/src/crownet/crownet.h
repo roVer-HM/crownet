@@ -27,6 +27,9 @@ inline std::ostream &operator<<(std::ostream &os,
 
 namespace crownet {
 
+inline bool operator<(const simtime_t& a, const double b){return a.dbl() < b; }
+inline bool operator<(const double a, const simtime_t& b){return a < b.dbl();}
+
 extern omnetpp::cConfigOption *CFGID_VADERE_HOST;
 extern omnetpp::cConfigOption *CFGID_SUMO_HOST;
 extern omnetpp::cConfigOption *CFGID_FLOW_HOST;

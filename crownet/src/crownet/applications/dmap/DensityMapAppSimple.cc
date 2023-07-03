@@ -32,6 +32,14 @@ void DensityMapAppSimple::initialize(int stage) {
         nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
         nTable->setOwnerId(hostId);
         nTable->registerEntryListner(this);
+
+        if (mapCfg->getAppendRessourceSharingDomoinId()){
+            // only count inside RSD
+            rsdCountVisitor = std::make_shared<RsdNeighborhoodCountVisitor>();
+        } else {
+            // count full map
+            rsdCountVisitor = std::make_shared<FullNeighborhoodCountVisitor>();
+        }
     }
 }
 
@@ -70,30 +78,23 @@ void DensityMapAppSimple::initLocalMap(){
 
 const int DensityMapAppSimple::getNeighborhoodSize() {
     computeValues();
-    int pedCount = 1; // add ego count
-    int rsdid = getResourceSharingDomainId();
-    if (rsdid <= 0 && mapCfg->getAppendRessourceSharingDomoinId()){
+    const RsdIdPair& rsd = getRsdIdPair();
+    int rsdid = rsd.getId();
+    if (!rsd.valid() && mapCfg->getAppendRessourceSharingDomoinId()){
         EV_INFO << "Node " << this->getHostId() << " is currently not connected. Use previous id for neighborhood estimate" << endl;
-        rsdid = getResourceSharingDomainIdPrev();
-    }
-    if (rsdid <= 0 && mapCfg->getAppendRessourceSharingDomoinId()){
-        EV_INFO << "Node " << this->getHostId() << " not connected (currently or previously). NO neighborhood estimate possible. Return neighborhood estimate: 0" << endl;
-    }
-
-    for (const auto& el : dcdMap->valid()){
-        auto val_ptr = el.second.val();
-        if (val_ptr){
-            if (mapCfg->getAppendRessourceSharingDomoinId() &&
-                    val_ptr->getResourceSharingDomainId() != rsdid){
-                //skip cell as is is not part of the current RSD.
-                continue;
-            }
-            pedCount += (int)val_ptr->getCount();
+        if (!rsd.validPrev() && mapCfg->getAppendRessourceSharingDomoinId()){
+            EV_INFO << "Node " << this->getHostId() << " not connected (currently or previously). NO neighborhood estimate possible. Return neighborhood estimate: 1 (ego count)" << endl;
+            return 1;
         }
+        rsdid = rsd.getPrevId();
     }
-    EV_INFO << "Node " << this->getHostId() << " in RSD " << rsdid << " with neighborhood estimate:" << pedCount << endl;
 
-    return pedCount;
+    rsdCountVisitor->reset(simTime(), rsdid);
+    dcdMap->visitCells(*rsdCountVisitor);
+
+    EV_INFO << LOG_MOD << hostId  << " in RSD " << rsdid << " with neighborhood estimate:" << rsdCountVisitor->getCount() << endl;
+
+    return rsdCountVisitor->getCount();
 }
 
 void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, BeaconReceptionInfo* info){
@@ -114,6 +115,7 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
                 simTime(),
                 1.0
         );
+        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
         EV_INFO << LOG_MOD << hostId << " removes:" << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
     }
@@ -153,6 +155,7 @@ void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, 
                 info->getCurrentData()->getReceivedTime(),
                 1.0
         );
+        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         cellEntryLocal->setEntryDist(std::move(dist));
         // remove node from Map NT
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
@@ -189,6 +192,7 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
                 1.0
         );
         cellEntryLocal->setEntryDist(std::move(dist));
+        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         // add node to neighborhood
         dcdMap->addToNeighborhood((int)info->getNodeId(), cellId);
         EV_INFO << LOG_MOD << hostId << " enter-cell: " << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
@@ -233,6 +237,7 @@ void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table,
             info->getCurrentData()->getReceivedTime()
         );
         cellEntryLocal->setEntryDist(std::move(dist));
+        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         EV_INFO << LOG_MOD << hostId << " stay-in-cell: " << cellId_current << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
     }
 }

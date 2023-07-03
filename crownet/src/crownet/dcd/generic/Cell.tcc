@@ -50,7 +50,8 @@ bool Cell<C, N, T>::hasLocal() const {
 
 template <typename C, typename N, typename T>
 bool Cell<C, N, T>::hasValid() const {
-  return this->validIter() != this->validIter().end();
+  auto iter = this->validIter();
+  return iter != iter.end();
 }
 
 template <typename C, typename N, typename T>
@@ -147,9 +148,21 @@ CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() {
 }
 
 template <typename C, typename N, typename T>
-CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() const {
+const CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() const {
   return const_cast<Cell<C, N, T>*>(this)->validIter();
 }
+
+template <typename C, typename N, typename T>
+CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::iterBy(const typename CellDataIterator<Cell<C, N, T>>::pred_t& pred){
+    return CellDataIterator<Cell<C, N, T>>(this, pred);
+}
+
+template <typename C, typename N, typename T>
+const CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::iterBy(const typename CellDataIterator<Cell<C, N, T>>::pred_t& pred) const{
+    return const_cast<Cell<C, N, T>*>(this)->iterBy(pred);
+}
+
+
 
 template <typename C, typename N, typename T>
 template <typename Fn>
@@ -159,15 +172,27 @@ void Cell<C, N, T>::acceptSet(Fn* visitor) {
 
 template <typename C, typename N, typename T>
 template <typename Fn>
-void Cell<C, N, T>::acceptSet(Fn visitor) {
+void Cell<C, N, T>::acceptSet(Fn& visitor) {
   visitor(*this);
+}
+template <typename C, typename N, typename T>
+template <typename Fn>
+void Cell<C, N, T>::acceptSet(Fn&& visitor) {
+    acceptSet(visitor);
 }
 
 template <typename C, typename N, typename T>
 template <typename Fn>
 typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::acceptGetEntry(
-    const Fn visitor) const {
+    Fn& visitor) const {
   return visitor(*this);
+}
+
+template <typename C, typename N, typename T>
+template <typename Fn>
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::acceptGetEntry(
+    Fn&& visitor) const {
+  return acceptGetEntry(visitor);
 }
 
 template <typename C, typename N, typename T>
@@ -194,13 +219,13 @@ bool Cell<C, N, T>::acceptCheck(const Fn visitor) const {
 
 template <typename C, typename N, typename T>
 template <typename Fn, typename Ret>
-Ret Cell<C, N, T>::accept(Fn visitor) {
+Ret Cell<C, N, T>::accept(Fn& visitor) {
   return visitor(*this);
 }
 
 template <typename C, typename N, typename T>
 template <typename Fn, typename Ret>
-Ret Cell<C, N, T>::accept(const Fn visitor) const {
+Ret Cell<C, N, T>::accept(Fn& visitor) const {
   return visitor(*this);
 }
 

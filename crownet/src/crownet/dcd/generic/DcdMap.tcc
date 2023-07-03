@@ -7,6 +7,7 @@
 
 #pragma once
 #include "crownet/dcd/generic/DcdMap.h"
+#include "crownet/dcd/common/Visitor_check.h"
 
 template <typename C, typename N, typename T>
 const typename DcDMap<C, N, T>::map_t::iterator DcDMap<C, N, T>::begin() const {
@@ -103,23 +104,27 @@ void DcDMap<C, N, T>::setCellKeyProvider(
 template <typename C, typename N, typename T>
 template <typename Fn>
 void DcDMap<C, N, T>::visitCells(Fn* visitor) {
+
   for (auto& entry : this->cells) {
     entry.second.acceptSet(visitor);
   }
+  setTimeIfIdempotenceVisitor(visitor, this->timeProvider->now(), 0);
+
 }
 template <typename C, typename N, typename T>
 template <typename Fn>
 void DcDMap<C, N, T>::visitCells(Fn& visitor) {
+
   for (auto& entry : this->cells) {
     entry.second.acceptSet(visitor);
   }
+  setTimeIfIdempotenceVisitor(visitor, this->timeProvider->now(), 0);
+
 }
 template <typename C, typename N, typename T>
 template <typename Fn>
 void DcDMap<C, N, T>::visitCells(Fn&& visitor) {
-  for (auto& entry : this->cells) {
-    entry.second.acceptSet(visitor);
-  }
+    visitCells(visitor);
 }
 
 template <typename C, typename N, typename T>
@@ -136,8 +141,13 @@ void DcDMap<C, N, T>::computeValues(Fn visitor) {
 
 template <typename C, typename N, typename T>
 template <typename Fn>
-void DcDMap<C, N, T>::applyVisitorTo(const cell_key_t& cell_id, Fn visitor) {
+void DcDMap<C, N, T>::applyVisitorTo(const cell_key_t& cell_id, Fn& visitor) {
   this->getCell(cell_id).acceptSet(visitor);
+}
+template <typename C, typename N, typename T>
+template <typename Fn>
+void DcDMap<C, N, T>::applyVisitorTo(const cell_key_t& cell_id, Fn&& visitor) {
+    applyVisitorTo(cell_id, visitor);
 }
 
 template <typename C, typename N, typename T>

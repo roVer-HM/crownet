@@ -19,16 +19,35 @@ using namespace inet;
 
 namespace crownet {
 
+struct RsdId{
+    int id = -1;
+    simtime_t time = simtime_t::ZERO;
+
+    const bool valid() const { return id > 0; }
+};
+
+struct RsdIdPair {
+    RsdId current;
+    RsdId previous;
+
+    const int getId() const { return current.id; }
+    const int getPrevId() const { return previous.id; }
+    const bool valid() const { return current.valid();}
+    const bool validPrev() const { return current.valid();}
+};
+
+bool operator==(const int& a, const RsdIdPair& b);
+bool operator==(const RsdIdPair& a, const int& b);
+
+
 class RsdListener : public omnetpp::cListener{
     public:
         virtual ~RsdListener() = default;
         virtual void receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) override;
-        const int getResourceSharingDomainId() const {return resourceSharingDomainId;}
-        const int getResourceSharingDomainIdPrev() const {return resourceSharingDomainId_prev;}
+        const RsdIdPair& getRsd()const {return rsd;}
         void setSignal(omnetpp::simsignal_t servingCell_) {this->servingCell_ = servingCell_;}
     private:
-        int resourceSharingDomainId = -1;
-        int resourceSharingDomainId_prev = -1;
+        RsdIdPair rsd;
         omnetpp::simsignal_t servingCell_;
 
 };
@@ -44,9 +63,10 @@ public:
     virtual void finish() override;
 
 
-    const int getResourceSharingDomainId() const {return rsd.getResourceSharingDomainId();}
-    const int getResourceSharingDomainIdPrev() const {return rsd.getResourceSharingDomainIdPrev();}
 
+    const int getResourceSharingDomainId() const {return rsd.getRsd().getId();}
+    const int getResourceSharingDomainIdPrev() const {return rsd.getRsd().previous.id;}
+    const RsdIdPair& getRsdIdPair() const {return rsd.getRsd();}
 
 private:
     RsdListener rsd;

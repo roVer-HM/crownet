@@ -10,7 +10,13 @@
 #include <memory>
 #include <string>
 
+#include "crownet/crownet.h"
 #include "crownet/common/Entry.h"
+
+namespace omnetpp{
+    bool operator<(const simtime_t& a, const double b){return a.dbl() < b; }
+    bool operator<(const double a, const simtime_t& b){return a < b.dbl();}
+}
 
 double TIME1 = 1.34;
 double TIME2 = 4.42;

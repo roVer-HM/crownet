@@ -16,6 +16,8 @@
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
+
 
 using namespace crownet;
 

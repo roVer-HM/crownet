@@ -12,6 +12,7 @@
 #include "crownet/crownet_testutil.h"
 
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 #include "crownet/common/RegularGridInfo.h"
 
@@ -168,8 +169,9 @@ class DcDMapFileWriterNoGlobalEntryTest : public BaseOppTest, public DcdFactoryP
     auto e = map->getEntry<Entry>(traci::TraCIPosition(x, y));
     e->incrementCount(t);
   }
-  void update(std::shared_ptr<RegularDcdMap> map, int x, int y, int id, int count, double t) {
+  void update(std::shared_ptr<RegularDcdMap> map, int x, int y, int id, int count, double t, int rsdid = -1) {
     auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
+    e->setResourceSharingDomainId(rsdid);
     map->setEntry(GridCellID(x, y), std::move(e));
   }
 
@@ -209,6 +211,7 @@ class DcDMapFileWriterNoGlobalEntryTest : public BaseOppTest, public DcdFactoryP
   std::shared_ptr<RegularDcdMap> mapLocal;
   std::shared_ptr<RegularDcdMap> mapFull;
 };
+
 
 TEST_F(DcDMapFileWriterNoGlobalEntryTest, print_all_valid) {
   std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();

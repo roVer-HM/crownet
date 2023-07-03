@@ -13,6 +13,7 @@
 #include "crownet/crownet_testutil.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/common/RegularGridInfo.h"
 
 using namespace crownet;
@@ -123,8 +124,9 @@ TEST_F(RegularCellTest, hasValid_False) {
   // no entry implies invalid entries
   EXPECT_FALSE(cellEmpty.hasValid());
 
-  // Invalidate all entries in cell
-  cell.acceptSet(ResetVisitor(111.1));
+  // Invalidate all entries in cel
+  ResetVisitor rv(111.1);
+  cell.acceptSet(rv);
   // Existing but invalid data
   EXPECT_FALSE(cell.hasValid());
 }
@@ -137,7 +139,8 @@ TEST_F(RegularCellTest, hasValidLocal_False) {
   EXPECT_FALSE(cellEmpty.hasValidLocal());
 
   // Invalidate all entries in cell
-  cell.acceptSet(ResetVisitor(111.1));
+  ResetVisitor rv(111.1);
+  cell.acceptSet(rv);
   // Existing but invalid local data
   EXPECT_FALSE(cell.hasValidLocal());
 }
@@ -324,7 +327,8 @@ TEST_F(RegularCellTest, printVisitorValid) {
 
 TEST_F(RegularCellTest, clearVisitor) {
   ClearVisitor clearVisitor(15);  // at time 15
-  cell.acceptSet(clearVisitor);
+//  cell.acceptSet(clearVisitor);
+  cell.acceptSet(ClearVisitor(15));
 
   CellPrinterAll<RegularCell> printAll;
   std::string cell_str =

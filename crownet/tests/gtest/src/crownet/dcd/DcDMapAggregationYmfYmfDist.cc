@@ -16,6 +16,7 @@
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include <iostream>
 #include <fstream>
 #include <boost/predef/other/endian.h>
@@ -295,7 +296,9 @@ TEST_F(RegularDcDMapAggregationTest, ymfDistStep_two_element_with_rank_disaggrem
                             << std::endl;
                 }
             };
-            ConstLambdaVisitor<RegularDcdMap::cell_t> visitor = ConstLambdaVisitor<RegularDcdMap::cell_t>( func );
+
+            ConstLambdaVisitor<RegularDcdMap::cell_t> visitor {func};
+
 
             mapFull = dcdFactory->create(3);
             YmfPlusDistStepVisitor v {alpha, simTime(), stepDist};

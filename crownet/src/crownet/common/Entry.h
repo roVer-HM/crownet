@@ -15,6 +15,7 @@
 #include <limits>
 
 #include "crownet/common/util/FilePrinter.h"
+#include "crownet/common/RsdProviderMixin.h"
 
 struct EntryDist{
     double sourceHost;     /* distance between the node which conducted the measurement and the current node */
@@ -89,6 +90,8 @@ class IEntry : public crownet::FilePrinter {
   virtual std::string getSelectedIn() const;
 
   virtual void setResourceSharingDomainId(const int rsd);
+  virtual void setResourceSharingDomainId(const crownet::RsdIdPair& rsdIdPair);
+
   virtual const int getResourceSharingDomainId() const;
 
   virtual std::string csv(std::string delimiter) const;
@@ -384,6 +387,21 @@ void IEntry<K, T>::setResourceSharingDomainId(const int rsd){
 }
 
 template <typename K, typename T>
+void IEntry<K, T>::setResourceSharingDomainId(const crownet::RsdIdPair& rsdIdPair){
+    if (this->measurement_time <  rsdIdPair.current.time && rsdIdPair.getPrevId() > 0){
+        /* packet processing intersected with RSD change event.
+         * This ensures that measurements from the old RSD does not bleed into the new one.
+         * This only append when the packet is already received far enough up the stack such
+         * that handover cleanup does not remove the packet.
+         */
+        this->setResourceSharingDomainId(rsdIdPair.getPrevId());
+    } else {
+        this->setResourceSharingDomainId(rsdIdPair.getId());
+    }
+}
+
+
+template <typename K, typename T>
 const int IEntry<K, T>::getResourceSharingDomainId() const{
     return this->resourceSharingDomainId;
 }
@@ -452,7 +470,7 @@ bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
 template <typename K, typename T>
 std::string IEntry<K, T>::logShort() const{
     std::stringstream s;
-    s << "Entry{" << this->count << ", " << this->measurement_time <<", " << this->received_time << ", " << this->source << "}";
+    s << "Entry{" << this->count << ", " << this->measurement_time <<", " << this->received_time << ", " << this->source << ", rsd[" << this->getResourceSharingDomainId() << "]}";
     return s.str();
 }
 

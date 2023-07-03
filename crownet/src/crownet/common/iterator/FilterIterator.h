@@ -40,6 +40,9 @@ class FilterIterator : public std::iterator<std::output_iterator_tag, IterVal> {
   FilterIterator<T, Iter, IterVal, Pred> begin();
   FilterIterator<T, Iter, IterVal, Pred> end();
 
+  const FilterIterator<T, Iter, IterVal, Pred> begin() const;
+  const FilterIterator<T, Iter, IterVal, Pred> end() const;
+
   int distance();
 
  protected:

@@ -6,6 +6,7 @@
  */
 
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 
@@ -50,7 +51,7 @@ std::shared_ptr<RegularDcdMap> RegularDcdMapFactory::create_shared_ptr(
   return std::make_shared<RegularDcdMap>(ownerID, cellKeyProvider, timeProvider, streamer);
 }
 
-std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> RegularDcdMapFactory::createValueVisitor(MapCfg* mapCfg){
+std::shared_ptr<CellAggregationAlgorihm<RegularCell>> RegularDcdMapFactory::createValueVisitor(MapCfg* mapCfg){
 
     auto mapType = mapCfg->getMapType();
     if (visitor_dispatcher.find(mapType) == visitor_dispatcher.end()){

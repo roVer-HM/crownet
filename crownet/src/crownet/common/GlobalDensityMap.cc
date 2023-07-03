@@ -22,6 +22,7 @@
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/utility/Identity.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 namespace {

@@ -57,6 +57,11 @@ protected:
  virtual Packet *createPacket() override;
  virtual Ptr<Chunk>  buildHeader();
  virtual Ptr<Chunk>  buildPayload(b maxData);
+
+ virtual Ptr<Chunk> buildPayload(b maxData, Ptr<SparseMapPacket> pyload);
+ virtual Ptr<Chunk> buildPayload(b maxData, Ptr<SparseMapPacketWithSharingDomainId> pyload);
+
+
  virtual BurstInfo getBurstInfo(inet::b) const override;
 
  // FSM
@@ -67,6 +72,11 @@ protected:
  virtual void initDcdMap();
  virtual void initWriter();
  virtual bool mergeReceivedMap(Packet *packet);
+
+ virtual bool mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<const SparseMapPacket> body);
+ virtual bool mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<const SparseMapPacketWithSharingDomainId> body);
+
+
  virtual void initLocalMap() {/*do nothing on default*/};
 
  // IDensityMapHandler
@@ -98,7 +108,7 @@ protected:
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::shared_ptr<ActiveWriter> fileWriter;
  //DPMM visitors
- std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
+ std::shared_ptr<CellAggregationAlgorihm<RegularCell>> valueVisitor;
  std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
  std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsdVisitor;
  simtime_t lastUpdate = -1.0;
