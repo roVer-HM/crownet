@@ -240,10 +240,9 @@ template <typename C, typename N, typename T>
 std::string Cell<C, N, T>::infoCompact() const{
     std::stringstream os;
     os << "[#" << this->data.size();
-    int validCount = 0;
-    for (const auto e : this->validIter()) {
-        ++validCount;
-    }
+
+    int validCount = this->validIter().distance();
+
     os << "V" << validCount;
     if (this->hasLocal()){
         const auto l = this->getLocal();

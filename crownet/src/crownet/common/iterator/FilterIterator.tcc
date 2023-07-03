@@ -100,7 +100,7 @@ const FilterIterator<T, Iter, IterVal, Pred> FilterIterator<T, Iter, IterVal, Pr
 
 
 template <typename T, typename Iter, typename IterVal, typename Pred>
-int FilterIterator<T, Iter, IterVal, Pred>::distance() {
+int FilterIterator<T, Iter, IterVal, Pred>::distance() const{
   // new iterator
   FilterIterator<T, Iter, IterVal, Pred> tmp(this->data, this->predicate);
   int i = 0;

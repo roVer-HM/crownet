@@ -12,11 +12,13 @@
 
 #include <omnetpp/cexception.h>
 #include <memory>
+#include <iterator>
 
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/generic/iterator/CellDataIterator.h"
 #include "crownet/dcd/identifier/Identifiers.h"
 #include "crownet/dcd/identifier/TimeProvider.h"
+
 
 namespace crownet {
 
@@ -174,6 +176,7 @@ class Cell {
 
  private:
   std::shared_ptr<TimeProvider<T>> timeProvider;
+
   map_t data;
   cell_key_t cell_id;
   node_key_t owner_id;
