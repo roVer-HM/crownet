@@ -93,4 +93,4 @@ sim-time-limit= 1800ms
 1.797675564556 TestStationaryWorld.misc[0].app[1].app : 15 in RSD 1 with neighborhood estimate:6
 
 %contains: stdout
-<!> Simulation time limit reached -- at t=10s
+<!> Simulation time limit reached -- at t=1.8s

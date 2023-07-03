@@ -94,4 +94,4 @@ sim-time-limit= 1800ms
 
 
 %contains: stdout
-<!> Simulation time limit reached -- at t=10s
+<!> Simulation time limit reached -- at t=1.8s
