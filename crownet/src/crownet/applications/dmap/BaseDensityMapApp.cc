@@ -109,7 +109,6 @@ void BaseDensityMapApp::initDcdMap(){
 
     if (!dcdMapFactory){
         EV_WARN << "Density map factory not set. This will impact the performance because each map has a separate distance cache!" << endl;
-//        converter->setCellSize(par("cellSize").doubleValue());
         dcdMapFactory = std::make_shared<RegularDcdMapFactory>(converter);
     }
     
