@@ -34,6 +34,7 @@ class MapCfg extends cOwnedObject {
      simtime_t cellAgeTTL @editable;
      string idStreamType;
      bool appendRessourceSharingDomoinId = false;
+     
 }
 
 cplusplus(MapCfg){{
@@ -133,6 +134,7 @@ class EntropyMap extends inet::TagBase
 enum MapType {
     DENSE = 0x10;   
  	SPARSE = 0x20;
+ 	SPARSE_RSD = 0x21;
 }
 
 class MapHeader extends inet::FieldsChunk {
