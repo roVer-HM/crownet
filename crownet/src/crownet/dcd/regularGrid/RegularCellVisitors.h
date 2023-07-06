@@ -87,10 +87,6 @@ class ClearSelection : public VoidCellVisitor<RegularCell> {
  */
 class ClearLocalVisitor : public BaseCellVisitor {
  public:
-//  ClearLocalVisitor(): BaseCellVisitor(){}
-//  ClearLocalVisitor(const ClearLocalVisitor& other): BaseCellVisitor(other) {}
-//  ClearLocalVisitor(RegularCell::time_t time) : TimestampedVoidCellVisitor<RegularCell>(time) {}
-//  virtual cObject *dup() const override { return new ClearLocalVisitor(*this); }
   virtual void applyTo(RegularCell& cell) override;
 };
 
@@ -122,11 +118,7 @@ class ClearLocalVisitor : public BaseCellVisitor {
 class TtlClearLocalVisitor : public ClearLocalVisitor{
 public:
     TtlClearLocalVisitor(): ClearLocalVisitor(), zeroTtl(0.0), keepZeroDistance(-1.0) {};
-//    TtlClearLocalVisitor(const TtlClearLocalVisitor& other): ClearLocalVisitor(other) {
-//        this->zeroTtl = other.getZeroTtl();
-//        this->keepZeroDistance = other.getKeepZeroDistance();
-//    }
-//    virtual cObject *dup() const override { return new TtlClearLocalVisitor(*this); }
+
     virtual void applyTo(RegularCell& cell) override;
 
     const simtime_t getZeroTtl() const { return zeroTtl;}
@@ -164,15 +156,18 @@ class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
  */
 class ApplyRessourceSharingDomainIdVisitor : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
  public:
-    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time = 0.0)
-        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time){}
-    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time, typename CellDataIterator<RegularCell>::pred_t& pred)
-        : IdenpotanceTimestampedVoidCellVisitor(time, pred) {}
+    ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time = 0.0, int rsdid = -1)
+        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time, CellDataIterator<RegularCell>::getValidDataIter_pred()), rsdid(rsdid){}
 
  public:
     virtual void applyIfChanged(RegularCell& cell) override;
+    virtual void reset(RegularCell::time_t time, int rsdid);
+    virtual int getCount() const {return count;}
+    virtual int getRsd() const {return rsdid;}
 
-
+ protected:
+   int rsdid;
+   int count;
 };
 
 class RsdNeighborhoodCountVisitor : public IdenpotanceTimestampedVoidCellVisitor<RegularCell>{
@@ -189,6 +184,9 @@ class RsdNeighborhoodCountVisitor : public IdenpotanceTimestampedVoidCellVisitor
     int count;
 
 };
+
+
+
 
 class FullNeighborhoodCountVisitor: public RsdNeighborhoodCountVisitor {
 public:

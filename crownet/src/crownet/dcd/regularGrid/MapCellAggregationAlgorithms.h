@@ -17,8 +17,8 @@ class YmfVisitor : public CellAggregationAlgorihm<RegularCell> {
  public:
     YmfVisitor(RegularCell::time_t t = 0.0)
       : CellAggregationAlgorihm<RegularCell>(t, CellDataIterator<RegularCell>::getValidDataIter_pred()){}
-  virtual RegularCell::entry_t_ptr applyIfChanged(
-      const RegularCell& cell) const override;
+  virtual RegularCell::entry_t_ptr applyTo(
+      const RegularCell& cell) override;
   virtual std::string getVisitorName() const override { return "ymf"; }
 
 };
@@ -37,8 +37,8 @@ public:
     YmfPlusDistVisitor(double alpha = 0.5, RegularCell::time_t t = 0.0)
         : CellAggregationAlgorihm<RegularCell>(t, CellDataIterator<RegularCell>::getValidDataIter_pred()), alpha(alpha){}
 
-    virtual RegularCell::entry_t_ptr applyIfChanged(
-        const RegularCell& cell) const override;
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) override;
     virtual sum_data getSums(const RegularCell& cell) const;
     virtual std::string getVisitorName() const override { return "ymfPlusDist"; }
 
@@ -51,8 +51,8 @@ public:
     YmfPlusDistStepVisitor(double alpha, RegularCell::time_t t, double stepDist)
         : YmfPlusDistVisitor(alpha, t), stepDist(stepDist) {}
 
-    virtual RegularCell::entry_t_ptr applyIfChanged(
-        const RegularCell& cell) const override;
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell)  override;
     virtual sum_data getSums(const RegularCell& cell) const override;
     virtual const double getDistValue(const double dist) const;
     virtual std::string getVisitorName() const override { return "ymfPlusDistStep"; }
@@ -65,8 +65,8 @@ class LocalSelector : public CellAggregationAlgorihm<RegularCell> {
  public:
     LocalSelector(RegularCell::time_t t = 0.0)
       : CellAggregationAlgorihm<RegularCell>(t) {}
-  virtual RegularCell::entry_t_ptr applyIfChanged(
-      const RegularCell& cell) const override;
+  virtual RegularCell::entry_t_ptr applyTo(
+      const RegularCell& cell) override;
   virtual std::string getVisitorName() const override { return "local"; }
 };
 
@@ -78,8 +78,8 @@ public:
     MeanVisitor(RegularCell::time_t t = 0.0) :
         CellAggregationAlgorihm<RegularCell>(t, CellDataIterator<RegularCell>::getValidDataIter_pred()) {}
 
-    virtual RegularCell::entry_t_ptr applyIfChanged(
-        const RegularCell& cell) const override;
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) override;
     virtual std::string getVisitorName() const override { return "mean"; }
 };
 
@@ -88,8 +88,8 @@ public:
     MedianVisitor(RegularCell::time_t t = 0.0) :
         CellAggregationAlgorihm<RegularCell>(t, CellDataIterator<RegularCell>::getValidDataIter_pred()) {}
 
-    virtual RegularCell::entry_t_ptr applyIfChanged(
-        const RegularCell& cell) const override;
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) override;
     virtual std::string getVisitorName() const override { return "mean"; }
 };
 
@@ -103,8 +103,8 @@ public:
     InvSourceDistVisitor(RegularCell::time_t t = 0.0) :
         CellAggregationAlgorihm<RegularCell>(t, CellDataIterator<RegularCell>::getValidDataIter_pred()) {}
 
-    virtual RegularCell::entry_t_ptr applyIfChanged(
-        const RegularCell& cell) const override;
+    virtual RegularCell::entry_t_ptr applyTo(
+        const RegularCell& cell) override;
     virtual std::string getVisitorName() const override { return "invSourceDist"; }
 };
 
@@ -115,8 +115,8 @@ class MaxCountVisitor : public CellAggregationAlgorihm<RegularCell> {
     MaxCountVisitor(RegularCell::time_t t = 0.0) : CellAggregationAlgorihm<RegularCell>(t) {}
     MaxCountVisitor(RegularCell::time_t t, typename CellDataIterator<RegularCell>::pred_t& pred) : CellAggregationAlgorihm<RegularCell>(t, pred) {}
 
-  virtual RegularCell::entry_t_ptr applyIfChanged(
-      const RegularCell& cell) const override;
+  virtual RegularCell::entry_t_ptr applyTo(
+      const RegularCell& cell) override;
   virtual std::string getVisitorName() const override { return "maxCount"; }
 
 };
@@ -126,8 +126,8 @@ class AlgSmall : public CellAggregationAlgorihm<RegularCell> {
     AlgSmall() : CellAggregationAlgorihm<RegularCell>() {}
     AlgSmall(typename CellDataIterator<RegularCell>::pred_t& pred) : CellAggregationAlgorihm<RegularCell>(0.0, pred) {}
 
-  virtual RegularCell::entry_t_ptr applyIfChanged(
-      const RegularCell& cell) const override;
+  virtual RegularCell::entry_t_ptr applyTo(
+      const RegularCell& cell) override;
 };
 
 } // namespace crownet

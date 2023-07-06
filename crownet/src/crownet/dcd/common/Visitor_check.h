@@ -23,7 +23,17 @@ auto setTimeIfIdempotenceVisitor(V &visitor, T time, float) -> void
     /*do nothing*/
  }
 
+template <typename V, typename T>
+auto setTimeIfIdempotenceVisitor(V *visitor, T time, int) -> decltype(visitor->setLastCall(time))
+ {
+    visitor->setLastCall(time);
+ }
 
+template <typename V, typename T>
+auto setTimeIfIdempotenceVisitor(V *visitor, T time, float) -> void
+ {
+    /*do nothing*/
+ }
 
 
 #endif /* CROWNET_DCD_COMMON_VISITOR_CHECK_H_ */

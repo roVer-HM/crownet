@@ -18,63 +18,33 @@
 #include "crownet/common/RegularGridInfo.h"
 
 
-namespace {
-
-DcdFactoryProvider f = DcdFactoryProvider(
-        inet::Coord(.0, .0),
-        inet::Coord(10.0, 10.0),
-        1.0
-);
-RegularGridInfo  grid = f.grid;
-std::shared_ptr<RegularDcdMapFactory> dcdFactory = f.dcdFactory;
-
-}
 using namespace crownet;
 
-class DpmmResourceSharingIdTest : public BaseOppTest, public DcdFactoryProvider {
+class DpmmResourceSharingIdTest : public MapTest{
     /**
      * By default all other data present is from nodes in other resource sharing domains.
      */
  public:
   using Entry = IEntry<IntIdentifer, omnetpp::simtime_t>;
   DpmmResourceSharingIdTest()
-      : mapFull(dcdFactory->create_shared_ptr(3)) {}
-
-  void incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int i, double t) {
-    auto e = map->getEntry<Entry>(traci::TraCIPosition(x, y));
-    e->setResourceSharingDomainId(ownRessourceSharingDomainId);
-    e->incrementCount(t);
-  }
-  void update(std::shared_ptr<RegularDcdMap> map, int x, int y, int id, int count, double t, int rsdid = -1) {
-    auto e = std::make_shared<Entry>(count, t, t, IntIdentifer(id));
-    e->setResourceSharingDomainId(rsdid);
-    map->setEntry(GridCellID(x, y), std::move(e));
+      : MapTest() {
+      mapFull = dcdFactory->create_shared_ptr(3);
   }
 
   void SetUp() override {
     setSimTime(0.0);
 
-    // [1, 1] Local = 2 / Other = 4
-    incr(mapFull, 1.2, 1.2, 100, 30.0);
-    incr(mapFull, 1.5, 1.5, 101, 30.0);
-    update(mapFull, 1, 1, 800, 4, 31.0, otherRessourceSharingDomainId);
-    // [3, 3] count 3 / Other = 3
-    incr(mapFull, 3.2, 3.2, 200, 32.0);
-    incr(mapFull, 3.5, 3.5, 201, 32.0);
-    incr(mapFull, 3.5, 3.5, 202, 32.0);
-    update(mapFull, 4, 4, 801, 3, 32.0, otherRessourceSharingDomainId);
-    // [4, 4] count 2 / Other = 0
-    incr(mapFull, 4.2, 4.5, 300, 34.0);
-    incr(mapFull, 4.2, 4.5, 301, 34.0);
-    // [6, 3] count 0 / Other = [5, 7, 9]
-    update(mapFull, 6, 3, 803, 5, 33.0, otherRessourceSharingDomainId);
-    update(mapFull, 6, 3, 805, 7, 31.0, otherRessourceSharingDomainId);
-    update(mapFull, 6, 3, 808, 9, 12.0, otherRessourceSharingDomainId);
+    setup_full(mapFull);
+
+    entry(mapFull, c1_1_800)->setResourceSharingDomainId(otherRessourceSharingDomainId);
+    entry(mapFull, c4_4_801)->setResourceSharingDomainId(otherRessourceSharingDomainId);
+    entry(mapFull, c6_3_803)->setResourceSharingDomainId(otherRessourceSharingDomainId);
+    entry(mapFull, c6_3_805)->setResourceSharingDomainId(otherRessourceSharingDomainId);
+    entry(mapFull, c6_3_808)->setResourceSharingDomainId(otherRessourceSharingDomainId);
+
   }
 
  protected:
-  int ownRessourceSharingDomainId = 5;
-  int otherRessourceSharingDomainId = 3;
   std::shared_ptr<RegularDcdMap> mapFull;
 };
 
@@ -84,7 +54,7 @@ class DpmmResourceSharingIdTest : public BaseOppTest, public DcdFactoryProvider 
 TEST_F(DpmmResourceSharingIdTest, ApplyRessourceSharingDomainIdVisitor_checkUpdate) {
     std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
     std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsd_v = std::make_shared<ApplyRessourceSharingDomainIdVisitor>();
-    RegularDcdMapValuePrinter p(mapFull);
+
     mapFull->setOwnerCell(GridCellID(3, 3));
     setSimTime(1.4);
     ymf_v->setTime(simTime());
@@ -101,7 +71,7 @@ TEST_F(DpmmResourceSharingIdTest, ApplyRessourceSharingDomainIdVisitor_checkUpda
     EXPECT_EQ(mapFull->getCell(GridCellID(6,3)).val()->getResourceSharingDomainId(), otherRessourceSharingDomainId);
 
     //update with old value  but with ownRessourceSharingDomainId
-    update(mapFull, 6, 3, 3, 1, 1, ownRessourceSharingDomainId);
+    entry(mapFull, c6_3_803)->setResourceSharingDomainId(ownRessourceSharingDomainId);
     //not time update
     setSimTime(2.4);
     ymf_v->setTime(simTime());
@@ -117,11 +87,77 @@ TEST_F(DpmmResourceSharingIdTest, ApplyRessourceSharingDomainIdVisitor_checkUpda
     EXPECT_EQ(mapFull->getCell(GridCellID(4,4)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
     EXPECT_EQ(mapFull->getCell(GridCellID(6,3)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId) << "wrong RSD cell";
 
-
     //with time update
 
 }
 
+
+TEST_F(DpmmResourceSharingIdTest, InfectuouseRessourceSharingDomainValid) {
+
+    /*
+     * For cells without any local measurement the RSD for the selected value is determined based on the
+     * RSD provided in the visitor. If any valid measurement, even if not selected, has the same RSD.
+     *
+     */
+
+    std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
+    std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsd_v = std::make_shared<ApplyRessourceSharingDomainIdVisitor>();
+
+    mapFull->setOwnerCell(GridCellID(3, 3));
+    setSimTime(35.0);
+    ymf_v->setTime(simTime());
+    rsd_v->reset(simTime(), ownRessourceSharingDomainId);
+
+    entry(mapFull, c6_3_808)->setResourceSharingDomainId(ownRessourceSharingDomainId); //set an old value to current RSD
+
+    mapFull->computeValues(ymf_v);
+    mapFull->visitCells(*rsd_v);
+
+    EXPECT_EQ(mapFull->getCell(GridCellID(1,1)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
+    EXPECT_EQ(mapFull->getCell(GridCellID(3,3)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
+    EXPECT_EQ(mapFull->getCell(GridCellID(4,4)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
+    EXPECT_EQ(mapFull->getCell(GridCellID(6,3)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId) << "Map Structure" << endl << mapFull->strFull();
+
+    EXPECT_EQ(mapFull->getCell(GridCellID(6,3)).val()->getCount(), 5);
+    EXPECT_EQ(entry(mapFull, c6_3_803)->getCount(), 5);
+
+
+}
+
+TEST_F(DpmmResourceSharingIdTest, InfectuouseRessourceSharingDomainInvalid) {
+
+    /*
+     * For cells without any local measurement the RSD for the selected value is determined based on the
+     * RSD provided in the visitor. If any valid measurement, even if not selected, has the same RSD
+     *
+     * --> Do not use ownRessourceSharingDomainId of invalid cells.
+     *
+     */
+
+    std::shared_ptr<YmfVisitor> ymf_v = std::make_shared<YmfVisitor>();
+    std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsd_v = std::make_shared<ApplyRessourceSharingDomainIdVisitor>();
+
+    mapFull->setOwnerCell(GridCellID(3, 3));
+    setSimTime(35.0);
+    ymf_v->setTime(simTime());
+    rsd_v->reset(simTime(), ownRessourceSharingDomainId);
+
+    entry(mapFull, c6_3_808)->setResourceSharingDomainId(ownRessourceSharingDomainId); //set an old value to current RSD
+    entry(mapFull, c6_3_808)->reset(); // but not valid!
+
+    mapFull->computeValues(ymf_v);
+    mapFull->visitCells(*rsd_v);
+
+    EXPECT_EQ(mapFull->getCell(GridCellID(1,1)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
+    EXPECT_EQ(mapFull->getCell(GridCellID(3,3)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
+    EXPECT_EQ(mapFull->getCell(GridCellID(4,4)).val()->getResourceSharingDomainId(), ownRessourceSharingDomainId);
+    EXPECT_EQ(mapFull->getCell(GridCellID(6,3)).val()->getResourceSharingDomainId(), otherRessourceSharingDomainId) << "Map Structure" << endl << mapFull->strFull();
+
+    EXPECT_EQ(mapFull->getCell(GridCellID(6,3)).val()->getCount(), 5);
+    EXPECT_EQ(entry(mapFull, c6_3_803)->getCount(), 5);
+
+
+}
 
 TEST_F(DpmmResourceSharingIdTest, RsdNeighborhoodCountVisitor_NeverRun) {
     std::shared_ptr<RsdNeighborhoodCountVisitor> rsdCount_v = std::make_shared<RsdNeighborhoodCountVisitor>();
@@ -165,7 +201,10 @@ TEST_F(DpmmResourceSharingIdTest, RsdNeighborhoodCountVisitor_ValidCount) {
     ymf_v->setTime(simTime());
     rsd_v->setTime(simTime());
     rsdCount_v->reset(simTime(), ownRessourceSharingDomainId);
-    update(mapFull, 6, 3, 3, 1, 1, ownRessourceSharingDomainId);
+
+//    update(mapFull, 6, 3, 3, 1, 1, ownRessourceSharingDomainId);
+    entry(mapFull, c6_3_803)->setResourceSharingDomainId(ownRessourceSharingDomainId);
+
     mapFull->computeValues(ymf_v); // still count 5
     mapFull->visitCells(*rsd_v); // but this time it counts towards the rsd_count
     mapFull->visitCells(*rsdCount_v);

@@ -14,7 +14,7 @@
 namespace crownet {
 
 
-RegularCell::entry_t_ptr YmfVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr YmfVisitor::applyTo(const RegularCell& cell)  {
   RegularCell::entry_t_ptr ret = nullptr;
   // cellIter -> valid entries only!
   for (const auto& e : this->cellIter(cell)) {
@@ -28,13 +28,12 @@ RegularCell::entry_t_ptr YmfVisitor::applyIfChanged(const RegularCell& cell) con
   }
   if (ret){
       ret->setSelectionRank(0.0);
-      ret->setSelectedIn(getVisitorName());
   }
-  return ret;
+  return update_selection(ret, YmfVisitor::COPY_TRUE);
 }
 
 
-YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell) const {
+YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell) const  {
     double age_sum = 0.0;
     double age_min = std::numeric_limits<double>::max();
     double distance_sum = 0.0;
@@ -78,7 +77,7 @@ YmfPlusDistVisitor::sum_data YmfPlusDistVisitor::getSums(const RegularCell& cell
     return sum_data{age_sum, age_min, distance_sum, dist_min, count};
 }
 
-RegularCell::entry_t_ptr YmfPlusDistVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr YmfPlusDistVisitor::applyTo(const RegularCell& cell)  {
 
     sum_data d = getSums(cell);
     double now = this->time.dbl(); // current time the visitor is called.
@@ -109,11 +108,11 @@ RegularCell::entry_t_ptr YmfPlusDistVisitor::applyIfChanged(const RegularCell& c
         ret_ymfPlusDist = ymfPlusDist;
       }
     }
-    return ret;
+    return  update_selection(ret, YmfPlusDistVisitor::COPY_TRUE);
 }
 
 
-RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyTo(const RegularCell& cell)  {
 
     sum_data d = getSums(cell);
     double now = this->time.dbl(); // current time the visitor is called.
@@ -143,14 +142,14 @@ RegularCell::entry_t_ptr YmfPlusDistStepVisitor::applyIfChanged(const RegularCel
         ret_ymfPlusDist = ymfPlusDist;
       }
     }
-    return ret;
+    return  update_selection(ret, YmfPlusDistStepVisitor::COPY_TRUE);
 }
 
 const double YmfPlusDistStepVisitor::getDistValue(const double dist) const {
         return (dist <= stepDist) ? stepDist : dist;
 }
 
-YmfPlusDistVisitor::sum_data YmfPlusDistStepVisitor::getSums(const RegularCell& cell) const {
+YmfPlusDistVisitor::sum_data YmfPlusDistStepVisitor::getSums(const RegularCell& cell)  const {
     double age_sum = 0.0;
     double age_min = std::numeric_limits<double>::max();
     double distance_sum = 0.0;
@@ -193,15 +192,15 @@ YmfPlusDistVisitor::sum_data YmfPlusDistStepVisitor::getSums(const RegularCell& 
     return sum_data{age_sum, age_min, distance_sum, dist_min, count};
 }
 
-RegularCell::entry_t_ptr LocalSelector::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr LocalSelector::applyTo(const RegularCell& cell)  {
     // to check local exists.... raise error.....
     auto val = cell.getLocal();
     val->setSelectionRank(0.0);
-    return val;
+    return update_selection(val, LocalSelector::COPY_TRUE);
 }
 
 
-RegularCell::entry_t_ptr MeanVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr MeanVisitor::applyTo(const RegularCell& cell)  {
   double sum = 0;
   double num = 0;
   double time = 0;
@@ -211,14 +210,14 @@ RegularCell::entry_t_ptr MeanVisitor::applyIfChanged(const RegularCell& cell) co
       sum += e.second->getCount();
       time  += e.second->getMeasureTime().dbl(); // todo
   }
-  auto entry = cell.createEntry(sum/num);
+  auto entry = cell.createEntry(sum/num); // new entry created here!
   entry->setMeasureTime(time/num);
   entry->setReceivedTime(time/num);
   entry->setSelectionRank(0.0);
-  return entry;
+  return update_selection(entry, MeanVisitor::COPY_FALSE);
 }
 
-RegularCell::entry_t_ptr MedianVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr MedianVisitor::applyTo(const RegularCell& cell)  {
   std::vector<double> count;
   std::vector<double> time;
   // cellIter -> valid entries only!
@@ -233,14 +232,14 @@ RegularCell::entry_t_ptr MedianVisitor::applyIfChanged(const RegularCell& cell) 
   std::nth_element(time.begin(), m, time.end()); // only sort half of the data
 
 
-  auto entry = cell.createEntry((double)(count[left] + count[right])/2);
+  auto entry = cell.createEntry((double)(count[left] + count[right])/2);  // new entry created here!
   entry->setMeasureTime((double)(count[left] + count[right])/2);
   entry->setReceivedTime((double)(time[left] + time[right])/2);
   entry->setSelectionRank(0.0);
-  return entry;
+  return update_selection(entry, MedianVisitor::COPY_FALSE);
 }
 
-RegularCell::entry_t_ptr InvSourceDistVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr InvSourceDistVisitor::applyTo(const RegularCell& cell)  {
   double itemSum = 0;
   double weightSum = 0;
   // cellIter -> valid entries only!
@@ -251,13 +250,13 @@ RegularCell::entry_t_ptr InvSourceDistVisitor::applyIfChanged(const RegularCell&
       weightSum += w;
       itemSum += w * e.second->getCount();
   }
-  auto entry = cell.createEntry(itemSum/weightSum);
+  auto entry = cell.createEntry(itemSum/weightSum);  // new entry created here!
   entry->touch(this->time);
   entry->setSelectionRank(0.0);
-  return entry;
+  return update_selection(entry, InvSourceDistVisitor::COPY_FALSE);
 }
 
-RegularCell::entry_t_ptr MaxCountVisitor::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr MaxCountVisitor::applyTo(const RegularCell& cell)  {
   double count = -1.0;
   RegularCell::entry_t_ptr p;
   for (const auto& e : this->cellIter(cell)) {
@@ -267,10 +266,10 @@ RegularCell::entry_t_ptr MaxCountVisitor::applyIfChanged(const RegularCell& cell
       }
   }
   p->setSelectionRank(0.0);
-  return p;
+  return update_selection(p, MaxCountVisitor::COPY_TRUE);
 }
 
-RegularCell::entry_t_ptr AlgSmall::applyIfChanged(const RegularCell& cell) const {
+RegularCell::entry_t_ptr AlgSmall::applyTo(const RegularCell& cell)  {
   RegularCell::value_type ret;
   for (const auto& e : this->cellIter(cell)) {
     if (!ret.second) ret.second = e.second;
@@ -278,7 +277,7 @@ RegularCell::entry_t_ptr AlgSmall::applyIfChanged(const RegularCell& cell) const
       ret = std::make_pair(e.first, e.second);
     }
   }
-  return ret.second;
+  return update_selection(ret.second, AlgSmall::COPY_TRUE);
 }
 
 }  // namespace crownet

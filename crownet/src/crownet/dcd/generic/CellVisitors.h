@@ -56,8 +56,8 @@ class ConstCellVisitor {
   virtual std::string getVisitorName() const { return ""; };
 
   virtual void setCellIterPredicate(typename CellDataIterator<C>::pred_t& pred) {entryPredicate = pred;}
-  CellDataIterator<C> cellIter(C& cell) {return cell.iterBy(entryPredicate); }
-  const CellDataIterator<C> cellIter(const C& cell) const {return cell.iterBy(entryPredicate);}
+  CellDataIterator<C> cellIter(const C& cell) const {return cell.iterBy(entryPredicate); }
+
 
 
  protected:
@@ -70,7 +70,6 @@ template<typename C>
 class TimestampMixin : public C {
 public:
     TimestampMixin() : C(), time() {}
-//    TimestampMixin(const TimestampMixin& other) : C(other) {this->time = other.getTime();}
 
     void setTime(const typename C::cell_t::time_t& t){
         this->time = t;
@@ -115,10 +114,6 @@ private:
 
 };
 
-
-
-
-
 template <typename C>
 class Timestamped{
  public:
@@ -142,11 +137,11 @@ class IdenpotanceTimestamped : public  Timestamped<C>{
     IdenpotanceTimestamped(typename C::time_t time) : Timestamped<C>(time) {}
     void setLastCall(const typename C::time_t& t){
         this->lastTime = t;
+        first_call = false;
     }
     typename C::time_t getLastCallTime() const {return lastTime;}
     const bool checkDoUpdate() {
         if (first_call){
-            first_call = true;
             return true;
         }
         return this->time > this->lastTime;
@@ -178,16 +173,6 @@ class GetEntryVisitor : public ConstCellVisitor<C, typename C::entry_t_ptr> {
 
   virtual typename C::entry_t_ptr applyTo(const C& cell) = 0;
 };
-
-template <typename C>
-class TimestampedGetEntryVisitor : public GetEntryVisitor<C>, public Timestamped<C>  {
- public:
-  TimestampedGetEntryVisitor(typename C::time_t time): GetEntryVisitor<C>(), Timestamped<C>(time) {}
-  TimestampedGetEntryVisitor(typename C::time_t time, typename CellDataIterator<C>::pred_t& pred): GetEntryVisitor<C>(pred), Timestamped<C>(time) {}
-  TimestampedGetEntryVisitor(typename C::time_t time, typename CellDataIterator<C>::pred_t&& pred): TimestampedGetEntryVisitor(time, pred) {} //allow move
-
-};
-
 
 /**
  * Convenient visitor for mutating calls without return values
@@ -239,36 +224,32 @@ class IdenpotanceTimestampedVoidCellVisitor : public VoidCellVisitor<C>, public 
 
 };
 
+
 template <typename C>
-class IdempotanceTimestampedGetCellVisitor : public GetEntryVisitor<C>, public IdenpotanceTimestamped<C> {
+class TimestampedGetCellVisitor : public GetEntryVisitor<C>, public Timestamped<C> {
  public:
-    IdempotanceTimestampedGetCellVisitor() : GetEntryVisitor<C>(), IdenpotanceTimestamped<C>() {}
-    IdempotanceTimestampedGetCellVisitor(typename C::time_t time) : GetEntryVisitor<C>(), IdenpotanceTimestamped<C>(time) {}
-    IdempotanceTimestampedGetCellVisitor(typename C::time_t time, typename CellDataIterator<C>::pred_t& pred) : GetEntryVisitor<C>(pred), IdenpotanceTimestamped<C>(time) {}
-
-
- public:
-    virtual typename C::entry_t_ptr applyTo(const C& cell) override {
-        if (IdenpotanceTimestamped<C>::checkDoUpdate()){
-            return applyIfChanged(cell);
-        }
-        return cell.val();
-    }
-    virtual typename C::entry_t_ptr applyIfChanged(const C& cell) const = 0;
+    TimestampedGetCellVisitor() : GetEntryVisitor<C>(), Timestamped<C>() {}
+    TimestampedGetCellVisitor(typename C::time_t time) : GetEntryVisitor<C>(), Timestamped<C>(time) {}
+    TimestampedGetCellVisitor(typename C::time_t time, typename CellDataIterator<C>::pred_t& pred) : GetEntryVisitor<C>(pred), Timestamped<C>(time) {}
 
 };
 
 template <typename C>
-class CellAggregationAlgorihm:  public IdempotanceTimestampedGetCellVisitor<C> {
+class CellAggregationAlgorihm:  public TimestampedGetCellVisitor<C> {
 public:
-    CellAggregationAlgorihm(): IdempotanceTimestampedGetCellVisitor<C>() {}
-    CellAggregationAlgorihm(typename C::time_t time): IdempotanceTimestampedGetCellVisitor<C>(time) {}
-    CellAggregationAlgorihm(typename C::time_t time, typename CellDataIterator<C>::pred_t& pred): IdempotanceTimestampedGetCellVisitor<C>(time, pred) {}
-    CellAggregationAlgorihm(typename C::time_t time, typename CellDataIterator<C>::pred_t&& pred): IdempotanceTimestampedGetCellVisitor<C>(time, pred) {} //allow move
+    CellAggregationAlgorihm(): TimestampedGetCellVisitor<C>() {}
+    CellAggregationAlgorihm(typename C::time_t time): TimestampedGetCellVisitor<C>(time) {}
+    CellAggregationAlgorihm(typename C::time_t time, typename CellDataIterator<C>::pred_t& pred): TimestampedGetCellVisitor<C>(time, pred) {}
+    CellAggregationAlgorihm(typename C::time_t time, typename CellDataIterator<C>::pred_t&& pred): TimestampedGetCellVisitor<C>(time, pred) {} //allow move
 
+    static const bool COPY_TRUE = true;
+    static const bool COPY_FALSE = true;
 public:
 
-    virtual typename C::entry_t_ptr update_selection(typename C::entry_t_ptr val, bool copy = true){
+    virtual typename C::entry_t_ptr update_selection(typename C::entry_t_ptr val, bool copy = true) const{
+        if(!val){
+            return val; // nullptr
+        }
         val->setSelectedIn(this->getVisitorName());
         if (copy){
             return std::make_shared<typename C::entry_t>(*val);
@@ -327,6 +308,7 @@ class CellPrinterAll : public ConstCellVisitor<C, std::string> {
       os << std::string(indnet + 2, ' ') << e.first << " --> "
          << e.second->str() << std::endl;
     }
+    os << std::endl;
     return os.str();
   }
 

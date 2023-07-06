@@ -419,8 +419,9 @@ inline std::string IEntry<K, T>::csv(std::string delimiter) const {
 template <typename K, typename T>
 inline std::string IEntry<K, T>::str() const {
   std::stringstream os;
-  os << "Count: " << this->count << "| meas_t: " << this->measurement_time
-     << "| recv_t: " << this->received_time << "| valid: " << this->valid();
+  os << "[Count: " << this->count << ", meas_t: " << this->measurement_time
+     << ", recv_t: " << this->received_time << ", valid: " << this->valid()
+     << ", rsd: "<< this->resourceSharingDomainId <<"]";
   return os.str();
 }
 
@@ -523,7 +524,7 @@ inline void IGlobalEntry<K, T>::clear(const T& t) {
 template <typename K, typename T>
 inline std::string IGlobalEntry<K, T>::str() const {
   std::stringstream os;
-  os << IEntry<K, T>::str() << "| node_ids: {";
+  os << IEntry<K, T>::str() << " node_ids: {";
   int nCount = this->nodeIds.size() - 1;
   for (const auto& e : this->nodeIds) {
     os << e;

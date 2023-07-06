@@ -203,6 +203,7 @@ void Cell<C, N, T>::computeValue(const Fn computeAlg) {
       e.second->setSelectedIn("");
       e.second->setSelectionRank(std::numeric_limits<double>::max());
   }
+
   // 2 apply computeAlg to select or compute value which represents this cell.
   this->cell_value = computeAlg->operator()(*this);  // may set empty shared_ptr
   // 3 set selection flag
@@ -232,7 +233,12 @@ Ret Cell<C, N, T>::accept(Fn& visitor) const {
 template <typename C, typename N, typename T>
 std::string Cell<C, N, T>::str() const {
   std::stringstream os;
-  os << "{cell_id: " << this->cell_id << " owner_id: " << this->owner_id << "}";
+  os << "{cell_id: " << this->cell_id << " owner_id: " << this->owner_id << ", val:";
+  if (this->val()){
+      os << this->val()->str() << "}";
+  } else {
+      os << "n/a}";
+  }
   return os.str();
 }
 

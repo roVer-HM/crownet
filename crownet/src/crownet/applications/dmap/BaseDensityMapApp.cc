@@ -473,19 +473,19 @@ void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConv
 
 
 void BaseDensityMapApp::computeValues() {
+   simtime_t now = simTime();
    // cellAgeHandler is Idempotent
-  cellAgeHandler->setTime(simTime());
+  cellAgeHandler->setTime(now);
   dcdMap->visitCells(*cellAgeHandler); //reference to cellAgeHandler needed
-  cellAgeHandler->setLastCall(simTime());
 
-  valueVisitor->setTime(simTime());
+
+  valueVisitor->setTime(now);
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
-//  int rsdid = getResourceSharingDomainId();
+
   if (mapCfg->getAppendRessourceSharingDomoinId()){
-      rsdVisitor->setTime(simTime());
+      rsdVisitor->reset(now, getResourceSharingDomainId());
       dcdMap->visitCells(*rsdVisitor); //reference to cellAgeHandler needed
-      rsdVisitor->setLastCall(simTime());
   }
 }
 

@@ -135,6 +135,7 @@ void DcDMap<C, N, T>::computeValues(Fn visitor) {
     for (auto& entry : this->cells) {
       entry.second.computeValue(visitor);
     }
+    setTimeIfIdempotenceVisitor(visitor, this->timeProvider->now(), 0);
     lastComputedAt = this->timeProvider->now();
   }
 }
