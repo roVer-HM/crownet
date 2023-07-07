@@ -19,7 +19,7 @@ from suqc.utils.SeedManager.VadereSeedManager import VadereSeedManager
 sys.path.append(os.path.abspath(""))
 run_local = True
 
-
+from analyze_sim_results import post_processing
 
 
 def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1):
@@ -78,6 +78,7 @@ def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1)
 
 
 if __name__ == "__main__":
+
 
     folder_name = "guiding_crowds_forward_propagation_sims"  # make sure this is the same in analyze_sim_results.py
 
@@ -156,8 +157,15 @@ if __name__ == "__main__":
             failed.append(os.path.join(simulation_dir, controller))
             print(info[info["('MetaInfo', 'return_code')"]])
 
+    post_processing(simulation_dir)
+
     if len(failed) == 0:
         sys.exit(0)
     else:
         print(f"Some of the simulations failed. Please check: {failed}.")
         sys.exit(-1)
+
+
+
+
+

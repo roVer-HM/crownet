@@ -151,6 +151,7 @@ def plot_travel_time(travel_time, output_dir):
         plt.xlabel(compliance_rate)
         plt.savefig(os.path.join(output_dir, f"travel_time_{controller_type}.pdf"))
         plt.show(block=False)
+        plt.close()
 
     fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
     fig.subplots_adjust(wspace=0.1, hspace=0)
@@ -447,22 +448,7 @@ def compare_densities_statistics(densities, output_dir):
         f.write(f"{kruskal}")
 
 
-if __name__ == "__main__":
-
-    folder_name = "guiding_crowds_forward_propagation_sims"  # make sure this is the same in run_simulations.py
-
-    if len(sys.argv) == 1:
-        # default behavior of script
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        simulation_dir = os.path.join(file_path, folder_name)
-    elif len(sys.argv) == 2:
-        # use arguments from command line
-        simulation_dir = sys.argv[1]  #
-    else:
-        raise ValueError(
-            "Call the script >python3 script_name.py abspathoutputdir/guiding_crowds_forward_propagation_sims < "
-            "where abspathoutputdir is the path to dir that contains all folders.")
-
+def post_processing(simulation_dir):
     if os.path.isdir(simulation_dir) == False:
         raise NotADirectoryError(f"Could not find simulation dir {simulation_dir}. "
                                  f"Please check if you use the same name as defined in run_simulations.py")
@@ -492,4 +478,8 @@ if __name__ == "__main__":
     plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [$ped/m^2$]", output_dir=output_dir)
     plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocity [$m/s$]", output_dir=output_dir)
 
+
+if __name__ == "__main__":
+    simulation_dir = "/sim_dir"  # TODO specify
+    post_processing(simulation_dir)
     sys.exit(0)
