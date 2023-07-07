@@ -79,8 +79,6 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
         print(f"Export result {qoi_} to {file_path}.")
         vals_.to_csv(file_path)
 
-    client.networks.create(network_id)
-
     return par, data
 
 
