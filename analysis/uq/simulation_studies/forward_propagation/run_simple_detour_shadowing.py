@@ -67,6 +67,7 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
     )
 
     par, data = setup.run(parralel_runs)
+    client.networks.get(network_id=network_id).remove()
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
     os.makedirs(summary_dir)
@@ -91,11 +92,11 @@ if __name__ == "__main__":
         # default behavior of script
         file_path = os.path.dirname(os.path.abspath(__file__))
         simulation_dir = os.path.join(file_path, "shadowing")
-        high = 120
-        number = 30
-        para_process = 6
+        high = 200
+        number = 300
+        para_process = 9
     elif len(sys.argv) == 5:
-        # use arguments from command line
+        print("Use arguments from command line")
         simulation_dir = sys.argv[1]
         high = float(sys.argv[2])
         number = int(sys.argv[3])

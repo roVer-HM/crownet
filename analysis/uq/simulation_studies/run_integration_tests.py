@@ -132,7 +132,8 @@ class SimulationStudiesTests(unittest.TestCase):
                             output_dir,
                             '1',
                             # controls the number of samples: 1 -> 8 samples for 3 para, 2 -> 27 samples for 3 para, ..
-                            '130',  # 100... 130 peds (controls the upper limit)
+                            '50',  # 50 peds min (controls the lower limit)
+                            '80',  # 130 peds max (controls the upper limit)
                             str(self.number_of_parralel_sims)  # number of parallel processes
                             ]
         print(f"Run {terminal_command} in {sim_dir}")

@@ -63,6 +63,7 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
     )
 
     par, data = setup.run(para_processes)
+    client.networks.get(network_id=network_id).remove()
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
@@ -134,18 +135,21 @@ if __name__ == "__main__":
         file_path = os.path.dirname(os.path.abspath(__file__))
         simulation_dir = os.path.join(file_path, "direct_communication")
         order = 2
+        low = 100
         up = 2000
         para_process = 6
-    elif len(sys.argv) == 5:
+    elif len(sys.argv) == 6:
         # use arguments from command line
         simulation_dir = sys.argv[1]
         order = int(sys.argv[2])
-        up = float(sys.argv[3])
-        para_process = int(sys.argv[4])
+        low = float(sys.argv[3])
+        up = float(sys.argv[4])
+        para_process = int(sys.argv[5])
     else:
-        raise ValueError("Call the script >python3 script_name.py abspathoutputdir 2 2000 1< "
+        raise ValueError("Call the script >python3 script_name.py abspathoutputdir 2 100 2000 1< "
                          "where abspathoutputdir is the path to the output directory"
                          "where 2 is the order for the polynomial chaos expansion."
+                         "where 100 is the lower limit of the number of peds parameter."
                          "where 2000 is the upper limit of the number of peds parameter."
                          "where 1 is the number of parallel processes.")
 
@@ -158,9 +162,8 @@ if __name__ == "__main__":
     output_dir = os.path.join(simulation_dir, "PolynomialChaos_results")
 
     # paratemeters
-    low = 50
-    b = 4
-    p1_ = chaospy.TruncExponential(upper=up, shift=low, scale=(up - low) / b)
+    # p1_ = chaospy.TruncExponential(upper=up, shift=low, scale=(up - low) / b) b=4
+    p1_ = chaospy.Uniform(lower=low, upper=up) # number of pedestrians
     p2_ = chaospy.Uniform(lower=0, upper=4000) #"*.hostMobile[*].app[1].messageLength"
     p3_ = chaospy.Uniform(lower=0.5,upper=2.0) # "**wlan[*].radio.transmitter.power"
 
