@@ -34,7 +34,7 @@ def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1)
 
     output_folder = os.path.join(simulation_dir, controller)
 
-    network_id = f"{controller}_{''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))}"
+    network_id = f"guiding_{controller}_{''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))}"
 
     client = docker.from_env(timeout=120, max_pool_size=10)
     try:

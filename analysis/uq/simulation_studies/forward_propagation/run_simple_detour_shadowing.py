@@ -32,7 +32,7 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
         "crownet/simulations/simple_detoure_suqc_traffic/omnetpp.ini",
     )
 
-    network_id = f"simple_detour_shadow_{''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))}"
+    network_id = f"shadowing_study_{''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))}"
 
     client = docker.from_env(timeout=120, max_pool_size=10)
     try:

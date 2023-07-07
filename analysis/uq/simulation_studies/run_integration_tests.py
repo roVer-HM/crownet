@@ -33,7 +33,7 @@ class SimulationStudiesTests(unittest.TestCase):
         print(f"Start intergation tests at {time.ctime()}")
         self._start_time = time.time()
 
-        self.number_of_parralel_sims = 2  # change this to 3..10 (depending on your system. in the CI, we choose 1)
+        self.number_of_parralel_sims = 4  # change this to 3..10 (depending on your system. in the CI, we choose 1)
         self._dir = os.path.dirname(os.path.abspath(__file__))
         self._sim_dir = os.path.join(self._dir, "unittest_sim_output")
 
