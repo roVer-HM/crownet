@@ -9,12 +9,12 @@ from common.db_utils import get_vec_files, get_parameter_value, count_all_vams
 from common.plot_utils import save_plot
 
 RESULTS = "../results"
-STUDY_NAME = "RunStudyVeloDifferenceVadereGroupsDistrib4"
-PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
-PARAMETER_NAME = "maxClusterVelocityDifference"
+STUDY_NAME = "RunStudyClusterDistance"
+PARAMETER = "*.pNode[*].middleware.VaService.maxClusterDistance"
+PARAMETER_NAME = "maxClusterDistance"
 TEMP_FILE = f"{STUDY_NAME}_temp_vamsps.json"
-YLABEL2 = "VAMs per Second\n+- Std. Deviation"
 YLABEL = "VAMs per Second per VRU\n+- Std. Deviation"
+YLABEL2 = "VAMs per Second\n+- Std. Deviation"
 NC_TX = 1.28
 NC_RX = 69.12
 
@@ -95,7 +95,7 @@ def setup_fig(height=6, yl=YLABEL):
     for tick in ax.get_xticklabels():
         tick.set_rotation(45)
     
-    plt.ylabel(yl)
+    plt.ylabel(YLABEL)
     plt.xlabel(f"{PARAMETER_NAME} parameter")
     fig.tight_layout()
 
@@ -127,7 +127,7 @@ def visualize():
             label="Transmitted VAMs w/o Clustering"
         )
         ax.legend()
-        save_plot(fig, "vam_rate_tx")
+        save_plot(fig, "vam_rate_dist_tx")
 
         plt, fig, ax = setup_fig(7, YLABEL2)
         ax.errorbar(
@@ -144,7 +144,7 @@ def visualize():
             parameters,
             [np.mean(data[p][2]) for p in parameters],
             color="orange",
-            label="Transmitted VAMs(aggregated)"
+            label="Transmitted VAMs (aggregated)"
         )
         ax.set_ylim(50, 110)
 
@@ -154,7 +154,7 @@ def visualize():
             label="Received VAMs w/o Clustering"
         )
         ax.legend(ncol=2)
-        save_plot(fig, "vam_rate_rx")
+        save_plot(fig, "vam_rate_dist_rx")
 
 
 if __name__ == '__main__':
