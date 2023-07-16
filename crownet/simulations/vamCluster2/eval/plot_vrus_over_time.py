@@ -65,7 +65,7 @@ if __name__ == '__main__':
     ax.plot(np.arange(0, T_END), avg_vrus, label="Pedestrian", color=VRU_COLOR)
     ax.plot(np.arange(0, T_END), avg_vehs, label="Vehicle", color=VEH_COLOR)
 
-    plt.axvspan(STABLE_START, STABLE_END, color='gray', alpha=0.2, label=f"Stable Phase ({STABLE_END - STABLE_START}s)")
+    plt.axvspan(STABLE_START, STABLE_END, color='gray', alpha=0.2, label=f"Steady state ({STABLE_END - STABLE_START}s)")
 
     vru_mean = np.mean(avg_vrus[STABLE_START:STABLE_END])
     vru_std = np.std(avg_vrus[STABLE_START:STABLE_END])

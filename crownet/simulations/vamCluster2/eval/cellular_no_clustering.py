@@ -44,6 +44,8 @@ def visualize():
         data = json.load(f)
 
         print(np.mean(data))
+        print(np.std(data))
+        print(np.max(data))
 
 if __name__ == '__main__':
     if not os.path.isfile(TEMP_FILE):
