@@ -24,10 +24,35 @@ if [ -z "${OPP_EXTERN_DATA_MNT}" ]; then
       exit -1
 fi
 
+if [ ! "$(nproc --all)" -ge 80 ]; then 
+   echo "Your System does not match the requirements. At least 80 CPUs are required."
+   exit 0
+fi
+
+ram=$(grep MemFree /proc/meminfo | awk '{print $2}')
+if [ ! "$ram" -ge 70000000 ]; then 
+   echo "Your System does not match the requirements. At least 70Gb available RAM is required."
+   exit 0
+fi
 
 echo "##################################### prepare output directory  #######################################"
 
-simulation_storage="/mnt/data1TB/storage"
+simulation_storage="/mnt/data1TB/storage" # TODO adjust this and make sure that the directory exists and is mounted! 
+
+if [ -n "$(find "$simulation_storage" -maxdepth 0 -type d -empty 2>/dev/null)" ]; then
+
+	free_space=$(df -k ${simulation_storage} | tail -1 | awk '{print $4}')
+	if [ "$free_space" -ge 175000000 ]; then
+		echo "Free space sufficient in ${simulation_storage}. Store simulation data there."
+	else
+		echo "Not enough free space available in ${simulation_storage}. Required: 170GB (free: ${free_space}B). Choose a different directory."
+        	exit 0
+	fi
+else
+    echo "${simulation_storage} must be an empty directory. Make sure that the directory exists and is empty."
+    exit 0
+fi
+
 
 output_folder=${CROWNET_HOME}/output_diss_cm
 echo "Write output of simulations to the directory ${output_folder}/"
