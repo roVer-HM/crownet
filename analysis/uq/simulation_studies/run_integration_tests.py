@@ -3,6 +3,10 @@ import subprocess
 import sys
 import unittest
 
+from subprocess import PIPE, run
+
+
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -10,21 +14,6 @@ import shutil
 import time
 from datetime import timedelta
 
-
-def call_script(sim_dir, script_name):
-    terminal_command = ['python3', script_name]
-
-    if os.path.isdir(sim_dir) == False:
-        raise EnvironmentError(f"Simulation dir {sim_dir} not found.")
-
-    print(f"Run {terminal_command} in {sim_dir}")
-
-    return_code = subprocess.check_call(
-        terminal_command,
-        cwd=sim_dir,
-        timeout=12000,  # stop simulation after 20min
-    )
-    return return_code
 
 
 class SimulationStudiesTests(unittest.TestCase):
@@ -77,7 +66,7 @@ class SimulationStudiesTests(unittest.TestCase):
         return_code = subprocess.check_call(
             terminal_command,
             cwd=sim_dir,
-            timeout=7200,  # stop simulation after 2h
+            timeout=1200,  # stop simulation after 20min
         )
 
         print(
@@ -108,7 +97,7 @@ class SimulationStudiesTests(unittest.TestCase):
         return_code = subprocess.check_call(
             terminal_command,
             cwd=sim_dir,
-            timeout=7200,  # stop simulation after 2h
+            timeout=1200,  # stop simulation after 20min
         )
 
         print(
@@ -141,7 +130,7 @@ class SimulationStudiesTests(unittest.TestCase):
         return_code = subprocess.check_call(
             terminal_command,
             cwd=sim_dir,
-            timeout=7200,  # stop simulation after 2h
+            timeout=1200,  # stop simulation after 20min
         )
 
         print(
