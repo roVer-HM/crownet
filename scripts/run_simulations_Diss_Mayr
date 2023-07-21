@@ -127,55 +127,48 @@ cp -r ${simulation_storage}/information_diss_time/results_summary ${output_folde
 cp -r ${simulation_storage}/information_diss_time/PolynomialChaos_results ${output_folder}/information_diss_time/
 
 cp -r ${simulation_storage}/guiding_strategies/analysis_guiding_strategies ${output_folder}/guiding_strategies
-find ${simulation_storage}/guiding_strategies -maxdepth 1 -type f -name '*.csv' -exec cp {} ${output_folder}/guiding_strategies \;
+find ${simulation_storage}/guiding_strategies -maxdepth 1 -type f -name '*.csv' -exec cp {} ${output_folder}/guiding_strategies/ \;
 
-cp -r ${result_dir} ${output_folder}/realistic_scenario
+cp -r ${result_dir} ${output_folder}/realistic_scenario/
 
 echo "################################################# check hashes ################################"
 
 shadowing_hash_exp="d41d8cd98f00b204e9800998ecf8427e"
-dissemination_hash_exp="633d87ecedbfd23968f81e71e15be43f"
-guiding_hash_exp="9e19a10530012e55ab1aa44d53489b23"
-realistic_scenario_hash_exp="002cf846bcf2cb294a96c274d17cbf98"
+dissemination_hash_exp="b5f1b4dd8b369c2836b36eb54428b7c5"
+guiding_hash_exp="e0083eba3aa73c84db38a6c3d6f0d5bc"
+realistic_scenario_hash_exp="fc213153b971e9a51c93450808613cd6"
 
-echo "Check the hash of the shadowing sim results" | tee -a $LOG_FILE
+
 shadowing_hash=$(find $output_folder/shadowing -type f \( -name '*_informed_.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
-echo "Hash of the shadowing study:  ${shadowing_hash}"  | tee -a $LOG_FILE
 
-echo "Check the hash of the dissemination sim results" | tee -a $LOG_FILE
 dissemination_hash=$(find $output_folder/information_diss_time -type f \( -name 'SA_and_FW_*.txt' -o -name 'degree_informed_extract.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
-echo "Hash of the information dissemination study:  ${dissemination_hash}"  | tee -a $LOG_FILE
 
-echo "Check the hash of the guiding strategy sim results" | tee -a $LOG_FILE
 guiding_hash=$(find $output_folder/guiding_strategies -type f \( -name '*_densities.csv' -o -name '*_fundamentalDiagramm.csv' -o -name '*_path_choice.csv' -o -name '*_startTime.csv' -o -name '*_targetReachTime.csv' -o -name 'statistical_test.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
-echo "Hash of the guiding strategies study:  ${guiding_hash}"  | tee -a $LOG_FILE
 
-echo "Check the hash of the realistic scenario sim results" | tee -a $LOG_FILE
 realistic_scenario_hash=$(find $output_folder/realistic_scenario -type f \( -name 'packet_loss_*.csv' -o -name 'postvis.traj' -o -name '*_diss_time.csv' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
-echo "Hash of the realistic scenario:  ${realistic_scenario_hash}"  | tee -a $LOG_FILE
 
 if [ "$shadowing_hash" == "$shadowing_hash_exp" ]; then
     echo "Shadowing study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
 else
-    echo "WARNING Shadowing study: Simulation output has not been re-produced successfully. Fingerprint do not match." | tee -a $LOG_FILE
+    echo "WARNING Shadowing study: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${shadowing_hash_exp}. Got :${shadowing_hash}." | tee -a $LOG_FILE
 fi
 
 if [ "$dissemination_hash" == "$dissemination_hash_exp" ]; then
     echo "Dissemination study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
 else
-    echo "WARNING Dissemination study: Simulation output has not been re-produced successfully. Fingerprint do not match." | tee -a $LOG_FILE
+    echo "WARNING Dissemination study: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${dissemination_hash_exp}. Got :${dissemination_hash}." | tee -a $LOG_FILE
 fi
 
 if [ "$guiding_hash" == "$guiding_hash_exp" ]; then
     echo "Guiding strategy study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
 else
-    echo "WARNING Guiding strategy study: Simulation output has not been re-produced successfully. Fingerprint do not match." | tee -a $LOG_FILE
+    echo "WARNING Guiding strategy study: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${guiding_hash_exp}. Got :${guiding_hash}." | tee -a $LOG_FILE
 fi
 
 if [ "$realistic_scenario_hash" == "$realistic_scenario_hash_exp" ]; then
     echo "Realistic scenario: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
 else
-    echo "WARNING Realistic scenario: Simulation output has not been re-produced successfully. Fingerprint do not match." | tee -a $LOG_FILE
+    echo "WARNING Realistic scenario: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${realistic_scenario_hash_exp}. Got :${realistic_scenario_hash}." | tee -a $LOG_FILE
 fi
 
 # fail when one of the command fails

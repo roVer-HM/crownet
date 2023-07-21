@@ -89,7 +89,7 @@ class AvoidShort(Controller):
         location = Location(areas=Rectangle(x=58.2, y=71.1, width=20., height=15.))
         recommendation = InformationStimulus(f"use target {self.current_target}")
         start_time = sim_time
-        end_time = start_time + 1.6  # TODO adjust the value here if you adjust the time stepping
+        end_time = start_time + 10000  # TODO adjust the value here if you adjust the time stepping
         timeframe = TimeFrame(start_time=sim_time, end_time=end_time)
         s = StimulusInfo(location=location, stimuli=recommendation, timeframe=timeframe)
         return s

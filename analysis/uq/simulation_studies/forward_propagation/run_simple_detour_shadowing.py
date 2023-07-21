@@ -67,17 +67,21 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
     )
 
     par, data = setup.run(parralel_runs)
-    client.networks.get(network_id=network_id).remove()
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
     os.makedirs(summary_dir)
-
     par.to_csv(os.path.join(summary_dir, f"parameters.txt"))
 
     for qoi_, vals_ in data.items():
         file_path = os.path.join(summary_dir, qoi_)
         print(f"Export result {qoi_} to {file_path}.")
         vals_.to_csv(file_path)
+
+    try:
+        client.networks.get(network_id=network_id).remove()
+    except Exception as error:
+        print(f"Warning: Could not remove newly created docker network {network_id}.")
+        print(error)
 
     return par, data
 
@@ -143,16 +147,8 @@ if __name__ == "__main__":
     ]
 
     info, qoi = run_simulations(par_var,summary_dir, quantity_of_interest, simulation_dir, para_process)
-    is_post_processing_only = True # skip simulations? comment line 115 and set this true
-
-    if is_post_processing_only:
-        print("try to read from old simulation")
-        time_95 = pd.read_csv(os.path.join(summary_dir, "time_95_informed_all.txt"))
-        number_peds = pd.read_csv(os.path.join(summary_dir, "number_of_peds.txt"))
-        info = pd.read_csv(os.path.join(summary_dir, "parameters.txt"))
-    else:
-        time_95 = qoi["time_95_informed_all.txt"]
-        number_peds = qoi["number_of_peds.txt"]
+    time_95 = qoi["time_95_informed_all.txt"]
+    number_peds = qoi["number_of_peds.txt"]
 
     aa = number_peds[time_95["timeToInform95PercentAgents"] == np.inf]
     bb = number_peds[time_95["timeToInform95PercentAgents"] != np.inf]
@@ -196,7 +192,7 @@ if __name__ == "__main__":
 
     print(info)
 
-    if (info["('MetaInfo', 'return_code')"] == 0).all():
+    if (info[('MetaInfo', 'return_code')] == 0).all():
         sys.exit(0)
     else:
         print("Some of the simulations failed.")

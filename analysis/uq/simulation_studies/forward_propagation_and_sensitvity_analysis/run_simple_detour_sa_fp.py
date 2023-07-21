@@ -63,7 +63,6 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
     )
 
     par, data = setup.run(para_processes)
-    client.networks.get(network_id=network_id).remove()
 
     print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
@@ -75,6 +74,12 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
         file_path = os.path.join(summary_dir, qoi_)
         print(f"Export result {qoi_} to {file_path}.")
         vals_.to_csv(file_path)
+
+    try:
+        client.networks.get(network_id=network_id).remove()
+    except Exception as error:
+        print(f"Warning: Could not remove newly created docker network {network_id}.")
+        print(error)
 
     return par, data
 
@@ -221,20 +226,10 @@ if __name__ == "__main__":
         shutil.rmtree(output_dir, ignore_errors=True)
     os.makedirs(output_dir)
 
-    is_post_processing_only = False # skip simulations? comment line 181 and set this true
-    if is_post_processing_only:
-        print("try to read from old simulation")
-        df1 = pd.read_csv(os.path.join(summary_dir, "time_95_informed_redirection_area.txt"))
-        df2 = pd.read_csv(os.path.join(summary_dir, "time_95_informed_all.txt"))
-        df3 = pd.read_csv(os.path.join(summary_dir, "packet_age.txt"))
-        df4 = pd.read_csv(os.path.join(summary_dir, "number_of_peds.txt"))
-        info = pd.read_csv(os.path.join(summary_dir, "parameters.txt"))
-    else:
-        df1 = qoi["time_95_informed_redirection_area.txt"]
-        df2 = qoi["time_95_informed_all.txt"]
-        df3 = qoi["packet_age.txt"]
-        df4 = qoi["number_of_peds.txt"]
-
+    df1 = qoi["time_95_informed_redirection_area.txt"]
+    df2 = qoi["time_95_informed_all.txt"]
+    df3 = qoi["packet_age.txt"]
+    df4 = qoi["number_of_peds.txt"]
 
     analyze_scalar_qoi(expansion, abscissas, weights, df1["timeToInform95PercentAgents"].values, "Time95PercentInformedRedirecationArea", output_dir)
     analyze_scalar_qoi(expansion, abscissas, weights, df2["timeToInform95PercentAgents"].values, "Time95PercentInformedAll", output_dir)
@@ -250,7 +245,6 @@ if __name__ == "__main__":
     plt.savefig(os.path.join(output_dir, "ParameterNumberOfAgents.pdf"))
     plt.show(block=False)
     plt.close()
-
 
     print(info.columns)
     if (info[('MetaInfo', 'return_code')] == 0).all():
