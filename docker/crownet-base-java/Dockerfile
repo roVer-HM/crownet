@@ -16,14 +16,14 @@ RUN apt-get install -y wget
 WORKDIR /opt/vadere/
 
 # install specific java version
-RUN wget https://download.java.net/java/ga/jdk11/openjdk-11_linux-x64_bin.tar.gz -P /opt/vadere/
-RUN tar xzvf /opt/vadere/openjdk-11_linux-x64_bin.tar.gz
-ENV PATH /opt/vadere/jdk-11/bin:$PATH
+RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz -P /opt/vadere/
+RUN tar xzvf /opt/vadere/openjdk-17.0.2_linux-x64_bin.tar.gz
+ENV PATH /opt/vadere/jdk-17.0.2/bin:$PATH
 
 # install specific maven version
-RUN wget https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.6.3/apache-maven-3.6.3-bin.tar.gz -P /opt/vadere/
-RUN tar xzvf /opt/vadere/apache-maven-3.6.3-bin.tar.gz
-ENV PATH /opt/vadere/apache-maven-3.6.3/bin:$PATH
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.tar.gz -P /opt/vadere/ 
+RUN tar xzvf /opt/vadere/apache-maven-3.9.3-bin.tar.gz
+ENV PATH /opt/vadere/apache-maven-3.9.3/bin:$PATH
 
 
 
