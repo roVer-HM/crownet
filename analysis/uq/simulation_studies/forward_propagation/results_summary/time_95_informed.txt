@@ -1,3 +1,0 @@
-id,run_id,Unnamed: 0,timeToInform95PercentAgents
-0,0,0,2.0
-1,0,0,2.0

@@ -20,9 +20,7 @@ run_local = True
 # Usecase: Set yourself the parameters you want to change. Do this by defining a list of dictionaries with the
 # corresponding parameter. Again, the Vadere output is deleted after all scenarios run.
 
-scenario = "three_corridors" #TODO test "three_corridors" or "route_choice_real_world"
-# scenario_name = "route_choice_real_world.scenario"
-#scenario = "route_choice_real_world"
+scenario = "three_corridors"
 
 def run_controller(controller, qoi, par_var):
 

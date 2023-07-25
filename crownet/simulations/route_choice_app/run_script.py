@@ -3,10 +3,10 @@ import sys, os
 import time
 sys.path.append(os.path.abspath(".."))
 
-from roveranalyzer.simulators.crownet.runner import BaseRunner
+from crownetutils.dockerrunner.simulationrunner import BaseSimulationRunner, process_as
 
 
-class SimulationRun(BaseRunner):
+class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
@@ -16,15 +16,16 @@ if __name__ == "__main__":
 
     settings = [
         'vadere-control',
+        '--write-container-log',
         '--create-vadere-container',
         '--experiment-label',
-        'output',
+        'output_avoidshort',
         '--with-control',
         'control.py',
         '--scenario-file',
-        'vadere/scenarios/route_choice_real_world.scenario', #TODO: test 'vadere/scenarios/route_choice_real_world.scenario' or 'vadere/scenarios/three_corridors.scenario'
+        'vadere/scenarios/three_corridors.scenario',
         '--ctrl.controller-type',
-        'ClosedLoop', #TODO: 'NoController' or 'ClosedLoop' or 'OpenLoop'
+        'AvoidShort',
         '--vadere-tag',
         'latest',
         '--control-tag',

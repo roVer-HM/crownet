@@ -1,0 +1,201 @@
+#!/bin/bash
+# fail when one of the command fails
+set -e 
+
+wait_symbol () {
+	spin[0]="-"
+	spin[1]="\\"
+	spin[2]="|"
+	spin[3]="/"
+        echo "Process started: `date`"
+	while kill -0 $1 2> /dev/null; do
+	for i in "${spin[@]}"
+	do
+	    echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b\bIn Progress $i"
+	    sleep 0.1
+	done
+	done
+	echo " "
+}
+
+
+if [ -z "${OPP_EXTERN_DATA_MNT}" ]; then
+      echo 'Variabel 'OPP_EXTERN_DATA_MNT' not set. Example > export OPP_EXTERN_DATA_MNT="/mnt/data1TB/:/mnt/data1TB:rw"'
+      exit -1
+fi
+
+if [ ! "$(nproc --all)" -ge 80 ]; then 
+   echo "Your System does not match the requirements. At least 80 CPUs are required."
+   exit 0
+fi
+
+ram=$(grep MemFree /proc/meminfo | awk '{print $2}')
+if [ ! "$ram" -ge 70000000 ]; then 
+   echo "Your System does not match the requirements. At least 70Gb available RAM is required."
+   exit 0
+fi
+
+echo "##################################### prepare output directory  #######################################"
+
+simulation_storage="/mnt/data1TB/storage" # TODO adjust this and make sure that the directory exists and is mounted! 
+
+if [ -n "$(find "$simulation_storage" -maxdepth 0 -type d -empty 2>/dev/null)" ]; then
+
+	free_space=$(df -k ${simulation_storage} | tail -1 | awk '{print $4}')
+	if [ "$free_space" -ge 175000000 ]; then
+		echo "Free space sufficient in ${simulation_storage}. Store simulation data there."
+	else
+		echo "Not enough free space available in ${simulation_storage}. Required: 170GB (free: ${free_space}B). Choose a different directory."
+        	exit 0
+	fi
+else
+    echo "${simulation_storage} must be an empty directory. Make sure that the directory exists and is empty."
+    exit 0
+fi
+
+
+output_folder=${CROWNET_HOME}/output_diss_cm
+echo "Write output of simulations to the directory ${output_folder}/"
+mkdir -p ${output_folder}
+
+LOG_FILE="${output_folder}/log.out"
+echo "This directory contains figures and tables used in Christina Mayr's disseration thesis" > $LOG_FILE
+echo "Script started: `date`"| tee -a $LOG_FILE
+
+echo "########################################### build CrowNet and  ########################################"
+
+#get containers
+
+docker pull ghcr.io/rover-hm/omnetpp:${CROWNET_OPP_CONT_TAG} | tee -a $LOG_FILE
+docker pull ghcr.io/rover-hm/vadere:${CROWNET_VADERE_CONT_TAG} | tee -a $LOG_FILE
+docker pull ghcr.io/rover-hm/flowcontrol:${CROWNET_CONTROL_CONT_TAG} | tee -a $LOG_FILE
+
+docker tag ghcr.io/rover-hm/omnetpp:${CROWNET_OPP_CONT_TAG} ${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG} | tee -a $LOG_FILE
+docker tag ghcr.io/rover-hm/vadere:${CROWNET_VADERE_CONT_TAG}  ${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG} | tee -a $LOG_FILE
+docker tag ghcr.io/rover-hm/flowcontrol:${CROWNET_CONTROL_CONT_TAG} ${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG} | tee -a $LOG_FILE
+
+echo "Build omnetpp." | tee -a $LOG_FILE
+cd $CROWNET_HOME 
+set +e 
+echo "Clean diretory"
+omnetpp exec make cleanall >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+set -e
+echo "Create makefiles"
+omnetpp exec make makefiles >> $LOG_FILE 2>&1  & pid=$! && wait_symbol $pid
+echo "Start actual build process"
+omnetpp exec make MODE=release >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+wait_symbol $pid
+echo "Built of omnetpp finished." | tee -a $LOG_FILE
+
+echo "Start building virtual python enviroment." | tee -a $LOG_FILE
+rm -rf ${CROWNET_HOME}/out
+omnetpp exec make analysis-clean >> $LOG_FILE 2>&1 
+echo "Build source distributions"
+omnetpp exec make analysis-build >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+echo "Install requirements and source distributions in virtual env /out/crownet_user"
+omnetpp exec make out/crownet_user 2>&1 >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+echo "Built of virtual python enviroment finished." | tee -a $LOG_FILE
+
+
+echo "####################################### run the simulations  ##########################################"
+
+source ${CROWNET_HOME}/out/crownet_user/bin/activate
+set +e && docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && set -e
+
+echo "################################### information dissemination shadowing #################################"
+
+simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagation"
+echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
+echo "Simulation started: `date`"| tee -a $LOG_FILE
+cd ${simulation_dir}
+python3 run_simple_detour_shadowing.py "${simulation_storage}/shadowing" 130 500 9 >> $LOG_FILE & pid=$! && wait_symbol $pid
+echo "Simulation finished: `date`"| tee -a $LOG_FILE
+
+echo "################################### information dissemination uq study #################################"
+
+simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagation_and_sensitvity_analysis"
+echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
+echo "Simulation started: `date`"| tee -a $LOG_FILE
+cd ${simulation_dir}
+python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 100 2000 6 >> $LOG_FILE & pid=$! && wait_symbol $pid
+echo "Simulation finished: `date`"| tee -a $LOG_FILE
+
+echo "####################################### compare guiding strategies ########################################"
+
+simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/guiding_crowds_forward_propagation"
+echo "Run the simulation study: compare guiding strategies in the simulation directory: ${simulation_dir}" | tee -a $LOG_FILE
+echo "Simulation started: `date`"| tee -a $LOG_FILE
+cd ${simulation_dir}
+python3 run_simulations.py "${simulation_storage}/guiding_strategies" 41 8 10 >> $LOG_FILE & pid=$! && wait_symbol $pid
+echo "Simulation finished: `date`"| tee -a $LOG_FILE
+
+echo "#################################### sim : realistic scenario ########################################"
+
+simulation_dir="${CROWNET_HOME}/crownet/simulations/mucFreiheit_route_choice_app"
+config="final"
+label="diss_cm"
+result_dir="${simulation_dir}/results/${config}_${label}"
+
+echo "Run the simulation of the realistic scenario in the simulation directory: ${simulation_dir}" | tee -a $LOG_FILE
+echo "Simulation started: `date`"| tee -a $LOG_FILE
+cd ${simulation_dir}
+python3 run_script.py vadere-opp-control --write-container-log --create-vadere-container --override-host-config --experiment-label "${label}" --vadere-tag 030b71de --control-tag 496ff02c --omnet-tag 6.0.1 --with-control control.py --ctrl.controller-type AvoidShort --opp.-c "${config}" --qoi number_of_peds.txt path_choice.txt densities_mapped.txt packet_loss_info_diss.csv packet_loss_heat_map.csv heat_map_diss_time.csv info_diss_time.csv simsec_sec_ratio.csv docker_stats.csv --log-docker-stats >> $LOG_FILE & pid=$! && wait_symbol $pid
+echo "Simulation finished: `date`"| tee -a $LOG_FILE
+
+
+echo "################ copy results to ${output_folder} #################################### "
+
+cp -r ${simulation_storage}/shadowing/results_summary ${output_folder}/shadowing/
+cp -r ${simulation_storage}/shadowing/Shadowing_results ${output_folder}/shadowing/
+
+cp -r ${simulation_storage}/information_diss_time/results_summary ${output_folder}/information_diss_time/
+cp -r ${simulation_storage}/information_diss_time/PolynomialChaos_results ${output_folder}/information_diss_time/
+
+cp -r ${simulation_storage}/guiding_strategies/analysis_guiding_strategies ${output_folder}/guiding_strategies
+find ${simulation_storage}/guiding_strategies -maxdepth 1 -type f -name '*.csv' -exec cp {} ${output_folder}/guiding_strategies/ \;
+
+cp -r ${result_dir} ${output_folder}/realistic_scenario/
+
+echo "################################################# check hashes ################################"
+
+shadowing_hash_exp="d41d8cd98f00b204e9800998ecf8427e"
+dissemination_hash_exp="b5f1b4dd8b369c2836b36eb54428b7c5"
+guiding_hash_exp="e0083eba3aa73c84db38a6c3d6f0d5bc"
+realistic_scenario_hash_exp="fc213153b971e9a51c93450808613cd6"
+
+
+shadowing_hash=$(find $output_folder/shadowing -type f \( -name '*_informed_.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+
+dissemination_hash=$(find $output_folder/information_diss_time -type f \( -name 'SA_and_FW_*.txt' -o -name 'degree_informed_extract.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+
+guiding_hash=$(find $output_folder/guiding_strategies -type f \( -name '*_densities.csv' -o -name '*_fundamentalDiagramm.csv' -o -name '*_path_choice.csv' -o -name '*_startTime.csv' -o -name '*_targetReachTime.csv' -o -name 'statistical_test.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+
+realistic_scenario_hash=$(find $output_folder/realistic_scenario -type f \( -name 'packet_loss_*.csv' -o -name 'postvis.traj' -o -name '*_diss_time.csv' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+
+if [ "$shadowing_hash" == "$shadowing_hash_exp" ]; then
+    echo "Shadowing study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
+else
+    echo "WARNING Shadowing study: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${shadowing_hash_exp}. Got :${shadowing_hash}." | tee -a $LOG_FILE
+fi
+
+if [ "$dissemination_hash" == "$dissemination_hash_exp" ]; then
+    echo "Dissemination study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
+else
+    echo "WARNING Dissemination study: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${dissemination_hash_exp}. Got :${dissemination_hash}." | tee -a $LOG_FILE
+fi
+
+if [ "$guiding_hash" == "$guiding_hash_exp" ]; then
+    echo "Guiding strategy study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
+else
+    echo "WARNING Guiding strategy study: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${guiding_hash_exp}. Got :${guiding_hash}." | tee -a $LOG_FILE
+fi
+
+if [ "$realistic_scenario_hash" == "$realistic_scenario_hash_exp" ]; then
+    echo "Realistic scenario: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
+else
+    echo "WARNING Realistic scenario: Simulation output has not been re-produced successfully. Fingerprint do not match. Expected: ${realistic_scenario_hash_exp}. Got :${realistic_scenario_hash}." | tee -a $LOG_FILE
+fi
+
+# fail when one of the command fails
+set +e
+

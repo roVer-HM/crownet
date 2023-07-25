@@ -1,4 +1,23 @@
-## StartUp with an run-script
+# Run simulations headless with Python
+
+## Prepare the virtual Python environment 
+
+Crownet uses multiple python frameworks to create simulation studies using a
+combination of multiple simulators. Use the following to create ready to use
+virtual environments:
+
+```
+omnetpp exec make analysis-all
+```
+This will create two virtual environments `out/crownet_user` and `out/crownet_dev`.
+In the first, the three packages `crownetutils`, `flowcontrol` and `suqc` are
+installed based on the current branch of the respective sub modules.
+The second environment (`out/crownet_dev`) only installs the respective
+requirements of the three packages. Use the `out/crownet_dev` environment
+in your IDE. See [this wiki page][345] how to setup a single PyCharm
+project to develop in all python packages.
+
+## Run the simulation
 The simulation startup with a run-script allows testing of multiple parameters for a given simulation without executing every service singly.
 This allows an easy way to test the simulation and execute simulation studies on it.
 
