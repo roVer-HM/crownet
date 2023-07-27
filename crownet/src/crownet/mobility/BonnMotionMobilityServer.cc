@@ -97,7 +97,6 @@ BonnMotionMobilityServer::~BonnMotionMobilityServer() {
     if (creationTimer){
         cancelAndDelete(creationTimer);
     }
-    BonnMotionFileCache::deleteInstance();
 }
 
 void BonnMotionMobilityServer::receiveSignal(cComponent *source, simsignal_t signalID, double d, cObject *details) {
