@@ -21,6 +21,6 @@ festival visitors that plan their visit depending on the current capacity, etc.
 ![Sidewalk model in SUMO and Vadere](../img/Interaction_overview_v2.png)
 
 ## Further information
-Please find details on the simulator exchange and implementation in our ![publication](https://doi.org/10.29007/nnfj).
+Please find details on the simulator exchange and implementation in our [publication](https://doi.org/10.29007/nnfj).
 
 

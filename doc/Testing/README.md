@@ -1,12 +1,12 @@
 # Testing
 
-CrowNet is continuously tested by unit tests and fingerprint tests. All tests can be found in the ![test directory](../../crownet/crownet/tests).
+CrowNet is continuously tested by unit tests and fingerprint tests. All tests can be found in the [test directory](../../crownet/crownet/tests).
 
 
 TODO add more information here
 
-- ![unit tests](gtest.md)
-- ![fingerprint tests](opp_test.md)
+- [unit tests](gtest.md)
+- [fingerprint tests](opp_test.md)
 
 
 

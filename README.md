@@ -1,6 +1,6 @@
 # *CrowNet*: *Crow*ds in *Net*works
 CrowNet is an open source simulation framework for the development of new networked mobility concepts and intelligent transportation systems.
-CrowNet has been developed as part of the ![roVer research project](https://www.hm.edu/forschung/forschungsprojekte/projektdetails/wischhof/wischhof_koester_rover.de.html) at ![Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html) that is funded by the ![Federal Ministry of Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html) (Grant number: 13FH669IX6).
+CrowNet has been developed as part of the [roVer research project](https://www.hm.edu/forschung/forschungsprojekte/projektdetails/wischhof/wischhof_koester_rover.de.html) at [Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html) that is funded by the [Federal Ministry of Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html) (Grant number: 13FH669IX6).
 
 <img align="center" width="60%" src="doc/img/crownet_sketch.png">
 
@@ -10,7 +10,7 @@ CrowNet has been developed as part of the ![roVer research project](https://www.
 CrowNet builds on state-of-the-art simulation frameworks for simulating mobile networks ([OMNeT++](https://omnetpp.org/), [INET](https://inet.omnetpp.org/), [VEINS](https://veins.car2x.org/), [Artery](http://artery.v2x-research.eu/), [Simu5G](http://simu5g.org/)) and mobility behavior ([VADERE](http://www.vadere.org/), [SUMO](https://dlr.de/ts/en/sumo/)).
 CrowNet extends these frameworks with several features.
 
-| ![Detailed pedestrian mobility](doc/features/AccuratePedestrianMobility.md) | ![Bi-directional interactions with pedestrian mobility](doc/features/Interactions.md) | ![Sidelink based crowd monitoring](doc/features/DensityMap.md) | ![App based crowd management](doc/features/RouteRecommendation.md) |
+| [Detailed pedestrian mobility](doc/features/AccuratePedestrianMobility.md) | [Bi-directional interactions with pedestrian mobility](doc/features/Interactions.md) | [Sidelink based crowd monitoring](doc/features/DensityMap.md) | [App based crowd management](doc/features/RouteRecommendation.md) |
 |-----------------------------------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|
 | <img  src="doc/img/detailed_vadere.png">                                    | <img  src="doc/img/interactions_strong.png">                      | <img src="doc/img/density_map.png">       | <img  src="doc/img/route_recommendation.png">  |
 
@@ -18,7 +18,7 @@ CrowNet extends these frameworks with several features.
 
 ### Quick start
 
-Please see the ![quick start example](doc/Installation/Installation.md) in our ![documenation](doc/README.md).
+Please see the [quick start example](doc/Installation/Installation.md) in our [documentation](doc/README.md).
 
 ### License and dependencies
 
@@ -35,7 +35,7 @@ The OMNeT++ simulation of communication and networking for disseminating mobilit
 * [Artery](http://artery.v2x-research.eu/) - Artery V2X Simulation Framework
 * [VEINS](https://veins.car2x.org/) - Vehicles in Network Simulation (VEINS) is an open-source vehicular network simulation framework.
 
-Our ![CrowNet features](crownet/src) are intended for academic and commercial purpose, see our ![license](LICENSE).
+Our [CrowNet features](crownet/src) are intended for academic and commercial purpose, see our [license](LICENSE).
 Please check the licenses of the projects listed above for your use case and purchase licenses if necessary.
 
 ### Scientific publications
@@ -49,7 +49,7 @@ Publications in which CrowNet was used:
 - L. Wischhof, J. A. Krahl, R. Müllner (2022): *Stimuli Generation for Quality-of-Experience Evaluation of Mobile Applications*. iJIM, 16(06), pp. 113–134. [doi: 10.3991/ijim.v16i06.28691](https://doi.org/10.3991/ijim.v16i06.28691)
 - M. Rupp, L. Wischhof (2022): *Prioritization for Latency Reduction in 5G MEC-Based VRU Protection Systems*, IEEE WiMob 2022, [doi: 10.1109/wimob55322.2022.9941690](https://doi.org/10.1109/wimob55322.2022.9941690)
 - C. M. Mayr, S. Schuhbäck, L. Wischhof, G. Köster (2021): *Analysis of Information Dissemination through Direct Communication in a Moving Crowd*, Safety Science, Volume 142, [doi: 10.1016/j.ssci.2021.105386](https://doi.org/10.1016/j.ssci.2021.105386)
-- S. Schuhbäck, L. Wischhof (2021), *Decentralized Pedestrian Density Maps based on Sidelink Communication*, IEEE International Conference on Communications COVI-COM, 14.-23. June 2021, Montreal, Canada, ![doi: 10.1109/ICCWorkshops50388.2021.9473545](https://doi.org/10.1109/ICCWorkshops50388.2021.9473545)
+- S. Schuhbäck, L. Wischhof (2021), *Decentralized Pedestrian Density Maps based on Sidelink Communication*, IEEE International Conference on Communications COVI-COM, 14.-23. June 2021, Montreal, Canada, [doi: 10.1109/ICCWorkshops50388.2021.9473545](https://doi.org/10.1109/ICCWorkshops50388.2021.9473545)
 - M. Rupp, S. Schuhbäck, L. Wischhof (2021): *Coupling Microscopic Mobility and Mobile Network Emulation for Pedestrian Communication Applications*, 8th OMNeT++ Community Summit, [arXiv:2109.12018v1](https://arxiv.org/abs/2109.12018)
 - L. Wischhof, F. Schaipp, S. Schuhbäck, G. Köster (2020): *Simulation vs. Testbed: Small Scale Experimental Validation of an Open-Source LTE-A Model*, PIMRC 2020, [doi: 10.1109/pimrc48278.2020.9217163](https://doi.org/10.1109/pimrc48278.2020.9217163)
 - S. Schuhbäck, N. Daßler, L. Wischhof, G. Köster (2019): *Towards a Bidirectional Coupling of Pedestrian Dynamics and Mobile Communication Simulation*, 6th OMNeT++ Community Summit, [doi: 10.29007/nnfj](https://doi.org/10.29007/nnfj)

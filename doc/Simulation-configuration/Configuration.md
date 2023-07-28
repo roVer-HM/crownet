@@ -81,7 +81,7 @@ extends=noTraCI
 *.pNode[*].mobility.typename = "BonnMotionMobilityClient"
 *.pNode[*].... etc.
 ```
-Please find more information on the configuration of the BonnMotion module ![here](./use-dynamic-bonnMotion-traces.md).
+Please find more information on the configuration of the BonnMotion module [here](./use-dynamic-bonnMotion-traces.md).
 
 ### Use node positions from coupled mobility provider
 If the mobility provider should be executed simultaneously, specify the mobility provider in `omnetpp.ini`.
