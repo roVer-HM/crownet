@@ -20,7 +20,7 @@ The density map itself does not contain any information like position data which
 ![](../img/density_map_processoverview.png)
 
 ## Tutorial
-Please find an example ![here](../../crownet/simulations/densityMap)
+Please find an example [here](../../crownet/simulations/densityMap)
 
 ## Further information
-Please find a detailed description of the density map in ![our publication](https://doi.org/10.1109/ACCESS.2023.3242946)
+Please find a detailed description of the density map in [our publication](https://doi.org/10.1109/ACCESS.2023.3242946)
