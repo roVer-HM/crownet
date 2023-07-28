@@ -12,7 +12,7 @@ Route recommendations are computed based on current density information.
 <img align="center" width="300px" src="../img/rerouted.png">
 
 ## Tutorial
-Please find an example ![here](../../crownet/simulations/guiding_crowds_test).
+Please find an example [here](../../crownet/simulations/guiding_crowds_test).
 
 ## Further information
-Please see our ![publication](https://doi.org/10.1371/journal.pone.0276229)
+Please see our [publication](https://doi.org/10.1371/journal.pone.0276229)
