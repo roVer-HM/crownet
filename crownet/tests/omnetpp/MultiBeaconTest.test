@@ -14,7 +14,7 @@ cmdenv-log-prefix = ""
 *.misc[*].app[*].app.cmdenv-log-level = debug
 *.misc[*].app[*].app.packetMeterIn.cmdenv-log-level = debug
 #**.cmdenv-log-level = off
-sim-time-limit= 500ms
+sim-time-limit= 250ms
 ned-path = ../../lib
 include ../lib/default_testConfig.ini
 **.vector-recording = false
@@ -32,14 +32,31 @@ extends = _default, D2D_General, MultiBeacon, stationary_n1
 # update interval bigger than sim time. Do not sent data in this case
 *.misc[*].app[1].app.localMapUpdateInterval = 300ms
 
-%postrun-command: grep -E "^.*burstCreationTime = 28.814045629ms.*$" test.out > test1.out
+%postrun-command: grep -E "^.*burstCreationTime =.*$" test.out > test1.out
 
 %contains: test1.out
-PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 28.814045629ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t: N/A age: N/A jitter:50.877852us avg_s:54 b count:1 loss_r:0}
-PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 28.814045629ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t: N/A age: N/A jitter:50.877852us avg_s:54 b count:1 loss_r:0}
-PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 28.814045629ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:28.814045629ms age:0s jitter:98.575838us avg_s:54 b count:2 loss_r:0}
-PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 28.814045629ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:28.814045629ms age:0s jitter:143.2927us avg_s:54 b count:3 loss_r:0}
+PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 30.011703228ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t: N/A age: N/A jitter:731.452ns avg_s:54 b count:1 loss_r:0}
+PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 30.011703228ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t: N/A age: N/A jitter:731.452ns avg_s:54 b count:1 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 30.011703228ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:30.011703228ms age:0s jitter:1.417188us avg_s:54 b count:2 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 30.011703228ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:30.011703228ms age:0s jitter:2.060066us avg_s:54 b count:3 loss_r:0}
+PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 87.39950013ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:30.011703228ms age:57.387796902ms jitter:26.168618us avg_s:13 B count:4 loss_r:0}
+PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 87.39950013ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t:30.011703228ms age:57.387796902ms jitter:26.168618us avg_s:13 B count:4 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 87.39950013ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:87.39950013ms age:0s jitter:48.770386us avg_s:13 B count:5 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 87.39950013ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:87.39950013ms age:0s jitter:69.959543us avg_s:13 B count:6 loss_r:0}
+PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 118.356653709ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:87.39950013ms age:30.957153579ms jitter:68.264973us avg_s:151 b count:7 loss_r:0}
+PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 118.356653709ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t:87.39950013ms age:30.957153579ms jitter:68.264973us avg_s:151 b count:7 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 118.356653709ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:118.356653709ms age:0s jitter:66.676314us avg_s:151 b count:8 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 118.356653709ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:118.356653709ms age:0s jitter:65.186946us avg_s:151 b count:9 loss_r:0}
+PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 178.618177681ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:118.356653709ms age:60.261523972ms jitter:77.45801us avg_s:195 b count:10 loss_r:0}
+PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 178.618177681ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t:118.356653709ms age:60.261523972ms jitter:77.45801us avg_s:195 b count:10 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 178.618177681ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:178.618177681ms age:0s jitter:88.962133us avg_s:195 b count:11 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 178.618177681ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:178.618177681ms age:0s jitter:99.747248us avg_s:195 b count:12 loss_r:0}
+PerSourceInfo: Found packet belonging to NEW burst. --> Meter packet and save id. burstCreationTime = 236.889806788ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:178.618177681ms age:58.271629107ms jitter:110.489864us avg_s:236 b count:13 loss_r:0}
+PerAppInfo: Found packet belonging to NEW burst. --> Meter packet and. burstCreationTime = 236.889806788ms, burstIndex = 0, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 0 tx_t:178.618177681ms age:58.271629107ms jitter:110.489864us avg_s:236 b count:13 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 236.889806788ms, burstIndex = 1, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:236.889806788ms age:0s jitter:120.561067us avg_s:236 b count:14 loss_r:0}
+PerSourceInfo: Found packet belonging to previous burst. --> Skip packet. burstCreationTime = 236.889806788ms, burstIndex = 2, burstPktCount = 3, burstSize = 108 B, skipStatsProcessing = false{id: 14 tx_t:236.889806788ms age:0s jitter:130.00282us avg_s:236 b count:15 loss_r:0}
+
 
 
 %contains: stdout
-<!> Simulation time limit reached -- at t=0.5s
+<!> Simulation time limit reached -- at t=0.25s
