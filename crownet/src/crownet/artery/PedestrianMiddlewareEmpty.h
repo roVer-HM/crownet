@@ -27,6 +27,7 @@ class PedestrianMiddlewareEmpty : public artery::MiddlewareBase {
  protected:
   void finish() override;
   void initializeController(omnetpp::cPar&);
+  using artery::MiddlewareBase::receiveSignal;
   void receiveSignal(omnetpp::cComponent*, omnetpp::simsignal_t,
                      omnetpp::cObject*, omnetpp::cObject*) override;
 
