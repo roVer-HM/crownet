@@ -217,6 +217,21 @@ class FingerprintTestCaseGenerator:
                 if ":" in kv:
                     _kv = kv.split(":")
                     _tags[_kv[0]] = _kv[1]
+        for k, v in _tags.items():
+            if v == "CFG":
+                try:
+                    tag = DockerCfg.get_default_tag(DockerCfg.CONTAINER_TAG_MAP.get(k))
+                    logger.info(
+                        f"replace {k}:'CFG' placeholder tag with configured tag {k}:'{tag}'"
+                    )
+                    _tags[k] = tag
+                except Exception as _:
+                    logger.warning(
+                        f"cannot find replacement tag for container {k}:'CFG'. Default to 'latest'. "
+                    )
+                    _tags[k] = "latest"
+                    pass
+
         return _tags
 
     # parse CSV file into a list of dicts
