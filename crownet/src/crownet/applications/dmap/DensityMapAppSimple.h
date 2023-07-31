@@ -62,7 +62,7 @@ protected:
 private:
   // application
  INeighborhoodTable *nTable  = nullptr;
-
+ std::shared_ptr<RsdNeighborhoodCountVisitor> rsdCountVisitor;
 };
 
 } // namespace crownet

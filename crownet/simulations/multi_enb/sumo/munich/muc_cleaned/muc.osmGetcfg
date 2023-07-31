@@ -1,0 +1,11 @@
+<configuration>
+    <!-- Old bbox from 2019-->
+    <!-- <bbox value="11.537957,48.140841,11.618985,48.177982"/> -->
+    <!-- 5x3 km bbox arround MF without city center-->
+    <bbox value="11.5555,48.1491,11.6248,48.1745"/>
+    <gzip value="True"/>
+    <output-dir value="./"/>
+    <prefix value="osm_muc_5kmx3km"/>
+    <road-types value="{&quot;Aerialway&quot;: [], &quot;Route&quot;: [], &quot;Aeroway&quot;: [], &quot;Railway&quot;: [&quot;preserved&quot;, &quot;tram&quot;], &quot;Waterway&quot;: [], &quot;Highway&quot;: [&quot;motorway&quot;, &quot;motorway_link&quot;, &quot;trunk&quot;, &quot;trunk_link&quot;, &quot;primary&quot;, &quot;primary_link&quot;, &quot;secondary&quot;, &quot;secondary_link&quot;, &quot;tertiary&quot;, &quot;tertiary_link&quot;, &quot;unclassified&quot;, &quot;residential&quot;, &quot;living_street&quot;, &quot;raceway&quot;, &quot;track&quot;, &quot;footway&quot;, &quot;pedestrian&quot;, &quot;path&quot;, &quot;bridleway&quot;, &quot;cycleway&quot;]}"/>
+    <shapes value="True"/>
+</configuration>

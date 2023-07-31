@@ -23,12 +23,22 @@ using namespace crownet::queueing;
 
 namespace crownet {
 
+void AppSchedulerBase::receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) {
+    if (signalID == servingCell_){
+        eNBId = i; // todo add some delay until application knows about the loss of connection?
+    }
+}
+
+
 void AppSchedulerBase::initialize(int stage)
 {
     ClockUserModuleMixin::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         outputGate = gate("out");
         schedulerIn = gate("schedulerIn");
+        servingCell_ = registerSignal("servingCell");
+        getContainingNode(this)->subscribe(servingCell_, this);
+        checkNetworkConnectivity = par("checkNetworkConnectivity");
         consumer = findConnectedModule<ICrownetActivePacketSource>(outputGate);
         app = findConnectedModule<AppStatusInfo>(outputGate);
     }
@@ -36,7 +46,7 @@ void AppSchedulerBase::initialize(int stage)
 
 void AppSchedulerBase::assertAppRunning() const{
     if (app->isStopped()){
-        throw cRuntimeError("Connected up is not running");
+        throw cRuntimeError("Connected app is not running");
     }
 }
 

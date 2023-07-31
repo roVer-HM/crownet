@@ -33,12 +33,16 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
 
       boost::filesystem::path p{outputScalarFile};
       boost::filesystem::absolute(p);
+      if (!boost::filesystem::exists(p.parent_path())){
+           boost::filesystem::create_directories(p.parent_path());
+      }
       std::string _path;
       if (0 == fileName.compare(fileName.size() - 4, fileName.size(), ".csv")){
           _path = p.parent_path().string() + "/" + fileName;
       } else {
           _path = p.parent_path().string() + "/" + fileName + ".csv";
       }
+
       return _path;
     } else {
       throw cRuntimeError("output-scalar-file not found");
@@ -116,9 +120,9 @@ FileWriterBuilder &FileWriterBuilder::addPath(const std::string &path) {
 
 
 template <>
-ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, const std::string &mapType){
+ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> map, MapCfg *mapCfg){
     ActiveFileWriter *obj = nullptr;
-    if (mapType == "all"){
+    if (strcmp(mapCfg->getMapTypeLog(), "all") == 0){
         obj = new ActiveFileWriter(
                 path,
                 std::make_shared<RegularDcdMapAllPrinter>(map));

@@ -16,6 +16,7 @@
 #ifndef CROWNET_APPLICATIONS_COMMON_SCHEDULER_APPSCHEDULERBASE_H_
 #define CROWNET_APPLICATIONS_COMMON_SCHEDULER_APPSCHEDULERBASE_H_
 
+#include <omnetpp/clistener.h>
 
 #include "inet/queueing/base/PacketProcessorBase.h"
 #include "inet/common/clock/ClockUserModuleMixin.h"
@@ -31,12 +32,21 @@ namespace crownet {
 
 class AppSchedulerBase :
             public IAppScheduler,
-            public ClockUserModuleMixin<inet::queueing::PacketProcessorBase> {
+            public ClockUserModuleMixin<inet::queueing::PacketProcessorBase>,
+            public omnetpp::cListener
+            {
 protected:
     cGate *outputGate = nullptr;
     cGate *schedulerIn = nullptr;
     ICrownetActivePacketSource *consumer = nullptr;
     AppStatusInfo *app = nullptr;
+
+    /** Statistic for serving cell */
+    omnetpp::simsignal_t servingCell_;
+
+public: //cListener
+
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) override;
 
 protected:
     virtual void initialize(int stage) override;
@@ -47,6 +57,11 @@ protected:
 public:
     virtual bool supportsPacketPushing(cGate *gate) const override { return true; }
     virtual bool supportsPacketPulling(cGate *gate) const override { return false; }
+
+protected:
+    int eNBId = -1; // < 0 no information, = 0 not connected to any base station, > 0 connected to a base station.
+    bool hasLteConnection() const { return eNBId > 0; }
+    bool checkNetworkConnectivity;
 };
 
 }

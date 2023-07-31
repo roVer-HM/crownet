@@ -29,10 +29,12 @@ namespace crownet;
 
 class MapCfg extends cOwnedObject {
      bool writeDensityLog;
-     string mapType;
+     string mapType;    
      string mapTypeLog;
      simtime_t cellAgeTTL @editable;
      string idStreamType;
+     bool appendRessourceSharingDomoinId = false;
+     
 }
 
 cplusplus(MapCfg){{
@@ -108,15 +110,22 @@ class LocatedDcDCell extends DcDCell {
     
 }
 
-class LocatedDcDCellWithSharingDomainId extends LocatedDcDCell {
- 	uint16_t sharingDominId = 0;   
-}
-
 cplusplus(LocatedDcDCell){{
   public:
       LocatedDcDCell(uint16_t count, uint16_t idOffsetX, uint16_t idOffsetY):
       	DcDCell(count), idOffsetX(idOffsetX), idOffsetY(idOffsetY) {}
 }}
+
+
+class LocatedDcDCellWithSharingDomainId extends LocatedDcDCell {
+ 	uint16_t sharingDominId = 0;   // 2B
+}
+cplusplus(LocatedDcDCellWithSharingDomainId){{
+  public:
+      LocatedDcDCellWithSharingDomainId(uint16_t count, uint16_t idOffsetX, uint16_t idOffsetY, int rsdId):
+      	LocatedDcDCell(count, idOffsetX, idOffsetY), sharingDominId(rsdId)  {}
+}}
+
 
 class EntropyMap extends inet::TagBase
 {}
@@ -125,6 +134,7 @@ class EntropyMap extends inet::TagBase
 enum MapType {
     DENSE = 0x10;   
  	SPARSE = 0x20;
+ 	SPARSE_RSD = 0x21;
 }
 
 class MapHeader extends inet::FieldsChunk {

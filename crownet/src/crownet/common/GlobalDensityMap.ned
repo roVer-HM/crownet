@@ -32,6 +32,15 @@ simple GlobalDensityMap like IGlobalDensityMap
 		string writerType = default("csv"); // or sql
         double writeMapInterval @unit(s) = default(2.0s) ;
         
+        object mapCfg = default(crownet::MapCfg{
+            writeDensityLog: true,
+            mapType: "global",
+            mapTypeLog: "all",
+            cellAgeTTL: -1.0s,
+            idStreamType: "insertionOrder",
+            appendRessourceSharingDomoinId: false
+        });
+        
         // search these nodes for the ground truth setup. 
         string vectorNodeModule= default("misc"); // does not work with Traci managed vectors! Use traciModuleListener
         double deleteTime @unit(s) = default(-1.0s);

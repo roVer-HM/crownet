@@ -53,6 +53,7 @@ class DcDMap {
   std::string strFull() const;
   std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() const;
   std::map<node_key_t, cell_key_t>& getNeighborhood();
+  time_t getLastComputedAt() const {return lastComputedAt;}
 
   // getter/setter (create if missing)
   cell_t& getCell(const cell_key_t& cell_id);
@@ -98,13 +99,11 @@ class DcDMap {
   const int allLocalCellCount() const;
 
 
+  // accept only pointer and reference to visitors (avoid copy)
   template <typename Fn>
   void visitCells(Fn* visitor);
-
-
   template <typename Fn>
   void visitCells(Fn& visitor);
-
   template <typename Fn>
   void visitCells(Fn&& visitor);
 
@@ -112,7 +111,9 @@ class DcDMap {
   template <typename Fn>
   void computeValues(Fn visitor);
   template <typename Fn>
-  void applyVisitorTo(const cell_key_t& cell_id, Fn visitor);
+  void applyVisitorTo(const cell_key_t& cell_id, Fn& visitor);
+  template <typename Fn>
+  void applyVisitorTo(const cell_key_t& cell_id, Fn&& visitor);
 
   std::shared_ptr<CellKeyProvider<C>> getCellKeyProvider() {return cellKeyProvider;}
   std::shared_ptr<ICellIdStream<C, N, T>> getCellKeyStream() {return cellKeyStream; }

@@ -50,7 +50,8 @@ bool Cell<C, N, T>::hasLocal() const {
 
 template <typename C, typename N, typename T>
 bool Cell<C, N, T>::hasValid() const {
-  return this->validIter() != this->validIter().end();
+  auto iter = this->validIter();
+  return iter != iter.end();
 }
 
 template <typename C, typename N, typename T>
@@ -147,9 +148,21 @@ CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() {
 }
 
 template <typename C, typename N, typename T>
-CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() const {
+const CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::validIter() const {
   return const_cast<Cell<C, N, T>*>(this)->validIter();
 }
+
+template <typename C, typename N, typename T>
+CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::iterBy(const typename CellDataIterator<Cell<C, N, T>>::pred_t& pred){
+    return CellDataIterator<Cell<C, N, T>>(this, pred);
+}
+
+template <typename C, typename N, typename T>
+const CellDataIterator<Cell<C, N, T>> Cell<C, N, T>::iterBy(const typename CellDataIterator<Cell<C, N, T>>::pred_t& pred) const{
+    return const_cast<Cell<C, N, T>*>(this)->iterBy(pred);
+}
+
+
 
 template <typename C, typename N, typename T>
 template <typename Fn>
@@ -159,15 +172,27 @@ void Cell<C, N, T>::acceptSet(Fn* visitor) {
 
 template <typename C, typename N, typename T>
 template <typename Fn>
-void Cell<C, N, T>::acceptSet(Fn visitor) {
+void Cell<C, N, T>::acceptSet(Fn& visitor) {
   visitor(*this);
+}
+template <typename C, typename N, typename T>
+template <typename Fn>
+void Cell<C, N, T>::acceptSet(Fn&& visitor) {
+    acceptSet(visitor);
 }
 
 template <typename C, typename N, typename T>
 template <typename Fn>
 typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::acceptGetEntry(
-    const Fn visitor) const {
+    Fn& visitor) const {
   return visitor(*this);
+}
+
+template <typename C, typename N, typename T>
+template <typename Fn>
+typename Cell<C, N, T>::entry_t_ptr Cell<C, N, T>::acceptGetEntry(
+    Fn&& visitor) const {
+  return acceptGetEntry(visitor);
 }
 
 template <typename C, typename N, typename T>
@@ -178,6 +203,7 @@ void Cell<C, N, T>::computeValue(const Fn computeAlg) {
       e.second->setSelectedIn("");
       e.second->setSelectionRank(std::numeric_limits<double>::max());
   }
+
   // 2 apply computeAlg to select or compute value which represents this cell.
   this->cell_value = computeAlg->operator()(*this);  // may set empty shared_ptr
   // 3 set selection flag
@@ -194,20 +220,25 @@ bool Cell<C, N, T>::acceptCheck(const Fn visitor) const {
 
 template <typename C, typename N, typename T>
 template <typename Fn, typename Ret>
-Ret Cell<C, N, T>::accept(Fn visitor) {
+Ret Cell<C, N, T>::accept(Fn& visitor) {
   return visitor(*this);
 }
 
 template <typename C, typename N, typename T>
 template <typename Fn, typename Ret>
-Ret Cell<C, N, T>::accept(const Fn visitor) const {
+Ret Cell<C, N, T>::accept(Fn& visitor) const {
   return visitor(*this);
 }
 
 template <typename C, typename N, typename T>
 std::string Cell<C, N, T>::str() const {
   std::stringstream os;
-  os << "{cell_id: " << this->cell_id << " owner_id: " << this->owner_id << "}";
+  os << "{cell_id: " << this->cell_id << " owner_id: " << this->owner_id << ", val:";
+  if (this->val()){
+      os << this->val()->str() << "}";
+  } else {
+      os << "n/a}";
+  }
   return os.str();
 }
 
@@ -215,10 +246,9 @@ template <typename C, typename N, typename T>
 std::string Cell<C, N, T>::infoCompact() const{
     std::stringstream os;
     os << "[#" << this->data.size();
-    int validCount = 0;
-    for (const auto e : this->validIter()) {
-        ++validCount;
-    }
+
+    int validCount = this->validIter().distance();
+
     os << "V" << validCount;
     if (this->hasLocal()){
         const auto l = this->getLocal();

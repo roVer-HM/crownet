@@ -8,6 +8,7 @@
 #pragma once
 
 #include "crownet/common/iterator/FilterIterator.h"
+#include "crownet/common/RsdProviderMixin.h"
 
 namespace crownet {
 
@@ -32,19 +33,50 @@ class CellDataIterator
                    typename CellDataIterator<CELL>::pred_t predicate);
   CellDataIterator(CellDataIterator& other,
                    typename CellDataIterator<CELL>::iter_t iter);
+
+//  using iter_pred_t = typename CellDataIterator<CELL>::pred_t;
   // static factory methods with common predicates
 
   /**
    * Filter based on valid state.
    */
+  static typename CellDataIterator<CELL>::pred_t getValidDataIter_pred(){
+      typename CellDataIterator<CELL>::pred_t f =
+          [](const typename CellDataIterator<CELL>::iter_value_t& val) -> bool {
+        return val.second->valid();
+      };
+      return f;
+  }
+
   static CellDataIterator<CELL> ValidDataIter(CELL* cell) {
-    typename CellDataIterator<CELL>::pred_t f =
-        [](const typename CellDataIterator<CELL>::iter_value_t& val) -> bool {
-      return val.second->valid();
-    };
+      typename CellDataIterator<CELL>::pred_t f = CellDataIterator<CELL>::getValidDataIter_pred();
+    return CellDataIterator<CELL>(cell,  f);
+  }
+
+  static typename CellDataIterator<CELL>::pred_t getValidRsdDataIter_pred(const int rsdid) {
+      typename CellDataIterator<CELL>::pred_t f =
+             [rsdid](const typename CellDataIterator<CELL>::iter_value_t& val) -> bool {
+           return val.second->valid() && val.second->getResourceSharingDomainId() == rsdid;
+         };
+      return f;
+  }
+
+  static CellDataIterator<CELL> ValidRsdDataIter(CELL* cell, const int rsdid) {
+      typename CellDataIterator<CELL>::pred_t f = CellDataIterator<CELL>::getValidRsdDataIter_pred(rsdid);
     return CellDataIterator<CELL>(cell, f);
   }
+
+  static typename CellDataIterator<CELL>::pred_t getAllDataIter_pred() {
+      typename CellDataIterator<CELL>::pred_t f =
+           [](const typename CellDataIterator<CELL>::iter_value_t& val) -> bool {
+         return true;
+       };
+    return f;
+    }
+
+
 };
+
 
 #include "crownet/dcd/generic/iterator/CellDataIterator.tcc"
 

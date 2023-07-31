@@ -907,6 +907,12 @@ class FingerprintTestCase(SimulationTestCase):
             else self.cmdLine.split(None, 1)
         )
 
+        # of vector ar part of finger print do not override ini vector recording config.
+        vector_recording = ""
+        fingerprint_content = self.fingerprint.split("/")
+        if len(fingerprint_content) == 2 and "v" not in fingerprint_content[1]:
+            vector_recording = " --vector-recording=false "
+
         command = (
             (
                 exeName + "_dbg"
@@ -922,7 +928,8 @@ class FingerprintTestCase(SimulationTestCase):
             + self.fingerprint
             + '" --cpu-time-limit='
             + TestGlobal.cpuTimeLimit
-            + " --vector-recording=false --scalar-recording=true "
+            + vector_recording
+            + " --scalar-recording=true "
             + " --result-dir="
             + self.resultdir
             + " "
