@@ -45,8 +45,7 @@ void EntropyNeigborhoodTableClient::handleMessage(cMessage *msg) {
 
 
 const int EntropyNeigborhoodTableClient::getSize(){
-    int count = iter().distance();
-    return count;
+    return iter().distance();
 }
 
 const NeighborhoodTableValue_t EntropyNeigborhoodTableClient::updateGetGlobalValue(const inet::Coord& pos){
