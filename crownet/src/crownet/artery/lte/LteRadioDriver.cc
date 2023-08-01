@@ -42,7 +42,6 @@ inet::MacAddress convert(const vanetza::MacAddress& mac) {
   return result;
 }
 
-std::once_flag register_protocol_flag;
 }  // namespace
 
 int LteRadioDriver::numInitStages() const {

@@ -36,14 +36,14 @@ void SimTimeIntervalFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     }
 }
 
-void SimTimeIntervalFilter::init(cComponent *component, cProperty *attrsProperty){
-    cPointerResultFilter::init(component, attrsProperty);
-    if(attrsProperty->containsKey("interval_par")){
-        auto _val = attrsProperty->getValue("interval_par");
-        if(component->hasPar(_val)){
-            this->filterInterval = component->par(_val);
+void SimTimeIntervalFilter::init(Context *ctx){
+    cPointerResultFilter::init(ctx);
+    if(ctx->attrsProperty->containsKey("interval_par")){
+        auto _val = ctx->attrsProperty->getValue("interval_par");
+        if(ctx->component->hasPar(_val)){
+            this->filterInterval = ctx->component->par(_val);
         } else {
-            throw cRuntimeError("simTimeIntervalFilter expected '%s' parameter on module '%s'", _val, component->getFullPath().c_str());
+            throw cRuntimeError("simTimeIntervalFilter expected '%s' parameter on module '%s'", _val, ctx->component->getFullPath().c_str());
         }
     } else {
         throw cRuntimeError("simTimeIntervalFilter expected a statistic attribute 'interval_par'");

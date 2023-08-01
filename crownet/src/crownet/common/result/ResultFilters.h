@@ -15,7 +15,11 @@
 
 #pragma once
 #include "inet/common/INETDefs.h"
-#include "inet/common/ResultFilters.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#include <inet/common/ResultFilters.h>
+#pragma GCC diagnostic pop
 
 using namespace inet;
 
@@ -41,7 +45,7 @@ class SimTimeIntervalFilter : public inet::utils::filters::cPointerResultFilter 
 public:
  virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
                             cObject *object, cObject *details) override;
- virtual void init(cComponent *component, cProperty *attrsProperty) override;
+ virtual void init(Context *ctx) override;
 private:
  simtime_t filterInterval = -1.0;
  simtime_t nextLogTime = 0.0;

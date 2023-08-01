@@ -24,7 +24,7 @@ RUN chmod 555 /waitfor.sh
 
 # add ide (intellij)
 WORKDIR /opt/intellij
-RUN wget https://download.jetbrains.com/idea/ideaIU-2021.1.2.tar.gz --output-document /opt/intellij/intellij.tar.gz
+RUN wget https://download.jetbrains.com/idea/ideaIU-2023.2.tar.gz --output-document /opt/intellij/intellij.tar.gz
 RUN tar xzvf /opt/intellij/intellij.tar.gz --one-top-level=intellij --strip-components 1
 ENV PATH="/opt/intellij/intellij/bin:${PATH}"
 

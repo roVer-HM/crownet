@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-typedef struct StoredBeacon
+struct StoredBeacon
 {
    SimpleMECBeacon beacon;
 };

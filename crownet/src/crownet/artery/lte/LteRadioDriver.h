@@ -19,6 +19,7 @@ class LteRadioDriver : public artery::RadioDriverBase,
  public:
   virtual ~LteRadioDriver() = default;
   int numInitStages() const override;
+  using artery::RadioDriverBase::initialize;
   void initialize(int stage) override;
   void handleMessage(omnetpp::cMessage*) override;
 
