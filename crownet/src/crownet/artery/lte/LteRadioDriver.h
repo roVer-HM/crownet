@@ -29,6 +29,9 @@ class LteRadioDriver : public artery::RadioDriverBase,
   void handleDataRequest(omnetpp::cMessage*) override;
   void refreshDisplay() const override;
 
+ protected:
+     const inet::Protocol* geonetProtocol;
+
  private:
   inet::NetworkInterface* interfaceEntry = nullptr;
   int numPassedUp, numSent;

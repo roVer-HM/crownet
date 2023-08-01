@@ -113,11 +113,12 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::vector<ITraCiNodeVisitorAcceptor*> dynamicNodeVisitorAcceptors;
   ITraCiNodeVisitorAcceptor* traciModuleListener = nullptr;
 
+  MapCfg *mapCfg;
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<RegularDcdMap> dcdMapGlobal;
   std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
   std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
-  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> valueVisitor;
+  std::shared_ptr<CellAggregationAlgorihm<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
   std::string mapDataType; //todo switch for PedestrianVsEntropy data
   std::string m_mobilityModule;

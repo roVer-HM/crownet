@@ -22,10 +22,12 @@ Define_Module(Geo2Nic);
 
 void Geo2Nic::initialize(int stage) {
     IP2Nic::initialize(stage);
-    if (stage == inet::INITSTAGE_APPLICATION_LAYER){
+    if (stage == inet::INITSTAGE_LOCAL){
+        geonetProtocol = artery::getGeoNetProtocol();
+    }
+    else if (stage == inet::INITSTAGE_APPLICATION_LAYER){
         // register geonet protocol
-        registerService(artery::InetRadioDriver::geonet, gate("upperLayerIn"),
-                        gate("upperLayerOut"));
+        registerService(*geonetProtocol, gate("upperLayerIn"),gate("upperLayerOut"));
     }
 }
 
@@ -34,7 +36,7 @@ void Geo2Nic::toStackUe(inet::Packet* pkt) {
   auto pTag = pkt->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
     IP2Nic::toStackUe(pkt);
-  } else if (pTag->getProtocol() == &artery::InetRadioDriver::geonet) {
+  } else if (pTag->getProtocol() == geonetProtocol) {
     auto geoTag = pkt->getTag<crownet::GeoNetTag>();
     // if needed, create a new structure for the flow
     int headerSize = B(10).get();  // todo: set correct
@@ -74,7 +76,7 @@ void Geo2Nic::toIpUe(Packet* datagram) {
   } else {
     EV << "Geo2Nic::toIpUe - message from stack: send to Geo layer" << endl;
     datagram->removeTagIfPresent<inet::PacketProtocolTag>();
-    prepareForGeo(datagram);
+    prepareForGeo(datagram, geonetProtocol);
     send(datagram, ipGateOut_);
   }
 }

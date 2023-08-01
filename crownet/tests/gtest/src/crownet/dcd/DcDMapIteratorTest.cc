@@ -16,6 +16,8 @@
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
+
 
 using namespace crownet;
 
@@ -100,8 +102,9 @@ TEST_F(DcDMapIteraotrTest, iter_validLocal) {
   // validLocal returns no cells after reset nut allLocal still does.
   EXPECT_TRUE(mapLocal.validLocal().begin() != mapLocal.validLocal().end());
   EXPECT_TRUE(mapLocal.allLocal().begin() != mapLocal.allLocal().end());
+  ResetVisitor rv(33.0);
   for (auto& m_val : mapLocal) {
-    m_val.second.acceptSet(ResetVisitor(33.0));
+    m_val.second.acceptSet(rv);
   }
   EXPECT_TRUE(mapLocal.validLocal().begin() == mapLocal.validLocal().end());
   EXPECT_TRUE(mapLocal.allLocal().begin() != mapLocal.allLocal().end());

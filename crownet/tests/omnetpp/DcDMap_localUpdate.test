@@ -20,7 +20,7 @@ outputscalarmanager-class="omnetpp::envir::SqliteOutputScalarManager"
 *.misc[*].pos*.result-recording-modes = all
 *.misc[*].app[*].**.vector-recording = true
 **.vector-recording = false
-#**.scalar-recording = false
+**.scalar-recording = true
 
 record-eventlog = true
 #*.gloablDensityMap.**.module-eventlog-recording = true

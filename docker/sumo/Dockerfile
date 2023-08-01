@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:experimental
 #
-# Scope: 
-# build the SUMO Simulator based on our public omnetpp mirror >https://github.com/roVer-HM/sumo.git<. 
+# Scope:
+# build the SUMO Simulator based on our public omnetpp mirror >https://github.com/roVer-HM/sumo.git<.
 
 # Requirements/dependencies:
 # none
@@ -16,7 +16,7 @@
 
 FROM ubuntu:18.04
 
-ENV GITHUB_TAG="v1_15_0"
+ENV GITHUB_TAG="v1_17_0_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)

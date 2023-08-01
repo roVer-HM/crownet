@@ -1,6 +1,6 @@
 # Parameter studies
 
-For conducting parameter studies, we use the Python framework ![suq-controller](../../analysis/suq-controller) which stands for `Surrogante and Uncertainty Quantification controller`.
+For conducting parameter studies, we use the Python framework [suq-controller](../../analysis/suq-controller) which stands for `Surrogante and Uncertainty Quantification controller`.
 
 ## Setup and running parameter studies
 To test parameter combinations (samples), the parameter values need to be specified in a list:
@@ -59,4 +59,4 @@ To run the parameter studies, simply run
 
 ## Tutorials
 
-Please find the `*_rover_*` tutorials in the ![suq-controller tutorials](../../analysis/suq-controller/tutorial).
+Please find the `*_rover_*` tutorials in the [suq-controller tutorials](../../analysis/suq-controller/tutorial).

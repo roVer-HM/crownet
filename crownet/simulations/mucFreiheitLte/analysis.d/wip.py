@@ -16,7 +16,9 @@ from typing import Tuple
 from crownetutils.utils.misc import Project
 import contextily as ctx
 from crownetutils.analysis.omnetpp import OppAnalysis
+from crownetutils.analysis.plot.app_misc import PlotAppMisc
 import crownetutils.analysis.dpmm as Dmap
+from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.omnetpp.scave import CrownetSql
 import crownetutils.utils.plot as Plot
 from crownetutils.utils.logging import logger, timing, logging
@@ -25,14 +27,14 @@ from IPython.display import display
 
 def run_data(
     run, sim, hdf_file="data.h5", **kwargs
-) -> Tuple[DpmmHdfBuilder, OMNeT.CrownetSql]:
+) -> Tuple[DpmmHdfBuilder, CrownetSql]:
     if "data_root" in kwargs:
         data_root = kwargs["data_root"]
     else:
         data_root = f"{os.environ['HOME']}/repos/crownet/crownet/simulations/{sim}/analysis.d/results/{run}"
     builder = DpmmHdfBuilder.get(hdf_file, data_root).epsg(Project.UTM_32N)
 
-    sql = OMNeT.CrownetSql(
+    sql = CrownetSql(
         vec_path=f"{data_root}/vars_rep_0.vec",
         sca_path=f"{data_root}/vars_rep_0.sca",
         network="World",
@@ -54,7 +56,7 @@ def subway_test():
 
     beacon_df = OppAnalysis.get_packet_source_distribution(sql1, app_path=".app[1].app")
 
-    fig, ax = OppAnalysis.plot_packet_source_distribution(beacon_df)
+    fig, ax = PlotAppMisc.plot_packet_source_distribution(beacon_df)
     ax.set_title("Beacon packet source distribution")
     fig.savefig(f"{root}/out/beacon_pkt_source_dis.pdf")
 

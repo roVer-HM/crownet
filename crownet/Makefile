@@ -94,7 +94,9 @@ INET_5G_ := -DINET_IMPORT \
 MISC_ := -lboost_filesystem \
 	     -lboost_system \
 	     -losg \
-	     -losgEarth
+	     -losgEarth \
+	     -lboost_iostreams \
+	     -lz
 
 TEST_ := -I$(GOOGLE_TEST_INCLUDE) \
 		 -L/usr/local/lib \

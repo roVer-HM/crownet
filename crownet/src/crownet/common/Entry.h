@@ -15,6 +15,7 @@
 #include <limits>
 
 #include "crownet/common/util/FilePrinter.h"
+#include "crownet/common/RsdProviderMixin.h"
 
 struct EntryDist{
     double sourceHost;     /* distance between the node which conducted the measurement and the current node */
@@ -88,6 +89,10 @@ class IEntry : public crownet::FilePrinter {
   virtual void setSelectedIn(std::string viewName);
   virtual std::string getSelectedIn() const;
 
+  virtual void setResourceSharingDomainId(const int rsd);
+  virtual void setResourceSharingDomainId(const crownet::RsdIdPair& rsdIdPair);
+
+  virtual const int getResourceSharingDomainId() const;
 
   virtual std::string csv(std::string delimiter) const;
   virtual std::string str() const;
@@ -112,6 +117,7 @@ class IEntry : public crownet::FilePrinter {
   key_type source = 0;
   EntryDist entryDist;
   std::string selected_in;
+  int resourceSharingDomainId = -1;
 };
 
 
@@ -376,6 +382,32 @@ std::string IEntry<K, T>::getSelectedIn() const {
 }
 
 template <typename K, typename T>
+void IEntry<K, T>::setResourceSharingDomainId(const int rsd){
+    this->resourceSharingDomainId = rsd;
+}
+
+template <typename K, typename T>
+void IEntry<K, T>::setResourceSharingDomainId(const crownet::RsdIdPair& rsdIdPair){
+    if (this->measurement_time <  rsdIdPair.current.time && rsdIdPair.getPrevId() > 0){
+        /* packet processing intersected with RSD change event.
+         * This ensures that measurements from the old RSD does not bleed into the new one.
+         * This only append when the packet is already received far enough up the stack such
+         * that handover cleanup does not remove the packet.
+         */
+        this->setResourceSharingDomainId(rsdIdPair.getPrevId());
+    } else {
+        this->setResourceSharingDomainId(rsdIdPair.getId());
+    }
+}
+
+
+template <typename K, typename T>
+const int IEntry<K, T>::getResourceSharingDomainId() const{
+    return this->resourceSharingDomainId;
+}
+
+
+template <typename K, typename T>
 inline std::string IEntry<K, T>::csv(std::string delimiter) const {
   std::stringstream out;
   out << this->count << delimiter << this->measurement_time << delimiter
@@ -387,8 +419,9 @@ inline std::string IEntry<K, T>::csv(std::string delimiter) const {
 template <typename K, typename T>
 inline std::string IEntry<K, T>::str() const {
   std::stringstream os;
-  os << "Count: " << this->count << "| meas_t: " << this->measurement_time
-     << "| recv_t: " << this->received_time << "| valid: " << this->valid();
+  os << "[Count: " << this->count << ", meas_t: " << this->measurement_time
+     << ", recv_t: " << this->received_time << ", valid: " << this->valid()
+     << ", rsd: "<< this->resourceSharingDomainId <<"]";
   return os.str();
 }
 
@@ -399,18 +432,31 @@ int IEntry<K, T>::columns() const {
 
 template <typename K, typename T>
 void IEntry<K, T>::writeTo(std::ostream& out, const std::string& sep) const {
-  out << this->count << sep << this->measurement_time << sep
-      << this->received_time << sep << this->source << sep << this->selected_in  << sep
-      << this->selectionRank << sep << this->entryDist.sourceHost << sep
-      << this->entryDist.sourceEntry << sep << this->entryDist.hostEntry;
+  out << this->count << sep << \
+          this->measurement_time << sep << \
+          this->received_time << sep << \
+          this->source << sep << \
+          this->selected_in  << sep << \
+          this->selectionRank << sep << \
+          this->entryDist.sourceHost << sep << \
+          this->entryDist.sourceEntry << sep << \
+          this->entryDist.hostEntry << sep << \
+          this->resourceSharingDomainId;
 }
 
 template <typename K, typename T>
 void IEntry<K, T>::writeHeaderTo(std::ostream& out,
                                  const std::string& sep) const {
-  out << "count" << sep << "measured_t" << sep << "received_t" << sep
-      << "source" << sep << "selection" << sep << "selectionRank" << sep
-      << "sourcerHost" << sep << "sourceEntry" << sep << "hostEntry" ;
+  out << "count" << sep << \
+          "measured_t" << sep << \
+          "received_t" << sep << \
+          "source" << sep << \
+          "selection" << sep << \
+          "selectionRank" << sep  << \
+          "sourcerHost" << sep << \
+          "sourceEntry" << sep << \
+          "hostEntry" << sep << \
+          "rsd_id";
 }
 
 template <typename K, typename T>
@@ -425,7 +471,7 @@ bool IEntry<K, T>::operator==(const IEntry<K, T>& rhs) const {
 template <typename K, typename T>
 std::string IEntry<K, T>::logShort() const{
     std::stringstream s;
-    s << "Entry{" << this->count << ", " << this->measurement_time <<", " << this->received_time << ", " << this->source << "}";
+    s << "Entry{" << this->count << ", " << this->measurement_time <<", " << this->received_time << ", " << this->source << ", rsd[" << this->getResourceSharingDomainId() << "]}";
     return s.str();
 }
 
@@ -478,7 +524,7 @@ inline void IGlobalEntry<K, T>::clear(const T& t) {
 template <typename K, typename T>
 inline std::string IGlobalEntry<K, T>::str() const {
   std::stringstream os;
-  os << IEntry<K, T>::str() << "| node_ids: {";
+  os << IEntry<K, T>::str() << " node_ids: {";
   int nCount = this->nodeIds.size() - 1;
   for (const auto& e : this->nodeIds) {
     os << e;

@@ -10,12 +10,19 @@
 #include <memory>
 #include <string>
 
+#include "crownet/crownet.h"
 #include "crownet/common/Entry.h"
+#include "main_test.h"
+
+namespace omnetpp{
+    bool operator<(const simtime_t& a, const double b){return a.dbl() < b; }
+    bool operator<(const double a, const simtime_t& b){return a < b.dbl();}
+}
 
 double TIME1 = 1.34;
 double TIME2 = 4.42;
 
-class IEntryTest : public ::testing::Test {
+class IEntryTest : public BaseOppTest {
  protected:
   void SetUp() override {
     e1_int_empty = IEntry<int, int>();
@@ -197,4 +204,41 @@ TEST_F(IEntryTest, resetLocal) {
   EXPECT_TRUE(e3_int_empty_loc.valid());
   e3_int_empty_loc.reset(t1);
   EXPECT_FALSE(e3_int_empty_loc.valid());
+}
+
+TEST_F(IEntryTest, set_get_RSD){
+    IEntry<int, simtime_t> e;
+    e.setResourceSharingDomainId(3);
+    EXPECT_EQ(3, e.getResourceSharingDomainId());
+}
+
+TEST_F(IEntryTest, set_get_RSD_with_pair){
+    IEntry<int, simtime_t> e;
+    crownet::RsdIdPair rsdPair {{10, 5.0}, {5, 3.0}};
+
+    EXPECT_EQ(-1, e.getResourceSharingDomainId()) << "not set. Must be -1";
+
+    // current time after RSD change at 5.0s
+    setSimTime(5.5);
+    e.setMeasureTime(5.3); // Measurement done after RSD change at 5.0
+    e.setReceivedTime(simTime());
+    e.setResourceSharingDomainId(rsdPair);
+
+    EXPECT_EQ(rsdPair.getId(), e.getResourceSharingDomainId());
+
+
+    setSimTime(5.5);
+    e.setMeasureTime(2.0); // Measurement done before RSD change. use previous RSD
+    e.setReceivedTime(simTime());
+    e.setResourceSharingDomainId(rsdPair);
+    EXPECT_EQ(rsdPair.getPrevId(), e.getResourceSharingDomainId());
+
+
+    setSimTime(5.5);
+    rsdPair.previous.id = -1;
+    e.setMeasureTime(2.0); // Measurement done before RSD change but previous id is invalid. use new one.
+    e.setReceivedTime(simTime());
+    e.setResourceSharingDomainId(rsdPair);
+    EXPECT_EQ(rsdPair.getId(), e.getResourceSharingDomainId());
+
 }

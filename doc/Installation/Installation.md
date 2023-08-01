@@ -42,13 +42,13 @@ Notes:
 * Disable SELinux (Fedoara, RedHat, ...) with `sudo setenforce 0` for the installation, since it blocks X11 Forwarding. 
 
 ### For developers only
-Please follow our ![coding style instructions](./CodingStyle.md), and see our ![recommendations](./Recommendations.md).
+Please follow our [coding style instructions](./CodingStyle.md), and see our [recommendations](./Recommendations.md).
 
 ## Build CrowNet 
 
-You can either build each ![component individually](BuildOfIndividualSubModules.md) or use the top-level Makefile.
-The simplest way to build the system is to use the top-level Makefile which we descrive in the following. 
-Preserving the required build-order, the top-level Makefile builds all the required components. 
+You can either build each [component individually](BuildOfIndividualSubModules.md) or use the top-level Makefile.
+The simplest way to build the system is to use the top-level Makefile which we descrive in the following.
+Preserving the required build-order, the top-level Makefile builds all the required components.
 Simply run:
 
 ```
@@ -60,12 +60,12 @@ Notes:
 * the flag "release" forces "release" mode. To switch to "debug" mode, use "debug".
 * the number of available processor cores are auto-detected during the build process and a sufficient number of threads is started.
 
-That's all - now you can change to ![simulations](../../crownet/simulations) and start running the simulations. 
+That's all - now you can change to [simulations](../../crownet/simulations) and start running the simulations.
 
-## Quick start 
+## Quick start
 
-This quick start example demonstrates how to simply run a CrowNet simulation. 
-Please find more detailed information on how to run CrowNet simulations in our ![documentation](../Running-a-Simulation/README.md)
+This quick start example demonstrates how to simply run a CrowNet simulation.
+Please find more detailed information on how to run CrowNet simulations in our [documentation](../Running-a-Simulation/README.md)
 
 ### Step 1: Start the mobility container
 
@@ -103,7 +103,7 @@ Start the omnetpp container:
 ```
 omnetpp-ide
 ```
-Setup the Omnet++ IDE as described ![here](../Running-a-Simulation/StartUp-GUI.md) and build the project in release or debug mode.
+Setup the Omnet++ IDE as described [here](../Running-a-Simulation/StartUp-GUI.md) and build the project in release or debug mode.
 
 ### Step 3: Run the simulation
 Got to `crownet/simulations/testSim` in the project view and search for the `omentpp.ini` file.

@@ -27,34 +27,50 @@ time_step_key = "timeStep"
 seed_key_key = "('Parameter', 'vadere', 'fixedSeed')"
 wall_clock_time_key = "('MetaInfo', 'required_wallclock_time')"
 return_code_key = "('MetaInfo', 'return_code')"
-simulation_time = 'Simulation time'
-corridors = {'areaDensityCountingNormed-PID101': "Corridor1",
-             'areaDensityCountingNormed-PID102': "Corridor2",
-             'areaDensityCountingNormed-PID103': "Corridor3"}
-velocities_dict = {'velocity-PID25': "Corridor1",
-                   'velocity-PID27': "Corridor2",
-                   'velocity-PID29': "Corridor3"}
-densities_dict = {'density-PID25': "Corridor1",
-                  'density-PID27': "Corridor2",
-                  'density-PID29': "Corridor3"}
-c__ = {11: "Short",
-       31: "Medium",
-       51: "Long",
-       'Corridor1': "Short",
-       'Corridor2': "Medium",
-       'Corridor3': "Long",
-       }
+simulation_time = "Simulation time"
+corridors = {
+    "areaDensityCountingNormed-PID101": "Corridor1",
+    "areaDensityCountingNormed-PID102": "Corridor2",
+    "areaDensityCountingNormed-PID103": "Corridor3",
+}
+velocities_dict = {
+    "velocity-PID25": "Corridor1",
+    "velocity-PID27": "Corridor2",
+    "velocity-PID29": "Corridor3",
+}
+densities_dict = {
+    "density-PID25": "Corridor1",
+    "density-PID27": "Corridor2",
+    "density-PID29": "Corridor3",
+}
+c__ = {
+    11: "Short",
+    31: "Medium",
+    51: "Long",
+    "Corridor1": "Short",
+    "Corridor2": "Medium",
+    "Corridor3": "Long",
+}
 
-args_boxplot = dict(flierprops=dict(marker='+', markerfacecolor='#AAAAAA', markersize=3,
-                                    linestyle='none', markeredgecolor='#AAAAAA'),
-                    boxprops=dict(color='#464646'),
-                    whiskerprops=dict(linewidth=1),
-                    medianprops=dict(linewidth=2.5, color='k'),
-                    notch=True)
+args_boxplot = dict(
+    flierprops=dict(
+        marker="+",
+        markerfacecolor="#AAAAAA",
+        markersize=3,
+        linestyle="none",
+        markeredgecolor="#AAAAAA",
+    ),
+    boxprops=dict(color="#464646"),
+    whiskerprops=dict(linewidth=1),
+    medianprops=dict(linewidth=2.5, color="k"),
+    notch=True,
+)
 
-controller__ = {"OpenLoop": "Fixed order strategy",
-                "ClosedLoop": "Minimal density strategy",
-                "AvoidShort": "Simple density strategy"}
+controller__ = {
+    "OpenLoop": "Fixed order strategy",
+    "ClosedLoop": "Minimal density strategy",
+    "AvoidShort": "Simple density strategy",
+}
 sim_time_steady_flow_start = 250
 sim_time_steady_flow_end = 1250
 time_step_size = 0.4
@@ -67,16 +83,33 @@ def get_fundamental_diagrams(controller_type, time_start=None, simulation_dir=No
     if time_start is None:
         time_start = sim_time_steady_flow_start
 
-    c1 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_parameters.csv"), index_col=[0, 1])
-    c2 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_fundamentalDiagramm.csv"), index_col=[0, 1])
+    c1 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_parameters.csv"),
+        index_col=[0, 1],
+    )
+    c2 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_fundamentalDiagramm.csv"),
+        index_col=[0, 1],
+    )
     densities_closed_loop = c1.join(c2)
 
-    densities_closed_loop[simulation_time] = densities_closed_loop[time_step_key] * time_step_size
-    densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] >= time_start]
-    densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] < sim_time_steady_flow_end]
-    densities_closed_loop.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
-                               inplace=True)
-    densities_closed_loop.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    densities_closed_loop[simulation_time] = (
+        densities_closed_loop[time_step_key] * time_step_size
+    )
+    densities_closed_loop = densities_closed_loop[
+        densities_closed_loop[simulation_time] >= time_start
+    ]
+    densities_closed_loop = densities_closed_loop[
+        densities_closed_loop[simulation_time] < sim_time_steady_flow_end
+    ]
+    densities_closed_loop.drop(
+        [seed_key_key, wall_clock_time_key, return_code_key, time_step_key],
+        axis=1,
+        inplace=True,
+    )
+    densities_closed_loop.rename(
+        columns={reaction_prob_key: reaction_prob_key_short}, inplace=True
+    )
 
     velocities_ = densities_closed_loop.drop(columns=list(densities_dict.keys()))
     velocities_.rename(columns=velocities_dict, inplace=True)
@@ -88,56 +121,97 @@ def get_fundamental_diagrams(controller_type, time_start=None, simulation_dir=No
     densities_["Controller"] = controller_type
     densities_.sort_index(axis=1, inplace=True)
 
-    densities_2 = get_densities(controller_type=controller_type, time_start=time_start, simulation_dir=simulation_dir)
+    densities_2 = get_densities(
+        controller_type=controller_type,
+        time_start=time_start,
+        simulation_dir=simulation_dir,
+    )
 
     if densities_.equals(densities_2):
         print(f"{controller_type}: density check successful.")
     else:
-        raise ValueError("Fundamental diagram densities differ from measured densities.")
+        raise ValueError(
+            "Fundamental diagram densities differ from measured densities."
+        )
 
     return densities_, velocities_
 
 
 def get_densities(controller_type, time_start, simulation_dir):
-    c1 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_parameters.csv"), index_col=[0, 1])
-    c2 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_densities.csv"), index_col=[0, 1])
+    c1 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_parameters.csv"),
+        index_col=[0, 1],
+    )
+    c2 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_densities.csv"),
+        index_col=[0, 1],
+    )
     densities_closed_loop = c1.join(c2)
     densities_closed_loop.rename(columns=corridors, inplace=True)
 
-    densities_closed_loop[simulation_time] = densities_closed_loop[time_step_key] * time_step_size
-    densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] >= time_start]
-    densities_closed_loop = densities_closed_loop[densities_closed_loop[simulation_time] < sim_time_steady_flow_end]
-    densities_closed_loop.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
-                               inplace=True)
-    densities_closed_loop.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    densities_closed_loop[simulation_time] = (
+        densities_closed_loop[time_step_key] * time_step_size
+    )
+    densities_closed_loop = densities_closed_loop[
+        densities_closed_loop[simulation_time] >= time_start
+    ]
+    densities_closed_loop = densities_closed_loop[
+        densities_closed_loop[simulation_time] < sim_time_steady_flow_end
+    ]
+    densities_closed_loop.drop(
+        [seed_key_key, wall_clock_time_key, return_code_key, time_step_key],
+        axis=1,
+        inplace=True,
+    )
+    densities_closed_loop.rename(
+        columns={reaction_prob_key: reaction_prob_key_short}, inplace=True
+    )
     densities_closed_loop["Controller"] = controller_type
     densities_closed_loop.sort_index(axis=1, inplace=True)
     return densities_closed_loop
 
 
 def get_time_controller_wise(controller_type, simulation_dir):
-    c1 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_startTime.csv"), index_col=[0, 1, 2])
-    c2 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_targetReachTime.csv"), index_col=[0, 1, 2])
+    c1 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_startTime.csv"),
+        index_col=[0, 1, 2],
+    )
+    c2 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_targetReachTime.csv"),
+        index_col=[0, 1, 2],
+    )
     times = c1.join(c2)
-    travel_times = pd.DataFrame(times["reachTime-PID12"].sub(times["startTime-PID13"]),
-                                columns=["travel_time"])
+    travel_times = pd.DataFrame(
+        times["reachTime-PID12"].sub(times["startTime-PID13"]), columns=["travel_time"]
+    )
     travel_times["Controller"] = controller_type
     travel_times = travel_times[times["startTime-PID13"] >= sim_time_steady_flow_start]
 
     travel_times.reset_index(level="pedestrianId", inplace=True, drop=True)
 
-    param = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_parameters.csv"), index_col=[0, 1])
+    param = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_parameters.csv"),
+        index_col=[0, 1],
+    )
     travel_times = travel_times.join(param[reaction_prob_key])
 
-    travel_times.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    travel_times.rename(
+        columns={reaction_prob_key: reaction_prob_key_short}, inplace=True
+    )
 
     return travel_times
 
 
 def get_travel_times(simulation_dir):
-    c2 = get_time_controller_wise(controller_type="OpenLoop", simulation_dir=simulation_dir)
-    c3 = get_time_controller_wise(controller_type="ClosedLoop", simulation_dir=simulation_dir)
-    c4 = get_time_controller_wise(controller_type="AvoidShort", simulation_dir=simulation_dir)
+    c2 = get_time_controller_wise(
+        controller_type="OpenLoop", simulation_dir=simulation_dir
+    )
+    c3 = get_time_controller_wise(
+        controller_type="ClosedLoop", simulation_dir=simulation_dir
+    )
+    c4 = get_time_controller_wise(
+        controller_type="AvoidShort", simulation_dir=simulation_dir
+    )
     travel_times = pd.concat([c2, c3, c4])
     return travel_times
 
@@ -148,7 +222,10 @@ def plot_travel_time(travel_time, output_dir):
     for c, data in travel_time.groupby(by=["Controller"]):
         controller_type = controller__[c[0]]
         data.drop(columns="Controller", inplace=True)
-        data.reset_index(inplace=True, drop=True, )
+        data.reset_index(
+            inplace=True,
+            drop=True,
+        )
         data[reaction_prob_key_short] = data[reaction_prob_key_short].round(3)
         data = data.pivot(columns=["reactionProbability"])
         data.columns = data.columns.droplevel()
@@ -168,7 +245,11 @@ def plot_travel_time(travel_time, output_dir):
     fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(15, 5), sharey=True)
     fig.subplots_adjust(wspace=0.1, hspace=0)
 
-    time_25 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.25).unstack(level=0)
+    time_25 = (
+        travel_time.groupby(by=["Controller", reaction_prob_key_short])
+        .quantile(0.25)
+        .unstack(level=0)
+    )
     time_25.columns = time_25.columns.droplevel(0)
     time_25.rename(columns=controller__, inplace=True)
     plt.sca(ax[0])
@@ -181,7 +262,11 @@ def plot_travel_time(travel_time, output_dir):
     ax[0].set_ylabel("Travel time [s]")
     ax[0].set_xlabel(compliance_rate)
 
-    time_med = travel_time.groupby(by=["Controller", reaction_prob_key_short]).median().unstack(level=0)
+    time_med = (
+        travel_time.groupby(by=["Controller", reaction_prob_key_short])
+        .median()
+        .unstack(level=0)
+    )
     time_med.columns = time_med.columns.droplevel(0)
     time_med.rename(columns=controller__, inplace=True)
     plt.sca(ax[1])
@@ -191,7 +276,11 @@ def plot_travel_time(travel_time, output_dir):
     ax[1].legend()
     ax[1].set_xlabel(compliance_rate)
 
-    time_75 = travel_time.groupby(by=["Controller", reaction_prob_key_short]).quantile(0.75).unstack(level=0)
+    time_75 = (
+        travel_time.groupby(by=["Controller", reaction_prob_key_short])
+        .quantile(0.75)
+        .unstack(level=0)
+    )
     time_75.columns = time_75.columns.droplevel(0)
     time_75.rename(columns=controller__, inplace=True)
     plt.sca(ax[2])
@@ -208,8 +297,9 @@ def plot_travel_time(travel_time, output_dir):
 
 
 def plot_hists_corridor1(output_dir, simulation_dir):
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0,
-                                                     simulation_dir=simulation_dir)
+    densities, velocities = get_fundamental_diagrams(
+        controller_type="NoController", time_start=0, simulation_dir=simulation_dir
+    )
 
     for c in ["Corridor1"]:
         velocities[c][densities[c] == 0] = np.nan
@@ -248,10 +338,16 @@ def plot_hists_corridor1(output_dir, simulation_dir):
     plt.show(block=False)
     plt.close()
 
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController", simulation_dir=simulation_dir)
-    times = get_time_controller_wise(controller_type="NoController", simulation_dir=simulation_dir)
+    densities, velocities = get_fundamental_diagrams(
+        controller_type="NoController", simulation_dir=simulation_dir
+    )
+    times = get_time_controller_wise(
+        controller_type="NoController", simulation_dir=simulation_dir
+    )
 
-    df = pd.concat([densities["Corridor1"].describe(), velocities["Corridor1"].describe()], axis=1)
+    df = pd.concat(
+        [densities["Corridor1"].describe(), velocities["Corridor1"].describe()], axis=1
+    )
 
     df["t"] = times[times["travel_time"] != np.inf].describe()["travel_time"]
 
@@ -261,8 +357,9 @@ def plot_hists_corridor1(output_dir, simulation_dir):
 
 
 def plot_fundamental_diagram_corridor1(output_dir, simulation_dir):
-    densities, velocities = get_fundamental_diagrams(controller_type="NoController", time_start=0.0,
-                                                     simulation_dir=simulation_dir)
+    densities, velocities = get_fundamental_diagrams(
+        controller_type="NoController", time_start=0.0, simulation_dir=simulation_dir
+    )
 
     for c in ["Corridor1"]:
         velocities[c][densities[c] == 0] = np.nan
@@ -275,7 +372,9 @@ def plot_fundamental_diagram_corridor1(output_dir, simulation_dir):
 
     degree = 2
     polyreg = make_pipeline(PolynomialFeatures(degree), LinearRegression())
-    polyreg.fit(densities["Corridor1"].values.reshape(-1, 1), flux.values.reshape(-1, 1))
+    polyreg.fit(
+        densities["Corridor1"].values.reshape(-1, 1), flux.values.reshape(-1, 1)
+    )
 
     plt.scatter(densities["Corridor1"], flux, label="Simulation data")
     d__ = np.linspace(0, 2.1)
@@ -286,12 +385,24 @@ def plot_fundamental_diagram_corridor1(output_dir, simulation_dir):
     flow_reg_ = polyreg.predict(d___.reshape(-1, 1))
     plt.plot(d___, flow_reg_.ravel(), color="black", linestyle="--", label=None)
 
-    plt.scatter(2.1, flow_reg.max(), marker="D", c="black", label="$J_{1,max}$ (Regression)")
-    plt.text(2.1 + 0.1, flow_reg.max() + 0.05, f'{flow_reg.max():.2f} (d = 2.1 $ped/m^{2}$)')
+    plt.scatter(
+        2.1, flow_reg.max(), marker="D", c="black", label="$J_{1,max}$ (Regression)"
+    )
+    plt.text(
+        2.1 + 0.1, flow_reg.max() + 0.05, f"{flow_reg.max():.2f} (d = 2.1 $ped/m^{2}$)"
+    )
 
-    densitiy_max_flux = densities.iloc[np.where(flux == flux.max())[0][0], :]["Corridor1"]
-    plt.scatter(densitiy_max_flux, flux.max(), marker="s", c="black", label="$J_{1,max}$ (Data)")
-    plt.text(densitiy_max_flux + 0.1, flux.max() + 0.0, f'{flux.max():.2f} (d = {densitiy_max_flux:.2f} $ped/m^{2}$)')
+    densitiy_max_flux = densities.iloc[np.where(flux == flux.max())[0][0], :][
+        "Corridor1"
+    ]
+    plt.scatter(
+        densitiy_max_flux, flux.max(), marker="s", c="black", label="$J_{1,max}$ (Data)"
+    )
+    plt.text(
+        densitiy_max_flux + 0.1,
+        flux.max() + 0.0,
+        f"{flux.max():.2f} (d = {densitiy_max_flux:.2f} $ped/m^{2}$)",
+    )
 
     plt.xlabel("Density [ped/m²]")
     plt.ylabel("Specific flow [1/(ms)]")
@@ -302,7 +413,9 @@ def plot_fundamental_diagram_corridor1(output_dir, simulation_dir):
     plt.show(block=False)
     plt.close()
 
-    plt.scatter(densities["Corridor1"], velocities["Corridor1"], label="Simulation data")
+    plt.scatter(
+        densities["Corridor1"], velocities["Corridor1"], label="Simulation data"
+    )
     plt.xlabel("Density [$ped/m^{2}$]")
     plt.ylabel("Velocity [m/s]")
     plt.title(f"Fundamental diagram: short corridor")
@@ -314,15 +427,22 @@ def plot_fundamental_diagram_corridor1(output_dir, simulation_dir):
 
 
 def get_densities_velocities(simulation_dir):
-    densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(controller_type="ClosedLoop",
-                                                                             simulation_dir=simulation_dir)
-    densities_open_loop, velocities_open_loop = get_fundamental_diagrams(controller_type="OpenLoop",
-                                                                         simulation_dir=simulation_dir)
-    densities_avoid_short, velocities_avoid_short = get_fundamental_diagrams(controller_type="AvoidShort",
-                                                                             simulation_dir=simulation_dir)
+    densities_closed_loop, velocities_closed_loop = get_fundamental_diagrams(
+        controller_type="ClosedLoop", simulation_dir=simulation_dir
+    )
+    densities_open_loop, velocities_open_loop = get_fundamental_diagrams(
+        controller_type="OpenLoop", simulation_dir=simulation_dir
+    )
+    densities_avoid_short, velocities_avoid_short = get_fundamental_diagrams(
+        controller_type="AvoidShort", simulation_dir=simulation_dir
+    )
 
-    densities = pd.concat([densities_closed_loop, densities_open_loop, densities_avoid_short])
-    velocities = pd.concat([velocities_closed_loop, velocities_open_loop, velocities_avoid_short])
+    densities = pd.concat(
+        [densities_closed_loop, densities_open_loop, densities_avoid_short]
+    )
+    velocities = pd.concat(
+        [velocities_closed_loop, velocities_open_loop, velocities_avoid_short]
+    )
 
     for c in corridors.values():
         velocities[c][densities[c] == 0] = np.nan
@@ -331,16 +451,29 @@ def get_densities_velocities(simulation_dir):
 
 
 def get_path_choice(controller_type, simulation_dir):
-    c1 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_parameters.csv"), index_col=[0, 1])
-    c2 = pd.read_csv(os.path.join(simulation_dir, f"{controller_type}_path_choice.csv"), index_col=[0, 1])
+    c1 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_parameters.csv"),
+        index_col=[0, 1],
+    )
+    c2 = pd.read_csv(
+        os.path.join(simulation_dir, f"{controller_type}_path_choice.csv"),
+        index_col=[0, 1],
+    )
     path_choice = c1.join(c2)
 
     path_choice[simulation_time] = path_choice[time_step_key] * time_step_size
-    path_choice = path_choice[path_choice[simulation_time] >= sim_time_steady_flow_start]
+    path_choice = path_choice[
+        path_choice[simulation_time] >= sim_time_steady_flow_start
+    ]
     path_choice = path_choice[path_choice[simulation_time] < sim_time_steady_flow_end]
-    path_choice.drop([seed_key_key, wall_clock_time_key, return_code_key, time_step_key], axis=1,
-                     inplace=True)
-    path_choice.rename(columns={reaction_prob_key: reaction_prob_key_short}, inplace=True)
+    path_choice.drop(
+        [seed_key_key, wall_clock_time_key, return_code_key, time_step_key],
+        axis=1,
+        inplace=True,
+    )
+    path_choice.rename(
+        columns={reaction_prob_key: reaction_prob_key_short}, inplace=True
+    )
     path_choice["Controller"] = controller_type
     path_choice.sort_index(axis=1, inplace=True)
 
@@ -351,20 +484,34 @@ def get_path_choice(controller_type, simulation_dir):
     return path_choice
 
 
-def plot_quantity(densities, file_name, y_min=0.0, y_max=2.5, ylabel="Density [ped/m*2]", output_dir=None):
+def plot_quantity(
+    densities,
+    file_name,
+    y_min=0.0,
+    y_max=2.5,
+    ylabel="Density [ped/m*2]",
+    output_dir=None,
+):
     fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(11, 11))
     fig.subplots_adjust(wspace=0.05, hspace=0.3)
 
     i = 0
     c_order = list()
-    for c, data in densities.groupby(by=["Controller"]):  # oxplot(column="travel_time"):
+    for c, data in densities.groupby(
+        by=["Controller"]
+    ):  # oxplot(column="travel_time"):
         c = c[0]
         c_order.append(controller__[c])
 
         densities_ = data
-        densities_[reaction_prob_key_short] = densities_[reaction_prob_key_short].round(3)
-        densities_ = densities_.reset_index(drop=True).drop(columns=[simulation_time, "Controller"]).pivot(
-            columns=[reaction_prob_key_short])
+        densities_[reaction_prob_key_short] = densities_[reaction_prob_key_short].round(
+            3
+        )
+        densities_ = (
+            densities_.reset_index(drop=True)
+            .drop(columns=[simulation_time, "Controller"])
+            .pivot(columns=[reaction_prob_key_short])
+        )
 
         ii = 0
         for corridor_ in ["Corridor1", "Corridor2", "Corridor3"]:
@@ -393,28 +540,44 @@ def plot_quantity(densities, file_name, y_min=0.0, y_max=2.5, ylabel="Density [p
 def plot_write_path_choice(path_choice, output_dir):
     counts_ = path_choice.groupby(by=["Controller", "corridorRecommended"]).count()
     counts = pd.DataFrame(counts_.iloc[:, 0])
-    counts.columns = ['Counts']
+    counts.columns = ["Counts"]
     counts.reset_index(inplace=True)
-    counts['Controller'] = counts['Controller'].replace(controller__)
+    counts["Controller"] = counts["Controller"].replace(controller__)
 
     counts = counts[counts["corridorRecommended"] != "none"]
     counts["corridorRecommended"] = counts["corridorRecommended"].astype(int)
 
-    counts = pd.pivot_table(counts, index='Controller', columns='corridorRecommended', values='Counts', fill_value=0)
+    counts = pd.pivot_table(
+        counts,
+        index="Controller",
+        columns="corridorRecommended",
+        values="Counts",
+        fill_value=0,
+    )
     counts = counts.transpose()
 
-    counts.to_latex(os.path.join(output_dir, "NumberOfRouteRecommensations.tex"), float_format="%.2f")
+    counts.to_latex(
+        os.path.join(output_dir, "NumberOfRouteRecommensations.tex"),
+        float_format="%.2f",
+    )
 
-    plt.bar(counts.columns.values, counts.loc[11].values, color='r')
-    plt.bar(counts.columns.values, counts.loc[21].values, bottom=counts.loc[11].values, color='b')
-    plt.bar(counts.columns.values, counts.loc[31].values, bottom=counts.loc[11].values + counts.loc[21].values,
-            color='g')
+    plt.bar(counts.columns.values, counts.loc[11].values, color="r")
+    plt.bar(
+        counts.columns.values,
+        counts.loc[21].values,
+        bottom=counts.loc[11].values,
+        color="b",
+    )
+    plt.bar(
+        counts.columns.values,
+        counts.loc[31].values,
+        bottom=counts.loc[11].values + counts.loc[21].values,
+        color="g",
+    )
 
     plt.xlabel("Guiding strategy")
     plt.ylabel("Number of recommendations")
-    plt.legend(labels=["Short route",  ##11
-                       "Medium route",  ##21
-                       "Long route"])  ##31
+    plt.legend(labels=["Short route", "Medium route", "Long route"])  ##11  ##21  ##31
 
     plt.savefig(os.path.join(output_dir, "NumberOfRouteRecommendations.pdf"))
     plt.show(block=False)
@@ -425,7 +588,7 @@ def compare_densities_statistics(densities, output_dir):
     densities = densities.reset_index()
     densities = densities[["id", "Controller", "Corridor1", "Corridor2", "Corridor3"]]
 
-    densities['Controller'] = densities['Controller'].replace(controller__)
+    densities["Controller"] = densities["Controller"].replace(controller__)
     densities = densities.groupby(by=["Controller", "id"])
 
     densities_max = densities.max().reset_index().set_index("id")
@@ -449,22 +612,28 @@ def compare_densities_statistics(densities, output_dir):
 
     # As the p-value is not less than 0.05, we cannot reject the null hypothesis that the median density is
     # the same for all three groups. Hence, We don’t have sufficient proof to claim that different controllers lead to statistically significant densities.
-    kruskal = stats.kruskal(densities_max.iloc[:, 0], densities_max.iloc[:, 1], densities_max.iloc[:, 2])
+    kruskal = stats.kruskal(
+        densities_max.iloc[:, 0], densities_max.iloc[:, 1], densities_max.iloc[:, 2]
+    )
     print(kruskal)
 
-    with open(os.path.join(output_dir, 'statistical_test.txt'), 'w+') as f:
+    with open(os.path.join(output_dir, "statistical_test.txt"), "w+") as f:
         f.write(f"Effect of controller: max densitiy (41 samples, 41 compliance rates)")
         f.write(f" not normally distributed, if p < 0.05 \n")
         f.write(results_normality)
-        f.write(f"Kruskal Wallis test: densities. no difference between groups, if  p > 0.05.\n")
+        f.write(
+            f"Kruskal Wallis test: densities. no difference between groups, if  p > 0.05.\n"
+        )
         f.write(f"{kruskal}")
 
 
 def post_processing(simulation_dir):
 
     if os.path.isdir(simulation_dir) == False:
-        raise NotADirectoryError(f"Could not find simulation dir {simulation_dir}. "
-                                 f"Please check if you use the same name as defined in run_simulations.py")
+        raise NotADirectoryError(
+            f"Could not find simulation dir {simulation_dir}. "
+            f"Please check if you use the same name as defined in run_simulations.py"
+        )
 
     output_dir = os.path.join(simulation_dir, "analysis_guiding_strategies")
 
@@ -481,15 +650,34 @@ def post_processing(simulation_dir):
 
     plot_fundamental_diagram_corridor1(output_dir, simulation_dir=simulation_dir)
 
-    path_choice = pd.concat([get_path_choice("OpenLoop", simulation_dir),
-                             get_path_choice("ClosedLoop", simulation_dir),
-                             get_path_choice("AvoidShort", simulation_dir)], axis=0)
+    path_choice = pd.concat(
+        [
+            get_path_choice("OpenLoop", simulation_dir),
+            get_path_choice("ClosedLoop", simulation_dir),
+            get_path_choice("AvoidShort", simulation_dir),
+        ],
+        axis=0,
+    )
     plot_write_path_choice(path_choice=path_choice, output_dir=output_dir)
 
     densities, velocities = get_densities_velocities(simulation_dir=simulation_dir)
     compare_densities_statistics(densities, output_dir)
-    plot_quantity(densities, "densities", y_min=-0.1, y_max=2.2, ylabel="Density [$ped/m^2$]", output_dir=output_dir)
-    plot_quantity(velocities, "velocities", y_min=-0.1, y_max=2.2, ylabel="Velocity [$m/s$]", output_dir=output_dir)
+    plot_quantity(
+        densities,
+        "densities",
+        y_min=-0.1,
+        y_max=2.2,
+        ylabel="Density [$ped/m^2$]",
+        output_dir=output_dir,
+    )
+    plot_quantity(
+        velocities,
+        "velocities",
+        y_min=-0.1,
+        y_max=2.2,
+        ylabel="Velocity [$m/s$]",
+        output_dir=output_dir,
+    )
 
 
 def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1):
@@ -498,7 +686,9 @@ def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1)
             "Please add ROVER_MAIN to your system variables to run a rover simulation."
         )
 
-    path2ini = os.path.join(os.environ["CROWNET_HOME"], "crownet/simulations/route_choice_app/omnetpp.ini")
+    path2ini = os.path.join(
+        os.environ["CROWNET_HOME"], "crownet/simulations/route_choice_app/omnetpp.ini"
+    )
 
     print(f"\n\n\nSimulation runs for controller-type = {controller} started.")
 
@@ -511,20 +701,22 @@ def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1)
     try:
         client.networks.get(network_id=network_id).remove()
     except:
-        pass # do nothing, there is no network existing that needs to be removed
+        pass  # do nothing, there is no network existing that needs to be removed
 
     print(f"Create docker network {network_id}.")
     client.networks.create(network_id)
 
-    model = VadereControlCommand() \
-        .create_vadere_container() \
-        .experiment_label("output") \
-        .with_control("control.py") \
-        .control_argument("controller-type", controller) \
-        .vadere_tag("030b71de") \
-        .control_tag("496ff02c") \
-        .write_container_log() \
+    model = (
+        VadereControlCommand()
+        .create_vadere_container()
+        .experiment_label("output")
+        .with_control("control.py")
+        .control_argument("controller-type", controller)
+        .vadere_tag("d302405a")
+        .control_tag("496ff02c")
+        .write_container_log()
         .network_name(network_id)
+    )
 
     setup = CoupledDictVariation(
         ini_path=path2ini,
@@ -544,7 +736,9 @@ def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1)
     par.to_csv(os.path.join(simulation_dir, f"{controller}_parameters.csv"))
 
     for qoi_, vals_ in data.items():
-        file_path = os.path.join(simulation_dir, f"{controller}_{qoi_.replace('.txt', '.csv')}")
+        file_path = os.path.join(
+            simulation_dir, f"{controller}_{qoi_.replace('.txt', '.csv')}"
+        )
         print(f"Export result {qoi_} to {file_path}.")
         vals_.to_csv(file_path)
 
@@ -558,7 +752,6 @@ def run_controller(controller, qoi, par_var, simulation_dir, number_processes=1)
 
 
 if __name__ == "__main__":
-
 
     folder_name = "guiding_crowds_forward_propagation_sims"  # make sure this is the same in analyze_sim_results.py
 
@@ -576,16 +769,19 @@ if __name__ == "__main__":
         spawnNumber = int(sys.argv[3])
         number_processes = int(sys.argv[4])
     else:
-        raise ValueError("Call the script >python3 script_name.py abspathoutputdir 41 8 2< "
-                         "where abspathoutputdir is the path to the dir that contains all simulations."
-                         "where 41 is the number of compliance rates"
-                         "number of agents spawned every 2s"
-                         "where 2 is the number of parallel processes")
+        raise ValueError(
+            "Call the script >python3 script_name.py abspathoutputdir 41 8 2< "
+            "where abspathoutputdir is the path to the dir that contains all simulations."
+            "where 41 is the number of compliance rates"
+            "number of agents spawned every 2s"
+            "where 2 is the number of parallel processes"
+        )
 
-    print(f"Write to {simulation_dir}. number of compliance rates: {number_compliance_rates}. "
-          f"spwanNumber: {spawnNumber}."
-          f"number of processes: {number_processes}")
-
+    print(
+        f"Write to {simulation_dir}. number of compliance rates: {number_compliance_rates}. "
+        f"spwanNumber: {spawnNumber}."
+        f"number of processes: {number_processes}"
+    )
 
     if os.path.isdir(simulation_dir):
         print(f"Remove {simulation_dir}")
@@ -606,29 +802,78 @@ if __name__ == "__main__":
 
     par_var_ = list()
     for p in probs:
-        short = [1.0, 0.0, 0.0] # assume all people follow the short route when recommended
-        medium = [round(1 - p, DIGIT), round(p, DIGIT), 0.0] # assume that compying people take the medium route, rest: short
-        long = [round(1 - p, DIGIT), 0.0, round(p, DIGIT)] # assume that compying people take the long route, rest: short
+        short = [
+            1.0,
+            0.0,
+            0.0,
+        ]  # assume all people follow the short route when recommended
+        medium = [
+            round(1 - p, DIGIT),
+            round(p, DIGIT),
+            0.0,
+        ]  # assume that compying people take the medium route, rest: short
+        long = [
+            round(1 - p, DIGIT),
+            0.0,
+            round(p, DIGIT),
+        ]  # assume that compying people take the long route, rest: short
 
-        sample = {'vadere':
-                      {'routeChoices.[instruction=="use target 11"].targetProbabilities': short,
-                       'routeChoices.[instruction=="use target 21"].targetProbabilities': medium,
-                       'routeChoices.[instruction=="use target 31"].targetProbabilities': long,
-                       'sources.[id==39].spawnNumber': spawnNumber},
-                  'dummy': {"Compliance": round(p, DIGIT)}}
+        sample = {
+            "vadere": {
+                'routeChoices.[instruction=="use target 11"].targetProbabilities': short,
+                'routeChoices.[instruction=="use target 21"].targetProbabilities': medium,
+                'routeChoices.[instruction=="use target 31"].targetProbabilities': long,
+                "sources.[id==39].spawner.eventElementCount": spawnNumber,
+            },
+            "dummy": {"Compliance": round(p, DIGIT)},
+        }
         par_var_.append(sample)
 
     reps = 1
-    par_var = VadereSeedManager(par_variations=par_var_, rep_count=reps, vadere_fixed=False).get_new_seed_variation()
+    par_var = VadereSeedManager(
+        par_variations=par_var_, rep_count=reps, vadere_fixed=False
+    ).get_new_seed_variation()
 
-    qoi = ["densities.txt", "fundamentalDiagramm.txt", "startTime.txt", "targetReachTime.txt", "path_choice.txt"]
+    qoi = [
+        "densities.txt",
+        "fundamentalDiagramm.txt",
+        "startTime.txt",
+        "targetReachTime.txt",
+        "path_choice.txt",
+    ]
 
-    run_controller(controller="NoController", par_var=par_var[:reps], qoi=qoi, number_processes=number_processes, simulation_dir=simulation_dir)
-    run_controller(controller="AvoidShort", par_var=par_var, qoi=qoi, number_processes=number_processes, simulation_dir=simulation_dir)
-    run_controller(controller="ClosedLoop", par_var=par_var, qoi=qoi, number_processes=number_processes,simulation_dir=simulation_dir)
-    run_controller(controller="OpenLoop", par_var=par_var, qoi=qoi, number_processes=number_processes,simulation_dir=simulation_dir)
+    run_controller(
+        controller="NoController",
+        par_var=par_var[:reps],
+        qoi=qoi,
+        number_processes=number_processes,
+        simulation_dir=simulation_dir,
+    )
+    run_controller(
+        controller="AvoidShort",
+        par_var=par_var,
+        qoi=qoi,
+        number_processes=number_processes,
+        simulation_dir=simulation_dir,
+    )
+    run_controller(
+        controller="ClosedLoop",
+        par_var=par_var,
+        qoi=qoi,
+        number_processes=number_processes,
+        simulation_dir=simulation_dir,
+    )
+    run_controller(
+        controller="OpenLoop",
+        par_var=par_var,
+        qoi=qoi,
+        number_processes=number_processes,
+        simulation_dir=simulation_dir,
+    )
 
-    print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
+    print(
+        f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss)."
+    )
 
     failed = list()
     for controller in ["NoController", "AvoidShort", "ClosedLoop", "OpenLoop"]:
@@ -644,8 +889,3 @@ if __name__ == "__main__":
     else:
         print(f"Some of the simulations failed. Please check: {failed}.")
         sys.exit(-1)
-
-
-
-
-

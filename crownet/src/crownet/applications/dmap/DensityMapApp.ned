@@ -48,7 +48,8 @@ simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
             mapType: "ymf",
             mapTypeLog: "all",
             cellAgeTTL: 10.0s,
-            idStreamType: "insertionOrder"
+            idStreamType: "insertionOrder",
+            appendRessourceSharingDomoinId: false
         });
         
         bool writeDensityLog = default(true);
