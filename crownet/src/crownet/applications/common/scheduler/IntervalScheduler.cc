@@ -23,6 +23,9 @@ namespace crownet {
 
 Define_Module(IntervalScheduler)
 
+simsignal_t IntervalScheduler::scheduledData_s = cComponent::registerSignal("scheduledData_s");
+simsignal_t IntervalScheduler::consumedData_s = cComponent::registerSignal("consumedData_s");
+
 
 void IntervalScheduler::initialize(int stage)
 {
@@ -84,47 +87,100 @@ void IntervalScheduler::handleMessage(cMessage *message)
     }
 }
 
-void IntervalScheduler::scheduleApp(cMessage *message){
-    Enter_Method("scheduleApp");
+const bool IntervalScheduler::packetMaximumReached(const int& scheduledPacketCount) const {
+    return hasPacketMaximum() && (sentPackets + scheduledPacketCount) > maxNumberPackets;
+}
+
+const bool IntervalScheduler::dataMaximumReached(const b& scheduledData) const{
+    return hasDataMaximum() && (sentData + scheduledData) > maxData;
+}
+
+IntervalScheduler::Unit IntervalScheduler::getScheduledUnit(){
     auto numPacket = numberPackets->intValue();
     auto data = b(amountOfData->intValue());
-    if (numPacket > 0){
-        // schedule packet based
-        if(maxNumberPackets > 0 && (sentPackets + numPacket) > maxNumberPackets){
-            stopScheduling = true;
-        } else {
-            app->setScheduleData(b(-1)); // just produce packets regardless of size
-            if (app->canProducePacket()){
-                // can produce at least one packet
-                EV_INFO << LOG_MOD << " schedule packet quota " << numPacket << "packet(s)" << endl;
-                consumer->producePackets(numPacket);
-                sentPackets += numPacket;
-            } else {
-                EV_INFO << LOG_MOD << "No data in application. Scheduled data dropped" << endl;
-            }
-            app->setScheduleData(b(0));
-        }
-    } else if (data > b(0)){
-        // schedule amount based
-        if(maxData > b(0) && (sentData + data) > maxData ){
-            stopScheduling = true;
-        } else {
-            app->setScheduleData(data);
-            if (app->canProducePacket()){
-                EV_INFO << LOG_MOD << " schedule data quota " << data.str() << endl;
-                consumer->producePackets(data);
-                // only decrease sentData of the amount actually transmitted.
-                auto consumedData = data - app->getScheduleData();
-                EV_INFO << LOG_MOD << " consumed " << consumedData.str() << " from " << data << " scheduled" << endl;
-                sentData = sentData - consumedData;
-            } else {
-                EV_INFO << LOG_MOD << " No data in application. Scheduled budget dropped" << endl;
-            }
-            app->setScheduleData(b(0)); // reset scheduledData
-        }
+
+    IntervalScheduler::Unit unit;
+    unit.type = IntervalSchedulerType::OTHER;
+    unit.packetCount = numPacket;
+    unit.data = data;
+
+    if (numPacket > 0) {
+        unit.type = IntervalSchedulerType::PACKET;
+    } else if (data > b(0)) {
+        unit.type = IntervalSchedulerType::DATA;
     } else {
-        throw cRuntimeError("Either number of packer or max data in Byte must be set");
+        throw cRuntimeError("expected numberPackets '%ld' or  amountOfData '%s' to be postive.",
+                numPacket, data.str().c_str());
     }
+    return unit;
+}
+
+void IntervalScheduler::scheduleByPackets(const Unit& unit){
+    if (!unit.validPacketUnit()){
+        throw cRuntimeError("scheduling based on number of packets with invalid packet unit '%s'.", unit.str().c_str());
+    }
+    // schedule packet based
+    if(packetMaximumReached(unit.packetCount)){
+        stopScheduling = true;
+    } else {
+        app->setScheduleData(b(-1)); // just produce packets regardless of size
+        if (app->canProducePacket()){
+            // can produce at least one packet
+            EV_INFO << LOG_MOD << " schedule packet quota " << unit.packetCount << " packet(s)" << endl;
+            consumer->producePackets(unit.packetCount);
+            sentPackets += unit.packetCount;
+        } else {
+            EV_INFO << LOG_MOD << "No data in application. Scheduled data dropped" << endl;
+        }
+        app->setScheduleData(b(0));
+    }
+
+}
+
+void IntervalScheduler::scheduleByData(const Unit& unit){
+
+    if (!unit.validDataUnit()){
+        throw cRuntimeError("scheduling based on amount of data with invalid data unit '%s'.", unit.str().c_str());
+    }
+    // schedule amount based
+    if(dataMaximumReached(unit.data)){
+       stopScheduling = true;
+    } else {
+       app->setScheduleData(unit.data);
+       emit(scheduledData_s, unit.data.get());
+       if (app->canProducePacket()){
+           EV_INFO << LOG_MOD << " schedule data quota " << unit.data.str() << endl;
+           consumer->producePackets(unit.data);
+           // only decrease sentData of the amount actually transmitted.
+           auto consumedData = unit.data - app->getScheduleData();
+           emit(consumedData_s, consumedData.get());
+           EV_INFO << LOG_MOD << " consumed " << consumedData.str() << " from " << unit.data << " scheduled" << endl;
+           sentData = sentData - consumedData;
+       } else {
+           emit(consumedData_s, (long)0);
+           EV_INFO << LOG_MOD << " No data in application. Scheduled budget dropped" << endl;
+       }
+       app->setScheduleData(b(0)); // reset scheduledData
+    }
+}
+
+
+void IntervalScheduler::scheduleApp(cMessage *message){
+    Enter_Method("scheduleApp");
+    Unit u = getScheduledUnit();
+
+    switch (u.type) {
+        case IntervalSchedulerType::PACKET:
+            scheduleByPackets(u);
+            break;
+        case IntervalSchedulerType::DATA:
+            scheduleByData(u);
+            break;
+        default:
+            throw cRuntimeError("expected packet or data scheduling");
+    }
+
+
 }
 
 
