@@ -29,9 +29,9 @@ if [ ! "$(nproc --all)" -ge 80 ]; then
    exit 0
 fi
 
-ram=$(grep MemFree /proc/meminfo | awk '{print $2}')
+ram=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
 if [ ! "$ram" -ge 70000000 ]; then 
-   echo "Your System does not match the requirements. At least 70Gb available RAM is required."
+   echo "Your System does not match the requirements. At least 70Gb available RAM is required. Check your system:  >>  cat proc/meminfo  <<"
    exit 0
 fi
 
@@ -52,7 +52,6 @@ else
     echo "${simulation_storage} must be an empty directory. Make sure that the directory exists and is empty."
     exit 0
 fi
-
 
 output_folder=${CROWNET_HOME}/output_diss_cm
 echo "Write output of simulations to the directory ${output_folder}/"
@@ -139,7 +138,7 @@ result_dir="${simulation_dir}/results/${config}_${label}"
 echo "Run the simulation of the realistic scenario in the simulation directory: ${simulation_dir}" | tee -a $LOG_FILE
 echo "Simulation started: `date`"| tee -a $LOG_FILE
 cd ${simulation_dir}
-python3 run_script.py vadere-opp-control --write-container-log --create-vadere-container --override-host-config --experiment-label "${label}" --vadere-tag 030b71de --control-tag 496ff02c --omnet-tag 6.0.1 --with-control control.py --ctrl.controller-type AvoidShort --opp.-c "${config}" --qoi number_of_peds.txt path_choice.txt densities_mapped.txt packet_loss_info_diss.csv packet_loss_heat_map.csv heat_map_diss_time.csv info_diss_time.csv simsec_sec_ratio.csv docker_stats.csv --log-docker-stats >> $LOG_FILE & pid=$! && wait_symbol $pid
+python3 run_script.py vadere-opp-control --write-container-log --create-vadere-container --override-host-config --experiment-label "${label}" --vadere-tag "${CROWNET_VADERE_CONT_TAG}" --control-tag "${CROWNET_CONTROL_CONT_TAG}" --omnet-tag "${CROWNET_OPP_CONT_TAG}" --with-control control.py --ctrl.controller-type AvoidShort --opp.-c "${config}" --qoi number_of_peds.txt path_choice.txt densities_mapped.txt packet_loss_info_diss.csv packet_loss_heat_map.csv heat_map_diss_time.csv info_diss_time.csv simsec_sec_ratio.csv docker_stats.csv --log-docker-stats >> $LOG_FILE & pid=$! && wait_symbol $pid
 echo "Simulation finished: `date`"| tee -a $LOG_FILE
 
 
@@ -151,18 +150,26 @@ cp -r ${simulation_storage}/shadowing/Shadowing_results ${output_folder}/shadowi
 cp -r ${simulation_storage}/information_diss_time/results_summary ${output_folder}/information_diss_time/
 cp -r ${simulation_storage}/information_diss_time/PolynomialChaos_results ${output_folder}/information_diss_time/
 
+files=$(find ${simulation_storage}/information_diss_time/simulation_runs/ -name "InformationDegree.pdf")
+for f in $files
+do
+ file="${f%/results*}"
+ file="${file#*Sample__}" # get sample number
+ cp $f "${output_folder}/information_diss_time/InformationDegree_Sample_${file}.pdf"
+done
+
 cp -r ${simulation_storage}/guiding_strategies/analysis_guiding_strategies ${output_folder}/guiding_strategies
 find ${simulation_storage}/guiding_strategies -maxdepth 1 -type f -name '*.csv' -exec cp {} ${output_folder}/guiding_strategies/ \;
 
 cp -r ${result_dir} ${output_folder}/realistic_scenario/
+find ${output_folder}/realistic_scenario -name "vars_rep_0.*" -type f -delete
 
 echo "################################################# check hashes ################################"
 
 shadowing_hash_exp="d41d8cd98f00b204e9800998ecf8427e"
-dissemination_hash_exp="b5f1b4dd8b369c2836b36eb54428b7c5"
-guiding_hash_exp="e0083eba3aa73c84db38a6c3d6f0d5bc"
-realistic_scenario_hash_exp="fc213153b971e9a51c93450808613cd6"
-
+dissemination_hash_exp="867b6823858d967ec533062c769b29ff"
+guiding_hash_exp="eaf62000a2cd2391498daa9b47e53f00"
+realistic_scenario_hash_exp="aafd3d27ca6cceaa897dcfb20021b435"
 
 shadowing_hash=$(find $output_folder/shadowing -type f \( -name '*_informed_.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
 
