@@ -10,7 +10,7 @@ from common.plot_utils import save_plot
 from common.opp_utils import s_to_st
 
 RESULTS = "../results"
-STUDY_NAME = "RunStudyNoClustering"
+STUDY_NAME = "RunStudyEffectiveClustering"
 TEMP_FILE = f"{STUDY_NAME}_dz.json"
 
 # Seconds to opp simtime
@@ -53,25 +53,49 @@ def analyze_vector(vector_file):
             currently_in_dz = set()
             last_data = 0
 
-            for t in range(START_TIME, END_TIME):
-                keys = [k for k in agg_data.keys() if k > s_to_st(t) and k < s_to_st(t + 1)]
+            cluster_size = {}
+            last_received = {}
 
+            for t in range(START_TIME, END_TIME, 3):
+                keys = [k for k in agg_data.keys() if k > s_to_st(t) and k < s_to_st(t + 3)]
                 rx_danger_zone[node][t] = []
+                
+                
 
                 for k in keys:
                     data = agg_data[k]
+
+                    last_received[data["vam_id"]] = t
                     last_data = t
 
-                    if (data["vam_y"] > DANGER_ZONE[0] * 10 and data["vam_y"] < DANGER_ZONE[1] * 10):
+                    if (data["vam_y"] > DANGER_ZONE[0] * 10 and data["vam_y"]< DANGER_ZONE[1] * 10):
                         currently_in_dz.add(data["vam_id"])
+                        
+                        print(data["vam_cluster"])
+
+                        if data["vam_cluster"] > 0:
+                            if data["vam_id"] not in cluster_size:
+                                cluster_size[data["vam_id"]] = []
+
+                            cluster_size[data["vam_id"]].append(data["vam_cluster"])
+                            
+                        else:
+                            cluster_size[data["vam_id"]] = [1]
                     else:
                         currently_in_dz.discard(data["vam_id"])
 
                 # No data for 5s -> Clear all VRUs in danger zone (aging)
-                if t - last_data > 5:
+                if t - last_data > 3:
                     currently_in_dz.clear()
 
-                rx_danger_zone[node][t] = len(currently_in_dz)
+                in_dz = 0
+
+                for c in currently_in_dz:
+                    if t - last_received[c] < 2:
+                        in_dz += int(np.median(cluster_size[c]))
+                    
+
+                rx_danger_zone[node][t] = in_dz
 
         #
         # Analyze real number of VRUs in danger zone
@@ -81,25 +105,25 @@ def analyze_vector(vector_file):
         # { mod1: [t1, t2, ...], mod: 2: [ ... ]  }
         modules_times_in_dz = {}
         
-        for mod in modules:
-            node = mod[0]
-            print(f"Analyzing {node}")
+        # for mod in modules:
+        #     node = mod[0]
+        #     print(f"Analyzing {node}")
 
-            d = aggregate_vam_recv(cur, node)
+        #     d = aggregate_vam_recv(cur, node)
 
-            modules_times_in_dz[node] = []
+        #     modules_times_in_dz[node] = []
 
-            pos_x = get_vru_pos(cur, node, "x")
-            pos_y = get_vru_pos(cur, node, "y")
+        #     pos_x = get_vru_pos(cur, node, "x")
+        #     pos_y = get_vru_pos(cur, node, "y")
 
-            for t in range(START_TIME, END_TIME):
-                py = [p[0] for p in pos_y if p[1] > s_to_st(t) and p[1] < s_to_st(t + 1)]
+        #     for t in range(START_TIME, END_TIME):
+        #         py = [p[0] for p in pos_y if p[1] > s_to_st(t) and p[1] < s_to_st(t + 1)]
 
-                if len(py):
+        #         if len(py):
                     
-                    if (py[0] > DANGER_ZONE[0] and py[0] < DANGER_ZONE[1]):
-                        # In Danger zone
-                        modules_times_in_dz[node].append(t)
+        #             if (py[0] > DANGER_ZONE[0] and py[0] < DANGER_ZONE[1]):
+        #                 # In Danger zone
+        #                 modules_times_in_dz[node].append(t)
                     
         return (modules_times_in_dz, rx_danger_zone)
 
@@ -107,7 +131,7 @@ def analyze_vector(vector_file):
 
 def analyze():
     pool = ThreadPoolExecutor(max_workers = 15)
-    results = pool.map(analyze_vector, [get_vec_files(RESULTS, STUDY_NAME)[5]])
+    results = pool.map(analyze_vector, [get_vec_files(RESULTS, STUDY_NAME)[0]])
 
     data = {"actual": [], "rx": []}
 
@@ -119,7 +143,7 @@ def analyze():
        json.dump(data, f)
 
 def setup_fig(height=6, yl=YLABEL):
-    fig = plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(15, 7))
     plt.rc('font', size=22)  
 
     ax = plt.gca()
@@ -132,7 +156,39 @@ def setup_fig(height=6, yl=YLABEL):
 
     return (plt, fig, ax)
 
+def plot_rx(ax, rx_data, label):
+    received_distrib = {}
+
+    for d in rx_data:
+        # Iterate modules
+        for m in d.keys():
+            # Iterate timestamps
+            for t in d[m].keys():
+                t_val = int(t)
+
+                number_of_vams = d[m][t]
+                if number_of_vams > 0:
+                    if t_val not in received_distrib:
+                        received_distrib[t_val] = []
+                    
+                    
+                    received_distrib[t_val].append(number_of_vams)
+
+    received_distrib_x = list(received_distrib.keys())
+    received_distrib_x.sort()
+
+    received_distrib_y = [np.mean(received_distrib[k]) for k in received_distrib_x]
+
+    ax.plot(received_distrib_x, received_distrib_y, label=label)
+
 def visualize():
+    data2 = {}
+
+    
+    with open("RunStudyEffectiveClustering_dz.json", "r") as f:
+        data2 = json.load(f)
+
+
     with open(TEMP_FILE, "r") as f:
         data = json.load(f)
         
@@ -154,35 +210,39 @@ def visualize():
 
         actual_distrib_y = [actual_distrib[k] for k in actual_distrib_x]
 
-        ax.plot(actual_distrib_x, actual_distrib_y)
+        ax.plot(actual_distrib_x, actual_distrib_y, label="Actual number")
 
 
-        received_distrib = {}
+        # received_distrib = {}
 
-        for d in data["rx"]:
-            # Iterate modules
-            for m in d.keys():
-                # Iterate timestamps
-                for t in d[m].keys():
-                    t_val = int(t)
+        plot_rx(ax, data["rx"], "No Clustering - Mean density received by vNodes")
+        plot_rx(ax, data2["rx"], "Clustering - Mean density received by vNodes")
 
-                    number_of_vams = d[m][t]
-                    if number_of_vams > 0:
-                        if t_val not in received_distrib:
-                            received_distrib[t_val] = []
+        # for d in data["rx"]:
+        #     # Iterate modules
+        #     for m in d.keys():
+        #         # Iterate timestamps
+        #         for t in d[m].keys():
+        #             t_val = int(t)
+
+        #             number_of_vams = d[m][t]
+        #             if number_of_vams > 0:
+        #                 if t_val not in received_distrib:
+        #                     received_distrib[t_val] = []
                         
                         
-                        received_distrib[t_val].append(number_of_vams)
+        #                 received_distrib[t_val].append(number_of_vams)
 
-        received_distrib_x = list(received_distrib.keys())
-        received_distrib_x.sort()
+        # received_distrib_x = list(received_distrib.keys())
+        # received_distrib_x.sort()
         
-        received_distrib_y = [np.mean(received_distrib[k]) for k in received_distrib_x]
+        # received_distrib_y = [np.mean(received_distrib[k]) for k in received_distrib_x]
 
-        ax.plot(received_distrib_x, received_distrib_y, label="")
+        # ax.plot(received_distrib_x, received_distrib_y, label="Mean density received by vNodes")
+        ax.set_ylim(0, 50)
+        ax.legend(loc="upper left")
 
-
-        plt.savefig("plt.png")
+        save_plot(plt, "danger_zone")
 
 
 

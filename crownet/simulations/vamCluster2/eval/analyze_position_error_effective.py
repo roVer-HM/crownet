@@ -5,15 +5,13 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
-from common.db_utils import get_vec_files, get_parameter_value, get_position_error
+from common.db_utils import get_vec_files, get_parameter_value, get_position_error_all_vams, get_position_error
 from common.plot_utils import save_plot
 
 RESULTS = "../results"
-STUDY_NAME = "RunStudyClusterDistance"
-PARAMETER = "*.pNode[*].middleware.VaService.maxClusterDistance"
-PARAMETER_NAME = "Maximum Distance Between Cluster Leader and Members\nin Meters"
+STUDY_NAME = "RunStudyEffectiveClustering"
 TEMP_FILE = f"{STUDY_NAME}_temp_perr.json"
-YLABEL = "Position Error of Cluster VAMs\nin Meters"
+YLABEL = "VAM Position Error\nin Meters"
 
 # Seconds to opp simtime
 ST_CONV_FACTOR = 10**12
@@ -26,44 +24,44 @@ def analyze_vector(vector_file):
 
     with sqlite3.connect(vector_file) as db:
         cur = db.cursor()
-        parameter_value = get_parameter_value(cur, PARAMETER)
 
-        errors = get_position_error(
+        errors = get_position_error_all_vams(
             cur,
-            "World.pNode[%].middleware.VaService",
+            "World.vNode[%].middleware.VaService",
+            ST_CONV_FACTOR * START_TIME,
+            ST_CONV_FACTOR * END_TIME
+        )
+
+        errors_c = get_position_error(
+            cur,
+            "World.vNode[%].middleware.VaService",
             ST_CONV_FACTOR * START_TIME,
             ST_CONV_FACTOR * END_TIME
         )
 
 
-        return (parameter_value, [e[0] for e in errors])
+        return ([e[0] for e in errors], [e[0] for e in errors_c])
 
 def analyze():
     pool = ThreadPoolExecutor(max_workers = 15)
     results = pool.map(analyze_vector, get_vec_files(RESULTS, STUDY_NAME))
 
-    data = {}
+    data = { "all" : [], "cluster": [] }
 
     for result in results:
-        if result[0] not in data:
-            data[result[0]] = []
-
-        data[result[0]].extend(result[1])
+        data["all"].extend(result[0])
+        data["cluster"].extend(result[1])
 
     with open(TEMP_FILE, "w") as f:
         json.dump(data, f)
 
 def setup_fig(height=6, yl=YLABEL):
-    fig = plt.figure(figsize=(13, height))
+    fig = plt.figure(figsize=(8, 4))
     plt.rc('font', size=22)  
 
     ax = plt.gca()
-
-    for tick in ax.get_xticklabels():
-        tick.set_rotation(45)
     
     plt.ylabel(yl)
-    plt.xlabel(f"{PARAMETER_NAME}")
     fig.tight_layout()
 
     ax.grid(True, axis="both", linestyle="--")
@@ -74,18 +72,16 @@ def visualize():
     with open(TEMP_FILE, "r") as f:
         data = json.load(f)
 
-        parameters = sorted([k for k in data.keys() if len(data[k]) and float(k) <= 4])
-
         plt, fig, ax = setup_fig()
 
         ax.boxplot(
-            [data[p] for p in parameters],
+            [data["all"], data["cluster"]],
             showfliers=False,
-            labels=parameters,
+            labels=[f"All VAMs", "Cluster VAMs"],
             medianprops=dict(color="black", linewidth=2)
         )
 
-        save_plot(fig, "pos_error")
+        save_plot(fig, "pos_error_ec")
 
 
 if __name__ == '__main__':

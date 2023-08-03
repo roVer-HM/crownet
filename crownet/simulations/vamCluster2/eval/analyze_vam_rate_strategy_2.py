@@ -9,7 +9,7 @@ from common.db_utils import get_vec_files, get_parameter_value, count_all_vams
 from common.plot_utils import save_plot
 
 RESULTS = "../results"
-STUDY_NAME = "RunStudyVeloDifferenceVadereGroupsDistrib4"
+STUDY_NAME = "Averaging"
 PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER_NAME = "maxClusterVelocityDifference"
 TEMP_FILE = f"{STUDY_NAME}_temp_vamsps.json"
@@ -127,7 +127,7 @@ def visualize():
             label="Transmitted VAMs w/o Clustering"
         )
         ax.legend()
-        save_plot(fig, "vam_rate_tx")
+        save_plot(fig, "avg")
 
         plt, fig, ax = setup_fig(7, YLABEL2)
         ax.errorbar(
@@ -154,7 +154,7 @@ def visualize():
             label="Received VAMs w/o Clustering"
         )
         ax.legend(ncol=2)
-        save_plot(fig, "vam_rate_rx")
+        save_plot(fig, "avg_r")
 
 
 if __name__ == '__main__':

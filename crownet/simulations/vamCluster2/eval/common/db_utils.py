@@ -83,6 +83,7 @@ def aggregate_vam_recv(cur, mod_name):
                     or v.vectorName = 'vam_y'
                     or v.vectorName = 'vam_id'
                     or v.vectorName = 'vam_cluster'
+                    or v.vectorName = 'pos_error_c'
                     or v.vectorName = 'vam_bbox_size' )
         where v.moduleName LIKE '{mod_name}'
     """)
