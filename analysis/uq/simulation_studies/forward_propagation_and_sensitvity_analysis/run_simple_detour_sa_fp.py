@@ -37,11 +37,14 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
         pass
     client.networks.create(network_id)
 
+    vadere_tag = os.getenv("CROWNET_VADERE_CONT_TAG")
+    omnet_tag = os.getenv("CROWNET_OPP_CONT_TAG")
+
     model = VadereOppCommand() \
         .create_vadere_container() \
         .experiment_label("output") \
-        .vadere_tag("030b71de") \
-        .omnet_tag("6.0.1") \
+        .vadere_tag(vadere_tag) \
+        .omnet_tag(omnet_tag) \
         .qoi(quantity_of_interest) \
         .write_container_log() \
         .network_name(network_id)
