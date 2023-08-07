@@ -16,6 +16,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.collections import LineCollection
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+
+
+def get_density_cfg(base_dir):
+    density_cfg = DpmmCfg(
+        base_dir=base_dir,
+        hdf_file="density_data.h5",
+        map_type=MapType.DENSITY,
+        global_map_csv_name="global.csv",
+        beacon_app_path="app[0]",
+        map_app_path="app[1]",
+        module_vectors=["misc", "pNode"],
+    )
+    return density_cfg
+
+
+def get_entropy_cfg(base_dir):
+    density_cfg = DpmmCfg(
+        base_dir=base_dir,
+        hdf_file="entropy_data.h5",
+        map_type=MapType.ENTROPY,
+        global_map_csv_name="entropyMap_global.csv",
+        node_map_csv_glob="entropyMap_*.csv",
+        beacon_app_path=None,
+        map_app_path="app[2]",
+        module_vectors=["misc", "pNode"],
+    )
+    return density_cfg
 
 
 def build_hdf(sim: Simulation):
@@ -51,12 +79,8 @@ def plot_defaults(sim: Simulation):
         sim.data_root, sim.builder, sim.sql, saver=saver
     )
     # PlotEnb.plot_served_blocks_ul_all(sim.data_root, sim.sql, saver=saver)
-    PlotAppTxInterval.plot_txinterval_all(
-        sim.data_root, sim.sql, app="Beacon", saver=saver
-    )
-    PlotAppTxInterval.plot_txinterval_all(
-        sim.data_root, sim.sql, app="Map", saver=saver
-    )
+    PlotAppTxInterval.plot_txinterval_all_beacon(sim.data_root, sim.sql, saver=saver)
+    PlotAppTxInterval.plot_txinterval_all_map(sim.data_root, sim.sql, saver=saver)
 
     return
 
@@ -139,15 +163,23 @@ def main(override):
     #     data_root="/mnt/data1tb/results/multi_enb/test_run_600s/",
     #     label="mulit_enb",
     # )
+    # cfg = get_density_cfg("/mnt/data1tb/results/multi_enb/test_run_600s_killed/")
+    cfg = get_density_cfg(
+        "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/count_and_entropy"
+    )
     sim = Simulation(
         # data_root="/mnt/data1tb/results/multi_enb/test_run_600s_killed/",
-        data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/with_rsd/",
+        # data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/with_rsd/",
+        # data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/final_muli_enb_dev_20230801-15:02:53",
+        # data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/count_and_entropy"
+        data_root=cfg.base_dir,
         label="mulit_enb",
+        dpmm_cfg=cfg,
     )
-    build_hdf(sim)
+    # build_hdf(sim)
 
-    plot_enb_association(sim)
-    # plot_enb_association_map(sim)
+    # plot_enb_association(sim)
+    plot_enb_association_map(sim)
     # inter = OppAnalysis.get_serving_enb_interval(sim)
 
 

@@ -91,25 +91,7 @@ class SimulationRun(BaseSimulationRunner):
             PlotEnb.plot_served_blocks_ul_all(
                 self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
             )
-            if sql.vector_exists(
-                sql.m_beacon(), sql.OR(["txInterval:vector", "txInterval:vector"])
-            ):
-                PlotAppTxInterval.plot_txinterval_all(
-                    self.result_base_dir(),
-                    sql=sql,
-                    app="Beacon",
-                    saver=FigureSaverPdfPages(pdf),
-                )
 
-            if sql.vector_exists(
-                sql.m_map(), sql.OR(["txInterval:vector", "txInterval:vector"])
-            ):
-                PlotAppTxInterval.plot_txinterval_all(
-                    self.result_base_dir(),
-                    sql=sql,
-                    app="Map",
-                    saver=FigureSaverPdfPages(pdf),
-                )
         if sql.is_count_map():
             print("build count based default plots")
             builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
@@ -138,11 +120,11 @@ class SimulationRun(BaseSimulationRunner):
         )
 
         # app tx data
-        PlotAppTxInterval.plot_txinterval_all(
-            data_root=sim.data_root, sql=sim.sql, app="Beacon", saver=saver
+        PlotAppTxInterval.plot_txinterval_all_beacon(
+            data_root=sim.data_root, sql=sim.sql, saver=saver
         )
-        PlotAppTxInterval.plot_txinterval_all(
-            data_root=sim.data_root, sql=sim.sql, app="Map", saver=saver
+        PlotAppTxInterval.plot_txinterval_all_map(
+            data_root=sim.data_root, sql=sim.sql, saver=saver
         )
 
         PlotAppMisc.plot_application_delay_jitter(sim, saver=saver)

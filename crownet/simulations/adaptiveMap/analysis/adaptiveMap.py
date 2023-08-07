@@ -99,11 +99,11 @@ def plot_per_sim_data(sim: Simulation):
     )
 
     # app tx data
-    PlotAppTxInterval.plot_txinterval_all(
-        data_root=sim.data_root, sql=sim.sql, app="Beacon", saver=saver
+    PlotAppTxInterval.plot_txinterval_all_beacon(
+        data_root=sim.data_root, sql=sim.sql, saver=saver
     )
-    PlotAppTxInterval.plot_txinterval_all(
-        data_root=sim.data_root, sql=sim.sql, app="Map", saver=saver
+    PlotAppTxInterval.plot_txinterval_all_map(
+        data_root=sim.data_root, sql=sim.sql, saver=saver
     )
 
     PlotAppMisc.plot_application_delay_jitter(sim, saver=saver)

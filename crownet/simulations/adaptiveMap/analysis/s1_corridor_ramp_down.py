@@ -874,7 +874,10 @@ class MemberEstPlotter(PlotUtil_):
                 df = _hdf.get_dataframe(g)
             else:
                 df = OppAnalysis.sg_get_txAppInterval(
-                    sg, app_type="map", interval_type="real", jobs=5
+                    sg,
+                    module_names_f=lambda x: x.m_map(path="scheduler"),
+                    interval_type="real",
+                    jobs=5,
                 )
                 _hdf.write_frame(group=g, frame=df)
             data = self.append_bin(
