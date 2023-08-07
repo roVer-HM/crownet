@@ -46,9 +46,12 @@ void GlobalEntropyMap::initialize(int stage) {
       entropyProvider = (EntropyProvider*)(par("entropyProvider").objectValue()->dup());
       take(entropyProvider);
       entropyProvider->initialize(getRNG(par("entropyRngGenerator").intValue()));
-      mapDataType = "entropyData";
+      mapDataType = DpmmMapType::ENTROPY;
   }
 }
+
+std::string GlobalEntropyMap::getMapName() const { return "entropyMap_global"; }
+
 
 void GlobalEntropyMap::visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) {
   const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));

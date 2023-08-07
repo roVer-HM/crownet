@@ -41,6 +41,6 @@ simple BeaconDynamic extends BaseApp like IBeaconApp {
         bool appendResourceSharingDomainId = default(false);
         
         // App logic
-        string neighborhoodTableMobdule  = default("mobility");
+        string neighborhoodTableModule  = default(".nTable"); // relative to containing (i.e. network node, module annoated with @networkNode) 
 }
 

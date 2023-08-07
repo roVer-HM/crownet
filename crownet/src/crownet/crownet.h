@@ -34,6 +34,15 @@ extern omnetpp::cConfigOption *CFGID_VADERE_HOST;
 extern omnetpp::cConfigOption *CFGID_SUMO_HOST;
 extern omnetpp::cConfigOption *CFGID_FLOW_HOST;
 
+enum DpmmMapType {
+    PEDESTRIAN_COUNT=0,
+    ENTROPY
+};
+
+static const char *dpmmMapTpyeString[] = {"pedestrianCount", "entropyData"};
+
+std::string dpmmMapTypeToString(const DpmmMapType& type);
+
 std::pair<std::string, int> getHostPortConfigOverride(omnetpp::cConfigOption *entry);
 
 uint32_t simtime_to_timestamp_32_ms(simtime_t t = -1.);

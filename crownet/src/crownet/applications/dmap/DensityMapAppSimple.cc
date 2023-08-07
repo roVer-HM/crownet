@@ -29,9 +29,11 @@ void DensityMapAppSimple::finish(){
 void DensityMapAppSimple::initialize(int stage) {
     BaseDensityMapApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableModule"), inet::getContainingNode(this));
         nTable->setOwnerId(hostId);
         nTable->registerEntryListner(this);
+        mapDataType = DpmmMapType::PEDESTRIAN_COUNT;
+
 
         if (mapCfg->getAppendRessourceSharingDomoinId()){
             // only count inside RSD

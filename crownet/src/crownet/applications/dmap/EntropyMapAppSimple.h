@@ -42,6 +42,8 @@ protected:
  // IDensityMapHandler
  virtual void updateLocalMap() override;
 
+ virtual std::string getMapName() const override;
+
 
 private:
   // application

@@ -25,9 +25,9 @@ Define_Module(EntropyMapAppSimple);
 void EntropyMapAppSimple::initialize(int stage) {
     BaseDensityMapApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-        entropyClient = inet::getModuleFromPar<EntropyNeigborhoodTableClient>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        entropyClient = inet::getModuleFromPar<EntropyNeigborhoodTableClient>(par("neighborhoodTableModule"), inet::getContainingNode(this));
         entropyClient->setOwnerId(hostId);
-        mapDataType = "entropyData";
+        mapDataType = DpmmMapType::ENTROPY;
     }
 }
 
@@ -35,6 +35,12 @@ void EntropyMapAppSimple::applyContentTags(Ptr<Chunk> content){
     BaseApp::applyContentTags(content);
     // mark packet as Entropy Packet and not pedestrian count
     content->addTagIfAbsent<EntropyMap>();
+}
+
+std::string  EntropyMapAppSimple::getMapName() const{
+    std::stringstream s;
+    s << "entropyMap_" << hostId;
+    return s.str();
 }
 
 void EntropyMapAppSimple::updateLocalMap() {

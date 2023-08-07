@@ -75,6 +75,10 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
                                      omnetpp::cObject *details) {
   if (signalId == initMap){
       auto mapHandler = check_and_cast<GridHandler *>(obj);
+      if (mapHandler->getMapType() != mapDataType){
+          EV_DEBUG << this->getFullPath() << " wrong map type for " << obj->getFullPath() << ". Ignore signal." << endl;
+          return;
+      }
       mapHandler->setMapFactory(dcdMapFactory);
       mapHandler->setCoordinateConverter(converter);
 
@@ -86,15 +90,24 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
   }
   else if (signalId == registerMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
+    if (mapHandler->getMapType() != mapDataType){
+        EV_DEBUG << this->getFullPath() << " wrong map type for " << obj->getFullPath() << ". Ignore signal." << endl;
+        return;
+    }
+
     dezentralMaps[mapHandler->getMap()->getOwnerId()] = mapHandler;
-    EV_DEBUG << "register DensityMap for node: "
-             << mapHandler->getMap()->getOwnerId();
+    EV_DEBUG  << this->getFullPath() << " register DensityMap(Type: " << dpmmMapTypeToString(mapDataType) << ") for node: "
+             << mapHandler->getMap()->getOwnerId() << ": " << obj->getFullPath() << endl;
 
   } else if (signalId == removeMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
+    if (mapHandler->getMapType() != mapDataType){
+        EV_DEBUG << this->getFullPath() << " wrong map type for " << obj->getFullPath() << ". Ignore signal." << endl;
+        return;
+    }
     dezentralMaps.erase(mapHandler->getMap()->getOwnerId());
-    EV_DEBUG << "remove DensityMap for node: "
-             << mapHandler->getMap()->getOwnerId();
+    EV_DEBUG  << this->getFullPath() << "remove DensityMap(Type: " << dpmmMapTypeToString(mapDataType) << ") for node: "
+             << mapHandler->getMap()->getOwnerId() << ": " << obj->getFullPath() << endl;
   } else if (signalId == registerNodeAcceptor){
       auto acceptor = check_and_cast<ITraCiNodeVisitorAcceptor*>(obj);
       dynamicNodeVisitorAcceptors.push_back(acceptor);
@@ -106,6 +119,8 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
       initializeMap();
   }
 }
+
+std::string GlobalDensityMap::getMapName() const { return "global"; }
 
 void GlobalDensityMap::initializeMap(){
     // 1) setup map
@@ -135,14 +150,14 @@ void GlobalDensityMap::initializeMap(){
         // todo cellsize in x and y
         fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
         fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
-        fBuilder.addMetadata("DATATYPE", mapDataType);
+        fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
         fBuilder.addMetadata<std::string>(
             "MAP_TYPE",
             mapCfg->getMapType());  // The global density map is the ground
                                     // truth. No algorihm needed.
         fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
         fBuilder.addMetadata<int>("NODE_ID", -1);
-        fBuilder.addPath("global");
+        fBuilder.addPath(getMapName());
 
         fileWriter.reset(fBuilder.build(
             std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
@@ -177,7 +192,7 @@ void GlobalDensityMap::initialize(int stage) {
       if (vectorNodeModule != ""){
           dynamicNodeVisitorAcceptors.push_back(this);
       }
-      mapDataType = "pedestrianCount";
+      mapDataType = DpmmMapType::PEDESTRIAN_COUNT;
       mapCfg = (MapCfg*)(par("mapCfg").objectValue()->dup());
       take(mapCfg);
 

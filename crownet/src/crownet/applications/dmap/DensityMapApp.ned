@@ -73,12 +73,12 @@ simple DensityMapAppSimple  extends BaseDensityMapApp  {
 
     parameters:
         @class(crownet::DensityMapAppSimple);
-         string neighborhoodTableMobdule = default("nTable");
+         string neighborhoodTableModule = default(".nTable"); // relative to containing (i.e. network node, module annoated with @networkNode) 
 }
 
 simple EntropyMapAppSimple  extends BaseDensityMapApp  {
 
     parameters:
         @class(crownet::EntropyMapAppSimple);
-        string neighborhoodTableMobdule = default("nTable");
+        string neighborhoodTableModule = default(".nTable"); // relative to containing (i.e. network node, module annoated with @networkNode) 
 }

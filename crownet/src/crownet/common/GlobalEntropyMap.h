@@ -39,6 +39,8 @@ public:
     // ITraciNodeVisitor
     virtual void visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) override;
 
+    virtual std::string getMapName() const override;
+
 
     // IBaseNeighborhoodTable
     virtual NeighborhoodTableIter_t iter() override;

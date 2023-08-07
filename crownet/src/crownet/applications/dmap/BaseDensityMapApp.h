@@ -88,6 +88,8 @@ protected:
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) override;
  virtual cModule* getModule() override { return this;}
+ virtual std::string getMapName() const;
+ virtual DpmmMapType getMapType() const override { return mapDataType;}
  //todo mw
  //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) override;
  virtual void updateOwnLocationInMap();
@@ -113,8 +115,7 @@ protected:
  std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsdVisitor;
  simtime_t lastUpdate = -1.0;
  MapCfg *mapCfg;
- std::string mapDataType; //todo switch for PedestrianVsEntropy data
-
+ DpmmMapType mapDataType;
 
  RegularDcdMapWatcher* dcdMapWatcher;
  cMessage *mainAppTimer;
