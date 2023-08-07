@@ -156,6 +156,10 @@ network World
         globalDensityMap: <default("")> like IGlobalDensityMap if typename != "" {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
+        globalMeasurementMap: <default("")> like IGlobalDensityMap if typename != "" {
+            @display("p=308.14874,268.6425;i=block/table2;is=s");
+        }
+        
 
         flowController: <default("")> like IControlManager if typename != "" {
             @display("p=411.99374,391.67624;i=block/table2;is=s");
