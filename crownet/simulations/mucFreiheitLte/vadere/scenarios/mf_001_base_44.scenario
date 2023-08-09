@@ -1,8 +1,8 @@
 {
   "name" : "mf_001_base_44",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
+  "release" : "2.4",
+  "commithash" : "eecc5fb8aebd57cd27c21ef5eac04e2094056f60",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -128,6 +128,7 @@
         }
       },
       "obstacles" : [ {
+        "id" : -999066049,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -150,8 +151,9 @@
             "y" : 223.2144283177331
           } ]
         },
-        "id" : -999066049
+        "visible" : true
       }, {
+        "id" : -999066056,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -186,8 +188,9 @@
             "y" : 68.42621949594468
           } ]
         },
-        "id" : -999066056
+        "visible" : true
       }, {
+        "id" : -999066057,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -210,8 +213,9 @@
             "y" : 49.01012758072466
           } ]
         },
-        "id" : -999066057
+        "visible" : true
       }, {
+        "id" : 105289325,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -288,8 +292,9 @@
             "y" : 268.31452713906765
           } ]
         },
-        "id" : 105289325
+        "visible" : true
       }, {
+        "id" : 112954043,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -327,8 +332,9 @@
             "y" : 242.08870655857027
           } ]
         },
-        "id" : 112954043
+        "visible" : true
       }, {
+        "id" : 117590119,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -363,8 +369,9 @@
             "y" : 268.2696625525132
           } ]
         },
-        "id" : 117590119
+        "visible" : true
       }, {
+        "id" : 173168628,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -387,8 +394,9 @@
             "y" : 16.082200379110873
           } ]
         },
-        "id" : 173168628
+        "visible" : true
       }, {
+        "id" : 210309547,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -417,8 +425,9 @@
             "y" : 260.30971815250814
           } ]
         },
-        "id" : 210309547
+        "visible" : true
       }, {
+        "id" : 315892727,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -447,8 +456,9 @@
             "y" : 121.18564400728792
           } ]
         },
-        "id" : 315892727
+        "visible" : true
       }, {
+        "id" : 327057004,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -465,8 +475,9 @@
             "y" : 224.4269485026598
           } ]
         },
-        "id" : 327057004
+        "visible" : true
       }, {
+        "id" : -999066050,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -513,8 +524,9 @@
             "y" : 295.9400542844087
           } ]
         },
-        "id" : -999066050
+        "visible" : true
       }, {
+        "id" : -999066058,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -558,8 +570,9 @@
             "y" : 335.3259130381048
           } ]
         },
-        "id" : -999066058
+        "visible" : true
       }, {
+        "id" : -999066059,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -594,8 +607,9 @@
             "y" : 222.77739096339792
           } ]
         },
-        "id" : -999066059
+        "visible" : true
       }, {
+        "id" : -999066060,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -630,8 +644,9 @@
             "y" : 109.48774266242981
           } ]
         },
-        "id" : -999066060
+        "visible" : true
       }, {
+        "id" : -999066061,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -681,8 +696,9 @@
             "y" : 177.97307213861495
           } ]
         },
-        "id" : -999066061
+        "visible" : true
       }, {
+        "id" : -999066062,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -705,8 +721,9 @@
             "y" : 336.6122348792851
           } ]
         },
-        "id" : -999066062
+        "visible" : true
       }, {
+        "id" : -999066063,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -732,8 +749,9 @@
             "y" : 298.77739213593304
           } ]
         },
-        "id" : -999066063
+        "visible" : true
       }, {
+        "id" : -999066064,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -765,8 +783,9 @@
             "y" : 346.960572748445
           } ]
         },
-        "id" : -999066064
+        "visible" : true
       }, {
+        "id" : -999066067,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -825,8 +844,9 @@
             "y" : 14.216226077638566
           } ]
         },
-        "id" : -999066067
+        "visible" : true
       }, {
+        "id" : -999066068,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -861,8 +881,9 @@
             "y" : 90.35686044581234
           } ]
         },
-        "id" : -999066068
+        "visible" : true
       }, {
+        "id" : -999066072,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -921,8 +942,9 @@
             "y" : 99.17558888345957
           } ]
         },
-        "id" : -999066072
+        "visible" : true
       }, {
+        "id" : -999066073,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -981,8 +1003,9 @@
             "y" : 133.96824430394918
           } ]
         },
-        "id" : -999066073
+        "visible" : true
       }, {
+        "id" : -999066074,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1041,8 +1064,9 @@
             "y" : 158.6910344986245
           } ]
         },
-        "id" : -999066074
+        "visible" : true
       }, {
+        "id" : -999066075,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1101,8 +1125,9 @@
             "y" : 116.83934929873794
           } ]
         },
-        "id" : -999066075
+        "visible" : true
       }, {
+        "id" : -999066076,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1161,8 +1186,9 @@
             "y" : 168.69598564691842
           } ]
         },
-        "id" : -999066076
+        "visible" : true
       }, {
+        "id" : -999066077,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1221,8 +1247,9 @@
             "y" : 233.09976173564792
           } ]
         },
-        "id" : -999066077
+        "visible" : true
       }, {
+        "id" : -999066078,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1353,8 +1380,9 @@
             "y" : 294.04878085292876
           } ]
         },
-        "id" : -999066078
+        "visible" : true
       }, {
+        "id" : -999066079,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1461,8 +1489,9 @@
             "y" : 236.65112372953445
           } ]
         },
-        "id" : -999066079
+        "visible" : true
       }, {
+        "id" : -999066080,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1521,8 +1550,9 @@
             "y" : 218.5621665455401
           } ]
         },
-        "id" : -999066080
+        "visible" : true
       }, {
+        "id" : -999066082,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1557,8 +1587,9 @@
             "y" : 290.5689494078979
           } ]
         },
-        "id" : -999066082
+        "visible" : true
       }, {
+        "id" : -999066083,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1665,8 +1696,9 @@
             "y" : 290.6808880157769
           } ]
         },
-        "id" : -999066083
+        "visible" : true
       }, {
+        "id" : -999066084,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1725,8 +1757,9 @@
             "y" : 221.12775953765959
           } ]
         },
-        "id" : -999066084
+        "visible" : true
       }, {
+        "id" : -999066085,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1845,8 +1878,9 @@
             "y" : 219.44898245483637
           } ]
         },
-        "id" : -999066085
+        "visible" : true
       }, {
+        "id" : -999066086,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1929,8 +1963,9 @@
             "y" : 240.48758159112185
           } ]
         },
-        "id" : -999066086
+        "visible" : true
       }, {
+        "id" : -999066087,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2025,8 +2060,9 @@
             "y" : 220.4320507152006
           } ]
         },
-        "id" : -999066087
+        "visible" : true
       }, {
+        "id" : -999066088,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2085,8 +2121,9 @@
             "y" : 304.6512364335358
           } ]
         },
-        "id" : -999066088
+        "visible" : true
       }, {
+        "id" : -999066089,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2121,8 +2158,9 @@
             "y" : 360.6047005690634
           } ]
         },
-        "id" : -999066089
+        "visible" : true
       }, {
+        "id" : -999066090,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2169,8 +2207,9 @@
             "y" : 359.6264485819265
           } ]
         },
-        "id" : -999066090
+        "visible" : true
       }, {
+        "id" : -999066091,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2229,8 +2268,9 @@
             "y" : 353.75034985598177
           } ]
         },
-        "id" : -999066091
+        "visible" : true
       }, {
+        "id" : -999066092,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2265,8 +2305,9 @@
             "y" : 304.3508915165439
           } ]
         },
-        "id" : -999066092
+        "visible" : true
       }, {
+        "id" : -999066117,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2298,8 +2339,9 @@
             "y" : 89.76996902283281
           } ]
         },
-        "id" : -999066117
+        "visible" : true
       }, {
+        "id" : -999066118,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2331,8 +2373,9 @@
             "y" : 51.77050573565066
           } ]
         },
-        "id" : -999066118
+        "visible" : true
       }, {
+        "id" : -999066119,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2361,8 +2404,9 @@
             "y" : 2.4563426533713937
           } ]
         },
-        "id" : -999066119
+        "visible" : true
       }, {
+        "id" : -999066120,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2394,8 +2438,9 @@
             "y" : 88.31416066829115
           } ]
         },
-        "id" : -999066120
+        "visible" : true
       }, {
+        "id" : -999066121,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2415,8 +2460,9 @@
             "y" : 58.33271599095315
           } ]
         },
-        "id" : -999066121
+        "visible" : true
       }, {
+        "id" : -999066122,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2439,8 +2485,9 @@
             "y" : 390.85583183914423
           } ]
         },
-        "id" : -999066122
+        "visible" : true
       }, {
+        "id" : -999066123,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2475,8 +2522,9 @@
             "y" : 373.5335910981521
           } ]
         },
-        "id" : -999066123
+        "visible" : true
       }, {
+        "id" : -999066124,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2499,8 +2547,9 @@
             "y" : 300.5945857455954
           } ]
         },
-        "id" : -999066124
+        "visible" : true
       }, {
+        "id" : -999066125,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2544,8 +2593,9 @@
             "y" : 282.780356916599
           } ]
         },
-        "id" : -999066125
+        "visible" : true
       }, {
+        "id" : -999066126,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2577,8 +2627,9 @@
             "y" : 196.95230752788484
           } ]
         },
-        "id" : -999066126
+        "visible" : true
       }, {
+        "id" : -999066127,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2616,8 +2667,9 @@
             "y" : 192.10837434791028
           } ]
         },
-        "id" : -999066127
+        "visible" : true
       }, {
+        "id" : -999066128,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2646,8 +2698,9 @@
             "y" : 4.973188903182745
           } ]
         },
-        "id" : -999066128
+        "visible" : true
       }, {
+        "id" : -999066131,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2712,8 +2765,9 @@
             "y" : 251.7482415549457
           } ]
         },
-        "id" : -999066131
+        "visible" : true
       }, {
+        "id" : -999066132,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2739,8 +2793,9 @@
             "y" : 75.47620683908463
           } ]
         },
-        "id" : -999066132
+        "visible" : true
       }, {
+        "id" : 258139203,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2757,8 +2812,9 @@
             "y" : 125.94847070705146
           } ]
         },
-        "id" : 258139203
+        "visible" : true
       }, {
+        "id" : 258747568,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2775,9 +2831,10 @@
             "y" : 141.80998495221138
           } ]
         },
-        "id" : 258747568
+        "visible" : true
       } ],
       "measurementAreas" : [ {
+        "id" : 3001,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2827,12 +2884,11 @@
             "y" : 145.5823727948591
           } ]
         },
-        "id" : 3001
+        "visible" : true
       } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2001,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2849,16 +2905,20 @@
             "y" : 161.73686695843935
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2004,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2875,16 +2935,20 @@
             "y" : 101.57735977787524
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2005,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2901,16 +2965,20 @@
             "y" : 133.86367024295032
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2007,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2927,16 +2995,20 @@
             "y" : 224.40854908991605
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2008,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2953,16 +3025,20 @@
             "y" : 360.95191854797304
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2009,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2979,16 +3055,20 @@
             "y" : 173.48516997043043
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2010,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3005,16 +3085,20 @@
             "y" : 85.51089675165713
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2012,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3031,16 +3115,20 @@
             "y" : 19.918710492551327
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2013,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3057,13 +3145,18 @@
             "y" : 261.1035760100931
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -3087,21 +3180,24 @@
             "y" : 158.59125952143222
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1002,
         "shape" : {
@@ -3120,21 +3216,24 @@
             "y" : 225.09726159647107
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1003,
         "shape" : {
@@ -3153,21 +3252,24 @@
             "y" : 125.56888923142105
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1004,
         "shape" : {
@@ -3186,21 +3288,24 @@
             "y" : 104.61519689764827
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1005,
         "shape" : {
@@ -3219,21 +3324,24 @@
             "y" : 134.85620195046067
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1006,
         "shape" : {
@@ -3252,21 +3360,24 @@
             "y" : 147.5738470396027
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1008,
         "shape" : {
@@ -3285,21 +3396,24 @@
             "y" : 363.0436927303672
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1009,
         "shape" : {
@@ -3318,21 +3432,24 @@
             "y" : 171.5487187989056
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1010,
         "shape" : {
@@ -3351,21 +3468,24 @@
             "y" : 88.29599837306887
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1012,
         "shape" : {
@@ -3384,21 +3504,24 @@
             "y" : 21.872196461074054
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 4,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 4,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1013,
         "shape" : {
@@ -3417,24 +3540,35 @@
             "y" : 264.80283942911774
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
-        },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : 6,
-        "startTime" : 0.0,
-        "endTime" : 90.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2007 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 6,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 90.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 2,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -3444,8 +3578,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

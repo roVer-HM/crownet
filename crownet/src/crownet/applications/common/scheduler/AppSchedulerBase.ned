@@ -21,6 +21,8 @@ import inet.queueing.base.PacketProcessorBase;
 simple AppSchedulerBase extends PacketProcessorBase like IAppScheduler {
     parameters:
         displayStringTextFormat = default("");
+        bool checkNetworkConnectivity = default(false); // include knwoledge about network connectivity in 
+        											    // application scheduling decition.
     
 	gates:
         output out; // connected to app module

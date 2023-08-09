@@ -1,8 +1,8 @@
 {
   "name" : "mf_klein_initial_peds",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
+  "release" : "2.4",
+  "commithash" : "eecc5fb8aebd57cd27c21ef5eac04e2094056f60",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -36,7 +36,9 @@
         "translate" : {
           "x" : 0.0,
           "y" : 233.492
-        }
+        },
+        "applyOffset" : false,
+        "origin" : "lower left"
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -158,6 +160,7 @@
         }
       },
       "obstacles" : [ {
+        "id" : -2146909508,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -192,8 +195,9 @@
             "y" : 93.49960389640182
           } ]
         },
-        "id" : -2146909508
+        "visible" : true
       }, {
+        "id" : -2146909509,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -216,8 +220,9 @@
             "y" : 74.0835119811818
           } ]
         },
-        "id" : -2146909509
+        "visible" : true
       }, {
+        "id" : 315892727,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -246,8 +251,9 @@
             "y" : 146.25902840774506
           } ]
         },
-        "id" : 315892727
+        "visible" : true
       }, {
+        "id" : -2146909512,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -282,8 +288,9 @@
             "y" : 134.56112706288695
           } ]
         },
-        "id" : -2146909512
+        "visible" : true
       }, {
+        "id" : -2146909544,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -315,8 +322,9 @@
             "y" : 113.3875450687483
           } ]
         },
-        "id" : -2146909544
+        "visible" : true
       }, {
+        "id" : -2146909545,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -336,8 +344,9 @@
             "y" : 83.40610039141029
           } ]
         },
-        "id" : -2146909545
+        "visible" : true
       }, {
+        "id" : -2146909552,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -366,8 +375,9 @@
             "y" : 30.04657330363989
           } ]
         },
-        "id" : -2146909552
+        "visible" : true
       }, {
+        "id" : -2146909556,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -393,8 +403,9 @@
             "y" : 100.54959123954177
           } ]
         },
-        "id" : -2146909556
+        "visible" : true
       }, {
+        "id" : -2146909574,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -423,8 +434,9 @@
             "y" : 124.12233390193433
           } ]
         },
-        "id" : -2146909574
+        "visible" : true
       }, {
+        "id" : -2146909575,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -453,8 +465,9 @@
             "y" : 159.53332803864032
           } ]
         },
-        "id" : -2146909575
+        "visible" : true
       }, {
+        "id" : -2146909576,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -483,8 +496,9 @@
             "y" : 183.8733884524554
           } ]
         },
-        "id" : -2146909576
+        "visible" : true
       }, {
+        "id" : 258747568,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -501,8 +515,9 @@
             "y" : 166.88336935266852
           } ]
         },
-        "id" : 258747568
+        "visible" : true
       }, {
+        "id" : -2146909513,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -552,13 +567,12 @@
             "y" : 203.0464565390721
           } ]
         },
-        "id" : -2146909513
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2004,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -575,16 +589,20 @@
             "y" : 126.65074417833239
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2005,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -601,16 +619,20 @@
             "y" : 158.93705464340746
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2006,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -627,16 +649,20 @@
             "y" : 174.5258869305253
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2010,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -653,16 +679,20 @@
             "y" : 110.58428115211427
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2012,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -679,13 +709,18 @@
             "y" : 13.69209489300847
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -709,21 +744,24 @@
             "y" : 129.68858129810542
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2010 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 15,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 300.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 5,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1005,
         "shape" : {
@@ -742,21 +780,24 @@
             "y" : 159.92958635091782
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2012 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 0.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 1.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1006,
         "shape" : {
@@ -775,21 +816,24 @@
             "y" : 172.64723144005984
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2010 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 15,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 300.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 5,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1010,
         "shape" : {
@@ -808,21 +852,24 @@
             "y" : 113.36938277352601
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2006 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 15,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 300.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 5,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1012,
         "shape" : {
@@ -841,21 +888,24 @@
             "y" : 15.645580861531197
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : 20,
-        "startTime" : 0.0,
-        "endTime" : 400.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2005 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 20,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 400.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 5,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1014,
         "shape" : {
@@ -865,25 +915,36 @@
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 30.0
-        },
-        "spawnNumber" : 5,
-        "maxSpawnNumberTotal" : 30,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2004 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 30,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 300.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 5,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 30.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       } ],
       "dynamicElements" : [ {
         "attributes" : {
           "id" : 1,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -893,8 +954,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -941,6 +1002,14 @@
       }, {
         "attributes" : {
           "id" : 2,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -950,8 +1019,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -998,6 +1067,14 @@
       }, {
         "attributes" : {
           "id" : 3,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1007,8 +1084,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -1055,6 +1132,14 @@
       }, {
         "attributes" : {
           "id" : 4,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1064,8 +1149,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1112,6 +1197,14 @@
       }, {
         "attributes" : {
           "id" : 5,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1121,8 +1214,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -1169,6 +1262,14 @@
       }, {
         "attributes" : {
           "id" : 6,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1178,8 +1279,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -1226,6 +1327,14 @@
       }, {
         "attributes" : {
           "id" : 7,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1235,8 +1344,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -1283,6 +1392,14 @@
       }, {
         "attributes" : {
           "id" : 8,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1292,8 +1409,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1340,6 +1457,14 @@
       }, {
         "attributes" : {
           "id" : 9,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1349,8 +1474,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -1397,6 +1522,14 @@
       }, {
         "attributes" : {
           "id" : 10,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1406,8 +1539,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1454,6 +1587,14 @@
       }, {
         "attributes" : {
           "id" : 11,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1463,8 +1604,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1511,6 +1652,14 @@
       }, {
         "attributes" : {
           "id" : 12,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1520,8 +1669,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -1568,6 +1717,14 @@
       }, {
         "attributes" : {
           "id" : 13,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1577,8 +1734,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1624,6 +1781,14 @@
         "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -1633,8 +1798,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

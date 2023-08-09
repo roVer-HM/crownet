@@ -49,7 +49,7 @@ void GenericPacketMeter::meterPacket(Packet *packet)
     }
 }
 
-const char *GenericPacketMeter::resolveDirective(char directive) const {
+std::string GenericPacketMeter::resolveDirective(char directive) const {
 
     static std::string result;
     switch (directive) {
@@ -68,7 +68,7 @@ const char *GenericPacketMeter::resolveDirective(char directive) const {
         default:
             throw cRuntimeError("Unknown directive: %c", directive);
     }
-    return result.c_str();
+    return result;
 
 }
 

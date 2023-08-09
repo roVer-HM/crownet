@@ -38,12 +38,14 @@ class SimulationRun(BaseSimulationRunner):
         df["DockerStatsCPUPerc"].plot(marker= "o")
         plt.ylabel("CPU usage in CPUPer")
         plt.savefig(os.path.join(self.result_base_dir(), "DockerStatsCPUPerc.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
         df["DockerStatsRamGByte"].plot(marker= "o")
         plt.ylabel("RAM usage in GByte")
         plt.savefig(os.path.join(self.result_base_dir(), "RAMUsageGByte.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
 
     @process_as({"prio": 90, "type": "post"})
@@ -53,11 +55,11 @@ class SimulationRun(BaseSimulationRunner):
         df = OppAnalysis.get_sim_real_time_ratio(omnetpp_log_file_path=opp_out)
         df.to_csv(os.path.join(self.result_base_dir(), "simsec_sec_ratio.csv"), sep = " ")
         df.set_index("sim_time",inplace=True)
-        df["ratio_sim_real"].plot()
+        (1./df["ratio_sim_real"]).plot()
         plt.xlabel("Simulation time in s")
         plt.ylabel("Ratio: simulation time / real time ")
         plt.savefig(os.path.join(self.result_base_dir(), "RatioSimulationTimeRealTime.pdf"))
-        plt.show()
+        plt.show(block=False)
 
 
     @process_as({"prio": 10, "type": "post"})
@@ -76,7 +78,8 @@ class SimulationRun(BaseSimulationRunner):
         df.plot(legend=False)
         plt.ylabel("Number of agents")
         plt.savefig(os.path.join(self.result_base_dir(), "numberOfPeds.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
     @process_as({"prio": 20, "type": "post"})
     def path_choice(self):
@@ -93,7 +96,8 @@ class SimulationRun(BaseSimulationRunner):
         plt.xlabel("Simulation time in s")
         plt.ylabel("Number of times the long route is recommended")
         plt.savefig(os.path.join(self.result_base_dir(), "numberRecommendations.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
     @process_as({"prio": 30, "type": "post"})
     def densities_mapped(self):
@@ -133,7 +137,8 @@ class SimulationRun(BaseSimulationRunner):
             plt.ylabel("Pedestrian density in $ped/m^2$")
             # plt.ylim(0,0.5)
             plt.savefig(os.path.join(self.result_base_dir(), f"{route}.pdf"))
-            plt.show()
+            plt.show(block=False)
+            plt.close()
 
     @process_as({"prio": 40, "type": "post"})
     def packet_loss_heat_map(self):
@@ -155,7 +160,8 @@ class SimulationRun(BaseSimulationRunner):
         plt.ylabel("Number of lost packets")
         plt.title("Density map application")
         plt.savefig(os.path.join(self.result_base_dir(), "LostPacketsDensityMap.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
     @process_as({"prio": 50, "type": "post"})
     def packet_loss_info_diss(self):
@@ -196,7 +202,8 @@ class SimulationRun(BaseSimulationRunner):
         plt.ylabel("Dissemination time in s")
         plt.title("Route recommendation")
         plt.savefig(os.path.join(self.result_base_dir(), "DisseminationTimeRouteRecommendation.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
     @process_as({"prio": 70, "type": "post"})
     def heat_map_diss_time(self):
@@ -218,7 +225,8 @@ class SimulationRun(BaseSimulationRunner):
         plt.ylabel("Dissemination time in s")
         plt.title("Density map dissemination")
         plt.savefig(os.path.join(self.result_base_dir(), "DisseminationTimeDensityMap.pdf"))
-        plt.show()
+        plt.show(block=False)
+        plt.close()
 
 
     @process_as({"prio": 120, "type": "post"})
@@ -262,11 +270,11 @@ if __name__ == "__main__":
         '--control-tag',
         'latest',
         '--omnet-tag',
-        '6.0.1',
+        'latest',
         "--with-control",
         "control.py",
         "--ctrl.controller-type",
-        "MinimalDensity",
+        "AvoidShort",
         "--opp.-c",
         "final",
         "--qoi",

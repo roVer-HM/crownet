@@ -16,7 +16,7 @@ variables:
 stages:
   - build
   - test
-  - uq-integration-test
+  - uq-test
   - simulation-campaign
   - deploy
 
@@ -177,8 +177,8 @@ opp-tests:
     expire_in: 8 weeks
 
 # run uq simulation studies
-uq-test:
-  stage: uq-integration-test
+uq-unit-tests:
+  stage: uq-test
   tags:
     - crownet-sim
   variables:
@@ -187,8 +187,27 @@ uq-test:
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq"
-    - "pip install -r requirements.txt"
     - "python3 -m unittest discover -v"
+
+uq-integration-tests:
+  stage: uq-test
+  tags:
+    - crownet-sim
+  variables:
+    ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
+  script:
+    - "source setup -i"
+    - "source ./out/crownet_user/bin/activate"
+    - "cd ${CROWNET_HOME}/analysis/uq/simulation_studies"
+    - "python3 run_integration_tests.py"
+  artifacts:
+    when: always
+    paths:
+      - ${CROWNET_HOME}/analysis/uq/simulation_studies/unittest_sim_output
+    exclude:
+      - ${CROWNET_HOME}/analysis/uq/simulation_studies/unittest_sim_output/**/simulation_runs/**
+      - ${CROWNET_HOME}/analysis/uq/simulation_studies/unittest_sim_output/**/simulation_runs/**/*
+    expire_in: 4 weeks
 
 # run given simulation-campaign
 simulation-campaign:

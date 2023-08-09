@@ -10,6 +10,7 @@ from crownetutils.analysis.omnetpp import (
     OppAnalysis,
 )
 from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.analysis.plot.mobility import PlotCellOccupancy
 from crownetutils.utils.logging import logging
 from crownetutils.utils.dataframe import (
     format_frame,
@@ -673,7 +674,9 @@ def _get_cell_occupation_ratio(run_map: RunMap) -> CellOccupancyInfo:
 
 def plot_cell_occupation_ratio(run_map: RunMap):
     ret = _get_cell_occupation_ratio(run_map)
-    CellOccupancy.plot_cell_occupation_info(ret, run_map, "cell_occupation_info.pdf")
+    PlotCellOccupancy.plot_cell_occupation_info(
+        ret, run_map, "cell_occupation_info.pdf"
+    )
 
 
 def _plot_cell_empty_intervals_paper(

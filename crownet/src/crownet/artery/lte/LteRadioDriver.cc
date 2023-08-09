@@ -42,7 +42,6 @@ inet::MacAddress convert(const vanetza::MacAddress& mac) {
   return result;
 }
 
-std::once_flag register_protocol_flag;
 }  // namespace
 
 int LteRadioDriver::numInitStages() const {
@@ -54,10 +53,9 @@ void LteRadioDriver::initialize(int stage) {
     RadioDriverBase::initialize();
     // we were allowed to call addProtocol each time but call_once makes more
     // sense to me
-    std::call_once(register_protocol_flag, []() {
-      inet::ProtocolGroup::ethertype.addProtocol(
-          0x8947, &artery::InetRadioDriver::geonet);
-    });
+
+    geonetProtocol = artery::getGeoNetProtocol();
+
 
     numSent = 0;
     numPassedUp = 0;
@@ -72,8 +70,7 @@ void LteRadioDriver::initialize(int stage) {
     interfaceEntry = interfaceTable->findInterfaceByName(
         par("dispatchInterfaceName").stdstringValue().c_str());
 
-    registerProtocol(artery::InetRadioDriver::geonet, gate("lowerLayerOut"),
-                     gate("lowerLayerIn"));
+    registerProtocol(*geonetProtocol, gate("lowerLayerOut"), gate("lowerLayerIn"));
     auto properties = new artery::RadioDriverProperties();
     properties->LinkLayerAddress = convert(interfaceEntry->getMacAddress());
     properties->ServingChannel = channelNumber;
@@ -110,14 +107,12 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
 
   // tag: DispatchProtocolReq
   auto pDispatch_tag = packet->addTagIfAbsent<inet::DispatchProtocolReq>();
-  pDispatch_tag->setProtocol(&artery::InetRadioDriver::geonet);
+  pDispatch_tag->setProtocol(geonetProtocol);
   pDispatch_tag->setServicePrimitive(inet::ServicePrimitive::SP_REQUEST);
 
   //tag: PacketProtocolTag
-  packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(&artery::InetRadioDriver::geonet);
-  assert(request->ether_type.host() ==
-         inet::ProtocolGroup::ethertype.findProtocolNumber(
-             &artery::InetRadioDriver::geonet));
+  packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(geonetProtocol);
+  assert(request->ether_type.host() == artery::InetRadioDriver::GEONET_ID);
 
   // tag: InterfaceReq
   packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(

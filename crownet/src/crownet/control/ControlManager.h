@@ -56,7 +56,6 @@ public:
 
   private:
     std::shared_ptr<ControlTraCiApi> api;
-    GlobalDensityMap* globalMap;
     simtime_t nextTime = simtime_t::ZERO;
     std::string controlGate;
 };

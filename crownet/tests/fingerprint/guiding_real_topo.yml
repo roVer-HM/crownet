@@ -21,7 +21,7 @@ route_choice_real_world:
     - --with-control
     - control.py
     - --ctrl.controller-type
-    - MinimalDensity
+    - AvoidShort
     - --opp.-c
     - test
     - --log-docker-stats

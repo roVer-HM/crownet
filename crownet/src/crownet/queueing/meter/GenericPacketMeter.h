@@ -39,7 +39,7 @@ protected:
   virtual void initialize(int stage) override;
   virtual void meterPacket(inet::Packet *packet) override;
 
-  virtual const char *resolveDirective(char directive) const override;
+  virtual std::string resolveDirective(char directive) const override;
 
 };
 

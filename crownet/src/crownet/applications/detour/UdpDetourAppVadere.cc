@@ -59,6 +59,7 @@ void UdpDetourAppVadere::actOnIncident(
   ctrl->setInformed(simTime().dbl(), -1.0,
                     std::string(pkt->getIncidentReason()));
 
+
   // check and act if needed.
   std::string blocked = std::string(pkt->getClosedTarget());
   std::vector<std::string> targetLists = ctrl->getTargetList();

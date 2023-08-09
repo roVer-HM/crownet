@@ -217,6 +217,21 @@ class FingerprintTestCaseGenerator:
                 if ":" in kv:
                     _kv = kv.split(":")
                     _tags[_kv[0]] = _kv[1]
+        for k, v in _tags.items():
+            if v == "CFG":
+                try:
+                    tag = DockerCfg.get_default_tag(DockerCfg.CONTAINER_TAG_MAP.get(k))
+                    logger.info(
+                        f"replace {k}:'CFG' placeholder tag with configured tag {k}:'{tag}'"
+                    )
+                    _tags[k] = tag
+                except Exception as _:
+                    logger.warning(
+                        f"cannot find replacement tag for container {k}:'CFG'. Default to 'latest'. "
+                    )
+                    _tags[k] = "latest"
+                    pass
+
         return _tags
 
     # parse CSV file into a list of dicts
@@ -892,6 +907,12 @@ class FingerprintTestCase(SimulationTestCase):
             else self.cmdLine.split(None, 1)
         )
 
+        # of vector ar part of finger print do not override ini vector recording config.
+        vector_recording = ""
+        fingerprint_content = self.fingerprint.split("/")
+        if len(fingerprint_content) == 2 and "v" not in fingerprint_content[1]:
+            vector_recording = " --vector-recording=false "
+
         command = (
             (
                 exeName + "_dbg"
@@ -907,7 +928,8 @@ class FingerprintTestCase(SimulationTestCase):
             + self.fingerprint
             + '" --cpu-time-limit='
             + TestGlobal.cpuTimeLimit
-            + " --vector-recording=false --scalar-recording=true "
+            + vector_recording
+            + " --scalar-recording=true "
             + " --result-dir="
             + self.resultdir
             + " "

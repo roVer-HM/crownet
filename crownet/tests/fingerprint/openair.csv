@@ -12,7 +12,7 @@
 /simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              9709-ee2e/tplx,  PASS,   omnetpp:6.0.1
 /simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              5f5c-848b/tplx,  PASS,   omnetpp:6.0.1
 /simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              4647-2f8b/tplx,  PASS,   omnetpp:6.0.1
-/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              b0eb-e86c/tplx,  PASS,   omnetpp:6.0.1
+/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              f162-cefa/tplx,  PASS,   omnetpp:6.0.1
 /simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              dffd-d0b7/tplx,  PASS,   omnetpp:6.0.1
 
 # D2D scenarios
