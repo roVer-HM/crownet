@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from functools import partial
 import sys, os
-from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 
 import pandas as pd
 import numpy as np
@@ -17,8 +16,14 @@ from crownetutils.analysis.vadere import VadereAnalysis
 from crownetutils.analysis.omnetpp import HdfExtractor, OppAnalysis
 from crownetutils.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
 
+from crownetutils.utils.misc import Project
 from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.imputation import (
+    ArbitraryValueImputationWithRsd,
+    DeleteMissingImputation,
+)
 
 load_matplotlib_style(STYLE_SIMPLE_169)
 
@@ -78,6 +83,25 @@ class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
+    def get_builder(self, cfg: DpmmCfg):
+        b: DpmmHdfBuilder = DpmmHdfBuilder.get(cfg, override_hdf=False)
+        b.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+        if cfg.is_count_map:
+            rsd_origin_position = Simulation.from_dpmm_cfg(
+                cfg
+            ).sql.get_resource_sharing_domains(
+                apply_offset=False, bottom_left_origin=True
+            )
+
+            i = ArbitraryValueImputationWithRsd(
+                rsd_origin_position=rsd_origin_position, fill_value=0.0
+            )
+            b.set_imputation_strategy(i)
+        else:
+            b.set_imputation_strategy(DeleteMissingImputation())
+
+        return b
+
     # todo: add pre and post processing to apply for each simulation run.
     # Post processing might inlcude result striping or aggreagtion.
     # add as many methods as needed and add the process_as annotation.
@@ -96,22 +120,21 @@ class SimulationRun(BaseSimulationRunner):
 
         cfg: DpmmCfg
         for cfg in get_cfg_list(self.result_base_dir()):
-            builder = DpmmHdfBuilder.get(cfg=cfg, override_hdf=False)
-            builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+            builder = self.get_builder(cfg)
             builder.build(self.ns.get("hdf_override", "False"))
 
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
         cfg: DpmmCfg
         for cfg in get_cfg_list(self.result_base_dir()):
-            sim = Simulation.with_dpmm_cfg(cfg)
+            sim = Simulation.from_dpmm_cfg(cfg)
             OppAnalysis.append_err_measures_to_hdf(sim)
 
     @process_as({"prio": 975, "type": "post"})
     def create_rcvd_stats(self):
         cfg: DpmmCfg
         for cfg in get_cfg_list(self.result_base_dir()):
-            sim = Simulation.with_dpmm_cfg(cfg, label="")
+            sim = Simulation.from_dpmm_cfg(cfg, label="")
             HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
 
     @process_as({"prio": 970, "type": "post"})
@@ -165,7 +188,7 @@ class SimulationRun(BaseSimulationRunner):
     def add_plots(self):
         cfg: DpmmCfg
         for cfg in get_cfg_list(self.result_base_dir()):
-            sim = Simulation.with_dpmm_cfg(cfg, label="")
+            sim = Simulation.from_dpmm_cfg(cfg, label="")
             p = cfg.makedirs_output("fig_out", exist_ok=True)
             saver = FigureSaverSimple(override_base_path=p, figure_type=".png")
             # agent count data

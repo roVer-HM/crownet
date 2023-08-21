@@ -1,11 +1,20 @@
 import os
-from attr import dataclass
 from crownetutils.analysis.common import Simulation
+from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.imputation import (
+    ArbitraryValueImputationWithRsd,
+    DeleteMissingImputation,
+)
 from crownetutils.analysis.hdf_providers.node_position import (
     EnbPositionHdf,
     NodePositionHdf,
+    RsdPositionHdf,
 )
-from crownetutils.analysis.omnetpp import OppAnalysis, HdfExtractor, ServingEnbHdf
+from crownetutils.analysis.omnetpp import (
+    OppAnalysis,
+    HdfExtractor,
+    NodePositionWithRsdHdf,
+)
 from crownetutils.analysis.plot.app_misc import PlotAppMisc, PlotAppTxInterval
 from crownetutils.analysis.plot.dpmMap import PlotDpmMap
 from crownetutils.analysis.plot.enb import PlotEnb
@@ -46,26 +55,42 @@ def get_entropy_cfg(base_dir):
     return density_cfg
 
 
-def build_hdf(sim: Simulation):
-    override_hdf = False
-    _, builder, _ = OppAnalysis.builder_from_output_folder(
-        data_root=sim.data_root, override_hdf=override_hdf
-    )
-    builder.only_selected_cells(True)
-    builder.build(override_hdf=override_hdf)
+def build_all(base_dir):
+    for f in [get_density_cfg, get_entropy_cfg]:
+        cfg = f(base_dir)
+        build_hdf(cfg)
+
+
+def build_hdf(cfg: DpmmCfg):
+    sim: Simulation = Simulation.from_dpmm_cfg(cfg)
+    b: DpmmHdfBuilder = DpmmHdfBuilder.get(cfg, override_hdf=False)
+    b.only_selected_cells(True)
+    if cfg.is_count_map:
+        rsd_origin_position = sim.sql.get_resource_sharing_domains(
+            apply_offset=False, bottom_left_origin=True
+        )
+
+        i = ArbitraryValueImputationWithRsd(
+            rsd_origin_position=rsd_origin_position, fill_value=0.0
+        )
+        b.set_imputation_strategy(i)
+    else:
+        b.set_imputation_strategy(DeleteMissingImputation())
+
+    b.build()
 
     OppAnalysis.append_err_measures_to_hdf(sim)
 
-    HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
+    # HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
 
-    HdfExtractor.extract_packet_loss(
-        sim.path("pkt_loss.h5"), "map", sim.sql, sim.sql.m_map()
-    )
-    HdfExtractor.extract_packet_loss(
-        sim.path("pkt_loss.h5"), "beacon", sim.sql, sim.sql.m_beacon()
-    )
+    # HdfExtractor.extract_packet_loss(
+    #     sim.path("pkt_loss.h5"), "map", sim.sql, sim.sql.m_map()
+    # )
+    # HdfExtractor.extract_packet_loss(
+    #     sim.path("pkt_loss.h5"), "beacon", sim.sql, sim.sql.m_beacon()
+    # )
 
-    HdfExtractor.extract_trajectories(sim.path("position.h5"), sim.sql)
+    # HdfExtractor.extract_trajectories(sim.path("position.h5"), sim.sql)
 
 
 def plot_defaults(sim: Simulation):
@@ -148,9 +173,9 @@ def plot_enb_association_map(sim: Simulation):
 
     ue = pos_ue.get_dataframe()
 
-    ue = OppAnalysis.get_node_serving_data(
+    ue = OppAnalysis.get_node_serving_data_color_coded(
         sim,
-        enb_pos=pos_enb,
+        enb_pos=pos_enb.frame(),
         ue_pos=ue,
     )
 
@@ -159,27 +184,29 @@ def plot_enb_association_map(sim: Simulation):
 
 
 def main(override):
-    # sim = Simulation(
-    #     data_root="/mnt/data1tb/results/multi_enb/test_run_600s/",
-    #     label="mulit_enb",
-    # )
-    # cfg = get_density_cfg("/mnt/data1tb/results/multi_enb/test_run_600s_killed/")
+    base = os.path.abspath(".")
     cfg = get_density_cfg(
-        "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/count_and_entropy"
+        # os.path.join(base, "./results/count_and_entropy")
+        os.path.join(base, "results/final_muli_enb_dev_20230821-07:18:40")
     )
     sim = Simulation(
         # data_root="/mnt/data1tb/results/multi_enb/test_run_600s_killed/",
-        # data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/with_rsd/",
-        # data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/final_muli_enb_dev_20230801-15:02:53",
-        # data_root="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/results/count_and_entropy"
+        # data_root=os.path.join(base,"results/with_rsd/"),
+        # data_root=os.path.join(base,"results/final_muli_enb_dev_20230801-15:02:53"),
+        # data_root=os.path.join(base,"results/count_and_entropy")
         data_root=cfg.base_dir,
         label="mulit_enb",
         dpmm_cfg=cfg,
     )
-    # build_hdf(sim)
+    build_all(cfg.base_dir)
+    # map = sim.get_dcdMap()
+    # h = sim.get_base_provider(group_name="cell_measures_by_rsd", path=cfg.hdf_path())
+    # h.clear_group(group="cell_measures_by_rsd", repack=True)
+    OppAnalysis.append_err_measures_to_hdf(sim)
 
+    print("hi")
     # plot_enb_association(sim)
-    plot_enb_association_map(sim)
+    # plot_enb_association_map(sim)
     # inter = OppAnalysis.get_serving_enb_interval(sim)
 
 

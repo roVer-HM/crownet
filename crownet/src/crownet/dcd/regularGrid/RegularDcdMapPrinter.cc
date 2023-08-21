@@ -31,13 +31,16 @@ void RegularDcdMapValuePrinter::writeTo(std::ostream& out,
   // for all cells in dcd map
     for (const auto& val : map->valid()) {
     int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
+    int owner_rsd_id = map->getResourceSharingDomainId();
 
     out << omnetpp::simTime().dbl() << sep;
     val.first.writeTo(out, sep);  // GridCellID (x, y)
     out << sep;
     val.second.val()->writeTo(out, sep);  // Entry (more than one column!)
     out << sep;
-    out << ownCell << std::endl;
+    out << ownCell << sep;
+    out << owner_rsd_id << std::endl;
+
   }
 }
 
@@ -56,7 +59,8 @@ void RegularDcdMapValuePrinter::writeHeaderTo(std::ostream& out,
           "sourceEntry" << sep << \
           "hostEntry" << sep << \
           "rsd_id" << sep << \
-          "own_cell" << std::endl;
+          "own_cell" << sep << \
+          "owner_rsd_id" << std::endl;
 }
 
 void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
@@ -64,6 +68,7 @@ void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
   // for all cells in dcd map
     for (const auto& val : map->valid()){
     int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
+    int owner_rsd_id = map->getResourceSharingDomainId();
     // for all measurements in cell
     bool foundSelected = false;
     for (const auto& cell: val.second.validIter()){
@@ -77,7 +82,9 @@ void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
       out << sep;
       entry->writeTo(out, sep);  // Entry (more than one column!)
       out << sep;
-      out << ownCell << std::endl;
+      out << ownCell << sep;
+      out << owner_rsd_id << std::endl;
+
     }
     if (!foundSelected){
         // selected value not found -> selected value was calculated.
@@ -87,7 +94,8 @@ void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
         out << sep;
         val.second.val()->writeTo(out, sep);  // Entry
         out << sep;
-        out << ownCell << std::endl;
+        out << ownCell << sep;
+        out << owner_rsd_id << std::endl;
     }
   }
 }

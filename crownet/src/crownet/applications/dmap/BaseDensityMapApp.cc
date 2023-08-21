@@ -456,6 +456,8 @@ void BaseDensityMapApp::updateLocalMap() {
 }
 
 void BaseDensityMapApp::writeMap() {
+    updateOwnLocationInMap();
+    this->dcdMap->setResourceSharingDomainId(getResourceSharingDomainId());
     fileWriter->writeData();
 }
 

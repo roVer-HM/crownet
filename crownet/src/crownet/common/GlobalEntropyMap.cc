@@ -50,7 +50,7 @@ void GlobalEntropyMap::initialize(int stage) {
   }
 }
 
-std::string GlobalEntropyMap::getMapName() const { return "entropyMap_global"; }
+std::string GlobalEntropyMap::getMapName() const { return "global_entropyMap"; }
 
 
 void GlobalEntropyMap::visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) {

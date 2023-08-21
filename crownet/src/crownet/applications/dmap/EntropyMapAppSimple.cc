@@ -63,7 +63,8 @@ void EntropyMapAppSimple::updateLocalMap() {
         const auto info = entropyClient->updateGetGlobalValue(getPosition());
         auto ee = dcdMap->getEntry<GridEntry>(posTraci);
         ee->setValue(now, info.second->getCurrentData()->getBeaconValue());
-
+        // append own RSD id (my differ for same cell if cell is at the edge of the reception range of the RSD
+        ee->setResourceSharingDomainId(getResourceSharingDomainId());
     } else {
         // interator has filters for distance
         for(const auto& e : entropyClient->iter()){
@@ -75,6 +76,8 @@ void EntropyMapAppSimple::updateLocalMap() {
             auto ee = dcdMap->getEntry<GridEntry>(posTraci);
             ee->setValue(now, info->getCurrentData()->getBeaconValue()); // entropy sever ensures that ther is at most on
                                                              // entry per cell. Thus increment works here.
+            // append own RSD id (my differ for same cell if cell is at the edge of the reception range of the RSD
+            ee->setResourceSharingDomainId(getResourceSharingDomainId()); // append own RSD id
          }
     }
 
