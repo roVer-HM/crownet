@@ -10,8 +10,8 @@
 #include "crownet/dcd/generic/Cell.h"
 #include "crownet/dcd/generic/DcdMap.h"
 #include "crownet/dcd/generic/DcdMapWatcher.h"
+#include "crownet/dcd/generic/transmissionOrderStrategies/CellIdStream.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
-#include "crownet/dcd/generic/CellIdStream.h"
 #include "crownet/common/RegularGridInfo.h"
 #include "crownet/applications/dmap/dmap_m.h"
 
