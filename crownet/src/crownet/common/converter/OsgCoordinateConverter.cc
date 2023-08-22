@@ -109,12 +109,15 @@ RegularGridInfo OsgCoordinateConverter::getGridDescription() const{
 
 
 RegularGridInfo OsgCoordinateConverter::getGridDescription(const inet::Coord& cellSize) const {
-    auto gridSize = getBoundary();
+    // set gridSize to max value of bound.
+    auto gridSize = inet::Coord(simBound.upperRightPosition().x, simBound.upperRightPosition().y);
     RegularGridInfo info;
     info.setGridSize(gridSize);
     info.setCellSize(cellSize);
-    info.setCellCount(inet::Coord{std::floor(gridSize.x / cellSize.x), std::floor(gridSize.y / cellSize.y), 0.0});
+    // use ceil to ensure all possible locations are present.
+    info.setCellCount(inet::Coord{std::ceil(gridSize.x / cellSize.x), std::ceil(gridSize.y / cellSize.y), 0.0});
     info.setAreaOfIntrest(areaOfIntrest);
+    info.setSimBound(simBound);
     return info;
 }
 

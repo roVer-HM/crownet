@@ -43,6 +43,7 @@ public:
     void setCellSize(const inet::Coord cSize) { cellSize = cSize; }
     void setCellCount(const inet::Coord cCount) { cellCount = cCount;}
     void setAreaOfIntrest(const traci::Boundary b) {areaOfIntrest = b;}
+    void setSimBound(const traci::Boundary sb) {simBound = sb; }
     const AoiIterator aoiIter() const;
 
     const traci::TraCIPosition getCellCenter(const GridCellID& cell) const {return getCellCenter(cell.x(), cell.y());}
