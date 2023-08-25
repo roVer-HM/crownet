@@ -6,9 +6,13 @@
 #include "inet/common/socket/ISocket.h"
 
 
+#include "crownet/applications/common/BurstInfo.h"
+
+
 using namespace inet;
 
 namespace crownet {
+
 
 // Root Finite State Machine setup omnetpp::cFSM fsm;
 enum FsmRootStates {
@@ -32,10 +36,7 @@ public:
     virtual FsmState handleDataArrived(Packet *packet) = 0;
 };
 
-struct BurstInfo {
-    int pkt_count;
-    inet::b burst_size;
-};
+
 
 class AppStatusInfo {
 public:

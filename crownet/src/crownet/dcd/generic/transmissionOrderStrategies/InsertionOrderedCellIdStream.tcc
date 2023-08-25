@@ -1,5 +1,5 @@
 #pragma once
-#include "crownet/dcd/generic/transmissionOrderStrategies/CellIdStream.h"
+#include "crownet/dcd/generic/transmissionOrderStrategies/InsertionOrderedCellIdStream.h"
 
 #include <omnetpp/cexception.h>
 
@@ -10,35 +10,20 @@ void InsertionOrderedCellIdStream<C, N, T>::addNew(const cell_key_t& cellId, con
 }
 
 template <typename C, typename N, typename T>
-const bool InsertionOrderedCellIdStream<C, N, T>::hasNext(const time_t& now) {
+bool InsertionOrderedCellIdStream<C, N, T>::isValid(const time_t& time, const cell_key_t& cell_key) const {
+    const auto& cell = this->map->getCell(cell_key);
+    return cell.hasValid() && cell.val() && cell.val()->valid() & cell.lastSent() < time;
+}
 
+template <typename C, typename N, typename T>
+const bool InsertionOrderedCellIdStream<C, N, T>::hasNext(const time_t& now) const {
 
-   for(int i=0; i < this->queue.size(); i++) {
 
        auto id = this->queue.front();
        auto cell = this->map->getCell(id);
 
-       if (cell.lastSent() >= now){
-           // all cells were sent at this time point.
-           // keep order and return false
-           return false;
-       }
-       // cell must be sent if the cell is valid
+       return this->isValid(now, this->queue.front());
 
-       if (cell.hasValid() && // cell has at least on valid entry
-               cell.val() &&  // cell has an selected/calculated
-               cell.val()->valid()) // cell has an selected/calculated and its valid
-       {
-           // current value can be sent
-           // keep order and return true
-           return true;
-       } else {
-          // current value is not valid. move to the end of the queue
-           moveBack();
-       }
-   }
-   // no cell is valid return false
-   return false;
 
 }
 
@@ -55,6 +40,7 @@ InsertionOrderedCellIdStream<C, N, T>::nextCellId(const time_t& now){
     if (this->hasNext(now)){
         auto id = this->queue.front();
         moveBack();
+        map->getCell(id).sentAt(now);
         return id;
     } else {
         throw omnetpp::cRuntimeError("No valid nextCellId");
@@ -72,16 +58,42 @@ InsertionOrderedCellIdStream<C, N, T>::nextCell(const time_t& now){
 template <typename C, typename N, typename T>
 const int InsertionOrderedCellIdStream<C, N, T>::size(const time_t& now) const {
     int count = 0;
-    for(const auto &p : *map){
-        const auto &cell = p.second;
-        if (cell.lastSent() < now && // cell was not already sent
+    for(const auto& cellId : this->queue){
+        const auto& cell = this->map->getCell(cellId);
+        if (
                 cell.hasValid() && // cell has at least on valid entry
                 cell.val() &&  // cell has an selected/calculated
                 cell.val()->valid()){ // cell has an selected/calculated and its valid
-            count++;
+            if (cell.lastSent() < now){
+                // cell was not already sent
+                count++;
+            } else {
+                // found first cell in queue that was alreayd sent. Stop count and return
+                break;
+            }
         }
     }
     return count;
+}
+
+
+
+
+template <typename C, typename N, typename T>
+std::vector<typename InsertionOrderedCellIdStream<C, N, T>::cell_key_t>
+InsertionOrderedCellIdStream<C, N, T>::getNumCellsOrLess(
+        const time_t& now, const int numCells) {
+
+    std::vector<typename InsertionOrderedCellIdStream<C, N, T>::cell_key_t> ret;
+
+    while(this->hasNext(now)){
+        auto cellId = this->nextCellId(now);
+        ret.push_back(cellId);
+        if ((ret.size() == numCells) || (ret.size() == this->queue.size())){
+            break; // enough cells collected or no more cells present, stop and return
+        }
+    }
+    return ret;
 }
 
 

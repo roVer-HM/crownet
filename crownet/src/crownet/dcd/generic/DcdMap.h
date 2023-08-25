@@ -12,7 +12,7 @@
 #include "crownet/dcd/generic/iterator/DcDMapIterator.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/identifier/TimeProvider.h"
-#include "crownet/dcd/generic/ICellIdStream.h"
+#include "transmissionOrderStrategies/ICellIdStream.h"
 
 namespace crownet {
 

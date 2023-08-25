@@ -3,7 +3,8 @@
 #pragma once
 
 #include <queue>
-#include "crownet/dcd/generic/ICellIdStream.h"
+
+#include "ICellIdStream.h"
 
 namespace crownet {
 
@@ -26,18 +27,22 @@ public:
 
     virtual void setMap(dMapPtr map) override {this->map = map;}
 
-    virtual const bool hasNext(const time_t& now) override;
+    virtual const bool hasNext(const time_t& now) const override;
 
     virtual const cell_key_t nextCellId(const time_t& now) override;
     virtual Cell& nextCell(const time_t& now) override;
     virtual const int size(const time_t& now) const override;
+    virtual std::vector<cell_key_t> getNumCellsOrLess(const time_t& now, const int numCells) override;
 
 
 
-    virtual void update(const time_t& time) override {/*nothing*/};
+
+    virtual void update(const time_t& time) override {/*Do nothing. Order will not change*/};
 
 protected:
     virtual void moveBack();
+    virtual bool isValid(const time_t& time, const cell_key_t& cell_key) const;
+
 
 
 protected:
@@ -45,5 +50,5 @@ protected:
     dMapPtr map;
 };
 
-#include "CellIdStream.tcc"
+#include "InsertionOrderedCellIdStream.tcc"
 }

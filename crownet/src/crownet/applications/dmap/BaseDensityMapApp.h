@@ -109,17 +109,18 @@ protected:
 
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::shared_ptr<ActiveWriter> fileWriter;
+ std::shared_ptr<BurstInfoProvider> burstInfoProdiver;
  //DPMM visitors
  std::shared_ptr<CellAggregationAlgorihm<RegularCell>> valueVisitor;
  std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
  std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsdVisitor;
  simtime_t lastUpdate = -1.0;
- MapCfg *mapCfg;
+ MapCfg *mapCfg = nullptr;
  DpmmMapType mapDataType;
 
- RegularDcdMapWatcher* dcdMapWatcher;
- cMessage *mainAppTimer;
- cPar *mainAppInterval;
+ RegularDcdMapWatcher* dcdMapWatcher = nullptr;
+ cMessage *mainAppTimer = nullptr;
+ cPar *mainAppInterval = nullptr;
 
 };
 
