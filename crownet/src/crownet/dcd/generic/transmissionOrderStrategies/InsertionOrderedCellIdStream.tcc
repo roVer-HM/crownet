@@ -12,15 +12,15 @@ void InsertionOrderedCellIdStream<C, N, T>::addNew(const cell_key_t& cellId, con
 template <typename C, typename N, typename T>
 bool InsertionOrderedCellIdStream<C, N, T>::isValid(const time_t& time, const cell_key_t& cell_key) const {
     const auto& cell = this->map->getCell(cell_key);
-    return cell.hasValid() && cell.val() && cell.val()->valid() & cell.lastSent() < time;
+    return cell.hasValid() &&
+            cell.val() &&
+            cell.val()->valid() &&
+            cell.lastSent() < time;
 }
 
 template <typename C, typename N, typename T>
 const bool InsertionOrderedCellIdStream<C, N, T>::hasNext(const time_t& now) const {
 
-
-       auto id = this->queue.front();
-       auto cell = this->map->getCell(id);
 
        return this->isValid(now, this->queue.front());
 
@@ -59,18 +59,10 @@ template <typename C, typename N, typename T>
 const int InsertionOrderedCellIdStream<C, N, T>::size(const time_t& now) const {
     int count = 0;
     for(const auto& cellId : this->queue){
-        const auto& cell = this->map->getCell(cellId);
-        if (
-                cell.hasValid() && // cell has at least on valid entry
-                cell.val() &&  // cell has an selected/calculated
-                cell.val()->valid()){ // cell has an selected/calculated and its valid
-            if (cell.lastSent() < now){
-                // cell was not already sent
-                count++;
-            } else {
-                // found first cell in queue that was alreayd sent. Stop count and return
-                break;
-            }
+        if (this->isValid(now, cellId)){
+            count++;
+        } else {
+            break;
         }
     }
     return count;

@@ -49,6 +49,17 @@ public:
         EXPECT_EQ(map->getCellKeyStream()->size(now), 3);
     }
 
+    void setupTestOneCell(std::shared_ptr<RegularDcdMap> map, std::shared_ptr<YmfVisitor> visitor){
+        setSimTime(1.0);
+        EXPECT_EQ(map->getCellKeyStream()->size(simTime()), 0);
+        this->update(map, GridCellID{0, 0}, 1, 5, simTime().dbl()); // id, count, time
+        setSimTime(10.0);
+        visitor->setTime(simTime());
+        map->computeValues(visitor);
+        auto now = simTime();
+        EXPECT_EQ(map->getCellKeyStream()->size(now), 1);
+    }
+
 };
 
 
@@ -150,6 +161,41 @@ TEST_F(InsertionOrderedCellIdStreamTest, list_of_cell_ids_more2) {
     // stream is a circle. Thus will start from beginning if cells are not reset
     EXPECT_EQ(cellIdList[0], GridCellID(2, 2));
     EXPECT_FALSE(stream->hasNext(now));
+
+}
+
+TEST_F(InsertionOrderedCellIdStreamTest, list_of_cell_ids_with_only_one_valid) {
+    std::shared_ptr<RegularDcdMap> map = this->dcdFactory->create_shared_ptr(1, "insertionOrder");
+    auto stream = map->getCellKeyStream();
+
+    auto ymf = std::make_shared<YmfVisitor>();
+
+    this->setupTest(map, ymf);
+    auto now = simTime();
+    EXPECT_EQ(stream->size(now), 3);
+    stream->nextCellId(now);
+    stream->nextCellId(now);
+    EXPECT_EQ(stream->size(now), 1) << "invalidate 2 out of 3. Asume that one is still left";
+
+    // access stream via getNumCellsOrLess
+    auto cellIdList = stream->getNumCellsOrLess(now, 1);
+    EXPECT_EQ(cellIdList.size(), 1) << "accessing one cell and one cell should be left";
+
+}
+
+TEST_F(InsertionOrderedCellIdStreamTest, stream_size_if_one_cell_is_invalid) {
+    std::shared_ptr<RegularDcdMap> map = this->dcdFactory->create_shared_ptr(1, "insertionOrder");
+    auto stream = map->getCellKeyStream();
+
+    auto ymf = std::make_shared<YmfVisitor>();
+
+    this->setupTest(map, ymf);
+    auto now = simTime();
+    EXPECT_EQ(stream->size(now), 3) << "all valid";
+
+    map->getCell(GridCellID(1, 1)).get(IntIdentifer(1))->reset();
+
+    EXPECT_EQ(stream->size(now), 1) << "expected count of 1 as the second item does not have a valid measure";
 
 }
 
