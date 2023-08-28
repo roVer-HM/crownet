@@ -28,7 +28,15 @@ Define_Module(GlobalEntropyMap);
 
 GlobalEntropyMap::~GlobalEntropyMap(){
     if (entropyTimer) cancelAndDelete(entropyTimer);
+    entropyTimer = nullptr;
     delete entropyProvider;
+    for (auto& e : _table){
+        if (e.second != nullptr && e.second->getOwner() == this){
+            delete e.second;
+            e.second = nullptr;
+        }
+    }
+    _table.clear();
 }
 
 
