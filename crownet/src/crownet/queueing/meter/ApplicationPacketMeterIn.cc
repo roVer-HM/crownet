@@ -69,6 +69,10 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     // todo how to handle self messages? aka hostId == sourceId
     GenericPacketMeter::meterPacket(packet);
     auto data = packet->peekData();
+    if (data->isEmpty()){
+        throw cRuntimeError("Data of received packet is empty! Receiving node: %s at time %s ",
+                getFullPath().c_str(), simTime().str().c_str());
+    }
     int sourceId = data->getAllTags<HostIdTag>().front().getTag()->getHostId();
     auto now = simTime();
 
