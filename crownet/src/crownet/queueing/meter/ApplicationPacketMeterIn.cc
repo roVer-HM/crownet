@@ -69,11 +69,14 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     // todo how to handle self messages? aka hostId == sourceId
     GenericPacketMeter::meterPacket(packet);
     auto data = packet->peekData();
-    if (data->isEmpty()){
-        throw cRuntimeError("Data of received packet is empty! Receiving node: %s at time %s ",
-                getFullPath().c_str(), simTime().str().c_str());
+    auto tags =  data->getAllTags<HostIdTag>();
+    if (tags.size() == 0){
+        std::stringstream s;
+        data->printToStream(s, 0);
+        throw cRuntimeError("HostIdTag not found for %s at time %s packet: %s",
+                getFullPath().c_str(), simTime().str().c_str(), s.str().c_str());
     }
-    int sourceId = data->getAllTags<HostIdTag>().front().getTag()->getHostId();
+    int sourceId = tags.front().getTag()->getHostId();
     auto now = simTime();
 
     // process source level statistics
