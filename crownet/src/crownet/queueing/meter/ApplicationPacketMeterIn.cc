@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "ApplicationPacketMeterIn.h"
+#include "crownet/queueing/meter/ApplicationPacketMeterIn.h"
 #include "inet/common/TimeTag_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/common/util/FilePrinter.h"

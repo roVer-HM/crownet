@@ -234,6 +234,10 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacket> payl
 
     // at most maxCellCount. Can be less if map does not have enough valid data.
     auto selectedCellIds = stream->getNumCellsOrLess(now, maxCellCount);
+    if (selectedCellIds.size() < 1){
+        throw cRuntimeError("No data available but it should be. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
 
     // set cell array
     payload->setCellsArraySize(selectedCellIds.size());
@@ -256,6 +260,10 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacket> payl
     }
 
     auto chunkLength = b(payload->getChunkLength().get() + payload->getCellsArraySize() *cellSize);
+    if (chunkLength < b(1)){
+        throw cRuntimeError("ChunkLength of packet is to samll. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
     payload->setChunkLength(chunkLength);
     return payload;
 }
@@ -271,6 +279,10 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacketWithSh
 
     // at most maxCellCount. Can be less if map does not have enough valid data.
     auto selectedCellIds = stream->getNumCellsOrLess(now, maxCellCount);
+    if (selectedCellIds.size() < 1){
+        throw cRuntimeError("No data available but it should be. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
 
     // set cell array
     payload->setCellsArraySize(selectedCellIds.size());
@@ -294,6 +306,10 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacketWithSh
     }
 
     auto chunkLength = b(payload->getChunkLength().get() + payload->getCellsArraySize() *cellSize);
+    if (chunkLength < b(1)){
+        throw cRuntimeError("ChunkLength of packet is to samll. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
     payload->setChunkLength(chunkLength);
     return payload;
 }

@@ -58,13 +58,6 @@ BurstInfo MapPacketBurstInfoProvider::createBurstInfo(const inet::b& scheduled, 
         lastPacketSizeForScheduledData = inet::b(0); // rest last packet size.
     }
 
-//
-//    double numberOfPossiblePackets = (double)scheduled.get() / this->packetSizeWithCells(maxNumberCellsPerPacket);
-//
-//    int numberPacketsNeededForAvailableData = (int)std::ceil((double)availableCells/maxNumberCellsPerPacket);
-//
-//    int num_pkt_possible = (int)std::ceil(((double)scheduled.get()/getMaxPdu().get()));
-
     BurstInfo b;
     inet::b burst_size;
 
@@ -80,18 +73,6 @@ BurstInfo MapPacketBurstInfoProvider::createBurstInfo(const inet::b& scheduled, 
 
     return b;
 
-//    int pkt_num;
-//    if (numberPacketsNeededForAvailableData <= num_pkt_possible){
-//     // send numberPacketsNeeded *NEEDED* packets where the last one is most likly not full.
-//     // Thus pkt_num times header plus all cells available.
-//     burst_size = inet::b(num_pkt_needed*h.getChunkLength().get() + availableCells*p.getCellSize().get());
-//     pkt_num = numberPacketsNeededForAvailableData;
-//    } else {
-//     // send num_pkt_possible *FULL* packets
-//     burst_size = inet::b(num_pkt_possible*(h.getChunkLength().get() + maxNumberCellsPerPacket*p.getCellSize().get()));
-//     pkt_num = num_pkt_possible;
-//    }
-//    return BurstInfo{pkt_num, burst_size};
 }
 
 

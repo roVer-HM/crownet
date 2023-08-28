@@ -19,7 +19,9 @@ namespace crownet {
 
 class MapPacketBurstInfoProvider : public BurstInfoProvider {
 public:
-    MapPacketBurstInfoProvider(std::shared_ptr<MapHeader> header, std::shared_ptr<MapPacketBase> packet): header(header), packet(packet){
+    MapPacketBurstInfoProvider(
+            std::shared_ptr<MapHeader> header,
+            std::shared_ptr<MapPacketBase> packet): BurstInfoProvider(), header(header), packet(packet){
         minPacketSize = this->packetSizeWithCells(1);
     }
     virtual ~MapPacketBurstInfoProvider() = default;
