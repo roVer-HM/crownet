@@ -34,6 +34,15 @@ class ResetVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 };
 
 /**
+ * Reset all IEntries within a RegularCell as well as the cell value if present.
+ */
+class ResetCellVisitor : public ResetVisitor {
+ public:
+    ResetCellVisitor(RegularCell::time_t time) : ResetVisitor(time) { }
+  virtual void applyTo(RegularCell& cell) override;
+};
+
+/**
  * Reset local IEntries in a RegularCell
  */
 class ResetLocalVisitor : public TimestampedVoidCellVisitor<RegularCell> {
