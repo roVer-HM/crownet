@@ -477,6 +477,7 @@ void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConv
 
 void BaseDensityMapApp::computeValues() {
    simtime_t now = simTime();
+   updateOwnLocationInMap();
    // cellAgeHandler is Idempotent
   cellAgeHandler->setTime(now);
   dcdMap->visitCells(*cellAgeHandler); //reference to cellAgeHandler needed

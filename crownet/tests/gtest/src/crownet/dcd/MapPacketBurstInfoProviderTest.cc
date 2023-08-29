@@ -245,9 +245,7 @@ TEST_P(MapPacketBurstInfoProviderTest, createBurstInfo_test_zero_burst_2) {
 TEST_P(MapPacketBurstInfoProviderTest, createBurstInfo_test_with_infinet_scheduled) {
     TestObject o = get(GetParam());
     inet::b maxPdu(1400*8);
-    int availbeCells = 10000; // Infinite will not be toped.
     int maxCellsPerPacket = o.p->getMaxCellCountPerPacket(maxPdu);
-    inet::b scheduled = o.p->packetSizeWithCells(maxCellsPerPacket-1); // packet with one cell slot empty
 
     auto ret = o.p->createBurstInfo(inet::b(100000), 1, maxPdu);
     EXPECT_EQ(ret.pkt_count,  1);

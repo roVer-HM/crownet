@@ -10,6 +10,12 @@
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 
+#include "crownet/dcd/generic/transmissionOrderStrategies/InsertionOrderedCellIdStream.h"
+#include "crownet/dcd/generic/transmissionOrderStrategies/OrderByCellIdStream.h"
+#include "crownet/dcd/generic/transmissionOrderStrategies/OrderdCellIdVectorProvider.h"
+
+
+
 namespace crownet {
 
 //RegularDcdMapFactory::RegularDcdMapFactory(const RegularGridInfo& grid)
@@ -51,6 +57,22 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::shared_ptr<OsgCoordinateConverte
     cellIdStream_dispatcher["insertionOrder"] = [](){
         return std::make_shared<InsertionOrderedCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>();
     };
+    cellIdStream_dispatcher["orderBySentLastAsc_DistAsc"] = [](){
+        bool lastSentAscendingOrder = true;
+        bool distanceAscendingOrder = true;
+        using vecProvider_t = OrderByLastSentAndCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(lastSentAscendingOrder, distanceAscendingOrder);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
+    cellIdStream_dispatcher["orderBySentLastAsc_DistDesc"] = [](){
+        bool lastSentAscendingOrder = true;
+        bool distanceAscendingOrder = false; // descending order (5,4,3,2,1)
+        using vecProvider_t = OrderByLastSentAndCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(lastSentAscendingOrder, distanceAscendingOrder);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
 }
 
 
