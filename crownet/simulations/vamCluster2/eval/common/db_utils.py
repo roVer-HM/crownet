@@ -22,6 +22,18 @@ def count_all_vams(cur, vec_name, mod_name, start, end):
         """).fetchall()
     return data[0][0] if len(data) else None
 
+def count_vams(cur, type_filter, mod_name, start, end):
+    data = cur.execute(f"""
+        select count(vectorData.value) from vectorData inner join vector
+        on vectorData.vectorId = vector.vectorId
+        and vectorData.value = {type_filter}
+        and vectorName = 'vam_sent_type'
+        and moduleName LIKE '{mod_name}'
+        and vectorData.simtimeRaw > {start}
+        and vectorData.simtimeRaw < {end}
+        """).fetchall()
+    return data[0][0] if len(data) else None
+
 def get_resource_blocks(cur, mod_name, start, end):
     data = cur.execute(f"""
         select vectorData.value, vectorData.simtimeRaw from vectorData inner join vector

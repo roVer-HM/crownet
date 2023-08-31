@@ -11,10 +11,12 @@ from common.opp_utils import st_to_s
 
 ST_CONV_FACTOR = 10**12
 RESULTS = "../results"
-STUDY_NAME = "RunStudyVeloDifferenceVadereGroupsDistrib4"
+STUDY_NAME = "RunStudyNoClustering_MF"
 
-T_END = 550
-STABLE_START = 200
+INLCUDE_VEH = False
+
+T_END = 600
+STABLE_START = 230
 STABLE_END = 500
 
 VRU_COLOR="blue"
@@ -51,6 +53,8 @@ if __name__ == '__main__':
     results = list(pool.map(analyze_vector, get_vec_files(RESULTS, STUDY_NAME)))
 
     avg_vrus = np.array([r[0] for r in results]).mean(axis=0)
+    std_vrus = np.array([r[0] for r in results]).std(axis=0)
+
     avg_vehs = np.array([r[1] for r in results]).mean(axis=0)
 
     font = {'size': 22}
@@ -59,11 +63,14 @@ if __name__ == '__main__':
     fig = plt.figure(figsize=(16, 7))
     ax = plt.gca()
 
-    ax.set_ylim(0,  150)
+    ax.set_ylim(0,  300)
     ax.set_xlim(0, T_END)
     ax.grid(True, axis="both", linestyle="--")
     ax.plot(np.arange(0, T_END), avg_vrus, label="Pedestrian", color=VRU_COLOR)
-    ax.plot(np.arange(0, T_END), avg_vehs, label="Vehicle", color=VEH_COLOR)
+    ax.fill_between(np.arange(0, T_END), avg_vrus - std_vrus, avg_vrus + std_vrus, color=VRU_COLOR, alpha=0.3)
+
+    if INLCUDE_VEH:
+        ax.plot(np.arange(0, T_END), avg_vehs, label="Vehicle", color=VEH_COLOR)
 
     plt.axvspan(STABLE_START, STABLE_END, color='gray', alpha=0.2, label=f"Steady state ({STABLE_END - STABLE_START}s)")
 
@@ -73,7 +80,9 @@ if __name__ == '__main__':
 
     veh_mean = np.mean(avg_vehs[STABLE_START:STABLE_END])
     veh_std = np.std(avg_vehs[STABLE_START:STABLE_END])
-    ax.axhline(veh_mean, linestyle="dashed", color=VEH_COLOR, label=f"Vehicle (mean) = {veh_mean:.2f}, std. dev = {veh_std:.2f}")
+
+    if INLCUDE_VEH:
+        ax.axhline(veh_mean, linestyle="dashed", color=VEH_COLOR, label=f"Vehicle (mean) = {veh_mean:.2f}, std. dev = {veh_std:.2f}")
 
     plt.axvspan(0, STABLE_START, facecolor="none", hatch="//", edgecolor="lightgray", label="Build-up / Fade-out")
     plt.axvspan(STABLE_END, T_END, facecolor="none", hatch="//", edgecolor="lightgray")
@@ -87,7 +96,7 @@ if __name__ == '__main__':
 
     plt.show()
 
-    fig.savefig(f"fig/vru_over_time.png")    
-    fig.savefig(f"fig/vru_over_time.svg")
-    fig.savefig(f"fig/vru_over_time.pdf")
+    fig.savefig(f"fig/vru_over_time_mf.png")    
+    fig.savefig(f"fig/vru_over_time_mf.svg")
+    fig.savefig(f"fig/vru_over_time_mf.pdf")
 

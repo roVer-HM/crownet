@@ -5,32 +5,32 @@
     <vType id="car_vh" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70"/>
     
     <!-- Lothstrasse in N-S direction -->
-    <flow id="loth_n-s_1" color="0,1,0"  begin="0" end= "200" period="40" type="car_vh">
+    <flow id="loth_n-s_1" color="0,1,0"  begin="0" end= "500" period="40" type="car_vh">
     	<route edges="-292630184#1 -278513971#5 -278513971#4 -278513971#2 -278513971#1 -278513971#0 38349617#0"/>
     </flow>
     
     <!-- Lothstrasse in S-N direction -->
-    <flow id="loth_s-n_1" color="0,1,0"  begin="0" end= "200" period="40" type="car_vh">
+    <flow id="loth_s-n_1" color="0,1,0"  begin="0" end= "500" period="40" type="car_vh">
     	<route edges="-38349617#2 278513971#0 278513971#1 278513971#2 278513971#4 278513971#5 292630184#1"/>
     </flow>
     
     <!-- Hess W-E -->
-    <flow id="hess_w-e_1" color="0,1,0"  begin="0" end= "200" period="40" type="car_vh">
+    <flow id="hess_w-e_1" color="0,1,0"  begin="0" end= "500" period="40" type="car_vh">
     	<route edges="4520030#0 4520030#1 4520030#2 4520030#3 24998362#1 24998362#2 24998362#3 24998362#4 24998362#5"/>
     </flow>
     
     <!-- Hess W-E -> Loth N-S -->
-    <flow id="hess_w-e_loth_n-s_1" color="0,1,0"  begin="0" end= "200" period="40" type="car_vh">
+    <flow id="hess_w-e_loth_n-s_1" color="0,1,0"  begin="0" end= "500" period="40" type="car_vh">
     	<route edges="4520030#0 4520030#1 4520030#2 4520030#3 -278513971#5 -278513971#4 -278513971#2 -278513971#1 -278513971#0 38349617#0"/>
     </flow>
     
     <!-- Hess W-E -> Loth S-N -->
-    <flow id="hess_w-e_loth_s-n_1" color="0,1,0"  begin="0" end= "200" period="40" type="car_vh">
+    <flow id="hess_w-e_loth_s-n_1" color="0,1,0"  begin="0" end= "500" period="40" type="car_vh">
     	<route edges="4520030#0 4520030#1 4520030#2 4520030#3 292630184#1"/>
     </flow>
     
     <!-- Lothstrasse in N-S Hess E-W -->
-    <flow id="loth_n-s_1_hess_w-e" color="0,1,0"  begin="0" end= "200" period="40" type="car_vh">
+    <flow id="loth_n-s_1_hess_w-e" color="0,1,0"  begin="0" end= "500" period="40" type="car_vh">
     	<route edges="-292630184#1 -4520030#3 -4520030#2 -4520030#1 -4520030#0"/>
     </flow>
     

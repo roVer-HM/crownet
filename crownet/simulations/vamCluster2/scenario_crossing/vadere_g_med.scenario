@@ -1,5 +1,5 @@
 {
-  "name" : "vadere",
+  "name" : "vadere2",
   "description" : "",
   "release" : "2.4",
   "processWriters" : {
@@ -127,8 +127,8 @@
           "epsgCode" : "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs",
           "description" : "Generated using SVG2Scen",
           "translation" : {
-            "x" : -689854.41,
-            "y" : -5336510.94
+            "x" : 689854.41,
+            "y" : 5336510.94
           }
         }
       },
@@ -375,17 +375,17 @@
         "targetIds" : [ 2001 ],
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
-          "constraintsElementsMax" : 20,
+          "constraintsElementsMax" : 50,
           "constraintsTimeStart" : 0.0,
-          "constraintsTimeEnd" : 90.0,
+          "constraintsTimeEnd" : 300.0,
           "eventPositionRandom" : false,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 15,
+          "eventElementCount" : 10,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 20.0
+            "updateFrequency" : 60.0
           }
         },
         "groupSizeDistribution" : [ 0.2, 0.2, 0.2, 0.2, 0.2 ]
@@ -411,7 +411,7 @@
         "targetIds" : [ 2000 ],
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
-          "constraintsElementsMax" : 10,
+          "constraintsElementsMax" : 15,
           "constraintsTimeStart" : 0.0,
           "constraintsTimeEnd" : 90.0,
           "eventPositionRandom" : false,
@@ -447,7 +447,7 @@
         "targetIds" : [ 2000 ],
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
-          "constraintsElementsMax" : 10,
+          "constraintsElementsMax" : 15,
           "constraintsTimeStart" : 0.0,
           "constraintsTimeEnd" : 90.0,
           "eventPositionRandom" : false,

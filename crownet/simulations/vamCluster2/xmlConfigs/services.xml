@@ -3,8 +3,5 @@
 	<service type="artery.application.VaService">
 		<listener port="2018" />
 	</service>
-	<service type="artery.application.DenService">
-		<listener port="2002" />
-	</service>
 </services>
 

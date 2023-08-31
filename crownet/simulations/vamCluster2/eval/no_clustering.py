@@ -9,16 +9,18 @@ from common.db_utils import get_vec_files, get_parameter_value, count_all_vams
 from common.plot_utils import save_plot
 
 RESULTS = "../results"
-STUDY_NAME = "RunStudyNoClustering"
+STUDY_NAME = "RunStudyEffectiveClustering_MF"
 TEMP_FILE = f"{STUDY_NAME}_temp_vamsps.json"
 YLABEL = "VAMs per Second"
 
 # Seconds to opp simtime
 ST_CONV_FACTOR = 10**12
 
-START_TIME = 200
+INLCUDE_VEH = False
+
+START_TIME = 220
 END_TIME = 500
-NUM_VRUS = 71
+NUM_VRUS = 139
 NUM_VEH = 8
 
 def analyze_vector(vector_file):
@@ -82,10 +84,18 @@ def visualize():
         fig = plt.figure()
         plt.rc('font', size=22)  
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6), gridspec_kw=dict(left=0.15, right=0.9,bottom=0.2, top=0.9))
+        ax1 = None
+        ax2 = None
+
+        if INLCUDE_VEH:
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6), gridspec_kw=dict(left=0.15, right=0.9,bottom=0.2, top=0.9))
+        else:
+            fig, ax1 = plt.subplots(1, 1, figsize=(6, 6), gridspec_kw=dict(left=0.2, right=0.9,bottom=0.2, top=0.9))
 
         ax1.grid(True, axis="both", linestyle="--")
-        ax2.grid(True, axis="both", linestyle="--")
+
+        if INLCUDE_VEH:
+            ax2.grid(True, axis="both", linestyle="--")
 
         fig.text(0.06, 0.5,YLABEL, ha='center', va='center', rotation='vertical')
 
@@ -95,16 +105,19 @@ def visualize():
             labels=[f"Sent by pNode\n(mean = {np.mean(data[0]):.2f})"]
         )
 
-        ax2.boxplot(
-            data[1], 
-            medianprops=dict(linestyle='-', linewidth=2, color='black'),
-            labels=[f"Received by vNode\n(mean = {np.mean(data[1]):.2f})"]
-        )
+        if INLCUDE_VEH:
+            ax2.boxplot(
+                data[1], 
+                medianprops=dict(linestyle='-', linewidth=2, color='black'),
+                labels=[f"Received by vNode\n(mean = {np.mean(data[1]):.2f})"]
+            )
 
-        ax2.set_ylim(0, 85)
+        if INLCUDE_VEH:
+            ax2.set_ylim(0, 85)
+
         ax1.set_ylim(0, 2)
 
-        save_plot(fig, "no_clustering")
+        save_plot(fig, "clustering_MF")
 
 
 if __name__ == '__main__':

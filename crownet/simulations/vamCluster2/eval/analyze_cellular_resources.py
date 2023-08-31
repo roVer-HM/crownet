@@ -46,15 +46,17 @@ def analyze():
         json.dump(data, f)
 
 def setup_fig():
-    fig = plt.figure(figsize=(10, 4))
+    fig = plt.figure(figsize=(13, 6))
+
+    plt.rc('font', size=22)  
 
     ax = plt.gca()
 
     for tick in ax.get_xticklabels():
         tick.set_rotation(45)
     
-    plt.ylabel(YLABEL, size=18)
-    plt.xlabel(f"{PARAMETER_NAME} parameter", size=18)
+    plt.ylabel(YLABEL)
+    plt.xlabel(f"{PARAMETER_NAME} parameter")
     fig.tight_layout()
 
     ax.grid(True, axis="both", linestyle="--")

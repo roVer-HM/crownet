@@ -48,7 +48,7 @@ def analyze():
         json.dump(data, f)
 
 def setup_fig(height=6, yl=YLABEL):
-    fig = plt.figure(figsize=(6, 4))
+    fig = plt.figure(figsize=(6, 6))
     plt.rc('font', size=22)  
 
     ax = plt.gca()
