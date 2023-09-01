@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from functools import partial
 import sys, os
+from crownetutils.analysis.hdf.provider import BaseHdfProvider
 
 import pandas as pd
 import numpy as np
@@ -114,6 +115,10 @@ class SimulationRun(BaseSimulationRunner):
     # @process_as({"prio": 10, "type": "pre"})
     # def bar(self):
     # pass
+    @process_as({"prio": 1000, "type": "post"})
+    def build_sql_index(self):
+        sim = Simulation.from_dpmm_cfg(get_density_cfg())
+        sim.sql.append_index_if_missing()
 
     @process_as({"prio": 999, "type": "post"})
     def build_hdf(self):
@@ -229,7 +234,17 @@ class SimulationRun(BaseSimulationRunner):
                 msce["cell_mse"], savefig=saver.with_name("Map_msce_ecdf.png")
             )
 
-    # @process_as({"prio": 960, "type": "post"})
+    @process_as({"prio": 100, "type": "post"})
+    def build_sql_index(self):
+        h = BaseHdfProvider(get_density_cfg()).repack_hdf(keep_old_file=False)
+
+    @process_as(
+        {"prio": 100, "type": "post"}
+    )  # todo mark some post processing task parallel?
+    def build_sql_index(self):
+        h = BaseHdfProvider(get_entropy_cfg()).repack_hdf(keep_old_file=False)
+
+    # @process_as({"prio": 100, "type": "post"})
     # def remove_density_map_csv(self):
     #     cfg: DpmmCfg
     #     for cfg in get_cfg_list(self.result_base_dir()):

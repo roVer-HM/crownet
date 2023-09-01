@@ -5,6 +5,7 @@ from crownetutils.analysis.dpmm.imputation import (
     ArbitraryValueImputationWithRsd,
     DeleteMissingImputation,
 )
+from crownetutils.analysis.hdf.provider import BaseHdfProvider
 from crownetutils.analysis.hdf_providers.node_position import (
     EnbPositionHdf,
     NodePositionHdf,
@@ -19,6 +20,7 @@ from crownetutils.analysis.plot.app_misc import PlotAppMisc, PlotAppTxInterval
 from crownetutils.analysis.plot.dpmMap import PlotDpmMap
 from crownetutils.analysis.plot.enb import PlotEnb
 from crownetutils.utils.dataframe import merge_on_interval
+from crownetutils.utils.logging import TimeIt
 from crownetutils.utils.plot import FigureSaverSimple
 import pandas as pd
 import numpy as np
@@ -26,6 +28,12 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.collections import LineCollection
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+
+
+sim_base = os.path.join(os.environ["CROWNET_HOME"], "crownet/simulations/multi_enb")
+mnt_base = os.path.join(
+    os.environ["OPP_EXTERN_DATA_MNT"].split(":")[0], "results/multi_enb/"
+)
 
 
 def get_density_cfg(base_dir):
@@ -77,20 +85,22 @@ def build_hdf(cfg: DpmmCfg):
     else:
         b.set_imputation_strategy(DeleteMissingImputation())
 
+    sim.sql.append_index_if_missing()
+
     b.build()
 
     OppAnalysis.append_err_measures_to_hdf(sim)
 
-    # HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
+    HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
 
-    # HdfExtractor.extract_packet_loss(
-    #     sim.path("pkt_loss.h5"), "map", sim.sql, sim.sql.m_map()
-    # )
-    # HdfExtractor.extract_packet_loss(
-    #     sim.path("pkt_loss.h5"), "beacon", sim.sql, sim.sql.m_beacon()
-    # )
+    HdfExtractor.extract_packet_loss(
+        sim.path("pkt_loss.h5"), "map", sim.sql, sim.sql.m_map()
+    )
+    HdfExtractor.extract_packet_loss(
+        sim.path("pkt_loss.h5"), "beacon", sim.sql, sim.sql.m_beacon()
+    )
 
-    # HdfExtractor.extract_trajectories(sim.path("position.h5"), sim.sql)
+    HdfExtractor.extract_trajectories(sim.path("position.h5"), sim.sql)
 
 
 def plot_defaults(sim: Simulation):
@@ -184,30 +194,44 @@ def plot_enb_association_map(sim: Simulation):
 
 
 def main(override):
-    base = os.path.abspath(".")
     cfg = get_density_cfg(
-        # os.path.join(base, "./results/count_and_entropy")
-        os.path.join(base, "results/final_muli_enb_dev_20230821-07:18:40")
+        # os.path.join(sim_base, "results/count_and_entropy")
+        # os.path.join(mnt_base, "test_run_600s_killed/",
+        # os.path.join(sim_base,"results/count_and_entropy")
+        # os.path.join(sim_base, "results/final_muli_enb_dev_20230821-07:18:40")
+        os.path.join(
+            mnt_base,
+            "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream",
+        )
     )
+
+    # build_all(cfg.base_dir)
     sim = Simulation(
-        # data_root="/mnt/data1tb/results/multi_enb/test_run_600s_killed/",
-        # data_root=os.path.join(base,"results/with_rsd/"),
-        # data_root=os.path.join(base,"results/final_muli_enb_dev_20230801-15:02:53"),
-        # data_root=os.path.join(base,"results/count_and_entropy")
         data_root=cfg.base_dir,
         label="mulit_enb",
         dpmm_cfg=cfg,
     )
-    build_all(cfg.base_dir)
-    # map = sim.get_dcdMap()
-    # h = sim.get_base_provider(group_name="cell_measures_by_rsd", path=cfg.hdf_path())
-    # h.clear_group(group="cell_measures_by_rsd", repack=True)
-    OppAnalysis.append_err_measures_to_hdf(sim)
+    m = sim.get_dcdMap()
+    OppAnalysis.plot_simtime_to_realtime_ratios(
+        os.path.join(
+            mnt_base,
+            "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream/cmd.out",
+        ),
+        os.path.join(
+            mnt_base,
+            "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream/cmd.pdf",
+        ),
+        nodes=m.glb_map.groupby(["simtime"]).sum(),
+    )
 
-    print("hi")
+    # # map = sim.get_dcdMap()
+    # # h = sim.get_base_provider(group_name="cell_measures_by_rsd", path=cfg.hdf_path())
+    # # h.clear_group(group="cell_measures_by_rsd", repack=True)
+    # OppAnalysis.append_err_measures_to_hdf(sim)
+
     # plot_enb_association(sim)
     # plot_enb_association_map(sim)
-    # inter = OppAnalysis.get_serving_enb_interval(sim)
+    # # inter = OppAnalysis.get_serving_enb_interval(sim)
 
 
 if __name__ == "__main__":
