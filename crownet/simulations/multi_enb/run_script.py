@@ -22,8 +22,12 @@ from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
+    ArbitraryValueImputation,
     ArbitraryValueImputationWithRsd,
     DeleteMissingImputation,
+    FullRsdImputation,
+    ImputationStream,
+    OwnerPositionImputation,
 )
 
 load_matplotlib_style(STYLE_SIMPLE_169)
@@ -85,21 +89,28 @@ class SimulationRun(BaseSimulationRunner):
         super().__init__(working_dir, args)
 
     def get_builder(self, cfg: DpmmCfg):
+
+        sim: Simulation = Simulation.from_dpmm_cfg(cfg)
+        sim.sql.append_index_if_missing()
+
         b: DpmmHdfBuilder = DpmmHdfBuilder.get(cfg, override_hdf=False)
         b.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-        if cfg.is_count_map:
-            rsd_origin_position = Simulation.from_dpmm_cfg(
-                cfg
-            ).sql.get_resource_sharing_domains(
-                apply_offset=False, bottom_left_origin=True
-            )
-
-            i = ArbitraryValueImputationWithRsd(
-                rsd_origin_position=rsd_origin_position, fill_value=0.0
-            )
-            b.set_imputation_strategy(i)
+        rsd_origin_position = sim.sql.get_resource_sharing_domains(
+            apply_offset=False, bottom_left_origin=True
+        )
+        if cfg.is_count_map():
+            stream = ImputationStream()
+            stream.append(ArbitraryValueImputation(fill_value=0))
+            # stream.append(DeleteMissingImputation())
+            stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
+            stream.append(OwnerPositionImputation())
+            b.set_imputation_strategy(stream)
         else:
-            b.set_imputation_strategy(DeleteMissingImputation())
+            stream = ImputationStream()
+            stream.append(DeleteMissingImputation())
+            stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
+            stream.append(OwnerPositionImputation())
+            b.set_imputation_strategy(stream)
 
         return b
 

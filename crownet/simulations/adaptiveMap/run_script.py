@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 import sys, os
+from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.imputation import (
+    ArbitraryValueImputation,
+    DeleteMissingImputation,
+    FullRsdImputation,
+    ImputationStream,
+    OwnerPositionImputation,
+)
 
 import pandas as pd
 import numpy as np
@@ -39,9 +48,45 @@ def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
     return ret
 
 
+def get_density_cfg(base_dir):
+    density_cfg = DpmmCfg(
+        base_dir=base_dir,
+        hdf_file="density_data.h5",
+        map_type=MapType.DENSITY,
+        global_map_csv_name="global.csv",
+        beacon_app_path="app[0]",
+        map_app_path="app[1]",
+        module_vectors=["misc"],
+    )
+    return density_cfg
+
+
 class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
+
+    def get_cfg(self):
+        return get_density_cfg(self.result_base_dir())
+
+    def get_builder(self):
+
+        cfg = get_density_cfg(self.result_base_dir())
+        sim: Simulation = Simulation.from_dpmm_cfg(cfg)
+        sim.sql.append_index_if_missing()
+
+        b: DpmmHdfBuilder = DpmmHdfBuilder.get(cfg, override_hdf=False)
+        b.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
+        rsd_origin_position = sim.sql.get_resource_sharing_domains(
+            apply_offset=False, bottom_left_origin=True
+        )
+        stream = ImputationStream()
+        # stream.append(ArbitraryValueImputation(fill_value=0))
+        stream.append(DeleteMissingImputation())
+        stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
+        stream.append(OwnerPositionImputation())
+        b.set_imputation_strategy(stream)
+
+        return b
 
     # todo: add pre and post processing to apply for each simulation run.
     # Post processing might inlcude result striping or aggreagtion.
@@ -56,36 +101,31 @@ class SimulationRun(BaseSimulationRunner):
     # def bar(self):
     # pass
 
+    @process_as({"prio": 1000, "type": "post"})
+    def build_sql_index(self):
+        cfg = self.get_cfg()
+        sim = Simulation.from_dpmm_cfg(cfg)
+        sim.sql.append_index_if_missing()
+
     @process_as({"prio": 999, "type": "post"})
     def build_hdf(self):
-        _, builder, _ = OppAnalysis.builder_from_output_folder(
-            data_root=self.result_base_dir()
-        )
-        builder.only_selected_cells(self.ns.get("hdf_cell_selection_mode", True))
-        # builder.set_imputation_strategy(DeleteMissingImputation())
+        cfg = self.get_cfg()
+        builder = self.get_builder(cfg)
         builder.build(self.ns.get("hdf_override", "False"))
 
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
-        try:
-            sim = Simulation.from_suqc_result(data_root=self.result_base_dir())
-        except ValueError:
-            print(
-                "No suqc context found. Try creating Simulation object without context. Some features of the Simulation analysis might be not supported."
-            )
-            sim = Simulation.from_output_dir(self.result_base_dir())
+        sim = Simulation.from_dpmm_cfg(self.get_cfg(), label="")
         OppAnalysis.append_err_measures_to_hdf(sim)
 
     @process_as({"prio": 975, "type": "post"})
     def create_rcvd_stats(self):
-        sim = Simulation(self.result_base_dir(), label="")
+        sim = Simulation.from_dpmm_cfg(self.get_cfg(), label="")
         HdfExtractor.extract_rvcd_statistics(sim.path("rcvd_stats.h5"), sim.sql)
 
     @process_as({"prio": 970, "type": "post"})
     def create_common_plots(self):
-        result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
-            data_root=self.result_base_dir()
-        )
+        result_dir, builder, sql = OppAnalysis.builder_from_cfg(self.get_cfg())
         os.makedirs(self.result_dir("fig_out"))
         with PdfPages(self.result_dir("fig_out/app_data.pdf")) as pdf:
             PlotEnb.plot_served_blocks_ul_all(
@@ -103,10 +143,7 @@ class SimulationRun(BaseSimulationRunner):
 
     @process_as({"prio": 965, "type": "post"})
     def add_plots(self):
-        result_dir, builder, sql = OppAnalysis.builder_from_output_folder(
-            data_root=self.result_base_dir()
-        )
-        sim = Simulation(self.result_base_dir(), label="")
+        sim = Simulation.from_dpmm_cfg(self.get_cfg(), label="")
         saver = FigureSaverSimple(
             override_base_path=self.result_dir("fig_out"), figure_type=".png"
         )
@@ -153,28 +190,10 @@ class SimulationRun(BaseSimulationRunner):
         for f in builder.map_paths:
             os.remove(f)
 
-    @process_as({"prio": 900, "type": "post"})
-    def vadere_position(self):
-        path = self.result_dir("vadere.d/numAgents.csv")
-        if os.path.exists(path):
-            df = VadereAnalysis.read_time_step(path)
-            VadereAnalysis.plot_number_agents_over_time(
-                data=df, savefig=self.result_dir("vadere.d/numAgents.pdf")
-            )
-
 
 if __name__ == "__main__":
 
     settings = []
-    # settings = [
-    #     "post-processing",
-    #     "--qoi",
-    #     "all",
-    #     "--override-hdf",
-    #     "--resultdir",
-    #     # "results/S1_bonn_motion_dev_20221007-13:43:08",
-    #     "results/S1_bonn_motion_dev_20221010-08:51:11",
-    # ]
 
     if len(sys.argv) == 1:
         # default behavior of script

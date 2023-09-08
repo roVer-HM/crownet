@@ -2,19 +2,19 @@ import os
 from crownetutils.analysis.common import Simulation
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
-    ArbitraryValueImputationWithRsd,
     DeleteMissingImputation,
+    ImputationStream,
+    FullRsdImputation,
+    OwnerPositionImputation,
 )
 from crownetutils.analysis.hdf.provider import BaseHdfProvider
 from crownetutils.analysis.hdf_providers.node_position import (
     EnbPositionHdf,
     NodePositionHdf,
-    RsdPositionHdf,
 )
 from crownetutils.analysis.omnetpp import (
     OppAnalysis,
     HdfExtractor,
-    NodePositionWithRsdHdf,
 )
 from crownetutils.analysis.plot.app_misc import PlotAppMisc, PlotAppTxInterval
 from crownetutils.analysis.plot.dpmMap import PlotDpmMap
@@ -54,8 +54,9 @@ def get_entropy_cfg(base_dir):
         base_dir=base_dir,
         hdf_file="entropy_data.h5",
         map_type=MapType.ENTROPY,
-        global_map_csv_name="entropyMap_global.csv",
+        global_map_csv_name="global_entropyMap.csv",
         node_map_csv_glob="entropyMap_*.csv",
+        node_map_csv_id_regex=r"entropyMap_(?P<node>\d+)\.csv",
         beacon_app_path=None,
         map_app_path="app[2]",
         module_vectors=["misc", "pNode"],
@@ -64,30 +65,39 @@ def get_entropy_cfg(base_dir):
 
 
 def build_all(base_dir):
-    for f in [get_density_cfg, get_entropy_cfg]:
+    # for f in [get_density_cfg, get_entropy_cfg]:
+    for f in [get_entropy_cfg]:
         cfg = f(base_dir)
         build_hdf(cfg)
 
 
 def build_hdf(cfg: DpmmCfg):
     sim: Simulation = Simulation.from_dpmm_cfg(cfg)
-    b: DpmmHdfBuilder = DpmmHdfBuilder.get(cfg, override_hdf=False)
-    b.only_selected_cells(True)
-    if cfg.is_count_map:
-        rsd_origin_position = sim.sql.get_resource_sharing_domains(
-            apply_offset=False, bottom_left_origin=True
-        )
-
-        i = ArbitraryValueImputationWithRsd(
-            rsd_origin_position=rsd_origin_position, fill_value=0.0
-        )
-        b.set_imputation_strategy(i)
-    else:
-        b.set_imputation_strategy(DeleteMissingImputation())
-
     sim.sql.append_index_if_missing()
 
+    b: DpmmHdfBuilder = DpmmHdfBuilder.get(cfg, override_hdf=False)
+    b.only_selected_cells(True)
+    rsd_origin_position = sim.sql.get_resource_sharing_domains(
+        apply_offset=False, bottom_left_origin=True
+    )
+    if cfg.is_count_map():
+        stream = ImputationStream()
+        # stream.append(ArbitraryValueImputation(fill_value=0))
+        stream.append(DeleteMissingImputation())
+        stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
+        stream.append(OwnerPositionImputation())
+        b.set_imputation_strategy(stream)
+    else:
+        stream = ImputationStream()
+        stream.append(DeleteMissingImputation())
+        stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
+        stream.append(OwnerPositionImputation())
+        b.set_imputation_strategy(stream)
+
     b.build()
+
+    if cfg.map_type == MapType.ENTROPY:
+        BaseHdfProvider(cfg.hdf_path()).repack_hdf(keep_old_file=False)
 
     OppAnalysis.append_err_measures_to_hdf(sim)
 
@@ -199,13 +209,17 @@ def main(override):
         # os.path.join(mnt_base, "test_run_600s_killed/",
         # os.path.join(sim_base,"results/count_and_entropy")
         # os.path.join(sim_base, "results/final_muli_enb_dev_20230821-07:18:40")
+        # os.path.join(
+        #     mnt_base,
+        #     "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream",
+        # )
         os.path.join(
             mnt_base,
-            "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream",
+            "final_multi_enb_30_min_20230829-with_3_apps_25m_radius_entropy_rnd_stream",
         )
     )
 
-    # build_all(cfg.base_dir)
+    build_all(cfg.base_dir)
     sim = Simulation(
         data_root=cfg.base_dir,
         label="mulit_enb",
@@ -213,14 +227,8 @@ def main(override):
     )
     m = sim.get_dcdMap()
     OppAnalysis.plot_simtime_to_realtime_ratios(
-        os.path.join(
-            mnt_base,
-            "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream/cmd.out",
-        ),
-        os.path.join(
-            mnt_base,
-            "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream/cmd.pdf",
-        ),
+        sim.path("cmd.out"),
+        sim.path("cmd.pdf"),
         nodes=m.glb_map.groupby(["simtime"]).sum(),
     )
 
