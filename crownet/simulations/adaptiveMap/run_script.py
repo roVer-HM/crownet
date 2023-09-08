@@ -3,8 +3,7 @@ import sys, os
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
 from crownetutils.analysis.dpmm.imputation import (
-    ArbitraryValueImputation,
-    DeleteMissingImputation,
+    DeleteMissingArbitraryGlobalValueForImagined,
     FullRsdImputation,
     ImputationStream,
     OwnerPositionImputation,
@@ -80,8 +79,9 @@ class SimulationRun(BaseSimulationRunner):
             apply_offset=False, bottom_left_origin=True
         )
         stream = ImputationStream()
-        # stream.append(ArbitraryValueImputation(fill_value=0))
-        stream.append(DeleteMissingImputation())
+        # stream.append(ArbitraryValueImputation(fill_value=0.0))
+        stream.append(DeleteMissingArbitraryGlobalValueForImagined(glb_fill_value=0.0))
+        # stream.append(DeleteMissingImputation())
         stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
         stream.append(OwnerPositionImputation())
         b.set_imputation_strategy(stream)
@@ -109,8 +109,7 @@ class SimulationRun(BaseSimulationRunner):
 
     @process_as({"prio": 999, "type": "post"})
     def build_hdf(self):
-        cfg = self.get_cfg()
-        builder = self.get_builder(cfg)
+        builder = self.get_builder()
         builder.build(self.ns.get("hdf_override", "False"))
 
     @process_as({"prio": 980, "type": "post"})
@@ -126,7 +125,7 @@ class SimulationRun(BaseSimulationRunner):
     @process_as({"prio": 970, "type": "post"})
     def create_common_plots(self):
         result_dir, builder, sql = OppAnalysis.builder_from_cfg(self.get_cfg())
-        os.makedirs(self.result_dir("fig_out"))
+        os.makedirs(self.result_dir("fig_out"), exist_ok=True)
         with PdfPages(self.result_dir("fig_out/app_data.pdf")) as pdf:
             PlotEnb.plot_served_blocks_ul_all(
                 self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
@@ -182,13 +181,13 @@ class SimulationRun(BaseSimulationRunner):
             msce["cell_mse"], savefig=saver.with_name("Map_msce_ecdf.png")
         )
 
-    @process_as({"prio": 960, "type": "post"})
-    def remove_density_map_csv(self):
-        _, builder, _ = OppAnalysis.builder_from_output_folder(
-            data_root=self.result_base_dir()
-        )
-        for f in builder.map_paths:
-            os.remove(f)
+    # @process_as({"prio": 960, "type": "post"})
+    # def remove_density_map_csv(self):
+    #     _, builder, _ = OppAnalysis.builder_from_output_folder(
+    #         data_root=self.result_base_dir()
+    #     )
+    #     for f in builder.map_paths:
+    #         os.remove(f)
 
 
 if __name__ == "__main__":
