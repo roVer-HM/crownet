@@ -117,7 +117,7 @@ simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagati
 echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
 echo "Simulation started: `date`"| tee -a $LOG_FILE
 cd ${simulation_dir}
-python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 100 2000 6 >> $LOG_FILE & pid=$! && wait_symbol $pid
+python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 100 2000 5 >> $LOG_FILE & pid=$! && wait_symbol $pid
 echo "Simulation finished: `date`"| tee -a $LOG_FILE
 
 echo "####################################### compare guiding strategies ########################################"

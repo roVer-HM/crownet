@@ -173,7 +173,7 @@ if __name__ == "__main__":
     # p1_ = chaospy.TruncExponential(upper=up, shift=low, scale=(up - low) / b) b=4
     p1_ = chaospy.Uniform(lower=low, upper=up) # number of pedestrians
     p2_ = chaospy.Uniform(lower=0, upper=4000) #"*.hostMobile[*].app[1].messageLength"
-    p3_ = chaospy.Uniform(lower=2.0,upper=20.0) # "**wlan[*].radio.transmitter.power"
+    p3_ = chaospy.Uniform(lower=2.0,upper=5.0) # "**wlan[*].radio.transmitter.power"
 
     distribution = chaospy.J(p1_,p2_,p3_)
 

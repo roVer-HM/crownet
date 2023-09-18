@@ -59,7 +59,7 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
 
     setup = CoupledDictVariation(
         ini_path=path2ini,
-        config="final",
+        config="final_no_traffic",
         parameter_dict_list=par_var,
         qoi=quantity_of_interest,
         model=model,
