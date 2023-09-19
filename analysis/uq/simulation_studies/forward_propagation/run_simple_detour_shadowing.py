@@ -133,7 +133,8 @@ if __name__ == "__main__":
             'vadere': {'sources.[id==1].spawner.distribution.numberPedsPerSecond': p,
                     'sources.[id==2].spawner.distribution.numberPedsPerSecond': p,
                     'sources.[id==5].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==6].spawner.distribution.numberPedsPerSecond': p}
+                    'sources.[id==6].spawner.distribution.numberPedsPerSecond': p}, 
+            'omnet': {"*.pNode[*].app[1].startTime": "300s"},
             }
 
         par_var.append(sample)
