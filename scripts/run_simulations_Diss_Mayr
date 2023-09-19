@@ -37,7 +37,7 @@ fi
 
 echo "##################################### prepare output directory  #######################################"
 
-simulation_storage="/mnt/data1TB/storage" # TODO adjust this and make sure that the directory exists and is mounted! 
+simulation_storage="/mnt/data1TB/simresults" # TODO adjust this and make sure that the directory exists and is mounted! 
 
 if [ -n "$(find "$simulation_storage" -maxdepth 0 -type d -empty 2>/dev/null)" ]; then
 
