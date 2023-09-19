@@ -172,8 +172,8 @@ if __name__ == "__main__":
     # paratemeters
     # p1_ = chaospy.TruncExponential(upper=up, shift=low, scale=(up - low) / b) b=4
     p1_ = chaospy.Uniform(lower=low, upper=up) # number of pedestrians
-    p2_ = chaospy.Uniform(lower=0, upper=4000) #"*.hostMobile[*].app[1].messageLength"
-    p3_ = chaospy.Uniform(lower=2.0,upper=5.0) # "**wlan[*].radio.transmitter.power"
+    p2_ = chaospy.Uniform(lower=1000, upper=3000) #"*.hostMobile[*].app[1].messageLength"
+    p3_ = chaospy.Uniform(lower=2.0,upper=20.0) # "**wlan[*].radio.transmitter.power"
 
     distribution = chaospy.J(p1_,p2_,p3_)
 
@@ -200,7 +200,7 @@ if __name__ == "__main__":
         power = f"{round(val3,4)}mW"
 
         sample = {
-            'omnet': {"*.misc[0].app[0].messageLength": message_length_parameter_val,
+            'omnet': {"*.*[*].app[0].messageLength": message_length_parameter_val,
                       "**wlan[*].radio.transmitter.power": power},
             'vadere': {'sources.[id==1].spawner.distribution.numberPedsPerSecond': p,
                     'sources.[id==2].spawner.distribution.numberPedsPerSecond': p,
