@@ -37,7 +37,7 @@ fi
 
 echo "##################################### prepare output directory  #######################################"
 
-simulation_storage="/mnt/data1TB/simresults" # TODO adjust this and make sure that the directory exists and is mounted! 
+simulation_storage="/mnt/data1TB/results" # TODO adjust this and make sure that the directory exists and is mounted! 
 
 if [ -n "$(find "$simulation_storage" -maxdepth 0 -type d -empty 2>/dev/null)" ]; then
 
@@ -108,7 +108,7 @@ simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagati
 echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
 echo "Simulation started: `date`"| tee -a $LOG_FILE
 cd ${simulation_dir}
-python3 run_simple_detour_shadowing.py "${simulation_storage}/shadowing" 130 500 9 >> $LOG_FILE & pid=$! && wait_symbol $pid
+python3 run_simple_detour_shadowing.py "${simulation_storage}/shadowing" 130 500 10 >> $LOG_FILE & pid=$! && wait_symbol $pid
 echo "Simulation finished: `date`"| tee -a $LOG_FILE
 
 echo "################################### information dissemination uq study #################################"
@@ -117,8 +117,9 @@ simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagati
 echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
 echo "Simulation started: `date`"| tee -a $LOG_FILE
 cd ${simulation_dir}
-python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 100 2000 5 >> $LOG_FILE & pid=$! && wait_symbol $pid
+python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 100 2000 8 >> $LOG_FILE & pid=$! && wait_symbol $pid
 echo "Simulation finished: `date`"| tee -a $LOG_FILE
+
 
 echo "####################################### compare guiding strategies ########################################"
 
