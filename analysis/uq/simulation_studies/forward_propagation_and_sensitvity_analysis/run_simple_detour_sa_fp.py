@@ -187,10 +187,7 @@ if __name__ == "__main__":
 
         # Parameter 1: number of agents
         # The number of agents is a parameter that is specified in the vadere simulator.
-        # There are four sources in the simulation that spawn agents according to Poisson processes.
-        # The unit of the Poisson parameter p is [agents/1 seconds].
-        # Since the 'number of agents' parameter refers to 100s and there are four sources, p must be:
-        p = round(val1 * 0.01 / 4, 4) # source parameters must be of type >list< in vadere, other parameters require other types
+        p = round(4*1*100/val1, 4) # = 4 sources* 1 Person*100s / (number of persons in scenario after 100s)
 
         # Parameter 2: message length
         # The message length is a parameter in the omnet simulator.
@@ -202,10 +199,10 @@ if __name__ == "__main__":
         sample = {
             'omnet': {"*.misc[0].app[0].repeateInterval": repeateInterval,
                       "**wlan[*].radio.transmitter.power": power},
-            'vadere': {'sources.[id==1].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==2].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==5].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==6].spawner.distribution.numberPedsPerSecond': p}
+            'vadere': {'sources.[id==1].spawner.distribution.updateFrequency': p,
+                    'sources.[id==2].spawner.distribution.updateFrequency': p,
+                    'sources.[id==5].spawner.distribution.updateFrequency': p,
+                    'sources.[id==6].spawner.distribution.updateFrequency': p}
             }
 
         par_var.append(sample)
