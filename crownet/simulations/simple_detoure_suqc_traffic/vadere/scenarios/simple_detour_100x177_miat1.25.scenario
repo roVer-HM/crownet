@@ -152,7 +152,7 @@
     "attributesSimulation" : {
       "finishTime" : 110.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 1.0,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -445,7 +445,7 @@
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
-          "constraintsTimeStart" : 0.0,
+          "constraintsTimeStart" : 0.41,
           "constraintsTimeEnd" : 100.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
@@ -472,7 +472,7 @@
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
-          "constraintsTimeStart" : 0.0,
+          "constraintsTimeStart" : 0.41,
           "constraintsTimeEnd" : 100.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
@@ -499,7 +499,7 @@
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
-          "constraintsTimeStart" : 0.0,
+          "constraintsTimeStart" : 0.41,
           "constraintsTimeEnd" : 100.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
@@ -526,7 +526,7 @@
         "spawner" : {
           "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
           "constraintsElementsMax" : -1,
-          "constraintsTimeStart" : 0.0,
+          "constraintsTimeStart" : 0.41,
           "constraintsTimeEnd" : 100.0,
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,

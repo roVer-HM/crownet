@@ -114,7 +114,7 @@ if __name__ == "__main__":
                          "where 1 is the number of parallel runs.")
 
 
-    samples = np.linspace(1, high, number)
+    samples = np.linspace(20, high, number)
 
     summary_dir = os.path.join(simulation_dir, "results_summary")
     output_dir = os.path.join(simulation_dir, "Shadowing_results")
