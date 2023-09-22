@@ -1,6 +1,8 @@
+import io
 import os
 from crownetutils.analysis.common import Simulation
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.hdf.dpmm_provider import DpmmProvider
 from crownetutils.analysis.dpmm.imputation import (
     DeleteMissingImputation,
     ImputationStream,
@@ -21,14 +23,19 @@ from crownetutils.analysis.plot.dpmMap import PlotDpmMap
 from crownetutils.analysis.plot.enb import PlotEnb
 from crownetutils.utils.dataframe import merge_on_interval
 from crownetutils.utils.logging import TimeIt
-from crownetutils.utils.plot import FigureSaverSimple
+from crownetutils.utils.misc import Timer
+from crownetutils.utils.parallel import queue_test
+from crownetutils.utils.plot import FigureSaverSimple, enb_patch
+from matplotlib.ticker import FuncFormatter, MultipleLocator
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
-from matplotlib.collections import LineCollection
+from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.patches import Rectangle
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
 
+from PIL import Image
 
 sim_base = os.path.join(os.environ["CROWNET_HOME"], "crownet/simulations/multi_enb")
 mnt_base = os.path.join(
@@ -204,7 +211,11 @@ def plot_enb_association_map(sim: Simulation):
 
 
 def main(override):
-    cfg = get_density_cfg(
+    base_dir = os.path.join(
+        mnt_base,
+        "final_multi_enb_30_min_20230829-with_3_apps_25m_radius_entropy_rnd_stream",
+    )
+    cfg: DpmmCfg = get_entropy_cfg(
         # os.path.join(sim_base, "results/count_and_entropy")
         # os.path.join(mnt_base, "test_run_600s_killed/",
         # os.path.join(sim_base,"results/count_and_entropy")
@@ -213,24 +224,119 @@ def main(override):
         #     mnt_base,
         #     "final_multi_enb_30_min_20230828-test_with_3_apps_1cell_entropy_rnd_stream",
         # )
-        os.path.join(
-            mnt_base,
-            "final_multi_enb_30_min_20230829-with_3_apps_25m_radius_entropy_rnd_stream",
-        )
+        base_dir=base_dir
     )
 
-    build_all(cfg.base_dir)
+    # build_all(cfg.base_dir)
+
     sim = Simulation(
         data_root=cfg.base_dir,
         label="mulit_enb",
         dpmm_cfg=cfg,
     )
-    m = sim.get_dcdMap()
+    sim.sql.append_index_if_missing()
+
+    m = Simulation.from_dpmm_cfg(get_density_cfg(base_dir)).get_dcdMap()
     OppAnalysis.plot_simtime_to_realtime_ratios(
         sim.path("cmd.out"),
         sim.path("cmd.pdf"),
         nodes=m.glb_map.groupby(["simtime"]).sum(),
     )
+    base_path = sim.path("age_over_distance")
+    os.makedirs(base_path, exist_ok=True)
+
+    bound = sim.sql.sim_bound()
+    enb = EnbPositionHdf.from_sim(sim).frame()
+    enb["x"] += bound.offset[0]
+    enb["y"] += bound.offset[1]
+
+    patches = []
+    for _, row in enb.iterrows():
+        patches.append(enb_patch(20, (row["x"], row["y"])))
+
+    patches = PatchCollection(patches)
+
+    for host_id in sim.sql.module_to_host_ids().id_map.values():
+
+        m = DpmmProvider(hdf_path=cfg.hdf_path())
+        with Timer(name="read hdf") as timer:
+            df1 = m[pd.IndexSlice[:, :, :, :, host_id], :]
+            timer.round("read by ID")
+            df2 = m[pd.IndexSlice[5, :, :, :, :], :]
+            timer.round("read by time")
+            print("hi")
+        x = m[pd.IndexSlice[:, :, :, :, host_id], :]
+        xx = (
+            x[["x_owner", "y_owner"]]
+            .droplevel(["x", "y", "source", "ID"])
+            .drop_duplicates()
+        )
+        fig, ax = plt.subplots(1, 1, figsize=(16, 9))
+        ax.set_title(f"HostId {host_id}")
+        ax.scatter(
+            xx["x_owner"], xx["y_owner"], color="blue", marker="x", label="trajectory"
+        )
+        ax.set_xlim(0, sim.sql.sim_bound().abs_bound[0] + 1200)
+        ax.set_ylim(0, sim.sql.sim_bound().abs_bound[1] + 1200)
+        ax.set_ylabel("y in meter")
+        ax.set_xlabel("x in meter")
+        cells = PatchCollection(
+            patches=[
+                Rectangle(
+                    xy, 5.0, 5.0, fill=False, edgecolor="black", facecolor="white"
+                )
+                for xy in x.index.droplevel(["simtime", "source", "ID"]).unique().values
+            ],
+            edgecolor="black",
+            facecolor="white",
+        )
+        ax.add_collection(cells)
+        patches.set_transform(ax.transData)
+        ax.add_collection(patches)
+        ax.set_aspect("equal")
+
+        bins = pd.interval_range(
+            start=0, end=x["owner_dist"].max(), freq=25.0, closed="left"
+        )
+        x["dist_bin"] = pd.cut(x["owner_dist"], bins=bins)
+        fig.tight_layout()
+        io_buf = io.BytesIO()
+        fig.savefig(io_buf)
+        plt.close(fig)
+
+        fig, ax = plt.subplots(1, 1, figsize=(16, 9))
+        agg_df = x.groupby("dist_bin")["measurement_age"].agg(["count", "mean", "std"])
+        agg_df["x"] = [i.right for i in agg_df.index.values]
+        agg_df = agg_df.reset_index(drop=True).set_index(["x"])
+        agg_df = agg_df.set_axis(
+            ["count", "mean age in second", "std age in second"], axis=1
+        )
+        agg_df.plot(
+            subplots=True,
+            sharex=True,
+            ax=ax,
+            marker=".",
+            title="Distance node to measured cell in meter",
+            xlabel="distance owner to measurement",
+        )
+        ax.set_title(f"AoI for node {host_id}")
+        ax.xaxis.set_major_locator(MultipleLocator(25.0))
+        ax.set_xlim(0, agg_df.index.max() + 20)
+        fig.tight_layout()
+        io_buf2 = io.BytesIO()
+        fig.savefig(io_buf2)
+        plt.close(fig)
+
+        i1 = Image.open(io_buf)
+        i2 = Image.open(io_buf2)
+        out = Image.new("RGB", (i1.width + i2.width, i1.height))
+        out.paste(i1, (0, 0))
+        out.paste(i2, (i1.width, 0))
+        out.save(os.path.join(base_path, f"host_id{host_id}.png"))
+        del i1
+        del i2
+        del out
+        print("hi")
 
     # # map = sim.get_dcdMap()
     # # h = sim.get_base_provider(group_name="cell_measures_by_rsd", path=cfg.hdf_path())
@@ -244,3 +350,4 @@ def main(override):
 
 if __name__ == "__main__":
     main(override=False)
+    # queue_test()
