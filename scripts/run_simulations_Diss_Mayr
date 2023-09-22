@@ -75,25 +75,25 @@ docker tag ghcr.io/rover-hm/vadere:${CROWNET_VADERE_CONT_TAG}  ${CROWNET_IMAGE_B
 docker tag ghcr.io/rover-hm/flowcontrol:${CROWNET_CONTROL_CONT_TAG} ${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG} | tee -a $LOG_FILE
 
 echo "Build omnetpp." | tee -a $LOG_FILE
-#cd $CROWNET_HOME 
-#set +e 
+cd $CROWNET_HOME 
+set +e 
 echo "Clean diretory"
-#omnetpp exec make cleanall >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
-#set -e
+omnetpp exec make cleanall >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+set -e
 echo "Create makefiles"
-#omnetpp exec make makefiles >> $LOG_FILE 2>&1  & pid=$! && wait_symbol $pid
+omnetpp exec make makefiles >> $LOG_FILE 2>&1  & pid=$! && wait_symbol $pid
 echo "Start actual build process"
-#omnetpp exec make MODE=release >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
-#wait_symbol $pid
+omnetpp exec make MODE=release >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+wait_symbol $pid
 echo "Built of omnetpp finished." | tee -a $LOG_FILE
 
 echo "Start building virtual python enviroment." | tee -a $LOG_FILE
-#rm -rf ${CROWNET_HOME}/out
-#omnetpp exec make analysis-clean >> $LOG_FILE 2>&1 
+rm -rf ${CROWNET_HOME}/out
+omnetpp exec make analysis-clean >> $LOG_FILE 2>&1 
 echo "Build source distributions"
-#omnetpp exec make analysis-build >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+omnetpp exec make analysis-build >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
 echo "Install requirements and source distributions in virtual env /out/crownet_user"
-#omnetpp exec make out/crownet_user 2>&1 >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
+omnetpp exec make out/crownet_user 2>&1 >> $LOG_FILE 2>&1 & pid=$! && wait_symbol $pid
 echo "Built of virtual python enviroment finished." | tee -a $LOG_FILE
 
 
