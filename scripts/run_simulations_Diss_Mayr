@@ -103,16 +103,6 @@ source ${CROWNET_HOME}/out/crownet_user/bin/activate
 set +e && docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && set -e
 
 
-echo "################################### information dissemination uq study #################################"
-
-simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagation_and_sensitvity_analysis"
-echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
-echo "Simulation started: `date`"| tee -a $LOG_FILE
-cd ${simulation_dir}
-python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 150 2500 8 >> $LOG_FILE & pid=$! && wait_symbol $pid
-echo "Simulation finished: `date`"| tee -a $LOG_FILE
-
-
 echo "################################### information dissemination shadowing #################################"
 
 simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagation"
@@ -122,6 +112,15 @@ cd ${simulation_dir}
 python3 run_simple_detour_shadowing.py "${simulation_storage}/shadowing" 150 500 10 >> $LOG_FILE & pid=$! && wait_symbol $pid
 echo "Simulation finished: `date`"| tee -a $LOG_FILE
 
+
+echo "################################### information dissemination uq study #################################"
+
+simulation_dir="${CROWNET_HOME}/analysis/uq/simulation_studies/forward_propagation_and_sensitvity_analysis"
+echo "Run the uq study: ${simulation_dir}" | tee -a $LOG_FILE
+echo "Simulation started: `date`"| tee -a $LOG_FILE
+cd ${simulation_dir}
+python3 run_simple_detour_sa_fp.py "${simulation_storage}/information_diss_time" 2 150 2500 8 >> $LOG_FILE & pid=$! && wait_symbol $pid
+echo "Simulation finished: `date`"| tee -a $LOG_FILE
 
 
 echo "####################################### compare guiding strategies ########################################"
@@ -170,9 +169,10 @@ rsync -r --exclude 'vars_rep_0.*' ${result_dir}/* ${output_folder}/realistic_sce
 echo "################################################# check hashes ################################"
 
 shadowing_hash_exp="d41d8cd98f00b204e9800998ecf8427e"
-dissemination_hash_exp="ca368d40d4f7e009d9223687c0188886"
-guiding_hash_exp="80fa0f2ba49a799d9168d6974764fe98"
-realistic_scenario_hash_exp="5b4c8d3a16d6e73f7959ae53d4312941"
+dissemination_hash_exp="cc67a0c0d996c518bd7e42687901dc2e"
+guiding_hash_exp="95aacae5f311cd29aa7fc534de98fa9b"
+realistic_scenario_hash_exp="a1f932a7ddedc1b726b39a2c970093f0"
+
 
 shadowing_hash=$(find $output_folder/shadowing -type f \( -name '*_informed_.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
 

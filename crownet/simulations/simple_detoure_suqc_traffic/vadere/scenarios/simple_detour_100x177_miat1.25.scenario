@@ -454,7 +454,7 @@
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 0.2
+            "updateFrequency" : 2.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
@@ -481,7 +481,7 @@
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 0.2
+            "updateFrequency" : 2.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
@@ -508,7 +508,7 @@
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 0.2
+            "updateFrequency" : 2.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
@@ -535,7 +535,7 @@
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 0.2
+            "updateFrequency" : 2.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
