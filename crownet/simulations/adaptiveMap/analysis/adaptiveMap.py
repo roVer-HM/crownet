@@ -42,20 +42,26 @@ def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_run_0(output_dir) -> RunMap:
     """
-    Simulation with N=20 seeds and two different numbers of agents
-    in the simulation. The study used the mf topography.
+    Simulation with N=20 seeds per two node estimates (NT and Map) and one
+    without rate limit.
     """
 
     def sim_group_f(sim: Simulation, **kwds):
         iat = sim.run_context.ini_get(
             "*.bonnMotionServer.traceFile", regex=r".*exp_(\d+)_.*", apply=int
         )
-        max_bw_beacon = sim.run_context.ini_get(
-            "*.misc[*].app[0].scheduler.maxApplicationBandwidth", apply=str
-        )
-        max_bw_map = sim.run_context.ini_get(
-            "*.misc[*].app[1].scheduler.maxApplicationBandwidth", apply=str
-        )
+        if sim.run_context.init_contains(
+            "*.misc[*].app[0].scheduler.maxApplicationBandwidth"
+        ):
+            max_bw_beacon = sim.run_context.ini_get(
+                "*.misc[*].app[0].scheduler.maxApplicationBandwidth", apply=str
+            )
+            max_bw_map = sim.run_context.ini_get(
+                "*.misc[*].app[1].scheduler.maxApplicationBandwidth", apply=str
+            )
+        else:
+            max_bw_beacon = "no limit"
+            max_bw_map = "no limit"
         group_name = f"g_iat_{iat}"
         attr = deepcopy(kwds.get("attr", {}))
         attr["iat"] = iat
@@ -64,21 +70,21 @@ def build_run_0(output_dir) -> RunMap:
         kwds["attr"] = attr
         return SimulationGroup(group_name, **kwds)
 
-    study = SuqcStudy("/mnt/data1tb/results/s0_mf_topo_2")
+    study = SuqcStudy(
+        "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/"
+    )
     run_map = study.update_run_map(
         run_map=RunMap(output_dir),
-        sim_per_group=1,
-        # sim_per_group=20,
+        # sim_per_group=1,
+        sim_per_group=20,
         id_offset=0,
         sim_group_factory=sim_group_f,
     )
     return run_map
 
 
-def get_run_map_0() -> RunMap:
-    return RunMap.load_or_create(
-        build_run_0, output_path="/mnt/data1tb/results/_dynamicTxInterval/s0-003"
-    )
+def get_run_map_0(output_path) -> RunMap:
+    return RunMap.load_or_create(build_run_0, output_path=output_path)
 
 
 def plot_per_sim_data(sim: Simulation):
@@ -126,9 +132,16 @@ def plot_per_sim_data(sim: Simulation):
 
 
 def main():
+    base_path = (
+        "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/",
+    )
+    study_out = os.path.join(base_path, "study_out")
+    os.mkdir(study_out)
+
+    sim_run = get_run_map_0(study_out)
 
     saver = FigureSaverSimple(
-        override_base_path="/mnt/data1tb/results/s1_corridor_5/simulation_runs/outputs/fig_out",
+        override_base_path=study_out,
         figure_type=".png",
     )
     os.makedirs(saver.override_base_path, exist_ok=True)
