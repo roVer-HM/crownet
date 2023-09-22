@@ -168,19 +168,27 @@ rsync -r --exclude 'vars_rep_0.*' ${result_dir}/* ${output_folder}/realistic_sce
 
 echo "################################################# check hashes ################################"
 
-shadowing_hash_exp="d41d8cd98f00b204e9800998ecf8427e"
-dissemination_hash_exp="cc67a0c0d996c518bd7e42687901dc2e"
-guiding_hash_exp="95aacae5f311cd29aa7fc534de98fa9b"
-realistic_scenario_hash_exp="a1f932a7ddedc1b726b39a2c970093f0"
+shadowing_hash_exp="acb07ea0b918d9a00d323a63b0a73064"
+dissemination_hash_exp="37139d8c765ac779dc37ba9c400911f4"
+guiding_hash_exp="40118fbbee2161b7361a3d4aeee53391"
+realistic_scenario_hash_exp="c1b36c6041ed79f53d490ab9671b2c36"
 
 
-shadowing_hash=$(find $output_folder/shadowing -type f \( -name '*_informed_.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+cd $output_folder/shadowing
+shadowing_hash=$(md5sum degree_informed_extract.txt packet_age.txt number_of_peds.txt time_95_informed_redirection_area.txt | md5sum | cut -b 1-32)
 
-dissemination_hash=$(find $output_folder/information_diss_time -type f \( -name 'SA_and_FW_*.txt' -o -name 'degree_informed_extract.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+cd $output_folder/information_diss_time/PolynomialChaos_results
+dissemination_hash=$(md5sum SA_and_FW_MinLifetime.txt SA_and_FW_NumberOfPeds.txt SA_and_FW_Time95PercentInformedAll.txt SA_and_FW_Time95PercentInformedRedirecationArea.txt | md5sum | cut -b 1-32)
 
-guiding_hash=$(find $output_folder/guiding_strategies -type f \( -name '*_densities.csv' -o -name '*_fundamentalDiagramm.csv' -o -name '*_path_choice.csv' -o -name '*_startTime.csv' -o -name '*_targetReachTime.csv' -o -name 'statistical_test.txt' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
 
-realistic_scenario_hash=$(find $output_folder/realistic_scenario -type f \( -name 'packet_loss_*.csv' -o -name 'postvis.traj' -o -name '*_diss_time.csv' \)  -exec md5sum {} \; | md5sum | cut -b 1-32) 
+cd $output_folder/guiding_strategies
+guiding_hash=$(md5sum AvoidShort_densities.csv AvoidShort_startTime.csv ClosedLoop_densities.csv ClosedLoop_path_choice.csv NoController_densities.csv NoController_path_choice.csv OpenLoop_densities.csv statistical_test.txt | md5sum | cut -b 1-32)
+
+cd $output_folder/realistic_scenario/vadere.d
+realistic_scenario_hash=$(md5sum postvis.traj densities.txt | md5sum | cut -b 1-32)
+
+
+cd $CROWNET_HOME
 
 if [ "$shadowing_hash" == "$shadowing_hash_exp" ]; then
     echo "Shadowing study: Simulation output has been re-produced successfully. Fingerprint match." | tee -a $LOG_FILE
