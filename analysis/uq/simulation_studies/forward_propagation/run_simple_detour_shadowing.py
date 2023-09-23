@@ -114,7 +114,7 @@ if __name__ == "__main__":
                          "where 1 is the number of parallel runs.")
 
 
-    samples = np.linspace(1, high, number)
+    samples = np.linspace(20, high, number)
 
     summary_dir = os.path.join(simulation_dir, "results_summary")
     output_dir = os.path.join(simulation_dir, "Shadowing_results")
@@ -124,16 +124,13 @@ if __name__ == "__main__":
 
         # Parameter 1: number of agents
         # The number of agents is a parameter that is specified in the vadere simulator.
-        # There are four sources in the simulation that spawn agents according to Poisson processes.
-        # The unit of the Poisson parameter p is [agents/1 seconds].
-        # Since the 'number of agents' parameter refers to 100s and there are four sources, p must be:
-        p = round(val1 * 0.01 / 4, 4) # source parameters must be of type >list< in vadere, other parameters require other types
+        p = round(4*1*100/val1, 4) # = 4 sources* 1 Person*100s / (number of persons in scenario after 100s)
 
         sample = {
-            'vadere': {'sources.[id==1].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==2].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==5].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==6].spawner.distribution.numberPedsPerSecond': p}
+            'vadere': {'sources.[id==1].spawner.distribution.updateFrequency': p,
+                    'sources.[id==2].spawner.distribution.updateFrequency': p,
+                    'sources.[id==5].spawner.distribution.updateFrequency': p,
+                    'sources.[id==6].spawner.distribution.updateFrequency': p}
             }
 
         par_var.append(sample)
@@ -173,7 +170,7 @@ if __name__ == "__main__":
     plt.bar(bins[:-1], number_rec[0], color='b', width=width, align="edge")
     plt.bar(bins[:-1], number_notrec[0], bottom=number_rec[0], color='r', width=width, align="edge")
     plt.ylabel('Information dissemination below 10s')
-    plt.xlabel("Number of pedestrians (mean)")
+    plt.xlabel("Number of agents")
     plt.legend(labels=['<= 10s', '>10s'])
     plt.savefig(os.path.join(output_dir,"Probabilites.pdf"))
     plt.show(block=False)
@@ -181,13 +178,13 @@ if __name__ == "__main__":
 
     plt.bar(bins[:-1], prob_fail, color='b', width=width, align="edge")
     plt.ylabel('Probability (>10s)')
-    plt.xlabel("Number of pedestrians (mean)")
+    plt.xlabel("Number of agents")
     plt.savefig(os.path.join(output_dir,"Probabilites_normed.pdf"))
     plt.show(block=False)
     plt.close()
 
     plt.scatter(x=number_peds["mean"], y=time_95["timeToInform95PercentAgents"])
-    plt.xlabel("Number of pedestrians (mean)")
+    plt.xlabel("Number of agents")
     plt.ylabel("Information dissemination time in s")
     plt.savefig(os.path.join(output_dir,"InfoDisserminationTime.pdf"))
     plt.show(block=False)
