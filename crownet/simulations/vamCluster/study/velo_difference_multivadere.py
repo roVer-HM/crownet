@@ -25,7 +25,7 @@ COLORS = ["black", "blue", "purple", "orange", "red"]
 PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER_NAME = "maxClusterVelocityDifference"
 RECEIVER = "World.vNode[%].middleware.VaService"
-YLABEL = "\nMedian number of messages\nreceived by vehicle nodes\n+/- std. deviation"
+YLABEL = "\nMedian number of\nmessages received by\nvehicle nodes\n+/- std. deviation"
 VAM_TYPES = {
     1: "Individual VAM",
     11: "Cluster VAM\n(cardinality = 1)",
@@ -101,10 +101,11 @@ def visualize():
     plt.rcParams.update({'font.size': 14})   
     plt.rc('axes', titlesize=16)   
     
-    fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(10, 4))
     ax = plt.gca()
     
     ax.grid(True, axis="both", linestyle="--")
+    ax.set_ylim(3500, 6000)
 
     for i, t in enumerate(TEMP_FILE):
         with open(t, "r") as f:

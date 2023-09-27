@@ -11,15 +11,15 @@ STUDY_NAME = "study_simple_velocity_difference_exceed_standard_fix"
 PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER_NAME = "maxClusterVelocityDifference"
 RECEIVER = "World.vNode[%].middleware.VaService"
-YLABEL = "\nMedian number of messages\nreceived by vehicle nodes\n+/- std. deviation"
+YLABEL = "\n\nMedian number of\nmessages received\nby vehicle nodes\n+/- std. deviation"
 VAM_TYPES = {
     1: "Individual VAM",
-    11: "Cluster VAM\n(cardinality = 1)",
-    2: "Cluster VAM\n(cardinality > 1)",
-    3: "Individual VAM\njoin notification",
-    4: "Individual VAM\nleave notification",
-    5: "Individual VAM\ncluster breakup",
-    10: "Individual VAM\nleader lost"
+    11: "Cluster VAM (cardinality = 1)",
+    2: "Cluster VAM (cardinality > 1)",
+    3: "Individual VAM (join)",
+    4: "Individual VAM (leave)",
+    5: "Individual VAM (breakup)",
+    10: "Individual VAM (leader lost)"
 }
 VAM_TYPE_COLORS = {
     1: "blue",
@@ -117,8 +117,8 @@ def visualize():
         
         for sli, sl in enumerate([[1, 11, 2], [3, 4, 5, 10]]):
             
-            fig, axs = plt.subplots(1, len(sl), dpi=100, figsize=(16, 4))
-            fig.subplots_adjust(bottom=0.25, left=0.1, top=0.8, right=0.99, hspace=0)
+            fig, axs = plt.subplots(1, len(sl), dpi=100, figsize=(17, 2.8))
+            fig.subplots_adjust(bottom=0.27, left=0.11, top=0.85, right=0.99, hspace=0)
             
     
             for i, type in enumerate(sl):
@@ -153,14 +153,14 @@ def visualize():
             fig.savefig(f"fig/{PARAMETER_NAME}_{sli}.pdf")
             plt.show()
         
-        fig = plt.figure(figsize=(10, 5))
+        fig = plt.figure(figsize=(10, 4))
         ax = plt.gca()
 
         parameters = sorted(by_param.keys())
 
         print(parameters)
         
-        ax.set_ylim(0, 7000)
+        ax.set_ylim(3000, 7000)
         ax.grid(True, axis="both", linestyle="--")
 
         ax.axhline(5680, linestyle="dashed", label="No clustering", linewidth=2, color="blue")

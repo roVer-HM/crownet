@@ -11,15 +11,15 @@ STUDY_NAME = "study_simple_velocity_difference_avg"
 PARAMETER1 = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER2 = "*.pNode[*].middleware.VaService.averageHeadingBufferSize"
 RECEIVER = "World.vNode[%].middleware.VaService"
-YLABEL = "\nMedian number of messages\nreceived by vehicle nodes\n+/- std. deviation"
+YLABEL = "\nMedian number of \n messages received by \nvehicle nodes\n+/- std. deviation"
 VAM_TYPES = {
     1: "Individual VAM",
-    11: "Cluster VAM\n(cardinality = 1)",
-    2: "Cluster VAM\n(cardinality > 1)",
-    3: "Individual VAM\njoin notification",
-    4: "Individual VAM\nleave notification",
-    5: "Individual VAM\ncluster breakup",
-    10: "Individual VAM\nleader lost"
+    11: "Cluster VAM (cardinality = 1)",
+    2: "Cluster VAM (cardinality > 1)",
+    3: "Individual VAM join notification",
+    4: "Individual VAM leave notification",
+    5: "Individual VAM cluster breakup",
+    10: "Individual VAM leader lost"
 }
 VAM_TYPE_COLORS = {
     1: "blue",
@@ -116,7 +116,7 @@ def visualize():
         plt.rc('axes', titlesize=16)   
         
         
-        fig = plt.figure(figsize=(10, 5))
+        fig = plt.figure(figsize=(10, 4))
         ax = plt.gca()
         
         ax.grid(True, axis="both", linestyle="--")
@@ -125,7 +125,7 @@ def visualize():
         ax.axhline(5680 + 432, color="blue", linestyle="dotted")
         ax.axhline(5680 - 432, color="blue", linestyle="dotted")
 
-        for param in list(by_param)[0:2]:
+        for param in list(by_param)[0:1]:
             parameters = sorted(by_param[param].keys())
 
             ax.errorbar(
@@ -170,7 +170,7 @@ def visualize():
 
         ax.legend()
 
-        ax.set_ylim(0, 7000)
+        ax.set_ylim(2000, 6500)
         
         plt.ylabel(YLABEL, size=18)
         plt.xlabel(f"maxClusterVelocityDifference parameter", size=18)

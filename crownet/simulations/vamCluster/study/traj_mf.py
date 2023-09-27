@@ -8,7 +8,7 @@ import numpy as np
 import utm
 
 RESULTS = "../results"
-STUDY_NAME = "study_mf_velocity_difference"
+STUDY_NAME = "mf_test"
 
 
 def get_x(cur, module):
@@ -46,8 +46,12 @@ def plt_node(filter, color, alpha):
     for i in range(len(x)):
         coords = utm.from_latlon(y[i] / 10**6, x[i] / 10**6, 32, "U")
         
-        u_x.append(coords[0] - 691444)
-        u_y.append(coords[1] - 5335504)
+        if color == "red":
+            u_x.append((coords[0] - 691444.68) - 620)
+            u_y.append((coords[1] - 5335504.47) - 1716)
+        else:
+            u_x.append((coords[0] - 691444.68))
+            u_y.append((coords[1] - 5335504.47))
         
     
     print(u_x[0], u_y[0])
@@ -59,11 +63,11 @@ if __name__ == "__main__":
         
         plt.rcParams["figure.figsize"] = (5,5)
         
-        for i in range(40):
+        for i in range(105):
             print(i)
             plt_node(f"%pNode[{i}]%", "orange", 0.5)
         
-        for i in range(30):
+        for i in range(25):
             print(i)
             plt_node(f"%vNode[{i}]%", "red", 0.5)
             
@@ -71,7 +75,7 @@ if __name__ == "__main__":
         plt.plot([], [], color="orange", label="pNode")  
         
         im = plt.imread("mf.png")
-        plt.imshow(im, extent=(0, 493, 0, 662), origin='upper', alpha=0.5)
+        # plt.imshow(im, extent=(0, 493, 0, 662), origin='upper', alpha=0.5)
         
         plt.xlim((0, 493))
         plt.ylim((0, 662))

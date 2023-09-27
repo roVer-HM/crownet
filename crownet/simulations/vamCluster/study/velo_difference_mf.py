@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 RESULTS = "../results"
-STUDY_NAME = "study_mf_velocity_difference_g_group_fix"
+STUDY_NAME = "study_mf_velocity_difference"
 PARAMETER = "*.pNode[*].middleware.VaService.maxClusterVelocityDifference"
 PARAMETER_NAME = "maxClusterVelocityDifference"
-RECEIVER = "World.vNode[2].middleware.VaService"
+RECEIVER = "World.vNode[%].middleware.VaService"
 YLABEL = "\nMedian number of messages\nreceived by vehicle nodes\n+/- std. deviation"
 VAM_TYPES = {
     1: "Individual VAM",
@@ -143,7 +143,7 @@ def visualize():
                 )
                 
                 axs[i].grid(True, axis="both", linestyle="--")
-                axs[i].set_ylim(0, 6000)
+                axs[i].set_ylim(0, 8000)
                 for tick in axs[i].get_xticklabels():
                     tick.set_rotation(45)
                 
@@ -169,6 +169,8 @@ def visualize():
         # ax.axhline(8594, linestyle="dashed", label="No clustering", linewidth=3, color="blue")
         # ax.axhline(8594 + 816, color="blue", linestyle="dotted")
         # ax.axhline(8594 - 816, color="blue", linestyle="dotted")
+
+        ax.axhline(11620, linestyle="dashed", label="No clustering", linewidth=2, color="blue")
         
         ax.errorbar(
             parameters,
@@ -181,6 +183,8 @@ def visualize():
             capsize=5,
             label="Clustering"
         )
+
+        ax.set_ylim(0, 20000)
 
         ax.legend()
         
