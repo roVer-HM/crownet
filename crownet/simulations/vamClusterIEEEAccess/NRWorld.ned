@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package crownet.simulations.vamCluster2;
+package crownet.simulations.vamClusterIEEEAccess;
 
 import inet.visualizer.contract.IIntegratedVisualizer;
 import artery.storyboard.IStoryboard;
