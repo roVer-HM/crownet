@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 from dataclasses import dataclass
+from functools import partial
 import os
 from os.path import join
 import glob
@@ -6,6 +8,7 @@ import subprocess
 import sys
 import datetime
 import random
+from typing import Any, Protocol
 from crownetutils.dockerrunner.dockerrunner import (
     ContainerLogWriter,
     DockerCleanup,
@@ -15,6 +18,8 @@ from crownetutils.dockerrunner.simulators.sumorunner import SumoRunner
 from crownetutils.entrypoint.parser import ArgList
 from crownetutils.utils.parallel import run_kwargs_map, run_args_map
 from crownetutils.sumo import SimDir
+from crownetutils.utils.logging import logger
+
 
 if "SUMO_HOME" in os.environ:
     sys.path.append(os.path.join(os.environ["SUMO_HOME"], "tools"))
@@ -54,7 +59,57 @@ class ContainerList:
             c.container_cleanup()
 
 
-def generate_routes(sim_dir: SimDir, net_file, scenario_prefix="", N=50):
+class PedestrianDistributionToArgList(Protocol):
+    def __call__(self, *, arg_list: ArgList) -> ArgList:
+        """Append pedestrian distribution arguments to randomTrips.py call"""
+        ...
+
+
+def create_rnd_trips_args(
+    ramp_up: float,
+    constant_interval: float,
+    speed_mean: float,
+    speed_std: float,
+    num_nodes_at_steady_state: int,
+    arg_list: ArgList = None,
+):
+
+    if arg_list is None:
+        arg_list = ArgList()
+
+    arg_list.add("--begin", 0)
+    arg_list.add("--end", ramp_up)
+    # mean - 1*std
+    dist_min = max(1, (speed_mean - speed_std) * 2 * (ramp_up + constant_interval))
+    if dist_min == 0:
+        logger.warn("min_dist is zero.")
+    max_dist = (speed_mean + speed_std) * 2 * (ramp_up + constant_interval)
+    arg_list.add("--min-distance", f"{dist_min:0.2f}")
+    arg_list.add("--max-distance", f"{max_dist:0.2f}")
+    arrival_rate = num_nodes_at_steady_state / ramp_up
+    arg_list.add("--period", f"{1/arrival_rate:0.4f}")
+
+    # out = f"To reach {num_nodes_at_steady_state} agents in the ramp up interval of {ramp_up} an arrival rate of {arrival_rate:0.4f} nodes/second is needed."
+    # out = f"{out} The min/max distance, given a mean speed {speed_mean} m/s +/- 2*({speed_std} m/s std. deviation), is [{dist_min:0.2f}m, {max_dist:0.2f}m])"
+    # print(out)
+    return arg_list
+
+
+def ped_dist_default(args: ArgList) -> ArgList:
+    args.add("--insertion-density", 6)
+    args.add("--begin", 0)
+    args.add("--end", 1800)  # 30 min
+    # args.add("--end", 3600) # 60 min
+    args.add("--max-distance", 2000)
+
+
+def generate_routes(
+    sim_dir: SimDir,
+    net_file,
+    ped_dist: PedestrianDistributionToArgList = ped_dist_default,
+    scenario_prefix="",
+    N=50,
+):
     runners = ContainerList()
     rnd = random.Random(x=42)
     for i in range(N):
@@ -62,8 +117,9 @@ def generate_routes(sim_dir: SimDir, net_file, scenario_prefix="", N=50):
         args.add("--net-file", net_file)
         args.add("--random")
         args.add("-s", rnd.randint(0, 100_000))
-        args.add("--fringe-factor", 1)
-        args.add("--insertion-density", 6)
+        args.add(
+            "--fringe-factor", 1
+        )  # do not favor edges at the perimeter of the simulation
         args.add(
             "--output-trip-file",
             sim_dir.route(f"{i:03}_{scenario_prefix}_ped_trip.xml"),
@@ -71,14 +127,13 @@ def generate_routes(sim_dir: SimDir, net_file, scenario_prefix="", N=50):
         args.add(
             "--route-file", sim_dir.route(f"{i:03}_{scenario_prefix}_ped_route.xml")
         )
-        args.add("--begin", 0)
-        args.add("--end", 1800)  # 30 min
-        # args.add("--end", 3600) # 60 min
         args.add("--verbose")
         args.add("--additional-files", sim_dir.root("custom_vtype.xml"))
         args.add("--trip-attributes", "'type=\\\"pedType1\\\"'")
         args.add("--pedestrians")
-        args.add("--max-distance", 2000)
+
+        args = ped_dist(arg_list=args)  # append creation parameters.
+
         args.add_cmd("$SUMO_HOME/tools/randomTrips.py")
 
         runners.create_and_run(args.to_list(), sim_dir.out())
@@ -164,16 +219,63 @@ def run_diff(root):
     print("done.")
 
 
-if __name__ == "__main__":
-    root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned/"
+def create_and_run_sumo_simulations(
+    simulation_root,
+    output_root,
+    ped_distribution: PedestrianDistributionToArgList = ped_dist_default,
+    runs: int = 20,
+):
+    sim_dir = SimDir(sim_root=simulation_root, output_root=output_root)
+    if os.path.exists(sim_dir.output_root):
+        raise ValueError("Output directory already exist")
+    sim_dir.create_output_directories()
 
-    # sim_dir = SimDir(sim_root=root, output_root="output/run_60_min/")
-    sim_dir = SimDir(sim_root=root, output_root="output/run_60_min_cleaned")
-    sim_dir.create_dirs()
     net_file = sim_dir.root("muc.net.xml.gz")
     scenario_prefix = ""
 
-    # generate_routes(sim_dir, net_file, scenario_prefix=scenario_prefix, N=20)
+    generate_routes(
+        sim_dir,
+        net_file,
+        ped_dist=ped_distribution,
+        scenario_prefix=scenario_prefix,
+        N=runs,
+    )
     run_simulations(sim_dir, net_file, scenario_prefix=scenario_prefix)
     convert_fcd_to_bonnmotion(sim_dir, net_file, scenario_prefix=scenario_prefix)
-    # run_diff(root)
+
+
+def rerun_cleaned_simulation(simulation_root, output_root):
+
+    sim_dir = SimDir(sim_root=simulation_root, output_root=output_root)
+    if os.path.exists(sim_dir.output_root):
+        raise ValueError("Output directory already exist")
+    sim_dir.create_output_directories()
+
+    net_file = sim_dir.root("muc.net.xml.gz")
+    scenario_prefix = ""
+
+    print(f"rerun simulations in {sim_dir.output_root}")
+    run_simulations(sim_dir, net_file, scenario_prefix=scenario_prefix)
+    convert_fcd_to_bonnmotion(sim_dir, net_file, scenario_prefix=scenario_prefix)
+
+
+if __name__ == "__main__":
+    root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned/"
+    # out = "output/muc_steady_state_short"
+    out = "output/muc_steady_state_short_cleaned"
+
+    ped_distribution_f = partial(
+        create_rnd_trips_args,
+        ramp_up=2 * 60,
+        constant_interval=7 * 60,
+        speed_mean=1.34,
+        speed_std=0.26,
+        num_nodes_at_steady_state=950,
+    )
+    # create_and_run_sumo_simulations(
+    #     simulation_root=root,
+    #     output_root=out,
+    #     ped_distribution=ped_distribution_f,
+    #     runs=20
+    #     )
+    rerun_cleaned_simulation(simulation_root=root, output_root=out)

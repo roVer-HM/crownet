@@ -60,7 +60,7 @@ network World
 {
     parameters:
         @figure[title](type=label; pos=0,-1; anchor=sw; color=darkblue);
-        @display("bgb=899,473");
+        @display("bgb=6500,4500;bgu=m");
 
         bool hasCellular = default(true);
         bool hasCellularCoreNetwork = default(hasCellular);
@@ -159,7 +159,7 @@ network World
         globalMeasurementMap: <default("")> like IGlobalDensityMap if typename != "" {
             @display("p=308.14874,268.6425;i=block/table2;is=s");
         }
-        
+
 
         flowController: <default("")> like IControlManager if typename != "" {
             @display("p=411.99374,391.67624;i=block/table2;is=s");
@@ -199,43 +199,37 @@ network World
 //        for i=0..numGnb-1, for j=0..numGnb-1 {
 //            gNB[i].x2++ <--> Eth10G <--> gNB[j].x2++ if i < j;
 //        }
-//		5x3
+
+        //      5x3 hex grid
         eNB[0].x2++ <--> Eth10G <--> eNB[1].x2++;
         eNB[0].x2++ <--> Eth10G <--> eNB[5].x2++;
         eNB[0].x2++ <--> Eth10G <--> eNB[6].x2++;
         eNB[1].x2++ <--> Eth10G <--> eNB[2].x2++;
-        eNB[1].x2++ <--> Eth10G <--> eNB[5].x2++;
         eNB[1].x2++ <--> Eth10G <--> eNB[6].x2++;
-        eNB[1].x2++ <--> Eth10G <--> eNB[7].x2++;
         eNB[2].x2++ <--> Eth10G <--> eNB[3].x2++;
         eNB[2].x2++ <--> Eth10G <--> eNB[6].x2++;
         eNB[2].x2++ <--> Eth10G <--> eNB[7].x2++;
         eNB[2].x2++ <--> Eth10G <--> eNB[8].x2++;
         eNB[3].x2++ <--> Eth10G <--> eNB[4].x2++;
-        eNB[3].x2++ <--> Eth10G <--> eNB[7].x2++;
         eNB[3].x2++ <--> Eth10G <--> eNB[8].x2++;
-        eNB[3].x2++ <--> Eth10G <--> eNB[9].x2++;
         eNB[4].x2++ <--> Eth10G <--> eNB[8].x2++;
         eNB[4].x2++ <--> Eth10G <--> eNB[9].x2++;
         eNB[5].x2++ <--> Eth10G <--> eNB[6].x2++;
         eNB[5].x2++ <--> Eth10G <--> eNB[10].x2++;
         eNB[5].x2++ <--> Eth10G <--> eNB[11].x2++;
         eNB[6].x2++ <--> Eth10G <--> eNB[7].x2++;
-        eNB[6].x2++ <--> Eth10G <--> eNB[10].x2++;
         eNB[6].x2++ <--> Eth10G <--> eNB[11].x2++;
-        eNB[6].x2++ <--> Eth10G <--> eNB[12].x2++;
         eNB[7].x2++ <--> Eth10G <--> eNB[8].x2++;
         eNB[7].x2++ <--> Eth10G <--> eNB[11].x2++;
         eNB[7].x2++ <--> Eth10G <--> eNB[12].x2++;
         eNB[7].x2++ <--> Eth10G <--> eNB[13].x2++;
         eNB[8].x2++ <--> Eth10G <--> eNB[9].x2++;
-        eNB[8].x2++ <--> Eth10G <--> eNB[12].x2++;
         eNB[8].x2++ <--> Eth10G <--> eNB[13].x2++;
-        eNB[8].x2++ <--> Eth10G <--> eNB[14].x2++;
         eNB[9].x2++ <--> Eth10G <--> eNB[13].x2++;
         eNB[9].x2++ <--> Eth10G <--> eNB[14].x2++;
         eNB[10].x2++ <--> Eth10G <--> eNB[11].x2++;
         eNB[11].x2++ <--> Eth10G <--> eNB[12].x2++;
         eNB[12].x2++ <--> Eth10G <--> eNB[13].x2++;
         eNB[13].x2++ <--> Eth10G <--> eNB[14].x2++;
+
 }

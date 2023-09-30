@@ -4,6 +4,7 @@ from crownetutils.analysis.common import Simulation
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.hdf.dpmm_provider import DpmmProvider
 from crownetutils.analysis.dpmm.imputation import (
+    ArbitraryValueImputation,
     DeleteMissingImputation,
     ImputationStream,
     FullRsdImputation,
@@ -24,7 +25,6 @@ from crownetutils.analysis.plot.enb import PlotEnb
 from crownetutils.utils.dataframe import merge_on_interval
 from crownetutils.utils.logging import TimeIt
 from crownetutils.utils.misc import Timer
-from crownetutils.utils.parallel import queue_test
 from crownetutils.utils.plot import FigureSaverSimple, enb_patch
 from matplotlib.ticker import FuncFormatter, MultipleLocator
 import pandas as pd
@@ -72,8 +72,8 @@ def get_entropy_cfg(base_dir):
 
 
 def build_all(base_dir):
-    # for f in [get_density_cfg, get_entropy_cfg]:
-    for f in [get_entropy_cfg]:
+    for f in [get_density_cfg, get_entropy_cfg]:
+        # for f in [get_entropy_cfg]:
         cfg = f(base_dir)
         build_hdf(cfg)
 
@@ -89,8 +89,8 @@ def build_hdf(cfg: DpmmCfg):
     )
     if cfg.is_count_map():
         stream = ImputationStream()
-        # stream.append(ArbitraryValueImputation(fill_value=0))
-        stream.append(DeleteMissingImputation())
+        stream.append(ArbitraryValueImputation(fill_value=0))
+        # stream.append(DeleteMissingImputation())
         stream.append(FullRsdImputation(rsd_origin_position=rsd_origin_position))
         stream.append(OwnerPositionImputation())
         b.set_imputation_strategy(stream)
@@ -113,9 +113,9 @@ def build_hdf(cfg: DpmmCfg):
     HdfExtractor.extract_packet_loss(
         sim.path("pkt_loss.h5"), "map", sim.sql, sim.sql.m_map()
     )
-    HdfExtractor.extract_packet_loss(
-        sim.path("pkt_loss.h5"), "beacon", sim.sql, sim.sql.m_beacon()
-    )
+    # HdfExtractor.extract_packet_loss(
+    #     sim.path("pkt_loss.h5"), "beacon", sim.sql, sim.sql.m_beacon()
+    # )
 
     HdfExtractor.extract_trajectories(sim.path("position.h5"), sim.sql)
 
@@ -213,7 +213,8 @@ def plot_enb_association_map(sim: Simulation):
 def main(override):
     base_dir = os.path.join(
         mnt_base,
-        "final_multi_enb_30_min_20230829-with_3_apps_25m_radius_entropy_rnd_stream",
+        "final_multi_enb_dev_20230929-15:03:00/",
+        # "final_multi_enb_30_min_20230829-with_3_apps_25m_radius_entropy_rnd_stream",
     )
     cfg: DpmmCfg = get_entropy_cfg(
         # os.path.join(sim_base, "results/count_and_entropy")
@@ -227,7 +228,7 @@ def main(override):
         base_dir=base_dir
     )
 
-    # build_all(cfg.base_dir)
+    build_all(cfg.base_dir)
 
     sim = Simulation(
         data_root=cfg.base_dir,

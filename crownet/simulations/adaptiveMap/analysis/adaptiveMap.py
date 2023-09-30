@@ -146,7 +146,7 @@ def main():
     )
     os.makedirs(saver.override_base_path, exist_ok=True)
     sim_nt = Simulation(
-        f"/mnt/data1tb/results/s1_corridor_4/simulation_runs/outputs/Sample_0_0/final_dynamic_m_bonn_motion_out/",
+        f"/mnt/data1tb/results/_4/simulation_runs/outputs/Sample_0_0/final_dynamic_m_bonn_motion_out/",
         "AdaptiveTx_NT",
     )
     sim_map = Simulation(

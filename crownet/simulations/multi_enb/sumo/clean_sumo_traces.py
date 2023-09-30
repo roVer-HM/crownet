@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
@@ -8,6 +9,7 @@ import shutil
 import xml.etree.ElementTree as ET
 from json import load, dump, JSONDecodeError, JSONEncoder, JSONDecoder
 from typing import Any, List, Protocol
+from crownetutils.sumo.plot_sumo_traces import process_sumo_sim
 import numpy as np
 import numpy.linalg as lg
 import pandas as pd
@@ -16,8 +18,14 @@ import os
 import sys
 import contextlib
 import gzip
-from crownetutils.utils.parallel import run_args_map
+from crownetutils.utils.parallel import ExecutionItem, run_args_map
 from crownetutils.sumo import SimDir as SumoSimDir
+from crownetutils.sumo.bonnmotion_reader import bm_df_with_dist_and_speed
+import tabulate
+
+from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
+
+load_matplotlib_style(STYLE_SIMPLE_169)
 
 if "SUMO_HOME" in os.environ:
     sys.path.append(os.path.join(os.environ["SUMO_HOME"], "tools"))
@@ -42,93 +50,62 @@ def _open(path: str):
         raise e
 
 
-class BonnMotionReader:
-    def __init__(self, path) -> None:
-        self.path = path
-        self.handler = None
-        self.sumo_ids = None
-
-    @contextlib.contextmanager
-    def _open(self, path: str):
-        fd = None
-        try:
-            if path.endswith(".gz"):
-                fd = gzip.open(path, "rt", encoding="utf-8")
-            else:
-                fd = open(path, "rt", encoding="utf-8")
-            yield fd
-            fd.close()
-            fd = None
-        except Exception as e:
-            if fd is not None:
-                fd.close()
-            raise e
-
-    def __iter__(self):
-        comment_count = 0
-        ID_MAP_COMMENT = "# Sumo id map:"
-        with self._open(self.path) as fd:
-            for c, _row in enumerate(fd):
-                if _row.startswith("#"):
-                    comment_count += 1
-                    if _row.startswith(ID_MAP_COMMENT):
-                        _c = _row[len(ID_MAP_COMMENT) :].strip()
-                        self.sumo_ids = np.array(_c.split(" ")).astype(int)
-                    continue
-
-                row_c = c - comment_count
-                dbl_row = np.array(_row.split(" ")).astype(float)
-                if len(dbl_row) % 3 != 0:
-                    print(
-                        f"row {row_c} number of elements in row are not divisible by 3, thus not a valid bonn motion trace. Skip."
-                    )
-                    continue
-                if self.handler is not None:
-                    dbl_row = self.handler(row_c, dbl_row)
-                yield row_c, dbl_row
-
-    def to_frame(self) -> pd.DataFrame:
-        df = []
-        for c, _row in self:
-            # print(f"process row {c}")
-            df.append(_row)
-        df = pd.DataFrame(
-            np.concatenate(df, axis=0),
-            columns=["id", "time", "x", "y", "dist", "speed"],
-        )
-        df = df.fillna(0.0)
-        df["id"] = df["id"].astype(int)
-        return df
-
-
-def row(id, data: np.array):
-    data = data.reshape((-1, 3))
-    data
-    data_shift = np.copy(data)
-    data_shift[-1] = data_shift[0]
-    data_shift = np.roll(data_shift, shift=1, axis=0)
-    data_diff = data - data_shift
-    dist = lg.norm(data_diff[:, 1:3], axis=1)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        speed = dist / data_diff[:, 0]
-    data = np.concatenate(
-        [
-            np.repeat(id, data.shape[0]).reshape(-1, 1),
-            data,
-            dist.reshape(-1, 1),
-            speed.reshape(-1, 1),
-        ],
-        axis=1,
-    )
-    return data
-
-
 def out_of(a, b):
     try:
         r = f"{a}/{b} ({100*a/b:.1f}%)"
     except ZeroDivisionError as e:
         r = f"{a}/{b} (N/A %)"
     return r
+
+
+def save_descriptive_stats(traces: pd.DataFrame, output_path: str, sim_id: int):
+
+    ped_count_ts = (
+        traces.groupby("time")[["id"]].count().set_axis(["count"], axis=1).reset_index()
+    )
+    route_dist_df = (
+        traces.groupby("id")[["dist"]]
+        .sum()
+        .reset_index()
+        .set_axis(["node_id", "route_length"], axis=1)
+    )
+    min_ = (
+        traces.loc[traces.groupby("id")["time"].idxmin(), ["id", "x", "y"]]
+        .set_index("id", drop=True)
+        .add_prefix("min_")
+    )
+    max_ = (
+        traces.loc[traces.groupby("id")["time"].idxmax(), ["id", "x", "y"]]
+        .set_index("id", drop=True)
+        .add_prefix("max_id")
+    )
+    #
+    v = pd.concat([min_, max_], axis=1).values.reshape((-1, 2, 2))
+    route_dist_df["start_end_dist"] = np.linalg.norm(v[:, 0] - v[:, 1], axis=1)
+
+    fig, axes = plt.subplot_mosaic("AA;BC", figsize=(16, 18))
+    a1 = axes["A"]
+    a1.plot("time", "count", data=ped_count_ts, color="black", label="number ped")
+    a1.set_xlabel("time in seconds")
+    a1.set_ylabel("number of pedestrians")
+    a1.set_title("Pedestrian count over time in Simulation area")
+
+    a2 = axes["B"]
+    a2.hist(route_dist_df["route_length"])
+    a2.set_title("Trajectory length of pedestrians")
+    a2.set_xlabel("distance in meter")
+    a2.set_ylabel("count")
+
+    a3 = axes["C"]
+    a3.hist(route_dist_df["start_end_dist"])
+    a3.set_title("Tajectory start/end euclidean distance")
+    a3.set_xlabel("distance meter")
+    a3.set_ylabel("count")
+
+    fig.tight_layout()
+    fig_path = os.path.join(output_path, f"trace_ts_{sim_id:03.0f}.pdf")
+    os.makedirs(os.path.dirname(fig_path), exist_ok=True)
+    fig.savefig(fig_path)
 
 
 @dataclass
@@ -650,8 +627,6 @@ def update_route(run_dict: dict, sim_dir: SumoSimDir):
         with open(route_path, "w", encoding="utf-8") as fd:
             routes.write(fd, encoding="unicode")
 
-        print("hi")
-
 
 def process_area_distribution(net, trace, bin_size=10.0, fd=sys.stdout):
 
@@ -689,15 +664,18 @@ def process_area_distribution(net, trace, bin_size=10.0, fd=sys.stdout):
     print("-" * 80, file=fd)
 
 
-def run(net, bm_path, row_f, fcd):
+def sim_extract_violating_steps(net, bm_path, fcd, output_path):
+    """Extract violating steps of one simulation"""
     fd = io.StringIO()
-    bmr = BonnMotionReader(bm_path)
-    bmr.handler = row_f
 
-    trace_info = BmTraceInfo(bmr.to_frame(), max_speed=2.2, max_dist=5.0)
+    sim_id = int(os.path.basename(bm_path)[:3])
+
+    traces, bmr = bm_df_with_dist_and_speed(bm_path)
+    save_descriptive_stats(traces, output_path, sim_id=sim_id)
+    trace_info = BmTraceInfo(traces, max_speed=2.2, max_dist=5.0)
 
     print("#" * 80, file=fd)
-    print(f"# process [...]{bmr.path[34:]}", file=fd)
+    print(f"# process [...]{bm_path[34:]}", file=fd)
     print("#" * 80, file=fd)
 
     # speed violation info
@@ -711,26 +689,32 @@ def run(net, bm_path, row_f, fcd):
     # process_area_distribution(net, trace_info.traces, bin_size=10.0, fd=fd)
 
     fd.seek(0)
-    id = int(os.path.basename(bm_path)[:3])
-    return fd, bmr, steps, traces, id
+    return fd, bmr, steps, traces, sim_id
 
 
-def main(sim_dir: SumoSimDir, out_prefix="traj_check"):
+def sg_extract_violating_steps(sim_dir: SumoSimDir, out_prefix="traj_check"):
+    """parse simulation results and mark speed violations"""
+
     net = sim_dir.root("muc.net.xml.gz")
     bm_files = glob.glob(sim_dir.bm("*__muc.bonnmotion.gz"))
+    items: List[ExecutionItem] = []
     args = []
     for bm in bm_files:
-        # id = int(os.path.basename(bm)[:3])
-        # if id != 11:
-        #     continue
         fcd = sim_dir.fcd(f"{os.path.basename(bm)[:3]}__fcd_muc.xml.gz")
-        args.append((net, bm, row, fcd))
+        # items.append(ExecutionItem(
+        #     fn=sim_extract_violating_steps,
+        #     args=(net, bm, fcd))
+        # )
+        args.append((net, bm, fcd, sim_dir.out(out_prefix)))
 
+    # x = items[0]()
     ret = run_args_map(
-        run, args_iter=args, pool_size=5, raise_on_error=False, append_args=False
+        sim_extract_violating_steps,
+        args_iter=args,
+        pool_size=15,
+        raise_on_error=False,
+        append_args=False,
     )
-    # ret = run(*args[0])
-    # ret = [(True, ret)]
 
     for err, out in ret:
         if err:
@@ -756,7 +740,7 @@ def main(sim_dir: SumoSimDir, out_prefix="traj_check"):
         for _, _mbr, steps, traces, id in data:
             for s in steps:
                 s: BmSumoStep
-                s.csv_line(fd, end=None)
+                s.csv_line(fd, end="")
                 print(f";{id}", file=fd)
                 edge_count.update([s.edges_dist])
 
@@ -770,7 +754,7 @@ def main(sim_dir: SumoSimDir, out_prefix="traj_check"):
         dump(step_list, fd, indent=2, cls=DataClassEncoder)
 
     with open(
-        sim_dir.out(out_prefix, "dist_valiation.csv", ensure_dir_exists=True),
+        sim_dir.out(out_prefix, "dist_violation.csv", ensure_dir_exists=True),
         "w",
         encoding="utf-8",
     ) as f:
@@ -782,17 +766,127 @@ def main(sim_dir: SumoSimDir, out_prefix="traj_check"):
     print("done.")
 
 
-if __name__ == "__main__":
+def create_or_read_trajectory_check(sim_root, output_root) -> SumoSimDir:
+    """Read  result of Sumo simulation study and apply trajectory check if missing."""
 
-    root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned"
+    # extract violating steps
+    orig_sim_dir = SumoSimDir(sim_root=sim_root, output_root=output_root)
+    if os.path.exists(orig_sim_dir.out("traj_check")):
+        print("trajectory check already done. Nothing to do.")
+    else:
+        print("run trajectorie check")
+        orig_sim_dir.create_output_directories()
+        sg_extract_violating_steps(orig_sim_dir, out_prefix="traj_check")
+    return orig_sim_dir
 
-    # sim_dir = SumoSimDir(sim_root=root, output_root="output/run_60_min")
-    sim_dir = SumoSimDir(sim_root=root, output_root="output/run_60_min_cleaned")
-    sim_dir.create_dirs()
 
-    # main(sim_dir, out_prefix="traj_check")
+def display_violation_info(sim_root, output_root):
+    orig_sim_dir = create_or_read_trajectory_check(sim_root, output_root)
+    print("original violations")
+    describe_violations(sim_dir=orig_sim_dir)
 
-    steps = load_bm_sumo_steps(sim_dir.out("traj_check", "steps.json"))
+
+def create_cleaned_simulation_dir(sim_root, output_root, clean_suffix="_cleaned"):
+    """Read  result of Sumo simulation study and apply trajectory check. This
+    will provide a list of steps (i.e. moves between edges or on one edge), that
+    violates normal pedestrian movements. Next copy the simulation study and fix
+    the issues by either removing the nodes completely or slice the route to
+    remove the violation. The resulting simulation study with updated route
+    files is saved with the provided `clean_suffix`."""
+
+    orig_sim_dir = create_or_read_trajectory_check(sim_root, output_root)
+
+    # create clean copy and remove violations
+    sim_dir = orig_sim_dir.copy_to_clean(out_suffix=clean_suffix)
+    route_backup = sim_dir.route("backup.d")
+    if os.path.exists(route_backup):
+        print("remove backup from copied folder")
+        shutil.rmtree(route_backup)
+
+    sim_dir.create_output_directories()
+
+    # load trajectory check and apply it to new simulation directory
+    steps = load_bm_sumo_steps(orig_sim_dir.out("traj_check", "steps.json"))
     update_route(steps, sim_dir)
-    sim_dir.copy_to_clean(out_suffix="_2")
-    # print("hi")
+    print("original violations")
+    describe_violations(sim_dir=orig_sim_dir)
+    print(f"cleaned simulation dir ready for simulation: {sim_dir.output_root} ")
+
+
+class StringBuff:
+    def __init__(self) -> None:
+        self.b = io.StringIO()
+
+    def __call__(
+        self,
+        *values: object,
+        sep: str | None = " ",
+        end: str | None = "\n",
+        flush: Literal[False] = False,
+    ) -> None:
+        self.print(values, sep, end, flush=flush)
+
+    def print(
+        self,
+        *values: object,
+        sep: str | None = " ",
+        end: str | None = "\n",
+        flush: Literal[False] = False,
+    ) -> None:
+        print(f"hi: {values}")
+        print(values, sep, end, file=self.b, flush=flush)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        return
+
+    def str(self):
+        self.b.seek(0)
+        print(self.b)
+        return self.b.getvalue()
+
+
+def describe_violations(sim_dir: SumoSimDir):
+
+    df = pd.read_csv(sim_dir.out("traj_check/steps.csv"), delimiter=";")
+    df_stat = (
+        df.groupby("run")[["dist"]]
+        .agg(["count", "min", "mean", "max"])
+        .set_axis(["num_instances", "min_dist", "mean_dist", "max_dist"], axis=1)
+    )
+
+    ret = StringBuff()
+    with ret as print:
+        print("#" * 80)
+        print(f"Simulation: {sim_dir.sim_root}")
+        print(
+            f"found {df_stat['num_instances'].sum()} violations in {df['run'].unique().shape[0]} runs."
+        )
+        if df_stat.shape[0] > 0:
+            t = tabulate.tabulate(
+                tabular_data=df_stat.reset_index().values,
+                headers=["run", *df_stat.columns],
+                floatfmt=(".0f", ".0f", "0.5f", "0.5f", "0.5f"),
+                tablefmt="github",
+            )
+            print(f"\n{t}\n")
+        print("#" * 80)
+    print("XXXX")
+    print(ret.str())
+
+
+if __name__ == "__main__":
+    enb = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/enb_position_hex_muc_clean.csv"
+    sim_root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned"
+    # out_root = "output/muc_steady_state_001_cleaned"
+    # out_root = "output/muc_steady_state_001"
+    out_root = "output/muc_steady_state_short_cleaned"
+    # out_root = "output/muc_steady_state_short"
+    # out_root = "output/muc_steady_state_60min_cleaned"
+
+    # create_or_read_trajectory_check(sim_root=sim_root, output_root=out_root)
+    # create_cleaned_simulation_dir(sim_root=sim_root, output_root=out_root)
+    # display_violation_info(sim_root, f"{out_root}")
+    process_sumo_sim(SumoSimDir(sim_root, out_root), enb)

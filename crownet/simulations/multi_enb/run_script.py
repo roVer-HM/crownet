@@ -23,7 +23,6 @@ from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
     ArbitraryValueImputation,
-    ArbitraryValueImputationWithRsd,
     DeleteMissingImputation,
     FullRsdImputation,
     ImputationStream,
@@ -128,7 +127,7 @@ class SimulationRun(BaseSimulationRunner):
     # pass
     @process_as({"prio": 1000, "type": "post"})
     def build_sql_index(self):
-        sim = Simulation.from_dpmm_cfg(get_density_cfg())
+        sim = Simulation.from_dpmm_cfg(get_density_cfg(self.result_base_dir()))
         sim.sql.append_index_if_missing()
 
     @process_as({"prio": 999, "type": "post"})
@@ -246,14 +245,18 @@ class SimulationRun(BaseSimulationRunner):
             )
 
     @process_as({"prio": 100, "type": "post"})
-    def build_sql_index(self):
-        h = BaseHdfProvider(get_density_cfg()).repack_hdf(keep_old_file=False)
+    def repack_1(self):
+        h = BaseHdfProvider(get_density_cfg(self.result_base_dir()).hdf_path())
+        print(h._hdf_path)
+        h.repack_hdf(keep_old_file=False)
 
     @process_as(
         {"prio": 100, "type": "post"}
     )  # todo mark some post processing task parallel?
-    def build_sql_index(self):
-        h = BaseHdfProvider(get_entropy_cfg()).repack_hdf(keep_old_file=False)
+    def repack_2(self):
+        h = BaseHdfProvider(get_entropy_cfg(self.result_base_dir()).hdf_path())
+        print(h._hdf_path)
+        h.repack_hdf(keep_old_file=False)
 
     # @process_as({"prio": 100, "type": "post"})
     # def remove_density_map_csv(self):
