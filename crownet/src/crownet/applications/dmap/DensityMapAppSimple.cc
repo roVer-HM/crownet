@@ -117,7 +117,9 @@ void DensityMapAppSimple::neighborhoodEntryRemoved(INeighborhoodTable* table, Be
                 simTime(),
                 1.0
         );
-        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
+        //do not update RSD information. This callback is not tight to a currently
+        //received packet. Thus, the current RSD is not necessarily the same.
+        //We therefore keep the old RSD set during packet/beacon reception time.
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
         EV_INFO << LOG_MOD << hostId << " removes:" << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
     }
@@ -157,7 +159,8 @@ void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, 
                 info->getCurrentData()->getReceivedTime(),
                 1.0
         );
-        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
+        // Do not change RSD ID of leaving cell because the RSD association of the current node at the
+        // current time (of beacon reception) does not have to reflect the same RSD association for the old cell.
         cellEntryLocal->setEntryDist(std::move(dist));
         // remove node from Map NT
         dcdMap->removeFromNeighborhood((int)info->getNodeId());
