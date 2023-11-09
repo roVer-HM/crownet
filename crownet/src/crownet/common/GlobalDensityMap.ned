@@ -38,7 +38,7 @@ simple GlobalDensityMap like IGlobalDensityMap
             mapTypeLog: "all",
             cellAgeTTL: -1.0s,
             idStreamType: "insertionOrder",
-            appendRessourceSharingDomoinId: false
+            appendRessourceSharingDomainId: false
         });
         
         // search these nodes for the ground truth setup. 

@@ -35,7 +35,7 @@ void DensityMapAppSimple::initialize(int stage) {
         mapDataType = DpmmMapType::PEDESTRIAN_COUNT;
 
 
-        if (mapCfg->getAppendRessourceSharingDomoinId()){
+        if (mapCfg->getAppendRessourceSharingDomainId()){
             // only count inside RSD
             rsdCountVisitor = std::make_shared<RsdNeighborhoodCountVisitor>();
         } else {
@@ -82,9 +82,9 @@ const int DensityMapAppSimple::getNeighborhoodSize() {
     computeValues();
     const RsdIdPair& rsd = getRsdIdPair();
     int rsdid = rsd.getId();
-    if (!rsd.valid() && mapCfg->getAppendRessourceSharingDomoinId()){
+    if (!rsd.valid() && mapCfg->getAppendRessourceSharingDomainId()){
         EV_INFO << "Node " << this->getHostId() << " is currently not connected. Use previous id for neighborhood estimate" << endl;
-        if (!rsd.validPrev() && mapCfg->getAppendRessourceSharingDomoinId()){
+        if (!rsd.validPrev() && mapCfg->getAppendRessourceSharingDomainId()){
             EV_INFO << "Node " << this->getHostId() << " not connected (currently or previously). NO neighborhood estimate possible. Return neighborhood estimate: 1 (ego count)" << endl;
             return 1;
         }

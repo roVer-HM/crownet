@@ -48,7 +48,7 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
 
-      if (mapCfg->getAppendRessourceSharingDomoinId()){
+      if (mapCfg->getAppendRessourceSharingDomainId()){
           burstInfoProdiver = std::make_shared<MapPacketBurstInfoProvider>(
                   std::make_shared<MapHeader>(),
                   std::make_shared<SparseMapPacketWithSharingDomainId>());
@@ -128,7 +128,7 @@ void BaseDensityMapApp::initDcdMap(){
     // do not share valueVisitor between nodes.
     valueVisitor = dcdMapFactory->createValueVisitor(mapCfg);
     cellAgeHandler = std::make_shared<TTLCellAgeHandler>(dcdMap, mapCfg->getCellAgeTTL(), simTime());
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         rsdVisitor = std::make_shared<ApplyRessourceSharingDomainIdVisitor>(simTime());
     }
 
@@ -203,7 +203,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
     header->setSequenceNumber(seqNo);
     header->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     header->setSourceId(hostId);
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         header->setVersion(MapType::SPARSE_RSD);
     } else {
         header->setVersion(MapType::SPARSE);
@@ -216,7 +216,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
 }
 
 Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData){
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         return buildPayload(maxData, makeShared<SparseMapPacketWithSharingDomainId>());
     } else {
         return buildPayload(maxData, makeShared<SparseMapPacket>());
@@ -495,7 +495,7 @@ void BaseDensityMapApp::computeValues() {
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
 
-  if (mapCfg->getAppendRessourceSharingDomoinId()){
+  if (mapCfg->getAppendRessourceSharingDomainId()){
       rsdVisitor->reset(now, getResourceSharingDomainId());
       dcdMap->visitCells(*rsdVisitor); //reference to cellAgeHandler needed
   }

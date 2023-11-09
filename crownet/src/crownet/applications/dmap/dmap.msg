@@ -33,7 +33,7 @@ class MapCfg extends cOwnedObject {
      string mapTypeLog;
      simtime_t cellAgeTTL @editable;
      string idStreamType;
-     bool appendRessourceSharingDomoinId = false;
+     bool appendRessourceSharingDomainId = false;
      
 }
 
