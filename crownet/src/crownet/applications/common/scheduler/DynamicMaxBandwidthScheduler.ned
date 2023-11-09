@@ -32,4 +32,8 @@ simple DynamicMaxBandwidthScheduler extends IntervalScheduler {
 		@statistic[txInterval](title="Transmission interval with random  portion between scheduling calls"; unit=s; source=txInterval_s; record=vector; interpolationmode=none);
     	@signal[txDetInterval_s](type=simtime_t);
 		@statistic[txDetInterval](title="Deterministic transmission interval between scheduling calls"; unit=s; source=txDetInterval_s; record=vector; interpolationmode=none);
+    	@signal[txMemberValue_s](type=int);
+		@statistic[txMemberValue](title="Perceived size of Resource Domain used for interval callcualtion"; source=txMemberValue_s; record=vector; interpolationmode=none);
+	
+		
 }
