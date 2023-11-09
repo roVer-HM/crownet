@@ -50,6 +50,8 @@ mapCfgYmfDist_Density = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
+    "appendRessourceSharingDomoinId",
+    BoolValue.TRUE,
 )
 mapCfgYmfDist_Entropy = ObjectValue.from_args(
     "crownet::MapCfgYmfPlusDistStep",
@@ -65,6 +67,8 @@ mapCfgYmfDist_Entropy = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
+    "appendRessourceSharingDomoinId",
+    BoolValue.TRUE,
 )
 
 t = UnitValue.s(2000.0)  # ~30min
