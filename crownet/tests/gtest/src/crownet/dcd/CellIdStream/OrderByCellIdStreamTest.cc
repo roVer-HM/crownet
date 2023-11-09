@@ -79,14 +79,13 @@ TEST_F(OrderByCellIdStreamTestF, vec_select_on_by_one_until_throw) {
 
     EXPECT_EQ(stream->size(now), 2);
     EXPECT_TRUE(stream->hasNext(now));
-    EXPECT_EQ(stream->nextCellId(now), GridCellID(6,3));
-    EXPECT_EQ(map->getCell(GridCellID(6,3)).lastSent(), now);
-
+    EXPECT_EQ(stream->nextCellId(now), GridCellID(1,1));
+    EXPECT_EQ(map->getCell(GridCellID(1,1)).lastSent(), now);
 
     EXPECT_EQ(stream->size(now), 1);
     EXPECT_TRUE(stream->hasNext(now));
-    EXPECT_EQ(stream->nextCellId(now), GridCellID(1,1));
-    EXPECT_EQ(map->getCell(GridCellID(1,1)).lastSent(), now);
+    EXPECT_EQ(stream->nextCellId(now), GridCellID(6,3));
+    EXPECT_EQ(map->getCell(GridCellID(6,3)).lastSent(), now);
 
     EXPECT_EQ(stream->size(now), 0);
     EXPECT_FALSE(stream->hasNext(now));
@@ -143,7 +142,7 @@ TEST_F(OrderByCellIdStreamTestF, vec_order_sentAsc_dist_Asc){
     EXPECT_EQ(stream->size(now), 0) << "extracting all cells should leave stream empty";
     EXPECT_EQ(ordered_ids.size(), 4) << "extracted cells should be all in vector";
 
-    std::vector<GridCellID> expectedOrder = {GridCellID(3,3), GridCellID(4,4), GridCellID(6,3), GridCellID(1,1)};
+    std::vector<GridCellID> expectedOrder = {GridCellID(3,3), GridCellID(4,4), GridCellID(1,1), GridCellID(6,3)};
     cmp_vec(ordered_ids, expectedOrder);
 
     // change order based on lastSent value.
@@ -161,7 +160,7 @@ TEST_F(OrderByCellIdStreamTestF, vec_order_sentAsc_dist_Asc){
     EXPECT_EQ(stream->size(now), 0) << "extracting all cells should leave stream empty";
     EXPECT_EQ(ordered_ids.size(), 4) << "extracted cells should be all in vector";
 
-    expectedOrder = {GridCellID(3,3), GridCellID(6,3), GridCellID(1,1), GridCellID(4,4)};
+    expectedOrder = {GridCellID(3,3),  GridCellID(1,1), GridCellID(6,3), GridCellID(4,4)};
     cmp_vec(ordered_ids, expectedOrder);
 
 }

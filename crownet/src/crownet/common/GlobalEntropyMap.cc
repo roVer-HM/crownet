@@ -16,7 +16,7 @@
 #include "crownet/common/GlobalEntropyMap.h"
 #include <inet/common/ModuleAccess.h>
 #include "crownet/crownet.h"
-
+#include <algorithm>
 
 using namespace omnetpp;
 using namespace inet;
@@ -169,6 +169,10 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const GridCellID& cellId){
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const inet::Coord& pos){
     auto id = -1*cellKeyProvider->getCellKey1D(pos);
     return getValue(id);
+}
+
+std::vector<GridCellID> GlobalEntropyMap::getCellsInRadius(const inet::Coord& pos, double distance) const{
+    return cellKeyProvider->getCellsInRadius(pos, distance);
 }
 
 void GlobalEntropyMap::updateEntropy(){

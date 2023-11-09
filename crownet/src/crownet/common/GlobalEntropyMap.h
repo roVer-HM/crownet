@@ -48,6 +48,9 @@ public:
     virtual NeighborhoodTableValue_t getValue(const GridCellID& cellId);
     virtual NeighborhoodTableValue_t getValue(const int sourceId);
     virtual NeighborhoodTableValue_t getValue(const inet::Coord& pos);
+    virtual std::vector<GridCellID> getCellsInRadius(const inet::Coord& pos, double distance) const;
+
+
 
 protected:
  virtual void handleMessage(cMessage *msg) override;
