@@ -253,6 +253,9 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacket> payl
             (uint16_t)cell.getCellId().x(), // offsetX
             (uint16_t)cell.getCellId().y()  // offsetY
         };
+        c.setCount_dummy(cell.val()->getCount());//cell value in full precision (simulation use only)
+
+
         auto delta_t = now-cell.val()->getMeasureTime();
         c.setDeltaCreation(delta_t);
         c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
@@ -299,6 +302,9 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacketWithSh
             (uint16_t)cell.getCellId().y(),  // offsetY
             cell.val()->getResourceSharingDomainId()
         };
+        c.setCount_dummy(cell.val()->getCount());//cell value in full precision (simulation use only)
+
+
         auto delta_t = now-cell.val()->getMeasureTime();
         c.setDeltaCreation(delta_t);
         c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
@@ -391,7 +397,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<
         }
         // get or create entry shared pointer
         auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
-        _entry->setCount((double)cell.getCount()/100.0);
+//        _entry->setCount((double)cell.getCount()/100.0);
+        _entry->setCount(cell.getCount_dummy()); // use full precision count value for now.
         _entry->setMeasureTime(_measured);
         _entry->setReceivedTime(_received);
         _entry->setEntryDist(std::move(entryDist));
@@ -436,7 +443,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<
         }
         // get or create entry shared pointer
         auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
-        _entry->setCount((double)cell.getCount()/100.0);
+//        _entry->setCount((double)cell.getCount()/100.0);
+        _entry->setCount(cell.getCount_dummy()); // use full precision count value for now.
         _entry->setMeasureTime(_measured);
         _entry->setReceivedTime(_received);
         _entry->setEntryDist(std::move(entryDist));
