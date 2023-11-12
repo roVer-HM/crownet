@@ -1,5 +1,4 @@
 MAKEMAKE=opp_makemake $(MMOPT)
-
 #ARTERY_PROJ=../artery
 #VANETZA_PROJ=${ARTERY_PROJ}/extern/vanetza
 #INET_PROJ=../inet4

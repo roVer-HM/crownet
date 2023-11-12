@@ -36,7 +36,6 @@ void UnityMobilityVisualizer::receiveSignal(cComponent *source,
                     dynamic_cast<InetVaderePersonMobility*>(source);
 
             if (personMobility) {
-                std::cout << "PersonIDxD" <<personMobility->getPersonId();
                 unityClient->sendMessage(
                         source->getFullPath(), "person",
                         convertPositionToCoord(personMobility->getPosition()));
