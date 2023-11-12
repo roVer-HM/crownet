@@ -3,7 +3,6 @@
 #include "omnetpp/cobject.h"
 #include <mutex>
 #include "crownet/unity/client/UnityClient.h"
-#include <numeric>
 #include "artery/traci/PersonMobility.h"
 #include "artery/traci/VehicleMobility.h"
 #include "inet/mobility/static/StationaryMobility.h"
@@ -12,40 +11,26 @@
 #include "artery/traci/VehicleMobility.h"
 #include "crownet/artery/traci/InetVaderePersonMobility.h"
 
-
 namespace crownet {
 
-class UnityMobilityVisualizer: public inet::visualizer::MobilityVisualizerBase {
-public:    virtual void initialize(int stage) override;
-    virtual void receiveSignal(cComponent *source, inet::simsignal_t signal,
-            cObject *object, cObject *details) override;
+class UnityMobilityVisualizer : public inet::visualizer::MobilityVisualizerBase {
+public:
+    UnityMobilityVisualizer() = default;
+    virtual ~UnityMobilityVisualizer() = default;
 
+    void initialize(int stage) override;
+    void receiveSignal(cComponent *source, inet::simsignal_t signal, cObject *object, cObject *details) override;
 
+    MobilityVisualization* createMobilityVisualization(inet::IMobility *mobility) override;
 
-    virtual void subscribe() override{
-        inet::visualizer::MobilityVisualizerBase::subscribe();
-    };
-    virtual void unsubscribe() override{
-        inet::visualizer::MobilityVisualizerBase::unsubscribe();
-            };
+protected:
+    inet::Coord convertPositionToCoord(const artery::Position& pos);
 
-
-    virtual void removeMobilityVisualization(
-            const MobilityVisualization *visualization) override {
-        inet::visualizer::MobilityVisualizerBase::removeMobilityVisualization(visualization);
-
-    }
-
-    virtual MobilityVisualization* createMobilityVisualization(
-            inet::IMobility *mobility) override;
+private:
+    void sendMobilityUpdateMessage(cComponent* source);
 
     UnityClient *unityClient;
     std::mutex m_mutex;
-
-protected:
-inet::Coord convertPositionToCoord(const artery::Position& pos);
-
 };
-
 
 }  // namespace crownet
