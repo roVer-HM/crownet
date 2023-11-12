@@ -82,11 +82,13 @@ void UnityClient::sendMessage(const std::string& sourceId, const std::string& ob
 
     std::string sourcePath = getIdFromPath(sourceId);
     std::string targetPath = getIdFromPath(targetId);
+    simtime_t currentSimTime = simTime();
     nlohmann::json data = {
         {"SourceId", sourcePath},
         {"TargetId", targetPath},
         {"Coordinates", {{"X", coordinates.x}, {"Y", coordinates.y}, {"Z", coordinates.z}}},
-        {"ObjectType", objectType}
+        {"ObjectType", objectType},
+        {"SimTime", currentSimTime.str()}
     };
 
     std::string jsonStr = data.dump();
