@@ -178,7 +178,7 @@ echo "################################################# check hashes ###########
 shadowing_hash_exp="acb07ea0b918d9a00d323a63b0a73064"
 dissemination_hash_exp="37139d8c765ac779dc37ba9c400911f4"
 guiding_hash_exp="40118fbbee2161b7361a3d4aeee53391"
-realistic_scenario_hash_exp="c1b36c6041ed79f53d490ab9671b2c36"
+realistic_scenario_hash_exp="f929cd8b565baf16ae21bb1e355cba32"
 
 
 cd $output_folder/shadowing
