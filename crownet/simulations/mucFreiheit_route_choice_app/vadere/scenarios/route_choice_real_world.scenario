@@ -1044,7 +1044,7 @@
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 11, 21, 31 ],
-        "probabilityToChangeTarget" : [ 0.21591, 0.29522, 0.48887 ]
+        "probabilityToChangeTarget" : [ 0.48887, 0.29522, 0.21591 ]
       }, {
         "id" : 23,
         "shape" : {
