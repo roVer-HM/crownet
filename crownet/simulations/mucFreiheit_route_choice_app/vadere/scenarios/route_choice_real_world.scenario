@@ -1,7 +1,7 @@
 {
   "name" : "route_choice_real_world",
   "description" : "",
-  "release" : "2.4",
+  "release" : "2.6",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -216,9 +216,7 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003,
-        "lostMembers" : false,
-        "waitBehaviourRelevantAgentsFactor" : -1
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
@@ -865,7 +863,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -894,7 +893,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -923,7 +923,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -952,7 +953,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -972,7 +974,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -992,7 +995,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1012,7 +1016,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1044,7 +1049,7 @@
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 11, 21, 31 ],
-        "probabilityToChangeTarget" : [ 0.21591, 0.29522, 0.48887 ]
+        "probabilityToChangeTarget" : [ 0.48887, 0.29522, 0.21591 ]
       }, {
         "id" : 23,
         "shape" : {
@@ -1118,10 +1123,10 @@
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 10.0
+            "updateFrequency" : 3.0
           }
         },
-        "groupSizeDistribution" : [ 1.0 ]
+        "groupSizeDistribution" : [ 2.0 ]
       }, {
         "id" : 5,
         "shape" : {
@@ -1148,7 +1153,7 @@
             "updateFrequency" : 2.0
           }
         },
-        "groupSizeDistribution" : [ 1.0 ]
+        "groupSizeDistribution" : [ 2.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
@@ -1172,8 +1177,7 @@
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
         "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
-      "teleporter" : null,
-      "attributesCar" : null
+      "teleporter" : null
     },
     "stimulusInfos" : [ {
       "timeframe" : {
