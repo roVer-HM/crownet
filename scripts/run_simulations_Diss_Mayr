@@ -138,12 +138,18 @@ simulation_dir="${CROWNET_HOME}/crownet/simulations/mucFreiheit_route_choice_app
 config="final"
 label="diss_cm"
 result_dir="${simulation_dir}/results/${config}_${label}"
+result_dir_unguided="${simulation_dir}/results/${config}_${label}_unguided/vadere.d"
 
 echo "Run the simulation of the realistic scenario in the simulation directory: ${simulation_dir}" | tee -a $LOG_FILE
-echo "Simulation started: `date`"| tee -a $LOG_FILE
 cd ${simulation_dir}
+
+echo "Simulation of the unguided setting started: `date`"| tee -a $LOG_FILE
+python3 run_script.py vadere --write-container-log --create-vadere-container --override-host-config --vadere-tag "${CROWNET_VADERE_CONT_TAG}" --scenario-file "vadere/scenarios/route_choice_real_world.scenario" --resultdir "${result_dir_unguided}" >> $LOG_FILE & pid=$! && wait_symbol $pid
+echo "Simulation (unguided) finished: `date`"| tee -a $LOG_FILE
+
+echo "Simulation of the guided setting started: `date`"| tee -a $LOG_FILE
 python3 run_script.py vadere-opp-control --write-container-log --create-vadere-container --override-host-config --experiment-label "${label}" --vadere-tag "${CROWNET_VADERE_CONT_TAG}" --control-tag "${CROWNET_CONTROL_CONT_TAG}" --omnet-tag "${CROWNET_OPP_CONT_TAG}" --with-control control.py --ctrl.controller-type AvoidShort --opp.-c "${config}" --qoi number_of_peds.txt path_choice.txt densities_mapped.txt packet_loss_info_diss.csv packet_loss_heat_map.csv heat_map_diss_time.csv info_diss_time.csv simsec_sec_ratio.csv docker_stats.csv --log-docker-stats >> $LOG_FILE & pid=$! && wait_symbol $pid
-echo "Simulation finished: `date`"| tee -a $LOG_FILE
+echo "Simulation (guided) finished: `date`"| tee -a $LOG_FILE
 
 echo "################ copy results to ${output_folder} #################################### "
 
@@ -164,7 +170,8 @@ done
 cp -r ${simulation_storage}/guiding_strategies/analysis_guiding_strategies ${output_folder}/guiding_strategies
 find ${simulation_storage}/guiding_strategies -maxdepth 1 -type f -name '*.csv' -exec cp {} ${output_folder}/guiding_strategies/ \;
 
-rsync -r --exclude 'vars_rep_0.*' ${result_dir}/* ${output_folder}/realistic_scenario/
+rsync -r --exclude 'vars_rep_0.*' ${result_dir}/* ${output_folder}/realistic_scenario/guided/
+rsync -r --exclude 'vars_rep_0.*' ${result_dir_unguided}/* ${output_folder}/realistic_scenario/unguided/
 
 echo "################################################# check hashes ################################"
 
@@ -184,7 +191,7 @@ dissemination_hash=$(md5sum SA_and_FW_MinLifetime.txt SA_and_FW_NumberOfPeds.txt
 cd $output_folder/guiding_strategies
 guiding_hash=$(md5sum AvoidShort_densities.csv AvoidShort_startTime.csv ClosedLoop_densities.csv ClosedLoop_path_choice.csv NoController_densities.csv NoController_path_choice.csv OpenLoop_densities.csv statistical_test.txt | md5sum | cut -b 1-32)
 
-cd $output_folder/realistic_scenario/vadere.d
+cd $output_folder/realistic_scenario/guided/vadere.d
 realistic_scenario_hash=$(md5sum postvis.traj densities.txt | md5sum | cut -b 1-32)
 
 
