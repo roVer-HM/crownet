@@ -671,8 +671,12 @@ class ThroughputPlotter(PlotUtil_):
                 relative_abs = data["diff_m"]
                 sg_data_relative.append(relative_diff.reset_index())
                 sg_data_abs.append(relative_abs.reset_index())
-                self.ecdf(relative_diff, ax=ax1a, label=kBpsLbl(sg), color=colors[i])
-                self.ecdf(relative_abs, ax=ax2a, label=kBpsLbl(sg), color=colors[i])
+                self.plot_ecdf(
+                    relative_diff, ax=ax1a, label=kBpsLbl(sg), color=colors[i]
+                )
+                self.plot_ecdf(
+                    relative_abs, ax=ax2a, label=kBpsLbl(sg), color=colors[i]
+                )
             # relative
             sg_data_relative = pd.concat(
                 sg_data_relative, axis=0, ignore_index=True, verify_integrity=False

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from functools import partial
 import sys, os
 import io
+from crownetutils.analysis.dpmm.dpmm import DpmMap
 from crownetutils.analysis.hdf.provider import BaseHdfProvider, HdfSelector
 from crownetutils.analysis.hdf_providers.node_position import (
     CoordinateType,
@@ -10,9 +10,8 @@ from crownetutils.analysis.hdf_providers.node_position import (
 from crownetutils.analysis.hdf_providers.node_rx_data import NodeRxData
 from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
 from crownetutils.analysis.hdf_providers.sql_app_proxy import SqlAppProxy
+from crownetutils.omnetpp.scave import CrownetSql
 
-import pandas as pd
-import numpy as np
 from crownetutils.analysis.common import Simulation
 from crownetutils.analysis.plot.app_misc import PlotAppMisc
 from crownetutils.dockerrunner.simulationrunner import (
@@ -22,12 +21,10 @@ from crownetutils.dockerrunner.simulationrunner import (
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from crownetutils.utils.plot import FigureSaverPdfPages, FigureSaverSimple
-from crownetutils.analysis.vadere import VadereAnalysis
-from crownetutils.analysis.omnetpp import HdfExtractor, OppAnalysis
+from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
 
 from crownetutils.utils.logging import logger
-from crownetutils.utils.misc import Project
 from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
@@ -99,6 +96,27 @@ class SimulationRun(BaseSimulationRunner):
     def __init__(self, working_dir, args=None):
         super().__init__(working_dir, args)
 
+    def fig_out(self, cfg: DpmmCfg = None) -> str:
+        """provide output directory and create all parents if needed. When cfg is provided create named subfolder"""
+        if cfg is None:
+            p = os.path.join(self.result_base_dir(), "fig_out")
+        else:
+            p = os.path.join(self.result_base_dir(), "fig_out", cfg.map_type.value)
+        os.makedirs(p, exist_ok=True)
+        return p
+
+    def simple_saver(
+        self, sub_dir: str = "", cfg: DpmmCfg = None, fig_type: str = ".png"
+    ):
+        """provide saver instance at default result directory with given fig_type. If cfg is provided
+        the configuration subdir is used. Any sub_dir string provided will create additional subdirs and
+        ensures that all parent folders exist."""
+        p = self.fig_out(cfg)
+        if sub_dir != "":
+            p = os.path.join(p, sub_dir)
+            os.makedirs(p, exist_ok=True)
+        return FigureSaverSimple(override_base_path=p, figure_type=fig_type)
+
     def get_builder(self, cfg: DpmmCfg):
 
         sim: Simulation = Simulation.from_dpmm_cfg(cfg)
@@ -146,6 +164,7 @@ class SimulationRun(BaseSimulationRunner):
     # @process_as({"prio": 10, "type": "pre"})
     # def bar(self):
     # pass
+
     @process_as({"prio": 1000, "type": "post"})
     def build_sql_index(self):
         sim = Simulation.from_dpmm_cfg(get_density_cfg(self.result_base_dir()))
@@ -164,13 +183,14 @@ class SimulationRun(BaseSimulationRunner):
                 fd.write(buf.getvalue())
 
     @process_as({"prio": 995, "type": "post"})
-    def create_position_hdf(self):
+    def create_position_hdf(self) -> NodePositionWithRsdHdf:
         # use any config. Position data is equal
         cfg = get_density_cfg(self.result_base_dir())
         sim = Simulation.from_dpmm_cfg(cfg)
-        NodePositionWithRsdHdf.get_or_create(
-            sim=sim, hdf_path=sim.path("position.h5"), override_existing=True
+        pos = NodePositionWithRsdHdf.get_or_create(
+            sim=sim, hdf_path=sim.path("position.h5"), override_existing=False
         )
+        return pos
 
     @process_as({"prio": 994, "type": "post"})
     def create_node_tx_hdf(self) -> NodeTxData:
@@ -182,10 +202,7 @@ class SimulationRun(BaseSimulationRunner):
         e_sim = Simulation.from_dpmm_cfg(e_cfg)
 
         # pos is equal for both configs
-        pos = NodePositionWithRsdHdf.get_or_create(
-            d_sim,
-            d_sim.path("position.h5"),
-        )
+        pos: NodePositionWithRsdHdf = self.create_position_hdf()
         # load tx data for three applications
         ret = NodeTxData.get_or_create(
             d_sim.path("node_tx_data.h5"),
@@ -208,10 +225,7 @@ class SimulationRun(BaseSimulationRunner):
         e_sim = Simulation.from_dpmm_cfg(e_cfg)
 
         # pos is equal for both configs
-        pos = NodePositionWithRsdHdf.get_or_create(
-            d_sim,
-            d_sim.path("position.h5"),
-        )
+        pos: NodePositionWithRsdHdf = self.create_position_hdf()
         # load tx data for three applications
         ret = NodeRxData.get_or_create(
             d_sim.path("node_rx_data.h5"),
@@ -231,124 +245,140 @@ class SimulationRun(BaseSimulationRunner):
             sim = Simulation.from_dpmm_cfg(cfg)
             OppAnalysis.append_err_measures_to_hdf(sim)
 
-    @process_as({"prio": 971, "type": "post"})
-    def create_map_plot(self):
+    @process_as({"prio": 590, "type": "post"})
+    def plot_node_traces(self):
         # use any config. Position data is equal
         d_cfg = get_density_cfg(self.result_base_dir())
-        d_sim = Simulation.from_dpmm_cfg(d_cfg)
-        pos = NodePositionWithRsdHdf.get_or_create(
-            d_sim,
-            d_sim.path("position.h5"),
-        )
+        pos: NodePositionWithRsdHdf = self.create_position_hdf()
 
-        _out = d_cfg.makedirs_output("fig_out", exist_ok=True)
-        fig, ax = PlotEnb.plot_node_enb_association_map(
+        fig, _ = PlotEnb.plot_node_enb_association_map(
             rsd=pos,
             coord=CoordinateType.xy_no_geo_offset,
             base_cmap="tab20",
             inner_r=650.0,
         )
-        figpath = os.path.join(_out, "trace_map_2.png")
+        figpath = os.path.join(self.fig_out(), "trace_map.png")
         logger.info(f"save {figpath}")
         fig.savefig(figpath)
         plt.close(fig)
 
-    @process_as({"prio": 970, "type": "post"})
-    def create_common_plots(self):
-        cfg: DpmmCfg
-        for cfg in get_cfg_list(self.result_base_dir()):
-            result_dir, builder, sql = OppAnalysis.builder_from_cfg(cfg)
-            _out = cfg.makedirs_output("fig_out", exist_ok=True)
-            with PdfPages(self.result_dir(_out, "app_data.pdf")) as pdf:
-                PlotEnb.plot_served_blocks_ul_all(
-                    self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
-                )
+    @process_as({"prio": 585, "type": "post"})
+    def plot_serving_enb_stats(self):
+        cfg = get_density_cfg(self.result_base_dir())
+        sql = CrownetSql.from_dpmm_cfg(cfg)
+        _out = os.path.join(self.fig_out(), "enb_stats.pdf")
+        with PdfPages(_out) as pdf:
+            PlotEnb.plot_served_blocks_ul_all(
+                self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
+            )
 
-            if sql.is_count_map():
-                print("build count based default plots")
-                s = FigureSaverSimple(
-                    self.result_dir(
-                        _out,
-                    )
-                )
-                builder.only_selected_cells(
-                    self.ns.get("hdf_cell_selection_mode", True)
-                )
-                PlotDpmMap.create_common_plots_density(
-                    result_dir,
-                    builder,
-                    sql,
-                    selection=builder.get_selected_alg(),
-                    saver=s,
-                )
-            else:
-                print("build entropy map based plots")
+    @process_as({"prio": 580, "type": "post"})
+    def plot_density_map_count_and_error_stats(self):
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        sim: Simulation = Simulation.from_dpmm_cfg(cfg)
+        saver = self.simple_saver(cfg=cfg, fig_type=".png")
+        saver_rsd = self.simple_saver("dMap_count_rsd", cfg=cfg, fig_type=".png")
 
-    @process_as({"prio": 965, "type": "post"})
-    def add_plot_tx_interval_plots(self):
-        _dir = self.result_base_dir()
-        d_cfg = get_density_cfg(_dir)
-        _out = d_cfg.makedirs_output("fig_out", exist_ok=True)
-        saver = FigureSaverSimple(override_base_path=_out, figure_type=".png")
-        tx = self.create_node_tx_hdf()
+        # Map count
+        dmap: DpmMap = sim.get_dcdMap()
+        dmap.plot_map_count_diff(savefig=saver.with_name("dMap_count.png"))
+        dmap.plot_map_count_diff_by_rsd(
+            saver=saver_rsd.with_name("dMap_count.png")
+        )  # will add suffix for rsd_id
+
+        # Cell error
+        msce = dmap.cell_count_measure(columns=["cell_mse"])
+        # msce time series
+        PlotDpmMap.plot_msce_ts(msce, savefig=saver.with_name("dMap_msce_ts.png"))
+        # msce ecdf
+        PlotDpmMap.plot_msce_ecdf(
+            msce["cell_mse"], savefig=saver.with_name("dMap_msce_ecdf.png")
+        )
+
+    @process_as({"prio": 580, "type": "post"})
+    def plot_neighborhood_table_state(self):
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        sim: Simulation = Simulation.from_dpmm_cfg(cfg)
+        saver = self.simple_saver(fig_type=".png")
+        saver_rsd = self.simple_saver(sub_dir="nt_map_node_rsd", fig_type=".png")
+
+        PlotAppMisc.plot_nt_map_comparison(sim, saver=saver)
+
+        pos = self.create_position_hdf()
+        PlotAppMisc.plot_nt_map_comparision_by_rsd(sim, pos=pos, saver=saver_rsd)
+
+    @process_as({"prio": 575, "type": "post"})
+    def plot_application_tx_stats(self):
+        tx: NodeTxData = self.create_node_tx_hdf()
         for app in tx.apps:
+            saver = self.simple_saver(f"{app.name}", fig_type=".png")
             PlotAppTxInterval.plot_txinterval_from_hdf_all(
                 data=tx, app_name=app.name, data_root=None, saver=saver
             )
 
-    @process_as({"prio": 965, "type": "post"})
-    def add_plots(self):
-        cfg: DpmmCfg
-        for cfg in get_cfg_list(self.result_base_dir()):
-            sim = Simulation.from_dpmm_cfg(cfg, label="")
-            p = cfg.makedirs_output("fig", exist_ok=True)
-            saver = FigureSaverSimple(override_base_path=p, figure_type=".png")
-            # agent count data
-            print("app misc")
-            if cfg.is_count_map():
-                PlotAppMisc.plot_number_of_agents(sim, saver=saver)
+    @process_as({"prio": 570, "type": "post"})
+    def plot_application_rx_stats(self):
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())  # any cfg will work
+        sim = Simulation.from_dpmm_cfg(cfg, label="")
+        saver = self.simple_saver(fig_type=".png")
 
-            # application data
-            rx = self.create_node_rx_hdf()
-            for app in rx.apps:
-                selector = HdfSelector(
-                    hdf=rx.rcvd_data(app),
-                    group=app.group_by_app("rcvd_stats"),
-                    columns=["delay", "jitter"],
-                    where=None,
-                )
-                PlotAppMisc.plot_application_delay_jitter(
-                    sim, hdf_selector=selector, saver=saver.with_suffix(f"_{app.name}")
-                )
-
-            # map specifics
-            dmap = sim.get_dcdMap()
-            if cfg.is_count_map():
-                dmap.plot_map_count_diff(savefig=saver.with_name("Map_count.png"))
-                dmap.plot_map_count_diff_by_rsd(saver=saver.with_name("Map_count.png"))
-
-            msce = dmap.cell_count_measure(columns=["cell_mse"])
-
-            # msce time series
-            PlotDpmMap.plot_msce_ts(msce, savefig=saver.with_name("Map_msce_ts.png"))
-            # msce ecdf
-            PlotDpmMap.plot_msce_ecdf(
-                msce["cell_mse"], savefig=saver.with_name("Map_msce_ecdf.png")
+        rx = self.create_node_rx_hdf()
+        for app in rx.apps:
+            selector = HdfSelector(
+                hdf=rx.rcvd_data(app),
+                group=app.group_by_app("rcvd_stats"),
+                columns=["delay", "jitter"],
+                where=None,
             )
+            PlotAppMisc.plot_application_delay_jitter(
+                sim, hdf_selector=selector, saver=saver.with_suffix(f"_{app.name}")
+            )
+
+    @process_as({"prio": 565, "type": "post"})
+    def plot_application_tx_throughput(self):
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        saver = self.simple_saver(fig_type=".png")
+        rsd_ids = CrownetSql.from_dpmm_cfg(cfg).get_resource_sharing_domains(
+            ids_only=True
+        )
+        tx_data: NodeTxData = self.create_node_tx_hdf()
+        PlotAppTxInterval.plot_app_tx_throughput(
+            hdf=tx_data,
+            target_rates_in_Bps=tx_data.get_target_rates(
+                bps_to_multiplier=1 / 8
+            ),  # need rate in Bps! not bps
+            rsd_ids=list(rsd_ids.values),
+            bin_size=10.0,
+            saver=saver,
+        )
+
+    @process_as({"prio": 560, "type": "post"})
+    def plot_application_tx_time_hist_ecdf(self):
+        saver = self.simple_saver(fig_type=".png")
+        tx_data: NodeTxData = self.create_node_tx_hdf()
+        PlotAppTxInterval.plot_application_tx_time_hist_ecdf(
+            tx_data=tx_data, saver=saver
+        )
 
     @process_as({"prio": 100, "type": "post"})
     def repack_1(self):
         h = BaseHdfProvider(get_density_cfg(self.result_base_dir()).hdf_path())
-        print(h._hdf_path)
-        h.repack_hdf(keep_old_file=False)
+        if h.hdf_file_exists:
+            logger.info(h._hdf_path)
+            h.repack_hdf(keep_old_file=False)
+        else:
+            logger.warn(f"file does not exist. No repacking...")
 
     @process_as(
         {"prio": 100, "type": "post"}
     )  # todo mark some post processing task parallel?
     def repack_2(self):
         h = BaseHdfProvider(get_entropy_cfg(self.result_base_dir()).hdf_path())
-        print(h._hdf_path)
-        h.repack_hdf(keep_old_file=False)
+        if h.hdf_file_exists:
+            logger.info(h._hdf_path)
+            h.repack_hdf(keep_old_file=False)
+        else:
+            logger.warn(f"file does not exist. No repacking...")
 
     # @process_as({"prio": 100, "type": "post"})
     # def remove_density_map_csv(self):

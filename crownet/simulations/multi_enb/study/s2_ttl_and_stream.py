@@ -50,7 +50,7 @@ mapCfgYmfDist_Density = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
-    "appendRessourceSharingDomoinId",
+    "appendRessourceSharingDomainId",
     BoolValue.TRUE,
 )
 mapCfgYmfDist_Entropy = ObjectValue.from_args(
@@ -67,7 +67,7 @@ mapCfgYmfDist_Entropy = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
-    "appendRessourceSharingDomoinId",
+    "appendRessourceSharingDomainId",
     BoolValue.TRUE,
 )
 

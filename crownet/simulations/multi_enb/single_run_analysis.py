@@ -13,7 +13,7 @@ from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
 from crownetutils.analysis.hdf_providers.sql_app_proxy import SqlAppProxy
 from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.analysis.plot.app_misc import PlotAppMisc, PlotAppTxInterval
-from crownetutils.analysis.plot.dpmMap import PlotDpmMap
+from crownetutils.analysis.plot.dpmMap import MapPlotter, PlotDpmMap
 from crownetutils.analysis.plot.enb import PlotEnb
 from crownetutils.omnetpp.scave import CrownetSql
 from crownetutils.utils.dataframe import append_interval
@@ -423,54 +423,17 @@ def create_map_pkt_count_plots(sim: Simulation):
         )
 
 
-def plot_macCellThrougputUL(d_sim):
-    fig, ax = plt.subplots(1, 1)
-    for i in [10]:
-        df = d_sim.sql.vec_data(
-            f"World.eNB[{i}].cellularNic.mac",
-            "macCellThroughputUl:vector",
-        ).reset_index()
-        ax.scatter(df["time"], df["value"], marker=".", alpha=0.5)
-    ax.set_ylabel("Bps")
-    ax.set_xlabel("time")
-    fig.tight_layout()
-    fig.savefig("out13a.png")
-
-
-def plot_tx_time_hist_for_syn_test(tx_data: NodeTxData):
-    data = tx_data.frame_by_app("tx_bytes", columns=["time"])
-    ecdf_x = data["time"].sort_values().values
-    ecdf_y = np.arange(len(ecdf_x)) / float(len(ecdf_x))
-
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(16, 9))
-    ax = axes[0]
-    ax.plot(ecdf_x, ecdf_y)
-    ax.set_xlabel("Tx time")
-    ax.set_ylabel("ecdf")
-    ax.set_title("ECDF of transmision times over time")
-    ax = axes[1]
-    ax.hist(ecdf_x)
-    ax.set_title("Hisogram of tx times")
-    fig.tight_layout()
-    fig.savefig("out14.png")
-
-
 if __name__ == "__main__":
     print("run qoi....")
     _, cfg_denisty, cfg_entropy = SimulationRun.postprocessing(
-        # "/mnt/data1tb/results/multi_enb/final_multi_enb_dev_20231018-130525",
         "/mnt/data1tb/results/arc-dsa_multi_cell/s2_ttl_and_stream/simulation_runs/outputs/Sample_0_0/final_multi_enb_out/",
-        # "/mnt/data1tb/results/multi_enb/final_multi_enb_dev_20231026_fixed_cell_value/",
-        qoi="create_map_plot",
-        exec=False,
+        # "/mnt/data1tb/results/arc-dsa_multi_cell/s2_ttl_and_stream/simulation_runs/outputs/oldSample_0/final_multi_enb_out/",
+        # qoi="plot_application_tx_throughput",
+        qoi="plot_application_tx_time_hist_ecdf",
+        exec=True,
     )
-    # sim: Simulation = Simulation.from_dpmm_cfg(cfg_entropy)
     e_sim: Simulation = Simulation.from_dpmm_cfg(cfg_entropy)
     d_sim: Simulation = Simulation.from_dpmm_cfg(cfg_denisty)
-    d_sim.sql.append_index_if_missing()
-
-    # plot_macCellThrougputUL(d_sim)
-
     pos = NodePositionWithRsdHdf.get_or_create(d_sim, d_sim.path("position.h5"))
     tx_data = NodeTxData.get_or_create(
         d_sim.path("node_tx_data.h5"),
@@ -481,19 +444,6 @@ if __name__ == "__main__":
         ],
         pos,
     )
-
-    # plot_tx_time_hist_for_syn_test(tx_data)
-
-    saver = FigureSaverSimple(override_base_path=p, figure_type=".png").with_name(
-        "Map_count.png"
-    )
-
-    PlotDpmMap.plot_ground_truth_tiles(sim=d_sim, node_pos=pos)
-    print("done")
-    sys.exit()
-    dmap = d_sim.get_dcdMap()
-    dmap.map_count_measure_by_rsd(load_cached_version=False)
-
     rx_data = NodeRxData.get_or_create(
         hdf_path=d_sim.path("node_rx_data.h5"),
         apps=[
@@ -503,46 +453,3 @@ if __name__ == "__main__":
         ],
         node_pos=pos,
     )
-    PlotAppTxInterval.plot_app_tx_throughput(
-        hdf=tx_data,
-        rsd_ids=list(range(1, 16, 1)),
-        target_rates={"e_map": 1e6, "d_map": 150e3, "d_beacon": 50e3},
-        bin_size=10.0,
-    )
-    print("hi")
-    # PlotAppTxInterval.plot_txinterval_from_hdf_all(
-    #     data = tx_data,
-    #     app_name="beacon",
-    #     data_root=sim.path("fig")
-    # )
-
-    # nt_count = e_sim.sql.vector_ids_to_host(
-    #     e_sim.sql.m_table(),
-    #     "tableSize:vector",
-    #     drop="vectorId",
-    #     name_columns=["hostId"],
-    #     pull_data=True,
-    #     value_name="nt_size"
-    #     )
-    # enb_colors = pos.enb_colors()
-    # nt_count = pos.merge_rsd_id_on_host_time_interval(nt_count)
-    # nt = nt_count[["servingEnb", "nt_size"]].set_index(["servingEnb"]).sort_index()
-    # data = []
-    # color = []
-    # label = []
-    # for enb, _df in nt.groupby("servingEnb"):
-    #     data.append(_df["nt_size"].values)
-    #     color.append(enb_colors[enb])
-    #     label.append(f"enb {enb}")
-    # fig, ax = plt.subplots(1, 1, figsize=(16,9))
-    # ax.hist(data, histtype="step", label=label, color=color, linewidth=2.0)
-    # ax.set_xlabel("Number of entires in neighborhood tabel")
-    # ax.legend()
-    # fig.tight_layout()
-    # fig.savefig("out_11.png")
-    # print("hi")
-
-    # PlotAppMisc.plot_number_of_agents(
-    #     d_sim,
-    #     saver=FigureSaverSimple(d_sim.path("fig"), figure_type=".png")
-    #     )
