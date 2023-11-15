@@ -170,8 +170,7 @@ done
 cp -r ${simulation_storage}/guiding_strategies/analysis_guiding_strategies ${output_folder}/guiding_strategies
 find ${simulation_storage}/guiding_strategies -maxdepth 1 -type f -name '*.csv' -exec cp {} ${output_folder}/guiding_strategies/ \;
 
-rsync -r --exclude 'vars_rep_0.*' ${result_dir}/* ${output_folder}/realistic_scenario/guided/
-rsync -r --exclude 'vars_rep_0.*' ${result_dir_unguided}/* ${output_folder}/realistic_scenario/unguided/
+rsync -r --exclude 'vars_rep_0.*' ${simulation_dir}/results/ ${output_folder}/realistic_scenario
 
 echo "################################################# check hashes ################################"
 
@@ -179,7 +178,6 @@ shadowing_hash_exp="acb07ea0b918d9a00d323a63b0a73064"
 dissemination_hash_exp="37139d8c765ac779dc37ba9c400911f4"
 guiding_hash_exp="40118fbbee2161b7361a3d4aeee53391"
 realistic_scenario_hash_exp="f929cd8b565baf16ae21bb1e355cba32"
-
 
 cd $output_folder/shadowing
 shadowing_hash=$(md5sum degree_informed_extract.txt packet_age.txt number_of_peds.txt time_95_informed_redirection_area.txt | md5sum | cut -b 1-32)
@@ -191,7 +189,7 @@ dissemination_hash=$(md5sum SA_and_FW_MinLifetime.txt SA_and_FW_NumberOfPeds.txt
 cd $output_folder/guiding_strategies
 guiding_hash=$(md5sum AvoidShort_densities.csv AvoidShort_startTime.csv ClosedLoop_densities.csv ClosedLoop_path_choice.csv NoController_densities.csv NoController_path_choice.csv OpenLoop_densities.csv statistical_test.txt | md5sum | cut -b 1-32)
 
-cd $output_folder/realistic_scenario/guided/vadere.d
+cd $output_folder/realistic_scenario/final_diss_cm/vadere.d
 realistic_scenario_hash=$(md5sum postvis.traj densities.txt | md5sum | cut -b 1-32)
 
 
