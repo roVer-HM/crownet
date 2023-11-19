@@ -177,7 +177,7 @@ echo "################################################# check hashes ###########
 shadowing_hash_exp="acb07ea0b918d9a00d323a63b0a73064"
 dissemination_hash_exp="37139d8c765ac779dc37ba9c400911f4"
 guiding_hash_exp="40118fbbee2161b7361a3d4aeee53391"
-realistic_scenario_hash_exp="f929cd8b565baf16ae21bb1e355cba32"
+realistic_scenario_hash_exp="68934440f848442e4d350b25462f43cd"
 
 cd $output_folder/shadowing
 shadowing_hash=$(md5sum degree_informed_extract.txt packet_age.txt number_of_peds.txt time_95_informed_redirection_area.txt | md5sum | cut -b 1-32)
