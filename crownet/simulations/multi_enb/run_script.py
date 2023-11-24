@@ -339,8 +339,8 @@ class SimulationRun(BaseSimulationRunner):
         cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
         saver = self.simple_saver(fig_type=".png")
         rsd_ids = CrownetSql.from_dpmm_cfg(cfg).get_resource_sharing_domains(
-            ids_only=True
-        )
+            ids_only=False
+        )["rsd_id"]
         tx_data: NodeTxData = self.create_node_tx_hdf()
         PlotAppTxInterval.plot_app_tx_throughput(
             hdf=tx_data,
@@ -359,6 +359,30 @@ class SimulationRun(BaseSimulationRunner):
         PlotAppTxInterval.plot_application_tx_time_hist_ecdf(
             tx_data=tx_data, saver=saver
         )
+    
+    @process_as({"prio": 555, "type": "post"})
+    def plot_application_debug_matrix(self):
+        saver = self.simple_saver(sub_dir="dbg", fig_type=".png")
+        run, cfg_d, cfg_e = SimulationRun.postprocessing(
+            result_dir=f"/home/stsc/simulation_output/arc-dsa_multi_cell/s2_ttl_and_stream_1/simulation_runs/outputs/Sample_{sim_id}_0/final_multi_enb_out",
+            qoi="plot_application_tx_throughput",
+            exec=False
+            )
+        node_rx: NodeRxData = run.create_node_rx_hdf()
+        node_tx: NodeTxData = run.create_node_tx_hdf()
+        pos: NodePositionWithRsdHdf = run.create_position_hdf()
+        d_sim: Simulation = Simulation.from_dpmm_cfg(cfg_d)
+        e_sim: Simulation = Simulation.from_dpmm_cfg(cfg_e)
+        apps = [
+            SqlAppProxy("d_map", d_sim.dpmm_cfg.m_map, d_sim),
+            SqlAppProxy("d_beacon", d_sim.dpmm_cfg.m_beacon, d_sim),
+            SqlAppProxy("e_map", e_sim.dpmm_cfg.m_map, e_sim),
+        ]
+        sim_id="" 
+        rsd_filter = list(range(1,16))
+        PlotAppMisc.plot_by_app_overview(saver, sim_id, node_rx, node_tx, pos, d_sim, apps, rsd_filter)
+        PlotAppMisc.plot_planed_throughput_in_rsd(saver, sim_id, node_tx, pos, apps)
+        PlotAppMisc.plot_received_bursts(node_rx, figuer_title=f"Simulation_{sim_id} fixed until time 400.0 seconds", saver=saver.with_suffix(f"_{sim_id}"), where="time < 400.0")
 
     @process_as({"prio": 100, "type": "post"})
     def repack_1(self):
