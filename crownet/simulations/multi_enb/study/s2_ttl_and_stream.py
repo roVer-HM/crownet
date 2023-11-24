@@ -108,6 +108,7 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
                 "cellAgeTTL", _ttl, "idStreamType", _id_stream
             )
             _run["omnet"]["*.pNode[*].app[2].app.mapCfg"] = _entropy_cfg
+            _run["omnet"]["*.misc[*].app[2].app.mapCfg"] = _entropy_cfg
             par_var_tmp.append(_run)
 
     par_var = []
