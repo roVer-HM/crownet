@@ -200,7 +200,7 @@ network World
 //            gNB[i].x2++ <--> Eth10G <--> gNB[j].x2++ if i < j;
 //        }
 
-        //      5x3 hex grid
+        //    hex_r650_muc_clean5x3 and hex_r500_muc_clean5x3
         eNB[0].x2++ <--> Eth10G <--> eNB[1].x2++;
         eNB[0].x2++ <--> Eth10G <--> eNB[5].x2++;
         eNB[0].x2++ <--> Eth10G <--> eNB[6].x2++;
@@ -231,5 +231,4 @@ network World
         eNB[11].x2++ <--> Eth10G <--> eNB[12].x2++;
         eNB[12].x2++ <--> Eth10G <--> eNB[13].x2++;
         eNB[13].x2++ <--> Eth10G <--> eNB[14].x2++;
-
 }

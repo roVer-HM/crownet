@@ -48,7 +48,7 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
 
-      if (mapCfg->getAppendRessourceSharingDomoinId()){
+      if (mapCfg->getAppendRessourceSharingDomainId()){
           burstInfoProdiver = std::make_shared<MapPacketBurstInfoProvider>(
                   std::make_shared<MapHeader>(),
                   std::make_shared<SparseMapPacketWithSharingDomainId>());
@@ -128,7 +128,7 @@ void BaseDensityMapApp::initDcdMap(){
     // do not share valueVisitor between nodes.
     valueVisitor = dcdMapFactory->createValueVisitor(mapCfg);
     cellAgeHandler = std::make_shared<TTLCellAgeHandler>(dcdMap, mapCfg->getCellAgeTTL(), simTime());
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         rsdVisitor = std::make_shared<ApplyRessourceSharingDomainIdVisitor>(simTime());
     }
 
@@ -203,7 +203,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
     header->setSequenceNumber(seqNo);
     header->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     header->setSourceId(hostId);
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         header->setVersion(MapType::SPARSE_RSD);
     } else {
         header->setVersion(MapType::SPARSE);
@@ -216,7 +216,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
 }
 
 Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData){
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         return buildPayload(maxData, makeShared<SparseMapPacketWithSharingDomainId>());
     } else {
         return buildPayload(maxData, makeShared<SparseMapPacket>());
@@ -253,6 +253,9 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacket> payl
             (uint16_t)cell.getCellId().x(), // offsetX
             (uint16_t)cell.getCellId().y()  // offsetY
         };
+        c.setCount_dummy(cell.val()->getCount());//cell value in full precision (simulation use only)
+
+
         auto delta_t = now-cell.val()->getMeasureTime();
         c.setDeltaCreation(delta_t);
         c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
@@ -299,6 +302,9 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacketWithSh
             (uint16_t)cell.getCellId().y(),  // offsetY
             cell.val()->getResourceSharingDomainId()
         };
+        c.setCount_dummy(cell.val()->getCount());//cell value in full precision (simulation use only)
+
+
         auto delta_t = now-cell.val()->getMeasureTime();
         c.setDeltaCreation(delta_t);
         c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
@@ -391,7 +397,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<
         }
         // get or create entry shared pointer
         auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
-        _entry->setCount((double)cell.getCount()/100.0);
+//        _entry->setCount((double)cell.getCount()/100.0);
+        _entry->setCount(cell.getCount_dummy()); // use full precision count value for now.
         _entry->setMeasureTime(_measured);
         _entry->setReceivedTime(_received);
         _entry->setEntryDist(std::move(entryDist));
@@ -436,7 +443,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<
         }
         // get or create entry shared pointer
         auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
-        _entry->setCount((double)cell.getCount()/100.0);
+//        _entry->setCount((double)cell.getCount()/100.0);
+        _entry->setCount(cell.getCount_dummy()); // use full precision count value for now.
         _entry->setMeasureTime(_measured);
         _entry->setReceivedTime(_received);
         _entry->setEntryDist(std::move(entryDist));
@@ -487,7 +495,7 @@ void BaseDensityMapApp::computeValues() {
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
 
-  if (mapCfg->getAppendRessourceSharingDomoinId()){
+  if (mapCfg->getAppendRessourceSharingDomainId()){
       rsdVisitor->reset(now, getResourceSharingDomainId());
       dcdMap->visitCells(*rsdVisitor); //reference to cellAgeHandler needed
   }

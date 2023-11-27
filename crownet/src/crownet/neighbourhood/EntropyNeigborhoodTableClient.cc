@@ -56,6 +56,16 @@ const bool EntropyNeigborhoodTableClient::currentCellOnly() const{
     return dist <= 0.0;
 }
 
+std::vector<GridCellID> EntropyNeigborhoodTableClient::getCellsInRadius(const inet::Coord& pos){
+    return globalTable->getCellsInRadius(pos, dist);
+}
+
+NeighborhoodTableValue_t EntropyNeigborhoodTableClient::getValue(const GridCellID& cellId){
+    return globalTable->getValue(cellId);
+}
+
+
+
 // iterator default to all elements in map
 NeighborhoodTableIter_t
 EntropyNeigborhoodTableClient::iter() {

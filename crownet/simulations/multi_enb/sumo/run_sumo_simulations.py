@@ -260,10 +260,8 @@ def rerun_cleaned_simulation(simulation_root, output_root):
 
 
 if __name__ == "__main__":
-    root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned/"
-    # out = "output/muc_steady_state_short"
-    out = "output/muc_steady_state_short_cleaned"
-
+    # root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned/"
+    root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned_r500_5x3_enb/"
     ped_distribution_f = partial(
         create_rnd_trips_args,
         ramp_up=2 * 60,
@@ -272,10 +270,14 @@ if __name__ == "__main__":
         speed_std=0.26,
         num_nodes_at_steady_state=950,
     )
+
+    # out = "output/muc_steady_state_short"
     # create_and_run_sumo_simulations(
     #     simulation_root=root,
     #     output_root=out,
     #     ped_distribution=ped_distribution_f,
     #     runs=20
     #     )
+
+    out = "output/muc_steady_state_short_cleaned"
     rerun_cleaned_simulation(simulation_root=root, output_root=out)

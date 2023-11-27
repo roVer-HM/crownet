@@ -22,6 +22,164 @@
 
 using namespace crownet;
 
+class GridCellIdKeyProvider_CellsInRange : public MapTest{
+
+    void SetUp() override {
+        keyProvider = this->dcdFactory->getCellKeyProvider();
+    }
+
+protected:
+
+    std::shared_ptr<GridCellIDKeyProvider> keyProvider; //10x10
+};
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, one_cell_in_range_dist_smaller_than_cell){
+
+    //center of map
+    inet::Coord pos {5.4, 4.4};
+    auto vec = keyProvider->getCellsInRadius(pos, 0.1);
+
+    EXPECT_EQ(vec.size(), 1);
+    EXPECT_EQ(vec[0], GridCellID(5, 5));
+
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, cells_in_range_dist_equal_cell_size_center_map){
+
+    //center of map
+    inet::Coord pos {5.4, 4.4};// off center OMNeT Coords upper left
+    auto vec = keyProvider->getCellsInRadius(pos, 0.5); // cell size 1x1 meter
+
+    EXPECT_EQ(vec.size(), 5);
+
+    std::vector<GridCellID> vec_expected = {GridCellID{4, 5}, GridCellID{5, 4}, GridCellID{5, 5}, GridCellID{5, 6}, GridCellID{6, 5}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, cells_in_range_dist_equal_cell_size_lower_left_map){
+
+    //center of map
+    inet::Coord pos {0.1, 9.9};// off center OMNeT Coords upper left
+    auto vec = keyProvider->getCellsInRadius(pos, 0.5); // cell size 1x1 meter
+
+    EXPECT_EQ(vec.size(), 3);
+
+    std::vector<GridCellID> vec_expected = {GridCellID{0, 0}, GridCellID{0, 1}, GridCellID{1, 0}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, cells_in_range_dist_equal_cell_size_upper_left_map){
+
+    //center of map
+    inet::Coord pos {0.1, 0.1};// off center OMNeT Coords upper left
+    auto vec = keyProvider->getCellsInRadius(pos, 0.5); // cell size 1x1 meter
+
+    EXPECT_EQ(vec.size(), 3);
+
+    std::vector<GridCellID> vec_expected = {GridCellID{0, 8}, GridCellID{0, 9}, GridCellID{1, 9}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, cells_in_range_dist_equal_cell_size_upper_right_map){
+
+    //center of map
+    inet::Coord pos {9.9, 0.1};// off center OMNeT Coords upper left
+    auto vec = keyProvider->getCellsInRadius(pos, 0.5); // cell size 1x1 meter
+
+    EXPECT_EQ(vec.size(), 3);
+
+    std::vector<GridCellID> vec_expected = {GridCellID{8, 9}, GridCellID{9, 8}, GridCellID{9, 9}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, cells_in_range_dist_equal_cell_size_lower_right_map){
+
+    //center of map
+    inet::Coord pos {9.9, 9.9};// off center OMNeT Coords upper left
+    auto vec = keyProvider->getCellsInRadius(pos, 0.5); // cell size 1x1 meter
+
+    EXPECT_EQ(vec.size(), 3);
+
+    std::vector<GridCellID> vec_expected = {GridCellID{8, 0}, GridCellID{9, 0}, GridCellID{9, 1}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, eight_cell_neighborhood_center){
+
+    //center of map
+    inet::Coord pos {5.5, 4.5};
+    auto vec = keyProvider->getCellsInRadius(pos, 0.8); // enclosing circle radius
+
+    EXPECT_EQ(vec.size(), 9);
+    std::vector<GridCellID> vec_expected = {
+            GridCellID{4, 4}, GridCellID{4, 5}, GridCellID{4, 6},
+            GridCellID{5, 4}, GridCellID{5, 5}, GridCellID{5, 6},
+            GridCellID{6, 4}, GridCellID{6, 5}, GridCellID{6, 6}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, eight_cell_neighborhood_lower_left){
+
+    //center of map
+    inet::Coord pos {0.1, 9.9};
+    auto vec = keyProvider->getCellsInRadius(pos, 0.8); // enclosing circle radius
+
+    EXPECT_EQ(vec.size(), 4);
+    std::vector<GridCellID> vec_expected = {
+            GridCellID{0, 0}, GridCellID{0, 1},
+            GridCellID{1, 0}, GridCellID{1, 1}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, eight_cell_neighborhood_upper_left){
+
+    //center of map
+    inet::Coord pos {0.1, 0.1};
+    auto vec = keyProvider->getCellsInRadius(pos, 0.8); // enclosing circle radius
+
+    EXPECT_EQ(vec.size(), 4);
+    std::vector<GridCellID> vec_expected = {
+            GridCellID{0, 8}, GridCellID{0, 9},
+            GridCellID{1, 8}, GridCellID{1, 9}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, eight_cell_neighborhood_upper_right){
+
+    //center of map
+    inet::Coord pos {9.9, 0.1};
+    auto vec = keyProvider->getCellsInRadius(pos, 0.8); // enclosing circle radius
+
+    EXPECT_EQ(vec.size(), 4);
+    std::vector<GridCellID> vec_expected = {
+            GridCellID{8, 8}, GridCellID{8, 9},
+            GridCellID{9, 8}, GridCellID{9, 9}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, eight_cell_neighborhood_lower_right){
+
+    //center of map
+    inet::Coord pos {9.9, 9.9};
+    auto vec = keyProvider->getCellsInRadius(pos, 0.8); // enclosing circle radius
+
+    EXPECT_EQ(vec.size(), 4);
+    std::vector<GridCellID> vec_expected = {
+            GridCellID{8, 0}, GridCellID{8, 1},
+            GridCellID{9, 0}, GridCellID{9, 1}};
+    cmp_vec(vec, vec_expected);
+}
+
+TEST_F(GridCellIdKeyProvider_CellsInRange, all_cells){
+
+    //center of map
+    inet::Coord pos {5.0, 5.0};
+    auto vec = keyProvider->getCellsInRadius(pos, 1000); // enclosing circle radius
+
+    EXPECT_EQ(vec.size(), 100);
+}
+
+
 class GridCellIdKeyProvider_F : public BaseOppTest {
 public:
     GridCellIdKeyProvider_F(){

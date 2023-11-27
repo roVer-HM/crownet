@@ -66,9 +66,11 @@ void EntropyMapAppSimple::updateLocalMap() {
         // append own RSD id (my differ for same cell if cell is at the edge of the reception range of the RSD
         ee->setResourceSharingDomainId(getResourceSharingDomainId());
     } else {
-        // interator has filters for distance
-        for(const auto& e : entropyClient->iter()){
+        // access cells within configured radius
+        auto cellIds = entropyClient->getCellsInRadius(getPosition());
+        for (const GridCellID& cellId : cellIds){
             ++count;
+            const auto e = entropyClient->getValue(cellId);
             const auto info = e.second;
             const auto &posTraci = converter->position_cast_traci(info->getCurrentData()->getPosition());
                     // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object

@@ -16,7 +16,7 @@
 #include "crownet/common/GlobalEntropyMap.h"
 #include <inet/common/ModuleAccess.h>
 #include "crownet/crownet.h"
-
+#include <algorithm>
 
 using namespace omnetpp;
 using namespace inet;
@@ -112,6 +112,15 @@ void GlobalEntropyMap::updateMaps() {
     // log agent cell position. Will update _table with missing entires
     acceptNodeVisitor(this);
 
+    // update decentralized map
+    // perform update of node maps first before building ground truth
+    // because the 'sensor range' of the nodes defines the ground truth.
+    // Ground truth is build lazily as needed.
+    for (auto &handler : dezentralMaps) {
+      handler.second->updateLocalMap();
+      handler.second->computeValues();
+    }
+
     for(const auto& e: _table){
         const auto currentData = e.second->getCurrentData();
         const auto &posTraci = converter->position_cast_traci(currentData->getPosition());
@@ -125,11 +134,7 @@ void GlobalEntropyMap::updateMaps() {
     valueVisitor->setTime(simTime());
     dcdMapGlobal->computeValues(valueVisitor);
 
-    // update decentralized map
-    for (auto &handler : dezentralMaps) {
-      handler.second->updateLocalMap();
-      handler.second->computeValues();
-    }
+
 }
 
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
@@ -164,6 +169,10 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const GridCellID& cellId){
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const inet::Coord& pos){
     auto id = -1*cellKeyProvider->getCellKey1D(pos);
     return getValue(id);
+}
+
+std::vector<GridCellID> GlobalEntropyMap::getCellsInRadius(const inet::Coord& pos, double distance) const{
+    return cellKeyProvider->getCellsInRadius(pos, distance);
 }
 
 void GlobalEntropyMap::updateEntropy(){

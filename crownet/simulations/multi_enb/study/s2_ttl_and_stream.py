@@ -50,6 +50,8 @@ mapCfgYmfDist_Density = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
+    "appendRessourceSharingDomainId",
+    BoolValue.TRUE,
 )
 mapCfgYmfDist_Entropy = ObjectValue.from_args(
     "crownet::MapCfgYmfPlusDistStep",
@@ -65,9 +67,11 @@ mapCfgYmfDist_Entropy = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
+    "appendRessourceSharingDomainId",
+    BoolValue.TRUE,
 )
 
-t = UnitValue.s(2000.0)  # ~30min
+t = UnitValue.s(1000.0)  # ~30min
 
 
 # insertionOrder, by distance, TTL
@@ -104,6 +108,7 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
                 "cellAgeTTL", _ttl, "idStreamType", _id_stream
             )
             _run["omnet"]["*.pNode[*].app[2].app.mapCfg"] = _entropy_cfg
+            _run["omnet"]["*.misc[*].app[2].app.mapCfg"] = _entropy_cfg
             par_var_tmp.append(_run)
 
     par_var = []
@@ -135,7 +140,8 @@ def create_sumo_crownet_seeds(trace_dir):
 
 def main_bonn_motion():
     sumo_traces = (
-        "../sumo/munich/muc_cleaned/output/muc_steady_state_60min_cleaned/bonnmotion"
+        # "../sumo/munich/muc_cleaned/output/muc_steady_state_60min_cleaned/bonnmotion"
+        "../sumo/munich/muc_cleaned_r500_5x3_enb/output/muc_steady_state_short_cleaned/bonnmotion"
     )
     trace_dir = os.path.abspath(sumo_traces)
     create_sumo_crownet_seeds(trace_dir)
@@ -177,7 +183,8 @@ def main_bonn_motion():
     extra_files = [
         (seed_file, os.path.basename(seed_file)),
         (
-            "../sumo/munich/muc_cleaned/muc.net.xml.gz",
+            # "../sumo/munich/muc_cleaned/muc.net.xml.gz",  # larger enb_size
+            "../sumo/munich/muc_cleaned_r500_5x3_enb/muc.net.xml.gz",
             "additional_rover_files/sumo/munich/muc_cleaned/muc.net.xml.gz",
         ),
     ]

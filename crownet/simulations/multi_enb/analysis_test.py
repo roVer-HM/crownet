@@ -13,8 +13,8 @@ from crownetutils.analysis.dpmm.imputation import (
 from crownetutils.analysis.hdf.provider import BaseHdfProvider
 from crownetutils.analysis.hdf_providers.node_position import (
     EnbPositionHdf,
-    NodePositionHdf,
 )
+from crownetutils.analysis.hdf_providers.node_position import NodePositionWithRsdHdf
 from crownetutils.analysis.omnetpp import (
     OppAnalysis,
     HdfExtractor,
@@ -159,54 +159,16 @@ def zero_enb_time_hist(serving, path, override):
     ax.get_figure().savefig(path)
 
 
-def plot_enb_association(sim: Simulation):
-    _i = pd.IndexSlice
-
-    # density maps per node
-    c = sim.get_dcdMap().count_p[_i[:, :, :, 1:], ["count"]]
-
-    enb = OppAnalysis.get_serving_enb_interval(sim)
-
-    fig, ax = PlotEnb.plot_node_enb_association_ts(data=enb)
-    fig.savefig(sim.path_mk("fig_err", "enb_association_per_node.png"))
-    plt.close(fig)
-
-    # density map node count with upper bound based on cell association
-    fig, ax = sim.get_dcdMap().plot_map_count_diff()
-
-    cc = c.groupby(["ID", "simtime"]).sum().sort_index()
-    cc.index.names = ["hostId", "time"]
-    d = merge_on_interval(cc, enb).drop(columns=["interval", "start", "end"]).dropna()
-
-    num_associated_over_time = (
-        d[d["servingEnb"] > 0].groupby("time")["hostId"].count().reset_index()
-    )
-    ax.plot(
-        num_associated_over_time["time"],
-        num_associated_over_time["hostId"],
-        label="total number of associated nodes (any eNB)",
-    )
-
-    ax.legend().remove()
-    ax.legend()
-    fig.tight_layout()
-    fig.savefig(sim.path("fig_err", "enb_association_ts.png"))
-
-
 def plot_enb_association_map(sim: Simulation):
 
-    pos_enb: EnbPositionHdf = EnbPositionHdf.from_sim(sim=sim)
-    pos_ue: NodePositionHdf = NodePositionHdf.from_sim(sim=sim)
+    rsd = NodePositionWithRsdHdf.get_or_create(sim, sim.path("postion2.h5"))
 
-    ue = pos_ue.get_dataframe()
-
-    ue = OppAnalysis.get_node_serving_data_color_coded(
-        sim,
-        enb_pos=pos_enb.frame(),
-        ue_pos=ue,
+    fig, ax = PlotEnb.plot_node_enb_association_map(
+        rsd=rsd,
+        cmap="tab20",
+        inner_r=650,
     )
 
-    fig, ax = PlotEnb.plot_node_enb_association_map(ue, pos_enb.get_dataframe())
     fig.savefig(sim.path_mk("fig_err", "enb_association_map.png"))
 
 

@@ -166,7 +166,7 @@ class ClearCellIdVisitor : public TimestampedVoidCellVisitor<RegularCell> {
 class ApplyRessourceSharingDomainIdVisitor : public IdenpotanceTimestampedVoidCellVisitor<RegularCell> {
  public:
     ApplyRessourceSharingDomainIdVisitor(RegularCell::time_t time = 0.0, int rsdid = -1)
-        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time, CellDataIterator<RegularCell>::getValidDataIter_pred()), rsdid(rsdid){}
+        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time, CellDataIterator<RegularCell>::getValidDataIter_pred()), rsdid(rsdid), count(0){}
 
  public:
     virtual void applyIfChanged(RegularCell& cell) override;

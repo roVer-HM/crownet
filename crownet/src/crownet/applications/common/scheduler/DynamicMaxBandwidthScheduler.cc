@@ -28,6 +28,9 @@ std::ostream& operator<<(std::ostream& os, const txInterval& i){
 
 simsignal_t DynamicMaxBandwidthScheduler::txInterval_s = cComponent::registerSignal("txInterval_s");
 simsignal_t DynamicMaxBandwidthScheduler::txDetInterval_s = cComponent::registerSignal("txDetInterval_s");
+simsignal_t DynamicMaxBandwidthScheduler::txMemberValue_s = cComponent::registerSignal("txMemberValue_s");
+
+
 
 Define_Module(DynamicMaxBandwidthScheduler)
 
@@ -135,6 +138,7 @@ void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
             scheduleApp(message);
             if (hasSent){
                 //ignore first send action as last_tx is not defined jet.
+                emit(txMemberValue_s, txIntervalDataCurrent.pmembers);
                 emit(txInterval_s, txIntervalDataCurrent.lastTransmisionInterval);
                 emit(txDetInterval_s, txIntervalDataCurrent.dInterval);
             }

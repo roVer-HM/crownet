@@ -97,7 +97,7 @@ def plot_per_sim_data(sim: Simulation):
 
     # agent count data
     print("app misc")
-    PlotAppMisc.plot_number_of_agents(sim, saver=saver)
+    PlotAppMisc.plot_nt_map_comparison(sim, saver=saver)
 
     # application data
     PlotAppMisc.plot_system_level_tx_rate_based_on_application_layer_data(

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-06-01 14:59:07.752994 by netdiff.py v1_17_0+0608-a6a27b83562
+<configuration>
+    <dest value="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_005/muc.net.xml.gz"/>
+    <outprefix value="2023-06-01_16-58_diff"/>
+    <patch-on-import value="True"/>
+    <remove-plain value="True"/>
+    <source value="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_005/muc_base.net.xml.gz"/>
+</configuration>
+-->
+
+<nodes version="1.16" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+    <!-- Deleted Elements -->
+    <delete id="1021176478"/>
+    <delete id="10258453"/>
+    <delete id="10258455"/>
+    <delete id="1042772382"/>
+    <delete id="1045830393"/>
+    <delete id="1045830531"/>
+    <delete id="1045917472"/>
+    <delete id="1073714252"/>
+    <delete id="1077714804"/>
+    <delete id="1078756858"/>
+    <delete id="1144060297"/>
+    <delete id="125082165"/>
+    <delete id="1363439195"/>
+    <delete id="1519557031"/>
+    <delete id="15752488"/>
+    <delete id="1608725475"/>
+    <delete id="1655200582"/>
+    <delete id="1688588874"/>
+    <delete id="1688588905"/>
+    <delete id="1688589337"/>
+    <delete id="1698244859"/>
+    <delete id="1711901393"/>
+    <delete id="1954419"/>
+    <delete id="1954469"/>
+    <delete id="1956146"/>
+    <delete id="204376969"/>
+    <delete id="2138722652"/>
+    <delete id="21646594"/>
+    <delete id="21646595"/>
+    <delete id="24550744"/>
+    <delete id="249157843"/>
+    <delete id="249157859"/>
+    <delete id="249157865"/>
+    <delete id="249179417"/>
+    <delete id="249184092"/>
+    <delete id="2563215955"/>
+    <delete id="260965210"/>
+    <delete id="260965211"/>
+    <delete id="262655747"/>
+    <delete id="26650807"/>
+    <delete id="270534547"/>
+    <delete id="27152653"/>
+    <delete id="27153164"/>
+    <delete id="272000085"/>
+    <delete id="272000148"/>
+    <delete id="284569737"/>
+    <delete id="286049313"/>
+    <delete id="286065103"/>
+    <delete id="286065142"/>
+    <delete id="286065211"/>
+    <delete id="286065223"/>
+    <delete id="286065239"/>
+    <delete id="295434631"/>
+    <delete id="29565896"/>
+    <delete id="297066065"/>
+    <delete id="30564581"/>
+    <delete id="30564605"/>
+    <delete id="30564610"/>
+    <delete id="30564622"/>
+    <delete id="3075348693"/>
+    <delete id="31088109"/>
+    <delete id="31315941"/>
+    <delete id="331142068"/>
+    <delete id="333194933"/>
+    <delete id="3563824195"/>
+    <delete id="3563824198"/>
+    <delete id="361053340"/>
+    <delete id="361056739"/>
+    <delete id="364930107"/>
+    <delete id="36650811"/>
+    <delete id="3711884241"/>
+    <delete id="372815558"/>
+    <delete id="372815599"/>
+    <delete id="3795182804"/>
+    <delete id="379579151"/>
+    <delete id="380211818"/>
+    <delete id="410665552"/>
+    <delete id="443464819"/>
+    <delete id="443464843"/>
+    <delete id="443464868"/>
+    <delete id="447069957"/>
+    <delete id="4634254617"/>
+    <delete id="467482590"/>
+    <delete id="49490378"/>
+    <delete id="502554108"/>
+    <delete id="5056761648"/>
+    <delete id="506338928"/>
+    <delete id="506827167"/>
+    <delete id="50775005"/>
+    <delete id="616887511"/>
+    <delete id="684595"/>
+    <delete id="684601"/>
+    <delete id="773287459"/>
+    <delete id="8404577586"/>
+    <delete id="8872395172"/>
+    <delete id="8901713296"/>
+    <delete id="9198032068"/>
+    <delete id="927138977"/>
+    <delete id="9627284037"/>
+    <delete id="9627284039"/>
+    <delete id="963602581"/>
+    <delete id="963602646"/>
+    <delete id="963602662"/>
+    <delete id="986650524"/>
+    <delete id="9913951194"/>
+    <delete id="993732582"/>
+    <delete id="cluster_1078841350_1078841362_1078841396"/>
+    <delete id="cluster_1371844380_1956144_4834103976_4837213504_#2more"/>
+    <delete id="cluster_1776057560_295609158"/>
+    <delete id="cluster_1875979399_1875979405"/>
+    <delete id="cluster_2154198245_2154198268_50757775"/>
+    <delete id="cluster_2246014289_684734"/>
+    <delete id="cluster_27152510_9242730532"/>
+    <delete id="cluster_516460013_927139127"/>
+    <!-- Created Elements -->
+    <!-- Changed Elements -->
+    <node id="1041430752" type="dead_end"/>
+    <node id="1042726296" type="dead_end"/>
+    <node id="1156432462" type="dead_end"/>
+    <node id="1156432466" type="dead_end"/>
+    <node id="1218818468" type="dead_end"/>
+    <node id="1875979377" type="dead_end"/>
+    <node id="1875979385" type="dead_end"/>
+    <node id="1875979408" type="dead_end"/>
+    <node id="1875979410" type="dead_end"/>
+    <node id="2418921818" type="dead_end"/>
+    <node id="249930715" type="dead_end"/>
+    <node id="271416639" type="dead_end"/>
+    <node id="27590690" type="dead_end"/>
+    <node id="286049819" type="dead_end"/>
+    <node id="286065225" type="dead_end"/>
+    <node id="3153419924" type="dead_end"/>
+    <node id="3249098929" type="dead_end"/>
+    <node id="339773356" type="dead_end"/>
+    <node id="3767296302" type="dead_end"/>
+    <node id="3816135292" type="dead_end"/>
+    <node id="3816135293" type="dead_end"/>
+    <node id="3816135295" type="dead_end"/>
+    <node id="4471270781" type="dead_end"/>
+    <node id="4622599271" type="dead_end"/>
+    <node id="462604383" type="dead_end"/>
+    <node id="5215203721" type="dead_end"/>
+    <node id="528089955" type="dead_end"/>
+    <node id="6511636673" type="dead_end"/>
+    <node id="8148528206" type="dead_end"/>
+    <node id="9913951195" type="dead_end"/>
+    <node id="9913951215" type="dead_end"/>
+    <node id="cluster_2374195363_606149341" type="dead_end"/>
+</nodes>

@@ -32,10 +32,12 @@ class NeighborhoodTableFilterIterator : public FilterIterator<T, Iter, IterVal, 
             typename FilterIterator<T, Iter, IterVal, Pred>::iterable_t* data,
             typename FilterIterator<T, Iter, IterVal, Pred>::pred_t predicate,
             GlobalEntropyMap* map)
-    : FilterIterator<T, Iter, IterVal, Pred>(data, predicate), map(map){}
+            : FilterIterator<T, Iter, IterVal, Pred>(data, predicate), map(map){}
+
     NeighborhoodTableFilterIterator(
             NeighborhoodTableFilterIterator& other,
-            typename FilterIterator<T, Iter, IterVal, Pred>::iter_t iter): FilterIterator<T, Iter, IterVal, Pred>(other, iter), map(other.map){}
+            typename FilterIterator<T, Iter, IterVal, Pred>::iter_t iter)
+            : FilterIterator<T, Iter, IterVal, Pred>(other, iter), map(other.map){}
 
     virtual typename FilterIterator<T, Iter, IterVal, Pred>::iter_value_t operator*() const override;
 

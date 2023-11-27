@@ -8,7 +8,7 @@ import io
 import shutil
 import xml.etree.ElementTree as ET
 from json import load, dump, JSONDecodeError, JSONEncoder, JSONDecoder
-from typing import Any, List, Protocol
+from typing import Any, List, Literal, Protocol
 from crownetutils.sumo.plot_sumo_traces import process_sumo_sim
 import numpy as np
 import numpy.linalg as lg
@@ -886,7 +886,13 @@ if __name__ == "__main__":
     # out_root = "output/muc_steady_state_short"
     # out_root = "output/muc_steady_state_60min_cleaned"
 
-    # create_or_read_trajectory_check(sim_root=sim_root, output_root=out_root)
+    ###
+    enb = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/enb_hex_r500_muc_clean5x3.csv"
+    sim_root = "/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_cleaned_r500_5x3_enb/"
+    out_root = "output/muc_steady_state_short"
+    out_root = "output/muc_steady_state_short_cleaned"
+
+    create_or_read_trajectory_check(sim_root=sim_root, output_root=out_root)
     # create_cleaned_simulation_dir(sim_root=sim_root, output_root=out_root)
-    # display_violation_info(sim_root, f"{out_root}")
+    display_violation_info(sim_root, f"{out_root}")
     process_sumo_sim(SumoSimDir(sim_root, out_root), enb)

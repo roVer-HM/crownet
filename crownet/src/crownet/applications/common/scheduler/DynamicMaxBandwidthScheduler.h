@@ -44,6 +44,7 @@ public:
     virtual ~DynamicMaxBandwidthScheduler();
     static simsignal_t txInterval_s;
     static simsignal_t txDetInterval_s;
+    static simsignal_t txMemberValue_s;
 
 
 protected:
