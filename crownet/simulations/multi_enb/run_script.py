@@ -85,7 +85,7 @@ class SimulationRun(BaseSimulationRunner):
                 "--qoi",
                 qoi,
                 "selected-only",
-                "-vv",
+                # "-vv",
                 "--debug",
             ],
         )
@@ -169,6 +169,7 @@ class SimulationRun(BaseSimulationRunner):
     def build_sql_index(self):
         sim = Simulation.from_dpmm_cfg(get_density_cfg(self.result_base_dir()))
         sim.sql.append_index_if_missing()
+        sim.sql.debug_load_host_id_map_from_data()
 
     @process_as({"prio": 999, "type": "post"})
     def build_hdf(self):
@@ -363,16 +364,11 @@ class SimulationRun(BaseSimulationRunner):
     @process_as({"prio": 555, "type": "post"})
     def plot_application_debug_matrix(self):
         saver = self.simple_saver(sub_dir="dbg", fig_type=".png")
-        run, cfg_d, cfg_e = SimulationRun.postprocessing(
-            result_dir=f"/home/stsc/simulation_output/arc-dsa_multi_cell/s2_ttl_and_stream_1/simulation_runs/outputs/Sample_{sim_id}_0/final_multi_enb_out",
-            qoi="plot_application_tx_throughput",
-            exec=False
-            )
-        node_rx: NodeRxData = run.create_node_rx_hdf()
-        node_tx: NodeTxData = run.create_node_tx_hdf()
-        pos: NodePositionWithRsdHdf = run.create_position_hdf()
-        d_sim: Simulation = Simulation.from_dpmm_cfg(cfg_d)
-        e_sim: Simulation = Simulation.from_dpmm_cfg(cfg_e)
+        node_rx: NodeRxData = self.create_node_rx_hdf()
+        node_tx: NodeTxData = self.create_node_tx_hdf()
+        pos: NodePositionWithRsdHdf = self.create_position_hdf()
+        d_sim: Simulation = Simulation.from_dpmm_cfg(get_density_cfg(self.result_base_dir()))
+        e_sim: Simulation = Simulation.from_dpmm_cfg(get_entropy_cfg(self.result_base_dir()))
         apps = [
             SqlAppProxy("d_map", d_sim.dpmm_cfg.m_map, d_sim),
             SqlAppProxy("d_beacon", d_sim.dpmm_cfg.m_beacon, d_sim),
@@ -381,7 +377,7 @@ class SimulationRun(BaseSimulationRunner):
         sim_id="" 
         rsd_filter = list(range(1,16))
         PlotAppMisc.plot_by_app_overview(saver, sim_id, node_rx, node_tx, pos, d_sim, apps, rsd_filter)
-        PlotAppMisc.plot_planed_throughput_in_rsd(saver, sim_id, node_tx, pos, apps)
+        PlotAppMisc.plot_planed_throughput_in_rsd(saver, sim_id, node_tx, apps, rsd_filter)
         PlotAppMisc.plot_received_bursts(node_rx, figuer_title=f"Simulation_{sim_id} fixed until time 400.0 seconds", saver=saver.with_suffix(f"_{sim_id}"), where="time < 400.0")
 
     @process_as({"prio": 100, "type": "post"})
