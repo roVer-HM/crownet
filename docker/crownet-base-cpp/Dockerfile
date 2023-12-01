@@ -24,6 +24,8 @@ RUN apt-get update && \
        libstdc++6-8-dbg \
        clang-format \
        bear cmake \
+       sqlite3 \
+       libsqlite3-dev \
        libboost-all-dev libcrypto++-dev libcrypto++-utils libcrypto++6 libgeographic-dev  \
        doxygen graphviz tcl-dev tk-dev  valgrind \
        openscenegraph libopenscenegraph-dev libosgearth-dev openscenegraph-plugin-osgearth \

@@ -9,6 +9,7 @@
 #include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/common/util/FileWriter.h"
 
 #include "crownet/dcd/generic/transmissionOrderStrategies/InsertionOrderedCellIdStream.h"
 #include "crownet/dcd/generic/transmissionOrderStrategies/OrderByCellIdStream.h"
@@ -101,6 +102,23 @@ std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> Reg
         throw cRuntimeError("No CellIdStream defined for type %s", typeName.c_str());
     }
     return cellIdStream_dispatcher[typeName]();
+}
+void RegularDcdMapFactory::create_result_db(std::string path, int maxCommitCount){
+    sqlApi = std::make_shared<SqlLiteApi>(maxCommitCount); //max commit count
+    auto absPath = BaseFileWriter::getAbsOutputPath(path, ".db");
+    sqlApi->initialize(absPath.c_str());
+}
+
+bool RegularDcdMapFactory::use_result_db() const {
+    return sqlApi != nullptr;
+}
+
+
+std::shared_ptr<SqlLiteApi> RegularDcdMapFactory::getSqlApi(){
+    if (sqlApi == nullptr){
+        throw cRuntimeError("SqlApi not configured in RegularDcdMapFactory");
+    }
+    return sqlApi;
 }
 
 }  // namespace crownet

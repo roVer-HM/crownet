@@ -29,6 +29,7 @@ simple GlobalDensityMap like IGlobalDensityMap
         string coordConverterModule = default("coordConverter");
         double cellSize @unit(m) = default(5.0m);
 
+		int mapSqlMaxCommitCount = default(200); // number of insert statements to inlcude in one sql transaction if writeType is 'sql'
 		string writerType = default("csv"); // or sql
         double writeMapInterval @unit(s) = default(2.0s) ;
         

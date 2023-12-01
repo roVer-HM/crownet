@@ -17,13 +17,16 @@
 #include "Writer.h"
 #include "FilePrinter.h"
 #include "crownet/applications/dmap/dmap_m.h"
+#include "crownet/common/util/SqlLiteApi.h"
+#include "crownet/common/util/SqlLiteWriter.h"
+
 
 namespace crownet {
 
 
 class BaseFileWriter : public BufferWriter {
 public:
-    static std::string getAbsOutputPath(std::string fileName);
+    static std::string getAbsOutputPath(std::string fileName, std::string suffix=".csv");
 
 public:
     BaseFileWriter(std::string filePath="", std::string sep=";", long bufferSize=8192);
@@ -131,6 +134,11 @@ public:
     ActiveFileWriter *build(std::shared_ptr<FilePrinter> printer);
     template <typename M>
     ActiveFileWriter *build(std::shared_ptr<M> map, MapCfg *mapCfg);
+
+    template <typename M>
+    ActiveWriter *buildSqlWriter(std::shared_ptr<M> map, MapCfg *mapCfg, std::shared_ptr<SqlLiteApi> sql);
+    ActiveWriter *buildSqlGlobalWriter(std::shared_ptr<SqlPrinter> printer, std::shared_ptr<SqlLiteApi> sql);
+
 
 };
 

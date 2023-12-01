@@ -95,6 +95,8 @@ MISC_ := -lboost_filesystem \
 	     -lboost_system \
 	     -losg \
 	     -losgEarth \
+	     -lsqlite3 \
+	     -L/usr/lib/x86_64-linux-gnu/ \
 	     -lboost_iostreams \
 	     -lz
 

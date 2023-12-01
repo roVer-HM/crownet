@@ -18,15 +18,23 @@ namespace crownet {
 class RegularDcdMapSqlValuePrinter : public SqlPrinter {
 public:
     RegularDcdMapSqlValuePrinter(std::shared_ptr<RegularDcdMap> map) : map(map){};
-    void writeSqlStatement(std::ostream& out) override;
-    void createSchema(std::ostream& out) override;
-    void writeInitSqlStatement(std::ostream& out) override;
+    virtual void writeSqlStatement(std::shared_ptr<SqlLiteApi> sqlApi) override;
 
 protected:
  std::shared_ptr<RegularDcdMap> map;
-// todo postion provider?
 
 };
+
+class RegularDcdMapSqlGlobalPrinter : public SqlPrinter {
+public:
+    RegularDcdMapSqlGlobalPrinter(std::shared_ptr<RegularDcdMap> map) : map(map){};
+    virtual void writeSqlStatement(std::shared_ptr<SqlLiteApi> sqlApi) override;
+
+protected:
+ std::shared_ptr<RegularDcdMap> map;
+
+};
+
 
 // todo integrate with crownet/common/util/FileWriter.h
 class RegularDcdMapValuePrinter : public FilePrinter {

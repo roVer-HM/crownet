@@ -34,6 +34,7 @@ class MapCfg extends cOwnedObject {
      simtime_t cellAgeTTL @editable;
      string idStreamType;
      bool appendRessourceSharingDomainId = false;
+     string logType = "csv";
      
 }
 

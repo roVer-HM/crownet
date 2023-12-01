@@ -13,6 +13,7 @@
 #include "crownet/dcd/regularGrid/RegularCell.h"
 #include "crownet/common/RegularGridInfo.h"
 #include "crownet/applications/dmap/dmap_m.h"
+#include "crownet/common/util/SqlLiteApi.h"
 
 
 
@@ -44,11 +45,17 @@ class RegularDcdMapFactory {
   RegularGridInfo getGrid() const {return grid;}
   std::shared_ptr<SimTimeProvider> getTimeProvider() { return timeProvider; }
 
+  void create_result_db(std::string path, int maxCommitCount = 200);
+  bool use_result_db() const;
+  std::shared_ptr<SqlLiteApi> getSqlApi();
+
  private:
   RegularGridInfo grid;
   std::shared_ptr<OsgCoordinateConverter> converter;
   std::shared_ptr<GridCellIDKeyProvider> cellKeyProvider;
   std::shared_ptr<SimTimeProvider> timeProvider;
+
+  std::shared_ptr<SqlLiteApi> sqlApi;
 };
 
 }  // namespace crownet

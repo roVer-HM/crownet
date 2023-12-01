@@ -9,20 +9,48 @@
 
 namespace crownet {
 
-void RegularDcdMapSqlValuePrinter::writeSqlStatement(std::ostream& out){
-    //todo mw write dcdMap State to sql buffer (out)
-    // out << "insert ..."
+void RegularDcdMapSqlValuePrinter::writeSqlStatement(std::shared_ptr<SqlLiteApi> sqlApi){
+
+    for(const auto& val : map->valid()){
+        const auto lEntry = val.second.val();
+        int own_cell = (val.first == map->getOwnerCell()) ? 1 : 0;
+        int owner_rsd_id = map->getResourceSharingDomainId();
+
+        sqlApi->write_map(
+                map->getOwnerId(), //hostId,
+                omnetpp::simTime().dbl(), //simtime,
+                val.first.x(), // x,
+                val.first.y(), //y,
+                lEntry->getCount(), // count,
+                lEntry->getMeasureTime().dbl(), // measured_t,
+                lEntry->getReceivedTime().dbl(), // received_t,
+                lEntry->getSource(), // source,
+                lEntry->getSelectedIn(), // selection,
+                lEntry->getSelectionRank(), //selectionRank,
+                lEntry->getEntryDist().sourceHost, // sourceHost,
+                lEntry->getEntryDist().sourceEntry, // sourceEntry,
+                lEntry->getEntryDist().hostEntry, // hostEntry,
+                lEntry->getResourceSharingDomainId(), // rsd_id,
+                own_cell, // own_cell,
+                owner_rsd_id); //owner_rsd_id
+    }
 }
 
-void RegularDcdMapSqlValuePrinter::createSchema(std::ostream& out){
-    //todo mw
-    // out << "insert ..."
+void RegularDcdMapSqlGlobalPrinter::writeSqlStatement(std::shared_ptr<SqlLiteApi> sqlApi){
+    for(const auto& val : map->validLocal()){
+        const auto lEntry = val.second.get<GridGlobalEntry>();
+
+        int64_t glb_id = sqlApi->write_map_glb(
+                omnetpp::simTime().dbl(), // simtime,
+                val.first.x(), // x,
+                val.first.y(), //y,
+                lEntry->getCount()); // count,
+        for (const auto& node_id : lEntry->nodeIds){
+            sqlApi->write_glb_node_id_mapping( glb_id, node_id);
+        }
+  }
 }
 
-void RegularDcdMapSqlValuePrinter::writeInitSqlStatement(std::ostream& out) {
-    //todo mw write metadata for given map
-    // out << "insert ..."
-}
 
 int RegularDcdMapValuePrinter::columns() const { return 9; }
 
@@ -103,16 +131,16 @@ void RegularDcdMapAllPrinter::writeTo(std::ostream& out,
 void RegularDcdMapGlobalPrinter::writeTo(std::ostream& out,
                                          const std::string& sep) const {
     for(const auto& val : map->validLocal()){
-    int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
-    const auto lEntry = val.second.get<GridGlobalEntry>();
+        int ownCell = (val.first == map->getOwnerCell()) ? 1 : 0;
+        const auto lEntry = val.second.get<GridGlobalEntry>();
 
-    out << omnetpp::simTime().dbl() << sep;
-    val.first.writeTo(out, sep);  // GridCellID (x, y)
-    out << sep;
-    lEntry->writeTo(out, sep);  // Entry
-    out << sep;
-    out << ownCell;
-    out << sep << lEntry->nodeString(sep) << std::endl;
+        out << omnetpp::simTime().dbl() << sep;
+        val.first.writeTo(out, sep);  // GridCellID (x, y)
+        out << sep;
+        lEntry->writeTo(out, sep);  // Entry
+        out << sep;
+        out << ownCell;
+        out << sep << lEntry->nodeString(sep) << std::endl;
   }
 }
 

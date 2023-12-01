@@ -26,7 +26,7 @@ from crownetutils.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
 
 from crownetutils.utils.logging import logger
 from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, DpmmCfgCsv, DpmmCfgDb, MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
     ArbitraryValueImputation,
@@ -39,13 +39,13 @@ from crownetutils.analysis.dpmm.imputation import (
 
 load_matplotlib_style(STYLE_SIMPLE_169)
 
-
+# todo:
 def get_density_cfg(base_dir):
-    density_cfg = DpmmCfg(
+    density_cfg = DpmmCfgDb(
         base_dir=base_dir,
         hdf_file="density_data.h5",
         map_type=MapType.DENSITY,
-        global_map_csv_name="global.csv",
+        map_db_name="global_densityMap.db",
         beacon_app_path="app[0]",
         map_app_path="app[1]",
         module_vectors=["misc", "pNode"],
@@ -54,13 +54,11 @@ def get_density_cfg(base_dir):
 
 
 def get_entropy_cfg(base_dir):
-    density_cfg = DpmmCfg(
+    density_cfg = DpmmCfgDb(
         base_dir=base_dir,
         hdf_file="entropy_data.h5",
         map_type=MapType.ENTROPY,
-        global_map_csv_name="global_entropyMap.csv",
-        node_map_csv_glob="entropyMap_*.csv",
-        node_map_csv_id_regex=r"entropyMap_(?P<node>\d+)\.csv",
+        map_db_name="global_entropyMap.db",
         beacon_app_path=None,
         map_app_path="app[2]",
         module_vectors=["misc", "pNode"],
@@ -256,7 +254,7 @@ class SimulationRun(BaseSimulationRunner):
             rsd=pos,
             coord=CoordinateType.xy_no_geo_offset,
             base_cmap="tab20",
-            inner_r=650.0,
+            inner_r=500.0,
         )
         figpath = os.path.join(self.fig_out(), "trace_map.png")
         logger.info(f"save {figpath}")
@@ -360,25 +358,38 @@ class SimulationRun(BaseSimulationRunner):
         PlotAppTxInterval.plot_application_tx_time_hist_ecdf(
             tx_data=tx_data, saver=saver
         )
-    
+
     @process_as({"prio": 555, "type": "post"})
     def plot_application_debug_matrix(self):
         saver = self.simple_saver(sub_dir="dbg", fig_type=".png")
         node_rx: NodeRxData = self.create_node_rx_hdf()
         node_tx: NodeTxData = self.create_node_tx_hdf()
         pos: NodePositionWithRsdHdf = self.create_position_hdf()
-        d_sim: Simulation = Simulation.from_dpmm_cfg(get_density_cfg(self.result_base_dir()))
-        e_sim: Simulation = Simulation.from_dpmm_cfg(get_entropy_cfg(self.result_base_dir()))
+        d_sim: Simulation = Simulation.from_dpmm_cfg(
+            get_density_cfg(self.result_base_dir())
+        )
+        e_sim: Simulation = Simulation.from_dpmm_cfg(
+            get_entropy_cfg(self.result_base_dir())
+        )
         apps = [
             SqlAppProxy("d_map", d_sim.dpmm_cfg.m_map, d_sim),
             SqlAppProxy("d_beacon", d_sim.dpmm_cfg.m_beacon, d_sim),
             SqlAppProxy("e_map", e_sim.dpmm_cfg.m_map, e_sim),
         ]
-        sim_id="" 
-        rsd_filter = list(range(1,16))
-        PlotAppMisc.plot_by_app_overview(saver, sim_id, node_rx, node_tx, pos, d_sim, apps, rsd_filter)
-        PlotAppMisc.plot_planed_throughput_in_rsd(saver, sim_id, node_tx, apps, rsd_filter)
-        PlotAppMisc.plot_received_bursts(node_rx, figuer_title=f"Simulation_{sim_id} fixed until time 400.0 seconds", saver=saver.with_suffix(f"_{sim_id}"), where="time < 400.0")
+        sim_id = ""
+        rsd_filter = list(range(1, 16))
+        PlotAppMisc.plot_by_app_overview(
+            saver, sim_id, node_rx, node_tx, pos, d_sim, apps, rsd_filter
+        )
+        PlotAppMisc.plot_planed_throughput_in_rsd(
+            saver, sim_id, node_tx, apps, rsd_filter
+        )
+        PlotAppMisc.plot_received_bursts(
+            node_rx,
+            figuer_title=f"Simulation_{sim_id} fixed until time 400.0 seconds",
+            saver=saver.with_suffix(f"_{sim_id}"),
+            where="time < 400.0",
+        )
 
     @process_as({"prio": 100, "type": "post"})
     def repack_1(self):

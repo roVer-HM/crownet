@@ -120,7 +120,7 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
   }
 }
 
-std::string GlobalDensityMap::getMapName() const { return "global"; }
+std::string GlobalDensityMap::getMapName() const { return "global_densityMap"; }
 
 void GlobalDensityMap::initializeMap(){
     // 1) setup map
@@ -140,38 +140,43 @@ void GlobalDensityMap::initializeMap(){
     cellKeyProvider = dcdMapFactory->getCellKeyProvider();
 
     // 2) setup writer.
+    ActiveFileWriterBuilder fBuilder{};
+    fBuilder.addMetadata("IDXCOL", 3);
+    fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+    fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
+    fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+    fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+    // todo cellsize in x and y
+    fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+    fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
+    fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
+    fBuilder.addMetadata<std::string>(
+        "MAP_TYPE",
+        mapCfg->getMapType());  // The global density map is the ground
+                                // truth. No algorihm needed.
+    fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
+    fBuilder.addMetadata<int>("NODE_ID", -1);
+    fBuilder.addMetadata("NODE_PATH", this->getFullPath());
+
+
     if (par("writerType").stdstringValue() == "csv"){
-        ActiveFileWriterBuilder fBuilder{};
-        fBuilder.addMetadata("IDXCOL", 3);
-        fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
-        fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
-        fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
-        fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
-        // todo cellsize in x and y
-        fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-        fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
-        fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
-        fBuilder.addMetadata<std::string>(
-            "MAP_TYPE",
-            mapCfg->getMapType());  // The global density map is the ground
-                                    // truth. No algorihm needed.
-        fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
-        fBuilder.addMetadata<int>("NODE_ID", -1);
+
         fBuilder.addPath(getMapName());
 
         fileWriter.reset(fBuilder.build(
             std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
     } else if (par("writerType").stdstringValue() == "sql"){
-//      todo mw
-//
-//      create sqlApi <--- will be shared
-//      create sqlWriter/Printer for global map
-//          todo mw setup SqlLiteWriter
-//          auto sqlWriter = std::make_shared<SqlLiteWriter>();
-//          auto sqlPrinter = std::make_shared<RegularDcdMapSqlValuePrinter>(dcdMapGlobal);
-//          sqlWriter->setSqlApi(sqlApi);
-//          sqlWriter->setPrinter(sqlPrinter);
-//          filewriter = sqlWriter;
+        if (hasPar("mapSqlMaxCommitCount")){
+            dcdMapFactory->create_result_db(getMapName());
+        } else {
+            dcdMapFactory->create_result_db(getMapName(), par("mapSqlMaxCommitCount").intValue());
+        }
+        fileWriter.reset(
+                fBuilder.buildSqlGlobalWriter(
+                        std::make_shared<RegularDcdMapSqlGlobalPrinter>(dcdMapGlobal),
+                        dcdMapFactory->getSqlApi()
+                )
+        );
     } else {
         throw cRuntimeError("expected sql or csv as writer type got '%s'", par("writerType").stringValue());
     }

@@ -89,6 +89,8 @@ protected:
  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) override;
  virtual cModule* getModule() override { return this;}
  virtual std::string getMapName() const;
+ virtual std::string getMapBaseName() const;
+
  virtual DpmmMapType getMapType() const override { return mapDataType;}
  //todo mw
  //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) override;

@@ -135,32 +135,45 @@ void BaseDensityMapApp::initDcdMap(){
 
 }
 
+std::string BaseDensityMapApp::getMapBaseName() const{
+    return "dcdMap";
+}
+
 std::string  BaseDensityMapApp::getMapName() const{
     std::stringstream s;
-    s << "dcdMap_" << hostId;
+    s << getMapBaseName() << "_" << hostId;
     return s.str();
 }
 
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
-      ActiveFileWriterBuilder fBuilder{};
-      fBuilder.addMetadata("IDXCOL", 3);
-      fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
-      fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
-      fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
-      fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
-      fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
-      // todo cellsize in x and y
-      fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-      fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
-      fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
-      fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
-      fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
 
-      fBuilder.addPath(getMapName());
+        ActiveFileWriterBuilder fBuilder{};
+        fBuilder.addMetadata("IDXCOL", 3);
+        fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+        fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
+        fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+        fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+        fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
+        // todo cellsize in x and y
+        fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+        fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
+        fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
+        fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
+        fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
+        fBuilder.addMetadata("NODE_PATH", this->getFullPath());
 
-      fileWriter.reset(fBuilder.build<RegularDcdMap>(
-              dcdMap, mapCfg));
+
+        if(strcmp(mapCfg->getLogType(), "csv") == 0){
+
+            fBuilder.addPath(getMapName());
+            fileWriter.reset(fBuilder.build<RegularDcdMap>(
+                    dcdMap, mapCfg));
+        } else if (strcmp(mapCfg->getLogType(), "sql") == 0)  {
+            fileWriter.reset(fBuilder.buildSqlWriter<RegularDcdMap>(dcdMap, mapCfg, dcdMapFactory->getSqlApi()));
+        } else {
+            throw cRuntimeError("logType %s unknown. Supported types: 'csv', 'sql'", mapCfg->getLogType());
+        }
     } else {
         // do nothing
         fileWriter.reset(new DevNullWriter());
