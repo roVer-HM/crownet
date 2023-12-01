@@ -43,7 +43,7 @@ mapCfgYmfDist_Density = ObjectValue.from_args(
     QString("ymfPlusDistStep"),
     # "mapTypeLog", QString("all"),
     "cellAgeTTL",
-    UnitValue.s(15.0),
+    UnitValue.s(60.0),
     "alpha",
     0.90,
     "idStreamType",
@@ -52,6 +52,8 @@ mapCfgYmfDist_Density = ObjectValue.from_args(
     60.0,
     "appendRessourceSharingDomainId",
     BoolValue.TRUE,
+    "logType",
+    QString("sql"),
 )
 mapCfgYmfDist_Entropy = ObjectValue.from_args(
     "crownet::MapCfgYmfPlusDistStep",
@@ -69,6 +71,8 @@ mapCfgYmfDist_Entropy = ObjectValue.from_args(
     60.0,
     "appendRessourceSharingDomainId",
     BoolValue.TRUE,
+    "logType",
+    QString("sql"),
 )
 
 t = UnitValue.s(1000.0)  # ~30min

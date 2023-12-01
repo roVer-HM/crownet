@@ -101,7 +101,7 @@ void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
             // set by using the scheduler startOffset parameter.
             simtime_t start_time = std::max(app->getStartTime(), now) + startOffset;
             txIntervalDataPrio.avg_pkt_size = estimatedAvgPaketSize;
-            txIntervalDataPrio.pmembers = 1;
+            txIntervalDataPrio.pmembers = 2; // Allays assume at least 2 members. Otherwise there is no need for communication ;)
             txIntervalDataPrio.timestamp = simTime();
             computeInterval(txIntervalDataPrio);
             simtime_t schedule_at = start_time + txIntervalDataPrio.rndInterval;
@@ -166,8 +166,8 @@ void DynamicMaxBandwidthScheduler::updateTxIntervalDataCurrent(){
         return;
     }
     txIntervalDataCurrent.timestamp = now;
-    // ensure to count at least one self.
-    txIntervalDataCurrent.pmembers = std::max(1, ntSizeProvider->getNeighborhoodSize());
+    // Allays assume at least 2 members. Otherwise there is no need for communication ;)
+    txIntervalDataCurrent.pmembers = std::max(2, ntSizeProvider->getNeighborhoodSize());
     txIntervalDataCurrent.avg_pkt_size = appRxInfoProvider->getAppRxInfo()->getAvg_packet_size();
     computeInterval(txIntervalDataCurrent);
 
