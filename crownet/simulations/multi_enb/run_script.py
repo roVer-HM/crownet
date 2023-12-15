@@ -26,6 +26,7 @@ from crownetutils.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
 
 from crownetutils.utils.logging import logger
 from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
+from crownetutils.analysis.dpmm.dpmm_sql import DpmmSql
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, DpmmCfgCsv, DpmmCfgDb, MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
@@ -236,6 +237,16 @@ class SimulationRun(BaseSimulationRunner):
             pos,
         )
         return ret
+    
+    @process_as({"prio": 979, "type": "post"})
+    def append_map_cell_count_over_time(self):
+        _dir = self.result_base_dir()
+        d_cfg = get_density_cfg(_dir)
+        if isinstance(d_cfg, DpmmCfgDb):
+            DpmmSql(d_cfg).create_cell_count_by_host_id_over_time_if_missing()
+        e_cfg = get_entropy_cfg(_dir)
+        if isinstance(e_cfg, DpmmCfgDb):
+            DpmmSql(e_cfg).create_cell_count_by_host_id_over_time_if_missing()
 
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
