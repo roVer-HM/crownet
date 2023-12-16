@@ -237,7 +237,7 @@ class SimulationRun(BaseSimulationRunner):
             pos,
         )
         return ret
-    
+
     @process_as({"prio": 979, "type": "post"})
     def append_map_cell_count_over_time(self):
         _dir = self.result_base_dir()
@@ -382,10 +382,17 @@ class SimulationRun(BaseSimulationRunner):
         e_sim: Simulation = Simulation.from_dpmm_cfg(
             get_entropy_cfg(self.result_base_dir())
         )
+
         apps = [
-            SqlAppProxy("d_map", d_sim.dpmm_cfg.m_map, d_sim),
+            SqlAppProxy("d_map", d_sim.dpmm_cfg.m_map, d_sim).add_callback(
+                cb_name="map_size",
+                func=DpmmSql(d_sim.dpmm_cfg).get_cell_count_by_host_id_over_time,
+            ),
             SqlAppProxy("d_beacon", d_sim.dpmm_cfg.m_beacon, d_sim),
-            SqlAppProxy("e_map", e_sim.dpmm_cfg.m_map, e_sim),
+            SqlAppProxy("e_map", e_sim.dpmm_cfg.m_map, e_sim).add_callback(
+                cb_name="map_size",
+                func=DpmmSql(e_sim.dpmm_cfg).get_cell_count_by_host_id_over_time,
+            ),
         ]
         sim_id = ""
         rsd_filter = list(range(1, 16))
