@@ -75,7 +75,7 @@ mapCfgYmfDist_Entropy = ObjectValue.from_args(
     QString("sql"),
 )
 
-t = UnitValue.s(1000.0)  # ~30min
+t = UnitValue.s(1000.0)
 
 
 # insertionOrder, by distance, TTL
