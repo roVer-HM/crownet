@@ -29,6 +29,35 @@ class CellOrderTestF : public MapTest {
 };
 
 
+TEST_F(CellOrderTestF, orderByDistance_compare){
+    auto map = dcdFactory->create_shared_ptr(IntIdentifer(1));
+
+        setSimTime(1.0);
+        for (int x = 0; x < 5; x++){
+            for (int y = 0; y < 5; y++){
+                // all cells same age
+                incr(map, GridCellID(x, y), 1, 1.0);
+            }
+        }
+        //last sent is 0.0
+        setSimTime(5.0);
+        YmfVisitor v{};
+        map->computeValues(&v);
+        map->setOwnerCell(GridCellID(0, 0));
+
+        OrderByCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t> order_ascending(true);
+        std::vector<GridCellID> vec_asc = order_ascending.getCellOrder(map.get());
+
+
+        OrderByCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t> order_descending(false);
+        std::vector<GridCellID> vec_desc = order_descending.getCellOrder(map.get());
+
+        std::vector<GridCellID>  vec_asc_reverse = vec_asc;
+        std::reverse(vec_asc_reverse.begin(), vec_asc_reverse.end());
+
+        cmp_vec(vec_desc, vec_asc_reverse);
+}
+
 TEST_F(CellOrderTestF, lastSentAsc_distanceAscDesc_compare){
     /*
      * lastSent is equal for all, sort will be defined only by distance. The reversed sorting order

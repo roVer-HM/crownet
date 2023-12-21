@@ -5,14 +5,14 @@ import sys
 
 import crownetutils.analysis.dpmm.builder as Builders
 from crownetutils.analysis.dpmm.hdf.dpmm_provider import DpmmProvider
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfgCsv, MapType
 
 
 def dcd_map_localUpdate(hostId, data_root):
     print(data_root)
     data_root = os.path.abspath(data_root)
     print(data_root)
-    cfg = DpmmCfg(
+    cfg = DpmmCfgCsv(
         base_dir=data_root,
         hdf_file="data.h5",
         map_type=MapType.DENSITY,

@@ -102,8 +102,8 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
             [UnitValue.s(15.0), UnitValue.s(60.0), UnitValue.s(3600)],
             [
                 QString("insertionOrder"),
-                QString("orderBySentLastAsc_DistAsc"),
-                QString("orderBySentLastAsc_DistDesc"),
+                QString("orderByDistanceAscending"),
+                QString("orderByDistanceDescending"),
             ],
         )
         for _ttl, _id_stream in _variations:

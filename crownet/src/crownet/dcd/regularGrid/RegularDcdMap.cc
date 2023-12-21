@@ -66,6 +66,21 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::shared_ptr<OsgCoordinateConverte
         return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
     };
 
+    cellIdStream_dispatcher["orderByDistanceAscending"] = [](){
+        bool ascending = true;
+        using vecProvider_t = OrderByCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(ascending);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
+    cellIdStream_dispatcher["orderByDistanceDescending"] = [](){
+        bool ascending = false;
+        using vecProvider_t = OrderByCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(ascending);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
+
     cellIdStream_dispatcher["orderBySentLastAsc_DistDesc"] = [](){
         bool lastSentAscendingOrder = true;
         bool distanceAscendingOrder = false; // descending order (5,4,3,2,1)

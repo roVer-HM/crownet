@@ -26,6 +26,53 @@ public:
 
 };
 
+template <typename C, typename N, typename T>
+class OrderByCellDistance: public OrderdCellIdVectorProvider<C, N, T>{
+public:
+    using Map = typename OrderdCellIdVectorProvider<C,N,T>::Map;
+    using CellId = typename Map::cell_key_t;
+
+    virtual ~OrderByCellDistance() = default;
+    OrderByCellDistance(bool ascending = true): ascending_order(ascending){};
+
+
+    virtual std::vector<CellId> getCellOrder(Map* map) override {
+
+
+        std::vector<std::pair<CellId, double>> sorted_cells;
+        CellId cell = map->getOwnerCell();
+
+        for(const auto &e : map->valid()){
+            float dist = std::sqrt(
+                std::pow(e.first.x() - cell.x(), 2) + std::pow(e.first.y() - cell.y(), 2)
+                );
+
+            sorted_cells.push_back(std::make_pair(e.first, dist));
+        }
+
+        // sort non-descending i.e. ascending
+       std::stable_sort(
+           sorted_cells.begin(),
+           sorted_cells.end(),
+           [](const std::pair<CellId, double>& a, const std::pair<CellId, double>& b) -> bool {
+               return a.second < b.second;
+       });
+
+       if (ascending_order){
+           // do nothing already sorted
+       } else{
+           std::reverse(sorted_cells.begin(), sorted_cells.end());
+       }
+
+       std::vector<CellId> ret;
+       for(const auto& e : sorted_cells){
+           ret.push_back(e.first);
+       }
+       return ret;
+    }
+private:
+    bool ascending_order = true;
+};
 
 
 template <typename C, typename N, typename T>
@@ -48,7 +95,6 @@ public:
 
          // 0,0 / 3,
         for(const auto &e : map->valid()){
-            // float dist = std::abs(e.first.x() - cell.x()) + std::abs(e.first.y() - cell.y());
             float dist = std::sqrt(
                 std::pow(e.first.x() - cell.x(), 2) + std::pow(e.first.y() - cell.y(), 2)
                 );
