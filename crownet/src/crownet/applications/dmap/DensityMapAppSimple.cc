@@ -197,7 +197,8 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
                 1.0
         );
         cellEntryLocal->setEntryDist(std::move(dist));
-        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
+        cellEntryLocal->setResourceSharingDomainId(info->getCurrentData()->getRessourceSharingDomainId());
+//        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         // add node to neighborhood
         dcdMap->addToNeighborhood((int)info->getNodeId(), cellId);
         EV_INFO << LOG_MOD << hostId << " enter-cell: " << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
@@ -242,7 +243,8 @@ void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table,
             info->getCurrentData()->getReceivedTime()
         );
         cellEntryLocal->setEntryDist(std::move(dist));
-        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
+        cellEntryLocal->setResourceSharingDomainId(info->getCurrentData()->getRessourceSharingDomainId());
+//        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         EV_INFO << LOG_MOD << hostId << " stay-in-cell: " << cellId_current << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
     }
 }

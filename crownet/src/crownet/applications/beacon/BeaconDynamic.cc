@@ -45,7 +45,7 @@ Packet *BeaconDynamic::createPacket() {
     if (appendResourceSharingDomainId){
         beacon = makeShared<DynamicBeaconPacketWithSharingDominId>();
         //todo: assume same domain, i.e. one eNB, for now.
-        dynamicPtrCast<DynamicBeaconPacketWithSharingDominId>(beacon)->setSharingDominId(0);
+        dynamicPtrCast<DynamicBeaconPacketWithSharingDominId>(beacon)->setSharingDomainId(getRsdIdPair().getId());
     } else {
         beacon = makeShared<DynamicBeaconPacket>();
     }
