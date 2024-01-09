@@ -1,0 +1,2 @@
+munich.net.xml filter=lfs diff=lfs merge=lfs -text
+osm/munich_clean.osm filter=lfs diff=lfs merge=lfs -text

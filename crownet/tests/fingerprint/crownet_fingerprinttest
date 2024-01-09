@@ -43,25 +43,25 @@ from enum import Enum
 import yaml
 from io import StringIO
 
-from roveranalyzer.entrypoint.parser import ArgList
-from roveranalyzer.simulators.controller.controllerrunner import ControlRunner
-from roveranalyzer.simulators.sumo.runner import SumoRunner
-from roveranalyzer.simulators.vadere.runner import VadereRunner
-from roveranalyzer.simulators.opp.runner import OppRunner
-from roveranalyzer.dockerrunner.dockerrunner import (
+from crownetutils.entrypoint.parser import ArgList
+from crownetutils.dockerrunner.simulators.controllerrunner import ControlRunner
+from crownetutils.dockerrunner.simulators.sumorunner import SumoRunner
+from crownetutils.dockerrunner.simulators.vadererunner import VadereRunner
+from crownetutils.dockerrunner.simulators.omnetrunner import OppRunner
+from crownetutils.dockerrunner.dockerrunner import (
     DockerClient,
     DockerCleanup,
     DockerReuse,
     stop_containers,
 )
-from roveranalyzer.dockerrunner import DockerCfg
-from roveranalyzer.utils.dirdiff import (
+from crownetutils.dockerrunner import DockerCfg
+from crownetutils.utils.dirdiff import (
     csv_to_diffdict,
     diffdict_to_csv,
     create_dir_diff,
     compare_diff,
 )
-from roveranalyzer.utils import levels, logger, set_format, set_level
+from crownetutils.utils.logging import levels, logger, set_format, set_level
 import docker
 from requests.exceptions import ReadTimeout
 
@@ -217,6 +217,21 @@ class FingerprintTestCaseGenerator:
                 if ":" in kv:
                     _kv = kv.split(":")
                     _tags[_kv[0]] = _kv[1]
+        for k, v in _tags.items():
+            if v == "CFG":
+                try:
+                    tag = DockerCfg.get_default_tag(DockerCfg.CONTAINER_TAG_MAP.get(k))
+                    logger.info(
+                        f"replace {k}:'CFG' placeholder tag with configured tag {k}:'{tag}'"
+                    )
+                    _tags[k] = tag
+                except Exception as _:
+                    logger.warning(
+                        f"cannot find replacement tag for container {k}:'CFG'. Default to 'latest'. "
+                    )
+                    _tags[k] = "latest"
+                    pass
+
         return _tags
 
     # parse CSV file into a list of dicts
@@ -892,6 +907,12 @@ class FingerprintTestCase(SimulationTestCase):
             else self.cmdLine.split(None, 1)
         )
 
+        # of vector ar part of finger print do not override ini vector recording config.
+        vector_recording = ""
+        fingerprint_content = self.fingerprint.split("/")
+        if len(fingerprint_content) == 2 and "v" not in fingerprint_content[1]:
+            vector_recording = " --vector-recording=false "
+
         command = (
             (
                 exeName + "_dbg"
@@ -907,7 +928,8 @@ class FingerprintTestCase(SimulationTestCase):
             + self.fingerprint
             + '" --cpu-time-limit='
             + TestGlobal.cpuTimeLimit
-            + " --vector-recording=false --scalar-recording=true "
+            + vector_recording
+            + " --scalar-recording=true "
             + " --result-dir="
             + self.resultdir
             + " "
@@ -1816,7 +1838,7 @@ if __name__ == "__main__":
             format="%(asctime)s:%(module)s:%(levelname)s> %(message)s",
         )
 
-    # roveranalyzer logging
+    # crownetutils logging
     level_idx = args.verbose
     set_level(levels[level_idx])
     set_format("%(asctime)s:%(module)s:%(levelname)s> %(message)s")

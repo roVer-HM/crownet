@@ -42,14 +42,17 @@
 #include "crownet/queueing/CrownetActivePacketSourceBase.h"
 #include "crownet/applications/common/scheduler/IAppScheduler.h"
 #include "crownet/common/MobilityProviderMixin.h"
+#include "crownet/common/RsdProviderMixin.h"
 
 using namespace inet;
 
 namespace crownet {
 
+using BaseAppMixin = RsdProviderMixin<MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase>>;
+
 class BaseApp : public DataArrivedHandler,
                 public AppStatusInfo,
-                public MobilityProviderMixin<crownet::queueing::CrownetActivePacketSourceBase> {
+                public BaseAppMixin {
  public:
   BaseApp(){};
   virtual ~BaseApp();

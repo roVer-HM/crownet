@@ -17,8 +17,8 @@ from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolVa
 from suqc.utils.SeedManager.SeedManager import SeedManager
 from suqc.utils.general import get_env_name
 from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
-import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
-import roveranalyzer.simulators.vadere.vadere_variation_helper as v
+import crownetutils.vadere.bonnmotion_traces as BmTrace
+import crownetutils.vadere.vadere_variation_helper as v
 
 t = UnitValue.s(1500.0)
 

@@ -45,7 +45,7 @@ In order to execute the tests, perform the following steps:
 ## Containerized Fingerprint Tests
 
 For simulations in the rover research project coupled simulations with 
-Vadere and Sumo are necessary. These simulations cannot be started 
+Vadere and Sumo are necessary. These simulations cannot be started in
 a single container but multiple container (one for each simulator) must
 be created. Therefore, the fingerprint script is adapted to allow these 
 tests.
@@ -59,10 +59,21 @@ the container tags are encoded in key-value pairs with `;` as delimiter
 # workingdir,    args,                      [...], tags
 /simulation/XX,  -f omnetpp.ini -c fTest01, [...], vadere:latest;omnetpp:latest
 /simulation/XX,  -f omnetpp.ini -c fTest02, [...], sumo:latest;omnetpp:latest
+/simulation/XX,  -f omnetpp.ini -c fTest03, [...], sumo:latest;omnetpp:6.0.1;vadere:CFG
 ```
 
-With the specified tags `vadere:latest;omnetpp:latest` the crownet_fingerprint script 
-will create corresponding containers and executes the simulation.
+With the specified tags `vadere:latest;omnetpp:latest` the crownet_fingerprint
+script will create corresponding containers and executes the simulation. Each
+container that is needed for the simulation must be mentioned. To use the
+container version configured in the current environment  based on the variables
+in `$CROWNET_HOME/config/CONTAINER_VERSION.config` use the tag placeholder `CFG`
+which will be replaced with the configured version in
+`CONTAINER_VERSION.config`.  Note that the script does not source the
+`CONTAINER_VERSION.config` but used the same environment variables used there.
+The user must ensure that the environment in which the fingerprint script is
+executed contains the correct variables. In case of missing variables the 
+default tag `latest` is assumed. 
+
 
 ### Configuration and TraCI Hostname conventions
 

@@ -89,7 +89,18 @@ FilterIterator<T, Iter, IterVal, Pred>::end() {
 }
 
 template <typename T, typename Iter, typename IterVal, typename Pred>
-int FilterIterator<T, Iter, IterVal, Pred>::distance() {
+const FilterIterator<T, Iter, IterVal, Pred> FilterIterator<T, Iter, IterVal, Pred>::begin() const {
+    return const_cast<FilterIterator<T, Iter, IterVal, Pred>*>(this)->begin();
+}
+
+template <typename T, typename Iter, typename IterVal, typename Pred>
+const FilterIterator<T, Iter, IterVal, Pred> FilterIterator<T, Iter, IterVal, Pred>::end() const {
+    return const_cast<FilterIterator<T, Iter, IterVal, Pred>*>(this)->end();
+}
+
+
+template <typename T, typename Iter, typename IterVal, typename Pred>
+int FilterIterator<T, Iter, IterVal, Pred>::distance() const{
   // new iterator
   FilterIterator<T, Iter, IterVal, Pred> tmp(this->data, this->predicate);
   int i = 0;

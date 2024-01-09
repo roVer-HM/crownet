@@ -43,10 +43,6 @@ void ControlManager::initialize(int stage)
         VadereCore* core =
             inet::getModuleFromPar<VadereCore>(par("coreModule"), this);
         subscribeTraCI(core);
-        //todo: (CM) save pointer DensityMap in proteced or private field use getModuleFromPar like with core
-        //todo: (CM) check if parameter is empty first! if (par("globalDcdModule).stdstringValue().empty()){...}
-//        GlobalDensityMap* globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
-//        globalMap = inet::getModuleFromPar<GlobalDensityMap>(par("globalDcdModule"), this);
 
         auto traciFw = core->getTraCiForwarder();
         api = std::make_shared<ControlTraCiApi>();
@@ -96,6 +92,7 @@ void ControlManager::handleActionCommand(const ControlCmd& cmd){
 
 std::vector<double> ControlManager::handleDensityMapCommand(const DensityMapCmd& cmd){
     Enter_Method_Silent();
+
 
     auto node_module = this->findModuleByPath(cmd.nodeId.c_str());
     IDensityMapHandlerBase<RegularDcdMap>* map_handler =

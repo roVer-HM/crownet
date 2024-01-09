@@ -24,7 +24,7 @@ namespace crownet {
 using RegularDcdMap = DcDMap<GridCellID, IntIdentifer, omnetpp::simtime_t>;
 using RegularDcdMapPtr = std::shared_ptr<RegularDcdMap>;
 using RegularDcdMapWatcher = DcdMapWatcher<GridCellID, IntIdentifer, omnetpp::simtime_t>;
-using VisitorCreator = std::function<std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>>(MapCfg*)>;
+using VisitorCreator = std::function<std::shared_ptr<CellAggregationAlgorihm<RegularCell>>(MapCfg*)>;
 using CellIdStreamCreator = std::function<std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>()>;
 using GridEntry = IEntry<IntIdentifer, omnetpp::simtime_t>;
 using GridGlobalEntry = IGlobalEntry<IntIdentifer, omnetpp::simtime_t>;
@@ -39,7 +39,7 @@ class RegularDcdMapFactory {
 
   RegularDcdMap create(const IntIdentifer& ownerID, const std::string& idStreamType = "default");
   std::shared_ptr<RegularDcdMap> create_shared_ptr(const IntIdentifer& ownerID, const std::string& idStreamType = "default");
-  std::shared_ptr<TimestampedGetEntryVisitor<RegularCell>> createValueVisitor(MapCfg* mapCfg);
+  std::shared_ptr<CellAggregationAlgorihm<RegularCell>> createValueVisitor(MapCfg* mapCfg);
   std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> createCellIdStream(const std::string& typeName);
   std::shared_ptr<GridCellIDKeyProvider> getCellKeyProvider() { return cellKeyProvider; }
   RegularGridInfo getGrid() const {return grid;}

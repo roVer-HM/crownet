@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-06-01 14:59:40.860517 by netdiff.py v1_17_0+0608-a6a27b83562
+<configuration>
+    <dest value="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_005/muc.net.xml.gz"/>
+    <outprefix value="2023-06-01_16-58_diff"/>
+    <patch-on-import value="True"/>
+    <remove-plain value="True"/>
+    <source value="/home/vm-sts/repos/crownet/crownet/simulations/multi_enb/sumo/munich/muc_005/muc_base.net.xml.gz"/>
+</configuration>
+-->
+
+<types>
+    <!-- Deleted Elements -->
+    <!-- Created Elements -->
+    <!-- Changed Elements -->
+</types>

@@ -15,8 +15,8 @@ from omnetinireader.config_parser import ObjectValue, UnitValue, QString, BoolVa
 from suqc.utils.SeedManager.SeedManager import SeedManager
 from suqc.utils.general import get_env_name
 from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
-import roveranalyzer.simulators.vadere.bonnmotion_traces as BmTrace
-import roveranalyzer.simulators.vadere.vadere_variation_helper as v
+import crownetutils.vadere.bonnmotion_traces as BmTrace
+import crownetutils.vadere.vadere_variation_helper as v
 
 
 s_5_20_const = QString("vadere/scenarios/mf_1d_m_const_2x5m_d20m.scenario")

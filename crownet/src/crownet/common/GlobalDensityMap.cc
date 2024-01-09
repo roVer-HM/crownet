@@ -22,6 +22,7 @@
 #include "artery/application/MovingNodeDataProvider.h"
 #include "artery/utility/Identity.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
 
 namespace {
@@ -48,6 +49,7 @@ GlobalDensityMap::~GlobalDensityMap() {
   if (appDeleteNode){
       cancelAndDelete(appDeleteNode);
   }
+  delete mapCfg;
 }
 
 void GlobalDensityMap::initialize() {
@@ -132,12 +134,13 @@ void GlobalDensityMap::initializeMap(){
         fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
         // todo cellsize in x and y
         fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-        fBuilder.addMetadata("VERSION", std::string("0.3")); // todo!!!
+        fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
         fBuilder.addMetadata("DATATYPE", mapDataType);
         fBuilder.addMetadata<std::string>(
             "MAP_TYPE",
-            "global");  // The global density map is the ground
-                        // truth. No algorihm needed.
+            mapCfg->getMapType());  // The global density map is the ground
+                                    // truth. No algorihm needed.
+        fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
         fBuilder.addMetadata<int>("NODE_ID", -1);
         fBuilder.addPath("global");
 
@@ -175,6 +178,8 @@ void GlobalDensityMap::initialize(int stage) {
           dynamicNodeVisitorAcceptors.push_back(this);
       }
       mapDataType = "pedestrianCount";
+      mapCfg = (MapCfg*)(par("mapCfg").objectValue()->dup());
+      take(mapCfg);
 
       cModule* _traciModuleListener = findModuleByPath(par("traciModuleListener").stringValue());
       if (_traciModuleListener){

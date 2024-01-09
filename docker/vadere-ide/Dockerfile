@@ -1,31 +1,32 @@
 # vadere Crowd Simulator
 #
-# see https://gitlab.lrz.de/vadere/vadere
-#
-# TODO:
-# - include drivers for HW-accelerated OpenCL/nvidia
-# - enable tests (currently tests are sklipped since they fail if no OpenCL device is available)
 
+ARG IMAGE_REG
+ARG BASE_IMAGE_TAG
+ARG CROWNET_COMMIT_HASH
 
-FROM sam-dev.cs.hm.edu:5023/rover/crownet/vadere:latest
+FROM ${IMAGE_REG}/crownet-base-java:${BASE_IMAGE_TAG}
 
 # Specify the version/tag of vadere to be put in the container:
-ENV RELEASE master
+ENV RELEASE $CROWNET_COMMIT_HASH
 
 LABEL description "vadere Crowd Simulator (as used in crownet)"
 LABEL maintainer  "christina_maria.mayr@hm.edu"
 
-# add ide (intellij)
-WORKDIR /opt/intellij
-ADD ~/.cache/crownet/intellij.tar.gz .
-ENV PATH="/opt/intellij/idea-IU-211.7442.40/bin:${PATH}"
-# for community version: replace 'idea-IU-211.7442.40' by 'idea-IC-211.7442.40'
-
 # init script (triggered at container start)
-COPY init.sh /init.sh
+COPY docker/vadere-ide/init.sh /init.sh
 RUN chmod 555 /init.sh
 ENTRYPOINT [ "/init.sh" ]
 
 # waitfor script (in order to wait for non-child processes)
-COPY waitfor.sh /waitfor.sh
+COPY docker/vadere-ide/waitfor.sh /waitfor.sh
 RUN chmod 555 /waitfor.sh
+
+# add ide (intellij)
+WORKDIR /opt/intellij
+RUN wget https://download.jetbrains.com/idea/ideaIU-2023.2.tar.gz --output-document /opt/intellij/intellij.tar.gz
+RUN tar xzvf /opt/intellij/intellij.tar.gz --one-top-level=intellij --strip-components 1
+ENV PATH="/opt/intellij/intellij/bin:${PATH}"
+
+
+

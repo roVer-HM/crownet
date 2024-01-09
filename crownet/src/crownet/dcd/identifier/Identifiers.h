@@ -86,6 +86,7 @@ class IntIdentifer : public NodeIdentifiere<int> {
                        const std::string& sep) const override;
   virtual void writeHeaderTo(std::ostream& out,
                              const std::string& sep) const override;
+  operator int() const { return value(); }
 };
 
 // class DblIdentifer : public NodeIdentifiere<double> {};

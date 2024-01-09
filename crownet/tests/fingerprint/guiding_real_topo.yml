@@ -1,0 +1,35 @@
+# Fingerprint tests for the "guiding_crowds_test" scenario.
+# See crownet_fingerprinttest crownet --help
+#   * workingdir is realtive to the given '-C' flag of crownet_fingerprinttest
+#   * each toplevel key will be one test case
+#   * if first item in `args` does not start with an `-` it will be
+#     interpreted as the command to execute
+#   * if fingerprint starts with 'file:' read the given path. If path
+#     is relative it based on workingdir. An empty path will default
+#     to hasd./<testcase-name>.csv relative to the current files location
+
+route_choice_real_world:
+  wd: simulations/mucFreiheit_route_choice_app
+  args:
+    - run_script.py
+    - vadere-opp-control
+    - --write-container-log
+    - --create-vadere-container
+    - --override-host-config
+    - --experiment-label
+    - output
+    - --with-control
+    - control.py
+    - --ctrl.controller-type
+    - AvoidShort
+    - --opp.-c
+    - test
+    - --log-docker-stats
+    - --qoi
+    - test_omnetpp_output.csv
+  simtimelimit: 400s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell

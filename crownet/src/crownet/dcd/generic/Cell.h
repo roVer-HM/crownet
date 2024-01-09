@@ -12,11 +12,13 @@
 
 #include <omnetpp/cexception.h>
 #include <memory>
+#include <iterator>
 
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/generic/iterator/CellDataIterator.h"
 #include "crownet/dcd/identifier/Identifiers.h"
 #include "crownet/dcd/identifier/TimeProvider.h"
+
 
 namespace crownet {
 
@@ -120,9 +122,13 @@ class Cell {
   typename map_t::iterator end() { return data.end(); }
   const typename map_t::iterator begin() const;
   const typename map_t::iterator end() const;
+
   // _ONLY_ valid items in data where entry->valid() returns true.
   CellDataIterator<Cell<C, N, T>> validIter();
-  CellDataIterator<Cell<C, N, T>> validIter() const;
+  const CellDataIterator<Cell<C, N, T>> validIter() const;
+  // Iterate over all entries in cell based on provided predicate funtion.
+  CellDataIterator<Cell<C, N, T>> iterBy(const typename CellDataIterator<Cell<C, N, T>>::pred_t& pred);
+  const CellDataIterator<Cell<C, N, T>> iterBy(const typename CellDataIterator<Cell<C, N, T>>::pred_t& pred) const;
 
   /**
    *  Visitors
@@ -135,16 +141,20 @@ class Cell {
    */
   // generic visitor
   template <typename Fn, typename Ret>
-  Ret accept(Fn visitor);
+  Ret accept(Fn& visitor);
   template <typename Fn, typename Ret>
-  Ret accept(const Fn visitor) const;
+  Ret accept(Fn& visitor) const; // cell is constant. Visitor can be mutated.
   // common specialized visitors (cleaner calls without to many <...> )
   template <typename Fn>
   void acceptSet(Fn* visitor);
   template <typename Fn>
-  void acceptSet(Fn visitor);
+  void acceptSet(Fn& visitor); // lvalue vase for stateful visitors to keep state over multiple cells.
   template <typename Fn>
-  entry_t_ptr acceptGetEntry(const Fn visitor) const;
+  void acceptSet(Fn&& visitor); // (lambdas) rvalue case for non-statefull visitors (i.e. ResetVisitors)
+  template <typename Fn>
+  entry_t_ptr acceptGetEntry(Fn& visitor) const; // cell is constant. Visitor can be mutated.
+  template <typename Fn>
+  entry_t_ptr acceptGetEntry(Fn&& visitor) const; // cell is constant. Visitor can be mutated.
   template <typename Fn>
   bool acceptCheck(const Fn visitor) const;
   // compute value of cell based on computeAlg
@@ -166,6 +176,7 @@ class Cell {
 
  private:
   std::shared_ptr<TimeProvider<T>> timeProvider;
+
   map_t data;
   cell_key_t cell_id;
   node_key_t owner_id;

@@ -1,8 +1,8 @@
 {
   "name" : "baseline",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
+  "release" : "2.4",
+  "commithash" : "eecc5fb8aebd57cd27c21ef5eac04e2094056f60",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -146,6 +146,7 @@
         }
       },
       "obstacles" : [ {
+        "id" : 4,
         "shape" : {
           "x" : 165.3,
           "y" : 180.0,
@@ -153,8 +154,9 @@
           "height" : 400.0,
           "type" : "RECTANGLE"
         },
-        "id" : 4
+        "visible" : true
       }, {
+        "id" : 5,
         "shape" : {
           "x" : 132.7,
           "y" : 180.0,
@@ -162,13 +164,12 @@
           "height" : 400.0,
           "type" : "RECTANGLE"
         },
-        "id" : 5
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2,
-        "absorbing" : true,
         "shape" : {
           "x" : 163.0,
           "y" : 180.0,
@@ -176,13 +177,18 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -197,24 +203,35 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 10.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.5,
-        "endTime" : 30.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.5,
+          "constraintsTimeEnd" : 30.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 1,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 10.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -224,12 +241,20 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -239,8 +264,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
         "length" : 4.5,
         "width" : 1.7,
         "direction" : {

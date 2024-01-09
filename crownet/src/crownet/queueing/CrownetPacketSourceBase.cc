@@ -41,7 +41,7 @@ void CrownetPacketSourceBase::initialize(int stage)
     }
 }
 
-const char *CrownetPacketSourceBase::createPacketName() const
+std::string CrownetPacketSourceBase::createPacketName() const
 {
     return StringFormat::formatString(packetNameFormat, [&] (char directive) {
         static std::string result;
@@ -74,7 +74,7 @@ const char *CrownetPacketSourceBase::createPacketName() const
     });
 }
 
-const char *CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& data) const
+std::string CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& data) const
 {
     return StringFormat::formatString(packetNameFormat, [&] (char directive) {
         static std::string result;
@@ -112,7 +112,7 @@ const char *CrownetPacketSourceBase::createPacketName(const Ptr<const Chunk>& da
             default:
                 throw cRuntimeError("Unknown directive: %c", directive);
         }
-        return result.c_str();
+        return result;
     });
 }
 

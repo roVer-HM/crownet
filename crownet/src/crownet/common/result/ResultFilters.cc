@@ -36,14 +36,14 @@ void SimTimeIntervalFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     }
 }
 
-void SimTimeIntervalFilter::init(cComponent *component, cProperty *attrsProperty){
-    cPointerResultFilter::init(component, attrsProperty);
-    if(attrsProperty->containsKey("interval_par")){
-        auto _val = attrsProperty->getValue("interval_par");
-        if(component->hasPar(_val)){
-            this->filterInterval = component->par(_val);
+void SimTimeIntervalFilter::init(Context *ctx){
+    cPointerResultFilter::init(ctx);
+    if(ctx->attrsProperty->containsKey("interval_par")){
+        auto _val = ctx->attrsProperty->getValue("interval_par");
+        if(ctx->component->hasPar(_val)){
+            this->filterInterval = ctx->component->par(_val);
         } else {
-            throw cRuntimeError("simTimeIntervalFilter expected '%s' parameter on module '%s'", _val, component->getFullPath().c_str());
+            throw cRuntimeError("simTimeIntervalFilter expected '%s' parameter on module '%s'", _val, ctx->component->getFullPath().c_str());
         }
     } else {
         throw cRuntimeError("simTimeIntervalFilter expected a statistic attribute 'interval_par'");
@@ -184,6 +184,21 @@ void RcvdSrcCount::receiveSignal(cResultFilter *prev, simtime_t_cref t,
         }
     }
 }
+
+
+Register_ResultFilter("simBBox", SimBBoxFilter);
+void SimBBoxFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+                             cObject *object, cObject *details){
+    OsgCoordConverterProvider *module = dynamic_cast<OsgCoordConverterProvider *>(object);
+     if (module) {
+         const traci::Boundary bbox = module->getConverter()->getSimBound();
+         fire(this, t, bbox.lowerLeftPosition().x, details);
+         fire(this, t, bbox.lowerLeftPosition().y, details);
+         fire(this, t, bbox.upperRightPosition().x, details);
+         fire(this, t, bbox.upperRightPosition().y, details);
+     }
+}
+
 
 Register_ResultFilter("simBound", SimBoundFilter);
 void SimBoundFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,

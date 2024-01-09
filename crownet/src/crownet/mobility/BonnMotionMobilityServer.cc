@@ -13,6 +13,12 @@
 #include "crownet/mobility/BonnMotionMobilityClient.h"
 #include "crownet/common/GlobalDensityMap.h"
 
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <fstream>
+#include <iostream>
+
 #include <list>
 #include <vector>
 #include <fstream>
@@ -25,14 +31,27 @@
 
 namespace crownet {
 
-void BonnMotionServerFile::loadFile(const char *filename){
-    std::ifstream in(filename, std::ios::in);
-    if (in.fail())
-        throw cRuntimeError("Cannot open file '%s'", filename);
+void BonnMotionServerFile::loadFile(const char *filename, bool is3D){
+    std::string fname(filename);
+    std::stringstream inStr;
+    if (fname.compare(fname.size()-3, 3, ".gz") == 0){
+        //gz
+        std::ifstream file(fname.c_str(), std::ios_base::in | std::ios_base::binary);
+        boost::iostreams::filtering_streambuf<boost::iostreams::input> gzIn;
+        gzIn.push(boost::iostreams::gzip_decompressor());
+        gzIn.push(file);
+        boost::iostreams::copy(gzIn, inStr);
+    } else {
+        std::ifstream file(fname.c_str(), std::ios::in);
+        if (file.fail())
+            throw cRuntimeError("Cannot open file '%s'", filename);
+        boost::iostreams::copy(file, inStr);
+    }
 
     std::string line;
     int lineCount = 0;
-    while (std::getline(in, line)) {
+    int minSize = is3D ? 4 : 3;
+    while (std::getline(inStr, line)) {
         if(line.at(0) == '#'){
             continue; // ignore comets
         }
@@ -44,16 +63,28 @@ void BonnMotionServerFile::loadFile(const char *filename){
         while (linestream >> d)
             vec.push_back(d);
 
+
+
+
+        if (((int)vec.size() % minSize) != 0 ){
+            throw cRuntimeError("Expected multiple of %i elements in row got %i for line %i",
+                        minSize, (int)vec.size(), lineCount);
+        }
+        if ((int)vec.size() == minSize){
+            throw cRuntimeError("Expected at least %i elements but got %i for line %i in %s mode. (Need at least 2 points for speed interpolation.)",
+                    2*minSize, (int)vec.size(), lineCount, is3D ? "3D" : "2D");
+        }
+
         timeLine.push_back(std::make_pair(lineCount, simtime_t(vec[0])));
         ++lineCount;
     }
-    in.close();
 
-    // sort timeLine based on time step
-    std::sort(
+    // sort timeLine based on time step **and** keep order of lines with the same time step!
+    std::stable_sort(
             timeLine.begin(), timeLine.end(),
-            [](const BmTimedLineIndex& left, const BmTimedLineIndex& right){return left.second <= right.second;}
+            [](const BmTimedLineIndex& left, const BmTimedLineIndex& right){return left.second < right.second;}
     );
+
 }
 
 bool BonnMotionServerFile::hasTraceForTime(const simtime_t time) const{
@@ -97,7 +128,6 @@ BonnMotionMobilityServer::~BonnMotionMobilityServer() {
     if (creationTimer){
         cancelAndDelete(creationTimer);
     }
-    BonnMotionFileCache::deleteInstance();
 }
 
 void BonnMotionMobilityServer::receiveSignal(cComponent *source, simsignal_t signalID, double d, cObject *details) {
@@ -121,8 +151,8 @@ void BonnMotionMobilityServer::initialize(int stage)
         getSystemModule()->subscribe(bonnMotionTargetReached, this);
         node_type = cModuleType::find(par("moduleType"));
         moduleVector = par("vectorNode").stdstringValue();
-        bmFile.loadFile(par("traceFile").stringValue());
         is3D = par("is3D").boolValue();
+        bmFile.loadFile(par("traceFile").stringValue(), is3D);
         m_mobility = par("mobilityModulePath").stdstringValue();
         creationTimer = new cMessage("BonnMotionCreationTimer");
 

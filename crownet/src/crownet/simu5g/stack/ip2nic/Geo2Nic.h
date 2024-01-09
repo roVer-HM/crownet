@@ -27,8 +27,11 @@ class Geo2Nic : public ::IP2Nic {
   virtual void initialize(int stage) override;
 
   void prepareForGeo(
-      inet::Packet* datagram,
-      const inet::Protocol* protocol = &artery::InetRadioDriver::geonet);
+      inet::Packet* datagram, const inet::Protocol* protocol);
+
+  protected:
+      const inet::Protocol* geonetProtocol;
+
 };
 
 } /* namespace crownet */

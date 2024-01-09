@@ -1,8 +1,8 @@
 {
   "name" : "mf_001_initial_peds",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "f5c800a863199107f62f86a7eea53065e9d62b86",
+  "release" : "2.4",
+  "commithash" : "eecc5fb8aebd57cd27c21ef5eac04e2094056f60",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -143,6 +143,7 @@
         }
       },
       "obstacles" : [ {
+        "id" : 1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -171,8 +172,9 @@
             "y" : 143.00989151280373
           } ]
         },
-        "id" : 1
+        "visible" : true
       }, {
+        "id" : 2,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -201,8 +203,9 @@
             "y" : 122.39011141005903
           } ]
         },
-        "id" : 2
+        "visible" : true
       }, {
+        "id" : 4,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -240,8 +243,9 @@
             "y" : 191.3448637779802
           } ]
         },
-        "id" : 4
+        "visible" : true
       }, {
+        "id" : 5,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -270,8 +274,9 @@
             "y" : 154.4609250543639
           } ]
         },
-        "id" : 5
+        "visible" : true
       }, {
+        "id" : 6,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -288,8 +293,9 @@
             "y" : 166.49352435022593
           } ]
         },
-        "id" : 6
+        "visible" : true
       }, {
+        "id" : 7,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -321,8 +327,9 @@
             "y" : 134.56926098559052
           } ]
         },
-        "id" : 7
+        "visible" : true
       }, {
+        "id" : 8,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -351,8 +358,9 @@
             "y" : 183.8733884524554
           } ]
         },
-        "id" : 8
+        "visible" : true
       }, {
+        "id" : 15,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -378,8 +386,9 @@
             "y" : 138.9240373559296
           } ]
         },
-        "id" : 15
+        "visible" : true
       }, {
+        "id" : 16,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -414,8 +423,9 @@
             "y" : 134.56112706288695
           } ]
         },
-        "id" : 16
+        "visible" : true
       }, {
+        "id" : 17,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -438,8 +448,9 @@
             "y" : 112.99634445086122
           } ]
         },
-        "id" : 17
+        "visible" : true
       }, {
+        "id" : 18,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -468,8 +479,9 @@
             "y" : 60.79684395994991
           } ]
         },
-        "id" : 18
+        "visible" : true
       }, {
+        "id" : 19,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -504,8 +516,9 @@
             "y" : 90.13497867714614
           } ]
         },
-        "id" : 19
+        "visible" : true
       }, {
+        "id" : 20,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -525,13 +538,12 @@
             "y" : 83.40610039141029
           } ]
         },
-        "id" : 20
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2004,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -548,16 +560,20 @@
             "y" : 126.65074417833239
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2005,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -574,16 +590,20 @@
             "y" : 154.23705464340748
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2006,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -600,16 +620,20 @@
             "y" : 174.5258869305253
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2010,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -626,16 +650,20 @@
             "y" : 110.58428115211427
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2012,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -652,13 +680,18 @@
             "y" : 13.69209489300847
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null,
+          "individualWaiting" : true
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -682,21 +715,24 @@
             "y" : 129.68858129810542
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2010 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 15,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 300.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1005,
         "shape" : {
@@ -715,21 +751,24 @@
             "y" : 155.22958635091783
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2012 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 0.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 1.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1006,
         "shape" : {
@@ -748,21 +787,24 @@
             "y" : 172.64723144005984
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2010 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 0.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 1.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1010,
         "shape" : {
@@ -781,21 +823,24 @@
             "y" : 113.36938277352601
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
-        "endTime" : 300.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2006 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 15,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 300.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1012,
         "shape" : {
@@ -814,21 +859,24 @@
             "y" : 15.645580861531197
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 99.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : 20,
-        "startTime" : 0.0,
-        "endTime" : 400.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2005 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 20,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 400.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 99.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       }, {
         "id" : 1014,
         "shape" : {
@@ -838,25 +886,36 @@
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 3.0
-        },
-        "spawnNumber" : 0,
-        "maxSpawnNumberTotal" : 15,
-        "startTime" : 0.0,
-        "endTime" : 10.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 2004 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : 15,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 10.0,
+          "eventPositionRandom" : false,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 0,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 3.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       } ],
       "dynamicElements" : [ {
         "attributes" : {
           "id" : 3,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -866,8 +925,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -914,6 +973,14 @@
       }, {
         "attributes" : {
           "id" : 13,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -923,8 +990,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -971,6 +1038,14 @@
       }, {
         "attributes" : {
           "id" : 9,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -980,8 +1055,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1028,6 +1103,14 @@
       }, {
         "attributes" : {
           "id" : 10,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1037,8 +1120,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1085,6 +1168,14 @@
       }, {
         "attributes" : {
           "id" : 11,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1094,8 +1185,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1142,6 +1233,14 @@
       }, {
         "attributes" : {
           "id" : 12,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1151,8 +1250,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1199,6 +1298,14 @@
       }, {
         "attributes" : {
           "id" : 14,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1208,8 +1315,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1256,6 +1363,14 @@
       }, {
         "attributes" : {
           "id" : 21,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1265,8 +1380,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ ],
@@ -1313,6 +1428,14 @@
       }, {
         "attributes" : {
           "id" : 22,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1322,8 +1445,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ ],
@@ -1370,6 +1493,14 @@
       }, {
         "attributes" : {
           "id" : 200,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1379,8 +1510,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -1427,6 +1558,14 @@
       }, {
         "attributes" : {
           "id" : 201,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1436,8 +1575,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1484,6 +1623,14 @@
       }, {
         "attributes" : {
           "id" : 202,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1493,8 +1640,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1541,6 +1688,14 @@
       }, {
         "attributes" : {
           "id" : 203,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1550,8 +1705,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -1598,6 +1753,14 @@
       }, {
         "attributes" : {
           "id" : 204,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1607,8 +1770,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1655,6 +1818,14 @@
       }, {
         "attributes" : {
           "id" : 205,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1664,8 +1835,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -1712,6 +1883,14 @@
       }, {
         "attributes" : {
           "id" : 206,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1721,8 +1900,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -1769,6 +1948,14 @@
       }, {
         "attributes" : {
           "id" : 207,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1778,8 +1965,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1826,6 +2013,14 @@
       }, {
         "attributes" : {
           "id" : 208,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1835,8 +2030,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1883,6 +2078,14 @@
       }, {
         "attributes" : {
           "id" : 209,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1892,8 +2095,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -1940,6 +2143,14 @@
       }, {
         "attributes" : {
           "id" : 210,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1949,8 +2160,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -1997,6 +2208,14 @@
       }, {
         "attributes" : {
           "id" : 211,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2006,8 +2225,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -2054,6 +2273,14 @@
       }, {
         "attributes" : {
           "id" : 212,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2063,8 +2290,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -2111,6 +2338,14 @@
       }, {
         "attributes" : {
           "id" : 213,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2120,8 +2355,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -2168,6 +2403,14 @@
       }, {
         "attributes" : {
           "id" : 214,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2177,8 +2420,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -2225,6 +2468,14 @@
       }, {
         "attributes" : {
           "id" : 215,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2234,8 +2485,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -2282,6 +2533,14 @@
       }, {
         "attributes" : {
           "id" : 216,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2291,8 +2550,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -2339,6 +2598,14 @@
       }, {
         "attributes" : {
           "id" : 217,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2348,8 +2615,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -2396,6 +2663,14 @@
       }, {
         "attributes" : {
           "id" : 218,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2405,8 +2680,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -2453,6 +2728,14 @@
       }, {
         "attributes" : {
           "id" : 219,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2462,8 +2745,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -2510,6 +2793,14 @@
       }, {
         "attributes" : {
           "id" : 220,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2519,8 +2810,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -2567,6 +2858,14 @@
       }, {
         "attributes" : {
           "id" : 221,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2576,8 +2875,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -2624,6 +2923,14 @@
       }, {
         "attributes" : {
           "id" : 222,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2633,8 +2940,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -2681,6 +2988,14 @@
       }, {
         "attributes" : {
           "id" : 223,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2690,8 +3005,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -2738,6 +3053,14 @@
       }, {
         "attributes" : {
           "id" : 224,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2747,8 +3070,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -2795,6 +3118,14 @@
       }, {
         "attributes" : {
           "id" : 225,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2804,8 +3135,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -2852,6 +3183,14 @@
       }, {
         "attributes" : {
           "id" : 226,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2861,8 +3200,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -2909,6 +3248,14 @@
       }, {
         "attributes" : {
           "id" : 227,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2918,8 +3265,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -2966,6 +3313,14 @@
       }, {
         "attributes" : {
           "id" : 228,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2975,8 +3330,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -3023,6 +3378,14 @@
       }, {
         "attributes" : {
           "id" : 229,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3032,8 +3395,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -3080,6 +3443,14 @@
       }, {
         "attributes" : {
           "id" : 24,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3089,8 +3460,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ ],
@@ -3137,6 +3508,14 @@
       }, {
         "attributes" : {
           "id" : 25,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3146,8 +3525,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ ],
@@ -3194,6 +3573,14 @@
       }, {
         "attributes" : {
           "id" : 26,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3203,8 +3590,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ ],
@@ -3251,6 +3638,14 @@
       }, {
         "attributes" : {
           "id" : 300,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3260,8 +3655,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -3308,6 +3703,14 @@
       }, {
         "attributes" : {
           "id" : 301,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3317,8 +3720,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -3365,6 +3768,14 @@
       }, {
         "attributes" : {
           "id" : 302,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3374,8 +3785,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -3422,6 +3833,14 @@
       }, {
         "attributes" : {
           "id" : 303,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3431,8 +3850,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -3479,6 +3898,14 @@
       }, {
         "attributes" : {
           "id" : 304,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3488,8 +3915,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -3536,6 +3963,14 @@
       }, {
         "attributes" : {
           "id" : 305,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3545,8 +3980,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -3593,6 +4028,14 @@
       }, {
         "attributes" : {
           "id" : 306,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3602,8 +4045,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -3650,6 +4093,14 @@
       }, {
         "attributes" : {
           "id" : 307,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3659,8 +4110,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -3707,6 +4158,14 @@
       }, {
         "attributes" : {
           "id" : 308,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3716,8 +4175,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -3764,6 +4223,14 @@
       }, {
         "attributes" : {
           "id" : 309,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3773,8 +4240,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -3821,6 +4288,14 @@
       }, {
         "attributes" : {
           "id" : 311,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3830,8 +4305,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -3878,6 +4353,14 @@
       }, {
         "attributes" : {
           "id" : 312,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3887,8 +4370,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -3935,6 +4418,14 @@
       }, {
         "attributes" : {
           "id" : 314,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3944,8 +4435,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -3992,6 +4483,14 @@
       }, {
         "attributes" : {
           "id" : 315,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4001,8 +4500,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -4049,6 +4548,14 @@
       }, {
         "attributes" : {
           "id" : 316,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4058,8 +4565,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -4106,6 +4613,14 @@
       }, {
         "attributes" : {
           "id" : 317,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4115,8 +4630,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -4163,6 +4678,14 @@
       }, {
         "attributes" : {
           "id" : 319,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4172,8 +4695,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -4220,6 +4743,14 @@
       }, {
         "attributes" : {
           "id" : 320,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4229,8 +4760,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -4277,6 +4808,14 @@
       }, {
         "attributes" : {
           "id" : 321,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4286,8 +4825,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -4334,6 +4873,14 @@
       }, {
         "attributes" : {
           "id" : 322,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4343,8 +4890,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -4391,6 +4938,14 @@
       }, {
         "attributes" : {
           "id" : 323,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4400,8 +4955,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -4448,6 +5003,14 @@
       }, {
         "attributes" : {
           "id" : 324,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4457,8 +5020,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -4505,6 +5068,14 @@
       }, {
         "attributes" : {
           "id" : 325,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4514,8 +5085,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -4562,6 +5133,14 @@
       }, {
         "attributes" : {
           "id" : 326,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4571,8 +5150,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -4619,6 +5198,14 @@
       }, {
         "attributes" : {
           "id" : 327,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4628,8 +5215,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -4676,6 +5263,14 @@
       }, {
         "attributes" : {
           "id" : 328,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4685,8 +5280,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -4733,6 +5328,14 @@
       }, {
         "attributes" : {
           "id" : 329,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4742,8 +5345,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -4790,6 +5393,14 @@
       }, {
         "attributes" : {
           "id" : 400,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4799,8 +5410,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -4847,6 +5458,14 @@
       }, {
         "attributes" : {
           "id" : 401,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4856,8 +5475,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -4904,6 +5523,14 @@
       }, {
         "attributes" : {
           "id" : 402,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4913,8 +5540,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -4961,6 +5588,14 @@
       }, {
         "attributes" : {
           "id" : 403,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4970,8 +5605,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -5018,6 +5653,14 @@
       }, {
         "attributes" : {
           "id" : 404,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5027,8 +5670,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5075,6 +5718,14 @@
       }, {
         "attributes" : {
           "id" : 405,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5084,8 +5735,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5132,6 +5783,14 @@
       }, {
         "attributes" : {
           "id" : 406,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5141,8 +5800,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5189,6 +5848,14 @@
       }, {
         "attributes" : {
           "id" : 407,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5198,8 +5865,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -5246,6 +5913,14 @@
       }, {
         "attributes" : {
           "id" : 408,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5255,8 +5930,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5303,6 +5978,14 @@
       }, {
         "attributes" : {
           "id" : 409,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5312,8 +5995,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5360,6 +6043,14 @@
       }, {
         "attributes" : {
           "id" : 410,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5369,8 +6060,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5417,6 +6108,14 @@
       }, {
         "attributes" : {
           "id" : 411,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5426,8 +6125,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -5474,6 +6173,14 @@
       }, {
         "attributes" : {
           "id" : 412,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5483,8 +6190,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -5531,6 +6238,14 @@
       }, {
         "attributes" : {
           "id" : 413,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5540,8 +6255,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -5588,6 +6303,14 @@
       }, {
         "attributes" : {
           "id" : 414,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5597,8 +6320,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -5645,6 +6368,14 @@
       }, {
         "attributes" : {
           "id" : 415,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5654,8 +6385,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -5702,6 +6433,14 @@
       }, {
         "attributes" : {
           "id" : 416,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5711,8 +6450,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -5759,6 +6498,14 @@
       }, {
         "attributes" : {
           "id" : 417,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5768,8 +6515,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -5816,6 +6563,14 @@
       }, {
         "attributes" : {
           "id" : 418,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5825,8 +6580,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -5873,6 +6628,14 @@
       }, {
         "attributes" : {
           "id" : 419,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5882,8 +6645,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -5930,6 +6693,14 @@
       }, {
         "attributes" : {
           "id" : 420,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5939,8 +6710,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -5987,6 +6758,14 @@
       }, {
         "attributes" : {
           "id" : 421,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5996,8 +6775,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -6044,6 +6823,14 @@
       }, {
         "attributes" : {
           "id" : 422,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6053,8 +6840,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2004 ],
@@ -6101,6 +6888,14 @@
       }, {
         "attributes" : {
           "id" : 423,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6110,8 +6905,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -6158,6 +6953,14 @@
       }, {
         "attributes" : {
           "id" : 424,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6167,8 +6970,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -6215,6 +7018,14 @@
       }, {
         "attributes" : {
           "id" : 425,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6224,8 +7035,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2005 ],
@@ -6272,6 +7083,14 @@
       }, {
         "attributes" : {
           "id" : 426,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6281,8 +7100,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -6329,6 +7148,14 @@
       }, {
         "attributes" : {
           "id" : 427,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6338,8 +7165,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2012 ],
@@ -6386,6 +7213,14 @@
       }, {
         "attributes" : {
           "id" : 428,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6395,8 +7230,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2006 ],
@@ -6443,6 +7278,14 @@
       }, {
         "attributes" : {
           "id" : 429,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6452,8 +7295,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 2010 ],
@@ -6499,6 +7342,14 @@
         "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -6508,8 +7359,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

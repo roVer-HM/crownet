@@ -11,20 +11,20 @@ import sys
 from typing import Tuple, List
 from matplotlib import pyplot as plt
 import numpy as np
-from roveranalyzer.analysis.common import (
+from crownetutils.analysis.common import (
     RunContext,
     RunMap,
     Simulation,
     SimulationGroup,
     SuqcStudy,
 )
-from roveranalyzer.analysis.omnetpp import OppAnalysis
-from roveranalyzer.analysis.plot import PlotDpmMap
-from roveranalyzer.analysis import adf_test
-from roveranalyzer.simulators.vadere.plots.scenario import VaderScenarioPlotHelper
-from roveranalyzer.utils.parallel import run_kwargs_map
-import roveranalyzer.utils.plot as PlotUtl
-import roveranalyzer.utils.dataframe as FrameUtl
+from crownetutils.analysis.omnetpp import OppAnalysis
+from crownetutils.analysis.plot import PlotDpmMap
+from crownetutils.analysis.adfuller import adf_test
+from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
+from crownetutils.utils.parallel import run_kwargs_map
+import crownetutils.utils.plot as PlotUtl
+import crownetutils.utils.dataframe as FrameUtl
 from matplotlib.ticker import MaxNLocator, FixedLocator
 import pandas as pd
 import seaborn as sns
@@ -132,7 +132,7 @@ def process_variation(data: pd.Series, scenario_lbl: str) -> dict:
     """collect results for one run based on multiple repetitions
 
     Args:
-        study(SuqcRun): Suqc study object (access to run definitions and output)
+        data(pd.Series):
         scenario_lbl (str): Label for scenario
         rep_ids (list): List of runs over which to average. len(rep_ids) := N (number of seeds)
 
@@ -159,11 +159,6 @@ def process_simulation_run(
     maps: pd.DataFrame, run_map: RunMap, vadere_ts: pd.DataFrame
 ):
     """Calculate statistic for multiple scenarios
-
-    Args:
-        study (SuqcRun): Suqc study object (access to run definitions and output
-        scenario_map (dict): Map of scenarios keys: [scenario_name[rep_ids, lbl, ts]], ts: link to ground truth
-        vadere_ts (pd.DataFrame): Ground truth
 
     Returns:
         _type_: Map and ground truth statistics for 1D study
@@ -599,7 +594,7 @@ def conv_err():
 
 
 def write_cell_tex(run_map: RunMap):
-    scenario = VaderScenarioPlotHelper(
+    scenario = VadereTopographyPlotter(
         "../study/traces_mf_1d_bm.d/mf_1d_m_const_2x5m_d20m_iat_25.out/BASIS_mf_1d_m_const_2x5m_d20m_iat_25.out.scenario"
     )
     area = (slice(15.0, 400.0, 5.0), slice(180.0, 210.0, 5.0))

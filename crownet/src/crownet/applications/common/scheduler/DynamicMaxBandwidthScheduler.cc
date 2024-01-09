@@ -40,6 +40,20 @@ DynamicMaxBandwidthScheduler::~DynamicMaxBandwidthScheduler() {
     cancelClockEvent(generationTimer);
 }
 
+void DynamicMaxBandwidthScheduler::receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) {
+    if (signalID == servingCell_ && eNBId == 0 && i != 0){
+        // connection regained. Start scheduling again. If generationTimer
+        // is not scheduled
+        if (!generationTimer->isScheduled()){
+            //schedule now.
+            EV_INFO << LOG_MOD << "Resume scheduling as network is up again." << endl;
+            simtime_t next = SimTime::fromRaw(simTime().raw() + 1); // next possible time point.
+            scheduleClockEventAt(SIMTIME_AS_CLOCKTIME(next), generationTimer);
+        }
+    }
+    AppSchedulerBase::receiveSignal(source, signalID, i, details);
+}
+
 void DynamicMaxBandwidthScheduler::initialize(int stage)
 {
     IntervalScheduler::initialize(stage);
@@ -65,25 +79,50 @@ void DynamicMaxBandwidthScheduler::initialize(int stage)
         WATCH(txIntervalDataCurrent);
     }
 }
-
 void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
 
-    if (txIntervalDataPrio.timestamp < 0.0){
-        // first scheduling
-        txIntervalDataPrio.avg_pkt_size = estimatedAvgPaketSize;
-        txIntervalDataPrio.pmembers = 1;
-        txIntervalDataPrio.timestamp = simTime();
-        computeInterval(txIntervalDataPrio);
-        EV_INFO << "first  scheduling using: " << txIntervalDataPrio << endl;
-        scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrio.rndInterval), generationTimer);
+    simtime_t now  = simTime();
+    if (startOffset < 0){
+        EV_INFO << LOG_MOD << " generationIntervalParameter < 0. Deactivate AppScheduler" << endl;
+        stopScheduling = true;
+    } else if ((app->getStopTime() > simtime_t::ZERO) && (simTime() > app->getStopTime())) {
+        EV_INFO << LOG_MOD << " App stop time reached. Do not schedule any more data" << endl;
+        stopScheduling = true;
+        // todo emit signal
     } else {
-        throw cRuntimeError("DynamicMaxBandwidthScheduler is scheduled in handleMessage. Only use scheduleGenerationTimer at startup");
+        if (isFirstScheduleCall){
+            //first call from init
+            isFirstScheduleCall = false;
+            // ensure start time of scheduler is *after* the start time of the application.
+            // The application start time is given as an absolute time. Relative offset is
+            // set by using the scheduler startOffset parameter.
+            simtime_t start_time = std::max(app->getStartTime(), now) + startOffset;
+            txIntervalDataPrio.avg_pkt_size = estimatedAvgPaketSize;
+            txIntervalDataPrio.pmembers = 1;
+            txIntervalDataPrio.timestamp = simTime();
+            computeInterval(txIntervalDataPrio);
+            simtime_t schedule_at = start_time + txIntervalDataPrio.rndInterval;
+            EV_INFO << "first  scheduling using (starttime + offset) + callculated randomIntervall: " << \
+                    start_time << " + " << txIntervalDataPrio << " = " << schedule_at << endl;
+
+            scheduleClockEventAt(SIMTIME_AS_CLOCKTIME(schedule_at), generationTimer);
+        } else {
+            computeInterval(txIntervalDataPrio);
+            EV_INFO << "next scheduling event at: " << txIntervalDataPrio << endl;
+            scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrio.rndInterval), generationTimer);
+        }
     }
+
+
 }
 
 void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
     auto now = simTime();
     if (message == generationTimer){
+        if(checkNetworkConnectivity && !hasLteConnection()){
+            EV_INFO << LOG_MOD << "Stop scheduling due to lost network connection. Resume when network is up." << endl;
+            return;
+        }
         updateTxIntervalDataCurrent();
         EV_INFO << LOG_MOD << "Prio interval: " << txIntervalDataPrio << endl;
         EV_INFO << LOG_MOD << "Current interval: " << txIntervalDataCurrent << endl;

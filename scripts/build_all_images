@@ -1,0 +1,81 @@
+#!/bin/bash
+
+
+
+print_usage() {
+   echo "$(basename "$0") [-h] [-i NON_INTERACTIVE]
+   Build all images based on current commit:
+    -p  push container after build process
+    -q  show docker build process."
+}
+
+# handle flags
+push_container=''
+quiet=''
+
+unset opt OPTARG OPTIND
+while getopts 'pqhv' flag
+do
+    case "${flag}" in
+        p) push_container='-p';;
+        q) quiet='-q';;
+		h) print_usage; exit 0;;
+        *) print_usage; exit 1;;
+    esac
+done
+
+##################################### MAIN SCRIPT ######################################
+
+# fail when one of the command fails
+set -e
+
+# build docker images based on the current commit
+start=$(date +%m)
+
+export DOCKER_BUILDKIT=1
+
+# check repository status for uncommited changes
+if [ -z "$CROWNET_HOME" ]; then
+      echo "Variable 'CROWNET_HOME' not set."
+      exit -1
+fi
+
+cd $CROWNET_HOME
+CROWNET_COMMIT=$(git rev-parse HEAD | head -c 8) # commit hash (use first 8 characters)
+echo "All containers will have the version tag ${CROWNET_COMMIT} ( = current commit hash)."
+
+# build parent images based on the current commit and use inherit from them
+PARENT_IMAGE_COMMIT=$CROWNET_COMMIT
+echo "Build parent images based on the current commit and inherit from them."
+
+echo "build base images - part 1"
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i crownet-base-min -f -u $push_container $quiet
+echo "build base images in parallel - part 2"
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i crownet-base-cpp -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i crownet-base-java -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+wait
+
+echo "build main images in parralel"
+# build omnetpp image including crownet modules (mobile networks simulator)
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i omnetpp -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+# build vadere image (mobility simulator with detailed crowd locomotion models)
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i vadere -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+# build sumo image (mobility simulator with simple crowd locomotion models)
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i sumo -f -u $push_container $quiet &
+# build flowcontrol image (route recommendation simulator)
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i flowcontrol -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+wait
+
+echo "build ide images in parralel"
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i flowcontrol-ide -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i vadere-ide -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+bash ${CROWNET_HOME}/scripts/build_and_push_image -i omnetpp-ide -b $PARENT_IMAGE_COMMIT -f -u $push_container $quiet &
+wait
+
+end=$(date +%m)
+
+echo "Elapsed Time: $(($end-$start)) minutes."
+
+set +e
+
+

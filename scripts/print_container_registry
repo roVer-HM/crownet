@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo ""
+echo "--------------------------CONTAINER REGISTRY-------------------------------"
+echo "CROWNET_IMAGE_REG=${CROWNET_IMAGE_REG}"
+echo "CROWNET_IMAGE_BASE=${CROWNET_IMAGE_BASE}"
+echo "---------------------------------------------------------------------------"
+echo ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+

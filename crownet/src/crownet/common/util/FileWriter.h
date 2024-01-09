@@ -13,9 +13,10 @@
 #include <memory>
 #include <vector>
 #include <omnetpp.h>
-
+#include "traci/Boundary.h"
 #include "Writer.h"
 #include "FilePrinter.h"
+#include "crownet/applications/dmap/dmap_m.h"
 
 namespace crownet {
 
@@ -79,6 +80,14 @@ class ActiveFileWriter : public BaseFileWriter,
   std::shared_ptr<FilePrinter> printer;
 };
 
+class DevNullWriter : public ActiveWriter {
+ public:
+  virtual ~DevNullWriter()=default;
+  DevNullWriter(){};
+  virtual void initWriter() override {};
+  virtual void writeData() override {};
+  virtual void finish() override {};
+};
 
 
 class FileWriterBuilder {
@@ -106,13 +115,22 @@ inline FileWriterBuilder &FileWriterBuilder::addMetadata(std::string key,
   metadata[key] = value;
   return *this;
 }
+template <>
+inline FileWriterBuilder &FileWriterBuilder::addMetadata(std::string key, const traci::Boundary& b) {
+    std::stringstream s;
+    s << b.lowerLeftPosition().x << ";" << b.lowerLeftPosition().y << ";" << \
+            b.upperRightPosition().x << ";" << b.upperRightPosition().y;
+  metadata[key] = s.str();
+  return *this;
+}
+
 
 class ActiveFileWriterBuilder : public FileWriterBuilder {
 public:
 
     ActiveFileWriter *build(std::shared_ptr<FilePrinter> printer);
     template <typename M>
-    ActiveFileWriter *build(std::shared_ptr<M> map, const std::string &mapType);
+    ActiveFileWriter *build(std::shared_ptr<M> map, MapCfg *mapCfg);
 
 };
 

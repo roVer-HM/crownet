@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-06-01 11:29:40 by Eclipse SUMO netedit Version v1_17_0+0607-d7e813026d5
+-->
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+<!--    <input>
+        <sumo-net-file value="muc.net.xml.gz"/>
+    </input>-->
+
+    <output>
+<!--         <output-file value="muc.net.xml.gz"/> -->
+        <output.street-names value="true"/>
+        <output.original-names value="true"/>
+    </output>
+
+    <processing>
+        <geometry.remove value="true"/>
+        <join-lanes value="true"/>
+        <edges.join value="true"/>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="0"/>
+    </processing>
+
+    <building_defaults>
+        <default.walkingarea-speed value="2.2"/>
+    </building_defaults>
+    
+    <tls_building>
+        <tls.discard-simple value="true"/>
+        <tls.join value="true"/>
+        <tls.guess-signals value="true"/>
+        <tls.default-type value="actuated"/>
+    </tls_building>
+    
+    <ramp_guessing>
+        <ramps.guess value="true"/>
+    </ramp_guessing>
+    
+    <junctions>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="5.50"/>
+        <rectangular-lane-cut value="0"/>
+        <junctions.join value="true"/>
+        <junctions.join-dist value="20.0"/>
+    </junctions>
+
+    <pedestrian>
+        <sidewalks.guess value="true"/>
+        <sidewalks.guess.from-permissions value="true"/>
+        <crossings.guess value="true"/>
+        <walkingareas value="true"/>
+    </pedestrian>
+    
+    <formats>
+        <osm.sidewalks value="true"/>
+        <osm.crossings value="true"/>
+    </formats>
+
+</configuration>

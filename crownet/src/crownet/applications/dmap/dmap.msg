@@ -29,10 +29,12 @@ namespace crownet;
 
 class MapCfg extends cOwnedObject {
      bool writeDensityLog;
-     string mapType;
+     string mapType;    
      string mapTypeLog;
      simtime_t cellAgeTTL @editable;
      string idStreamType;
+     bool appendRessourceSharingDomoinId = false;
+     
 }
 
 cplusplus(MapCfg){{
@@ -71,14 +73,12 @@ cplusplus(MapCfgYmfPlusDistStep){{
 
 class DcDCell {
 	uint16_t count;         // 2B pedestrian count
-	uint16_t variation;     // 2B   
 	uint16_t deltaCreation; // 2B delte to packet creation time in 1/10 seconds
 }
 
 cplusplus(DcDCell){{
   public:
-      DcDCell(uint16_t count, uint16_t variation):
-      	count(count), variation(variation){}
+      DcDCell(uint16_t count): count(count){}
       void setDeltaCreation(const simtime_t& delta);
       simtime_t getCreationTime(const simtime_t& base) const;
 }}
@@ -106,15 +106,26 @@ cplusplus(cc){{
 class LocatedDcDCell extends DcDCell {
     uint16_t idOffsetX;   // 2B
     uint16_t idOffsetY;   // 2B
-    double sourceEntryDist = 0.; // todo fix header size?
+    double sourceEntryDist = 0.; // 2B in meter
     
 }
 
 cplusplus(LocatedDcDCell){{
   public:
-      LocatedDcDCell(uint16_t count, uint16_t variation, uint16_t idOffsetX, uint16_t idOffsetY):
-      	DcDCell(count, variation), idOffsetX(idOffsetX), idOffsetY(idOffsetY) {}
+      LocatedDcDCell(uint16_t count, uint16_t idOffsetX, uint16_t idOffsetY):
+      	DcDCell(count), idOffsetX(idOffsetX), idOffsetY(idOffsetY) {}
 }}
+
+
+class LocatedDcDCellWithSharingDomainId extends LocatedDcDCell {
+ 	uint16_t sharingDominId = 0;   // 2B
+}
+cplusplus(LocatedDcDCellWithSharingDomainId){{
+  public:
+      LocatedDcDCellWithSharingDomainId(uint16_t count, uint16_t idOffsetX, uint16_t idOffsetY, int rsdId):
+      	LocatedDcDCell(count, idOffsetX, idOffsetY), sharingDominId(rsdId)  {}
+}}
+
 
 class EntropyMap extends inet::TagBase
 {}
@@ -123,26 +134,20 @@ class EntropyMap extends inet::TagBase
 enum MapType {
     DENSE = 0x10;   
  	SPARSE = 0x20;
+ 	SPARSE_RSD = 0x21;
 }
 
 class MapHeader extends inet::FieldsChunk {
-    uint16_t sequenceNumber;
- 	uint32_t sourceId; 
- 	uint32_t timestamp;  // in ms
- 	MapType  version = MapType::SPARSE;	 // DenseCells 0x10 | SparseCells 0x20
- 	uint8_t	 reserverd = 0;
- 	uint32_t refCoordLon; // X in microdegree
- 	uint32_t refCoordLat; // Y in microdegree
- 	uint16_t refIdOffsetX;
-	uint16_t refIdOffsetY;
-	inet::Coord pos;
-	
-	// todo check
- 	uint16_t sourceCellIdX; // 2B
-	uint16_t sourceCellIdY; // 2B
-    uint16_t numberOfNeighbours; // 2B
-    
-	chunkLength = B(24 + 6);
+    uint16_t sequenceNumber;   // 2B
+ 	uint32_t sourceId; 			// 4B
+ 	uint32_t timestamp;  // 4B in ms
+ 	MapType  version = MapType::SPARSE; // DenseCells 0x10 | SparseCells 0x20
+
+ 	uint16_t cellIdOffsetX; // 2B
+	uint16_t cellIdOffsetY; // 2B
+	inet::Coord sourcePosition;  //2*8B (A.???/A.???)
+	    
+    chunkLength = B(2+4+4+2+2+2*8); // = 30B
 }
 
 class MapPacketBase extends inet::FieldsChunk {
@@ -159,8 +164,12 @@ class DenseMapPacket extends MapPacketBase {
 }
 
 class SparseMapPacket extends MapPacketBase {
-    cellSize = B(10);
+    cellSize = B(10); // count 2B + deltaCreation 2B + idOffsetX/Y 2*2B + sourceEntryDist 2B
 	LocatedDcDCell cells[];
 }
 
+class SparseMapPacketWithSharingDomainId extends MapPacketBase {
+    cellSize = B(12); // count 2B + deltaCreation 2B + idOffsetX/Y 2*2B + sourceEntryDist 2B + enbID
+	LocatedDcDCellWithSharingDomainId cells[];
+}
 

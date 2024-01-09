@@ -31,36 +31,36 @@ extends = _default, D2D_General, DcDMap, stationary_n1
 %postrun-command: grep -E "^0.*TestStationaryWorld\.misc\[0\].app\[1\].(scheduler|app)" test.out > test1.out
 
 %contains: test1.out
-0.05 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell (prio increment): [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 50ms, pos.:(5, 2, 1.3) m] Entry{0, 0.05, 0.05, 14}
-0.05 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell: [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 50ms, pos.:(5, 2, 1.3) m] Entry{1, 0.05, 0.05, 14}
+0.05 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell (prio increment): [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 50ms, pos.:(5, 2, 1.3) m] Entry{0, 0.05, 0.05, 14, rsd[-1]}
+0.05 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell: [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 50ms, pos.:(5, 2, 1.3) m] Entry{1, 0.05, 0.05, 14, rsd[1]}
 0.1 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.1 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
-0.1 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 100ms, pos.:(5, 2, 1.3) m] Entry{1, 0.05, 0.05, 14}
-0.1 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 100ms, pos.:(5, 2, 1.3) m] Entry{1, 0.1, 0.1, 14}
-0.15 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 150ms, pos.:(5, 2, 1.3) m] Entry{1, 0.1, 0.1, 14}
-0.15 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 150ms, pos.:(5, 2, 1.3) m] Entry{1, 0.15, 0.15, 14}
+0.1 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 100ms, pos.:(5, 2, 1.3) m] Entry{1, 0.05, 0.05, 14, rsd[1]}
+0.1 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 100ms, pos.:(5, 2, 1.3) m] Entry{1, 0.1, 0.1, 14, rsd[1]}
+0.15 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 150ms, pos.:(5, 2, 1.3) m] Entry{1, 0.1, 0.1, 14, rsd[1]}
+0.15 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 150ms, pos.:(5, 2, 1.3) m] Entry{1, 0.15, 0.15, 14, rsd[1]}
 0.2 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.2 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
-0.2 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 200ms, pos.:(5, 2, 1.3) m] Entry{1, 0.15, 0.15, 14}
-0.2 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 200ms, pos.:(5, 2, 1.3) m] Entry{1, 0.2, 0.2, 14}
-0.25 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 250ms, pos.:(5, 2, 1.3) m] Entry{1, 0.2, 0.2, 14}
-0.25 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 250ms, pos.:(5, 2, 1.3) m] Entry{1, 0.25, 0.25, 14}
+0.2 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 200ms, pos.:(5, 2, 1.3) m] Entry{1, 0.15, 0.15, 14, rsd[1]}
+0.2 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 200ms, pos.:(5, 2, 1.3) m] Entry{1, 0.2, 0.2, 14, rsd[1]}
+0.25 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 250ms, pos.:(5, 2, 1.3) m] Entry{1, 0.2, 0.2, 14, rsd[1]}
+0.25 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 250ms, pos.:(5, 2, 1.3) m] Entry{1, 0.25, 0.25, 14, rsd[1]}
 0.3 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.3 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
-0.3 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 300ms, pos.:(5, 2, 1.3) m] Entry{1, 0.25, 0.25, 14}
-0.3 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 300ms, pos.:(5, 2, 1.3) m] Entry{1, 0.3, 0.3, 14}
-0.35 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 350ms, pos.:(5, 2, 1.3) m] Entry{1, 0.3, 0.3, 14}
-0.35 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 350ms, pos.:(5, 2, 1.3) m] Entry{1, 0.35, 0.35, 14}
+0.3 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 300ms, pos.:(5, 2, 1.3) m] Entry{1, 0.25, 0.25, 14, rsd[1]}
+0.3 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 300ms, pos.:(5, 2, 1.3) m] Entry{1, 0.3, 0.3, 14, rsd[1]}
+0.35 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 350ms, pos.:(5, 2, 1.3) m] Entry{1, 0.3, 0.3, 14, rsd[1]}
+0.35 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 350ms, pos.:(5, 2, 1.3) m] Entry{1, 0.35, 0.35, 14, rsd[1]}
 0.4 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.4 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
-0.4 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 400ms, pos.:(5, 2, 1.3) m] Entry{1, 0.35, 0.35, 14}
-0.4 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 400ms, pos.:(5, 2, 1.3) m] Entry{1, 0.4, 0.4, 14}
-0.45 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 450ms, pos.:(5, 2, 1.3) m] Entry{1, 0.4, 0.4, 14}
-0.45 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 450ms, pos.:(5, 2, 1.3) m] Entry{1, 0.45, 0.45, 14}
+0.4 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 400ms, pos.:(5, 2, 1.3) m] Entry{1, 0.35, 0.35, 14, rsd[1]}
+0.4 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 400ms, pos.:(5, 2, 1.3) m] Entry{1, 0.4, 0.4, 14, rsd[1]}
+0.45 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 450ms, pos.:(5, 2, 1.3) m] Entry{1, 0.4, 0.4, 14, rsd[1]}
+0.45 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 450ms, pos.:(5, 2, 1.3) m] Entry{1, 0.45, 0.45, 14, rsd[1]}
 0.5 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 1000 B
 0.5 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 1000 B scheduled
-0.5 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 500ms, pos.:(5, 2, 1.3) m] Entry{1, 0.45, 0.45, 14}
-0.5 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 500ms, pos.:(5, 2, 1.3) m] Entry{1, 0.5, 0.5, 14}
+0.5 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 500ms, pos.:(5, 2, 1.3) m] Entry{1, 0.45, 0.45, 14, rsd[1]}
+0.5 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 500ms, pos.:(5, 2, 1.3) m] Entry{1, 0.5, 0.5, 14, rsd[1]}
 
 
 %contains: stdout

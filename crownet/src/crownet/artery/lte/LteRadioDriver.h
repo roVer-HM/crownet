@@ -19,6 +19,7 @@ class LteRadioDriver : public artery::RadioDriverBase,
  public:
   virtual ~LteRadioDriver() = default;
   int numInitStages() const override;
+  using artery::RadioDriverBase::initialize;
   void initialize(int stage) override;
   void handleMessage(omnetpp::cMessage*) override;
 
@@ -28,6 +29,9 @@ class LteRadioDriver : public artery::RadioDriverBase,
   void handleDataIndication(omnetpp::cMessage*);
   void handleDataRequest(omnetpp::cMessage*) override;
   void refreshDisplay() const override;
+
+ protected:
+     const inet::Protocol* geonetProtocol;
 
  private:
   inet::NetworkInterface* interfaceEntry = nullptr;

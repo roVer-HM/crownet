@@ -66,9 +66,19 @@ class GtestEnv : public omnetpp::cNullEnvir {
  */
 class BaseOppTest : public ::testing::Test {
  public:
-  void setSimTime(simtime_t t) {
+
+  simtime_t incrementSimTime(double incr = 1.0){
     auto sim = cSimulation::getActiveSimulation();
+    simtime_t old = sim->getSimTime();
+    sim->setSimTime(old+incr);
+    return old;
+  }
+
+  simtime_t setSimTime(simtime_t t) {
+    auto sim = cSimulation::getActiveSimulation();
+    simtime_t old = sim->getSimTime();
     sim->setSimTime(t);
+    return old;
   }
 
   Packet* build(Ptr<Chunk> content){

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo ""
+echo "-----------------------------ENVIRONMENT-----------------------------------"
+echo "CROWNET_HOME=${CROWNET_HOME}"
+echo "PATH=${PATH}"
+echo "OPP_EXTERN_DATA_MNT=${OPP_EXTERN_DATA_MNT} (addional docker mount point)"
+echo "---------------------------------------------------------------------------"
+echo ""
+
+
+
+
+
+
+
+
+
+
+
+

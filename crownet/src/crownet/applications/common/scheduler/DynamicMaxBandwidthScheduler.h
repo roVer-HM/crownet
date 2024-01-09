@@ -52,6 +52,7 @@ protected:
 
     virtual void scheduleGenerationTimer() override;
 
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) override;
 
     simtime_t getMinTransmissionInterval() const;
     void updateTxIntervalDataCurrent();
@@ -74,6 +75,9 @@ protected:
 
     double rndIntervalLowerBound;
     double rndIntervalUpperBound;
+
+private:
+    bool isFirstScheduleCall = true;
 
 
 };
