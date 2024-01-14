@@ -419,7 +419,9 @@ class SimulationRun(BaseSimulationRunner):
                 where=None,
             )
             PlotAppMisc.plot_application_delay_jitter(
-                sim, hdf_selector=selector, saver=saver.with_suffix(f"_{app.name}")
+                sim,
+                hdf_selector=selector,
+                saver=saver.with_suffix(f"_{app.name}", count=-1),
             )
 
     @process_as({"prio": 565, "type": "post"})
