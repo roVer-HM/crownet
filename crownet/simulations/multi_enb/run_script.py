@@ -7,6 +7,11 @@ from crownetutils.analysis.hdf_providers.node_position import (
     CoordinateType,
     NodePositionWithRsdHdf,
 )
+from crownetutils.analysis.hdf_providers.map_error_data import (
+    MapCountError,
+    CellCountError,
+    CellEntropyValueError,
+)
 from crownetutils.analysis.hdf_providers.node_rx_data import NodeRxData
 from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
 from crownetutils.analysis.hdf_providers.sql_app_proxy import SqlAppProxy
@@ -84,7 +89,7 @@ class SimulationRun(BaseSimulationRunner):
                 "--qoi",
                 qoi,
                 "selected-only",
-                # "-vv",
+                "-vv",
                 "--debug",
             ],
         )
@@ -171,18 +176,6 @@ class SimulationRun(BaseSimulationRunner):
         sim.sql.debug_load_host_id_map_from_data()
 
     @process_as({"prio": 999, "type": "post"})
-    def build_hdf(self):
-
-        cfg: DpmmCfg
-        for idx, cfg in enumerate(get_cfg_list(self.result_base_dir())):
-            builder, imputation_logger = self.get_builder(cfg)
-            builder.build(self.ns.get("hdf_override", "False"))
-            with open(cfg.path(f"impuation_{idx}.log"), "w", encoding="utf-8") as fd:
-                buf: io.StringIO = imputation_logger.writer
-                buf.seek(0)
-                fd.write(buf.getvalue())
-
-    @process_as({"prio": 995, "type": "post"})
     def create_position_hdf(self) -> NodePositionWithRsdHdf:
         # use any config. Position data is equal
         cfg = get_density_cfg(self.result_base_dir())
@@ -191,6 +184,36 @@ class SimulationRun(BaseSimulationRunner):
             sim=sim, hdf_path=sim.path("position.h5"), override_existing=False
         )
         return pos
+
+    @process_as({"prio": 996, "type": "post"})
+    def build_density_map(self):
+
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        builder, imputation_logger = self.get_builder(cfg)
+        builder.build(self.ns.get("hdf_override", "False"))
+        # add rsd provider to include rsd association to postion frame
+        builder.set_rsd_association_provider(self.create_position_hdf())
+        with open(
+            cfg.path(f"impuation_{cfg.map_type}.log"), "w", encoding="utf-8"
+        ) as fd:
+            buf: io.StringIO = imputation_logger.writer
+            buf.seek(0)
+            fd.write(buf.getvalue())
+
+    @process_as({"prio": 995, "type": "post"})
+    def build_entropy_map(self):
+
+        cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
+        builder, imputation_logger = self.get_builder(cfg)
+        builder.build(self.ns.get("hdf_override", "False"))
+        # add rsd provider to include rsd association to postion frame
+        builder.set_rsd_association_provider(self.create_position_hdf())
+        with open(
+            cfg.path(f"impuation_{cfg.map_type}.log"), "w", encoding="utf-8"
+        ) as fd:
+            buf: io.StringIO = imputation_logger.writer
+            buf.seek(0)
+            fd.write(buf.getvalue())
 
     @process_as({"prio": 994, "type": "post"})
     def create_node_tx_hdf(self) -> NodeTxData:
@@ -248,6 +271,44 @@ class SimulationRun(BaseSimulationRunner):
         if isinstance(e_cfg, DpmmCfgDb):
             DpmmSql(e_cfg).create_cell_count_by_host_id_over_time_if_missing()
 
+    @process_as({"prio": 985, "type": "post"})
+    def create_density_map_count_error_hdf(self) -> MapCountError:
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        pos: NodePositionWithRsdHdf = self.create_position_hdf()
+        dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
+        map_count_error_hdf = MapCountError.get_or_create(
+            hdf_path=self.result_dir("density_map_count_error.h5"),
+            map_p=dmap._map_p,
+            glb_pos=dmap.position_df,
+            rsd_p=pos,
+            with_rsd=True,
+        )
+        return map_count_error_hdf
+
+    @process_as({"prio": 984, "type": "post"})
+    def create_density_cell_count_error_hdf(self) -> CellCountError:
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
+
+        hdf = CellCountError.get_or_create(
+            hdf_path=self.result_dir(f"density_cell_count_error.h5"),
+            count_p=dmap.count_p,
+            with_rsd=True,
+        )
+        return hdf
+
+    @process_as({"prio": 983, "type": "post"})
+    def create_entropy_cell_count_error_hdf(self) -> CellEntropyValueError:
+        cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
+        dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
+
+        hdf = CellEntropyValueError.get_or_create(
+            hdf_path=self.result_dir(f"entropy_cell_count_error.h5"),
+            count_p=dmap.count_p,
+            with_rsd=True,
+        )
+        return hdf
+
     @process_as({"prio": 980, "type": "post"})
     def append_err_measure_hdf(self):
         cfg: DpmmCfg
@@ -281,6 +342,23 @@ class SimulationRun(BaseSimulationRunner):
             PlotEnb.plot_served_blocks_ul_all(
                 self.result_base_dir(), sql, FigureSaverPdfPages(pdf)
             )
+
+    @process_as({"prio": 581, "type": "post"})
+    def plot_density_map_count_stats(self):
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
+        rsd_list = dmap._map_p.select(key="rsd_id")
+
+        saver = self.simple_saver(sub_dir="test", cfg=cfg, fig_type=".png")
+        saver_rsd = self.simple_saver("test/dMap_count_rsd", cfg=cfg, fig_type=".png")
+        map_err = self.create_density_map_count_error_hdf()
+        PlotDpmMap.plot_map_count_diff(
+            data=map_err, savefig=saver.with_name("dMap_count.png")
+        )
+        # by rsd local and total
+        PlotDpmMap.plot_map_count_diff_by_rsd(
+            data=map_err, rsd_list=rsd_list, saver=saver_rsd.with_name("dMap_count.png")
+        )
 
     @process_as({"prio": 580, "type": "post"})
     def plot_density_map_count_and_error_stats(self):
@@ -341,9 +419,7 @@ class SimulationRun(BaseSimulationRunner):
                 where=None,
             )
             PlotAppMisc.plot_application_delay_jitter(
-                sim,
-                hdf_selector=selector,
-                saver=saver.with_suffix(f"_{app.name}", count=-1),
+                sim, hdf_selector=selector, saver=saver.with_suffix(f"_{app.name}")
             )
 
     @process_as({"prio": 565, "type": "post"})
