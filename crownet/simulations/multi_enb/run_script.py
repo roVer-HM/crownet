@@ -32,7 +32,12 @@ from crownetutils.analysis.plot import PlotEnb, PlotAppTxInterval, PlotDpmMap
 from crownetutils.utils.logging import logger
 from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
 from crownetutils.analysis.dpmm.dpmm_sql import DpmmSql
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, DpmmCfgCsv, DpmmCfgDb, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import (
+    DpmmCfg,
+    DpmmCfgBuilder,
+    DpmmCfgDb,
+    MapType,
+)
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
     ArbitraryValueImputation,
@@ -169,13 +174,22 @@ class SimulationRun(BaseSimulationRunner):
     # def bar(self):
     # pass
 
-    @process_as({"prio": 1000, "type": "post"})
+    @process_as({"prio": 1010, "type": "post"})
     def build_sql_index(self):
         sim = Simulation.from_dpmm_cfg(get_density_cfg(self.result_base_dir()))
         sim.sql.append_index_if_missing()
         sim.sql.debug_load_host_id_map_from_data()
 
-    @process_as({"prio": 999, "type": "post"})
+    @process_as({"prio": 1005, "type": "post"})
+    def save_map_cfg(self):
+        _dir = self.result_base_dir()
+        d_cfg = get_density_cfg(_dir)
+        e_cfg = get_entropy_cfg(_dir)
+        b = DpmmCfgBuilder()
+        b.save_in_root(d_cfg)
+        b.save_in_root(e_cfg)
+
+    @process_as({"prio": 1000, "type": "post"})
     def create_position_hdf(self) -> NodePositionWithRsdHdf:
         # use any config. Position data is equal
         cfg = get_density_cfg(self.result_base_dir())
@@ -190,11 +204,11 @@ class SimulationRun(BaseSimulationRunner):
 
         cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
         builder, imputation_logger = self.get_builder(cfg)
-        builder.build(self.ns.get("hdf_override", "False"))
-        # add rsd provider to include rsd association to postion frame
+        builder.build(self.ns.get("hdf_override", "False"), repack_on_build=True)
+        # add rsd provider to include rsd association to position frame
         builder.set_rsd_association_provider(self.create_position_hdf())
         with open(
-            cfg.path(f"impuation_{cfg.map_type}.log"), "w", encoding="utf-8"
+            cfg.path(f"imputation_{cfg.map_type}.log"), "w", encoding="utf-8"
         ) as fd:
             buf: io.StringIO = imputation_logger.writer
             buf.seek(0)
@@ -205,11 +219,11 @@ class SimulationRun(BaseSimulationRunner):
 
         cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
         builder, imputation_logger = self.get_builder(cfg)
-        builder.build(self.ns.get("hdf_override", "False"))
-        # add rsd provider to include rsd association to postion frame
+        builder.build(self.ns.get("hdf_override", "False"), repack_on_build=True)
+        # add rsd provider to include rsd association to position frame
         builder.set_rsd_association_provider(self.create_position_hdf())
         with open(
-            cfg.path(f"impuation_{cfg.map_type}.log"), "w", encoding="utf-8"
+            cfg.path(f"imputation_{cfg.map_type}.log"), "w", encoding="utf-8"
         ) as fd:
             buf: io.StringIO = imputation_logger.writer
             buf.seek(0)
@@ -238,7 +252,7 @@ class SimulationRun(BaseSimulationRunner):
         )
         return ret
 
-    @process_as({"prio": 994, "type": "post"})
+    @process_as({"prio": 993, "type": "post"})
     def create_node_rx_hdf(self) -> NodeRxData:
         # use any config. Position data is equal
         _dir = self.result_base_dir()
@@ -261,8 +275,8 @@ class SimulationRun(BaseSimulationRunner):
         )
         return ret
 
-    @process_as({"prio": 979, "type": "post"})
-    def append_map_cell_count_over_time(self):
+    @process_as({"prio": 992, "type": "post"})
+    def append_map_cell_count_over_time_to_db(self):
         _dir = self.result_base_dir()
         d_cfg = get_density_cfg(_dir)
         if isinstance(d_cfg, DpmmCfgDb):
@@ -308,13 +322,6 @@ class SimulationRun(BaseSimulationRunner):
             with_rsd=True,
         )
         return hdf
-
-    @process_as({"prio": 980, "type": "post"})
-    def append_err_measure_hdf(self):
-        cfg: DpmmCfg
-        for cfg in get_cfg_list(self.result_base_dir()):
-            sim = Simulation.from_dpmm_cfg(cfg)
-            OppAnalysis.append_err_measures_to_hdf(sim)
 
     @process_as({"prio": 590, "type": "post"})
     def plot_node_traces(self):
@@ -488,34 +495,6 @@ class SimulationRun(BaseSimulationRunner):
             saver=saver.with_suffix(f"_{sim_id}"),
             where="time < 400.0",
         )
-
-    @process_as({"prio": 100, "type": "post"})
-    def repack_1(self):
-        h = BaseHdfProvider(get_density_cfg(self.result_base_dir()).hdf_path())
-        if h.hdf_file_exists:
-            logger.info(h._hdf_path)
-            h.repack_hdf(keep_old_file=False)
-        else:
-            logger.warn(f"file does not exist. No repacking...")
-
-    @process_as(
-        {"prio": 100, "type": "post"}
-    )  # todo mark some post processing task parallel?
-    def repack_2(self):
-        h = BaseHdfProvider(get_entropy_cfg(self.result_base_dir()).hdf_path())
-        if h.hdf_file_exists:
-            logger.info(h._hdf_path)
-            h.repack_hdf(keep_old_file=False)
-        else:
-            logger.warn(f"file does not exist. No repacking...")
-
-    # @process_as({"prio": 100, "type": "post"})
-    # def remove_density_map_csv(self):
-    #     cfg: DpmmCfg
-    #     for cfg in get_cfg_list(self.result_base_dir()):
-    #         builder = DpmmHdfBuilder.get(cfg)
-    #         for f in builder.map_paths:
-    #             os.remove(f)
 
 
 if __name__ == "__main__":
