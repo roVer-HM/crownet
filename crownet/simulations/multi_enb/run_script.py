@@ -435,16 +435,15 @@ class SimulationRun(BaseSimulationRunner):
     def plot_application_tx_throughput(self):
         cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
         saver = self.simple_saver(fig_type=".png")
-        rsd_ids = CrownetSql.from_dpmm_cfg(cfg).get_resource_sharing_domains(
-            ids_only=False
-        )["rsd_id"]
+
+        rsd_colors = self.create_position_hdf().enb_colors()
         tx_data: NodeTxData = self.create_node_tx_hdf()
         PlotAppTxInterval.plot_app_tx_throughput(
             hdf=tx_data,
             target_rates_in_Bps=tx_data.get_target_rates(
                 bps_to_multiplier=1 / 8
             ),  # need rate in Bps! not bps
-            rsd_ids=list(rsd_ids.values),
+            rsd_colors=rsd_colors,
             bin_size=10.0,
             saver=saver,
         )
