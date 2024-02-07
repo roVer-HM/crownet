@@ -14,6 +14,7 @@ mod_veins         := veins
 mod_veins_inet    := veins/subprojects/veins_inet
 mod_artery        := artery
 mod_crownetutils  := analysis/crownetutils
+mod_crownetutils_name  := crownetutils
 mod_flowcontrol   := flowcontrol
 mod_suqc          := analysis/suq-controller
 
@@ -49,6 +50,7 @@ python_dists := $(addprefix out/, $(crownetutils_sdist) $(flowcontrol_sdist) $(s
 venv_user := crownet_user
 venv_dev  := crownet_dev
 python_venvs := $(addprefix out/, $(venv_user) $(venv_dev))
+
 
 # In case the user did not specify a MODE, use the default mode which is "debug".
 MODE ?= debug
@@ -102,6 +104,9 @@ analysis-clean:
 	rm -f $(python_dists)
 	rm -rf out/$(venv_user)
 	rm -rf out/$(venv_dev)
+	rm -f out/${mod_crownetutils_name}*.tar.gz
+	rm -rf ${mod_crownetutils}/${mod_crownetutils_name}.egg-info
+	rm -f  ${mod_crownetutils}/dist/*.tar.gz
 
 venv-build: $(python_venvs) python-hint
 
