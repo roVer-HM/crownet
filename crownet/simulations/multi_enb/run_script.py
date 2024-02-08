@@ -390,17 +390,22 @@ class SimulationRun(BaseSimulationRunner):
             msce["cell_mse"], savefig=saver.with_name("dMap_msce_ecdf.png")
         )
 
-    @process_as({"prio": 580, "type": "post"})
+    @process_as({"prio": 579, "type": "post"})
     def plot_neighborhood_table_state(self):
         cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
         sim: Simulation = Simulation.from_dpmm_cfg(cfg)
         saver = self.simple_saver(fig_type=".png")
         saver_rsd = self.simple_saver(sub_dir="nt_map_node_rsd", fig_type=".png")
 
-        PlotAppMisc.plot_nt_map_comparison(sim, saver=saver)
+        map_count_error = self.create_density_map_count_error_hdf()
+        PlotAppMisc.plot_nt_map_comparison(
+            sim, map_count_error=map_count_error, saver=saver
+        )
 
         pos = self.create_position_hdf()
-        PlotAppMisc.plot_nt_map_comparision_by_rsd(sim, pos=pos, saver=saver_rsd)
+        PlotAppMisc.plot_nt_map_comparison_by_rsd(
+            sim, pos=pos, map_count_error=map_count_error, saver=saver_rsd
+        )
 
     @process_as({"prio": 575, "type": "post"})
     def plot_application_tx_stats(self):
