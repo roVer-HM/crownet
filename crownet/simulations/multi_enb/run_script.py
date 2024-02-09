@@ -280,10 +280,13 @@ class SimulationRun(BaseSimulationRunner):
         _dir = self.result_base_dir()
         d_cfg = get_density_cfg(_dir)
         if isinstance(d_cfg, DpmmCfgDb):
-            DpmmSql(d_cfg).create_cell_count_by_host_id_over_time_if_missing()
+            sql = DpmmSql(d_cfg)
+            last_uid = sql.get_last_processed_uid_of_row_mapping_cache()
+            sql.create_dcd_map_row_mapping_cache(chunk_size=10_000_000, offset=last_uid)
         e_cfg = get_entropy_cfg(_dir)
         if isinstance(e_cfg, DpmmCfgDb):
-            DpmmSql(e_cfg).create_cell_count_by_host_id_over_time_if_missing()
+            sql = DpmmSql(e_cfg)
+            sql.create_dcd_map_row_mapping_cache(chunk_size=10_000_000, offset=last_uid)
 
     @process_as({"prio": 985, "type": "post"})
     def create_density_map_count_error_hdf(self) -> MapCountError:
@@ -356,8 +359,9 @@ class SimulationRun(BaseSimulationRunner):
         dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
         rsd_list = dmap._map_p.select(key="rsd_id")
 
-        saver = self.simple_saver(sub_dir="test", cfg=cfg, fig_type=".png")
-        saver_rsd = self.simple_saver("test/dMap_count_rsd", cfg=cfg, fig_type=".png")
+        saver = self.simple_saver(cfg=cfg, fig_type=".png")
+        saver_rsd = self.simple_saver("dMap_count_rsd", cfg=cfg, fig_type=".png")
+
         map_err = self.create_density_map_count_error_hdf()
         PlotDpmMap.plot_map_count_diff(
             data=map_err, savefig=saver.with_name("dMap_count.png")
@@ -368,26 +372,46 @@ class SimulationRun(BaseSimulationRunner):
         )
 
     @process_as({"prio": 580, "type": "post"})
-    def plot_density_map_count_and_error_stats(self):
+    def plot_density_map_error_stats(self):
         cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
-        sim: Simulation = Simulation.from_dpmm_cfg(cfg)
         saver = self.simple_saver(cfg=cfg, fig_type=".png")
         saver_rsd = self.simple_saver("dMap_count_rsd", cfg=cfg, fig_type=".png")
 
-        # Map count
-        dmap: DpmMap = sim.get_dcdMap()
-        dmap.plot_map_count_diff(savefig=saver.with_name("dMap_count.png"))
-        dmap.plot_map_count_diff_by_rsd(
-            saver=saver_rsd.with_name("dMap_count.png")
-        )  # will add suffix for rsd_id
-
+        cell_count_error: CellCountError = self.create_density_cell_count_error_hdf()
         # Cell error
-        msce = dmap.cell_count_measure(columns=["cell_mse"])
+        dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
+        rsd_list = dmap._map_p.select(key="rsd_id")
+        msce = cell_count_error.hdf_cell_measure.select(columns=["cell_mse"])
         # msce time series
         PlotDpmMap.plot_msce_ts(msce, savefig=saver.with_name("dMap_msce_ts.png"))
+        PlotDpmMap.plot_msce_ts_rsd_figure_per_rsd(
+            data=cell_count_error,
+            rsd_list=rsd_list,
+            local_only=False,
+            saver=saver_rsd.with_name("dMap_msce_ts.png"),
+        )
+        PlotDpmMap.plot_msce_ts_rsd_figure_per_rsd(
+            data=cell_count_error,
+            rsd_list=rsd_list,
+            local_only=True,
+            saver=saver_rsd.with_name("dMap_msce_ts.png"),
+        )
+
         # msce ecdf
         PlotDpmMap.plot_msce_ecdf(
             msce["cell_mse"], savefig=saver.with_name("dMap_msce_ecdf.png")
+        )
+        PlotDpmMap.plot_msce_ecdf_rsd_figure_per_rsd(
+            data=cell_count_error,
+            rsd_list=rsd_list,
+            inner_view=False,
+            saver=saver_rsd.with_name("dMap_msce_ecdf.png"),
+        )
+        PlotDpmMap.plot_msce_ecdf_rsd_figure_per_rsd(
+            data=cell_count_error,
+            rsd_list=rsd_list,
+            inner_view=True,
+            saver=saver_rsd.with_name("dMap_msce_ecdf.png"),
         )
 
     @process_as({"prio": 579, "type": "post"})
@@ -397,7 +421,7 @@ class SimulationRun(BaseSimulationRunner):
         saver = self.simple_saver(fig_type=".png")
         saver_rsd = self.simple_saver(sub_dir="nt_map_node_rsd", fig_type=".png")
 
-        map_count_error = self.create_density_map_count_error_hdf()
+        map_count_error: MapCountError = self.create_density_map_count_error_hdf()
         PlotAppMisc.plot_nt_map_comparison(
             sim, map_count_error=map_count_error, saver=saver
         )
