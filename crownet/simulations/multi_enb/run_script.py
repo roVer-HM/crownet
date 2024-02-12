@@ -281,12 +281,29 @@ class SimulationRun(BaseSimulationRunner):
         d_cfg = get_density_cfg(_dir)
         if isinstance(d_cfg, DpmmCfgDb):
             sql = DpmmSql(d_cfg)
-            last_uid = sql.get_last_processed_uid_of_row_mapping_cache()
-            sql.create_dcd_map_row_mapping_cache(chunk_size=10_000_000, offset=last_uid)
+            if not sql.has_complete_dcd_map_cache():
+                last_uid, last_time = sql.get_last_processed_uid_of_row_mapping_cache()
+                logger.info(
+                    f"create dcd_map row id cache starting from row {last_uid} from time {last_time}"
+                )
+                sql.create_dcd_map_row_mapping_cache(
+                    chunk_size=10_000_000, initial_offset=last_uid
+                )
+            else:
+                logger.info(f"found row id cache nothing to do.")
         e_cfg = get_entropy_cfg(_dir)
         if isinstance(e_cfg, DpmmCfgDb):
             sql = DpmmSql(e_cfg)
-            sql.create_dcd_map_row_mapping_cache(chunk_size=10_000_000, offset=last_uid)
+            if not sql.has_complete_dcd_map_cache():
+                last_uid, last_time = sql.get_last_processed_uid_of_row_mapping_cache()
+                logger.info(
+                    f"create dcd_map row id cache starting from row {last_uid} from time {last_time}"
+                )
+                sql.create_dcd_map_row_mapping_cache(
+                    chunk_size=10_000_000, initial_offset=last_uid
+                )
+            else:
+                logger.info(f"found row id cache nothing to do.")
 
     @process_as({"prio": 985, "type": "post"})
     def create_density_map_count_error_hdf(self) -> MapCountError:
