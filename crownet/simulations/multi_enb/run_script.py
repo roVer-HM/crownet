@@ -214,20 +214,21 @@ class SimulationRun(BaseSimulationRunner):
             buf.seek(0)
             fd.write(buf.getvalue())
 
-    @process_as({"prio": 995, "type": "post"})
-    def build_entropy_map(self):
+    # do not execute for now... use time delta for entropy data!
+    # @process_as({"prio": 995, "type": "post"})
+    # def build_entropy_map(self):
 
-        cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
-        builder, imputation_logger = self.get_builder(cfg)
-        builder.build(self.ns.get("hdf_override", "False"), repack_on_build=True)
-        # add rsd provider to include rsd association to position frame
-        builder.set_rsd_association_provider(self.create_position_hdf())
-        with open(
-            cfg.path(f"imputation_{cfg.map_type}.log"), "w", encoding="utf-8"
-        ) as fd:
-            buf: io.StringIO = imputation_logger.writer
-            buf.seek(0)
-            fd.write(buf.getvalue())
+    #     cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
+    #     builder, imputation_logger = self.get_builder(cfg)
+    #     builder.build(self.ns.get("hdf_override", "False"), repack_on_build=True)
+    #     # add rsd provider to include rsd association to position frame
+    #     builder.set_rsd_association_provider(self.create_position_hdf())
+    #     with open(
+    #         cfg.path(f"imputation_{cfg.map_type}.log"), "w", encoding="utf-8"
+    #     ) as fd:
+    #         buf: io.StringIO = imputation_logger.writer
+    #         buf.seek(0)
+    #         fd.write(buf.getvalue())
 
     @process_as({"prio": 994, "type": "post"})
     def create_node_tx_hdf(self) -> NodeTxData:
@@ -331,17 +332,18 @@ class SimulationRun(BaseSimulationRunner):
         )
         return hdf
 
-    @process_as({"prio": 983, "type": "post"})
-    def create_entropy_cell_count_error_hdf(self) -> CellEntropyValueError:
-        cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
-        dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
+    # do not execute for now... use time delta for entropy data!
+    # @process_as({"prio": 983, "type": "post"})
+    # def create_entropy_cell_count_error_hdf(self) -> CellEntropyValueError:
+    #     cfg: DpmmCfg = get_entropy_cfg(self.result_base_dir())
+    #     dmap = Simulation.from_dpmm_cfg(cfg).get_dcdMap()
 
-        hdf = CellEntropyValueError.get_or_create(
-            hdf_path=self.result_dir(f"entropy_cell_count_error.h5"),
-            count_p=dmap.count_p,
-            with_rsd=True,
-        )
-        return hdf
+    #     hdf = CellEntropyValueError.get_or_create(
+    #         hdf_path=self.result_dir(f"entropy_cell_count_error.h5"),
+    #         count_p=dmap.count_p,
+    #         with_rsd=True,
+    #     )
+    #     return hdf
 
     @process_as({"prio": 590, "type": "post"})
     def plot_node_traces(self):
