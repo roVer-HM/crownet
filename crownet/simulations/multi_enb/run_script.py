@@ -3,6 +3,10 @@ import sys, os
 import io
 from crownetutils.analysis.dpmm.dpmm import DpmMap
 from crownetutils.analysis.hdf.provider import BaseHdfProvider, HdfSelector
+from crownetutils.analysis.hdf_providers.map_age_over_distance import (
+    MapMeasurementsAgeOverDistance,
+    MapSizeAndAgeOverDistance,
+)
 from crownetutils.analysis.hdf_providers.node_position import (
     CoordinateType,
     NodePositionWithRsdHdf,
@@ -204,7 +208,7 @@ class SimulationRun(BaseSimulationRunner):
 
         cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
         builder, imputation_logger = self.get_builder(cfg)
-        builder.build(self.ns.get("hdf_override", "False"), repack_on_build=True)
+        builder.build(override_hdf=True, repack_on_build=True)
         # add rsd provider to include rsd association to position frame
         builder.set_rsd_association_provider(self.create_position_hdf())
         with open(
@@ -285,26 +289,26 @@ class SimulationRun(BaseSimulationRunner):
             if not sql.has_complete_dcd_map_cache():
                 last_uid, last_time = sql.get_last_processed_uid_of_row_mapping_cache()
                 logger.info(
-                    f"create dcd_map row id cache starting from row {last_uid} from time {last_time}"
+                    f"create dcd_map row id cache starting from row {last_uid} from time {last_time} for db {sql.path}"
                 )
                 sql.create_dcd_map_row_mapping_cache(
                     chunk_size=10_000_000, initial_offset=last_uid
                 )
             else:
-                logger.info(f"found row id cache nothing to do.")
+                logger.info(f"found row id cache for density map. Nothing to do.")
         e_cfg = get_entropy_cfg(_dir)
         if isinstance(e_cfg, DpmmCfgDb):
             sql = DpmmSql(e_cfg)
             if not sql.has_complete_dcd_map_cache():
                 last_uid, last_time = sql.get_last_processed_uid_of_row_mapping_cache()
                 logger.info(
-                    f"create dcd_map row id cache starting from row {last_uid} from time {last_time}"
+                    f"create dcd_map row id cache starting from row {last_uid} from time {last_time} for db {sql.path}"
                 )
                 sql.create_dcd_map_row_mapping_cache(
                     chunk_size=10_000_000, initial_offset=last_uid
                 )
             else:
-                logger.info(f"found row id cache nothing to do.")
+                logger.info(f"found row id cache for entropy map. Nothing to do.")
 
     @process_as({"prio": 985, "type": "post"})
     def create_density_map_count_error_hdf(self) -> MapCountError:
@@ -331,6 +335,38 @@ class SimulationRun(BaseSimulationRunner):
             with_rsd=True,
         )
         return hdf
+
+    @process_as({"prio": 971, "type": "post"})
+    def create_entropy_map_size_and_age_over_distance(
+        self,
+    ) -> MapSizeAndAgeOverDistance:
+        cfg: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
+        map_sql = DpmmSql(cfg)
+
+        obj = MapSizeAndAgeOverDistance.get_or_create(
+            hdf_path=self.result_dir("entropy_map_size_and_age_over_distance.h5"),
+            map_sql=map_sql,
+            distance_interval=50.0,
+            start_time=1.0,
+            override_existing=True,
+            allow_append=True,
+        )
+        return obj
+
+    @process_as({"prio": 970, "type": "post"})
+    def create_map_measure_over_distance(self) -> MapMeasurementsAgeOverDistance:
+        cfg: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
+        map_sql = DpmmSql(cfg)
+
+        obj = MapMeasurementsAgeOverDistance.get_or_create(
+            hdf_path=self.result_dir("entropy_map_measurements_age_over_distance.h5"),
+            map_sql=map_sql,
+            distance_interval=50.0,
+            start_time=0.0,
+            time_bin=10.0,
+            override_existing=True,
+        )
+        return obj
 
     # do not execute for now... use time delta for entropy data!
     # @process_as({"prio": 983, "type": "post"})
