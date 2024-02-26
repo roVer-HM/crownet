@@ -2,12 +2,12 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              6347-b324/tlv, PASS, vadere:CFG;omnetpp:6.0.1
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              b1ac-a979/tlv, PASS, omnetpp:6.0.1
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              7328-e9a0/tlv, PASS, omnetpp:6.0.1
-/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              dd65-dc41/tlv, PASS, vadere:CFG;omnetpp:6.0.1
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              4706-f163/tlv, PASS, sumo:v1_15_0;omnetpp:6.0.1
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              59fc-efb3/tlv, PASS, sumo:v1_15_0;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              fbc0-581c/tlv, PASS, vadere:CFG;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              a2d1-8406/tlv, PASS, omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              539d-d7c5/tlv, PASS, omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              885f-3fa1/tlv, PASS, vadere:CFG;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              cb01-f877/tlv, PASS, sumo:v1_15_0;omnetpp:6.0.1
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              5b5a-43ee/tlv, PASS, sumo:v1_15_0;omnetpp:6.0.1
 
 # Vulnerable Road User (VRU) Multi Access Edge Computing (MEC) scenarios
 /simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    b69f-1a99/tplx, PASS, sumo:v1_15_0;omnetpp:6.0.1
