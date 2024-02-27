@@ -41,7 +41,7 @@ DynamicMaxBandwidthScheduler::~DynamicMaxBandwidthScheduler() {
 }
 
 void DynamicMaxBandwidthScheduler::receiveSignal(cComponent *source, simsignal_t signalID, intval_t i, cObject *details) {
-    if (signalID == servingCell_ && eNBId == 0 && i != 0){
+    if (signalID == servingCell_ && eNBId == 0 && i != 0 && initialized()){
         // connection regained. Start scheduling again. If generationTimer
         // is not scheduled
         if (!generationTimer->isScheduled()){
