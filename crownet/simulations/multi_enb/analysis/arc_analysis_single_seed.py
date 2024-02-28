@@ -89,16 +89,16 @@ def plot_rsd_overview_grids(data_root, analysis_out, seed_list, all=True):
     plotter.plot_map_size_over_time_total(run_map)
     for p in parameters:
         logger.info(f"process {p}")
-        plotter.plot_rsd_size_grid(run_map, parameter=p, seed=seed)
-        plotter.plot_serving_enb_grid(run_map, bin_size=10.0, parameter=p, seed=seed)
-        plotter.plot_throughput_grid(run_map, bin_size=10.0, parameter=p, seed=seed)
-        plotter.plot_packet_delay_grid(run_map, bin_size=10.0, parameter=p, seed=seed)
-        plotter.plot_burst_information_ratio_grid(run_map, parameter=p, seed=seed)
-        plotter.plot_map_age_over_distance_grid(run_map, parameter=p, seed=seed)
-        plotter.plot_map_number_measures_over_distance_grid(
-            run_map, parameter=p, seed=seed
-        )
-        plotter.plot_map_size_over_distance_grid(run_map, parameter=p, seed=seed)
+        # plotter.plot_rsd_size_grid(run_map, parameter=p, seed=seed)
+        # plotter.plot_serving_enb_grid(run_map, bin_size=10.0, parameter=p, seed=seed)
+        # plotter.plot_throughput_grid(run_map, bin_size=10.0, parameter=p, seed=seed)
+        # plotter.plot_packet_delay_grid(run_map, bin_size=10.0, parameter=p, seed=seed)
+        # plotter.plot_burst_information_ratio_grid(run_map, parameter=p, seed=seed)
+        # plotter.plot_map_age_over_distance_grid(run_map, parameter=p, seed=seed)
+        # plotter.plot_map_number_measures_over_distance_grid(
+        #     run_map, parameter=p, seed=seed
+        # )
+        # plotter.plot_map_size_over_distance_grid(run_map, parameter=p, seed=seed)
         plotter.plot_map_size_over_time(run_map, parameter=p, seed=seed)
 
     combine_figures(analysis_dir=analysis_out)
@@ -144,6 +144,7 @@ if __name__ == "__main__":
         data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
         analysis_out="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/seed5only_one_row_only",
         seed_list=[5],
+        all=False,
     )
     # plot_rsd_overview_grids(
     #     data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
