@@ -3,6 +3,7 @@ import glob
 import os
 from typing import Callable
 from crownetutils.utils.plot import PlotUtil
+from crownetutils.utils.styles import STYLE_SIMPLE_169, STYLE_TEX, load_matplotlib_style
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
@@ -11,7 +12,22 @@ from matplotlib.ticker import FormatStrFormatter, MultipleLocator, ScalarFormatt
 import numpy as np
 import pandas as pd
 import json
+   
+load_matplotlib_style(os.path.join(os.path.dirname(__file__), "paper_tex.mplstyle"))
 
+class MyMultipleLocator(MultipleLocator):
+
+    def __init__(self, base: float = ...) -> None:
+        super().__init__(base)
+
+    def set_params(self, base: float):
+        return super().set_params(base)
+    
+    def __call__(self):
+        return super().__call__()
+    
+    def tick_values(self, vmin: float, vmax: float):
+        return super().tick_values(vmin, vmax)
 
 def get_seeds(path):
     bm_files = glob.glob(f"{path}/**/*.bonnmotion.gz", recursive=True)
@@ -154,12 +170,36 @@ def get_trace_length_hist_data(study_dir, cache_path):
 
     return get_speed_hist_data(study_dir, cache_path)
 
+class Labeloffset():
+    def __init__(self,  ax, pos, axis="y"):
+        self.ax: plt.Axes = ax
+        self.axis = {"y":ax.yaxis, "x":ax.xaxis}[axis]
+        self.pos = pos
+        ax.callbacks.connect(axis+'lim_changed', self.update)
+        ax.figure.canvas.draw()
+        self.update(None)
+
+    def update(self, lim):
+        fmt = self.axis.get_major_formatter()
+        o = fmt.get_offset()
+        print(f"offset {o} {self.pos}")
+        self.ax.text(
+            *self.pos, 
+            o,
+            transform=self.ax.transData,
+            fontdict={"size":"small"}
+        )
+
+
 
 def main():
-    study_dir = "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/simulation_runs/"
-    cache_dir_base = (
-        "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/sumo_plots/"
-    )
+    # study_dir = "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/simulation_runs/"
+    # cache_dir_base = 
+    #     "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/sumo_plots/"
+    # )
+    study_dir = "/home/sts/s2_ttl_and_stream_4/analysis_dir/sumo_plots/"
+    cache_dir_base = "/home/sts/s2_ttl_and_stream_4/analysis_dir/sumo_plots"
+
 
     node_count = get_number_of_nodes(
         study_dir, os.path.join(cache_dir_base, "num_nodes.csv")
@@ -171,14 +211,14 @@ def main():
         study_dir, os.path.join(cache_dir_base, "trace_length_hist.json")
     )
 
-    col_pt = 242.67355
-    col_cm = col_pt / 2.835 / 100
+    col_pt = 242.67355 * 1.3 
+    col_cm = col_pt / 2.835 / 10
     col_inch = col_cm / 2.54
-    fig8 = plt.figure(constrained_layout=False, figsize=(col_inch, 6 / 2.54))
-    gs1 = fig8.add_gridspec(nrows=3, ncols=4, bottom=0.08, wspace=0.08)
-    ax_count_ts = fig8.add_subplot(gs1[0, :])
-    ax_speed_hist = fig8.add_subplot(gs1[1:, 0:2])
-    ax_dist_hist = fig8.add_subplot(gs1[1:, 2:])
+    fig8 = plt.figure(constrained_layout=False, figsize=(col_inch, 9 / 2.54))
+    gs1 = fig8.add_gridspec(nrows=4, ncols=4, top=1.0, right=1.0, bottom=0.31, wspace=0.3, hspace=2.1 )
+    ax_count_ts = fig8.add_subplot(gs1[:2, :])
+    ax_speed_hist = fig8.add_subplot(gs1[2:, 0:2])
+    ax_dist_hist = fig8.add_subplot(gs1[2:, 2:])
 
     colors = plt.get_cmap("tab10")(range(10))
 
@@ -188,24 +228,30 @@ def main():
         _d = node_count.loc[seed]
         ax_count_ts.plot(_d.index, _d, label=f"Seed {seed}", color=colors[seed])
     ax_count_ts.grid(visible=True, which="major", axis="both")
-    ax_count_ts.set_ylabel("number of pedestrians")
+    ax_count_ts.set_ylabel("Num nodes")
     ax_count_ts.set_xlabel("Simulation time in seconds")
+    ax_count_ts.xaxis.set_label_coords(.5, -.26)
     ax_count_ts.set_xlim(0, 1010)
     ax_count_ts.set_ylim(0, 1000)
     ax_count_ts.vlines(
-        120, 0, 820, colors="darkred", linestyles="dashed", label="No new pedestrians"
+        120, 0, 1000, colors="darkred", linestyles="dashed", label="Stop spawn"
     )
-    ax_count_ts.yaxis.set_major_locator(MultipleLocator(200))
+    ax_count_ts.yaxis.set_major_locator(MultipleLocator(400))
     ax_count_ts.xaxis.set_major_locator(MultipleLocator(200))
     ax_count_ts.xaxis.set_minor_locator(MultipleLocator(50))
     ax_count_ts.text(
         120,
-        -50,
+        -220,
         "120",
         transform=ax_count_ts.transData,
         horizontalalignment="center",
-        fontdict=dict(color="darkred"),
+        fontdict=dict(color="darkred", size="small"),
     )
+    ax_count_ts.figure.canvas.draw() # populate ticks
+    for l in ax_count_ts.xaxis.get_majorticklabels():
+        if "1000" in l.get_text():
+            l.set_horizontalalignment("right")
+
 
     # 2
     bins = hist_data_speed["bins"]
@@ -230,6 +276,23 @@ def main():
             label=f"Seed {seed}",
         )
     ax_speed_hist.set_xlim(0, 4.0)
+    ax_speed_hist.set_ylabel("Density")
+    ax_speed_hist.set_ylim(0, 1.6)
+    ax_speed_hist.xaxis.set_major_locator(MultipleLocator(1))
+    ax_speed_hist.xaxis.set_minor_locator(MultipleLocator(0.2))
+    ax_speed_hist.yaxis.set_major_locator(MultipleLocator(0.5))
+    ax_speed_hist.yaxis.set_minor_locator(MultipleLocator(0.1))
+
+    ax_speed_hist.set_xlabel("Node speed in m/s")
+    ax_speed_hist.xaxis.set_label_coords(.5, -.24)
+    view = 100.0 - hist_data_speed["faster_than_in_percent"]["4"] 
+    ax_dist_hist.text(
+        3.95, 1.5, 
+        f"Clipped view:\n {view:.2f}\% of data \n $\leq$ 4.0 m/s", 
+        transform=ax_speed_hist.transData, 
+        fontdict={'size':'small'}, 
+        verticalalignment='top', 
+        horizontalalignment='right')
 
     # 3
     bins = hist_data_trace["bins"]
@@ -258,12 +321,24 @@ def main():
     s.set_scientific(True)
     s.set_powerlimits((-3, 1))
     ax_dist_hist.yaxis.set_major_formatter(s)
+    ax_dist_hist.yaxis.offsetText.set_visible(False)
+    lo = Labeloffset(ax_dist_hist, pos=(5, 0.0019))
+    ax_dist_hist.xaxis.set_major_locator(MultipleLocator(500))
+    ax_dist_hist.xaxis.set_minor_locator(MultipleLocator(100))
+    ax_dist_hist.yaxis.set_major_locator(MultipleLocator(1e-3))
+    ax_dist_hist.yaxis.set_minor_locator(MultipleLocator(0.2e-3))
+    ax_dist_hist.set_xlabel("Trace length in m")
+    ax_dist_hist.xaxis.set_label_coords(.5, -.24)
 
     h, l = ax_dist_hist.get_legend_handles_labels()
-
-    fig8.legend(h, l, ncol=11, loc="lower center")
-    fig8.tight_layout()
-    fig8.savefig()
+    h = np.array(h)[[0,4,8,1,5,9,2,6,10,3,7]].tolist()
+    l = np.array(l)[[0,4,8,1,5,9,2,6,10,3,7]].tolist()
+    _h, _l  = ax_count_ts.get_legend_handles_labels()
+    h.append(_h[-1])
+    l.append(_l[-1])
+    fig8.legend(h, l, ncol=4, loc="lower center", fontsize="small", columnspacing=1, frameon=False, 
+                borderpad=0.1, labelspacing=0.3, handletextpad=.2)
+    fig8.savefig(os.path.join(study_dir, "paper_plot.pdf"))
 
     # ax.set_xlim(0, 4.0)
     # PlotUtil.auto_major_minor_locator(ax)
