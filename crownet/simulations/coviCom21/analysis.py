@@ -79,23 +79,6 @@ def read_app_data(root_path, run=0, *args, **kwargs):
     return _df
 
 
-def analyse_interactive(dcd, what):
-    if what == "map":
-
-        time = 2
-        id = 0
-        fig, ax = dcd.plot_area(
-            time_step=time, node_id=id, pcolormesh_dic=dict(vmin=0, vmax=4)
-        )
-        i = InteractiveAreaPlot(dcd, ax)
-    else:
-
-        fig, ax = dcd.plot_delay_over_distance(64, 2, "measurement_age", bins_width=5)
-        i = InteractiveValueOverDistance(dcd, ax)
-
-    i.show()
-
-
 def make_density_plot(path, dcd):
     # make density_map_plots
     time = [140]
