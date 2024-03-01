@@ -47,18 +47,10 @@ mapCfgYmfDist = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
-)
-mapCfgYmf = ObjectValue.from_args(
-    "crownet::MapCfgYmf",
-    "writeDensityLog",
+    "appendRessourceSharingDomainId",
     BoolValue.TRUE,
-    "mapTypeLog",
-    QString("ymf"),
-    # "mapTypeLog", QString("all"),
-    "cellAgeTTL",
-    UnitValue.s(15.0),
-    "idStreamType",
-    QString("insertionOrder"),
+    "logType",
+    QString("sql"),
 )
 t = UnitValue.s(900.0)
 
@@ -136,7 +128,8 @@ def main_bonn_motion():
     # Enviroment setup.
     #
     ini_file = os.path.abspath("../omnetpp.ini")
-    base_dir = "/mnt/data1tb/results/arc-dsa_single_cell/"
+    # base_dir = "/mnt/data1tb/results/arc-dsa_single_cell/"
+    base_dir = "/mnt/ssd_local/arc-dsa_single_cell/"
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
