@@ -36,6 +36,7 @@ from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.utils.plot import PlotUtil_, percentile, with_axis
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import scipy
 import matplotlib.pyplot as plt
 import matplotlib.patches as pltPatch
@@ -60,7 +61,7 @@ S1_SIM_DATA_DIR = (
 SIM_RESULT_DIR = "/mnt/ssd_local/arc-dsa_single_cell/analysis_dir"
 
 
-class RandomMap:
+class RandomMap(PlotUtil_):
     def __init__(self, run_map) -> None:
         self.run_map: RunMap = run_map
 
@@ -76,6 +77,180 @@ class RandomMap:
 
         draw = draw.reset_index()
         return draw
+
+    def plot_random_msme(self):
+        data = self.get_data()
+        draw = self.get_random_draw()
+
+        figsize = self.fig_size_cm(width=11.1, height=12.5)
+        fig, ax_m = plt.subplot_mosaic("111;222", figsize=figsize)
+        ax_hist = ax_m["1"]
+        self.plot_cell_occupation_hist(data, ax=ax_hist)
+
+        ax_box = ax_m["2"]
+        self.plot_seed_random_msme(draw, ax_box)
+
+        fig.tight_layout(h_pad=2.0)
+        fig.subplots_adjust(left=0.158, bottom=0.1, right=0.99, top=0.99)
+
+        self.move_last_y_ticklabel_down(ax_hist, "0.6")
+
+        try:
+            shutil.copy(
+                self.run_map.path("rnd_msme.pdf"),
+                self.run_map.path("rnd_msme_old.pdf"),
+            )
+        except:
+            pass
+        fig.savefig(self.run_map.path("rnd_msme.pdf"))
+        print("done")
+
+    def plot_seed_random_msme(self, draw: pd.DataFrame, ax: plt.Axes):
+        seeds = draw["seed"].unique()
+        colors = sns.color_palette("colorblind", n_colors=len(seeds))
+        box_data = []
+        for idx, (g, _df) in enumerate(draw.groupby("seed")):
+            box_data.append(_df["msme"])
+
+        ax.hlines(
+            y=np.percentile(draw["msme"], 25),
+            colors="red",
+            xmin=-0.5,
+            xmax=19.5,
+            linestyles="dashed",
+            label="Q3/4",
+        )
+        ax.hlines(
+            y=np.percentile(draw["msme"], 75),
+            colors="red",
+            xmin=-0.5,
+            xmax=19.5,
+            linestyles="dashed",
+            label="Q3.4",
+        )
+        ax.hlines(
+            y=draw["msme"].mean(),
+            colors="red",
+            xmin=-0.5,
+            xmax=19.5,
+            linestyles="solid",
+            label="mean",
+        )
+        print(draw["msme"].describe())
+        draw["msme"].describe().to_csv(self.run_map.path("rnd_msme_stats.csv"))
+
+        b = ax.boxplot(box_data, positions=range(20), flierprops={"marker": "."})
+        # ax.xaxis.set_major_locator(MultipleLocator(2))
+        lbls = [i if i % 2 == 0 else "" for i in range(20)]
+        lbls[0] = "0"
+        lbls[-1] = "19"
+        ax.set_xticklabels(lbls)
+        ax.set_xlim(-0.5, 19.5)
+        ax.yaxis.set_major_locator(MultipleLocator(0.05))
+        ax.yaxis.set_minor_locator(MultipleLocator(0.05 / 5))
+        ax.set_ylim(1.725, 1.925)
+        ax.set_ylabel("MSME")
+        ax.set_xlabel("Simulation Seeds")
+        h, l = ax.get_legend_handles_labels()
+        ax.legend(
+            [h[-1], h[0]],
+            [l[-1], l[0]],
+            ncol=2,
+            loc="lower left",
+            frameon=False,
+            borderpad=0.2,
+            borderaxespad=0,
+            labelspacing=0.1,
+            handlelength=1.3,
+            columnspacing=0.5,
+            handletextpad=0.1,
+        )
+
+    def plot_cell_occupation_hist(
+        self, data: pd.DataFrame, *, alpha=0.5, ax: plt.Axes = None
+    ):
+        seeds = data["seed"].unique()
+        colors = sns.color_palette("colorblind", n_colors=len(seeds))
+        _range = (data["count"].min(), data["count"].max())
+        _bin_count = data["count"].max() + 1
+        _bins = np.histogram(data["count"], bins=int(_bin_count))[1]
+        s = stats.describe(data["count"])
+        s2 = data["count"].describe().iloc[1:].apply("{:.4f}".format)
+
+        def str_pad(strings):
+            m_length = max([len(str(s)) for s in strings])
+
+            def _f(s):
+                pad = m_length - len(str(s))
+                pad = " " * pad
+                s = f"{s}:{pad} "
+                return s
+
+            return _f
+
+        pad_f = str_pad(s2.index)
+        lbl = ""
+        for l, v in list(zip(s2.index, s2.values)):
+            lbl += f"{pad_f(l)}{v}\n"
+
+        lbl = lbl.replace("%", "\%")
+        lbl = lbl[:-1]
+        ax.text(
+            9.353,
+            0.58,
+            lbl,
+            transform=ax.transData,
+            verticalalignment="top",
+            horizontalalignment="right",
+            bbox=dict(facecolor="white", alpha=1.0),
+            fontdict={"family": "monospace", "size": "small"},
+        )
+
+        for idx, (g, _df) in enumerate(data.groupby("seed")):
+            ax.hist(
+                _df["count"],
+                bins=10,
+                range=(-0.5, 9.5),
+                density=True,
+                histtype="step",
+                color=colors[idx],
+            )
+        ax.hist(
+            data["count"],
+            bins=10,
+            range=(-0.5, 9.5),
+            histtype="stepfilled",
+            density=True,
+            color="gray",
+            alpha=0.30,
+            label="all Seeds",
+        )
+        ax.vlines(
+            data["count"].mean(),
+            0,
+            0.6,
+            colors="black",
+            linestyles="dashed",
+            label="mean all Seeds",
+        )
+
+        ax.xaxis.set_major_locator(MultipleLocator(1))
+        ax.yaxis.set_major_locator(MultipleLocator(0.1))
+        ax.yaxis.set_minor_locator(MultipleLocator(0.1 / 2))
+        ax.set_ylim(0, 0.6)
+        ax.set_xlim(-0.5, 9.5)
+        ax.set_xlabel("Number of agents in cell")
+        ax.set_ylabel("Density")
+        ax.legend(
+            loc="lower right",
+            frameon=False,
+            borderpad=0.2,
+            borderaxespad=0,
+            labelspacing=0.1,
+            handlelength=1.3,
+        )
+        # color_legend(ax, colors=colors, alpha=0.3, loc="upper right")
+        return ax
 
     def build_draw_dpmm(
         self, hdf: BaseHdfProvider, data: pd.DataFrame, seed_dist: pd.Series
@@ -1456,9 +1631,12 @@ def main():
         load_if_present=True,
     )
     r2_plotter = MemberEstPlotter(r2)
-    r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
-    r2_plotter.plot_msce()
-    r2_plotter.plot_tx_interval(freq=25.0)
+    # r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
+    # r2_plotter.plot_msce()
+    # r2_plotter.plot_tx_interval(freq=25.0)
+
+    rnd = RandomMap(r2)
+    rnd.plot_random_msme()
     print("done")
 
 
