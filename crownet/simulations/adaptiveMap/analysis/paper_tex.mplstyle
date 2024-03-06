@@ -1,0 +1,24 @@
+
+text.usetex     : True
+pdf.fonttype    : 42
+ps.fonttype     : 42
+pgf.texsystem   : pdflatex
+path.simplify: True
+
+font.size       : 14
+font.family    : serif
+axes.titlesize  : x-large
+axes.titleweight    : bold
+axes.labelsize      : medium
+xtick.labelsize     : small
+ytick.labelsize     : small
+
+axes.grid:          False   # display grid or not
+axes.grid.axis:     both    # which axis the grid should apply to
+axes.grid.which:    major   # grid lines at {major, minor, both} ticks
+
+grid.alpha: 0.8
+legend.facecolor:   (1.0, 1.0, 1.0, 1.0)
+legend.frameon:     True
+legend.framealpha:    1.0
+legend.fontsize: x-large

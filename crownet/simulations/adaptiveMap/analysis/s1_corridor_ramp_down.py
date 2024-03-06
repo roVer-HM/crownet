@@ -1,8 +1,14 @@
+from functools import partial
 import os
 import glob
 import re
+import shutil
+import io
+import scipy.stats as stats
 from typing import List, Tuple
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.hdf_providers.map_error_data import MapCountError
+from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
 from matplotlib.ticker import (
     MultipleLocator,
     FixedLocator,
@@ -18,7 +24,11 @@ from crownetutils.analysis.common import (
 )
 from itertools import repeat
 from crownetutils.analysis.dpmm.metadata import DpmmMetaData
-from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.analysis.hdf.provider import (
+    BaseHdfProvider,
+    HdfGroupFactory,
+    LazyHdfProvider,
+)
 from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
 from crownetutils.utils.dataframe import numeric_formatter, save_as_tex_table
 from crownetutils.utils.parallel import run_kwargs_map
@@ -36,7 +46,145 @@ from crownetutils.utils.styles import (
     STYLE_TEX,
 )
 
-load_matplotlib_style(STYLE_TEX)
+# load_matplotlib_style(STYLE_TEX)
+load_matplotlib_style(os.path.join(os.path.dirname(__file__), "paper_tex.mplstyle"))
+
+# SIM_RESULT_DIR = "/mnt/data1tb/results"
+# S0_SIM_DATA_DIR = "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/"
+# S1_SIM_DATA_DIR = "/mnt/data1tb/results/arc-dsa_single_cell/s1_corridor_5_to_500kbps_map_count_est_only"
+
+S0_SIM_DATA_DIR = "/mnt/ssd_local/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/"
+S1_SIM_DATA_DIR = (
+    "/mnt/ssd_local/arc-dsa_single_cell/s1_corridor_5_to_500kbps_map_count_est_only/"
+)
+SIM_RESULT_DIR = "/mnt/ssd_local/arc-dsa_single_cell/analysis_dir"
+
+
+class RandomMap:
+    def __init__(self, run_map) -> None:
+        self.run_map: RunMap = run_map
+
+    def get_random_draw(self):
+        hdf = self.run_map.get_hdf("dpmm_ground_truth.h5", "gt")
+        data = self.get_data()
+        seed_dist = data.groupby(["seed", "count"]).count().iloc[:, 0]
+        seed_dist = seed_dist / seed_dist.groupby("seed").sum()
+        if hdf.contains_group("msme_draw"):
+            draw = hdf.get_dataframe("msme_draw")
+        else:
+            draw = self.build_draw_dpmm(hdf=hdf, data=data, seed_dist=seed_dist)
+
+        draw = draw.reset_index()
+        return draw
+
+    def build_draw_dpmm(
+        self, hdf: BaseHdfProvider, data: pd.DataFrame, seed_dist: pd.Series
+    ):
+        buf = io.StringIO()
+
+        def _print(_str):
+            buf.write(str(_str))
+            buf.write("\n")
+            print(_str)
+
+        seeds = data["seed"].unique()
+        draw = []
+        for seed in seeds:
+            _print(f"for mobility seed: {seed}")
+            _print(data[data["seed"] == seed]["count"].describe())
+            _print(stats.describe(data[data["seed"] == seed]["count"]))
+
+            _d = data[data["seed"] == seed]
+            _d = _d.set_index(["simtime", "x", "y"]).sort_index()
+            seed_rv = stats.rv_discrete(
+                values=(seed_dist.loc[seed].index, seed_dist.loc[seed].values)
+            )
+            _df_draw = self.draw_dpmm(seed_rv, _d, N=1000, _print=_print)
+            draw.append(_df_draw)
+
+        draw = pd.concat(draw, axis=0)
+        hdf.write_frame(frame=draw, group="msme_draw")
+        with open(self.run_map.path("draw_msme.txt"), "w") as fd:
+            buf.seek(0)
+            fd.write(buf.read())
+        return draw
+
+    def get_data(self) -> pd.DataFrame:
+        return self.lazy_read_dpmm_gt_from_sim_group(
+            sg="map-500kbps",
+            hdf_path=self.run_map.path("dpmm_ground_truth.h5"),
+            group="gt",
+        ).frame()
+
+    def lazy_read_dpmm_gt_from_sim_group(
+        self, sg: str, hdf_path: str, group: str = "root"
+    ):
+        gf = HdfGroupFactory(
+            group_name=group,
+            factory=partial(self.read_dpmm_gt_from_sim_group, sg=sg),
+        )
+        return LazyHdfProvider(hdf_path, group, gf)
+
+    def read_dpmm_gt_from_sim_group(self, sg: str):
+
+        df = []
+        for sim in self.run_map[sg]:
+            # select ground truth data from simulation run (i.e. seed)
+            _df = (
+                sim.get_dcdMap()
+                .count_p[pd.IndexSlice[:, :, :, 0], ["count"]]
+                .reset_index(["ID"], drop=True)
+            )
+            _df = _df.reorder_levels(["simtime", "x", "y"])
+            # build missing (time, x, y) entries containing a count of zero.
+            times = _df.index.get_level_values("simtime").sort_values().unique()
+            full_idx = sim.get_dcdMap().metadata.create_full_index(
+                times=times, real_coords=True
+            )
+            diff_idx = full_idx.difference(_df.index)
+            _zero = pd.DataFrame(0, index=diff_idx, columns=["count"])
+            _df = pd.concat([_df, _zero])
+            # add seed column and add to list
+            _df["seed"] = sim.run_context.opp_seed
+            _df = _df.reset_index("simtime")
+            _df = _corridor_filter_target_cells(_df).reset_index()
+            df.append(_df)
+        return pd.concat(df, axis=0)
+
+    def draw_dpmm(
+        self, seed_rv: stats.rv_discrete, gt: pd.DataFrame, N=200, _print=print
+    ):
+        msme = []
+        msd = []
+        for i in np.arange(N):
+            _df = gt.rename(columns={"count": "gt"}).copy(deep=True)
+            # draw from distribution
+            _df["count"] = seed_rv.rvs(size=_df.shape[0])
+            # _df["count"] = _df["gt"].mean()
+            # calculate Mean squared cell error for ONE 'random measurement' thus the MSCE is
+            # calcuated using N=1 --> MSCE = Suqared error
+            _df["err"] = _df["count"] - _df["gt"]
+            _df["sqerr"] = _df["err"] ** 2
+            # MSME over time and the for the hole simulation
+            _msme = _df.loc[:, ["sqerr"]].groupby(["simtime"]).mean().mean()
+            _msd = _df.loc[:, ["err"]].groupby(["simtime"]).mean().mean()
+            msme.append(_msme.values[0])
+            msd.append(_msd.values[0])
+
+        _print(f"MSME over N={N} meta seeds")
+        msme = pd.Series(
+            msme, name="msme", index=pd.Index(np.arange(N), name="meta_seed")
+        )
+        _print(msme.describe())
+        _print(stats.describe(msme))
+        msd = pd.Series(msd, name="msd", index=pd.Index(np.arange(N), name="meta_seed"))
+        _print(msd.describe())
+        _print(stats.describe(msd))
+
+        df = pd.concat([msme, msd], axis=1)
+        df["seed"] = gt["seed"].unique()[0]
+
+        return df
 
 
 def kBpsLbl(kbps):
@@ -110,55 +258,14 @@ def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
     return ret
 
 
-def sg_tx_throughput_cache(sg: SimulationGroup, freq: float):
-    kw_list = [dict(sim=sim, freq=freq) for sim in sg.simulations]
-    print(f"preparing {len(kw_list)} simulations for tx_cache")
-    run_kwargs_map(sim_tx_throughput_cache, kw_list, pool_size=20)
-
-
-def sim_tx_throughput_cache(sim: Simulation, freq: float):
-    _hdf = sim.get_base_provider("tk_pkt_bytes", sim.path("tk_pkt_bytes.h5"))
-    g2 = f"tx_throughput{str(freq).replace('.', '_')}"
-    if _hdf.contains_group(_hdf.group) and _hdf.contains_group(g2):
-        print("nothing to do")
-        return
-    if not _hdf.contains_group(_hdf.group):
-        print(f"read tx bytes {sim.label}")
-        tx_pkt = OppAnalysis.get_sent_packet_bytes_by_app(sim.sql)
-        tx_pkt = tx_pkt.reset_index().set_index(["app", "time"]).sort_index()
-        print("write tx bytes to hdf")
-        _hdf.write_frame(_hdf.group, tx_pkt)
-    else:
-        tx_pkt = _hdf.get_dataframe()
-    tx_rate = tx_pkt.reset_index(["app"])
-
-    if not _hdf.contains_group(g2):
-        print(f"create throughput based on interval {freq} for sim: {sim.label}")
-        bins = pd.interval_range(
-            start=0.0,
-            end=tx_rate.index.get_level_values(0).max(),
-            freq=freq,
-            closed="right",
-        )
-        # rate in kilo bit per seconds
-        tx_rate = (
-            (tx_rate.groupby([pd.cut(tx_rate.index, bins), "app"]).sum() / freq / 1000)
-            .unstack("app")
-            .droplevel(0, axis=1)
-        )
-        tx_rate.index = bins.right
-        tx_rate.index.name = "time"
-        _hdf.write_frame(g2, tx_rate)
-
-
 def create_member_estimate_run_map(output_path, *args, **kwargs) -> RunMap:
     """All runs with different member estimates (neighborhood Table, Density Map, No adaption)"""
     os.makedirs(output_path, exist_ok=True)
-    study_base = "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/"
-    base_cfg = DpmmCfg.load(
-        str_fd=os.path.join(study_base, "map_cfg_tmpl.json"), base_dir="foo"
-    )
-    base_cfg.base_dir = None
+    study_base = S0_SIM_DATA_DIR
+    # base_cfg = DpmmCfg.load(
+    #     str_fd=os.path.join(study_base, "map_cfg_tmpl.json"), base_dir="foo"
+    # )
+    # base_cfg.base_dir = None
 
     def create_sim_group(sim: Simulation, data: List[Simulation], *args, **kwargs):
         ctx: RunContext = data[0].run_context
@@ -191,10 +298,6 @@ def create_member_estimate_run_map(output_path, *args, **kwargs) -> RunMap:
         else:
             meta["lbl"] = "Constant rate"
 
-        # set cfg
-        for s in data:
-            s.dpmm_cfg = base_cfg.copy(base_dir=s.data_root)
-
         sg = SimulationGroup(
             data=data,
             group_name=f"{meta['member_estimate']}-{meta['map_target_rate']}",
@@ -216,7 +319,7 @@ def create_member_estimate_run_map(output_path, *args, **kwargs) -> RunMap:
 def create_target_rate_run_map_new(output_path, *args, **kwargs) -> RunMap:
     """All runs with member estimate using density map and changing target rates [50...500kbps]"""
     os.makedirs(output_path, exist_ok=True)
-    study_base = "/mnt/data1tb/results/arc-dsa_single_cell/s1_corridor_5_to_500kbps_map_count_est_only/"
+    study_base = S1_SIM_DATA_DIR
     base_cfg = DpmmCfg.load(
         str_fd=os.path.join(study_base, "map_cfg_tmpl.json"), base_dir="foo"
     )
@@ -287,7 +390,7 @@ def create_target_rate_run_map(output_path, *args, **kwargs) -> RunMap:
     run_map: RunMap = RunMap(output_path)
 
     # 1 500kbps
-    root_target_rate_500 = "/mnt/data1tb/results/s1_corridor_ramp_down/"
+    root_target_rate_500 = os.path.join(SIM_RESULT_DIR, "s1_corridor_ramp_down/")
     _study: SuqcStudy = SuqcStudy(root_target_rate_500)
     map_filter = lambda x: x[0] >= 20 and x[0] < 40
     _study.update_run_map(
@@ -299,8 +402,8 @@ def create_target_rate_run_map(output_path, *args, **kwargs) -> RunMap:
     )
 
     # 2 [50, 100, 150, 250] kbps
-    root_target_rate_lt500 = (
-        "/mnt/data1tb/results/s1_corridor_ramp_down_rate_lt500kbps/"
+    root_target_rate_lt500 = os.path.join(
+        SIM_RESULT_DIR, "s1_corridor_ramp_down_rate_lt500kbps"
     )
     # map_filter = lambda x: not(x[0]>=20 and x[0]<60)
     map_filter = lambda x: True
@@ -313,8 +416,8 @@ def create_target_rate_run_map(output_path, *args, **kwargs) -> RunMap:
         id_filter=map_filter,
     )
 
-    root_target_rate_lt500 = (
-        "/mnt/data1tb/results/s1_corridor_ramp_down_rate_lt500kbps_1/"
+    root_target_rate_lt500 = os.path.join(
+        SIM_RESULT_DIR, "s1_corridor_ramp_down_rate_lt500kbps_1"
     )
     # map_filter = lambda x: not(x[0]>=20 and x[0]<60)
     map_filter = lambda x: True
@@ -815,10 +918,21 @@ class MemberEstPlotter(PlotUtil_):
         super().__init__()
         self.run_map: RunMap = run_map
 
+    # def _collect_tx_throughput(self, sg: SimulationGroup, freq="20_0"):
+    #     df = []
+    #     sim: Simulation
+    #     for _, id, sim in sg.simulation_iter(enum=True):
+    #         _df = sim.from_hdf("tk_pkt_bytes.h5", f"tx_throughput{freq}")
+    #         _df["run"] = id
+    #         df.append(_df)
+    #     return pd.concat(df, axis=0, verify_integrity=False).sort_index()
+
     def _collect_tx_throughput(self, sg: SimulationGroup, freq="20_0"):
         df = []
         sim: Simulation
         for _, id, sim in sg.simulation_iter(enum=True):
+            tx = NodeTxData(sim.dpmm_cfg.node_tx.path)
+            _df = tx.tx_bytes_per_app(app_names=["b", "m"])
             _df = sim.from_hdf("tk_pkt_bytes.h5", f"tx_throughput{freq}")
             _df["run"] = id
             df.append(_df)
@@ -839,7 +953,6 @@ class MemberEstPlotter(PlotUtil_):
             _df = OppAnalysis.sg_get_msce_data(
                 sim_group=sg,
                 cell_count=len(_corridor_filter_target_cells(_free)),
-                cell_slice_fc=_corridor_filter_target_cells,
             )
             _hdf.write_frame(group=g, frame=_df)
         return _df
@@ -862,7 +975,7 @@ class MemberEstPlotter(PlotUtil_):
         )
         return ax.get_figure(), ax
 
-    def plot_msce(self):
+    def plot_msce(self, with_random: bool = False):
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         box_data = []
         pos = []
@@ -876,37 +989,68 @@ class MemberEstPlotter(PlotUtil_):
                 df_m = df_m.droplevel(0, axis=1)
             pos.append(sg.attr["member_estimate"])
             box_data.append(df_m["mean"])
-        rc = {
-            "axes.labelsize": "xx-large",
-            "xtick.labelsize": "x-large",
-            "ytick.labelsize": "x-large",
-        }
         colors = self.get_default_color_cycle()[0:3]
         colors = [colors[-1], colors[0], colors[1]]
-        with plt.rc_context(rc):
-            fig, _ax = plt.subplot_mosaic("a;a;a;b;b", figsize=(8.9, 8.9))
-            ax = _ax["a"]
-            tbl = _ax["b"]
-            b = ax.boxplot(box_data, positions=[10, 20, 30], widths=3.5)
-            ax.set_xticklabels(
-                ["Constant rate", "Neighbor count est.", "Map count est."]
+        positions = [10, 20, 30]
+        labels = ["Constant\nrate", "Neighbor count\nestimate", "Map count\nestiamte"]
+        if with_random:
+            colors.append(self.get_default_color_cycle()[4])
+            _df = RandomMap(self.run_map).get_random_draw()
+            box_data.append(_df["msme"])
+            positions = [10, 20, 30, 40]
+            labels = [
+                "Constant\nrate",
+                "Neighbor\ncount est.",
+                "Map count\nest.",
+                "Random",
+            ]
+
+        figsize = self.fig_size_cm(width=11.1, height=12.5)
+        fig, _ax = plt.subplot_mosaic(
+            "zzaaaaaaaa;zzaaaaaaaa;zzaaaaaaaa;zzaaaaaaaa;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb",
+            figsize=figsize,
+        )
+        _null = _ax["z"]
+        _null.set_axis_off()
+        ax = _ax["a"]
+        tbl = _ax["b"]
+        b = ax.boxplot(box_data, positions=positions, widths=3.5)
+        ax.set_xticklabels(labels)
+        ax.yaxis.set_major_locator(MultipleLocator(0.025))
+        ax.yaxis.set_minor_locator(MultipleLocator(0.025 / 5))
+        ax.set_ylim(0.175, 0.275)
+        ax.grid(visible=True, which="major", axis="both")
+        self.move_last_y_ticklabel_down(ax, lbl_str="0.275")
+        ax.set_ylabel("Mean squared map error\n(MSME)")
+        ax.yaxis.set_label_coords(-0.14, 0.45)
+        self.color_box_plot(b, fill_color=colors, ax=ax)
+        box_data = [_df.reset_index(drop=True) for _df in box_data]
+        df = pd.concat(box_data, axis=1, ignore_index=True)
+        df = df.describe().iloc[1:, :]
+        df = df.applymap(lambda x: f"{x:.4f}")
+        df.columns = labels
+        df.index.name = ""
+        t: plt.Table
+        _, _, t = self.df_to_table(
+            df.reset_index(),
+            ax=tbl,
+            col_width=[5.1, 6, 8, 6],
+            cell_height=0.1,
+            col_header_height=0.15,
+        )
+        t.set_fontsize("small")
+        fig.tight_layout()
+        fig.subplots_adjust(left=0.01, bottom=0.005, right=0.99, top=0.995, hspace=2.5)
+        try:
+            shutil.copy(
+                self.run_map.path("member_est_msme.pdf"),
+                self.run_map.path("member_est_msme_old.pdf"),
             )
-            ax.yaxis.set_major_locator(MultipleLocator(0.025))
-            ax.yaxis.set_minor_locator(MultipleLocator(0.025 / 2))
-            ax.set_ylim(0.2125, 0.35)
-            ax.set_ylabel("Mean squared map error (MSME)")
-            self.color_box_plot(b, fill_color=colors, ax=ax)
-            box_data = [_df.reset_index(drop=True) for _df in box_data]
-            df = pd.concat(box_data, axis=1, ignore_index=True)
-            df = df.describe().iloc[1:, :]
-            df = df.applymap(lambda x: f"{x:.4f}")
-            df.columns = ["Constant rate", "Neighbor count est.", "Map count est."]
-            df.index.name = ""
-            t: plt.Table
-            _, _, t = self.df_to_table(df.reset_index(), ax=tbl)
-            t.set_fontsize(14)
-            fig.tight_layout()
-            fig.savefig(self.run_map.path("member_est_msme.pdf"))
+        except:
+            pass
+        fig.savefig(self.run_map.path("member_est_msme.pdf"))
+
+        print("done")
 
     @with_axis
     def plot_tx_interval(self, freq=1.0, *, ax: plt.Axes = None):
@@ -918,15 +1062,19 @@ class MemberEstPlotter(PlotUtil_):
             if _hdf.contains_group(g):
                 df = _hdf.get_dataframe(g)
             else:
-                df = OppAnalysis.sg_get_txAppInterval(
-                    sg,
-                    module_names_f=lambda x: x.m_map(path="scheduler"),
-                    interval_type="real",
-                    jobs=5,
-                )
+                df = []
+                for idx, sim in sg.simulation_iter():
+                    x = NodeTxData(hdf_path=sim.dpmm_cfg.node_tx.path)
+                    d = x.hdf.select(
+                        key="d_beacon/tx_interval", columns=["time", "tx_interval"]
+                    ).reset_index()
+                    d["run_id"] = idx
+                    df.append(d)
+
+                df = pd.concat(df)
                 _hdf.write_frame(group=g, frame=df)
             data = self.append_bin(
-                data=df[["time", "txInterval"]],
+                data=df[["time", "tx_interval"]],
                 bin_size=freq,
                 start=0.0,
                 agg=["mean", percentile(25), percentile(75)],
@@ -937,9 +1085,9 @@ class MemberEstPlotter(PlotUtil_):
                     :,
                     [
                         "bin_right",
-                        "txInterval_mean",
-                        "txInterval_p25",
-                        "txInterval_p75",
+                        "tx_interval_mean",
+                        "tx_interval_p25",
+                        "tx_interval_p75",
                     ],
                 ],
                 line_args=dict(
@@ -954,14 +1102,21 @@ class MemberEstPlotter(PlotUtil_):
         h, l = self.merge_legend_patches(*ax.get_legend_handles_labels())
         ax.legend().remove()
         ax.legend(h, l, loc="lower right", ncol=2)
-        return ax.get_figure(), ax
+        try:
+            shutil.copy(
+                self.run_map.path("tx_interval.pdf"),
+                self.run_map.path("tx_interval_old.pdf"),
+            )
+        except:
+            pass
+        ax.get_figure().savefig(self.run_map.path("tx_interval.pdf"))
 
     @with_axis
     def plot_throughput_ts_fill(
         self, bin="25_0", *, ax: plt.Axes = None
     ) -> Tuple[plt.Figure, plt.Axes]:
         color = self.get_default_color_cycle()[0:3]
-        marker = ["x", "2", "o"]
+        marker = ["|", ".", "x"]
         fig: plt.Figure = ax.get_figure()
         for i, (g, sg) in enumerate(self.run_map.items()):
             df = self._collect_tx_throughput(sg, bin).loc[:, ["m"]].reset_index()
@@ -980,39 +1135,96 @@ class MemberEstPlotter(PlotUtil_):
             500 / 8,
             0,
             t.max() + 25,
-            color="red",
-            linestyles="solid",
+            color="darkred",
+            linestyles="dashed",
         )
-        ax.text(
-            52,
-            500 / 8 + 5,
+        # ax.text(
+        #     50,
+        #     100,
+        #     kBpsLbl(500),
+        #     color="darkred",
+        #     fontsize="small",
+        #     transform=ax.transData,
+        # )
+        ax.annotate(
             kBpsLbl(500),
-            color="red",
-            fontsize="large",
-            transform=ax.transData,
+            xy=(75, 500 / 8),
+            xycoords="data",
+            xytext=(120, 90),
+            textcoords="data",
+            size="small",
+            va="center",
+            ha="center",
+            color="darkred",
+            arrowprops=dict(
+                arrowstyle="->",
+                facecolor="darkred",
+                edgecolor="darkred",
+                connectionstyle="arc3,rad=-0.2",
+            ),
         )
 
         ax.set_ylabel("Throughput in kB/s")
         ax.set_xlabel("Simulation time in seconds")
         ax.yaxis.set_major_locator(MultipleLocator(20))
         ax.yaxis.set_minor_locator(MultipleLocator(10))
-        ax.set_ylim(-5, 170)
+        ax.set_ylim(0, 160)
         ax.xaxis.set_major_locator(MultipleLocator(50))
         ax.xaxis.set_minor_locator(MultipleLocator(25))
         ax.set_xlim(25, 875)
         ax.legend(loc="upper left", ncol=2)
+        self.move_last_y_ticklabel_down(ax, "160")
         return fig, ax
+
+    def get_dmap_and_nt_ts_data(self, cache_name: str = "map_nt.h5"):
+
+        _hdf = BaseHdfProvider(self.run_map.path(cache_name))
+        if not (_hdf.contains_group("map") and _hdf.contains_group("nt")):
+            sg: SimulationGroup = self.run_map["nTable-500kbps"]
+            g = sg.group_name
+            for run_id, _, sim in sg.simulation_iter(enum=True):
+                print(f"{run_id}-{g}")
+                sim: Simulation
+
+                _nt = sim.sql.vec_data(
+                    sim.sql.m_table(), "tableSize:vector", drop="vectorId"
+                )
+                nt.append(_nt)
+            sg: SimulationGroup = self.run_map["map-500kbps"]
+            g = sg.group_name
+            for run_id, _, sim in sg.simulation_iter(enum=True):
+                print(f"{run_id}-{g}")
+                sim: Simulation
+                map_count_error = MapCountError(
+                    hdf_path=sim.dpmm_cfg.map_count_error.path
+                )
+                _dmap = (
+                    map_count_error.hdf_map_measure.select(columns=["map_mean_count"])
+                    .reset_index()
+                    .set_axis(["time", "value"], axis=1)
+                )
+                dmap.append(_dmap)
+
+            dmap = pd.concat(dmap, axis=0, ignore_index=True, verify_integrity=False)
+            nt = pd.concat(nt, axis=0, ignore_index=True, verify_integrity=False)
+            _hdf.write_frame("map", dmap)
+            _hdf.write_frame("nt", nt)
+        else:
+            dmap = _hdf.get_dataframe("map")
+            nt = _hdf.get_dataframe("nt")
+        return dmap, nt
 
     def plot_throughput_ped_count_ts(self, bin="25_0"):
         rc = {
-            "legend.fontsize": "xx-large",
-            "axes.labelsize": "xx-large",
-            "xtick.labelsize": "x-large",
-            "ytick.labelsize": "x-large",
+            "legend.fontsize": "small",
+            "axes.labelsize": "large",
+            "xtick.labelsize": "medium",
+            "ytick.labelsize": "medium",
         }
         with plt.rc_context(rc=rc):
+            figsize = self.fig_size_cm(width=11.1, ratio=1 / 1.3)
             fig, axes = plt.subplot_mosaic(
-                mosaic="T;T;P", figsize=(8.9 * 2, (8.9 * 2) / (16 / 9)), sharex=True
+                mosaic="T;T;T;P;P", figsize=figsize, sharex=True
             )
 
             ax_t: plt.Axes = axes["T"]
@@ -1024,14 +1236,26 @@ class MemberEstPlotter(PlotUtil_):
 
             # legend for lower 'P' plot.
             h, l = self.merge_legend_patches(*ax_p.get_legend_handles_labels())
-            h.insert(1, pltPatch.Patch("white", "white"))
-            l.insert(1, "")
             ax_p.legend().remove()
-            ax_p.legend(h, l, loc="lower right", ncol=2)
+            ax_p.legend(
+                h,
+                l,
+                loc="lower right",
+                handlelength=1.3,
+                handletextpad=0.5,
+                bbox_to_anchor=(873, 1),
+                bbox_transform=ax_p.transData,
+                borderpad=0.2,
+                borderaxespad=0,
+            )
 
             ax_p.set_xlabel("Simulation time in seconds")
+            ax_p.xaxis.set_major_locator(MultipleLocator(100))
+            ax_p.xaxis.set_minor_locator(MultipleLocator(25))
+
             ax_p.set_ylabel("Ped. count")
-            ax_p.yaxis.set_major_locator(MultipleLocator(25))
+            ax_p.yaxis.set_major_locator(MultipleLocator(50))
+            ax_p.yaxis.set_minor_locator(MultipleLocator(10))
             ax_p.set_ylim(0, 175)
 
             # legend for upper 'T' plot.
@@ -1055,11 +1279,26 @@ class MemberEstPlotter(PlotUtil_):
             l_new = [_l.replace("Mean tx-rate: ", "") for _l in l_new]
 
             ax_t.get_legend().remove()
-            _legend = ax_t.legend(h_new, l_new, loc="lower right", ncol=2)
+            _legend = ax_t.legend(
+                h_new,
+                l_new,
+                loc="lower right",
+                handlelength=1.3,
+                handletextpad=0.5,
+                bbox_to_anchor=(873, 1),
+                bbox_transform=ax_t.transData,
+                borderpad=0.2,
+                borderaxespad=0,
+            )
             _legend.get_texts()[1].set_weight("bold")
             ax_t.set_xlabel("")
 
-            fig.tight_layout()
+            fig.tight_layout(w_pad=0.05, h_pad=0.05, rect=(0, 0, 1, 1), pad=1.02)
+            fig.subplots_adjust(left=0.158, bottom=0.1, right=0.99, top=0.99)
+            shutil.copy(
+                self.run_map.path(f"throughput_pedcount_ts_{bin}.pdf"),
+                self.run_map.path(f"throughput_pedcount_ts_{bin}_old.pdf"),
+            )
             fig.savefig(self.run_map.path(f"throughput_pedcount_ts_{bin}.pdf"))
 
     @with_axis
@@ -1137,42 +1376,7 @@ class MemberEstPlotter(PlotUtil_):
     @with_axis
     def plot_dmap_and_nt_ts(self, *, ax: plt.Axes):
 
-        dmap = []
-        nt = []
-
-        _hdf = BaseHdfProvider(self.run_map.path("map_nt.h5"))
-        if not (_hdf.contains_group("map") and _hdf.contains_group("nt")):
-            sg: SimulationGroup = self.run_map["nTable-500kbps"]
-            g = sg.group_name
-            for run_id, _, sim in sg.simulation_iter(enum=True):
-                print(f"{run_id}-{g}")
-                sim: Simulation
-
-                _nt = sim.sql.vec_data(
-                    sim.sql.m_table(), "tableSize:vector", drop="vectorId"
-                )
-                nt.append(_nt)
-            sg: SimulationGroup = self.run_map["map-500kbps"]
-            g = sg.group_name
-            for run_id, _, sim in sg.simulation_iter(enum=True):
-                print(f"{run_id}-{g}")
-                sim: Simulation
-                _dmap = (
-                    sim.get_dcdMap()
-                    .map_count_measure()
-                    .loc[:, ["map_mean_count"]]
-                    .reset_index()
-                    .set_axis(["time", "value"], axis=1)
-                )
-                dmap.append(_dmap)
-
-            dmap = pd.concat(dmap, axis=0, ignore_index=True, verify_integrity=False)
-            nt = pd.concat(nt, axis=0, ignore_index=True, verify_integrity=False)
-            _hdf.write_frame("map", dmap)
-            _hdf.write_frame("nt", nt)
-        else:
-            dmap = _hdf.get_dataframe("map")
-            nt = _hdf.get_dataframe("nt")
+        dmap, nt = self.get_dmap_and_nt_ts_data()
         # with right
         dmap = (
             self.append_bin(
@@ -1230,13 +1434,12 @@ class MemberEstPlotter(PlotUtil_):
 
 
 def main():
-    base_path = "/mnt/data1tb/results/arc-dsa_single_cell/"
-    study_out = os.path.join(base_path, "study_out")
+    study_out = SIM_RESULT_DIR
     os.makedirs(study_out, exist_ok=True)
 
     # r1 = RunMap.load_or_create(
     #     # create_f=create_target_rate_run_map,
-    #     # output_path="/mnt/data1tb/results/_dyn_tx/s1_corridor_rate_cmp",
+    #     # output_path=os.path.join(SIM_RESULT_DIR, "_dyn_tx/s1_corridor_rate_cmp"),
     #     create_f=create_target_rate_run_map_new,
     #     output_path=os.path.join(study_out, "s1"),
     #     load_if_present=True,
@@ -1253,8 +1456,6 @@ def main():
         load_if_present=True,
     )
     r2_plotter = MemberEstPlotter(r2)
-    # for sg in r2.values():
-    #     sg_tx_throughput_cache(sg, 25.0)
     r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
     r2_plotter.plot_msce()
     r2_plotter.plot_tx_interval(freq=25.0)

@@ -16,6 +16,7 @@ from crownetutils.analysis.dpmm.imputation import (
 )
 from crownetutils.analysis.hdf_providers.map_error_data import (
     CellCountError,
+    CellCountErrorBuilder,
     MapCountError,
 )
 from crownetutils.analysis.hdf_providers.node_position import NodePositionWithRsdHdf
@@ -44,7 +45,7 @@ from crownetutils.utils.styles import load_matplotlib_style, STYLE_SIMPLE_169
 load_matplotlib_style(STYLE_SIMPLE_169)
 
 
-def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
+def _corridor_filter_target_cells(df: pd.DataFrame, *arg, **args) -> pd.DataFrame:
     # remove cells under target area
     xy = df.index.to_frame()
     mask = np.repeat(False, xy.shape[0])
@@ -59,7 +60,9 @@ def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
         mask = mask | (xy["x"] == x) & (xy["y"] == y)
 
     ret = df[~mask].copy(deep=True)
-    print(f"remove {df.shape[0]-ret.shape[0]} rows")
+    logger.debug(
+        f"Remove source/target cells from analysis: {df.shape[0]-ret.shape[0]:,}/{df.shape[0]:,} rows"
+    )
     return ret
 
 
@@ -149,6 +152,7 @@ class SimulationRun(BaseSimulationRunner):
                 SqlAppProxy("d_beacon", d_sim.dpmm_cfg.m_beacon, d_sim),
             ],
             pos,
+            allow_empty_max_bandwidth=True,
         )
         return ret
 
@@ -212,6 +216,7 @@ class SimulationRun(BaseSimulationRunner):
             hdf_path=self.result_dir(f"density_cell_count_error.h5"),
             count_p=dmap.count_p,
             with_rsd=True,
+            builder=CellCountErrorBuilder(fc=_corridor_filter_target_cells),
         )
         return hdf
 
