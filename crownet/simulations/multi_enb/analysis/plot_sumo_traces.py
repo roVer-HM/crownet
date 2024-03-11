@@ -1,15 +1,14 @@
 from __future__ import annotations
 import glob
 import os
-from typing import Callable
+from argparse import ArgumentParser, Namespace
 from crownetutils.utils.json import NumpyEncoder
 from crownetutils.utils.plot import PlotUtil
-from crownetutils.utils.styles import STYLE_SIMPLE_169, STYLE_TEX, load_matplotlib_style
+from crownetutils.utils.styles import load_matplotlib_style
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 from crownetutils.sumo.bonnmotion_reader import frame_from_bm
-from matplotlib.ticker import FormatStrFormatter, MultipleLocator, ScalarFormatter
+from matplotlib.ticker import MultipleLocator, ScalarFormatter
 import numpy as np
 import pandas as pd
 import json
@@ -180,34 +179,30 @@ class Labeloffset:
         )
 
 
-def main():
-    # study_dir = "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/simulation_runs/"
-    # cache_dir_base =
-    #     "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/sumo_plots/"
-    # )
-    study_dir = "/home/sts/s2_ttl_and_stream_4/analysis_dir/sumo_plots/"
-    cache_dir_base = "/home/sts/s2_ttl_and_stream_4/analysis_dir/sumo_plots"
+def main(ns: Namespace):
+    study_dir = ns.input[0]
+    analysis_dir = ns.output
 
     node_count = get_number_of_nodes(
-        study_dir, os.path.join(cache_dir_base, "num_nodes.csv")
+        study_dir, os.path.join(analysis_dir, "num_nodes.csv")
     )
     hist_data_speed = get_speed_hist_data(
-        study_dir, os.path.join(cache_dir_base, "speed_hist.json")
+        study_dir, os.path.join(analysis_dir, "speed_hist.json")
     )
     hist_data_trace = get_trace_length_hist_data(
-        study_dir, os.path.join(cache_dir_base, "trace_length_hist.json")
+        study_dir, os.path.join(analysis_dir, "trace_length_hist.json")
     )
 
     col_pt = 242.67355 * 1.3
     col_cm = col_pt / 2.835 / 10
     col_inch = col_cm / 2.54
-    fig8 = plt.figure(constrained_layout=False, figsize=(col_inch, 9 / 2.54))
-    gs1 = fig8.add_gridspec(
+    fig = plt.figure(constrained_layout=False, figsize=(col_inch, 9 / 2.54))
+    gs1 = fig.add_gridspec(
         nrows=4, ncols=4, top=1.0, right=1.0, bottom=0.31, wspace=0.3, hspace=2.1
     )
-    ax_count_ts = fig8.add_subplot(gs1[:2, :])
-    ax_speed_hist = fig8.add_subplot(gs1[2:, 0:2])
-    ax_dist_hist = fig8.add_subplot(gs1[2:, 2:])
+    ax_count_ts = fig.add_subplot(gs1[:2, :])
+    ax_speed_hist = fig.add_subplot(gs1[2:, 0:2])
+    ax_dist_hist = fig.add_subplot(gs1[2:, 2:])
 
     colors = plt.get_cmap("tab10")(range(10))
 
@@ -326,7 +321,7 @@ def main():
     _h, _l = ax_count_ts.get_legend_handles_labels()
     h.append(_h[-1])
     l.append(_l[-1])
-    fig8.legend(
+    fig.legend(
         h,
         l,
         ncol=4,
@@ -338,16 +333,14 @@ def main():
         labelspacing=0.3,
         handletextpad=0.2,
     )
-    fig8.savefig(os.path.join(study_dir, "paper_plot.pdf"))
-
-    # ax.set_xlim(0, 4.0)
-    # PlotUtil.auto_major_minor_locator(ax)
-    # ax.set_ylabel("density")
-    # ax.set_xlabel("Pedestrian speed in m/s")
-    # ax.legend(loc="upper right", ncol=2)
-    # fig.tight_layout()
-    print("hi")
+    fig.savefig(os.path.join(analysis_dir, "sumo_trace_plot.pdf"))
 
 
 if __name__ == "__main__":
-    main()
+    p = ArgumentParser(prog="Create Sumo Trace Plots")
+    p.add_argument(
+        "-o", "--output-dir", dest="output", help="Directory to place generated files"
+    )
+    p.add_argument("input", nargs=1, help="Directory containing simulation runs")
+    ns = p.parse_args()
+    main(ns)

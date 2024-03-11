@@ -33,7 +33,12 @@ from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
 from crownetutils.utils.dataframe import numeric_formatter, save_as_tex_table
 from crownetutils.utils.parallel import run_kwargs_map
 from crownetutils.analysis.omnetpp import OppAnalysis
-from crownetutils.utils.plot import PlotUtil_, percentile, with_axis
+from crownetutils.utils.plot import (
+    PlotUtil_,
+    mpl_table_cell_iter,
+    percentile,
+    with_axis,
+)
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -118,7 +123,7 @@ class RandomMap(PlotUtil_):
             xmin=-0.5,
             xmax=19.5,
             linestyles="dashed",
-            label="Q3/4",
+            label="Q1/3",
         )
         ax.hlines(
             y=np.percentile(draw["msme"], 75),
@@ -126,7 +131,7 @@ class RandomMap(PlotUtil_):
             xmin=-0.5,
             xmax=19.5,
             linestyles="dashed",
-            label="Q3.4",
+            label="Q1/3",
         )
         ax.hlines(
             y=draw["msme"].mean(),
@@ -1180,9 +1185,9 @@ class MemberEstPlotter(PlotUtil_):
                 "Random",
             ]
 
-        figsize = self.fig_size_cm(width=11.1, height=12.5)
+        figsize = self.fig_size_cm(width=11.1, height=11.5)
         fig, _ax = plt.subplot_mosaic(
-            "zzaaaaaaaa;zzaaaaaaaa;zzaaaaaaaa;zzaaaaaaaa;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb",
+            "zzaaaaaaaa;zzaaaaaaaa;zzaaaaaaaa;zzaaaaaaaa;bbbbbbbbbb;bbbbbbbbbb;bbbbbbbbbb",
             figsize=figsize,
         )
         _null = _ax["z"]
@@ -1209,11 +1214,24 @@ class MemberEstPlotter(PlotUtil_):
         _, _, t = self.df_to_table(
             df.reset_index(),
             ax=tbl,
-            col_width=[5.1, 6, 8, 6],
-            cell_height=0.1,
-            col_header_height=0.15,
+            col_width=[5.6, 6, 11.8, 6],
+            use_col_labels=False,
+            cell_height=0.08,
+            col_header_height=0.08,
+            cell_align=["right", "center", "center", "center"],
         )
         t.set_fontsize("small")
+        _rows, _ = mpl_table_cell_iter._tbl_dim(t)
+        for _key, cell in mpl_table_cell_iter.by_col(t):
+            row = mpl_table_cell_iter.row(_key)
+            if row == 0:
+                brtl = "T"
+            elif row == _rows - 1:
+                brtl = "B"
+            else:
+                brtl = "open"
+            cell.visible_edges = brtl
+
         fig.tight_layout()
         fig.subplots_adjust(left=0.01, bottom=0.005, right=0.99, top=0.995, hspace=2.5)
         try:
@@ -1433,6 +1451,44 @@ class MemberEstPlotter(PlotUtil_):
             ax_p.yaxis.set_minor_locator(MultipleLocator(10))
             ax_p.set_ylim(0, 175)
 
+            ss_start = 380
+            ss_end = 780
+            ax_t.vlines(
+                [ss_start, ss_end],
+                0,
+                160,
+                colors="gray",
+                linestyles="dashdot",
+                zorder=0,
+            )
+            ax_p.vlines(
+                [ss_start, ss_end],
+                0,
+                180,
+                colors="gray",
+                linestyles="dashdot",
+                zorder=0,
+            )
+            ax_t.annotate(
+                "",
+                xy=(ss_start, 110),
+                xycoords="data",
+                xytext=(ss_end, 110),
+                textcoords="data",
+                arrowprops=dict(arrowstyle="<->", color="gray"),
+            )
+            ax_t.annotate(
+                "Pedestrian flow\nsteady state",
+                xy=(ss_start, 110),
+                xycoords="data",
+                xytext=((ss_start + (780 - ss_start) / 2), 111),
+                textcoords="data",
+                ha="center",
+                va="bottom",
+                color="gray",
+                fontsize="small",
+            )
+
             # legend for upper 'T' plot.
             h, l = ax_t.get_legend_handles_labels()
             l = [l_.replace("Constant rate", "Constant rate*") for l_ in l]
@@ -1632,11 +1688,11 @@ def main():
     )
     r2_plotter = MemberEstPlotter(r2)
     # r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
-    # r2_plotter.plot_msce()
+    r2_plotter.plot_msce()
     # r2_plotter.plot_tx_interval(freq=25.0)
 
-    rnd = RandomMap(r2)
-    rnd.plot_random_msme()
+    # rnd = RandomMap(r2)
+    # rnd.plot_random_msme()
     print("done")
 
 
