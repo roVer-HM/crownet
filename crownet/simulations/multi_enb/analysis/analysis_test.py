@@ -1,6 +1,7 @@
 import io
 import os
 from crownetutils.analysis.common import Simulation
+from crownetutils.analysis.dpmm import MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.hdf.dpmm_provider import DpmmProvider
 from crownetutils.analysis.dpmm.imputation import (
@@ -19,21 +20,17 @@ from crownetutils.analysis.omnetpp import (
     OppAnalysis,
     HdfExtractor,
 )
-from crownetutils.analysis.plot.app_misc import PlotAppMisc, PlotAppTxInterval
+from crownetutils.analysis.plot.app_misc import PlotAppTxInterval
 from crownetutils.analysis.plot.dpmMap import PlotDpmMap
 from crownetutils.analysis.plot.enb import PlotEnb
-from crownetutils.utils.dataframe import merge_on_interval
-from crownetutils.utils.logging import TimeIt
 from crownetutils.utils.misc import Timer
 from crownetutils.utils.plot import FigureSaverSimple, enb_patch
-from matplotlib.ticker import FuncFormatter, MultipleLocator
+from matplotlib.ticker import MultipleLocator
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors
-from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 
 from PIL import Image
 

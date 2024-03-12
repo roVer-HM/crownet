@@ -4,9 +4,10 @@ import glob
 import re
 import shutil
 import io
+from crownetutils.analysis.dpmm import MapType
 import scipy.stats as stats
 from typing import List, Tuple
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.analysis.hdf_providers.map_error_data import MapCountError
 from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
 from matplotlib.ticker import (

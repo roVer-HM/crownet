@@ -1,3 +1,4 @@
+from crownetutils.analysis.dpmm import MapType
 import matplotlib as mpl
 import pandas as pd
 import numpy as np
@@ -9,7 +10,7 @@ import contextily as ctx
 from crownetutils.utils.misc import Project
 import contextily as ctx
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.omnetpp.scave import CrownetSql
 
 

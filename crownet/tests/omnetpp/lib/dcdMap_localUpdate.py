@@ -1,3 +1,4 @@
+from crownetutils.analysis.dpmm import MapType
 import pandas as pd
 from pandas import IndexSlice as I
 import os
@@ -5,7 +6,7 @@ import sys
 
 import crownetutils.analysis.dpmm.builder as Builders
 from crownetutils.analysis.dpmm.hdf.dpmm_provider import DpmmProvider
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfgCsv, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfgCsv
 
 
 def dcd_map_localUpdate(hostId, data_root):

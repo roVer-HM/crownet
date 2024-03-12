@@ -1,15 +1,12 @@
 import os
+from crownetutils.analysis.dpmm import MapType
 from crownetutils.omnetpp.sql import SqlOp
 
 import matplotlib
 from matplotlib.lines import Line2D
 
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
-from crownetutils.analysis.dpmm.plot.interactive import (
-    InteractiveAreaPlot,
-    InteractiveValueOverDistance,
-)
 from crownetutils.utils.path import get_or_create
 
 matplotlib.use("TkAgg")

@@ -1,5 +1,6 @@
 from crownetutils.analysis.common import Simulation
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm import MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.omnetpp.scave import CrownetSql
 
 import matplotlib.pyplot as plt

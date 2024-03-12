@@ -1,10 +1,11 @@
 import importlib
+from crownetutils.analysis.dpmm import MapType
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime, timedelta
 
 import pandas as pd
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfgDb, MapType, DpmmCfgBuilder
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfgDb, DpmmCfgBuilder
 
 
 def main():

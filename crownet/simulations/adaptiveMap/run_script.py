@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import sys, os
+from crownetutils.analysis.dpmm import MapType
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.dpmm_cfg import (
     DpmmCfg,
     DpmmCfgBuilder,
     DpmmCfgDb,
-    MapType,
 )
 from crownetutils.analysis.dpmm.dpmm_sql import DpmmSql
 from crownetutils.analysis.dpmm.imputation import (

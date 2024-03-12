@@ -1,4 +1,5 @@
 # %%
+from crownetutils.analysis.dpmm import MapType
 import folium
 from folium.plugins import HeatMapWithTime
 from crownetutils.analysis.omnetpp import PlotUtil
@@ -13,7 +14,7 @@ from crownetutils.utils.misc import Project
 from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.analysis.plot.app_misc import PlotAppMisc
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, MapType
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.omnetpp.scave import CrownetSql
 from crownetutils.utils.logging import logger, timing, logging
 
