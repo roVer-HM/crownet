@@ -7,7 +7,7 @@ path.simplify: True
 
 font.size       : 14
 font.family    : serif
-axes.titlesize  : x-large
+axes.titlesize  :  medium
 axes.titleweight    : bold
 axes.labelsize      : medium
 xtick.labelsize     : small
