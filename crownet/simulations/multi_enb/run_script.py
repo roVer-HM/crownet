@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os
 import io
-from crownetutils.analysis.dpmm.dpmm import DpmMap
+from crownetutils.analysis.dpmm import MapType
 from crownetutils.analysis.hdf.provider import BaseHdfProvider, HdfSelector
 from crownetutils.analysis.hdf_providers.map_age_over_distance import (
     MapMeasurementsAgeOverDistance,
@@ -14,7 +14,6 @@ from crownetutils.analysis.hdf_providers.node_position import (
 from crownetutils.analysis.hdf_providers.map_error_data import (
     MapCountError,
     CellCountError,
-    CellEntropyValueError,
 )
 from crownetutils.analysis.hdf_providers.node_rx_data import NodeRxData
 from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
@@ -40,7 +39,6 @@ from crownetutils.analysis.dpmm.dpmm_cfg import (
     DpmmCfg,
     DpmmCfgBuilder,
     DpmmCfgDb,
-    MapType,
 )
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.imputation import (
@@ -367,6 +365,27 @@ class SimulationRun(BaseSimulationRunner):
             override_existing=True,
         )
         return obj
+
+    @process_as({"prio": 969, "type": "post"})
+    def create_enb_cache(self) -> MapMeasurementsAgeOverDistance:
+        cfg: DpmmCfgDb = get_density_cfg(self.result_base_dir())
+        sql = Simulation.from_dpmm_cfg(cfg).sql
+        hdf = BaseHdfProvider(hdf_path=cfg.enb_rb.path, group=cfg.enb_rb.group)
+        OppAnalysis.cache_avgServedBlocksUl(
+            sql=sql, hdf=hdf, enb_index_list=list(range(15))
+        )
+
+    @process_as({"prio": 968, "type": "post"})
+    def create_map_size_cache(self) -> MapMeasurementsAgeOverDistance:
+        cfg: DpmmCfgDb = get_density_cfg(self.result_base_dir())
+        map_sql = DpmmSql(cfg)
+        df = map_sql.get_cell_count_by_host_id_over_time()
+        df.to_csv(cfg.map_size.path, index=False)
+
+        cfg: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
+        map_sql = DpmmSql(cfg)
+        df = map_sql.get_cell_count_by_host_id_over_time()
+        df.to_csv(cfg.map_size.path, index=False)
 
     # do not execute for now... use time delta for entropy data!
     # @process_as({"prio": 983, "type": "post"})

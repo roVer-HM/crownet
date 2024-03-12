@@ -1,30 +1,39 @@
+from dataclasses import dataclass
 from itertools import product
-import json
 from functools import partial
 import os
-import sys
+import shutil
 from typing import Any, List
-from crownetutils.analysis.plot.rsd_grid_plots import RsdGridPlotter
+from crownetutils.analysis.plot.rsd_grid_plots import (
+    RsdGridPlotter,
+    RunMapRsdGridPlotStyler,
+)
+from crownetutils.utils.styles import load_matplotlib_style
+from matplotlib import pyplot as plt
 import numpy as np
 from crownetutils.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
-from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfgBuilder
 
-from crownetutils.analysis.hdf_providers.node_rx_data import NodeRxData
-from crownetutils.analysis.hdf_providers.sql_app_proxy import SqlAppProxy
-from crownetutils.utils.plot import combine_images
-from crownetutils.utils.logging import logger, timing, set_level
-import logging
-import timeit as it
+from crownetutils.utils.plot import GridPlot, GridPlotIter, PlotUtil, combine_images
+from crownetutils.utils.logging import logger, timing
 
-
-from crownetutils.analysis.hdf_providers.node_position import (
-    NodePositionWithRsdHdf,
+from matplotlib.ticker import (
+    FixedFormatter,
+    FixedLocator,
+    MultipleLocator,
+    ScalarFormatter,
 )
+
+load_matplotlib_style(os.path.join(os.path.dirname(__file__), "paper_tex.mplstyle"))
 
 
 class FilteredSeedGroupFactory:
-    def __init__(self, seeds: List[int]) -> None:
+
+    """Only select specific seeds from the provided SqucStudy """
+
+    def __init__(self, seeds: List[int], sim_per_group=20, offset=0) -> None:
         self.seed = seeds
+        self.sim_per_group = sim_per_group
+        self.offset = offset
 
     def __call__(
         self, sim: Simulation, data: List[Simulation], **kwds: Any
@@ -41,23 +50,37 @@ class FilteredSeedGroupFactory:
         )
         return sg
 
-    def get_sim_group(self, output_dir, data_root) -> RunMap:
 
-        r = RunMap(output_dir)
-        study = SuqcStudy(base_path=data_root)
+@dataclass
+class SeedLocation:
+
+    seed_list: List[int]  # list of seeds to use for that study
+    study_dir: str  # path to suqc directory
+    offset: int = 0  # offset applied if multiple studies are combined
+    group_size: int = 20  # number of seeds
+
+
+def build_run_map(output_path, seed_location_list: List[SeedLocation]):
+
+    r = RunMap(output_path)
+    for seed_location in seed_location_list:
+        f = FilteredSeedGroupFactory(seed_location.seed_list)
+        study = SuqcStudy(base_path=seed_location.study_dir)
         study.update_run_map(
-            run_map=r, sim_per_group=20, id_offset=0, sim_group_factory=self
+            run_map=r,
+            sim_per_group=seed_location.group_size,
+            id_offset=seed_location.offset,
+            sim_group_factory=f,
         )
 
-        return r
+    return r
 
 
 @timing
 def plot_rsd_overview_grids(data_root, analysis_out, seed_list, all=True):
-
-    factory = FilteredSeedGroupFactory(seed_list)
+    seed_location_list = ([SeedLocation(seed_list, data_root)],)
     run_map = RunMap.load_or_create(
-        create_f=partial(factory.get_sim_group, data_root=data_root),
+        create_f=partial(build_run_map, seed_location_list=seed_location_list),
         output_path=analysis_out,
     )
 
@@ -86,7 +109,6 @@ def plot_rsd_overview_grids(data_root, analysis_out, seed_list, all=True):
     ]
 
     seed = 0
-    plotter.plot_map_size_over_time_total(run_map)
     for p in parameters:
         logger.info(f"process {p}")
         # plotter.plot_rsd_size_grid(run_map, parameter=p, seed=seed)
@@ -136,16 +158,105 @@ def combine_figures(analysis_dir):
         )
 
 
-if __name__ == "__main__":
-    set_level(logging.DEBUG)
-    logger.info("info")
-    logger.info("debug")
-    plot_rsd_overview_grids(
-        data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
-        analysis_out="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/seed5only_one_row_only",
-        seed_list=[5],
-        all=False,
+def figure_builder(colors):
+    # fig_size = (single_fig_width * cols, 9 / 16 * single_fig_width * rows)
+    fig_size = PlotUtil.fig_size_mm(width=178, height=65)
+    # get list of colors based on list of rsd's
+    grid_figure = GridPlot(
+        rows=3, columns=5, colors=colors, figsize=fig_size, sharex=True, sharey=True
     )
+    grid_figure_iter: GridPlotIter = grid_figure.iter_lowerLeftOrig()
+    return grid_figure_iter
+
+
+def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
+
+    for fig, ax, color in ax_iter:
+        ax: plt.Axes
+        ax.get_legend().remove()
+        # ax.axis("equal")
+        ax.set_title(None)
+        ax.set_ylim((0, 200))
+        ax.yaxis.set_major_locator(MultipleLocator(100))
+        ax.yaxis.set_minor_locator(MultipleLocator(20))
+
+        ax.xaxis.set_major_locator(MultipleLocator(400))
+        ax.xaxis.set_minor_locator(MultipleLocator(50))
+        ax.set_xlim(0, 1000)
+
+    for ax in ax_iter.lower_axes():
+        PlotUtil.move_last_x_ticklabel_left(ax, "1000")
+        ax.set_xlabel("")
+
+    ax.text(
+        x=0.5,
+        y=0.01,
+        s="Simulaton time in seconds",
+        transform=fig.transFigure,
+        fontdict=dict(size="medium"),
+        ha="center",
+    )
+
+    for idx, ax in enumerate(ax_iter.left_axes()):
+        PlotUtil.move_last_y_ticklabel_down(ax, "200")
+        t = "Number of nodes" if idx == 1 else ""
+        ax.set_ylabel(t)
+
+    fig.subplots_adjust(
+        left=0.09, bottom=0.155, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+    )
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    try:
+        shutil.copyfile(path, f"{path}.old")
+    except:
+        pass
+    fig.savefig(path)
+
+
+def test():
+
+    seed_location_list = [
+        SeedLocation(
+            [1], "/mnt/data1tb/results/arc-dsa_multi_cell/s2_ttl_and_stream_4/"
+        ),
+        SeedLocation([5], "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/"),
+    ]
+    output_path = (
+        "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/paper_plots"
+    )
+    run_map = RunMap.load_or_create(
+        create_f=partial(build_run_map, seed_location_list=seed_location_list),
+        output_path=output_path,
+    )
+    plotter = RsdGridPlotter.from_sim(sim=run_map[0][0])  # all
+    color_list = [plotter.color_map[c] for c in plotter.get_rsd_list()]
+    plotter.create_figure = partial(figure_builder, colors=color_list)
+    sim_group: SimulationGroup = run_map[0]
+
+    ax_iter: GridPlotIter
+    fig: plt.Figure
+
+    fig, ax_iter = plotter.plot_map_size_over_time(
+        **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
+    )
+    # fig, ax_iter = plotter.plot_rsd_size_grid(
+    #     **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
+    # )
+    path = "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/paper_plots/test.pdf"
+    plot_rsd_size_grid_for_paper(fig, ax_iter, path)
+
+
+if __name__ == "__main__":
+    test()
+    # set_level(logging.DEBUG)
+    # logger.info("info")
+    # logger.info("debug")
+    # plot_rsd_overview_grids(
+    #     data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
+    #     analysis_out="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/seed5only_one_row_only",
+    #     seed_list=[5],
+    #     all=False,
+    # )
     # plot_rsd_overview_grids(
     #     data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
     #     analysis_out="/mnt/data1tb/results/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/seed0only",

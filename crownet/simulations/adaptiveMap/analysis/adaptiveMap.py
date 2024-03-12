@@ -20,6 +20,9 @@ import crownetutils as r
 
 load_matplotlib_style(STYLE_SIMPLE_169)
 
+S0_SIM_DATA_DIR = "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/"
+S0_SIM_DATA_DIR = "/mnt/ssd_local/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit"
+
 
 def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
     # remove cells under target area
@@ -70,9 +73,7 @@ def build_run_0(output_dir) -> RunMap:
         kwds["attr"] = attr
         return SimulationGroup(group_name, **kwds)
 
-    study = SuqcStudy(
-        "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/"
-    )
+    study = SuqcStudy(S0_SIM_DATA_DIR)
     run_map = study.update_run_map(
         run_map=RunMap(output_dir),
         # sim_per_group=1,
@@ -132,9 +133,7 @@ def plot_per_sim_data(sim: Simulation):
 
 
 def main():
-    base_path = (
-        "/mnt/data1tb/results/arc-dsa_single_cell/s0_corridor_500kbps_map_table_count_est_and_no_rate_limit/",
-    )
+    base_path = S0_SIM_DATA_DIR
     study_out = os.path.join(base_path, "study_out")
     os.mkdir(study_out)
 
