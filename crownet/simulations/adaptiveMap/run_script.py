@@ -220,6 +220,40 @@ class SimulationRun(BaseSimulationRunner):
         )
         return hdf
 
+    @process_as({"prio": 600, "type": "post"})
+    def remove_unused_vectors(self):
+        cfg: DpmmCfg = get_density_cfg(self.result_base_dir())
+        sql = Simulation.from_dpmm_cfg(cfg).sql
+        sql_id_query = """
+                    SELECT 
+                        v.vectorId  
+                    from 
+                        vector as v 
+                    where 
+                        (
+                        v.vectorName == "avgServedBlocksDl:vector"
+                        or
+                        v.moduleName like "World.%.udp"
+                        )
+                        and 
+                        v.vectorCount > 10
+        """
+        vec_ids = sql.query_vec(sql_id_query)
+        if not vec_ids.empty:
+            sql_del = """
+                DELETE from {tbl} as vd 
+                where 
+                    vd.vectorId in 
+                        (
+                            {id_query}
+                        )
+            """
+            # remove from data table first
+            sql.write_vec(sql_del.format(tbl="vectorData", id_query=sql_id_query))
+            # remove from data `vector` table
+            sql.write_vec(sql_del.format(tbl="vector", id_query=sql_id_query))
+            sql.vacuum_vec()  # release freed space
+
     @process_as({"prio": 585, "type": "post"})
     def plot_serving_enb_stats(self):
         cfg = get_density_cfg(self.result_base_dir())
