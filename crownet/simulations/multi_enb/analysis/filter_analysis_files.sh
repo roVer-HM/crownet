@@ -10,13 +10,13 @@ entropy_map_size.csv|\
 entropy_map_measurements_age_over_distance.h5|\
 entropy_map_size_and_age_over_distance.h5"
 
-find $1 -path "*Sample*9*" -type f -exec ls -l {} \; | # create file list
+find $1 -path "*Sample*$2*" -type f -exec ls -l {} \; | # create file list
 	tr -s ' ' | # collapse multiple strings
 	awk -F ' '  '{print $9 " "  $5;}' | # select name and size columns 
-	grep -E "${GREP_STR}"  > "analysis_file_list.txt"  # select copied files and save to file 
+	grep -E "${GREP_STR}"  > "analysis_file_list_seed_$2.txt"  # select copied files and save to file 
 
-cat "analysis_file_list.txt" | awk '{sum+=$2}END{print NR" files with total size of " sum/1000000000" GB";}'
+cat "analysis_file_list_seed_$2.txt" | awk '{sum+=$2}END{print NR" files with total size of " sum/1000000000" GB";}'
 
-cat "analysis_file_list.txt" | awk '{print $1}' > "tmp_analysis_file_list.txt"
+cat "analysis_file_list_seed_$2.txt" | awk '{print $1}' > "tmp_analysis_file_list_seed_$2.txt"
 
-mv  "tmp_analysis_file_list.txt" "analysis_file_list.txt"
+mv  "tmp_analysis_file_list_seed_$2.txt" "analysis_file_list_seed_$2.txt"
