@@ -10,10 +10,20 @@ from crownetutils.analysis.plot.rsd_grid_plots import (
 )
 from crownetutils.utils.styles import load_matplotlib_style
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.offsetbox import AnnotationBbox, TextArea
+from matplotlib.patches import BoxStyle
 import numpy as np
 from crownetutils.analysis.common import RunMap, Simulation, SimulationGroup, SuqcStudy
 
-from crownetutils.utils.plot import GridPlot, GridPlotIter, PlotUtil, combine_images
+from crownetutils.utils.plot import (
+    GridPlot,
+    GridPlotIter,
+    MulticolorPatch,
+    MulticolorPatchHandler,
+    PlotUtil,
+    combine_images,
+)
 from crownetutils.utils.logging import logger, timing
 
 from matplotlib.ticker import (
@@ -160,7 +170,7 @@ def combine_figures(analysis_dir):
 
 def figure_builder(colors):
     # fig_size = (single_fig_width * cols, 9 / 16 * single_fig_width * rows)
-    fig_size = PlotUtil.fig_size_mm(width=178, height=65)
+    fig_size = PlotUtil.fig_size_mm(width=178, height=70)
     # get list of colors based on list of rsd's
     grid_figure = GridPlot(
         rows=3, columns=5, colors=colors, figsize=fig_size, sharex=True, sharey=True
@@ -169,17 +179,33 @@ def figure_builder(colors):
     return grid_figure_iter
 
 
-def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
+def rsd_name(txt, color, xy, xybox, bbox_align, coord_transform):
+    text = TextArea(
+        txt,
+        textprops=dict(
+            size="x-small",
+            horizontalalignment="center",
+            verticalalignment="baseline",
+            color=color,
+        ),
+    )
+    abox = AnnotationBbox(
+        offsetbox=text,
+        xy=xy,
+        xybox=xybox,
+        boxcoords=coord_transform,
+        box_alignment=bbox_align,
+        frameon=False,
+        bboxprops=dict(boxstyle=BoxStyle("Round", pad=0.06)),
+        zorder=10,
+    )
+    return abox
 
-    for fig, ax, color in ax_iter:
+
+def set_time_axis(fig: plt.Figure, ax_iter: GridPlotIter):
+
+    for i, (fig, ax, color) in enumerate(ax_iter):
         ax: plt.Axes
-        ax.get_legend().remove()
-        # ax.axis("equal")
-        ax.set_title(None)
-        ax.set_ylim((0, 200))
-        ax.yaxis.set_major_locator(MultipleLocator(100))
-        ax.yaxis.set_minor_locator(MultipleLocator(20))
-
         ax.xaxis.set_major_locator(MultipleLocator(400))
         ax.xaxis.set_minor_locator(MultipleLocator(50))
         ax.set_xlim(0, 1000)
@@ -188,7 +214,8 @@ def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
         PlotUtil.move_last_x_ticklabel_left(ax, "1000")
         ax.set_xlabel("")
 
-    ax.text(
+    # use any ax coordinates are base on figure
+    ax_iter[0].text(
         x=0.5,
         y=0.01,
         s="Simulaton time in seconds",
@@ -197,14 +224,10 @@ def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
         ha="center",
     )
 
-    for idx, ax in enumerate(ax_iter.left_axes()):
-        PlotUtil.move_last_y_ticklabel_down(ax, "200")
-        t = "Number of nodes" if idx == 1 else ""
-        ax.set_ylabel(t)
 
-    fig.subplots_adjust(
-        left=0.09, bottom=0.155, right=0.995, top=0.99, wspace=0.08, hspace=0.15
-    )
+def save_old(fig, path):
+    """Save figure but keep old version"""
+
     os.makedirs(os.path.dirname(path), exist_ok=True)
     try:
         shutil.copyfile(path, f"{path}.old")
@@ -213,7 +236,157 @@ def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
     fig.savefig(path)
 
 
-def test():
+def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
+
+    set_time_axis(fig, ax_iter)
+
+    colors = []
+    for i, (fig, ax, color) in enumerate(ax_iter):
+        colors.append(color)
+        ax: plt.Axes
+        ax.get_legend().remove()
+        ax.set_title(None)
+        ax.set_ylim((0, 200))
+        ax.yaxis.set_major_locator(MultipleLocator(100))
+        ax.yaxis.set_minor_locator(MultipleLocator(20))
+
+        ax.vlines(120, 0, 160, color="darkred", linestyles="dashed")
+
+        a = rsd_name(
+            f"$e\mathit{{NB}}_{{{i+1}}}$",
+            color=color,
+            xy=(0.03, 0.96),
+            xybox=(0.03, 0.96),
+            bbox_align=(0, 1),
+            coord_transform=ax.transAxes,
+        )
+        ax.add_artist(a)
+
+    for idx, ax in enumerate(ax_iter.left_axes()):
+        PlotUtil.move_last_y_ticklabel_down(ax, "200")
+        t = "Number of nodes" if idx == 1 else ""
+        ax.set_ylabel(t)
+
+    fig.subplots_adjust(
+        left=0.09, bottom=0.185, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+    )
+    fig.legend(
+        [MulticolorPatch(colors)],
+        ["Mean node count\nwith Q1/3"],
+        handler_map={MulticolorPatch: MulticolorPatchHandler()},
+        loc="lower right",
+        bbox_to_anchor=(1.015, -0.0515),
+        frameon=False,
+        fontsize="x-small",
+        handlelength=3.0,
+        labelspacing=0.1,
+    )
+    l2 = plt.legend(
+        [
+            Line2D([0], [0], color="darkred", linestyle="dashed"),
+            Line2D([0], [0], color="black"),
+        ],
+        ["Stop spawn after 120 seconds", "Total node count"],
+        loc="lower left",
+        bbox_to_anchor=(0.0, -0.05),
+        bbox_transform=fig.transFigure,
+        frameon=False,
+        fontsize="x-small",
+        labelspacing=0.1,
+    )
+    # l2.set_transform(fig.transFigure)
+    fig.add_artist(l2)
+    save_old(fig, path)
+
+
+class EnbTxtPos:
+    @classmethod
+    def top_left(cls):
+        return cls((0.03, 0.96), (0, 1))
+
+    @classmethod
+    def bottom_right(cls):
+        return cls((0.985, 0.03), (1, 0))
+
+    @classmethod
+    def right(cls, y):
+        return cls((0.985, y), (1, 0))
+
+    def __init__(self, xy, box_algin) -> None:
+        self.xy = xy
+        self.box_algin = box_algin
+
+
+def plot_throughput_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
+
+    set_time_axis(fig, ax_iter)
+
+    _r = EnbTxtPos.right(0.6)
+    colors = []
+    enb_txt_loc: List[EnbTxtPos] = [
+        _r,
+        _r,
+        EnbTxtPos.bottom_right(),
+        _r,
+        _r,
+        EnbTxtPos.bottom_right(),
+        EnbTxtPos.bottom_right(),
+        EnbTxtPos.bottom_right(),
+        EnbTxtPos.bottom_right(),
+        EnbTxtPos.bottom_right(),
+        _r,
+        EnbTxtPos.bottom_right(),
+        _r,
+        _r,
+        _r,
+    ]
+    for i, (fig, ax, color) in enumerate(ax_iter):
+        colors.append(color)
+        ax: plt.Axes
+        if ax.get_legend() is not None:
+            ax.get_legend().remove()
+        ax.set_title(None)
+        ax.set_ylim((0, 150))
+        ax.yaxis.set_major_locator(MultipleLocator(50))
+        ax.yaxis.set_minor_locator(MultipleLocator(10))
+
+        a = rsd_name(
+            f"$e\mathit{{NB}}{{{i+1}}}$",
+            color="black",
+            xy=enb_txt_loc[i].xy,
+            xybox=enb_txt_loc[i].xy,
+            bbox_align=enb_txt_loc[i].box_algin,
+            coord_transform=ax.transAxes,
+        )
+        ax.add_artist(a)
+
+    for idx, ax in enumerate(ax_iter.left_axes()):
+        PlotUtil.move_last_y_ticklabel_down(ax, "150")
+        t = "Throughput in kB/s" if idx == 1 else ""
+        ax.set_ylabel(t)
+
+    l2 = plt.legend(
+        [Line2D([0], [0], color="darkred", linestyle="dashed")],
+        [
+            "Configured shared\nbandwidth of 125 kB/s",
+        ],
+        loc="lower left",
+        bbox_to_anchor=(0.0, -0.05),
+        bbox_transform=fig.transFigure,
+        frameon=False,
+        fontsize="x-small",
+        labelspacing=0.1,
+    )
+    # l2.set_transform(fig.transFigure)
+    fig.add_artist(l2)
+
+    fig.subplots_adjust(
+        left=0.09, bottom=0.185, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+    )
+    save_old(fig, path)
+
+
+def plot_single_seed_data_for_paper():
 
     seed_location_list = [
         SeedLocation(
@@ -236,29 +409,18 @@ def test():
     ax_iter: GridPlotIter
     fig: plt.Figure
 
-    fig, ax_iter = plotter.plot_map_size_over_time(
+    fig, ax_iter = plotter.plot_throughput_grid(
         **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
     )
-    # fig, ax_iter = plotter.plot_rsd_size_grid(
-    #     **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
-    # )
-    path = "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/paper_plots/test.pdf"
-    plot_rsd_size_grid_for_paper(fig, ax_iter, path)
+    plot_throughput_grid_for_paper(
+        fig, ax_iter, run_map.path("throughput_over_time.pdf")
+    )
+
+    fig, ax_iter = plotter.plot_rsd_size_grid(
+        **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
+    )
+    plot_rsd_size_grid_for_paper(fig, ax_iter, run_map.path("map_size_over_time.pdf"))
 
 
 if __name__ == "__main__":
-    test()
-    # set_level(logging.DEBUG)
-    # logger.info("info")
-    # logger.info("debug")
-    # plot_rsd_overview_grids(
-    #     data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
-    #     analysis_out="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/seed5only_one_row_only",
-    #     seed_list=[5],
-    #     all=False,
-    # )
-    # plot_rsd_overview_grids(
-    #     data_root="/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/",
-    #     analysis_out="/mnt/data1tb/results/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/seed0only",
-    #     seed_list=[1]
-    # )
+    plot_single_seed_data_for_paper()

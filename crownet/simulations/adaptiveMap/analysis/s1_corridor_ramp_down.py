@@ -4,9 +4,11 @@ import glob
 import re
 import shutil
 import io
+import sys
 from crownetutils.analysis.dpmm import MapType
+from crownetutils.utils.logging import timing
 import scipy.stats as stats
-from typing import List, Tuple
+from typing import Any, List, Tuple
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.analysis.hdf_providers.map_error_data import MapCountError
 from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
@@ -17,6 +19,8 @@ from matplotlib.ticker import (
     LogFormatter,
 )
 from crownetutils.analysis.common import (
+    CacheLoader,
+    IndexedSimulation,
     RunContext,
     RunMap,
     Simulation,
@@ -32,7 +36,7 @@ from crownetutils.analysis.hdf.provider import (
 )
 from crownetutils.vadere.plot.topgraphy_plotter import VadereTopographyPlotter
 from crownetutils.utils.dataframe import numeric_formatter, save_as_tex_table
-from crownetutils.utils.parallel import run_kwargs_map
+from crownetutils.utils.parallel import ExecutionItem, run_items, run_kwargs_map
 from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.utils.plot import (
     PlotUtil_,
@@ -65,6 +69,68 @@ S1_SIM_DATA_DIR = (
     "/mnt/ssd_local/arc-dsa_single_cell/s1_corridor_5_to_500kbps_map_count_est_only/"
 )
 SIM_RESULT_DIR = "/mnt/ssd_local/arc-dsa_single_cell/analysis_dir"
+
+
+class ThroughputCache(CacheLoader):
+    G_rates_ts = "rates_over_time"
+    G_qq = "qq"
+    G_root = "tp_25"
+
+    @staticmethod
+    @timing
+    def _load(isim: IndexedSimulation, target_rates: dict, freq: float):
+        tx = NodeTxData(isim.sim.dpmm_cfg.node_tx.path)
+        data = tx.get_tx_throughput_diff_by_app(
+            bin_size=freq, throughput_unit=1000, target_rates=target_rates
+        )
+        data["run_id"] = isim.simulation_index
+        data["sg"] = isim.group_name
+        return data
+
+    def __init__(self, run_map: RunMap) -> None:
+        super().__init__(run_map, run_map.path("throughput.h5"), root_group=self.G_root)
+
+    def cache_exists(self) -> bool:
+        return super().cache_exists() and all(
+            [
+                self.hdf.contains_group(g)
+                for g in [self.G_rates_ts, self.G_qq, self.G_root]
+            ]
+        )
+
+    @property
+    def qq(self) -> BaseHdfProvider:
+        self.check()
+        return self.hdf.created_shared_provider(self.G_qq)
+
+    @property
+    def rates_over_time(self) -> BaseHdfProvider:
+        self.check()
+        return self.hdf.created_shared_provider(self.G_rates_ts)
+
+    def load(self):
+        items: List[ExecutionItem] = []
+        for sg, isim in self.run_map.iter_all_sim(with_group=True):
+            target_rates = dict(
+                d_map=sg.attr["target_rate_in_kbps"] / 8, d_beacon=50 / 8
+            )
+            item = ExecutionItem(
+                fn=self._load,
+                kwargs=dict(isim=isim, target_rates=target_rates, freq=25.0),
+            )
+            items.append(item)
+        df = run_items(items, pool_size=10, raise_on_error=True, unpack=True)
+        df: pd.DataFrame = pd.concat(df, axis=0)
+        df = df.reset_index().set_index(["time", "sg", "run_id"]).sort_index()
+
+        qq = df.groupby(["sg", "run_id"])["d_map"].mean()
+        rates_over_time = df.groupby(["sg", "time"])["d_map"].agg(
+            ["mean", percentile(25), percentile(75)]
+        )
+
+        self.hdf.write_frame(group=self.hdf.group, frame=df)
+        self.hdf.write_frame(group=self.G_qq, frame=qq)
+        self.hdf.write_frame(group=self.G_rates_ts, frame=rates_over_time)
 
 
 class RandomMap(PlotUtil_):
@@ -375,40 +441,6 @@ def kBpsLbl(kbps):
     return f"{kBps:.1f} kBps"
 
 
-def __func_prepare_throughput_cache(
-    sim: Simulation, sg: str, run_id: int, freq: float, target_rate: float
-):
-    df = OppAnalysis.get_sent_packet_throughput_diff_by_app(
-        sim.sql,
-        target_rate,
-        freq,
-        sim.get_base_provider("root", sim.path("tx_pkt_bytes.h5")),
-    )
-    return sg, run_id, df
-
-
-def prepare_throughput_cache(run_map: RunMap, freq: float = 25.0):
-
-    kw_list = []
-    sg: SimulationGroup
-    for g, sg in run_map.items():
-        for id, _, sim in sg.simulation_iter(enum=True):
-            kw_list.append(
-                dict(
-                    sim=sim,
-                    sg=g,
-                    run_id=id,
-                    freq=freq,
-                    target_rate=dict(m=sg.attr["target_rate_in_kbps"] / 8, b=50 / 8),
-                )
-            )
-    ret = run_kwargs_map(
-        __func_prepare_throughput_cache, kwargs_iter=kw_list, pool_size=5
-    )
-    # ret = __func_prepare_throughput_cache(**kw_list[0])
-    print("hi")
-
-
 def _corridor_filter_target_cells(df: pd.DataFrame) -> pd.DataFrame:
     # remove cells under target area
     if isinstance(df, pd.MultiIndex):
@@ -443,10 +475,6 @@ def create_member_estimate_run_map(output_path, *args, **kwargs) -> RunMap:
     """All runs with different member estimates (neighborhood Table, Density Map, No adaption)"""
     os.makedirs(output_path, exist_ok=True)
     study_base = S0_SIM_DATA_DIR
-    # base_cfg = DpmmCfg.load(
-    #     str_fd=os.path.join(study_base, "map_cfg_tmpl.json"), base_dir="foo"
-    # )
-    # base_cfg.base_dir = None
 
     def create_sim_group(sim: Simulation, data: List[Simulation], *args, **kwargs):
         ctx: RunContext = data[0].run_context
@@ -501,12 +529,13 @@ def create_target_rate_run_map_new(output_path, *args, **kwargs) -> RunMap:
     """All runs with member estimate using density map and changing target rates [50...500kbps]"""
     os.makedirs(output_path, exist_ok=True)
     study_base = S1_SIM_DATA_DIR
-    base_cfg = DpmmCfg.load(
-        str_fd=os.path.join(study_base, "map_cfg_tmpl.json"), base_dir="foo"
-    )
-    base_cfg.base_dir = None
+
+    seed_list = [0, 1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 13, 14, 16, 18]
 
     def create_sim_group(sim: Simulation, data: List[Simulation], *args, **kwargs):
+
+        data = list(np.array(data)[seed_list])
+
         ctx: RunContext = data[0].run_context
         meta = {
             "map_target_rate": ctx.ini_get(
@@ -519,9 +548,6 @@ def create_target_rate_run_map_new(output_path, *args, **kwargs) -> RunMap:
                 .replace("app[1].app", "map"),
             ),
         }
-        # set cfg
-        for s in data:
-            s.dpmm_cfg = base_cfg.copy(base_dir=s.data_root)
         meta["target_rate_in_kbps"] = float(meta["map_target_rate"].replace("kbps", ""))
         meta["lbl"] = meta["map_target_rate"]
         sg = SimulationGroup(
@@ -657,107 +683,109 @@ class ThroughputPlotter(PlotUtil_):
     # @with_axis
     def msce_over_target_rate_box(self, *, ax: plt.Axes = None):
 
-        rc = {
-            "axes.labelsize": "x-large",
-            "xtick.labelsize": "x-large",
-            "ytick.labelsize": "x-large",
-        }
-        with plt.rc_context(rc):
-            fig, ax = self.check_ax(figsize=(8.9, 8.9 / (16 / 9)))
-            scenario = VadereTopographyPlotter(
-                "../study/corridor_trace_5perSpawn_ramp_down.d/corridor_2x5m_d20_5perSpawn_ramp_down.out/BASIS_corridor_2x5m_d20_5perSpawn_ramp_down.out.scenario"
-            )
-            # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
-            # same top for all. Just use first simulation
-            m: DpmmMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
-            _free, _covered = scenario.get_legal_cells(m.create_full_index_slice())
-            self.cell_to_tex(
-                _corridor_filter_target_cells(_free),
-                c=5.0,
-                fd=self.run_map.path("cell_tikz.tex"),
-                attr=["cell"],
-            )
+        figsize = self.fig_size_mm(111, 50)
+        fig, ax = self.check_ax(figsize=figsize)
+        scenario = VadereTopographyPlotter(
+            "../study/corridor_trace_5perSpawn_ramp_down.d/corridor_2x5m_d20_5perSpawn_ramp_down.out/BASIS_corridor_2x5m_d20_5perSpawn_ramp_down.out.scenario"
+        )
+        # scenario = VaderScenarioPlotHelper("../vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
+        # same top for all. Just use first simulation
+        m: DpmmMetaData = self.run_map[0].simulations[0].get_dcdMap().metadata
+        _free, _covered = scenario.get_legal_cells(m.create_full_index_slice())
+        self.cell_to_tex(
+            _corridor_filter_target_cells(_free),
+            c=5.0,
+            fd=self.run_map.path("cell_tikz.tex"),
+            attr=["cell"],
+        )
 
-            fig: plt.Figure = ax.get_figure()
+        fig: plt.Figure = ax.get_figure()
 
-            # get ascending order of target rates
-            sg_names = dict(
-                sorted(
-                    self.run_map.items(), key=lambda x: x[1].attr["target_rate_in_kbps"]
+        # get ascending order of target rates
+        sg_names = dict(
+            sorted(self.run_map.items(), key=lambda x: x[1].attr["target_rate_in_kbps"])
+        ).keys()
+        _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
+        colors = self.get_default_color_cycle()
+        box_data = []
+        pos = []
+        for i, g in enumerate(sg_names):
+            sg: SimulationGroup = self.run_map[g]
+            if _hdf.contains_group(g):
+                df = _hdf.get_dataframe(g)
+            else:
+                df = OppAnalysis.sg_get_msce_data(
+                    sim_group=sg,
+                    cell_count=len(_corridor_filter_target_cells(_free)),
                 )
-            ).keys()
-            _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
-            colors = self.get_default_color_cycle()
-            box_data = []
-            pos = []
-            for i, g in enumerate(sg_names):
-                sg: SimulationGroup = self.run_map[g]
-                if _hdf.contains_group(g):
-                    df = _hdf.get_dataframe(g)
-                else:
-                    df = OppAnalysis.sg_get_msce_data(
-                        sim_group=sg,
-                        cell_count=len(_corridor_filter_target_cells(_free)),
-                        cell_slice_fc=_corridor_filter_target_cells,
-                    )
-                    _hdf.write_frame(group=g, frame=df)
-                df_m = df.groupby("run_id").agg(
-                    ["mean", "std", percentile(25), percentile(75)]
-                )
-                if isinstance(df_m.columns, pd.MultiIndex):
-                    df_m = df_m.droplevel(0, axis=1)
-                df_m["tp"] = int(sg.attr["map_target_rate"].replace("kbps", ""))
-                # ax.scatter(df_m["tp"], df_m["mean"], marker="x", color="black")
-                pos.append(sg.attr["target_rate_in_kbps"] / 8)
-                box_data.append(df_m["mean"])
-
-            box_df = pd.concat(
-                [_d.reset_index(drop=True) for _d in box_data],
-                axis=1,
-                ignore_index=True,
+                _hdf.write_frame(group=g, frame=df)
+            df_m = df.groupby("run_id").agg(
+                ["mean", "std", percentile(25), percentile(75)]
             )
-            m, t, b, func, r2 = self.exp_fit(pos, box_df)
-            xs = np.linspace(0.5, 70, 200)
-            ys = func(xs)
-            ax.plot(xs, ys, linestyle="dashed", color="red", label="Exp. fit")
-            h, l = ax.get_legend_handles_labels()
-            h.append(pltPatch.Patch("white", "white"))
-            l.append(f"$R^2={r2:.6f}$")
-            ax.legend().remove()
-            ax.legend(h, l, loc="lower left")
+            if isinstance(df_m.columns, pd.MultiIndex):
+                df_m = df_m.droplevel(0, axis=1)
+            df_m["tp"] = int(sg.attr["map_target_rate"].replace("kbps", ""))
+            # ax.scatter(df_m["tp"], df_m["mean"], marker="x", color="black")
+            pos.append(sg.attr["target_rate_in_kbps"] / 8)
+            box_data.append(df_m["mean"])
+        df: List[pd.DataFrame] = [_d.reset_index(drop=True) for _d in box_data]
+        box_df = pd.concat(
+            df,
+            axis=1,
+            ignore_index=True,
+        )
+        m, t, b, func, r2 = self.exp_fit(pos, box_df)
+        xs = np.linspace(0.5, 70, 200)
+        ys = func(xs)
+        ax.plot(xs, ys, linestyle="dashed", color="darkred", label="Exp. fit")
+        h, l = ax.get_legend_handles_labels()
+        h.append(pltPatch.Patch("white", "white"))
+        l.append(f"$R^2={r2:.6f}$")
+        ax.legend().remove()
+        ax.legend(
+            h,
+            l,
+            loc="lower left",
+            frameon=True,
+            fontsize="x-small",
+        )
 
-            w = 0.08
-            width = lambda p, w: 10 ** (np.log10(p) + w / 2.0) - 10 ** (
-                np.log10(p) - w / 2.0
-            )
-            b = ax.boxplot(box_data, positions=pos, widths=width(pos, w))
-            c = list(repeat("gray", len(pos)))
-            self.color_box_plot(b, fill_color=c, flier_size=5, flier="o", ax=ax)
-            plt.setp(
-                b["fliers"],
-                mec="black",
-                # mfc=colors[i],
-                color="gray",
-                mfc="white",
-                marker="o",
-                markersize=5,
-            )
+        w = 0.08
+        width = lambda p, w: 10 ** (np.log10(p) + w / 2.0) - 10 ** (
+            np.log10(p) - w / 2.0
+        )
+        b = ax.boxplot(box_data, positions=pos, widths=width(pos, w))
+        c = list(repeat("gray", len(pos)))
+        self.color_box_plot(b, fill_color=c, flier_size=5, flier="x", ax=ax)
+        plt.setp(
+            b["fliers"],
+            mec="black",
+            # mfc=colors[i],
+            color="gray",
+            mfc="white",
+            marker=".",
+            markersize=5,
+        )
 
-            ax.set_xlabel("Target transmission rate in kBps (log scale)")
-            ax.set_ylabel("Mean squared map error (MSME)")
-            ax.set_xscale("log")
-            _yminor_tick = 0.025 / 2
-            ax.yaxis.set_major_locator(MultipleLocator(0.025))
-            ax.yaxis.set_minor_locator(MultipleLocator(0.025 / 2))
-            ax.xaxis.set_minor_formatter(self.getLogFormatter())
-            ax.tick_params(axis="x", which="minor", labelsize="large")
-            ax.set_ylim(0.25 - _yminor_tick, 0.50)
-            ax.set_xlim(0.5, 70.0)
-            ax.grid(visible=True, axis="both")
-            ax.grid(visible=True, which="minor", axis="x", linestyle="--")
+        ax.set_xlabel("Target transmission rate in kBps (log scale)")
+        ax.set_ylabel("Mean squared\ncell error (MSCE)")
+        ax.xaxis.set_label_coords(0.585, 0.099, transform=fig.transFigure)
+        ax.set_xscale("log")
+        _yminor_tick = 0.025 / 2
+        ax.yaxis.set_major_locator(MultipleLocator(0.05))
+        ax.yaxis.set_minor_locator(MultipleLocator(0.05 / 5))
+        ax.xaxis.set_minor_formatter(self.getLogFormatter())
+        ax.tick_params(axis="x", which="minor")
+        ax.set_ylim(0.25 - _yminor_tick, 0.41)
+        ax.set_xlim(0.5, 70.0)
+        ax.grid(visible=True, axis="both")
+        ax.grid(visible=True, which="minor", axis="x", linestyle="--")
 
-            fig.tight_layout()
-            fig.savefig(self.run_map.path("msme_over_target_rate_by_seed.pdf"))
+        fig.tight_layout()
+        fig.subplots_adjust(
+            left=0.2, bottom=0.22, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+        )
+        fig.savefig(self.run_map.path("msce_over_target_rate_by_seed.pdf"))
 
     def exp_fit(self, pos, data):
         ys = data.mean().to_numpy()
@@ -774,141 +802,111 @@ class ThroughputPlotter(PlotUtil_):
         r2 = 1 - np.sum(sq_diff) / np.sum(sq_diff_from_mean)
         return m, t, b, lambda x: _exp(x, m, t, b), r2
 
+    def plot_qq(self):
+        figsize = self.fig_size_mm(111, 65)
+        fig, ax = self.check_ax(figsize=figsize)
+
+        data = ThroughputCache(self.run_map).qq.frame()
+
+        for sg_name, _d in data.groupby("sg"):
+            target_rate = self.run_map[sg_name].attr["target_rate_in_kbps"] / 8
+            x = np.repeat(target_rate, len(_d))
+            ax.scatter(x, _d, marker="x", color="black")
+
+        ax.set_xlabel("Target Tx rate in kB/s")
+        ax.set_ylabel("Actual Tx rate\nin kB/s")
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.xaxis.set_minor_formatter(self.getLogFormatter())
+        ax.yaxis.set_minor_formatter(self.getLogFormatter())
+        ax.tick_params(axis="both", which="minor", labelsize="medium")
+        ax.set_xlim(0.5, 74.0)
+        ax.set_ylim(0.5, 74.0)
+        ax.grid(visible=True, axis="both", which="major")
+        # ax.grid(visible=True, which="minor", axis="both", linestyle="--")
+        fig.legend(
+            [
+                pltLines.Line2D([0], [0], color="darkred"),
+                pltLines.Line2D([0], [0], marker="x", color="black", linestyle=""),
+            ],
+            ["QQ-Line", "Data"],
+            loc="lower left",
+            bbox_to_anchor=(72, -8),
+            bbox_transform=ax.transData,
+            handlelength=1.0,
+            frameon=False,
+        )
+
+        x = np.linspace(-5, 75, num=200)
+        ax.plot(x, x, color="darkred")
+        ax.set_aspect("equal", adjustable="box")
+        fig.tight_layout()
+        fig.savefig(self.run_map.path("rate-qq-scatter_log.pdf"))
+
+        ax.set_xscale("linear")
+        ax.set_yscale("linear")
+        ax.xaxis.set_major_locator(MultipleLocator(10))
+        ax.yaxis.set_major_locator(MultipleLocator(10))
+        ax.xaxis.set_minor_locator(MultipleLocator(5))
+        ax.yaxis.set_minor_locator(MultipleLocator(5))
+        ax.set_xlim(-1.0, 74.0)
+        ax.set_ylim(-1.0, 75.0)
+        fig.tight_layout()
+        fig.subplots_adjust(
+            left=0.0, bottom=0.22, right=1.0, top=0.99, wspace=0.08, hspace=0.15
+        )
+        fig.savefig(self.run_map.path("rate-qq-scatter_lin.pdf"))
+
     @with_axis
     def plot_target_rate_ts(self, *, ax: plt.Axes = None):
 
-        rc = {
-            "axes.labelsize": "x-large",
-            "xtick.labelsize": "x-large",
-            "ytick.labelsize": "x-large",
-        }
-        with plt.rc_context(rc):
-            fig, ax = self.check_ax(figsize=(8.9, 1 + 8.9 / (16 / 9)))
-            fig2, ax2 = self.check_ax(figsize=(5.9, 5.9))
-            sg_names = list(
-                dict(
-                    sorted(
-                        self.run_map.items(),
-                        key=lambda x: x[1].attr["target_rate_in_kbps"],
-                    )
-                ).keys()
+        # figsize = self.fig_size_cm(width=11.1, ratio=1 / 1.3)
+        fig, ax = self.check_ax(figsize=(8.9, 1 + 8.9 / (16 / 9)))
+        data = ThroughputCache(self.run_map).rates_over_time.frame()
+
+        colors = self.get_default_color_cycle()
+        target_rates = []
+        for i, (sg_name, _d) in enumerate(data.groupby("sg")):
+            rate = self.run_map[sg_name].attr["target_rate_in_kbps"] / 8
+            self.fill_between(
+                _d.reset_index().iloc[:, 1:],
+                line_args=dict(color=colors[i], label=kBpsLbl(rate)),
+                fill_args=dict(label="dummy"),
+                ax=ax,
             )
-            # sg_names = [sg_names[-1]]
-            colors = self.get_default_color_cycle()
-            sg_data = []
-            target_rates = []
-            pos = []
-            box_data = []
-            for i, g in enumerate(sg_names):
-                sg: SimulationGroup = self.run_map[g]
-                for id, _, sim in sg.simulation_iter(enum=True):
-                    _hdf = sim.get_base_provider(path="tx_pkt_bytes.h5")
-                    data = _hdf.get_dataframe("tx_throughput_diff_25_0")
-                    data = data.loc[:, ["m"]]
-                    data["run"] = id
-                    sg_data.append(data.reset_index())
-                sg_data = pd.concat(
-                    sg_data, axis=0, ignore_index=True, verify_integrity=False
-                )
-                box_data.append(
-                    sg_data[sg_data["time"] >= 200].groupby("run").mean()["m"]
-                )
-                sg_data = (
-                    sg_data[["time", "m"]]
-                    .groupby("time")
-                    .agg(["mean", percentile(25), percentile(75)])
-                    .droplevel(0, axis=1)
-                )
-                self.fill_between(
-                    sg_data.reset_index(),
-                    line_args=dict(color=colors[i], label=kBpsLbl(sg)),
-                    fill_args=dict(label="dummy"),
-                    ax=ax,
-                )
-                sg_data = []
-                target_rates.append(sg.attr["target_rate_in_kbps"] / 8)
+            target_rates.append(rate)
 
-            # w = 0.08
-            # width = lambda p, w: 10**(np.log10(p)+w/2.)-10**(np.log10(p)-w/2.)
-            # b = ax2.boxplot(box_data, positions=target_rates, widths=width(target_rates, w))
-            # self.color_box_plot(b, fill_color="gray", flier_size=5, flier="o", ax=ax2)
-            # plt.setp(
-            #     b["fliers"],
-            #     mec="black",
-            #     # mfc=colors[i],
-            #     color="gray",
-            #     mfc="white",
-            #     marker="o",
-            #     markersize=5,
-            # )
-
-            for x, y in zip(target_rates, box_data):
-                ax2.scatter(np.repeat(x, len(y)), y, marker="x", color="black")
-
-            ax2.set_xlabel("Target transmission rate in kBps")
-            ax2.set_ylabel("Actual transmission rate in kBps")
-            ax2.set_xscale("log")
-            ax2.set_yscale("log")
-            ax2.xaxis.set_minor_formatter(self.getLogFormatter())
-            ax2.yaxis.set_minor_formatter(self.getLogFormatter())
-            ax2.tick_params(axis="both", which="minor", labelsize="medium")
-            ax2.set_xlim(0.5, 70.0)
-            ax2.set_ylim(0.5, 70.0)
-            ax2.grid(visible=True, axis="both")
-            ax2.grid(visible=True, which="minor", axis="both", linestyle="--")
-
-            x = np.linspace(-5, 70, num=200)
-            ax2.plot(x, x, color="red")
-            ax2.set_aspect("equal", adjustable="box")
-            fig2.tight_layout()
-            fig2.savefig(self.run_map.path("rate-qq-scatter_log.pdf"))
-
-            ax2.set_xscale("linear")
-            ax2.set_yscale("linear")
-            ax2.xaxis.set_major_locator(MultipleLocator(10))
-            ax2.yaxis.set_major_locator(MultipleLocator(10))
-            ax2.xaxis.set_minor_locator(MultipleLocator(5))
-            ax2.yaxis.set_minor_locator(MultipleLocator(5))
-            ax2.set_xlim(-1.0, 70.0)
-            ax2.set_ylim(-1.0, 70.0)
-            fig2.tight_layout()
-            fig2.savefig(self.run_map.path("rate-qq-scatter_lin.pdf"))
-            # ax2.grid(visible=False, which="minor", axis="both", linestyle="--")
-            # fig2.savefig(self.run_map.path("rate-qq-box.pdf"))
-
-            h, l = self.merge_legend_patches(*ax.get_legend_handles_labels())
-            ax.hlines(target_rates, 0, 900, colors="red", linestyles="solid")
-            for _rate in target_rates:
-                if _rate == target_rates[0]:
-                    y = -1.0
-                elif _rate == target_rates[1]:
-                    continue
-                else:
-                    y = _rate
-                ax.text(
-                    x=855,
-                    y=y,
-                    s=f"{_rate:.1f} kBps",
-                    color="red",
-                    transform=ax.transData,
-                )
-            ax.legend().remove()
-            ax.grid(visible=False, axis="y")
-
-            ax.set_xlabel("Simulation time in seconds")
-            ax.set_ylabel("Tx rate in kBps")
-            ax.set_xlim((0, 850))
-            ax.set_ylim(-4, 70)
-            ax.xaxis.set_major_locator(MultipleLocator(50))
-            ax.xaxis.set_minor_locator(MultipleLocator(25))
-            ax.yaxis.set_major_locator(MultipleLocator(5))
-            ax.yaxis.set_minor_locator(MultipleLocator(2.5))
-            ax.tick_params(axis="y", which="both", right=True)
-            fig.tight_layout(rect=(0, 0.1, 1, 1))
-            fig.legend(
-                h, l, loc="lower center", ncol=5, fontsize="medium", frameon=False
+        h, l = self.merge_legend_patches(*ax.get_legend_handles_labels())
+        ax.hlines(target_rates, 0, 900, colors="red", linestyles="solid")
+        for _rate in target_rates:
+            if _rate == target_rates[0]:
+                y = -1.0
+            elif _rate == target_rates[1]:
+                continue
+            else:
+                y = _rate
+            ax.text(
+                x=855,
+                y=y,
+                s=f"{_rate:.1f} kBps",
+                color="red",
+                transform=ax.transData,
             )
-            fig.savefig(self.run_map.path("rates_over_time.pdf"))
+        ax.legend().remove()
+        ax.grid(visible=False, axis="y")
+
+        ax.set_xlabel("Simulation time in seconds")
+        ax.set_ylabel("Tx rate in kBps")
+        ax.set_xlim((0, 850))
+        ax.set_ylim(-4, 70)
+        ax.xaxis.set_major_locator(MultipleLocator(50))
+        ax.xaxis.set_minor_locator(MultipleLocator(25))
+        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.yaxis.set_minor_locator(MultipleLocator(2.5))
+        ax.tick_params(axis="y", which="both", right=True)
+        fig.tight_layout(rect=(0, 0.1, 1, 1))
+        fig.legend(h, l, loc="lower center", ncol=5, fontsize="medium", frameon=False)
+        fig.savefig(self.run_map.path("rates_over_time.pdf"))
 
     @with_axis
     def plot_ped_count(self, *, ax: plt.Axes = None) -> Tuple[plt.Figure, plt.Axes]:
@@ -932,7 +930,7 @@ class ThroughputPlotter(PlotUtil_):
         return ax.get_figure(), ax
 
     @with_axis
-    def plot_target_rate_diff(self, *, ax: plt.Axes = None):
+    def plot_target_rate_diff(self, *, freq: float = 25.0, ax: plt.Axes = None):
         # get ascending order of target rates
         fig1, (ax1a, ax1b) = plt.subplots(2, 1, figsize=(16, 9))
         fig2, (ax2a, ax2b) = plt.subplots(2, 1, figsize=(16, 9))
@@ -942,19 +940,27 @@ class ThroughputPlotter(PlotUtil_):
         ).keys()
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         colors = self.get_default_color_cycle()
-        sg_data_relative = []
-        sg_data_abs = []
-        stat = []
+        sg_data_relative: List[pd.DataFrame] = []
+        sg_data_abs: List[pd.DataFrame] = []
+        stat: List[pd.DataFrame] = []
         for i, g in enumerate(sg_names):
             sg: SimulationGroup = self.run_map[g]
             for id, _, sim in sg.simulation_iter(enum=True):
-                _hdf = sim.get_base_provider(path="tx_pkt_bytes.h5")
-                data = _hdf.get_dataframe("tx_throughput_diff_25_0")
+                sim: Simulation
+                target_rates = dict(
+                    d_map=sg.attr["target_rate_in_kbps"] / 8, d_beacon=50 / 8
+                )
+                tx = NodeTxData(sim.dpmm_cfg.node_tx.path)
+                data = tx.get_tx_throughput_diff_by_app(
+                    bin_size=freq, throughput_unit=1000, target_rates=target_rates
+                )
                 data = data.loc[200:]
-                relative_diff = data["diff_m"] / data["m"]
-                relative_abs = data["diff_m"]
+                relative_diff = data["diff_d_map"] / data["d_map"]
+                relative_abs = data["diff_d_map"]
+
                 sg_data_relative.append(relative_diff.reset_index())
                 sg_data_abs.append(relative_abs.reset_index())
+
                 self.plot_ecdf(
                     relative_diff, ax=ax1a, label=kBpsLbl(sg), color=colors[i]
                 )
@@ -1044,8 +1050,8 @@ class ThroughputPlotter(PlotUtil_):
         _h = []
         _l = []
         for i in range(len(sg_names)):
-            _h.append(h[i * 20])
-            _l.append(l[i * 20])
+            _h.append(h[i * len(sg)])
+            _l.append(l[i * len(sg)])
         ax2a.legend().remove()
         ax2a.legend(_h, _l, loc="lower right", ncol=2)
 
@@ -1073,8 +1079,8 @@ class ThroughputPlotter(PlotUtil_):
         _h = []
         _l = []
         for i in range(len(sg_names)):
-            _h.append(h[i * 20])
-            _l.append(l[i * 20])
+            _h.append(h[i * len(sg)])
+            _l.append(l[i * len(sg)])
         ax1a.legend().remove()
         ax1a.legend(_h, _l, loc="upper left")
 
@@ -1090,8 +1096,6 @@ class ThroughputPlotter(PlotUtil_):
 
         fig1.tight_layout()
         fig1.savefig(self.run_map.path("relative_rate_diff.pdf"))
-
-        print("hi")
 
 
 class MemberEstPlotter(PlotUtil_):
@@ -1669,19 +1673,19 @@ def main():
     study_out = SIM_RESULT_DIR
     os.makedirs(study_out, exist_ok=True)
 
-    # r1 = RunMap.load_or_create(
-    #     # create_f=create_target_rate_run_map,
-    #     # output_path=os.path.join(SIM_RESULT_DIR, "_dyn_tx/s1_corridor_rate_cmp"),
-    #     create_f=create_target_rate_run_map_new,
-    #     output_path=os.path.join(study_out, "s1"),
-    #     load_if_present=True,
-    # )
-    # r1_plotter = ThroughputPlotter(r1)
-    # r1_plotter.msce_over_target_rate_box()
-    # prepare_throughput_cache(r1)
-    # r1_plotter.plot_target_rate_diff()
+    r1 = RunMap.load_or_create(
+        create_f=create_target_rate_run_map_new,
+        output_path=os.path.join(study_out, "s1"),
+        load_if_present=True,
+    )
+    ThroughputCache(r1).get()
+    r1_plotter = ThroughputPlotter(r1)
+    # r1_plotter.plot_qq()
+    r1_plotter.msce_over_target_rate_box()
+    # r1_plotter.plot_target_rate_diff() # not used in paper
     # r1_plotter.plot_target_rate_ts()
 
+    sys.exit()
     r2 = RunMap.load_or_create(
         create_f=create_member_estimate_run_map,
         output_path=os.path.join(study_out, "s0"),

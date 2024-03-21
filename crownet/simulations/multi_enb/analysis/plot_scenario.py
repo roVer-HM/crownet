@@ -7,7 +7,7 @@ from crownetutils.analysis.hdf_providers.node_position import (
     NodePositionWithRsdHdf,
 )
 from crownetutils.utils.logging import timing
-from crownetutils.utils.plot import enb_with_hex
+from crownetutils.utils.plot import PlotUtil, enb_with_hex
 
 from crownetutils.utils.styles import load_matplotlib_style
 from matplotlib import pyplot as plt
@@ -54,11 +54,8 @@ def main():
     )
     out_base = "/mnt/ssd_local/arc-dsa_multi_cell/s2_ttl_and_stream_4/analysis_dir/"
 
-    col_pt = 242.67355 * 1.3
-    col_cm = col_pt / 2.835 / 10
-    col_inch = col_cm / 2.54
-
-    fig = plt.figure(constrained_layout=False, figsize=(col_inch, 7.5 / 2.54))
+    fig_size = PlotUtil.fig_size_mm(width=111, height=75)
+    fig = plt.figure(constrained_layout=False, figsize=fig_size)
     gs1 = fig.add_gridspec(
         nrows=4, ncols=4, top=1.0, right=0.99, bottom=0.09, wspace=0.3, hspace=2.1
     )
@@ -106,7 +103,7 @@ def main():
                 size="small",
                 horizontalalignment="center",
                 verticalalignment="baseline",
-                color=enb.iloc[row]["color"],
+                color="black",
             ),
         )
         abox = AnnotationBbox(

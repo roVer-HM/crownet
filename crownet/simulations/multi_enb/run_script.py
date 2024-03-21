@@ -387,6 +387,18 @@ class SimulationRun(BaseSimulationRunner):
         df = map_sql.get_cell_count_by_host_id_over_time()
         df.to_csv(cfg.map_size.path, index=False)
 
+    @process_as({"prio": 967, "type": "post"})
+    def create_map_size_global_cache(self) -> MapMeasurementsAgeOverDistance:
+        cfg: DpmmCfgDb = get_density_cfg(self.result_base_dir())
+        map_sql = DpmmSql(cfg)
+        df = map_sql.get_cell_count_global_over_time()
+        df.to_csv(cfg.map_size_global.path, index=False)
+
+        cfg: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
+        map_sql = DpmmSql(cfg)
+        df = map_sql.get_cell_count_global_over_time()
+        df.to_csv(cfg.map_size_global.path, index=False)
+
     # do not execute for now... use time delta for entropy data!
     # @process_as({"prio": 983, "type": "post"})
     # def create_entropy_cell_count_error_hdf(self) -> CellEntropyValueError:
