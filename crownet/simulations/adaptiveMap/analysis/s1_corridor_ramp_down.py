@@ -530,7 +530,11 @@ def create_target_rate_run_map_new(output_path, *args, **kwargs) -> RunMap:
     os.makedirs(output_path, exist_ok=True)
     study_base = S1_SIM_DATA_DIR
 
-    seed_list = [0, 1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 13, 14, 16, 18]
+    # 15 seeds only
+    # seed_list = [0, 1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 13, 14, 16, 18]
+
+    # all 20 seeds
+    seed_list = list(range(20))
 
     def create_sim_group(sim: Simulation, data: List[Simulation], *args, **kwargs):
 
@@ -931,6 +935,7 @@ class ThroughputPlotter(PlotUtil_):
 
     @with_axis
     def plot_target_rate_diff(self, *, freq: float = 25.0, ax: plt.Axes = None):
+        """Not used in paper"""
         # get ascending order of target rates
         fig1, (ax1a, ax1b) = plt.subplots(2, 1, figsize=(16, 9))
         fig2, (ax2a, ax2b) = plt.subplots(2, 1, figsize=(16, 9))
@@ -1680,24 +1685,22 @@ def main():
     )
     ThroughputCache(r1).get()
     r1_plotter = ThroughputPlotter(r1)
-    # r1_plotter.plot_qq()
+    r1_plotter.plot_qq()
     r1_plotter.msce_over_target_rate_box()
-    # r1_plotter.plot_target_rate_diff() # not used in paper
-    # r1_plotter.plot_target_rate_ts()
+    r1_plotter.plot_target_rate_ts()
 
-    sys.exit()
     r2 = RunMap.load_or_create(
         create_f=create_member_estimate_run_map,
         output_path=os.path.join(study_out, "s0"),
         load_if_present=True,
     )
     r2_plotter = MemberEstPlotter(r2)
-    # r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
+    r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
     r2_plotter.plot_msce()
-    # r2_plotter.plot_tx_interval(freq=25.0)
+    r2_plotter.plot_tx_interval(freq=25.0)
 
-    # rnd = RandomMap(r2)
-    # rnd.plot_random_msme()
+    rnd = RandomMap(r2)
+    rnd.plot_random_msme()
     print("done")
 
 
