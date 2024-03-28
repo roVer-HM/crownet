@@ -48,7 +48,7 @@ check_containers_local_available() {
 	if [ "$MISS" -gt 0 ]; then
            printf >&2 'Not all images are available on your local machine. Missing: %d out of 7.\n' $MISS
         else
-           echo >&2 "All required images available on your local machine. Not build or pull is necessary." 
+           echo >&2 "All required images available on your local machine. No build or pull is necessary." 
         fi
 
         echo $MISS
@@ -59,6 +59,7 @@ check_containers_local_available() {
 
 echo "The following images are required for the simulation: "
 sh ${CROWNET_HOME}/scripts/print_container_versions
+sh ${CROWNET_HOME}/scripts/print_container_registry
 
 missing=$(check_containers_local_available)
 
@@ -109,39 +110,6 @@ if ! [ "$missing" = "0" ]; then
 fi
 
 
-# check if image versions are based on the current commit - then they can be built
-
-cd $CROWNET_HOME
-COMMIT=$(git rev-parse HEAD | head -c 8) # commit hash (use first 8 characters)
-
-based_on_current_commit='true'
-if ! [ "${CROWNET_OPP_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-if ! [ "${CROWNET_VADERE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-if ! [ "${CROWNET_CONTROL_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-if ! [ "${CROWNET_SUMO_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-if ! [ "${CROWNET_OPP_IDE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-if ! [ "${CROWNET_VADERE_IDE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-if ! [ "${CROWNET_CONTROL_IDE_CONT_TAG}" = "${COMMIT}" ]; then based_on_current_commit='false'; fi
-
-
-if [ "$based_on_current_commit" = false ]; then
-        echo "(!) ERROR The setup of the images as specified in config/CONTAINER_VERSION.config FAILED."
-        echo "          Images are neither available nor buildable." 
-        echo "          For building the images based on the current commit, specify the versions and re-run the script: "
-        echo "                 source setup -i -u && ./get_images.sh"
-        echo "(!) WARNING: this will change the image versions config/CONTAINER_VERSION.config."
-        exit -1
-fi 
-
-echo "Build images based on the current commit (=${COMMIT}) (y/N): "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-   bash $CROWNET_HOME/scripts/build_all_images
-   exit 0
-fi
-
-echo "(!) Error image setup failed."
-exit -1
 
 
 

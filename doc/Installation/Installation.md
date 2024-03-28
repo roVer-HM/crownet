@@ -4,40 +4,51 @@ Setting up a simulation machine with the CrowNet environment is quite simple. Yo
 
 ## Required Hard- and Software
 
-The CrowNet environment requires a Linux System. We are currently using Ubuntu 18.04.2 LTS but any major distribution should do, since the required dependencies are all part of the respective Docker containers. A system with 8 GB of RAM is recommended.
+The CrowNet environment requires a Linux System. A system with  8 GB of RAM or more is recommended.
+
+* Install Docker Engine for your distribution based on the guidelines given by [Install Docker Engine](https://docs.docker.com/engine/install/)
+* Python 3.8 is required on the host system
 
 ## Repo setup
 
-Clone the CrowNet repository including all submodules within your home directory. 
+Clone the CrowNet repository including all submodules within your home
+directory. Note: The home directory will be mounted into the running containers
+by default to access NED and omnetpp.ini files.
+
 ```
-cd ~
 git clone --recurse-submodules https://github.com/roVer-HM/crownet.git
 ```
-Note: if you are a developer, clone the gitlab repository instead: 
+
+Note: if you are a developer, clone the gitlab repository instead. Requires credentials and configured ssh-key.  
 ```
-cd ~
 git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.git
 ```
 
-Install Docker (if not already available on your system):
+Activate the  CrowNet environment by sourcing the setup script. This will add
+environment variables to your current shell.  If you don not need a specific
+container version do not change the container versions. Ensure that the public
+container registry `ghcr.io/rover-hm` is selected.  
 ```
-cd crownet/scripts
-install_docker.sh
-```
-
-Configure CrowNet by running (do not overwrite the pre-configured images tags unless you provide the respective images yourself):
-```
-cd ..
 source setup
 ```
-Get the required Docker images (due to the large size of some of them, this will take some time - depending on your Internet connection):
+
+The  `crownet_info` command is no available and lists the CrowNet environment.
+Including the used container registry and container version tags.  The container
+registry and container versions can be configured using the files
+`config/CONTAINER_REGISTRY.config` and  `config/CONTAINER_VERSION.config`. After
+changing these files `source setup` must be rerun to update the environment. 
+
+
+Pull the required Docker images. This may take some time due to the large size of
+some of them and depending on your Internet connection:
 ```
 ./scripts/get_images
 ```
 We recommended to include 'source ${CROWNET_HOME}/setup -i' in the startup file of your shell (~/.bashrc). 
 
 Notes:
-* The start script will mount your home directory so that it is visible inside the Docker container. 
+* The start script will mount your home directory so that it is visible inside the Docker container. If you have data not in your 
+  home directory you must provide an secondary volume mount using the environment variabel `OPP_EXTERNAL_DATA_MNT`. See `config/USER_ENV.config`.
 * The OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
 * Disable SELinux (Fedoara, RedHat, ...) with `sudo setenforce 0` for the installation, since it blocks X11 Forwarding. 
 
