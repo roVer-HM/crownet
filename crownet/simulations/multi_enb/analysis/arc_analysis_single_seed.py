@@ -10,6 +10,7 @@ from crownetutils.analysis.plot.rsd_grid_plots import (
 )
 from crownetutils.utils.styles import load_matplotlib_style
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure, SubFigure
 from matplotlib.lines import Line2D
 from matplotlib.offsetbox import AnnotationBbox, TextArea
 from matplotlib.patches import BoxStyle
@@ -29,6 +30,7 @@ from crownetutils.utils.logging import logger, timing
 from matplotlib.ticker import (
     FixedFormatter,
     FixedLocator,
+    FuncFormatter,
     MultipleLocator,
     ScalarFormatter,
 )
@@ -84,6 +86,24 @@ def build_run_map(output_path, seed_location_list: List[SeedLocation]):
         )
 
     return r
+
+
+class EnbTxtPos:
+    @classmethod
+    def top_left(cls):
+        return cls((0.03, 0.96), (0, 1))
+
+    @classmethod
+    def bottom_right(cls):
+        return cls((0.985, 0.03), (1, 0))
+
+    @classmethod
+    def right(cls, y):
+        return cls((0.985, y), (1, 0))
+
+    def __init__(self, xy, box_algin) -> None:
+        self.xy = xy
+        self.box_algin = box_algin
 
 
 @timing
@@ -227,13 +247,29 @@ def set_time_axis(fig: plt.Figure, ax_iter: GridPlotIter):
 
 def save_old(fig, path):
     """Save figure but keep old version"""
-
+    if path is None:
+        return
     os.makedirs(os.path.dirname(path), exist_ok=True)
     try:
         shutil.copyfile(path, f"{path}.old")
     except:
         pass
     fig.savefig(path)
+
+
+def legend_args(**kwargs):
+    default = dict(
+        frameon=False,
+        fontsize="x-small",
+        handlelength=1.5,
+        labelspacing=0.1,
+        columnspacing=0.8,
+        handletextpad=0.5,
+    )
+    for k, v in kwargs.items():
+        default[k] = v
+
+    return default
 
 
 def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
@@ -254,7 +290,7 @@ def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
 
         a = rsd_name(
             f"$e\mathit{{NB}}_{{{i+1}}}$",
-            color=color,
+            color="black",
             xy=(0.03, 0.96),
             xybox=(0.03, 0.96),
             bbox_align=(0, 1),
@@ -267,54 +303,144 @@ def plot_rsd_size_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
         t = "Number of nodes" if idx == 1 else ""
         ax.set_ylabel(t)
 
-    fig.subplots_adjust(
-        left=0.09, bottom=0.185, right=0.995, top=0.99, wspace=0.08, hspace=0.15
-    )
+    for idx, ax in enumerate(ax_iter.lower_axes()):
+        t = "Time in seconds" if idx == 0 else ""
+        ax.set_xlabel(t)
+
     fig.legend(
-        [MulticolorPatch(colors)],
-        ["Mean node count\nwith Q1/3"],
-        handler_map={MulticolorPatch: MulticolorPatchHandler()},
-        loc="lower right",
-        bbox_to_anchor=(1.015, -0.0515),
-        frameon=False,
-        fontsize="x-small",
-        handlelength=3.0,
-        labelspacing=0.1,
-    )
-    l2 = plt.legend(
         [
             Line2D([0], [0], color="darkred", linestyle="dashed"),
             Line2D([0], [0], color="black"),
+            MulticolorPatch(colors),
         ],
-        ["Stop spawn after 120 seconds", "Total node count"],
-        loc="lower left",
-        bbox_to_anchor=(0.0, -0.05),
-        bbox_transform=fig.transFigure,
-        frameon=False,
-        fontsize="x-small",
-        labelspacing=0.1,
+        [
+            "Stop spawn after\n120 seconds",
+            "Total node\ncount",
+            "Avg. node count\nwith Q1/3",
+        ],
+        handler_map={MulticolorPatch: MulticolorPatchHandler()},
+        loc="upper right",
+        bbox_to_anchor=(0.999, 0.21),
+        **legend_args(),
+        ncol=3,
     )
-    # l2.set_transform(fig.transFigure)
-    fig.add_artist(l2)
+    fig.subplots_adjust(
+        left=0.09, bottom=0.25, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+    )
     save_old(fig, path)
 
 
-class EnbTxtPos:
-    @classmethod
-    def top_left(cls):
-        return cls((0.03, 0.96), (0, 1))
+def plot_age_over_distance_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
 
-    @classmethod
-    def bottom_right(cls):
-        return cls((0.985, 0.03), (1, 0))
+    _r = EnbTxtPos.right(0.6)
+    colors = []
+    enb_txt_loc: List[EnbTxtPos] = [EnbTxtPos.bottom_right() for _ in range(15)]
+    for i, (fig, ax, color) in enumerate(ax_iter):
+        colors.append(color)
+        ax: plt.Axes
+        if ax.get_legend() is not None:
+            ax.get_legend().remove()
+        ax.set_title(None)
+        ax.set_ylim((0, 16))
+        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.yaxis.set_minor_locator(MultipleLocator(1))
 
-    @classmethod
-    def right(cls, y):
-        return cls((0.985, y), (1, 0))
+        ax.xaxis.set_major_locator(MultipleLocator(1000))
+        ax.xaxis.set_minor_locator(MultipleLocator(200))
+        ax.xaxis.set_major_formatter(
+            FuncFormatter(lambda x, pos: "{x:d}".format(x=int(x / 1000)))
+        )
+        ax.set_xlim(0, 4000)
 
-    def __init__(self, xy, box_algin) -> None:
-        self.xy = xy
-        self.box_algin = box_algin
+        a = rsd_name(
+            f"$e\mathit{{NB}}{{{i+1}}}$",
+            color="black",
+            xy=enb_txt_loc[i].xy,
+            xybox=enb_txt_loc[i].xy,
+            bbox_align=enb_txt_loc[i].box_algin,
+            coord_transform=ax.transAxes,
+        )
+        ax.add_artist(a)
+
+    for idx, ax in enumerate(ax_iter.left_axes()):
+        t = "AoI in seconds" if idx == 1 else ""
+        ax.set_ylabel(t)
+
+    for idx, ax in enumerate(ax_iter.lower_axes()):
+        PlotUtil.move_last_x_ticklabel_left(ax, "4")
+        t = "Distance in km" if idx == 0 else ""
+        ax.set_xlabel(t)
+
+    # use any ax coordinates are base on figure
+    ax_iter[0].text(
+        x=0.5,
+        y=0.1,
+        s="Distance in km",
+        transform=fig.transFigure,
+        fontdict=dict(size="medium"),
+        ha="center",
+        va="bottom",
+    )
+
+    fig.legend(
+        [
+            Line2D([0], [0], color="firebrick", linestyle="-"),
+            Line2D([0], [0], color="green", linestyle="-"),
+            MulticolorPatch(colors),
+        ],
+        ["Median", "Mean", "Fliers"],
+        handler_map={MulticolorPatch: MulticolorPatchHandler()},
+        loc="upper right",
+        bbox_to_anchor=(0.9995, 0.21),
+        **legend_args(),
+        ncol=3,
+    )
+
+    fig.subplots_adjust(
+        left=0.09, bottom=0.25, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+    )
+    save_old(fig, path)
+
+
+class StaticGridPlot(GridPlot):
+    def __init__(self, fig, axes, rows, columns, colors, **fig_kwargs) -> None:
+        super().__init__(rows, columns, colors, **fig_kwargs)
+        self.fig = fig
+        self.axes = axes
+
+    def create_axes(self) -> List:
+        return self.fig, self.axes
+
+
+class PageFigure:
+    def __init__(self, major_rows, rows, columns, colors, **fig_kwargs) -> None:
+        self.fig: Figure = plt.figure(**fig_kwargs)
+        self.sub_figures: List[SubFigure] = self.fig.subfigures(
+            nrows=major_rows, ncols=1, hspace=0.5
+        )
+        self.major_rows = major_rows
+        self.rows = rows
+        self.cols = columns
+        self.curr = 0
+        self.colors = colors
+        self.subplot_args = dict(sharex=True, sharey=True)
+
+    def next(self):
+        self.curr += 1
+        print("next figure")
+
+    def __call__(self, *args: Any, **kwds: Any) -> GridPlot:
+        axes = self.sub_figures[self.curr].subplots(
+            nrows=self.rows, ncols=self.cols, **self.subplot_args
+        )
+        g = StaticGridPlot(
+            fig=self.sub_figures[self.curr],
+            axes=axes,
+            rows=self.rows,
+            columns=self.cols,
+            colors=self.colors,
+        )
+        return g.iter_lowerLeftOrig()
 
 
 def plot_throughput_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path):
@@ -365,24 +491,27 @@ def plot_throughput_grid_for_paper(fig: plt.Figure, ax_iter: GridPlotIter, path)
         t = "Throughput in kB/s" if idx == 1 else ""
         ax.set_ylabel(t)
 
-    l2 = plt.legend(
-        [Line2D([0], [0], color="darkred", linestyle="dashed")],
+    for idx, ax in enumerate(ax_iter.lower_axes()):
+        t = "Time in seconds" if idx == 0 else ""
+        ax.set_xlabel(t)
+
+    fig.legend(
         [
-            "Configured shared\nbandwidth of 125 kB/s",
+            Line2D([0], [0], color="darkred", linestyle="dashed"),
+            MulticolorPatch(colors),
         ],
-        loc="lower left",
-        bbox_to_anchor=(0.0, -0.05),
-        bbox_transform=fig.transFigure,
-        frameon=False,
-        fontsize="x-small",
-        labelspacing=0.1,
+        ["Shared bandwidth\nlimit of 125 kB/s", "Avg. throughput"],
+        handler_map={MulticolorPatch: MulticolorPatchHandler()},
+        loc="upper right",
+        bbox_to_anchor=(0.999, 0.21),
+        **legend_args(),
+        ncol=2,
     )
-    # l2.set_transform(fig.transFigure)
-    fig.add_artist(l2)
 
     fig.subplots_adjust(
-        left=0.09, bottom=0.185, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+        left=0.09, bottom=0.25, right=0.995, top=0.99, wspace=0.08, hspace=0.15
     )
+
     save_old(fig, path)
 
 
@@ -403,23 +532,48 @@ def plot_single_seed_data_for_paper():
     )
     plotter = RsdGridPlotter.from_sim(sim=run_map[0][0])  # all
     color_list = [plotter.color_map[c] for c in plotter.get_rsd_list()]
-    plotter.create_figure = partial(figure_builder, colors=color_list)
+
+    # one plot per figure
+    # plotter.create_figure = partial(figure_builder, colors=color_list)
+
+    # with subplots
+    page_figure = PageFigure(
+        major_rows=4,
+        rows=3,
+        columns=5,
+        colors=color_list,
+        figsize=PlotUtil.fig_size_mm(178, 70 * 5),
+    )
+    plotter.create_figure = page_figure
+
     sim_group: SimulationGroup = run_map[0]
 
     ax_iter: GridPlotIter
     fig: plt.Figure
 
-    fig, ax_iter = plotter.plot_throughput_grid(
-        **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
-    )
-    plot_throughput_grid_for_paper(
-        fig, ax_iter, run_map.path("throughput_over_time.pdf")
-    )
-
+    ####
     fig, ax_iter = plotter.plot_rsd_size_grid(
         **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
     )
-    plot_rsd_size_grid_for_paper(fig, ax_iter, run_map.path("map_size_over_time.pdf"))
+    plot_rsd_size_grid_for_paper(fig, ax_iter, path=None)
+    page_figure.next()
+
+    ####
+    fig, ax_iter = plotter.plot_throughput_grid(
+        **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
+    )
+    plot_throughput_grid_for_paper(fig, ax_iter, None)
+    page_figure.next()
+
+    ###
+    fig, ax_iter = plotter.plot_map_age_over_distance_grid(
+        **RunMapRsdGridPlotStyler.plot_kwargs(run_map, sim_group.group_name, 1)
+    )
+    plot_age_over_distance_for_paper(fig, ax_iter, path=None)
+    page_figure.next()
+
+    save_old(page_figure.fig, run_map.path("appendix.pdf"))
+    print("done")
 
 
 if __name__ == "__main__":
