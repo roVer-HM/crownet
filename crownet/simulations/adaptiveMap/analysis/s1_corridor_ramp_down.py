@@ -335,7 +335,7 @@ class RandomMap(PlotUtil_):
             print(_str)
 
         seeds = data["seed"].unique()
-        draw = []
+        draw: List[pd.DataFrame] = []
         for seed in seeds:
             _print(f"for mobility seed: {seed}")
             _print(data[data["seed"] == seed]["count"].describe())
@@ -1214,7 +1214,7 @@ class MemberEstPlotter(PlotUtil_):
         ax.set_ylabel("Mean squared map error\n(MSME)")
         ax.yaxis.set_label_coords(-0.14, 0.45)
         self.color_box_plot(b, fill_color=colors, ax=ax)
-        box_data = [_df.reset_index(drop=True) for _df in box_data]
+        box_data: List[pd.DataFrame] = [_df.reset_index(drop=True) for _df in box_data]
         df = pd.concat(box_data, axis=1, ignore_index=True)
         df = df.describe().iloc[1:, :]
         df = df.applymap(lambda x: f"{x:.4f}")
