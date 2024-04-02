@@ -149,7 +149,7 @@ function run_container_X11() {
 	if [[ "$OSTYPE" == "darwin"* ]]; then
 		CMD_ARR+=(--volume="/Users/$USER:/home/$USER")
 	else
-		CMD_ARR+=(--volume="/home/$USER:/home/$USER")
+		CMD_ARR+=(--volume="$HOME:/$HOME")
 	fi
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
