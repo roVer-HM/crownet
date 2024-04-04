@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from functools import partial
 import os
 import glob
@@ -6,6 +7,7 @@ import shutil
 import io
 import sys
 from crownetutils.analysis.dpmm import MapType
+from crownetutils.analysis.dpmm.dpmm_sql import DpmmSql
 from crownetutils.utils.logging import timing
 import scipy.stats as stats
 from typing import Any, List, Tuple
@@ -71,10 +73,10 @@ S1_SIM_DATA_DIR = (
 SIM_RESULT_DIR = "/mnt/ssd_local/arc-dsa_single_cell/analysis_dir"
 
 
+@dataclass
 class ThroughputCache(CacheLoader):
-    G_rates_ts = "rates_over_time"
-    G_qq = "qq"
-    G_root = "tp_25"
+    qq: BaseHdfProvider = CacheLoader.shared_hdf_field()
+    rates_over_time: BaseHdfProvider = CacheLoader.shared_hdf_field()
 
     @staticmethod
     @timing
@@ -87,26 +89,19 @@ class ThroughputCache(CacheLoader):
         data["sg"] = isim.group_name
         return data
 
-    def __init__(self, run_map: RunMap) -> None:
-        super().__init__(run_map, run_map.path("throughput.h5"), root_group=self.G_root)
+    @classmethod
+    def create(cls, run_map):
+        obj = cls(run_map, run_map.path("throughput.h5"), root_group="tp_25")
+        obj.check()
+        return obj
 
     def cache_exists(self) -> bool:
         return super().cache_exists() and all(
             [
                 self.hdf.contains_group(g)
-                for g in [self.G_rates_ts, self.G_qq, self.G_root]
+                for g in [self.hdf.group, self.qq.group, self.rates_over_time.group]
             ]
         )
-
-    @property
-    def qq(self) -> BaseHdfProvider:
-        self.check()
-        return self.hdf.created_shared_provider(self.G_qq)
-
-    @property
-    def rates_over_time(self) -> BaseHdfProvider:
-        self.check()
-        return self.hdf.created_shared_provider(self.G_rates_ts)
 
     def load(self):
         items: List[ExecutionItem] = []
@@ -123,14 +118,18 @@ class ThroughputCache(CacheLoader):
         df: pd.DataFrame = pd.concat(df, axis=0)
         df = df.reset_index().set_index(["time", "sg", "run_id"]).sort_index()
 
-        qq = df.groupby(["sg", "run_id"])["d_map"].mean()
+        steady_state = (df.index.get_level_values("time") >= 375) & (
+            df.index.get_level_values("time") <= 775
+        )
+
+        _qq = df[steady_state].groupby(["sg", "run_id"])["d_map"].mean()
         rates_over_time = df.groupby(["sg", "time"])["d_map"].agg(
             ["mean", percentile(25), percentile(75)]
         )
 
-        self.hdf.write_frame(group=self.hdf.group, frame=df)
-        self.hdf.write_frame(group=self.G_qq, frame=qq)
-        self.hdf.write_frame(group=self.G_rates_ts, frame=rates_over_time)
+        self.save_hdf(self.hdf, frame=df)
+        self.save_hdf(self.qq, frame=_qq)
+        self.save_hdf(self.rates_over_time, frame=rates_over_time)
 
 
 class RandomMap(PlotUtil_):
@@ -685,7 +684,7 @@ class ThroughputPlotter(PlotUtil_):
         )
 
     # @with_axis
-    def msce_over_target_rate_box(self, *, ax: plt.Axes = None):
+    def msme_over_target_rate_box(self, *, ax: plt.Axes = None):
 
         figsize = self.fig_size_mm(111, 50)
         fig, ax = self.check_ax(figsize=figsize)
@@ -772,7 +771,7 @@ class ThroughputPlotter(PlotUtil_):
         )
 
         ax.set_xlabel("Target transmission rate in kBps (log scale)")
-        ax.set_ylabel("Mean squared\ncell error (MSCE)")
+        ax.set_ylabel("Mean squared\nmap error (MSME)")
         ax.xaxis.set_label_coords(0.585, 0.099, transform=fig.transFigure)
         ax.set_xscale("log")
         _yminor_tick = 0.025 / 2
@@ -789,7 +788,7 @@ class ThroughputPlotter(PlotUtil_):
         fig.subplots_adjust(
             left=0.2, bottom=0.22, right=0.995, top=0.99, wspace=0.08, hspace=0.15
         )
-        fig.savefig(self.run_map.path("msce_over_target_rate_by_seed.pdf"))
+        fig.savefig(self.run_map.path("msme_over_target_rate_by_seed.pdf"))
 
     def exp_fit(self, pos, data):
         ys = data.mean().to_numpy()
@@ -810,7 +809,7 @@ class ThroughputPlotter(PlotUtil_):
         figsize = self.fig_size_mm(111, 65)
         fig, ax = self.check_ax(figsize=figsize)
 
-        data = ThroughputCache(self.run_map).qq.frame()
+        data = ThroughputCache.create(self.run_map).qq.frame()
 
         for sg_name, _d in data.groupby("sg"):
             target_rate = self.run_map[sg_name].attr["target_rate_in_kbps"] / 8
@@ -1117,12 +1116,12 @@ class MemberEstPlotter(PlotUtil_):
     #         df.append(_df)
     #     return pd.concat(df, axis=0, verify_integrity=False).sort_index()
 
-    def _collect_tx_throughput(self, sg: SimulationGroup, freq="20_0"):
+    # todo: add removed cache builder use Opp.get_sent_throughput_by_app
+    def _collect_tx_throughput(self, sg: SimulationGroup, freq):
         df = []
         sim: Simulation
         for _, id, sim in sg.simulation_iter(enum=True):
             tx = NodeTxData(sim.dpmm_cfg.node_tx.path)
-            _df = tx.tx_bytes_per_app(app_names=["b", "m"])
             _df = sim.from_hdf("tk_pkt_bytes.h5", f"tx_throughput{freq}")
             _df["run"] = id
             df.append(_df)
@@ -1165,7 +1164,7 @@ class MemberEstPlotter(PlotUtil_):
         )
         return ax.get_figure(), ax
 
-    def plot_msce(self, with_random: bool = False):
+    def plot_msme(self, with_random: bool = False):
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         box_data = []
         pos = []
@@ -1316,7 +1315,7 @@ class MemberEstPlotter(PlotUtil_):
 
     @with_axis
     def plot_throughput_ts_fill(
-        self, bin="25_0", *, ax: plt.Axes = None
+        self, bin, *, ax: plt.Axes = None
     ) -> Tuple[plt.Figure, plt.Axes]:
         color = self.get_default_color_cycle()[0:3]
         marker = ["|", ".", "x"]
@@ -1385,6 +1384,7 @@ class MemberEstPlotter(PlotUtil_):
         if not (_hdf.contains_group("map") and _hdf.contains_group("nt")):
             sg: SimulationGroup = self.run_map["nTable-500kbps"]
             g = sg.group_name
+            nt: List[pd.DataFrame] = []
             for run_id, _, sim in sg.simulation_iter(enum=True):
                 print(f"{run_id}-{g}")
                 sim: Simulation
@@ -1395,6 +1395,7 @@ class MemberEstPlotter(PlotUtil_):
                 nt.append(_nt)
             sg: SimulationGroup = self.run_map["map-500kbps"]
             g = sg.group_name
+            dmap: List[pd.DataFrame] = []
             for run_id, _, sim in sg.simulation_iter(enum=True):
                 print(f"{run_id}-{g}")
                 sim: Simulation
@@ -1417,7 +1418,7 @@ class MemberEstPlotter(PlotUtil_):
             nt = _hdf.get_dataframe("nt")
         return dmap, nt
 
-    def plot_throughput_ped_count_ts(self, bin="25_0"):
+    def plot_throughput_ped_count_ts(self, bin):
         rc = {
             "legend.fontsize": "small",
             "axes.labelsize": "large",
@@ -1683,11 +1684,11 @@ def main():
         output_path=os.path.join(study_out, "s1"),
         load_if_present=True,
     )
-    ThroughputCache(r1).get()
+    # ThroughputCache(r1).get()
     r1_plotter = ThroughputPlotter(r1)
     r1_plotter.plot_qq()
-    r1_plotter.msce_over_target_rate_box()
-    r1_plotter.plot_target_rate_ts()
+    # r1_plotter.msme_over_target_rate_box()
+    # r1_plotter.plot_target_rate_ts()
 
     r2 = RunMap.load_or_create(
         create_f=create_member_estimate_run_map,
@@ -1695,15 +1696,40 @@ def main():
         load_if_present=True,
     )
     r2_plotter = MemberEstPlotter(r2)
-    r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
-    r2_plotter.plot_msce()
-    r2_plotter.plot_tx_interval(freq=25.0)
+    # r2_plotter.plot_throughput_ped_count_ts(bin="25_0")
+    # r2_plotter.plot_msme()
+    # r2_plotter.plot_tx_interval(freq=25.0)
 
     rnd = RandomMap(r2)
     rnd.plot_random_msme()
     print("done")
 
 
+def test():
+
+    study_out = SIM_RESULT_DIR
+    os.makedirs(study_out, exist_ok=True)
+
+    r1 = RunMap.load_or_create(
+        create_f=create_target_rate_run_map_new,
+        output_path=os.path.join(study_out, "s1"),
+        load_if_present=True,
+    )
+
+    sim = r1[0][0]
+    map_sql = DpmmSql(sim.dpmm_cfg)
+    map_size = map_sql.get_cell_count_by_host_id_over_time()
+
+    tx_data = NodeTxData(sim.dpmm_cfg.node_tx.path)
+    burst = tx_data.tx_burst("d_map").frame()
+    burst["simtime"] = burst.index.get_level_values("time").astype(int)
+    burst = burst.reset_index().set_index(["hostId", "simtime"])
+    data = burst.join(map_size.set_index(["hostId", "simtime"]))
+    data["cells_per_burst"] = (data["burst_size"] - 30 * data["burst_num"]) / 12
+    print("hi")
+
+
 if __name__ == "__main__":
 
     main()
+    # test()

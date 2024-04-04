@@ -178,7 +178,7 @@ class MemberEstPlotterWithRandomComparison(MemberEstPlotter):
 
     """
 
-    def plot_msce(self):
+    def plot_msme(self):
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         box_data = []
         for g in ["ConstantRate-", "nTable-500kbps", "map-500kbps"]:
@@ -414,4 +414,4 @@ if __name__ == "__main__":
     # main(r2)
 
     r2_plotter = MemberEstPlotterWithRandomComparison(r2)
-    r2_plotter.plot_msce()
+    r2_plotter.plot_msme()
