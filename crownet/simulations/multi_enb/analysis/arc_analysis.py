@@ -9,6 +9,7 @@ import os
 import shutil
 from typing import Any, List
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, DpmmCfgBuilder
+from crownetutils.analysis.dpmm.dpmm_sql import DpmmSql
 from crownetutils.analysis.hdf.provider import BaseHdfProvider
 from crownetutils.analysis.hdf_providers.helper import save_box_plot_to_hdf
 from crownetutils.analysis.hdf_providers.map_age_over_distance import (
@@ -19,6 +20,7 @@ from crownetutils.analysis.hdf_providers.map_error_data import MapCountError
 from crownetutils.analysis.hdf_providers.node_position import NodePositionWithRsdHdf
 from crownetutils.analysis.hdf_providers.node_tx_data import NodeTxData
 from crownetutils.utils.parallel import ExecutionItem, run_items
+from crownetutils.utils.plot import FigureSaver, FigureSaverSimple, MultiWayNorm
 from crownetutils.utils.styles import load_matplotlib_style
 from matplotlib import pyplot as plt
 import matplotlib
@@ -29,6 +31,7 @@ from matplotlib.patches import BoxStyle
 import numpy as np
 import pandas as pd
 from crownetutils.analysis.common import (
+    CacheFunc,
     CacheLoader,
     IndexedSimulation,
     RunMap,
@@ -132,6 +135,8 @@ def get_enb_colors(r: RunMap, with_zero: bool = False):
 
 def save_old(fig, path):
     """Save figure but keep old version"""
+    if path is None:
+        return
     print(f"save {path}")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     try:
@@ -161,23 +166,59 @@ def get_box_props(rsd_color):
 
 
 @dataclass
-class NumGlobalCount(CacheLoader):
-    """Number of nodes per RSD (Average over Seeds)"""
-
+class ByOrderCache(CacheLoader):
     @classmethod
-    def insertion_order(cls, run_map: RunMap) -> NumGlobalCount:
+    def _insertion_order(cls, run_map, path_suffix):
         obj = cls(
             run_map,
-            cache_path=run_map.path("insertion_order_glb_mean_number_nodes_per_enb.h5"),
+            cache_path=run_map.path(f"insertion_order_{path_suffix}.h5"),
+            idx_sim_filter=lambda x: "insertionOrder" in x.group_name,
         )
         obj.check()
         return obj
 
+    @classmethod
+    def _dist_ascending(cls, run_map, path_suffix):
+        obj = cls(
+            run_map,
+            cache_path=run_map.path(f"dist_ascending_{path_suffix}.h5"),
+            idx_sim_filter=lambda x: "orderByDistanceAscending" in x.group_name,
+        )
+        obj.check()
+        return obj
+
+    @classmethod
+    def _dist_descending(cls, run_map, path_suffix):
+        obj = cls(
+            run_map,
+            cache_path=run_map.path(f"dist_descending_{path_suffix}.h5"),
+            idx_sim_filter=lambda x: "orderByDistanceDescending" in x.group_name,
+        )
+        obj.check()
+        return obj
+
+
+@dataclass
+class NumGlobalCount(ByOrderCache):
+    """Number of nodes per RSD (Average over Seeds)"""
+
+    @classmethod
+    def insertion_order(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._insertion_order(run_map, "glb_mean_number_nodes_per_enb")
+
+    @classmethod
+    def dist_ascending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_ascending(run_map, "glb_mean_number_nodes_per_enb")
+
+    @classmethod
+    def dist_descending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_descending(run_map, "glb_mean_number_nodes_per_enb")
+
     def load(self):
         items: List[ExecutionItem] = []
-        for idx_sim in self.run_map.iter_all_sim():
-            if "insertionOrder" in idx_sim.group_name:
-                items.append(ExecutionItem(fn=self._load, kwargs=dict(isim=idx_sim)))
+        for idx_sim in self.filtered_indexed_simulation_iter():
+            items.append(ExecutionItem(fn=self._load, kwargs=dict(isim=idx_sim)))
+
         ret = run_items(items=items, pool_size=6, raise_on_error=True, unpack=True)
         df: pd.DataFrame = pd.concat(ret, axis=0)
         df = df.groupby(["ttl", "rsd_id"])["map_glb_count"].mean()
@@ -189,17 +230,25 @@ class NumGlobalCount(CacheLoader):
         map_err = MapCountError(hdf_path=isim.sim.dpmm_cfg.map_count_error.path)
         df = map_err.hdf_map_measure_rsd_local.select(columns=["map_glb_count"])
         df["run_id"] = isim.global_id
-        df["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+        df["ttl"] = int(_ttl)
         return df
 
 
 @dataclass
-class EnbRBData(CacheLoader):
+class EnbRBData(ByOrderCache):
     @classmethod
-    def insertion_order(cls, run_map: RunMap) -> EnbRBData:
-        obj = cls(run_map, run_map.path("insertion_order_rb_usage_by_ttl.h5"))
-        obj.check()
-        return obj
+    def insertion_order(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._insertion_order(run_map, "rb_usage_by_ttl")
+
+    @classmethod
+    def dist_ascending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_ascending(run_map, "rb_usage_by_ttl")
+
+    @classmethod
+    def dist_descending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_descending(run_map, "rb_usage_by_ttl")
 
     hdf_boxes: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_fliers: BaseHdfProvider = CacheLoader.shared_hdf_field()
@@ -212,9 +261,8 @@ class EnbRBData(CacheLoader):
 
     def load(self):
         items: List[ExecutionItem] = []
-        for idx_sim in self.run_map.iter_all_sim():
-            if "insertionOrder" in idx_sim.group_name:
-                items.append(ExecutionItem(fn=self._load, kwargs=dict(isim=idx_sim)))
+        for idx_sim in self.filtered_indexed_simulation_iter():
+            items.append(ExecutionItem(fn=self._load, kwargs=dict(isim=idx_sim)))
         ret = run_items(items=items, pool_size=6, raise_on_error=True, unpack=True)
         df: pd.DataFrame = pd.concat(ret, axis=0)
 
@@ -250,7 +298,9 @@ class EnbRBData(CacheLoader):
         else:
             raise FileNotFoundError(df._hdf_path)
         df["run_id"] = isim.global_id
-        df["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+        df["ttl"] = int(_ttl)
         df = df.reset_index().rename(columns={"enb_idx": "rsd_id"})
         df["rsd_id"] += 1
         df = df.set_index(["rsd_id", "time"])
@@ -258,12 +308,18 @@ class EnbRBData(CacheLoader):
 
 
 @dataclass
-class NumberOfCellsInMap(CacheLoader):
+class NumberOfCellsInMap(ByOrderCache):
     @classmethod
-    def insertion_order(cls, r: RunMap):
-        c = cls(run_map=r, cache_path=r.path("insertion_order_num_cells_in_map.h5"))
-        c.check()
-        return c
+    def insertion_order(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._insertion_order(run_map, "num_cells_in_map")
+
+    @classmethod
+    def dist_ascending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_ascending(run_map, "num_cells_in_map")
+
+    @classmethod
+    def dist_descending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_descending(run_map, "num_cells_in_map")
 
     # helpers for ease access to specific group
     hdf_glb_all_boxes: BaseHdfProvider = CacheLoader.shared_hdf_field()
@@ -271,6 +327,7 @@ class NumberOfCellsInMap(CacheLoader):
     hdf_glb_after_120_boxes: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_glb_after_120_fliers: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_glb_desc_all: BaseHdfProvider = CacheLoader.shared_hdf_field()
+    hdf_glb_desc_after_120: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_glb_after_120: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_nodes_desc_all: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_nodes_all_boxes: BaseHdfProvider = CacheLoader.shared_hdf_field()
@@ -281,9 +338,8 @@ class NumberOfCellsInMap(CacheLoader):
 
     def load(self):
         items: List[ExecutionItem] = []
-        for idx_sim in self.run_map.iter_all_sim():
-            if "insertionOrder" in idx_sim.group_name:
-                items.append(ExecutionItem(fn=self._load, kwargs=dict(isim=idx_sim)))
+        for idx_sim in self.filtered_indexed_simulation_iter():
+            items.append(ExecutionItem(fn=self._load, kwargs=dict(isim=idx_sim)))
         ret = run_items(items=items, pool_size=6, raise_on_error=True, unpack=True)
         df_nodes = [i[0] for i in ret]
         df_nodes: pd.DataFrame = pd.concat(df_nodes, axis=0)
@@ -342,8 +398,11 @@ class NumberOfCellsInMap(CacheLoader):
         cfg = DpmmCfgBuilder.load_entropy_cfg(isim.sim.data_root)
         df_nodes = pd.read_csv(cfg.map_size.path, index_col=None)
         pos = NodePositionWithRsdHdf(isim.sim, cfg.position.path)
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+
         df_nodes["run_id"] = isim.global_id
-        df_nodes["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        df_nodes["ttl"] = int(_ttl)
         df_nodes = pos.merge_rsd_id_on_host_time_interval(
             df_nodes,
             time_col="simtime",
@@ -353,11 +412,44 @@ class NumberOfCellsInMap(CacheLoader):
         )
         df_glb = pd.read_csv(cfg.map_size_global.path, index_col=None)
         df_glb["run_id"] = isim.global_id
-        df_glb["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        df_glb["ttl"] = int(_ttl)
         return df_nodes, df_glb
 
 
-class ThroughputData(CacheLoader):
+class ThroughputData(ByOrderCache):
+    @classmethod
+    def insertion_order(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._insertion_order(run_map, "throughput_by_ttl")
+
+    @classmethod
+    def dist_ascending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_ascending(run_map, "throughput_by_ttl")
+
+    @classmethod
+    def dist_descending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_descending(run_map, "throughput_by_ttl")
+
+    def load(self):
+        items: List[ExecutionItem] = []
+        rsd_list = list(range(1, 16))
+        for idx_sim in self.filtered_indexed_simulation_iter():
+            items.append(
+                ExecutionItem(
+                    fn=self._load,
+                    kwargs=dict(isim=idx_sim, rsd_list=rsd_list, bin_size=10.0),
+                )
+            )
+        ret = run_items(items=items, pool_size=6, raise_on_error=True, unpack=True)
+        df: pd.DataFrame = pd.concat(ret, axis=0)
+
+        bplot = df.groupby(["ttl", "rsd"])[["e_map", "diff_e_map"]].agg(
+            calc_box_stats(use_mpl_name=True, include_mean=True)
+        )
+        save_box_plot_to_hdf(bbox=bplot["e_map"], hdf=self.hdf, base_name="throughput_")
+        save_box_plot_to_hdf(
+            bbox=bplot["diff_e_map"], hdf=self.hdf, base_name="throughput_diff_"
+        )
+
     @staticmethod
     @timing
     def _load(isim: IndexedSimulation, rsd_list, bin_size):
@@ -378,37 +470,25 @@ class ThroughputData(CacheLoader):
             df.append(tp)
         df = pd.concat(df, axis=0)
         df["run_id"] = isim.global_id
-        df["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+        df["ttl"] = int(_ttl)
         return df
-
-    def __init__(self, run_map: RunMap) -> None:
-        super().__init__(run_map, run_map.path("insertion_order_throughput_by_ttl.h5"))
-
-    def load(self):
-        items: List[ExecutionItem] = []
-        rsd_list = list(range(1, 16))
-        for idx_sim in self.run_map.iter_all_sim():
-            if "insertionOrder" in idx_sim.group_name:
-                items.append(
-                    ExecutionItem(
-                        fn=self._load,
-                        kwargs=dict(isim=idx_sim, rsd_list=rsd_list, bin_size=10.0),
-                    )
-                )
-        ret = run_items(items=items, pool_size=6, raise_on_error=True, unpack=True)
-        df: pd.DataFrame = pd.concat(ret, axis=0)
-
-        bplot = df.groupby(["ttl", "rsd"])[["e_map", "diff_e_map"]].agg(
-            calc_box_stats(use_mpl_name=True, include_mean=True)
-        )
-        save_box_plot_to_hdf(bbox=bplot["e_map"], hdf=self.hdf, base_name="throughput_")
-        save_box_plot_to_hdf(
-            bbox=bplot["diff_e_map"], hdf=self.hdf, base_name="throughput_diff_"
-        )
 
 
 @dataclass
-class MapAgeOverDistance(CacheLoader):
+class MapAgeOverDistance(ByOrderCache):
+    @classmethod
+    def insertion_order(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._insertion_order(run_map, "map_age_over_distance")
+
+    @classmethod
+    def dist_ascending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_ascending(run_map, "map_age_over_distance")
+
+    @classmethod
+    def dist_descending(cls, run_map: RunMap) -> NumGlobalCount:
+        return cls._dist_descending(run_map, "map_age_over_distance")
 
     hdf_age_over_dist_rsd_mean_of_means: BaseHdfProvider = (
         CacheLoader.shared_hdf_field()
@@ -416,23 +496,16 @@ class MapAgeOverDistance(CacheLoader):
     hdf_age_over_dist_rsd_mean_of_mins: BaseHdfProvider = CacheLoader.shared_hdf_field()
     hdf_age_over_dist_rsd_min_of_mins: BaseHdfProvider = CacheLoader.shared_hdf_field()
 
-    @classmethod
-    def insertion_order(cls, run_map: RunMap):
-        obj = cls(run_map, run_map.path("insertion_order_map_age_over_distance.h5"))
-        obj.check()
-        return obj
-
     def load(self):
         items: List[ExecutionItem] = []
         rsd_list = list(range(1, 16))
-        for idx_sim in self.run_map.iter_all_sim():
-            if "insertionOrder" in idx_sim.group_name:
-                items.append(
-                    ExecutionItem(
-                        fn=self._load,
-                        kwargs=dict(isim=idx_sim, rsd_list=rsd_list),
-                    )
+        for idx_sim in self.filtered_indexed_simulation_iter():
+            items.append(
+                ExecutionItem(
+                    fn=self._load,
+                    kwargs=dict(isim=idx_sim, rsd_list=rsd_list),
                 )
+            )
         ret = run_items(items=items, pool_size=6, raise_on_error=True, unpack=True)
         mean_of_means: List[pd.DataFrame] = [r[0] for r in ret]
         df: pd.DataFrame = pd.concat(mean_of_means, axis=0)
@@ -461,7 +534,9 @@ class MapAgeOverDistance(CacheLoader):
         df.index.names = ["rsd", "dist"]
 
         df["run_id"] = isim.global_id
-        df["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+        df["ttl"] = int(_ttl)
 
         df2 = mm.hdf_rsd.select(where=f"metric={metric_id}", columns=["min"])
         df2 = (
@@ -472,7 +547,9 @@ class MapAgeOverDistance(CacheLoader):
         df2.index.names = ["rsd", "dist"]
 
         df2["run_id"] = isim.global_id
-        df2["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+        df2["ttl"] = int(_ttl)
 
         df3 = mm.hdf_rsd.select(where=f"metric={metric_id}", columns=["min"])
         df3 = (
@@ -483,7 +560,9 @@ class MapAgeOverDistance(CacheLoader):
         df3.index.names = ["rsd", "dist"]
 
         df3["run_id"] = isim.global_id
-        df3["ttl"] = int(isim.group_name.replace("insertionOrder_ttl", ""))
+        ttl_index = isim.group_name.index("_ttl") + 4
+        _ttl = isim.group_name[ttl_index:]
+        df3["ttl"] = int(_ttl)
 
         return df, df2, df3
 
@@ -540,19 +619,32 @@ def add_boxes_to_axes(ax: plt.Axes, boxes: pd.DataFrame, fliers: pd.DataFrame, c
     return width, fixed_lbl
 
 
-def plot_map_size(run_map: RunMap):
+def plot_map_size(
+    run_map: RunMap,
+    num_cells_cache_f: CacheFunc,
+    rsd_order: np.ndarray,
+    saver: FigureSaverSimple,
+):
 
     colors = get_enb_colors(run_map, with_zero=False)
 
     fig_size = PlotUtil.fig_size_mm(width=111, height=65)
     fig, axes = plt.subplots(ncols=1, nrows=3, figsize=fig_size, sharex=True)
-    num_cells = NumberOfCellsInMap.insertion_order(run_map)
+    num_cells = num_cells_cache_f(run_map)
 
-    boxes = num_cells.hdf_nodes_after_120_boxes.frame()
+    boxes: pd.DataFrame = num_cells.hdf_nodes_after_120_boxes.frame()
     fliers = num_cells.hdf_nodes_after_120_fliers.frame()
 
-    boxes = sort_boxes_by_node_count(boxes=boxes, run_map=run_map)
+    boxes = boxes.reorder_levels((1, 0)).sort_index().loc[rsd_order]
     fixed_lbl = boxes.index.get_level_values(0).unique().values
+    for ttl, _df in boxes.groupby("ttl"):
+        w = _df["count"] / _df["count"].sum()
+        w_mean = (_df["mean"] * w).sum()
+        print(
+            ">>>>>>{path}: weighted mean number of cells over all eNBs {w_mean}".format(
+                path=saver.override_base_path, w_mean=w_mean
+            )
+        )
     for i, (idx, box) in enumerate(boxes.iterrows()):
         enb, ttl = idx
         b = box.to_dict()
@@ -653,21 +745,23 @@ def plot_map_size(run_map: RunMap):
     fig.subplots_adjust(
         left=0.18, bottom=0.18, right=0.995, top=0.99, wspace=0.08, hspace=0.15
     )
-    save_old(fig, run_map.path("insertion_order_map_size.pdf"))
+    saver(fig, "map_size", tight_layout=False)
 
 
-def throughput_by_enb_for_all_ttls(run_map: RunMap):
+def plot_throughput_by_enb_for_all_ttls(
+    run_map: RunMap, tp_data_cache: CacheFunc, rsd_order, saver: FigureSaverSimple
+):
 
     colors = get_enb_colors(run_map, with_zero=False)
 
     fig_size = PlotUtil.fig_size_mm(width=111, height=75)
     fig, ax = plt.subplots(1, 1, figsize=fig_size)
 
-    box_df = ThroughputData(run_map).get()
+    box_df = tp_data_cache(run_map).get()
     boxes = box_df.frame("throughput_boxes")
     fliers = box_df.frame("throughput_fliers").dropna()
 
-    boxes = sort_boxes_by_node_count(boxes=boxes, run_map=run_map)
+    boxes = boxes.reorder_levels((1, 0)).sort_index().loc[rsd_order]
 
     width, fixed_lbl = add_boxes_to_axes(ax, boxes=boxes, fliers=fliers, colors=colors)
 
@@ -701,6 +795,11 @@ def throughput_by_enb_for_all_ttls(run_map: RunMap):
     )
 
     ax.yaxis.set_label_coords(-0.08, 0.5, transform=ax.transAxes)
+    fig.tight_layout()
+
+    fig.subplots_adjust(
+        left=0.12, bottom=0.25, right=0.995, top=0.99, wspace=0.08, hspace=0.15
+    )
 
     h = [
         Line2D([0], [0], color="darkred"),
@@ -735,7 +834,7 @@ def throughput_by_enb_for_all_ttls(run_map: RunMap):
         ),
         Line2D([0], [0], color="darkred", linestyle="dashed"),
     ]
-    l = ["Flieres", "Shared bandwidth"]
+    l = ["Flieres", "Shared\nbandwidth limit"]
 
     fig.legend(
         h,
@@ -751,16 +850,10 @@ def throughput_by_enb_for_all_ttls(run_map: RunMap):
         handlelength=1.0,
     )
 
-    fig.tight_layout()
-
-    fig.subplots_adjust(
-        left=0.12, bottom=0.22, right=0.995, top=0.99, wspace=0.08, hspace=0.15
-    )
-
-    save_old(fig, run_map.path("insertion_order_throughput.pdf"))
+    saver(fig, "throughput", tight_layout=False)
 
 
-def rb_utilization_by_enb_for_all_ttls_histogram(run_map: RunMap):
+def plot_rb_utilization_by_enb_for_all_ttls_histogram(run_map: RunMap):
 
     colors = get_enb_colors(run_map)
 
@@ -803,20 +896,26 @@ def rb_utilization_by_enb_for_all_ttls_histogram(run_map: RunMap):
 # Base station utilization over all seeds.
 # x base station id
 # y box plot of combined data
-def rb_utilization_by_enb_for_all_ttls_bar_chart(run_map: RunMap):
+def plot_rb_utilization_by_enb_for_all_ttls_bar_chart(
+    run_map: RunMap,
+    enb_rb_cache_f: CacheFunc,
+    glb_node_count_cache_f: CacheFunc,
+    rsd_order: np.ndarray,
+    saver: FigureSaverSimple,
+):
 
     colors = get_enb_colors(run_map, with_zero=False)
 
     fig_size = PlotUtil.fig_size_mm(width=111, height=55)
     fig, ax = plt.subplots(1, 1, figsize=fig_size)
 
-    box_df = EnbRBData.insertion_order(run_map).hdf_boxes
+    box_df: BaseHdfProvider = enb_rb_cache_f(run_map).hdf_boxes
     boxes = box_df.frame("boxes")
     width = 2.5
     fixed_lbl = [0]
 
-    boxes = sort_boxes_by_node_count(boxes, run_map)
-    num_nodes = NumGlobalCount.insertion_order(r).hdf.frame()
+    boxes = boxes.reorder_levels((1, 0)).sort_index().loc[rsd_order]
+    num_nodes = glb_node_count_cache_f(run_map).hdf.frame()
     ax.grid(visible=True, which="major", axis="y", zorder=1)
     annotation_y = [
         2,
@@ -932,41 +1031,27 @@ def rb_utilization_by_enb_for_all_ttls_bar_chart(run_map: RunMap):
         left=0.12, bottom=0.3, right=0.995, top=0.99, wspace=0.08, hspace=0.15
     )
 
-    save_old(fig, run_map.path("insertion_order_rb_utilization.pdf"))
+    saver(fig, "rb_utilization", tight_layout=False)
 
 
-class MultiWayNorm(matplotlib.colors.Normalize):
-    def __init__(self, x, y, vmin=..., vmax=..., clip=...) -> None:
-        super().__init__(vmin, vmax, clip)
-        self.x = x
-        self.y = y
+def plot_map_age_over_dist(
+    run_map: RunMap, cache_f: CacheFunc, rsd_order: np.ndarray, saver: FigureSaverSimple
+):
 
-    def __call__(self, value, clip: bool | None = None):
-        x, y = [self.vmin, *self.x, self.vmax], [0, *self.y, 1]
-        return np.ma.masked_array(np.interp(value, x, y, left=-np.inf, right=np.inf))
-
-    def inverse(self, value):
-        y, x = [self.vmin, *self.x, self.vmax], [0, *self.y, 1]
-        return np.ma.masked_array(np.interp(value, x, y, left=-np.inf, right=np.inf))
-
-
-def plot_map_age_over_dist(run_map: RunMap):
-
-    map_age_dist = MapAgeOverDistance.insertion_order(run_map)
+    map_age_dist: MapAgeOverDistance = cache_f(run_map)
     df_min = map_age_dist.hdf_age_over_dist_rsd_mean_of_mins.frame()
     df = df_min.groupby(["rsd", "dist", "ttl"])["mean_age"].mean().unstack("rsd")
     # df_avg =  map_age_dist.hdf_age_over_dist_rsd_avg.frame()
     # df = df_avg.groupby(["rsd", "dist", "ttl"])["mean_age"].mean().unstack("rsd")
 
-    # get rsd values sorted by ascending number of nodes
-    rsd_order = (
-        NumGlobalCount.insertion_order(run_map)
-        .get()
-        .frame()["mean"]
+    max_dist = (
+        map_age_dist.hdf_age_over_dist_rsd_min_of_mins.frame()
         .reset_index()
-        .sort_values("mean")["rsd_id"]
-        .values
+        .groupby(["ttl", "rsd"])["dist"]
+        .max()
     )
+    max_dist = max_dist.groupby(["ttl"]).agg(["max", "mean"])
+    print(f">>>>>>{saver.override_base_path} max map distance:\n{max_dist}")
 
     for provider in [
         map_age_dist.hdf_age_over_dist_rsd_mean_of_means,
@@ -974,7 +1059,6 @@ def plot_map_age_over_dist(run_map: RunMap):
         map_age_dist.hdf_age_over_dist_rsd_min_of_mins,
     ]:
 
-        out_path = run_map.path(f"insertion_order_{provider.group}.pdf")
         df = provider.frame()
         value = df.columns[0]
         print(value)
@@ -1072,18 +1156,142 @@ def plot_map_age_over_dist(run_map: RunMap):
             fontsize="xx-small",
             transform=fig.transFigure,
         )
-        save_old(fig, out_path)
-        print("hi")
+
+        saver(fig, provider.group, tight_layout=False)
+
+
+def plot_insertion_order(r: RunMap, rsd_order):
+
+    # pdf_saver = FigureSaverSimple(override_base_path=r.path("insertion_order"), figure_type=".pdf")
+    pdf_saver = FigureSaverSimple(
+        override_base_path=r.path("insertion_order"), figure_type=".png", dpi=600
+    )
+    pdf_saver.with_prefix("fsft_", count=-1)
+
+    plot_rb_utilization_by_enb_for_all_ttls_bar_chart(
+        run_map=r,
+        enb_rb_cache_f=EnbRBData.insertion_order,
+        glb_node_count_cache_f=NumGlobalCount.insertion_order,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_throughput_by_enb_for_all_ttls(
+        run_map=r,
+        tp_data_cache=ThroughputData.insertion_order,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_map_size(
+        run_map=r,
+        num_cells_cache_f=NumberOfCellsInMap.insertion_order,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_map_age_over_dist(
+        run_map=r,
+        cache_f=MapAgeOverDistance.insertion_order,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+
+def plot_dist_ascending(r: RunMap, rsd_order):
+
+    # pdf_saver = FigureSaverSimple(override_base_path=r.path("dist_ascending"), figure_type=".pdf")
+    pdf_saver = FigureSaverSimple(
+        override_base_path=r.path("dist_ascending"), figure_type=".png", dpi=600
+    )
+    pdf_saver.with_prefix("d_asc_", count=-1)
+
+    plot_rb_utilization_by_enb_for_all_ttls_bar_chart(
+        run_map=r,
+        enb_rb_cache_f=EnbRBData.dist_ascending,
+        glb_node_count_cache_f=NumGlobalCount.dist_ascending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_throughput_by_enb_for_all_ttls(
+        run_map=r,
+        tp_data_cache=ThroughputData.dist_ascending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_map_size(
+        run_map=r,
+        num_cells_cache_f=NumberOfCellsInMap.dist_ascending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_map_age_over_dist(
+        run_map=r,
+        cache_f=MapAgeOverDistance.dist_ascending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+
+def plot_dist_descending(r: RunMap, rsd_order):
+
+    # pdf_saver = FigureSaverSimple(override_base_path=r.path("dist_descending"), figure_type=".pdf")
+    pdf_saver = FigureSaverSimple(
+        override_base_path=r.path("dist_descending"), figure_type=".png", dpi=600
+    )
+    pdf_saver.with_prefix("d_desc_", count=-1)
+
+    plot_rb_utilization_by_enb_for_all_ttls_bar_chart(
+        run_map=r,
+        enb_rb_cache_f=EnbRBData.dist_descending,
+        glb_node_count_cache_f=NumGlobalCount.dist_descending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_throughput_by_enb_for_all_ttls(
+        run_map=r,
+        tp_data_cache=ThroughputData.dist_descending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_map_size(
+        run_map=r,
+        num_cells_cache_f=NumberOfCellsInMap.dist_descending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+    plot_map_age_over_dist(
+        run_map=r,
+        cache_f=MapAgeOverDistance.dist_descending,
+        rsd_order=rsd_order,
+        saver=pdf_saver,
+    )
+
+
+def plot_all():
+    r = get_or_create_run_map()
+
+    # get rsd values sorted by ascending number of nodes
+    rsd_order = (
+        NumGlobalCount.insertion_order(r)
+        .get()
+        .frame()["mean"]
+        .reset_index()
+        .sort_values("mean")["rsd_id"]
+        .values
+    )
+    plot_insertion_order(r, rsd_order)
+    plot_dist_ascending(r, rsd_order)
+    plot_dist_descending(r, rsd_order)
 
 
 if __name__ == "__main__":
     logger.setLevel(DEBUG)
-    r = get_or_create_run_map()
 
-    # rb_utilization_by_enb_for_all_ttls_bar_chart(r)
-    # throughput_by_enb_for_all_ttls(r)
-    # plot_map_size(r)
-    plot_map_age_over_dist(r)
-    # x = MapAgeOverDistance.insertion_order(r)
-
-    print("hi")
+    plot_all()
