@@ -12,6 +12,8 @@ density_map_size.csv|\
 density_map_size_global.csv|\
 entropy_map_measurements_age_over_distance.h5|\
 entropy_map_size_and_age_over_distance.h5|\
+entropy_map_size_global_by_rsd.csv|\
+density_map_size_global_by_rsd|\
 DENSITY.cfg|\
 ENTROPY.cfg"
 

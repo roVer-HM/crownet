@@ -50,6 +50,8 @@ from crownetutils.analysis.dpmm.imputation import (
     OwnerPositionImputation,
 )
 
+from numpy.typing import NDArray
+
 load_matplotlib_style(STYLE_SIMPLE_169)
 
 # todo:
@@ -388,16 +390,28 @@ class SimulationRun(BaseSimulationRunner):
         df.to_csv(cfg.map_size.path, index=False)
 
     @process_as({"prio": 967, "type": "post"})
-    def create_map_size_global_cache(self) -> MapMeasurementsAgeOverDistance:
-        cfg: DpmmCfgDb = get_density_cfg(self.result_base_dir())
-        map_sql = DpmmSql(cfg)
-        df = map_sql.get_cell_count_global_over_time()
-        df.to_csv(cfg.map_size_global.path, index=False)
+    def create_map_size_global_cache(self):
+        cfg1: DpmmCfgDb = get_density_cfg(self.result_base_dir())
+        cfg2: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
 
-        cfg: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
-        map_sql = DpmmSql(cfg)
-        df = map_sql.get_cell_count_global_over_time()
-        df.to_csv(cfg.map_size_global.path, index=False)
+        for cfg in [cfg1, cfg2]:
+            cfg: DpmmCfgDb = get_density_cfg(self.result_base_dir())
+            map_sql = DpmmSql(cfg)
+            df = map_sql.get_cell_count_global_over_time()
+            df.to_csv(cfg.map_size_global.path, index=False)
+
+    @process_as({"prio": 966, "type": "post"})
+    def create_map_size_global_cache_by_rsd(self):
+        pos: NodePositionWithRsdHdf = self.create_position_hdf()
+        enb_pos: NDArray = pos.enb.frame()[CoordinateType.xy_cell.cols].values
+
+        cfg1: DpmmCfgDb = get_density_cfg(self.result_base_dir())
+        cfg2: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
+
+        for cfg in [cfg1, cfg2]:
+            map_sql = DpmmSql(cfg)
+            df = map_sql.get_cell_count_global_by_rsd_over_time(enb_pos=enb_pos)
+            df.to_csv(cfg.map_size_global_by_rsd.path, index=True)
 
     # do not execute for now... use time delta for entropy data!
     # @process_as({"prio": 983, "type": "post"})
