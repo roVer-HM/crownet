@@ -19,15 +19,17 @@ ARG IMAGE_REG
 ARG BASE_IMAGE_TAG
 FROM ${IMAGE_REG}/crownet-base-cpp:${BASE_IMAGE_TAG}
 
-ENV GITHUB_TAG="omnetpp-6.0.1"
+ENV GITHUB_TAG="omnetpp-6.0.3"
 ENV RELEASE=$GITHUB_TAG
 
-LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0.1)"
+LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0.3)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # Use bash shell
 SHELL ["/bin/bash", "-c"]
 
+# setup image to use bash also as default shell
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 # install additionally needed Python modules
 RUN pip3 install numpy pandas matplotlib posix_ipc scipy
