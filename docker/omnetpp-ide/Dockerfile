@@ -30,7 +30,7 @@ COPY docker/omnetpp-ide/waitfor.sh /waitfor.sh
 RUN chmod 555 /waitfor.sh
 
 RUN rm -rf /tmp/omnetpp.tgz
-RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.0.1/omnetpp-6.0.1-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
+RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.0.3/omnetpp-6.0.3-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
 
 # extract IDE and copy to omnetpp
 WORKDIR /tmp/
