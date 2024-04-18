@@ -395,7 +395,6 @@ class SimulationRun(BaseSimulationRunner):
         cfg2: DpmmCfgDb = get_entropy_cfg(self.result_base_dir())
 
         for cfg in [cfg1, cfg2]:
-            cfg: DpmmCfgDb = get_density_cfg(self.result_base_dir())
             map_sql = DpmmSql(cfg)
             df = map_sql.get_cell_count_global_over_time()
             df.to_csv(cfg.map_size_global.path, index=False)
