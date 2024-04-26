@@ -42,7 +42,7 @@ void UdpDetourAppVadere::initialize(int stage) {
     ctrl = mobility->getController<VaderePersonController>();
 
     // record internal identifier for node.
-    std::string exId = ctrl->getNodeId();
+    std::string exId = ctrl->getTraciId();
     try {
       recordScalar("externalId", std::stod(exId));
     } catch (std::invalid_argument const &e) {

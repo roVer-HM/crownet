@@ -31,18 +31,16 @@ VaderePersonController::VaderePersonController(
 VaderePersonController::VaderePersonController(
     const std::string& id, std::shared_ptr<VaderePersonCache> cache,
     std::shared_ptr<API> api)
-    : m_id(id),
+    : traci::PersonController(api, cache),
+      m_id(id),
       m_cache(cache),
       m_api(std::dynamic_pointer_cast<VadereApi>(api)),
       m_boundary(m_api->v_simulation.getNetBoundary()) {}
 
-const std::string& VaderePersonController::getNodeId() const { return m_id; }
+const std::string& VaderePersonController::getTraciId() const { return m_id; }
+
 std::string VaderePersonController::getTypeId() const {
   return m_cache->get<VAR_TYPE>();
-}
-
-const std::string VaderePersonController::getNodeClass() const {
-  return m_cache->get<VAR_TYPE>();  // todo  VAR_VEHICLECLASS -> VAR_PersonCLASS
 }
 
 artery::Position VaderePersonController::getPosition() const {

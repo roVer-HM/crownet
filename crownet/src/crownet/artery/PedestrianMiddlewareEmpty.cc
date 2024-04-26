@@ -41,7 +41,7 @@ void PedestrianMiddlewareEmpty::initialize(int stage) {
     mDataProvider.update(getKinematics(*mPersonController));
 
     Identity identity;
-    identity.traci = mPersonController->getNodeId();
+    identity.traci = mPersonController->getTraciId();
     identity.application = mDataProvider.station_id();
     emit(Identity::changeSignal,
          Identity::ChangeTraCI | Identity::ChangeStationId, &identity);

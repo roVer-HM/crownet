@@ -34,7 +34,7 @@ void PedestrianMiddleware::initialize(int stage) {
 
     // emit will update mIdenity of Middelware base
     Identity identity;
-    identity.traci = mPersonController->getNodeId();
+    identity.traci = mPersonController->getTraciId();
     identity.application = mDataProvider.station_id();
     emit(Identity::changeSignal,
          Identity::ChangeTraCI | Identity::ChangeStationId, &identity);

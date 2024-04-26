@@ -7,22 +7,21 @@
 
 #pragma once
 
-#include <artery/traci/MovingNodeController.h>
+#include <artery/traci/PersonController.h>
 #include "crownet/artery/traci/VadereApi.h"
 #include "crownet/artery/traci/VariableCache.h"
 
 namespace crownet {
 
-class VaderePersonController : public traci::MovingNodeController {
+class VaderePersonController : public traci::PersonController {
  public:
   virtual ~VaderePersonController() = default;
   VaderePersonController(const std::string& id, std::shared_ptr<API> api);
   VaderePersonController(std::shared_ptr<VaderePersonCache> cache);
 
-  // MovingNodeController
-  virtual const std::string& getNodeId() const override;
+  // Controller
+  virtual const std::string& getTraciId() const override;
   virtual std::string getTypeId() const override;
-  virtual const std::string getNodeClass() const override;
 
   virtual artery::Position getPosition() const override;
   virtual artery::GeoPosition getGeoPosition() const override;

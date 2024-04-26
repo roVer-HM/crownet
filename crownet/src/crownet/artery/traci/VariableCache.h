@@ -7,7 +7,7 @@
 
 namespace crownet {
 
-class VaderePersonCache : public traci::VariableCache {
+class VaderePersonCache : public traci::PersonCache {
  public:
   VaderePersonCache(std::shared_ptr<API> api, const std::string& id);
 };
