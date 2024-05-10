@@ -1,3 +1,7 @@
+"""Create Topography plot for scenario S3/S4
+
+Paper: Adaptive Transmission Rate Control for Decentralized Sensing Applications
+"""
 import os
 
 from crownetutils.analysis.common import Simulation

@@ -12,7 +12,7 @@ from threading import Lock
 from typing import Any, List
 from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg, DpmmCfgBuilder
 from crownetutils.analysis.dpmm.dpmm_sql import DpmmSql
-from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.analysis.hdf.provider import BaseHdfProvider, GroupedResultObject
 from crownetutils.analysis.hdf_providers.helper import save_box_plot_to_hdf
 from crownetutils.analysis.hdf_providers.map_age_over_distance import (
     MapMeasurementsAgeOverDistance,
@@ -109,17 +109,29 @@ def add_ax_text(
     ax.text(x, y, s=lbl, transform=transform, ha=ha, va=va, **kwargs)
 
 
-class BoxPlotHdfProvider(BaseHdfProvider):
-    def __init__(
-        self,
-        hdf_path: str,
-        group: str = "root",
-        allow_lazy_loading: bool = False,
-        shared_loc: Lock = None,
-    ):
-        super().__init__(hdf_path, group, allow_lazy_loading, shared_loc)
-        self.boxes: BaseHdfProvider = self.created_shared_provider("boxes")
-        self.fliers: BaseHdfProvider = self.created_shared_provider("fliers")
+class BoxPlotHdfProvider(GroupedResultObject):
+    def __init__(self, hdf: BaseHdfProvider, group_name: str):
+        self.base_group: str = group_name
+        self._hdf: BaseHdfProvider = hdf
+        self.boxes: BaseHdfProvider = self._hdf.created_shared_provider(
+            group=f"{group_name}/boxes"
+        )
+        self.fliers: BaseHdfProvider = self._hdf.created_shared_provider(
+            group=f"{group_name}/fliers"
+        )
+
+    @property
+    def group(self) -> str:
+        """Default group of result object"""
+        return self.boxes.group
+
+    def get_groups(self) -> List[str]:
+        """Return root groups of object"""
+        return [self.boxes.group, self.fliers.group]
+
+    def get_keys(self) -> List[str]:
+        """Return all result items in this object"""
+        return [f"/{g}" for g in self.get_groups()]
 
 
 class FilteredSeedGroupFactory:
@@ -603,8 +615,12 @@ class MapAgeOverDistanceBoxPlots(CacheLoader):
         obj.check()
         return obj
 
-    boxes: BaseHdfProvider = CacheLoader.shared_hdf_field(is_root=True)
-    fliers: BaseHdfProvider = CacheLoader.shared_hdf_field()
+    aoi: BoxPlotHdfProvider = CacheLoader.shared_hdf_field(
+        is_root=True, factory=BoxPlotHdfProvider
+    )
+    map_size: BoxPlotHdfProvider = CacheLoader.shared_hdf_field(
+        factory=BoxPlotHdfProvider
+    )
 
     def load(self):
         items: List[ExecutionItem] = []
@@ -621,7 +637,7 @@ class MapAgeOverDistanceBoxPlots(CacheLoader):
         ret: pd.DataFrame = pd.concat(ret, axis=0)
         print(f"shape {ret.shape}")
 
-        boxes = ret.groupby(["order", "ttl", "dist_left"])["aoi"].agg(
+        data = ret.groupby(["order", "ttl", "dist_left"])[["num_cells", "aoi"]].agg(
             [
                 "std",
                 "min",
@@ -632,27 +648,33 @@ class MapAgeOverDistanceBoxPlots(CacheLoader):
                 calc_box_stats(use_mpl_name=True, include_mean=True),
             ]
         )
-        boxes = pd.concat(
+        self.save(data["aoi"], self.aoi.boxes, self.aoi.fliers)
+        self.save(data["num_cells"], self.map_size.boxes, self.map_size.fliers)
+
+    def save(
+        self,
+        data: pd.DataFrame,
+        hdf_boxes: BaseHdfProvider,
+        hdf_fliers: BaseHdfProvider,
+    ):
+        data = pd.concat(
             [
-                boxes[["std", "min", "max"]],
-                pd.DataFrame.from_records(
-                    boxes["percentile_records"], index=boxes.index
-                ),
-                pd.DataFrame.from_records(boxes["box_stats"], index=boxes.index),
+                data[["std", "min", "max"]],
+                pd.DataFrame.from_records(data["percentile_records"], index=data.index),
+                pd.DataFrame.from_records(data["box_stats"], index=data.index),
             ],
             axis=1,
         )
         fliers = (
-            boxes["fliers"]
+            data["fliers"]
             .explode()
             .to_frame()
             .set_axis(["fliers"], axis=1)
             .astype(float)
         )
-        boxes = boxes.drop(columns=["fliers"])
-        self.save_hdf(self.boxes, boxes)
-        self.save_hdf(self.fliers, fliers)
-        # save_box_plot_to_hdf(boxes["aoi"], hdf=self.boxes, fliers_hdf=self.fliers)
+        data = data.drop(columns=["fliers"])
+        self.save_hdf(frame=data, hdf=hdf_boxes)
+        self.save_hdf(frame=fliers, hdf=hdf_fliers)
 
     def _load(self, isim: IndexedSimulation):
         e_cfg = DpmmCfgBuilder.load_entropy_cfg(isim.sim.data_root)
@@ -660,9 +682,9 @@ class MapAgeOverDistanceBoxPlots(CacheLoader):
             hdf_path=e_cfg.map_size_and_age_over_distance.path
         )
         metric_id = mm.metric_map["age_of_information"]
-        df = mm.hdf.select(where=f"metric={metric_id}", columns=["mean"]).set_axis(
-            ["aoi"], axis=1
-        )
+        df = mm.hdf.select(
+            where=f"metric={metric_id}", columns=["count", "mean"]
+        ).set_axis(["num_cells", "aoi"], axis=1)
         df["run_id"] = isim.global_id
         ttl_index = isim.group_name.index("_ttl") + 4
         _ttl = isim.group_name[ttl_index:]
@@ -686,7 +708,7 @@ class MapAgeOverDistance(ByOrderCache):
     def dist_descending(cls, run_map: RunMap) -> NumGlobalCount:
         return cls._dist_descending(run_map, "map_age_over_distance")
 
-    hdf_age_over_dist_rsd: BaseHdfProvider = CacheLoader.shared_hdf_field()
+    hdf_age_over_dist_rsd: BaseHdfProvider = CacheLoader.shared_hdf_field(is_root=True)
 
     def load(self):
         items: List[ExecutionItem] = []
@@ -1251,6 +1273,12 @@ def plot_map_age_over_dist(
         for ax, ttl, vmax in zip(axes[0:3], ttls, vmaxs):
             ax: plt.Axes
             _df: pd.DataFrame = df.loc[pd.IndexSlice[:, ttl], rsd_order]
+            _avg_age_at_max_extend = _df.stack("rsd").to_frame().reset_index()
+            _max_age_idx = _avg_age_at_max_extend.groupby("rsd")["dist"].idxmax()
+            _avg_age_stats = (
+                _avg_age_at_max_extend.loc[_max_age_idx, 0].describe().to_dict()
+            )
+
             lbls = [str(i) for i in _df.columns]
 
             _x = np.arange(16) - 0.5
@@ -1277,6 +1305,16 @@ def plot_map_age_over_dist(
             add_ax_text(ttl_lbl_map(ttl), ax=ax, x=0.02, y=0.98, fontsize="xx-small")
             add_ax_text(
                 dist_str, ax=ax, ha="right", x=0.99, y=0.98, fontsize="xx-small"
+            )
+            if ttl == 3600:
+                age_str = "{mean:3d}$\pm${std:3d}\,s\phantom{{m}}".format(
+                    mean=int(_avg_age_stats["mean"]), std=int(_avg_age_stats["std"])
+                )
+            else:
+                age_str = "{mean:3.1f}$\pm${std:3.1f}\,s".format(**_avg_age_stats)
+
+            add_ax_text(
+                age_str, ax=ax, ha="right", x=0.99, y=0.925, fontsize="xx-small"
             )
 
             ax.set_xlim(-0.5, 14.5)
@@ -1330,27 +1368,27 @@ def plot_insertion_order(r: RunMap, rsd_order):
 
     saver = get_muli_saver(r.path("insertion_order"), "fsft_")
 
-    plot_rb_utilization_by_enb_for_all_ttls_bar_chart(
-        run_map=r,
-        enb_rb_cache_f=EnbRBData.insertion_order,
-        glb_node_count_cache_f=NumGlobalCount.insertion_order,
-        rsd_order=rsd_order,
-        saver=saver,
-    )
+    # plot_rb_utilization_by_enb_for_all_ttls_bar_chart(
+    #     run_map=r,
+    #     enb_rb_cache_f=EnbRBData.insertion_order,
+    #     glb_node_count_cache_f=NumGlobalCount.insertion_order,
+    #     rsd_order=rsd_order,
+    #     saver=saver,
+    # )
 
-    plot_throughput_by_enb_for_all_ttls(
-        run_map=r,
-        tp_data_cache=ThroughputData.insertion_order,
-        rsd_order=rsd_order,
-        saver=saver,
-    )
+    # plot_throughput_by_enb_for_all_ttls(
+    #     run_map=r,
+    #     tp_data_cache=ThroughputData.insertion_order,
+    #     rsd_order=rsd_order,
+    #     saver=saver,
+    # )
 
-    plot_map_size(
-        run_map=r,
-        num_cells_cache_f=NumberOfCellsInMap.insertion_order,
-        rsd_order=rsd_order,
-        saver=saver,
-    )
+    # plot_map_size(
+    #     run_map=r,
+    #     num_cells_cache_f=NumberOfCellsInMap.insertion_order,
+    #     rsd_order=rsd_order,
+    #     saver=saver,
+    # )
 
     plot_map_age_over_dist(
         run_map=r,
@@ -1450,8 +1488,8 @@ def plot_all():
         .values
     )
     plot_insertion_order(r, rsd_order)
-    plot_dist_ascending(r, rsd_order)
-    plot_dist_descending(r, rsd_order)
+    # plot_dist_ascending(r, rsd_order)
+    # plot_dist_descending(r, rsd_order)
 
 
 class NumberOfCellsGlbByRSD(CacheLoader):
@@ -1613,14 +1651,40 @@ def plot_s4_map_size():
     saver(fig, "map_size", tight_layout=False)
 
 
+def _plot_s4_age_over_map_extend(ax, dist, boxes, o, c):
+    ax.plot(
+        dist,
+        boxes["mean"],
+        linestyle="solid",
+        label=f"{order_lbl_map[o]} mean",
+        color=c,
+    )
+    ax.plot(
+        dist,
+        boxes["med"],
+        linestyle="dotted",
+        label=f"{order_lbl_map[o]} median",
+        color=c,
+    )
+    ax.fill_between(
+        x=dist,
+        y1=boxes["p10"],
+        y2=boxes["p90"],
+        label="p10/90",
+        color=c,
+        alpha=0.2,
+    )
+
+
 def plot_s4_age_over_map_extend():
     r = get_or_create_run_map()
 
     saver = get_muli_saver(r.path("s4"), "s4_")
 
-    fig_size = PlotUtil.fig_size_mm(width=111, height=110)
+    # fig_size = PlotUtil.fig_size_mm(width=111, height=110)
+    fig_size = PlotUtil.fig_size_mm(width=210, height=120)
     m: MapAgeOverDistanceBoxPlots = MapAgeOverDistanceBoxPlots.get(r)
-    fig, axes = plt.subplots(ncols=1, nrows=3, figsize=fig_size, sharex=True)
+    fig, axes = plt.subplots(ncols=2, nrows=3, figsize=fig_size, sharex=True)
     ttl = [15, 60, 3600]
     colors = plt.colormaps["tab10"]([0, 1, 2])
     order: List[str] = [
@@ -1628,57 +1692,98 @@ def plot_s4_age_over_map_extend():
         "orderByDistanceAscending",
         "orderByDistanceDescending",
     ]
-    for t, ax in zip(ttl, axes):
-        ax: plt.Axes
-        for o, c in zip(order, colors):
-            boxes = m.boxes.select(where=f"order={o} and ttl={t}")
-            dist = boxes.index.get_level_values("dist_left") / 1000
-            line = ax.plot(
-                dist,
-                boxes["mean"],
-                linestyle="solid",
-                label=f"{order_lbl_map[o]} mean",
-                color=c,
-            )
-            line = ax.plot(
-                dist,
-                boxes["med"],
-                linestyle="dotted",
-                label=f"{order_lbl_map[o]} median",
-                color=c,
-            )
-            ax.fill_between(
-                x=dist,
-                y1=boxes["p10"],
-                y2=boxes["p90"],
-                label="p10/90",
-                color=c,
-                alpha=0.2,
-            )
 
-        if t == 15:
-            ax.yaxis.set_major_locator(MultipleLocator(5))
-            ax.yaxis.set_minor_locator(MultipleLocator(1))
-            ax.set_ylim(0, 16)
-        elif t == 60:
-            ax.yaxis.set_major_locator(MultipleLocator(10))
-            ax.yaxis.set_minor_locator(MultipleLocator(2))
-            ax.set_ylim(0, 65)
-            ax.set_ylabel("Age of Information (AoI) in seconds")
-            ax.yaxis.set_label_coords(0.05, 0.6, transform=fig.transFigure)
+    data: BoxPlotHdfProvider = [m.aoi, m.map_size]
+    lbls = [
+        "Age of Information (AoI) in seconds",
+        "Number of cells in distance bucket (50m)",
+    ]
+    x_max = 4.4
+    for col, (d, lbl) in enumerate(zip(data, lbls)):
 
-        else:
-            ax.yaxis.set_major_locator(MultipleLocator(200))
-            ax.yaxis.set_minor_locator(MultipleLocator(50))
-            ax.set_ylim(0, 1100)
+        ax_col = axes[:, col]
+        for t, ax in zip(ttl, ax_col):
+            ax: plt.Axes
+            ax_zoom1: plt.Axes = None
+            ax_zoom2: plt.Axes = None
+            for o, c in zip(order, colors):
+                boxes = d.boxes.select(where=f"order={o} and ttl={t}")
+                dist = boxes.index.get_level_values("dist_left") / 1000
+                _plot_s4_age_over_map_extend(ax, dist, boxes, o, c)
+                if t == 3600 and col == 1:
+                    if ax_zoom2 is None:
+                        x1, x2, y1, y2 = 2, x_max, 0.0, 50.0
+                        ax_zoom2 = ax.inset_axes(
+                            bounds=[x1, 300, x2 - x1, 400],
+                            transform=ax.transData,
+                            xlim=(x1, x2),
+                            ylim=(y1, y2),
+                            xticklabels=[],
+                        )
+                    _plot_s4_age_over_map_extend(ax_zoom2, dist, boxes, o, c)
+                if t == 60 and col == 1:
+                    if ax_zoom1 is None:
+                        x1, x2, y1, y2 = 1, 4.0, 0.0, 25.0
+                        ax_zoom1 = ax.inset_axes(
+                            bounds=[x1, 50, x2 - x1, 80],
+                            transform=ax.transData,
+                            xlim=(x1, x2),
+                            ylim=(y1, y2),
+                            xticklabels=[],
+                        )
+                    _plot_s4_age_over_map_extend(ax_zoom1, dist, boxes, o, c)
 
-        add_ax_text(ttl_lbl_map(t), ax=ax, x=0.99, ha="right")
+            if t == 15:
+                if col == 0:
+                    ax.yaxis.set_major_locator(MultipleLocator(5))
+                    ax.yaxis.set_minor_locator(MultipleLocator(1))
+                    ax.set_ylim(0, 16)
+                else:
+                    ax.yaxis.set_major_locator(MultipleLocator(25))
+                    ax.yaxis.set_minor_locator(MultipleLocator(5))
+                    ax.set_ylim(0, 65)
+            elif t == 60:
+                ax.set_ylabel(lbl)
+                if col == 0:
+                    ax.yaxis.set_major_locator(MultipleLocator(25))
+                    ax.yaxis.set_minor_locator(MultipleLocator(5))
+                    ax.set_ylim(0, 65)
+                    ax.yaxis.set_label_coords(0.03, 0.6, transform=fig.transFigure)
+                else:
+                    ax.yaxis.set_major_locator(MultipleLocator(50))
+                    ax.yaxis.set_minor_locator(MultipleLocator(10))
+                    ax.set_ylim(0, 160)
+                    ax.indicate_inset_zoom(ax_zoom1, edgecolor="black", alpha=1.0)
+                    ax_zoom1.grid(visible="major", axis="x")
+                    ax_zoom1.xaxis.set_major_locator(MultipleLocator(0.5))
+                    ax_zoom1.xaxis.set_minor_locator(MultipleLocator(0.100))
+                    ax_zoom1.yaxis.set_major_locator(MultipleLocator(10))
+                    ax_zoom1.yaxis.set_minor_locator(MultipleLocator(2))
 
-        ax.xaxis.set_major_locator(MultipleLocator(1))
-        ax.xaxis.set_minor_locator(MultipleLocator(0.200))
-        ax.set_xlim(0, 4.5)
-        ax.grid(visible="major", axis="x")
-    ax = axes[-1]
+            else:
+                if col == 0:
+                    ax.yaxis.set_major_locator(MultipleLocator(200))
+                    ax.yaxis.set_minor_locator(MultipleLocator(50))
+                    ax.set_ylim(0, 1100)
+                else:
+                    ax.yaxis.set_major_locator(MultipleLocator(200))
+                    ax.yaxis.set_minor_locator(MultipleLocator(50))
+                    ax.set_ylim(0, 900)
+                    ax.indicate_inset_zoom(ax_zoom2, edgecolor="black", alpha=1.0)
+                    ax_zoom2.grid(visible="major", axis="x")
+                    ax_zoom2.xaxis.set_major_locator(MultipleLocator(0.5))
+                    ax_zoom2.xaxis.set_minor_locator(MultipleLocator(0.100))
+                    ax_zoom2.yaxis.set_major_locator(MultipleLocator(25))
+                    ax_zoom2.yaxis.set_minor_locator(MultipleLocator(5))
+
+            add_ax_text(ttl_lbl_map(t), ax=ax, x=0.99, ha="right")
+
+            ax.xaxis.set_major_locator(MultipleLocator(0.5))
+            ax.xaxis.set_minor_locator(MultipleLocator(0.100))
+            ax.set_xlim(0, x_max)
+            ax.grid(visible="major", axis="x")
+
+    ax = axes[0, 0]
     h, l = ax.get_legend_handles_labels()
     h = [h[0], (h[1], h[2]), h[3], (h[4], h[5]), h[6], (h[7], h[8])]
     l = [
@@ -1692,23 +1797,24 @@ def plot_s4_age_over_map_extend():
     fig.legend(
         h,
         l,
-        ncol=3,
+        ncol=6,
         bbox_transform=fig.transFigure,
-        bbox_to_anchor=(0.95, 0.15),
+        bbox_to_anchor=(0.95, 0.1),
         frameon=False,
         fontsize="x-small",
         labelspacing=0.5,
         columnspacing=1.2,
         handlelength=1.5,
     )
-    ax.set_xlabel("Average map extend in km")
+    axes[-1, 0].set_xlabel("Distance in km")
+    axes[-1, 1].set_xlabel("Distance in km")
     fig.tight_layout()
     fig.subplots_adjust(
-        left=0.15,
-        bottom=0.25,
+        left=0.09,
+        bottom=0.20,
         right=0.995,
         top=0.99,
-        wspace=0.02,
+        wspace=0.2,
         hspace=0.09,
     )
     saver(fig, "age_over_map_extend", tight_layout=False)

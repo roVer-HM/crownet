@@ -1,3 +1,7 @@
+"""Create mobility statistics for sumo simulation
+
+Paper: Adaptive Transmission Rate Control for Decentralized Sensing Applications
+"""
 from __future__ import annotations
 import glob
 import os
