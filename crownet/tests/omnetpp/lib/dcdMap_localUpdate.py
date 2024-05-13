@@ -41,8 +41,4 @@ def dcd_map_localUpdate(hostId, data_root):
 
 
 if __name__ == "__main__":
-    # dcd_map_localUpdate(hostId=sys.argv[1], data_root=sys.argv[2])
-    dcd_map_localUpdate(
-        hostId=15,
-        data_root="/home/vm-sts/repos/crownet/crownet/tests/omnetpp/work/DcDMap_localUpdate/results",
-    )
+    dcd_map_localUpdate(hostId=sys.argv[1], data_root=sys.argv[2])
