@@ -22,20 +22,28 @@ void PedestrianPositionProvider::initialize(int stage) {
         inet::getModuleFromPar<artery::Runtime>(par("runtimeModule"), this);
     auto& mobilityPar = par("mobilityModule");
     mMobility = check_and_cast<InetVaderePersonMobility*>(getModuleByPath(mobilityPar));
-    if (mMobility) {
-        mMobility->subscribe(artery::MobilityBase::stateChangedSignal, this);
-      if (auto mobilityBase =
-              dynamic_cast<artery::MobilityBase*>(mMobility)) {
 
-        mController = mobilityBase->getController<VaderePersonController>();
-      } else {
-        error("Module on path '%s' is not a MobilityBase",
-                mMobility->getFullPath().c_str());
-      }
-    } else {
-      error("Module not found on path '%s' defined by par '%s'",
-            mobilityPar.stringValue(), mobilityPar.getFullPath().c_str());
+    if (!mMobility) {
+        error("Module not found on path '%s' defined by par '%s'",
+                    mobilityPar.stringValue(), mobilityPar.getFullPath().c_str());
     }
+
+    mMobility->subscribe(artery::MobilityBase::stateChangedSignal, this);
+
+    auto personMobility = dynamic_cast<artery::PersonMobility*>(mMobility);
+
+    if(!personMobility) {
+        error("Module on path '%s' is not a PersonMobility",
+                        mMobility->getFullPath().c_str());
+    }
+
+    auto personController = personMobility->getPersonController();
+
+    mController = dynamic_cast<VaderePersonController*>(personController);
+    if(!mController){
+        error("Controller is not a valid VaderePersonController.");
+    };
+
   } else if (stage == artery::InitStages::Propagate) {
     updatePosition();
   }

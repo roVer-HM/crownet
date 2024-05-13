@@ -6,7 +6,7 @@
  */
 
 #include "crownet/applications/detour/UdpDetourAppVadere.h"
-#include <artery/traci/ControllableObject.h>
+#include "artery/traci/ControllablePerson.h"
 
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/TagBase_m.h"
@@ -37,9 +37,16 @@ void UdpDetourAppVadere::initialize(int stage) {
   if (stage == INITSTAGE_LOCAL) {
       //
   } else if (stage == INITSTAGE_APPLICATION_LAYER) {
-    auto mobility = inet::getModuleFromPar<ControllableObject>(
+    auto mobility = inet::getModuleFromPar<ControllablePerson>(
         par("mobilityModule"), inet::getContainingNode(this));
-    ctrl = mobility->getController<VaderePersonController>();
+
+    auto persCon = mobility->getPersonController();
+
+    ctrl = dynamic_cast<VaderePersonController*>(persCon);
+
+    if(!ctrl){
+        error("Mobility module of this node has no valid VaderePersonController.");
+    }
 
     // record internal identifier for node.
     std::string exId = ctrl->getTraciId();

@@ -16,7 +16,9 @@
 #include "crownet/applications/control/BroadcastControlApp.h"
 #include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/applications/control/control_m.h"
-#include <artery/traci/ControllableObject.h>
+#include "crownet/artery/traci/VaderePersonController.h"
+#include "artery/traci/ControllablePerson.h"
+#include "artery/traci/PersonMobility.h"
 #include "inet/common/packet/Message.h"
 
 
@@ -32,8 +34,11 @@ void BroadcastControlApp::initialize(int stage) {
     BaseBroadcast::initialize(stage);
     if (stage == INITSTAGE_APPLICATION_LAYER) {
         if (par("isControlled").boolValue()){
-            auto mobility = castMobility<ControllableObject>();
-            ctrl = mobility->getController<VaderePersonController>();
+            auto mobility = castMobility<ControllablePerson>();
+            auto persCon = mobility->getPersonController();
+
+            ctrl = dynamic_cast<VaderePersonController*>(persCon);
+            ASSERT(ctrl);
         }
 
     }
