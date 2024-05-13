@@ -20,6 +20,10 @@ def dcd_map_localUpdate(hostId, data_root):
         module_vectors=["misc"],
         beacon_app_path="app[0]",
         map_app_path="app[1]",
+        sca_name="final-#0.sca",
+        vec_name="final-#0.vec",
+        network_name="TestStationaryWorld",
+        global_map_csv_name="global_densityMap.csv",
     )
     builder = Builders.DpmmHdfBuilder.get(cfg)
     map: DpmmProvider = builder.build().map_p
@@ -37,4 +41,8 @@ def dcd_map_localUpdate(hostId, data_root):
 
 
 if __name__ == "__main__":
-    dcd_map_localUpdate(hostId=sys.argv[1], data_root=sys.argv[2])
+    # dcd_map_localUpdate(hostId=sys.argv[1], data_root=sys.argv[2])
+    dcd_map_localUpdate(
+        hostId=15,
+        data_root="/home/vm-sts/repos/crownet/crownet/tests/omnetpp/work/DcDMap_localUpdate/results",
+    )
