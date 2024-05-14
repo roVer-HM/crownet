@@ -14,7 +14,7 @@
 # Common problems:
 # Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/sumo<.
 
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 ENV GITHUB_TAG="v1_20_0_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
@@ -54,13 +54,13 @@ RUN git pull https://github.com/roVer-HM/sumo.git $SUMO_RELEASE
 
 # configure and compile
 ENV PATH /opt/sumo/sumo/bin:$PATH
-RUN mkdir build/cmake-build && cd build/cmake-build && \
-    cmake ../.. && \
-    make -j16
+ENV SUMO_HOME $PWD
+RUN cmake -B build . && \
+    cmake --build build -j$(nproc)
 
 # clean-up the build directory
 WORKDIR /opt/sumo/sumo
-RUN rm -rf build/cmake-build
+RUN rm -rf build
 
 
 COPY docker/sumo/veins_launchd /veins_launchd
