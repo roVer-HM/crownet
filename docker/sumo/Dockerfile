@@ -14,7 +14,7 @@
 # Common problems:
 # Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/sumo<.
 
-FROM ubuntu:24.04
+FROM ubuntu:20.04
 
 ENV GITHUB_TAG="v1_20_0_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
