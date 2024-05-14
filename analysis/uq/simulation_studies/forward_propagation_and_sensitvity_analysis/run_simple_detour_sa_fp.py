@@ -2,10 +2,12 @@
 #!/usr/bin/python3
 
 import os, sys
+
 sys.path.append(os.path.abspath(""))
 
 import time
 from datetime import timedelta
+
 sys.path.append(os.path.abspath(""))
 import shutil
 import docker
@@ -18,7 +20,10 @@ import chaospy, numpy
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, para_processes=1):
+
+def run_simulations(
+    par_var, summary_dir, quantity_of_interest, simulation_dir, para_processes=1
+):
 
     start_time = time.time()
     print(f"Simulation started at {time.ctime()}")
@@ -37,14 +42,19 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
         pass
     client.networks.create(network_id)
 
-    model = VadereOppCommand() \
-        .create_vadere_container() \
-        .experiment_label("output") \
-        .vadere_tag("030b71de") \
-        .omnet_tag("6.0.1") \
-        .qoi(quantity_of_interest) \
-        .write_container_log() \
+    vadere_tag = os.getenv("CROWNET_VADERE_CONT_TAG")
+    omnet_tag = os.getenv("CROWNET_OPP_CONT_TAG")
+
+    model = (
+        VadereOppCommand()
+        .create_vadere_container()
+        .experiment_label("output")
+        .vadere_tag(vadere_tag)
+        .omnet_tag(omnet_tag)
+        .qoi(quantity_of_interest)
+        .write_container_log()
         .network_name(network_id)
+    )
 
     if os.path.isdir(simulation_dir):
         print(f"Remove {simulation_dir}")
@@ -64,7 +74,9 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
 
     par, data = setup.run(para_processes)
 
-    print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
+    print(
+        f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss)."
+    )
 
     os.makedirs(summary_dir)
 
@@ -83,9 +95,12 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
 
     return par, data
 
-def analyze_scalar_qoi(expansion, abscissas,weights, sim_results, qoi, output_dir):
 
-    print(f"Start sensitivity analysis and qoi of qoi = {qoi} \n Qoi values: {sim_results}")
+def analyze_scalar_qoi(expansion, abscissas, weights, sim_results, qoi, output_dir):
+
+    print(
+        f"Start sensitivity analysis and qoi of qoi = {qoi} \n Qoi values: {sim_results}"
+    )
 
     if numpy.all(numpy.isfinite(sim_results)) == False:
         print("There are non numerical values in the output. Skip qoi.")
@@ -111,8 +126,10 @@ def analyze_scalar_qoi(expansion, abscissas,weights, sim_results, qoi, output_di
         f.write(f"Qoi (stats):  E = {e1}, std = {std1}, skew = {skew1}\n\n")
 
         if is_constant:
-            f.write("Warning. The sensitivity indices are rounding errors, since the std is appro. = 0.\n"
-                    "DO NOT USE THEM \n")
+            f.write(
+                "Warning. The sensitivity indices are rounding errors, since the std is appro. = 0.\n"
+                "DO NOT USE THEM \n"
+            )
 
         f.write(f"Sensitivity indices \n")
         f.write(f"First order \n")
@@ -131,7 +148,10 @@ def analyze_scalar_qoi(expansion, abscissas,weights, sim_results, qoi, output_di
         plt.show(block=False)
         plt.close()
 
-    print(f"{qoi}: sensitivity analysis and forward propagation results exported to {output_file_name} ")
+    print(
+        f"{qoi}: sensitivity analysis and forward propagation results exported to {output_file_name} "
+    )
+
 
 if __name__ == "__main__":
 
@@ -151,16 +171,20 @@ if __name__ == "__main__":
         up = float(sys.argv[4])
         para_process = int(sys.argv[5])
     else:
-        raise ValueError("Call the script >python3 script_name.py abspathoutputdir 2 100 2000 1< "
-                         "where abspathoutputdir is the path to the output directory"
-                         "where 2 is the order for the polynomial chaos expansion."
-                         "where 100 is the lower limit of the number of peds parameter."
-                         "where 2000 is the upper limit of the number of peds parameter."
-                         "where 1 is the number of parallel processes.")
+        raise ValueError(
+            "Call the script >python3 script_name.py abspathoutputdir 2 100 2000 1< "
+            "where abspathoutputdir is the path to the output directory"
+            "where 2 is the order for the polynomial chaos expansion."
+            "where 100 is the lower limit of the number of peds parameter."
+            "where 2000 is the upper limit of the number of peds parameter."
+            "where 1 is the number of parallel processes."
+        )
 
-    print(f"Write output to {simulation_dir}. \n"
-          f"Use following values: \n"
-          f"polynomial chaos expansion: order =  {order}, number of peds (max): {up}. Number of parallel runs: {para_process}")
+    print(
+        f"Write output to {simulation_dir}. \n"
+        f"Use following values: \n"
+        f"polynomial chaos expansion: order =  {order}, number of peds (max): {up}. Number of parallel runs: {para_process}"
+    )
 
     DIGIT = 3
     summary_dir = os.path.join(simulation_dir, "results_summary")
@@ -168,14 +192,18 @@ if __name__ == "__main__":
 
     # paratemeters
     # p1_ = chaospy.TruncExponential(upper=up, shift=low, scale=(up - low) / b) b=4
-    p1_ = chaospy.Uniform(lower=low, upper=up) # number of pedestrians
-    p2_ = chaospy.Uniform(lower=0, upper=4000) #"*.hostMobile[*].app[1].messageLength"
-    p3_ = chaospy.Uniform(lower=0.5,upper=2.0) # "**wlan[*].radio.transmitter.power"
+    p1_ = chaospy.Uniform(lower=low, upper=up)  # number of pedestrians
+    p2_ = chaospy.Uniform(lower=0, upper=4000)  # "*.hostMobile[*].app[1].messageLength"
+    p3_ = chaospy.Uniform(lower=0.5, upper=2.0)  # "**wlan[*].radio.transmitter.power"
 
-    distribution = chaospy.J(p1_,p2_,p3_)
+    distribution = chaospy.J(p1_, p2_, p3_)
 
-    abscissas, weights = chaospy.generate_quadrature(order, distribution, rule="gaussian")
-    expansion = chaospy.orth_ttr(order, distribution) #TODO replace with orth_ttr with chaospy.expansion.stieltjes
+    abscissas, weights = chaospy.generate_quadrature(
+        order, distribution, rule="gaussian"
+    )
+    expansion = chaospy.orth_ttr(
+        order, distribution
+    )  # TODO replace with orth_ttr with chaospy.expansion.stieltjes
 
     samples = abscissas.T
 
@@ -187,27 +215,37 @@ if __name__ == "__main__":
         # There are four sources in the simulation that spawn agents according to Poisson processes.
         # The unit of the Poisson parameter p is [agents/1 seconds].
         # Since the 'number of agents' parameter refers to 100s and there are four sources, p must be:
-        p = round(val1 * 0.01 / 4, 4) # source parameters must be of type >list< in vadere, other parameters require other types
+        p = round(
+            val1 * 0.01 / 4, 4
+        )  # source parameters must be of type >list< in vadere, other parameters require other types
 
         # Parameter 2: message length
         # The message length is a parameter in the omnet simulator.
         # It must be an integer value with unit B.
-        message_length_parameter_val = f"{int(val2)}B" # note: parameter values must be always strings in omnet
+        message_length_parameter_val = (
+            f"{int(val2)}B"  # note: parameter values must be always strings in omnet
+        )
 
         power = f"{round(val3,4)}mW"
 
         sample = {
-            'omnet': {"*.misc[0].app[0].messageLength": message_length_parameter_val,
-                      "**wlan[*].radio.transmitter.power": power},
-            'vadere': {'sources.[id==1].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==2].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==5].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==6].spawner.distribution.numberPedsPerSecond': p}
-            }
+            "omnet": {
+                "*.misc[0].app[0].messageLength": message_length_parameter_val,
+                "**wlan[*].radio.transmitter.power": power,
+            },
+            "vadere": {
+                "sources.[id==1].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==2].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==5].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==6].spawner.distribution.numberPedsPerSecond": p,
+            },
+        }
 
         par_var.append(sample)
 
-    par_var = OmnetSeedManager(par_variations=par_var, rep_count=1, vadere_fixed=True, omnet_fixed=True).get_new_seed_variation()
+    par_var = OmnetSeedManager(
+        par_variations=par_var, rep_count=1, vadere_fixed=True, omnet_fixed=True
+    ).get_new_seed_variation()
 
     quantity_of_interest = [
         "degree_informed_extract.txt",
@@ -215,10 +253,12 @@ if __name__ == "__main__":
         "time_95_informed_redirection_area.txt",
         "time_95_informed_all.txt",
         "packet_age.txt",
-        "number_of_peds.txt"
+        "number_of_peds.txt",
     ]
 
-    info, qoi = run_simulations(par_var,summary_dir, quantity_of_interest, simulation_dir, para_process)
+    info, qoi = run_simulations(
+        par_var, summary_dir, quantity_of_interest, simulation_dir, para_process
+    )
 
     # apply forward prop and sensitivity analysis
     if os.path.isdir(output_dir):
@@ -231,13 +271,37 @@ if __name__ == "__main__":
     df3 = qoi["packet_age.txt"]
     df4 = qoi["number_of_peds.txt"]
 
-    analyze_scalar_qoi(expansion, abscissas, weights, df1["timeToInform95PercentAgents"].values, "Time95PercentInformedRedirecationArea", output_dir)
-    analyze_scalar_qoi(expansion, abscissas, weights, df2["timeToInform95PercentAgents"].values, "Time95PercentInformedAll", output_dir)
-    analyze_scalar_qoi(expansion, abscissas, weights, df3["50%"].values, "MedianLifetime", output_dir)
-    analyze_scalar_qoi(expansion, abscissas, weights, df3["max"].values, "MaxLifetime", output_dir)
-    analyze_scalar_qoi(expansion, abscissas, weights, df3["min"].values, "MinLifetime", output_dir)
-    analyze_scalar_qoi(expansion, abscissas, weights, df3["mean"].values, "MinLifetime", output_dir)
-    analyze_scalar_qoi(expansion, abscissas, weights, df4["mean"].values, "NumberOfPeds", output_dir)
+    analyze_scalar_qoi(
+        expansion,
+        abscissas,
+        weights,
+        df1["timeToInform95PercentAgents"].values,
+        "Time95PercentInformedRedirecationArea",
+        output_dir,
+    )
+    analyze_scalar_qoi(
+        expansion,
+        abscissas,
+        weights,
+        df2["timeToInform95PercentAgents"].values,
+        "Time95PercentInformedAll",
+        output_dir,
+    )
+    analyze_scalar_qoi(
+        expansion, abscissas, weights, df3["50%"].values, "MedianLifetime", output_dir
+    )
+    analyze_scalar_qoi(
+        expansion, abscissas, weights, df3["max"].values, "MaxLifetime", output_dir
+    )
+    analyze_scalar_qoi(
+        expansion, abscissas, weights, df3["min"].values, "MinLifetime", output_dir
+    )
+    analyze_scalar_qoi(
+        expansion, abscissas, weights, df3["mean"].values, "MinLifetime", output_dir
+    )
+    analyze_scalar_qoi(
+        expansion, abscissas, weights, df4["mean"].values, "NumberOfPeds", output_dir
+    )
 
     plt.hist(p1_.sample(1000))
     plt.xlabel("Parameter: number of agents")
@@ -247,7 +311,7 @@ if __name__ == "__main__":
     plt.close()
 
     print(info.columns)
-    if (info[('MetaInfo', 'return_code')] == 0).all():
+    if (info[("MetaInfo", "return_code")] == 0).all():
         sys.exit(0)
     else:
         print("Some of the simulations failed.")

@@ -2,11 +2,13 @@
 #!/usr/bin/python3
 
 import os, sys
+
 sys.path.append(os.path.abspath(""))
 
 
 import time
 from datetime import timedelta
+
 sys.path.append(os.path.abspath(""))
 import shutil
 import string, random
@@ -22,7 +24,9 @@ import docker
 run_local = True
 
 
-def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, parralel_runs=1):
+def run_simulations(
+    par_var, summary_dir, quantity_of_interest, simulation_dir, parralel_runs=1
+):
 
     start_time = time.time()
     print(f"Simulation started at {time.ctime()}")
@@ -41,14 +45,19 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
         pass
     client.networks.create(network_id)
 
-    model = VadereOppCommand() \
-        .create_vadere_container() \
-        .experiment_label("output") \
-        .vadere_tag("030b71de") \
-        .omnet_tag("6.0.1") \
-        .qoi(quantity_of_interest) \
-        .write_container_log() \
+    vadere_tag = os.getenv("CROWNET_VADERE_CONT_TAG")
+    omnet_tag = os.getenv("CROWNET_OPP_CONT_TAG")
+
+    model = (
+        VadereOppCommand()
+        .create_vadere_container()
+        .experiment_label("output")
+        .vadere_tag(vadere_tag)
+        .omnet_tag(omnet_tag)
+        .qoi(quantity_of_interest)
+        .write_container_log()
         .network_name(network_id)
+    )
 
     if os.path.isdir(simulation_dir):
         print(f"Remove {simulation_dir}")
@@ -67,7 +76,9 @@ def run_simulations(par_var, summary_dir, quantity_of_interest, simulation_dir, 
     )
 
     par, data = setup.run(parralel_runs)
-    print(f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
+    print(
+        f"Time to run all simulations: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss)."
+    )
 
     os.makedirs(summary_dir)
     par.to_csv(os.path.join(summary_dir, f"parameters.txt"))
@@ -104,12 +115,13 @@ if __name__ == "__main__":
         number = int(sys.argv[3])
         para_process = int(sys.argv[4])
     else:
-        raise ValueError("Call the script >python3 script_name.py abspathoutputdir 120 20 1< "
-                         "where abspathoutputdir is the path to the output directory"
-                         "where 120 is the max of the number of peds parameter."
-                         "where 20 is the number of samples"
-                         "where 1 is the number of parallel runs.")
-
+        raise ValueError(
+            "Call the script >python3 script_name.py abspathoutputdir 120 20 1< "
+            "where abspathoutputdir is the path to the output directory"
+            "where 120 is the max of the number of peds parameter."
+            "where 20 is the number of samples"
+            "where 1 is the number of parallel runs."
+        )
 
     samples = np.linspace(1, high, number)
 
@@ -124,18 +136,24 @@ if __name__ == "__main__":
         # There are four sources in the simulation that spawn agents according to Poisson processes.
         # The unit of the Poisson parameter p is [agents/1 seconds].
         # Since the 'number of agents' parameter refers to 100s and there are four sources, p must be:
-        p = round(val1 * 0.01 / 4, 4) # source parameters must be of type >list< in vadere, other parameters require other types
+        p = round(
+            val1 * 0.01 / 4, 4
+        )  # source parameters must be of type >list< in vadere, other parameters require other types
 
         sample = {
-            'vadere': {'sources.[id==1].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==2].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==5].spawner.distribution.numberPedsPerSecond': p,
-                    'sources.[id==6].spawner.distribution.numberPedsPerSecond': p}
+            "vadere": {
+                "sources.[id==1].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==2].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==5].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==6].spawner.distribution.numberPedsPerSecond": p,
             }
+        }
 
         par_var.append(sample)
 
-    par_var = OmnetSeedManager(par_variations=par_var, rep_count=1, vadere_fixed=False, omnet_fixed=True).get_new_seed_variation()
+    par_var = OmnetSeedManager(
+        par_variations=par_var, rep_count=1, vadere_fixed=False, omnet_fixed=True
+    ).get_new_seed_variation()
 
     quantity_of_interest = [
         "degree_informed_extract.txt",
@@ -143,10 +161,12 @@ if __name__ == "__main__":
         "time_95_informed_redirection_area.txt",
         "time_95_informed_all.txt",
         "packet_age.txt",
-        "number_of_peds.txt"
+        "number_of_peds.txt",
     ]
 
-    info, qoi = run_simulations(par_var,summary_dir, quantity_of_interest, simulation_dir, para_process)
+    info, qoi = run_simulations(
+        par_var, summary_dir, quantity_of_interest, simulation_dir, para_process
+    )
     time_95 = qoi["time_95_informed_all.txt"]
     number_peds = qoi["number_of_peds.txt"]
 
@@ -166,48 +186,40 @@ if __name__ == "__main__":
         shutil.rmtree(output_dir, ignore_errors=True)
     os.makedirs(output_dir)
 
-
-    plt.bar(bins[:-1], number_rec[0], color='b', width=width, align="edge")
-    plt.bar(bins[:-1], number_notrec[0], bottom=number_rec[0], color='r', width=width, align="edge")
-    plt.ylabel('Information dissemination below 10s')
+    plt.bar(bins[:-1], number_rec[0], color="b", width=width, align="edge")
+    plt.bar(
+        bins[:-1],
+        number_notrec[0],
+        bottom=number_rec[0],
+        color="r",
+        width=width,
+        align="edge",
+    )
+    plt.ylabel("Information dissemination below 10s")
     plt.xlabel("Number of pedestrians (mean)")
-    plt.legend(labels=['<= 10s', '>10s'])
-    plt.savefig(os.path.join(output_dir,"Probabilites.pdf"))
+    plt.legend(labels=["<= 10s", ">10s"])
+    plt.savefig(os.path.join(output_dir, "Probabilites.pdf"))
     plt.show(block=False)
     plt.close()
 
-    plt.bar(bins[:-1], prob_fail, color='b', width=width, align="edge")
-    plt.ylabel('Probability (>10s)')
+    plt.bar(bins[:-1], prob_fail, color="b", width=width, align="edge")
+    plt.ylabel("Probability (>10s)")
     plt.xlabel("Number of pedestrians (mean)")
-    plt.savefig(os.path.join(output_dir,"Probabilites_normed.pdf"))
+    plt.savefig(os.path.join(output_dir, "Probabilites_normed.pdf"))
     plt.show(block=False)
     plt.close()
 
     plt.scatter(x=number_peds["mean"], y=time_95["timeToInform95PercentAgents"])
     plt.xlabel("Number of pedestrians (mean)")
     plt.ylabel("Information dissemination time in s")
-    plt.savefig(os.path.join(output_dir,"InfoDisserminationTime.pdf"))
+    plt.savefig(os.path.join(output_dir, "InfoDisserminationTime.pdf"))
     plt.show(block=False)
     plt.close()
 
     print(info)
 
-    if (info[('MetaInfo', 'return_code')] == 0).all():
+    if (info[("MetaInfo", "return_code")] == 0).all():
         sys.exit(0)
     else:
         print("Some of the simulations failed.")
         sys.exit(-1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
