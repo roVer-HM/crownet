@@ -14,7 +14,7 @@
 # Common problems:
 # Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/sumo<.
 
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 ENV GITHUB_TAG="v1_20_0_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
@@ -30,8 +30,9 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo net-tools \
        openssh-client git git-lfs \
-       cmake python libxerces-c-dev libfox-1.6-dev \
-       libgl1-mesa-dev libglu1-mesa-dev libgdal-dev libproj-dev libgl2ps-dev && \
+       cmake python3 python3-dev g++ libxerces-c-dev libfox-1.6-dev \
+       libgl1-mesa-dev libglu1-mesa-dev libgdal-dev libproj-dev libgl2ps-dev \ 
+       swig default-jdk maven libeigen3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
