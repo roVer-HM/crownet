@@ -121,7 +121,7 @@ def analyze_scalar_qoi(expansion, abscissas, weights, sim_results, qoi, output_d
     is_constant = std1 < 0.001
 
     with open(output_file_name, "w") as f:
-        f.write("Parameters: Number of peds, message length, power \n")
+        f.write("Parameters: Number of peds, repeat Interval, power \n")
         f.write(f"Quantity of interest: {qoi} \n")
         f.write(f"Qoi (stats):  E = {e1}, std = {std1}, skew = {skew1}\n\n")
 
@@ -193,8 +193,10 @@ if __name__ == "__main__":
     # paratemeters
     # p1_ = chaospy.TruncExponential(upper=up, shift=low, scale=(up - low) / b) b=4
     p1_ = chaospy.Uniform(lower=low, upper=up)  # number of pedestrians
-    p2_ = chaospy.Uniform(lower=0, upper=4000)  # "*.hostMobile[*].app[1].messageLength"
-    p3_ = chaospy.Uniform(lower=0.5, upper=2.0)  # "**wlan[*].radio.transmitter.power"
+    p2_ = chaospy.Uniform(
+        lower=0.8, upper=2.8
+    )  # *.misc[0].app[0].repeateInterval  "*.hostMobile[*].app[1].messageLength"
+    p3_ = chaospy.Uniform(lower=2.0, upper=20.0)  # "**wlan[*].radio.transmitter.power"
 
     distribution = chaospy.J(p1_, p2_, p3_)
 
@@ -212,32 +214,27 @@ if __name__ == "__main__":
 
         # Parameter 1: number of agents
         # The number of agents is a parameter that is specified in the vadere simulator.
-        # There are four sources in the simulation that spawn agents according to Poisson processes.
-        # The unit of the Poisson parameter p is [agents/1 seconds].
-        # Since the 'number of agents' parameter refers to 100s and there are four sources, p must be:
         p = round(
-            val1 * 0.01 / 4, 4
-        )  # source parameters must be of type >list< in vadere, other parameters require other types
+            4 * 1 * 100 / val1, 4
+        )  # = 4 sources* 1 Person*100s / (number of persons in scenario after 100s)
 
         # Parameter 2: message length
         # The message length is a parameter in the omnet simulator.
         # It must be an integer value with unit B.
-        message_length_parameter_val = (
-            f"{int(val2)}B"  # note: parameter values must be always strings in omnet
-        )
+        repeateInterval = f"{round(val2,4)}s"  # note: parameter values must be always strings in omnet
 
         power = f"{round(val3,4)}mW"
 
         sample = {
             "omnet": {
-                "*.misc[0].app[0].messageLength": message_length_parameter_val,
+                "*.misc[0].app[0].repeateInterval": repeateInterval,
                 "**wlan[*].radio.transmitter.power": power,
             },
             "vadere": {
-                "sources.[id==1].spawner.distribution.numberPedsPerSecond": p,
-                "sources.[id==2].spawner.distribution.numberPedsPerSecond": p,
-                "sources.[id==5].spawner.distribution.numberPedsPerSecond": p,
-                "sources.[id==6].spawner.distribution.numberPedsPerSecond": p,
+                "sources.[id==1].spawner.distribution.updateFrequency": p,
+                "sources.[id==2].spawner.distribution.updateFrequency": p,
+                "sources.[id==5].spawner.distribution.updateFrequency": p,
+                "sources.[id==6].spawner.distribution.updateFrequency": p,
             },
         }
 

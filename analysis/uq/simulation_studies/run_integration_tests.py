@@ -1,11 +1,8 @@
 import os
-import subprocess
 import sys
 import unittest
 
-from subprocess import PIPE, run
-
-
+from subprocess import run
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -13,7 +10,6 @@ sys.path.append(rootPath)
 import shutil
 import time
 from datetime import timedelta
-
 
 
 class SimulationStudiesTests(unittest.TestCase):
@@ -63,16 +59,23 @@ class SimulationStudiesTests(unittest.TestCase):
                             ]
         print(f"Run {terminal_command} in {sim_dir}")
 
-        return_code = subprocess.check_call(
+        out = open(os.path.join(self._sim_dir, f"{sim_name}.out"), 'w+')
+        err = open(os.path.join(self._sim_dir, f"{sim_name}.err"), 'w+')
+
+        p = run(
             terminal_command,
             cwd=sim_dir,
-            timeout=1200,  # stop simulation after 20min
-        )
+            timeout=1200, # stop simulation after 20min
+            stdout=out,
+            stderr=err)
+
+        out.close()
+        err.close()
 
         print(
             f"Time to run {sim_name} (jobs= {self.number_of_parralel_sims}: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
-        assert (return_code == 0)
+        assert (p.returncode == 0)
 
     def forward_propagation(self):
 
@@ -94,16 +97,24 @@ class SimulationStudiesTests(unittest.TestCase):
                             ]
         print(f"Run {terminal_command} in {sim_dir}")
 
-        return_code = subprocess.check_call(
+        out = open(os.path.join(self._sim_dir, f"{sim_name}.out"), 'w+')
+        err = open(os.path.join(self._sim_dir, f"{sim_name}.err"), 'w+')
+
+        p = run(
             terminal_command,
             cwd=sim_dir,
             timeout=1200,  # stop simulation after 20min
-        )
+            stdout=out,
+            stderr=err)
+
+        out.close()
+        err.close()
+
 
         print(
             f"Time to run {sim_name} (jobs= {self.number_of_parralel_sims}: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
-        assert (return_code == 0)
+        assert (p.returncode == 0)
 
     def forward_propagation_and_sensitvity_analysis(self):
 
@@ -127,16 +138,24 @@ class SimulationStudiesTests(unittest.TestCase):
                             ]
         print(f"Run {terminal_command} in {sim_dir}")
 
-        return_code = subprocess.check_call(
+        out = open(os.path.join(self._sim_dir, f"{sim_name}.out"), 'w+')
+        err = open(os.path.join(self._sim_dir, f"{sim_name}.err"), 'w+')
+
+        p = run(
             terminal_command,
             cwd=sim_dir,
-            timeout=1200,  # stop simulation after 20min
+            timeout=1200, # stop simulation after 20min
+            stdout=out,
+            stderr=err
         )
+
+        out.close()
+        err.close()
 
         print(
             f"Time to run {sim_name} (jobs= {self.number_of_parralel_sims}: {timedelta(seconds=time.time() - start_time)} (hh:mm:ss).")
 
-        assert (return_code == 0)
+        assert (p.returncode == 0)
 
 
 if __name__ == "__main__":

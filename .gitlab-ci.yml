@@ -124,6 +124,7 @@ fingerprints:
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
@@ -147,6 +148,7 @@ fingerprints_crownet:
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
@@ -184,6 +186,7 @@ uq-unit-tests:
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq"
@@ -196,6 +199,7 @@ uq-integration-tests:
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq/simulation_studies"

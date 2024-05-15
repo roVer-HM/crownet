@@ -55,11 +55,13 @@ class SimulationRun(BaseSimulationRunner):
         df = OppAnalysis.get_sim_real_time_ratio(omnetpp_log_file_path=opp_out)
         df.to_csv(os.path.join(self.result_base_dir(), "simsec_sec_ratio.csv"), sep = " ")
         df.set_index("sim_time",inplace=True)
-        (1./df["ratio_sim_real"]).plot()
+        (1./df["ratio_sim_real"][2:]).plot()
         plt.xlabel("Simulation time in s")
-        plt.ylabel("Ratio: simulation time / real time ")
+        plt.ylabel("Simulation time / real time ")
+        plt.gcf().subplots_adjust(bottom=0.15)
         plt.savefig(os.path.join(self.result_base_dir(), "RatioSimulationTimeRealTime.pdf"))
         plt.show(block=False)
+        plt.close()
 
 
     @process_as({"prio": 10, "type": "post"})
@@ -75,8 +77,9 @@ class SimulationRun(BaseSimulationRunner):
         df.set_index(["timeStep"], inplace=True)
         df.index.name = "Simulation time in s"
 
-        df.plot(legend=False)
+        df.plot(legend=False,figsize=(8, 3))
         plt.ylabel("Number of agents")
+        plt.gcf().subplots_adjust(bottom=0.15)
         plt.savefig(os.path.join(self.result_base_dir(), "numberOfPeds.pdf"))
         plt.show(block=False)
         plt.close()
@@ -99,7 +102,7 @@ class SimulationRun(BaseSimulationRunner):
         plt.show(block=False)
         plt.close()
 
-    @process_as({"prio": 30, "type": "post"})
+    @process_as({"prio": 130, "type": "post"})
     def densities_mapped(self):
         fp_densitites_true = self.wait_for_file(
             os.path.join(self.result_base_dir(), "vadere.d", "densities.txt"),
@@ -130,12 +133,14 @@ class SimulationRun(BaseSimulationRunner):
         for densitiy_estimate, density_ground_truth, route in zip(areas, dataprocessor, routes):
             a = densitiy_estimate
             b = density_ground_truth
-            df[a].plot(label="Estimate", )
-            df[b].plot(label="Ground truth", linestyle="dotted")
+            df[a].plot(label="Estimate", color='blue',figsize=(8, 3) )
+            (df[a]/0.4).plot(label="Estimate (scaled)", linestyle='dashed',color='green',figsize=(8, 3) )
+            df[b].plot(label="Ground truth",color='black',figsize=(8, 3))
             plt.legend()
             plt.title(route)
             plt.ylabel("Pedestrian density in $ped/m^2$")
             # plt.ylim(0,0.5)
+            plt.gcf().subplots_adjust(bottom=0.15)
             plt.savefig(os.path.join(self.result_base_dir(), f"{route}.pdf"))
             plt.show(block=False)
             plt.close()
@@ -196,6 +201,8 @@ class SimulationRun(BaseSimulationRunner):
 
         info_diss_time = info_diss_time[info_diss_time["diss_time"] > 0]  # remove self messages
         info_diss_time.to_csv(os.path.join(self.result_base_dir(), "info_diss_time.csv"), sep=" ")
+        info_diss_time.describe().to_csv(os.path.join(self.result_base_dir(), "info_diss_time_stats.csv"), sep=" ")
+        
 
         plt.scatter(x=info_diss_time["time"], y=info_diss_time["diss_time"])
         plt.xlabel("Simulation time in s")
@@ -221,6 +228,7 @@ class SimulationRun(BaseSimulationRunner):
         plt.scatter(x=heatmap_diss_time["time"], y=heatmap_diss_time["diss_time"])
 
         heatmap_diss_time.to_csv(os.path.join(self.result_base_dir(), "heat_map_diss_time.csv"), sep=" ")
+        heatmap_diss_time.describe().to_csv(os.path.join(self.result_base_dir(), "heat_map_diss_time_stats.csv"), sep=" ")
         plt.xlabel("Simulation time in s")
         plt.ylabel("Dissemination time in s")
         plt.title("Density map dissemination")

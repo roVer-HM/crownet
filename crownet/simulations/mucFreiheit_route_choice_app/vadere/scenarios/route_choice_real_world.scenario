@@ -2,7 +2,6 @@
   "name" : "route_choice_real_world",
   "description" : "",
   "release" : "2.6",
-  "commithash" : "71e4cc56e0774efd45e57685680f8e4594d4183f",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -221,7 +220,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1300.0,
+      "finishTime" : 630.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -1050,7 +1049,7 @@
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_ELEMENT",
         "nextTarget" : [ 11, 21, 31 ],
-        "probabilityToChangeTarget" : [ 0.21591, 0.29522, 0.48887 ]
+        "probabilityToChangeTarget" : [ 0.48887, 0.29522, 0.21591 ]
       }, {
         "id" : 23,
         "shape" : {
@@ -1124,10 +1123,10 @@
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 10.0
+            "updateFrequency" : 3.0
           }
         },
-        "groupSizeDistribution" : [ 1.0 ]
+        "groupSizeDistribution" : [ 2.0 ]
       }, {
         "id" : 5,
         "shape" : {
@@ -1154,7 +1153,7 @@
             "updateFrequency" : 2.0
           }
         },
-        "groupSizeDistribution" : [ 1.0 ]
+        "groupSizeDistribution" : [ 2.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
