@@ -22,12 +22,15 @@ namespace crownet {
 std::ostream& operator<<(std::ostream& os, const txInterval& i){
     os << "(T_det: " << i.dInterval.ustr() << ", T_rnd: " << i.rndInterval.ustr() \
             << ", ts: " << i.timestamp.ustr() << ", avg_pkt_size: " \
-            << i.avg_pkt_size << ", pmember: " << i.pmembers << ")";
+            << i.avg_pkt_size << ", pmember: " << i.pmembers <<  ", lastTxInterval: " << i.lastTransmisionInterval.ustr() << ")";
     return os;
 }
 
 simsignal_t DynamicMaxBandwidthScheduler::txInterval_s = cComponent::registerSignal("txInterval_s");
 simsignal_t DynamicMaxBandwidthScheduler::txDetInterval_s = cComponent::registerSignal("txDetInterval_s");
+simsignal_t DynamicMaxBandwidthScheduler::txMemberValue_s = cComponent::registerSignal("txMemberValue_s");
+
+
 
 Define_Module(DynamicMaxBandwidthScheduler)
 
@@ -98,7 +101,7 @@ void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
             // set by using the scheduler startOffset parameter.
             simtime_t start_time = std::max(app->getStartTime(), now) + startOffset;
             txIntervalDataPrio.avg_pkt_size = estimatedAvgPaketSize;
-            txIntervalDataPrio.pmembers = 1;
+            txIntervalDataPrio.pmembers = 2; // Allays assume at least 2 members. Otherwise there is no need for communication ;)
             txIntervalDataPrio.timestamp = simTime();
             computeInterval(txIntervalDataPrio);
             simtime_t schedule_at = start_time + txIntervalDataPrio.rndInterval;
@@ -116,6 +119,7 @@ void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
 
 }
 
+
 void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
     auto now = simTime();
     if (message == generationTimer){
@@ -130,10 +134,12 @@ void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
         if (updatedTxTime < now){
             EV_INFO << LOG_MOD << "Transmit now" << endl;
             // sent data now because updated transmission time lies in the past
+            txIntervalDataCurrent.lastTransmisionInterval = simTime() - last_tx;
             scheduleApp(message);
             if (hasSent){
                 //ignore first send action as last_tx is not defined jet.
-                emit(txInterval_s, simTime() - last_tx);
+                emit(txMemberValue_s, txIntervalDataCurrent.pmembers);
+                emit(txInterval_s, txIntervalDataCurrent.lastTransmisionInterval);
                 emit(txDetInterval_s, txIntervalDataCurrent.dInterval);
             }
             hasSent = true;
@@ -160,8 +166,8 @@ void DynamicMaxBandwidthScheduler::updateTxIntervalDataCurrent(){
         return;
     }
     txIntervalDataCurrent.timestamp = now;
-    // ensure to count at least one self.
-    txIntervalDataCurrent.pmembers = std::max(1, ntSizeProvider->getNeighborhoodSize());
+    // Allays assume at least 2 members. Otherwise there is no need for communication ;)
+    txIntervalDataCurrent.pmembers = std::max(2, ntSizeProvider->getNeighborhoodSize());
     txIntervalDataCurrent.avg_pkt_size = appRxInfoProvider->getAppRxInfo()->getAvg_packet_size();
     computeInterval(txIntervalDataCurrent);
 
@@ -180,6 +186,30 @@ simtime_t DynamicMaxBandwidthScheduler::getMinTransmissionInterval() const{
 
 simtime_t DynamicMaxBandwidthScheduler::rndInterval(simtime_t dInterval){
     return uniform(rndIntervalLowerBound*dInterval, rndIntervalUpperBound*dInterval);
+}
+
+
+IntervalScheduler::Unit DynamicMaxBandwidthScheduler::getScheduledUnit(){
+    auto numPacket = numberPackets->intValue();
+    auto data = b(amountOfData->intValue());
+
+    IntervalScheduler::Unit unit;
+    if (numPacket > 0){
+        unit.type = IntervalSchedulerType::PACKET;
+        unit.packetCount = numPacket;
+
+    } else if (data > b(0)){
+        unit.type = IntervalSchedulerType::DATA;
+        unit.data = data;
+    } else {
+        // fair amount of data for current interval based on app limit and number of members.
+        bps fair_share_bandwidth = bps((long)(appBandwidth.get()/txIntervalDataCurrent.pmembers));
+        b fair_data_amount = b((long)(fair_share_bandwidth.get() * txIntervalDataCurrent.lastTransmisionInterval.dbl()));
+
+        unit.type = IntervalSchedulerType::DATA;
+        unit.data = fair_data_amount;
+    }
+    return unit;
 }
 
 

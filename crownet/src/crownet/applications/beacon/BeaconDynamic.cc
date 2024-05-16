@@ -24,8 +24,8 @@ BeaconDynamic::~BeaconDynamic() {
 void BeaconDynamic::initialize(int stage) {
     BaseApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL){
-        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
-        tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        nTable = inet::getModuleFromPar<INeighborhoodTable>(par("neighborhoodTableModule"), inet::getContainingNode(this));
+        tablePktProcessor = inet::getModuleFromPar<INeighborhoodTablePacketProcessor>(par("neighborhoodTableModule"), inet::getContainingNode(this));
         minSentFrequency = par("minSentFrequency");
         maxSentFrequyncy = par("maxSentFrequency");
         maxBandwidth = par("maxBandwidth");
@@ -45,7 +45,7 @@ Packet *BeaconDynamic::createPacket() {
     if (appendResourceSharingDomainId){
         beacon = makeShared<DynamicBeaconPacketWithSharingDominId>();
         //todo: assume same domain, i.e. one eNB, for now.
-        dynamicPtrCast<DynamicBeaconPacketWithSharingDominId>(beacon)->setSharingDominId(0);
+        dynamicPtrCast<DynamicBeaconPacketWithSharingDominId>(beacon)->setSharingDomainId(getRsdIdPair().getId());
     } else {
         beacon = makeShared<DynamicBeaconPacket>();
     }

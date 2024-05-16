@@ -27,6 +27,7 @@ struct txInterval{
     simtime_t dInterval = -1.0;
     simtime_t rndInterval =  -1.0;
     simtime_t timestamp = -1.0;
+    simtime_t lastTransmisionInterval = -1.0;
     int pmembers = 1;
     b avg_pkt_size = b(0);
 };
@@ -43,6 +44,7 @@ public:
     virtual ~DynamicMaxBandwidthScheduler();
     static simsignal_t txInterval_s;
     static simsignal_t txDetInterval_s;
+    static simsignal_t txMemberValue_s;
 
 
 protected:
@@ -58,6 +60,10 @@ protected:
     void updateTxIntervalDataCurrent();
     void computeInterval(txInterval& tx);
     simtime_t rndInterval(simtime_t dInterval );
+
+    virtual Unit getScheduledUnit() override;
+
+    simtime_t getTimeSinceLastTransmission() const;
 
 
     simtime_t last_tx;

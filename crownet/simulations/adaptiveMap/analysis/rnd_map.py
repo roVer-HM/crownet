@@ -1,3 +1,7 @@
+from __future__ import annotations
+from functools import partial
+import io
+from matplotlib.patches import Patch
 from matplotlib.ticker import (
     MultipleLocator,
 )
@@ -7,11 +11,16 @@ from crownetutils.analysis.common import (
     RunMap,
     SimulationGroup,
 )
-from crownetutils.analysis.hdf.provider import BaseHdfProvider
+from crownetutils.analysis.hdf.provider import (
+    BaseHdfProvider,
+    HdfGroupFactory,
+    LazyHdfProvider,
+)
 from crownetutils.utils.plot import PlotUtil_, percentile, with_axis
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
 from s1_corridor_ramp_down import (
     MemberEstPlotter,
@@ -25,6 +34,16 @@ from crownetutils.utils.styles import (
 )
 
 load_matplotlib_style(STYLE_TEX)
+
+
+def lazy_read_dpmm_gt_from_sim_group(
+    run_map: RunMap, sg: str, hdf_path: str, group: str = "root"
+):
+    gf = HdfGroupFactory(
+        group_name=group,
+        factory=partial(read_dpmm_gt_from_sim_group, run_map=run_map, sg=sg),
+    )
+    return LazyHdfProvider(hdf_path, group, gf)
 
 
 def read_dpmm_gt_from_sim_group(run_map: RunMap, sg: str):
@@ -52,6 +71,39 @@ def read_dpmm_gt_from_sim_group(run_map: RunMap, sg: str):
         _df = _corridor_filter_target_cells(_df).reset_index()
         df.append(_df)
     return pd.concat(df, axis=0)
+
+
+def build_draw_dpmm(
+    run_map: RunMap, hdf: BaseHdfProvider, data: pd.DataFrame, seed_dist: pd.Series
+):
+    buf = io.StringIO()
+
+    def _print(_str):
+        buf.write(str(_str))
+        buf.write("\n")
+        print(_str)
+
+    seeds = data["seed"].unique()
+    draw = []
+    for seed in seeds:
+        _print(f"for mobility seed: {seed}")
+        _print(data[data["seed"] == seed]["count"].describe())
+        _print(stats.describe(data[data["seed"] == seed]["count"]))
+
+        _d = data[data["seed"] == seed]
+        _d = _d.set_index(["simtime", "x", "y"]).sort_index()
+        seed_rv = stats.rv_discrete(
+            values=(seed_dist.loc[seed].index, seed_dist.loc[seed].values)
+        )
+        _df_draw = draw_dpmm(seed_rv, _d, N=1000, _print=_print)
+        draw.append(_df_draw)
+
+    draw = pd.concat(draw, axis=0)
+    hdf.write_frame(frame=draw, group="msme_draw")
+    with open(run_map.path("draw_msme.txt"), "w") as fd:
+        buf.seek(0)
+        fd.write(buf.read())
+    return draw
 
 
 def histogram_cell_occupation(data: pd.DataFrame, *, alpha=0.5, ax: plt.Axes = None):
@@ -119,41 +171,14 @@ def histogram_cell_occupation(data: pd.DataFrame, *, alpha=0.5, ax: plt.Axes = N
     return ax
 
 
-def build_draw_dpmm(
-    run_map: RunMap, hdf: BaseHdfProvider, data: pd.DataFrame, seed_dist: pd.Series
-):
-    buf = io.StringIO()
+class MemberEstPlotterWithRandomComparison(MemberEstPlotter):
+    """Compare error (MSCE) of member estimates (no est, neighborhood, map)
+    with random map density map based on cell occupation distribution collected
+    via ground truth data.
 
-    def _print(_str):
-        buf.write(str(_str))
-        buf.write("\n")
-        print(_str)
+    """
 
-    seeds = data["seed"].unique()
-    draw = []
-    for seed in seeds:
-        _print(f"for mobility seed: {seed}")
-        _print(data[data["seed"] == seed]["count"].describe())
-        _print(stats.describe(data[data["seed"] == seed]["count"]))
-
-        _d = data[data["seed"] == seed]
-        _d = _d.set_index(["simtime", "x", "y"]).sort_index()
-        seed_rv = stats.rv_discrete(
-            values=(seed_dist.loc[seed].index, seed_dist.loc[seed].values)
-        )
-        _df_draw = draw_dpmm(seed_rv, _d, N=1000, _print=_print)
-        draw.append(_df_draw)
-
-    draw = pd.concat(draw, axis=0)
-    hdf.write_frame(frame=draw, group="msme_draw")
-    with open(run_map.path("draw_msme.txt"), "w") as fd:
-        buf.seek(0)
-        fd.write(buf.read())
-    return draw
-
-
-class MemberEstPlotterExtended(MemberEstPlotter):
-    def msce_plot(self):
+    def plot_msme(self):
         _hdf = BaseHdfProvider(self.run_map.path("msce_over_tp.h5"))
         box_data = []
         for g in ["ConstantRate-", "nTable-500kbps", "map-500kbps"]:
@@ -196,7 +221,8 @@ class MemberEstPlotterExtended(MemberEstPlotter):
 
             b = ax_zoom.boxplot(box_data, positions=[10, 20, 30, 40], widths=3.5)
             self.color_box_plot(b, fill_color=colors, ax=ax_zoom)
-            ax_zoom.set_ylim(0.15, 0.324)
+            # ax_zoom.set_ylim(0.15, 0.324)
+            ax_zoom.set_ylim(0.2125, 0.345)
             # ax_zoom.yaxis.set_major_locator(MultipleLocator(0.05))
             ax_zoom.yaxis.set_major_locator(MultipleLocator(0.05 / 2))
             ax_zoom.set_xlim(6, 35)
@@ -229,7 +255,7 @@ class MemberEstPlotterExtended(MemberEstPlotter):
             df.index.name = ""
             t: plt.Table
             _, _, t = self.df_to_table(
-                df.reset_index(), ax=tbl, colWidths=[1 / 9, 2 / 9, 2 / 9, 2 / 9, 2 / 9]
+                df.reset_index(), ax=tbl, col_width=[1 / 9, 2 / 9, 2 / 9, 2 / 9, 2 / 9]
             )
             t.set_fontsize(15)
             fig.tight_layout()
@@ -253,13 +279,13 @@ def get_random_draw():
 
 def get_data():
     run_map: RunMap = get_random_draw_run_map()
-    hdf = run_map.get_hdf("dpmm_ground_truth.h5", "gt")
-    if hdf.contains_group("gt"):
-        data = hdf.get_dataframe("gt")
-    else:
-        data = read_dpmm_gt_from_sim_group(run_map, "map-500kbps")
-        hdf.write_frame("gt", data)
-    return data
+
+    return lazy_read_dpmm_gt_from_sim_group(
+        run_map=run_map,
+        sg="map-500kbps",
+        hdf_path=run_map.path("dpmm_ground_truth.h5"),
+        group="gt",
+    ).frame()
 
 
 def main(run_map: RunMap):
@@ -376,19 +402,16 @@ def draw_dpmm(seed_rv: stats.rv_discrete, gt: pd.DataFrame, N=200, _print=print)
 def get_random_draw_run_map():
     r2 = RunMap.load_or_create(
         create_f=create_member_estimate_run_map,
-        output_path="/mnt/data1tb/results/_dyn_tx/s1_corridor_member_estimate_cmp",
+        # output_path="/mnt/data1tb/results/_dyn_tx/s1_corridor_member_estimate_cmp",
+        output_path="/mnt/data1tb/results/arc-dsa_single_cell/study_out/s0",
         load_if_present=True,
     )
     return r2
 
 
 if __name__ == "__main__":
-    r2 = RunMap.load_or_create(
-        create_f=create_member_estimate_run_map,
-        output_path="/mnt/data1tb/results/_dyn_tx/s1_corridor_member_estimate_cmp",
-        load_if_present=True,
-    )
-    main(r2)
+    r2 = get_random_draw_run_map()
+    # main(r2)
 
-    # r2_plotter = MemberEstPlotterExtended(r2)
-    # r2_plotter.msce_plot()
+    r2_plotter = MemberEstPlotterWithRandomComparison(r2)
+    r2_plotter.plot_msme()

@@ -37,6 +37,7 @@ using namespace inet;
 
 namespace crownet {
 
+
 class GlobalDensityMap : public omnetpp::cSimpleModule,
                          public omnetpp::cListener,
                          public traci::ITraciNodeVisitor,
@@ -75,6 +76,9 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   virtual std::shared_ptr<RegularDcdMap> getDcdMapGlobal(){
       return dcdMapGlobal;
   }
+
+  virtual std::string getMapName() const;
+
 
   virtual std::shared_ptr<RegularDcdMap> getMap() override {
       return getDcdMapGlobal();
@@ -120,9 +124,10 @@ class GlobalDensityMap : public omnetpp::cSimpleModule,
   std::shared_ptr<RegularDcdMapFactory> dcdMapFactory;
   std::shared_ptr<CellAggregationAlgorihm<RegularCell>> valueVisitor;
   gridMap_t dezentralMaps;
-  std::string mapDataType; //todo switch for PedestrianVsEntropy data
+  DpmmMapType mapDataType; //todo switch for PedestrianVsEntropy data
   std::string m_mobilityModule;
   std::shared_ptr<ActiveWriter> fileWriter;
+
 
 
 };

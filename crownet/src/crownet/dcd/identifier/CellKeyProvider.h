@@ -49,7 +49,14 @@ class CellKeyProvider {
   virtual EntryDist getExactDist(const inet::Coord source, const inet::Coord owner, const C& entry)=0;
   virtual EntryDist getExactDist(const inet::Coord source, const inet::Coord owner, const GridCellID& entry, const double sourceEntry) = 0;
 
+  virtual bool cellInRadius(const GridCellID& cell, const double radius, const traci::TraCIPosition& circleCenter) const = 0;
+
+  virtual bool intersectLineCircle(const inet::Coord& a, const inet::Coord& b, const double radiusSquared, const inet::Coord& center) const  = 0;
+  virtual std::vector<C> getCellsInRadius(const inet::Coord& pos, double distance) const = 0;
+//  virtual std::vector<C> getCellsInRadius(const traci::TraCIPosition& pos, double distance) const = 0;
+
 };
+
 
 
 class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
@@ -89,6 +96,13 @@ class GridCellIDKeyProvider : public CellKeyProvider<GridCellID> {
   virtual EntryDist getEntryDist(const GridCellID& source, const GridCellID& owner, const GridCellID& entry) override;
   virtual EntryDist getExactDist(const inet::Coord source, const inet::Coord owner, const GridCellID& entry) override;
   virtual EntryDist getExactDist(const inet::Coord source, const inet::Coord owner, const GridCellID& entry, const double sourceEntry) override;
+
+  virtual bool cellInRadius(const GridCellID& cell, const double radius, const traci::TraCIPosition& circleCenter) const override;
+
+  virtual bool intersectLineCircle(const inet::Coord& a, const inet::Coord& b, const double radiusSquared, const inet::Coord& center) const  override;
+  virtual std::vector<GridCellID> getCellsInRadius(const inet::Coord& pos, double distance) const override;
+//  virtual std::vector<GridCellID> getCellsInRadius(const traci::TraCIPosition& pos, double distance) const override;
+
 
  private:
   std::shared_ptr<OsgCoordinateConverter> converter;

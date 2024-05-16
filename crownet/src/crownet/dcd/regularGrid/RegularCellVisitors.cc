@@ -27,6 +27,12 @@ void ResetVisitor::applyTo(RegularCell& cell) {
   }
 }
 
+
+void ResetCellVisitor::applyTo(RegularCell& cell) {
+    ResetVisitor::applyTo(cell);
+    cell.reset_cell_value();
+}
+
 void ResetLocalVisitor::applyTo(RegularCell& cell) {
     if (cell.hasLocal()) {
       cell.getLocal()->reset(time);

@@ -24,34 +24,34 @@ moduleinterface IDensityMapApp extends IBaseApp {
 
 simple BaseDensityMapApp  extends BaseApp like IDensityMapApp {
 	parameters:
-	    @display("i=block/users"); 
+	    @display("i=block/users");
 	    @class(crownet::ArteryDensityMapBase);
 	    @signal[InitDensityMap];
         @signal[RegisterDensityMap];
         @signal[RemoveDensityMap];
-        
+
         // Aid app override defaults
         packetName = default("DcDMap");
         allEmptyDestAddress = false;
         attachSequenceIdTag = default(false); // set by app logic
-        
+
         // App logic
         string coordConverterModule;
         double cellSize @unit(m) = default(5.0m);
-        // FSM-mainApp trigger (not used by default ). If < 0 deactivated. Packet creation 
+        // FSM-mainApp trigger (not used by default ). If < 0 deactivated. Packet creation
         // is manged by scheduler modules
-        double mainAppInterval @unit(s) = default(-1.0s); //  
+        double mainAppInterval @unit(s) = default(-1.0s); //
         bool appendResourceSharingDomainId = default(false);
-        
+
         object mapCfg = default(crownet::MapCfg{
             writeDensityLog: true,
             mapType: "ymf",
             mapTypeLog: "all",
             cellAgeTTL: 10.0s,
             idStreamType: "insertionOrder",
-            appendRessourceSharingDomoinId: false
+            appendRessourceSharingDomainId: false
         });
-        
+
         bool writeDensityLog = default(true);
 }
 
@@ -62,23 +62,23 @@ simple ArteryDensityMapApp  extends BaseDensityMapApp  {
         string middelwareModule = default("^.^.middleware"); //node internal
         string identiyRegistryModule = default("identiyRegistry");
         string routerModule = default("^.^.vanetza.router");
-        // Use FSM-mainApp state to tirgger local map update by accessing 
-        // the vaneza managed neighborhood tabale. 
+        // Use FSM-mainApp state to tirgger local map update by accessing
+        // the vaneza managed neighborhood tabale.
         mainAppInterval @unit(s) = default(1.0s);
-        
-        
+
+
 }
 
 simple DensityMapAppSimple  extends BaseDensityMapApp  {
 
     parameters:
         @class(crownet::DensityMapAppSimple);
-         string neighborhoodTableMobdule = default("nTable");
+         string neighborhoodTableModule = default(".nTable"); // relative to containing (i.e. network node, module annoated with @networkNode)
 }
 
 simple EntropyMapAppSimple  extends BaseDensityMapApp  {
 
     parameters:
         @class(crownet::EntropyMapAppSimple);
-        string neighborhoodTableMobdule = default("nTable");
+        string neighborhoodTableModule = default(".nTable"); // relative to containing (i.e. network node, module annoated with @networkNode)
 }

@@ -1,8 +1,8 @@
 {
   "name" : "mf_001_base_44",
   "description" : "",
-  "release" : "2.4",
-  "commithash" : "eecc5fb8aebd57cd27c21ef5eac04e2094056f60",
+  "release" : "2.6",
+  "commithash" : "71e4cc56e0774efd45e57685680f8e4594d4183f",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -3581,8 +3581,7 @@
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
         "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
-      "teleporter" : null,
-      "attributesCar" : null
+      "teleporter" : null
     },
     "stimulusInfos" : [ ]
   }

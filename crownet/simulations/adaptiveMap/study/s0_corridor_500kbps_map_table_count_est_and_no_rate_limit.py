@@ -1,32 +1,29 @@
+"""
+Simulation study S0: Corridor scenario comparing DPMM application with and 
+without bandwidth limits. In addition when bandwidth limit is applied we compare
+two different RSD member estimations using either the neighborhood count or the
+RSD limited map count. 
+
+Each parameter variation is executed N=20 times with different seeds. 
+"""
 from __future__ import annotations
 from copy import deepcopy
 from functools import partial
-from itertools import product
 import os
-import json
-from os.path import join, abspath
-import shutil
 import timeit as it
-from time import time_ns
 from typing import Tuple, List
-from suqc.CommandBuilder.VadereOppCommand import VadereOppCommand
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from suqc.environment import (
     CrownetEnvironmentManager,
 )
-from suqc.parameter.create import coupled_creator, opp_creator
+from suqc.parameter.create import opp_creator
 from suqc.parameter.sampling import ParameterVariationBase
 from suqc.request import CrownetRequest
-from suqc.requestitem import RequestItem
-from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
 from omnetinireader.config_parser import (
     ObjectValue,
     UnitValue,
     QString,
     BoolValue,
-    OppConfigFileBase,
-    OppConfigType,
-    OppParser,
 )
 import crownetutils.vadere.bonnmotion_traces as BmTrace
 
@@ -35,7 +32,6 @@ from suqc.utils.general import get_env_name
 from suqc.utils.variation_scenario_p import VariationBasedScenarioProvider
 
 
-reps = 10  # seed-set
 mapCfgYmfDist = ObjectValue.from_args(
     "crownet::MapCfgYmfPlusDistStep",
     "writeDensityLog",
@@ -51,28 +47,12 @@ mapCfgYmfDist = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
-)
-mapCfgYmf = ObjectValue.from_args(
-    "crownet::MapCfgYmf",
-    "writeDensityLog",
+    "appendRessourceSharingDomainId",
     BoolValue.TRUE,
-    "mapTypeLog",
-    QString("ymf"),
-    # "mapTypeLog", QString("all"),
-    "cellAgeTTL",
-    UnitValue.s(15.0),
-    "idStreamType",
-    QString("insertionOrder"),
+    "logType",
+    QString("sql"),
 )
-scenario_ped_180 = QString("vadere/scenarios/mf_m_dyn_const_4e20s_15x12_180.scenario")
-scenario_exp_25 = QString("vadere/scenarios/mf_dyn_exp_25.scenario")
-scenario_exp_15 = QString("vadere/scenarios/mf_dyn_exp_15.scenario")
-scenario_exp_5 = QString("vadere/scenarios/mf_dyn_exp_05.scenario")
-# t = UnitValue.s(800.0)
-t = UnitValue.s(800.0)
-# t = UnitValue.s(2.0)
-source_end_time = 400.0
-source_id_range = range(1117, 1131)
+t = UnitValue.s(900.0)
 
 
 def par_var_bonn_motion():
@@ -80,9 +60,12 @@ def par_var_bonn_motion():
         {
             "omnet": {
                 "sim-time-limit": t,
-                "*.bonnMotionServer.traceFile": "trace/trace_mf_dyn_exp_25_SEED.bonnMotion",  # SEED wil be replaced
+                "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_ramp_down_SEED.bonnMotion",
                 "*.misc[*].app[1].scheduler.generationInterval": "2000ms",
                 "*.misc[*].app[0].scheduler.generationInterval": "500ms",
+                "*.misc[*].app[*].scheduler.typename": QString(
+                    "DynamicMaxBandwidthScheduler"
+                ),
             }
         },
     ]
@@ -93,14 +76,30 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
 
     par_var_tmp = []
     for run in par_var:
-        for trace in [15, 25]:
+        for scheduler in ["DynamicMaxBandwidthScheduler", "IntervalScheduler"]:
             _run = deepcopy(run)  # copy
-            _run["omnet"][
-                "*.bonnMotionServer.traceFile"
-            ] = f"trace/trace_mf_dyn_exp_{trace}_SEED.bonnMotion"  # SEED wil be replaced
             _run["omnet"]["*.misc[*].app[1].app.mapCfg"] = mapCfgYmfDist.copy()
-
-            par_var_tmp.append(_run)
+            _run["omnet"]["*.misc[*].app[*].scheduler.typename"] = QString(scheduler)
+            if scheduler == "IntervalScheduler":
+                _run["omnet"][
+                    "*.misc[*].app[1].scheduler.generationInterval"
+                ] = "uniform(1000ms, 3000ms)"
+                _run["omnet"][
+                    "*.misc[*].app[0].scheduler.generationInterval"
+                ] = "uniform(250ms, 750ms)"
+                par_var_tmp.append(_run)
+            else:
+                # duplicate it again. 1) with neighborhood table 2) with map
+                _run1 = deepcopy(_run)
+                _run2 = deepcopy(_run)
+                _run1["omnet"][
+                    "*.misc[*].app[*].scheduler.neighborhoodSizeProvider"
+                ] = QString("^.^.nTable")
+                _run2["omnet"][
+                    "*.misc[*].app[*].scheduler.neighborhoodSizeProvider"
+                ] = QString("^.^.app[1].app")
+                par_var_tmp.append(_run1)
+                par_var_tmp.append(_run2)
 
     par_var = []
     for _var in par_var_tmp:
@@ -112,65 +111,13 @@ def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
     return opp_config, ParameterVariationBase().add_data_points(par_var)
 
 
-def create_traces(trace_dir: str | None = None):
-    print("create traces")
-    if trace_dir is None:
-        os.path.dirname(__file__), f"{os.path.basename(__file__)[:-3]}.d"
-
-    # [ (scenario_path, name, par_var), ...]
-    traces = [
-        (abspath(join("../vadere/scenarios/", f"{name}.scenario")), name, {})
-        for name in [
-            # "mf_dyn_exp_05",
-            # "mf_dyn_exp_10",
-            "mf_dyn_exp_15",
-            # "mf_dyn_exp_20",
-            "mf_dyn_exp_25",
-        ]
-    ]
-
-    # seed=time_ns()
-    seed = 1656000207970109272
-    seed_mgr = OmnetSeedManager(
-        par_variations=[],
-        rep_count=10,
-        omnet_fixed=False,
-        vadere_fixed=False,
-        seed=seed,
-    )
-    description = """
-    hack: To generate the same first 10 parings for the seed used in 
-    an old settings, the rep count is fixed to rep_count=10 in the 
-    OmnetSeedManager. To create more than 10 parings call get_seed_paring()
-    multiple times and concatenate the parings and drop parings at the end if 
-    there are to many. Thus, to recreate the paring set rep_count=10 and not to 
-    'reps' as shown in the omnetSeedManager.json config.
-    """
-    a, b = seed_mgr.get_seed_paring()
-    aa, bb = seed_mgr.get_seed_paring()
-    paring = ([*a, *aa], [*b, *bb])
-    BmTrace.write_seed_paring(seed, paring, trace_dir, comment=description)
-
-    for scenario, scenario_name, par_var in traces:
-        print(f"create trace for: {scenario}")
-        BmTrace.generate_traces(
-            scenario=scenario,
-            scenario_name=scenario_name,
-            par_var_default=par_var,
-            keep_files=["trace.bonnMotion", "positions.csv", "postvis.traj"],
-            base_output_path=trace_dir,
-            jobs=6,
-            vadere_seeds=paring[0],
-            remove_output=False,
-        )
-
-
 def main_bonn_motion():
-    trace_dir = os.path.abspath("trace_mf_topo.d")
+    trace_dir = os.path.abspath("corridor_trace_5perSpawn_ramp_down.d")
+    # trace_dir = os.path.abspath("corridor_trace_5perSpawn.d")
+    # trace_dir = os.path.abspath("corridor_trace.d")
     opp_config, parameter_variation = create_variation_with_bonn_motion(
         seed_paring=BmTrace.get_seed_paring(trace_dir)
     )
-
     model = (
         OmnetCommand().write_container_log().omnet_tag("latest").experiment_label("out")
     )
@@ -181,8 +128,8 @@ def main_bonn_motion():
     # Enviroment setup.
     #
     ini_file = os.path.abspath("../omnetpp.ini")
-    # base_dir = os.path.abspath("../suqc")
-    base_dir = os.path.abspath("/mnt/data1tb/results/")
+    # base_dir = "/mnt/data1tb/results/arc-dsa_single_cell/"
+    base_dir = "/mnt/ssd_local/arc-dsa_single_cell/"
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
@@ -224,5 +171,4 @@ def main_bonn_motion():
 
 
 if __name__ == "__main__":
-    # create_traces(trace_dir=os.path.abspath("traces_dynamic.d"))
     main_bonn_motion()

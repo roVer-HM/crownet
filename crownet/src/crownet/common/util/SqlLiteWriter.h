@@ -11,38 +11,33 @@
 #include <sstream>
 #include "Writer.h"
 #include <memory>
+#include "crownet/common/util/SqlLiteApi.h"
 
 namespace crownet {
 
 class SqlPrinter {
 public:
     virtual ~SqlPrinter()=default;
-    virtual void writeSqlStatement(std::ostream& out) = 0;
-    virtual void createSchema(std::ostream& out) = 0;
-    virtual void writeInitSqlStatement(std::ostream& out) = 0;
+    virtual void writeSqlStatement(std::shared_ptr<SqlLiteApi> sqlApi) = 0;
 };
 
-class SqlLiteWriter : public BufferWriter,
-                      public ActiveWriter  {
+class SqlLiteWriter : public ActiveWriter  {
 public:
-    SqlLiteWriter(long bufferSize=8192);
+    SqlLiteWriter(std::shared_ptr<SqlLiteApi> api, std::shared_ptr<SqlPrinter> printer)
+        : sqlApi(api), printer(printer){}
     virtual ~SqlLiteWriter();
 
-    virtual void writeBuffer() override;
     virtual void initWriter() override;
     virtual void writeData() override;
     virtual void finish() override;
-    virtual void flush() override;
-    virtual void close() override;
-    virtual void initialize() override;
+
     void setPrinter(std::shared_ptr<SqlPrinter> p){ printer = p;}
     std::shared_ptr<SqlPrinter> getPrinter() { return printer;}
-    // todo mw
-//    void setSqlApi(std::shared_ptr<SqlAPI>);
+
+    void setSqlApi(std::shared_ptr<SqlLiteApi>);
 
 private:
+    std::shared_ptr<SqlLiteApi> sqlApi;
     std::shared_ptr<SqlPrinter> printer;
-    // todo mw add sql handle here
-    // std::shared_ptr<SqlAPI> sqlApi;
 };
 }

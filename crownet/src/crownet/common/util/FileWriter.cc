@@ -7,8 +7,10 @@
 
 #include "crownet/crownet.h"
 #include "crownet/common/util/FileWriter.h"
+#include "crownet/common/util/SqlLiteWriter.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "crownet/dcd/regularGrid/RegularDcdMapPrinter.h"
+#include "crownet/common/util/SqlLiteApi.h"
 
 #include <omnetpp.h>
 #include <boost/algorithm/string/join.hpp>
@@ -18,7 +20,7 @@
 
 namespace crownet {
 
-std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
+std::string BaseFileWriter::getAbsOutputPath(std::string fileName, std::string suffix){
 
     boost::filesystem::path pp{fileName};
     if (pp.is_absolute()){
@@ -37,10 +39,10 @@ std::string BaseFileWriter::getAbsOutputPath(std::string fileName){
            boost::filesystem::create_directories(p.parent_path());
       }
       std::string _path;
-      if (0 == fileName.compare(fileName.size() - 4, fileName.size(), ".csv")){
+      if (0 == fileName.compare(fileName.size() - 4, fileName.size(), suffix)){
           _path = p.parent_path().string() + "/" + fileName;
       } else {
-          _path = p.parent_path().string() + "/" + fileName + ".csv";
+          _path = p.parent_path().string() + "/" + fileName + suffix;
       }
 
       return _path;
@@ -136,6 +138,29 @@ ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<RegularDcdMap> 
     obj->flush();
     return obj;
 }
+
+template <>
+ActiveWriter *ActiveFileWriterBuilder::buildSqlWriter(std::shared_ptr<RegularDcdMap> map, MapCfg *mapCfg, std::shared_ptr<SqlLiteApi> sql){
+    SqlLiteWriter *obj = new SqlLiteWriter(sql, std::make_shared<RegularDcdMapSqlValuePrinter>(map));
+
+    for(const auto& e: metadata){
+        sql->write_metadata(map->getOwnerId(), e.first, e.second);
+    }
+    sql->flush();
+
+    return obj;
+}
+
+ActiveWriter *ActiveFileWriterBuilder::buildSqlGlobalWriter(std::shared_ptr<SqlPrinter> printer, std::shared_ptr<SqlLiteApi> sql){
+    SqlLiteWriter *obj = new SqlLiteWriter(sql, printer);
+    for(const auto& e: metadata){
+        sql->write_metadata(-1, e.first, e.second); // global id -1
+    }
+    sql->flush();
+
+    return obj;
+}
+
 
 ActiveFileWriter *ActiveFileWriterBuilder::build(std::shared_ptr<FilePrinter> printer) {
   ActiveFileWriter *obj = new ActiveFileWriter(

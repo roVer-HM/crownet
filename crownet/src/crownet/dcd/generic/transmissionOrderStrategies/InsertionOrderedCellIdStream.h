@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include <queue>
-#include "crownet/dcd/generic/ICellIdStream.h"
+#include <set>
+#include <vector>
+
+#include "ICellIdStream.h"
 
 namespace crownet {
 
@@ -23,6 +25,7 @@ public:
     using Cell = Cell<C, N, T>;
 
     virtual void addNew(const cell_key_t& cellId, const time_t& time) override;
+    virtual void update(const time_t& time) override;
 
     virtual void setMap(dMapPtr map) override {this->map = map;}
 
@@ -30,20 +33,26 @@ public:
 
     virtual const cell_key_t nextCellId(const time_t& now) override;
     virtual Cell& nextCell(const time_t& now) override;
-    virtual const int size(const time_t& now) const override;
+    virtual const int size(const time_t& now)  override;
+    virtual std::vector<cell_key_t> getNumCellsOrLess(const time_t& now, const int numCells) override;
 
 
 
-    virtual void update(const time_t& time) override {/*nothing*/};
-
-protected:
-    virtual void moveBack();
 
 
 protected:
-    std::deque<cell_key_t> queue;
+    /**
+     *  check if the cell is a valid cell and if it already was sent at the given time.
+     */
+    virtual bool isValidAndCanBeSent(const time_t& now, const cell_key_t& cell_key) const;
+
+protected:
+    std::vector<cell_key_t> vec;
     dMapPtr map;
+    int head;
+    time_t lastUpdated;
+    std::set<time_t> nextLoopDone;
 };
 
-#include "CellIdStream.tcc"
+#include "InsertionOrderedCellIdStream.tcc"
 }

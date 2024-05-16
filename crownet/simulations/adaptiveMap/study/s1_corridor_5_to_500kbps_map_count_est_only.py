@@ -1,13 +1,15 @@
+"""
+Simulation study S1: Corridor scenario comparing DPMM application with different
+bandwidth limits, ranging form 5 to 500 kbps. In this study we only use map
+based count estimates.
+
+Each parameter variation is executed N=20 times with different seeds. 
+"""
 from __future__ import annotations
 from copy import deepcopy
 from functools import partial
-from itertools import product
 import os
-import json
-from os.path import join, abspath
-import shutil
 import timeit as it
-from time import time_ns
 from typing import Tuple, List
 from suqc.CommandBuilder.OmnetCommand import OmnetCommand
 from suqc.environment import (
@@ -16,7 +18,6 @@ from suqc.environment import (
 from suqc.parameter.create import opp_creator
 from suqc.parameter.sampling import ParameterVariationBase
 from suqc.request import CrownetRequest
-from suqc.utils.SeedManager.OmnetSeedManager import OmnetSeedManager
 from omnetinireader.config_parser import (
     ObjectValue,
     UnitValue,
@@ -45,6 +46,10 @@ mapCfgYmfDist = ObjectValue.from_args(
     QString("insertionOrder"),
     "stepDist",
     60.0,
+    "appendRessourceSharingDomainId",
+    BoolValue.TRUE,
+    "logType",
+    QString("sql"),
 )
 mapCfgYmf = ObjectValue.from_args(
     "crownet::MapCfgYmf",
@@ -59,7 +64,6 @@ mapCfgYmf = ObjectValue.from_args(
     QString("insertionOrder"),
 )
 t = UnitValue.s(900.0)
-# t = UnitValue.s(2.0)
 
 
 def par_var_bonn_motion():
@@ -68,12 +72,10 @@ def par_var_bonn_motion():
             "omnet": {
                 "sim-time-limit": t,
                 "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_ramp_down_SEED.bonnMotion",
-                # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_5perSpawn_SEED.bonnMotion",
-                # "*.bonnMotionServer.traceFile": "trace/trace_corridor_2x5m_d20_SEED.bonnMotion",
                 "*.misc[*].app[1].scheduler.generationInterval": "2000ms",
                 "*.misc[*].app[0].scheduler.generationInterval": "500ms",
                 "*.misc[*].app[*].scheduler.neighborhoodSizeProvider": QString(
-                    "^.^.app[1].app"
+                    "^.^.app[1].app"  # map based neighborhoodSizeProvider!
                 ),
                 "*.misc[*].app[1].app.mapCfg": mapCfgYmfDist.copy(),
                 "*.misc[*].app[*].scheduler.typename": QString(
@@ -84,13 +86,21 @@ def par_var_bonn_motion():
     ]
 
 
+# adapting ...
+#  neighborhoodSizeProvider (map, vs beacons)
+# ...app[*].scheduler.neighborhoodSizeProvider = "^.^.app[1].app" vs "^.^.nTable"
+#  maxBandwidth used
+# ...app[0].scheduler.maxApplicationBandwidth = 50kbps  (fixed for beacon)
+# ...app[1].scheduler.maxApplicationBandwidth = [...]  (interval for beacon)
+#  no limit on Bandwidth (other scheduler...)
+
+
 def create_variation_with_bonn_motion(seed_paring: List[Tuple[int, int]]):
     opp_config, par_var = par_var_bonn_motion()
 
     par_var_tmp = []
     for run in par_var:
-        # for target_bit_rate in [50, 100, 150, 250]:
-        for target_bit_rate in [5, 10, 25, 325, 425]:
+        for target_bit_rate in [5, 10, 25, 50, 100, 150, 250, 325, 425, 500]:
             _run = deepcopy(run)  # copy
             _run["omnet"][
                 "*.misc[*].app[1].scheduler.maxApplicationBandwidth"
@@ -124,13 +134,12 @@ def main_bonn_motion():
     # Enviroment setup.
     #
     ini_file = os.path.abspath("../omnetpp.ini")
-    # base_dir = os.path.abspath("../suqc")
-    base_dir = os.path.abspath("/mnt/data1tb/results/")
+    # base_dir = "/mnt/data1tb/results/arc-dsa_single_cell/"
+    base_dir = "/mnt/ssd_local/arc-dsa_single_cell/"
     os.makedirs(base_dir, exist_ok=True)
 
     env = CrownetEnvironmentManager(
         base_path=base_dir,
-        # env_name="s1_corridor_ramp_down",
         env_name=get_env_name(base_dir, __file__.replace(".py", "")),
         opp_config=opp_config,
         opp_basename="omnetpp.ini",

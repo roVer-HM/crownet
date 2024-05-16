@@ -25,7 +25,34 @@ using namespace inet;
 
 namespace crownet {
 
+enum IntervalSchedulerType {
+    PACKET,
+    DATA,
+    OTHER,
+};
+
 class IntervalScheduler : public AppSchedulerBase {
+protected:
+
+    struct Unit {
+        IntervalSchedulerType type;
+        int packetCount;
+        b data;
+
+        bool validPacketUnit() const {
+            return type == IntervalSchedulerType::PACKET && this->packetCount > 0;
+        }
+        bool validDataUnit() const {
+            return type == IntervalSchedulerType::DATA && this->data > b(0);
+        }
+
+        std::string str() const {
+            std::stringstream s;
+            s << "[" << "type: " << type << ", packetCount: " << packetCount << ", data: " << data.str() << "]";
+            return s.str();
+        }
+    };
+
 
 protected:
    cPar *generationIntervalParameter = nullptr;
@@ -51,8 +78,23 @@ protected:
    virtual void scheduleEvent(cMessage *message) override {throw cRuntimeError("Event Trigger not supported");}
    virtual void schedulePacket(Packet *packet) override {throw cRuntimeError("Event Trigger not supported");}
 
+   virtual void scheduleByPackets(const Unit& unit);
+   virtual void scheduleByData(const Unit& unit);
+
+   virtual Unit getScheduledUnit();
+
  public:
    virtual ~IntervalScheduler() { cancelAndDeleteClockEvent(generationTimer); }
+
+
+   const bool hasPacketMaximum() const {return maxNumberPackets > 0;}
+   const bool packetMaximumReached(const int& scheduledPacketCount) const;
+
+   const bool hasDataMaximum() const { return maxData > b(0);}
+   const bool dataMaximumReached(const b& scheduledData) const;
+
+   static simsignal_t scheduledData_s;
+   static simsignal_t consumedData_s;
 
 };
 

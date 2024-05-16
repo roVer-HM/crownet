@@ -88,6 +88,10 @@ protected:
  virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) override;
  virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) override;
  virtual cModule* getModule() override { return this;}
+ virtual std::string getMapName() const;
+ virtual std::string getMapBaseName() const;
+
+ virtual DpmmMapType getMapType() const override { return mapDataType;}
  //todo mw
  //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) override;
  virtual void updateOwnLocationInMap();
@@ -107,18 +111,18 @@ protected:
 
  std::shared_ptr<RegularDcdMap> dcdMap;
  std::shared_ptr<ActiveWriter> fileWriter;
+ std::shared_ptr<BurstInfoProvider> burstInfoProdiver;
  //DPMM visitors
  std::shared_ptr<CellAggregationAlgorihm<RegularCell>> valueVisitor;
  std::shared_ptr<TTLCellAgeHandler> cellAgeHandler;
  std::shared_ptr<ApplyRessourceSharingDomainIdVisitor> rsdVisitor;
  simtime_t lastUpdate = -1.0;
- MapCfg *mapCfg;
- std::string mapDataType; //todo switch for PedestrianVsEntropy data
+ MapCfg *mapCfg = nullptr;
+ DpmmMapType mapDataType;
 
-
- RegularDcdMapWatcher* dcdMapWatcher;
- cMessage *mainAppTimer;
- cPar *mainAppInterval;
+ RegularDcdMapWatcher* dcdMapWatcher = nullptr;
+ cMessage *mainAppTimer = nullptr;
+ cPar *mainAppInterval = nullptr;
 
 };
 

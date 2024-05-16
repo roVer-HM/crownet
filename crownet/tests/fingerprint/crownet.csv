@@ -5,7 +5,7 @@
 /simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              fbae-d036/tlv, PASS, vadere:CFG;omnetpp:6.0.3
 /simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              1420-e31a/tlv, PASS, omnetpp:6.0.3
 /simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              4201-6736/tlv, PASS, omnetpp:6.0.3
-/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              3406-ced9/tlv, PASS, vadere:CFG;omnetpp:6.0.3
+/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              37e9-ded0/tlv, PASS, vadere:CFG;omnetpp:6.0.3
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              c9f9-9073/tlv, PASS, sumo:v1_15_0;omnetpp:6.0.3
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              5113-19a2/tlv, PASS, sumo:v1_15_0;omnetpp:6.0.3
 

@@ -45,6 +45,10 @@ public:
     virtual const int getSize() override;
     virtual const NeighborhoodTableValue_t updateGetGlobalValue(const inet::Coord& pos);
     virtual const bool currentCellOnly() const;
+    virtual std::vector<GridCellID> getCellsInRadius(const inet::Coord& pos);
+    virtual NeighborhoodTableValue_t getValue(const GridCellID& cellId);
+    virtual const double getDistance() const {return dist;}
+
 
     // default to distance based iterator because this class accesses the global table.
     virtual NeighborhoodTableIter_t iter() override;
