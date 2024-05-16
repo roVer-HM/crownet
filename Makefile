@@ -37,9 +37,18 @@ PYTHON := python3.8
 IGNORE := $(shell bash -c "source $(mod_inet)/setenv; env | sed 's/=/:=/' | sed 's/^/export /' > .makeenv.tmp")                         
 include .makeenv.tmp   
 
-# check if omnetpp is found
-ifeq (, $(shell which opp_configfilepath))
- $(error opp_configfilepath not found. In order to run the command within the roVer docker container, try "omnetpp exec make")
+out_of_container_targets := analysis-all analysis-build analysis-clean out/crownet_user out/crownet_dev
+# check if omnetpp is found. But only for C++ build. Create python env without container to fail fast if python enviroment is not present.
+ifeq (, $(filter $(out_of_container_targets),$(MAKECMDGOALS)))
+# make goal requires container enviroment. 
+ ifeq (, $(shell which opp_configfilepath))
+  $(error opp_configfilepath not found (No container detected). In order to run the command within the CrowNet docker container, try "omnetpp exec make")
+ endif
+else
+# make goal does not requiere container an should be run directly
+ ifneq (, $(shell which opp_configfilepath))
+  $(error Container detected but target provided that does not requiere container exectuion. Provided targets '$(MAKECMDGOALS)'. The following targets should not be executed inside a container '$(out_of_container_targets)'")
+ endif
 endif
 
 # python build variables
@@ -59,7 +68,7 @@ target clean : TARGET = clean
 target cleanall : TARGET = cleanall
 target makefiles : TARGET = makefiles
 
-.PHONY: all $(models) python-hint
+.PHONY: all $(models) python-hint 
 
 all: $(models_l4) $(models_l3) $(models_l2) $(models_l1)
 

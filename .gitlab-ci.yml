@@ -93,10 +93,10 @@ build-analysis-tools:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - docker pull $CI_REGISTRY/rover/crownet/omnetpp
-    # ## build python project and setup user enviroment
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make analysis-clean"
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make analysis-build"
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make out/crownet_user"
+    # ## build python project and setup user environment. Do not use container to create python projects.
+    - make analysis-clean"
+    - make analysis-build"
+    - make out/crownet_user"
   artifacts:
     paths:
     - ${CROWNET_HOME}/out
