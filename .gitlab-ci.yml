@@ -94,9 +94,9 @@ build-analysis-tools:
     - "source setup -i"
     - docker pull $CI_REGISTRY/rover/crownet/omnetpp
     # ## build python project and setup user environment. Do not use container to create python projects.
-    - make analysis-clean"
-    - make analysis-build"
-    - make out/crownet_user"
+    - make analysis-clean
+    - make analysis-build
+    - make out/crownet_user
   artifacts:
     paths:
     - ${CROWNET_HOME}/out
