@@ -22,56 +22,33 @@ import simu5g.nodes.eNodeB;
 import simu5g.world.radio.LteChannelControl;
 import simu5g.nodes.PgwStandard;
 
+import inet.common.misc.ThruputMeteringChannel;
 
-network LabSingleCellBase
+
+network LabSingleCellLte extends LabSingleCellBase
 {
-    parameters:
-        int numUe = default(1);
-        int numENB = default(1);
-        @display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab R1.009a (Munich University of Applied Sciences);bgg=1,,#888A85;bgu=m");
-
-    submodules:
-        channelControl: LteChannelControl {
-            @display("p=8,1;is=s");
-        }
-        routingRecorder: RoutingTableRecorder {
-            @display("p=8,2;is=s");
-        }
-        configurator: Ipv4NetworkConfigurator {
-            @display("p=8,3");
-        }
-        binder: Binder {
-            @display("p=8,4;is=s");
-        }
-        carrierAggregation: CarrierAggregation {
-            @display("p=8,5;is=s");
-        }
-        eNB[numENB]: eNodeB {
-            @display("p=1.0457151,2.6142879;is=vl");
-        }
-        pgw: PgwStandard {
-            @display("p=1.0293758,4.4116106;is=l");
-        }
-        router: Router {
-            @display("p=1.0457151,5.8167906;i=device/smallrouter");
-        }
-        server: StandardHost {
-            @display("p=1.0457151,7;is=n;i=device/server");
-        }
-        ue[numUe]: Ue {
-            @display("p=6,3");
-        }
-}
-
-network LabSingleCell extends LabSingleCellBase
-{
+    	parameters:
+        	int numUe = default(1);
+        	int numENB = default(1);
+        	@display("i=block/network2;bgb=7.5,10,#FCE94F;bgi=background/lab_r1009a_map,s;bgtt=Lab (LTE-A setup), R1.009a, HM Munich University of Applied Sciences;bgg=1,,#888A85;bgu=m");
+    	
         types:
             channel Eth1GMetered extends ThruputMeteringChannel
             {
                 datarate = 1024Mbps;
                 thruputDisplayFormat = "u";
             }
-
+        submodules:
+            eNB[numENB]: eNodeB {
+            	@display("p=1.0457151,2.6142879;is=vl");
+        	}
+        	pgw: PgwStandard {
+            	@display("p=1.0293758,4.4116106;is=l");
+        	}
+        	ue[numUe]: Ue {
+            	@display("p=6,3");
+        	}
+        	
         connections:
         server.pppg++ <--> Eth1GMetered <--> router.pppg++;
         router.pppg++ <--> Eth1GMetered <--> pgw.filterGate;
