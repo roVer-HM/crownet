@@ -31,7 +31,7 @@ models_l4 := $(mod_crownet)
 models :=  $(models_l4) $(models_l3) $(models_l2) $(models_l1)
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
-PYTHON := python3.9
+PYTHON := python3.8
 
 # prepare environment (sub-projects need to set env variables)
 IGNORE := $(shell bash -c "source $(mod_inet)/setenv; env | sed 's/=/:=/' | sed 's/^/export /' > .makeenv.tmp")
