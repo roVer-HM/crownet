@@ -12,7 +12,7 @@ fi
 
 if [[ ! -f "${CROWNET_HOME}/${ENV_ACTIVATE}" ]]; then
     echo "Missing environment activation script: $CROWNET_HOME/$ENV_ACTIVATE"
-    echo "Please run \"omnetpp exec make analysis-all\" in $CROWNET_HOME to create the environments."
+    echo "Please run \"make analysis-all\" in $CROWNET_HOME to create the environments."
     exit 1
 fi
 

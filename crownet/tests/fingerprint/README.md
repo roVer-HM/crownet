@@ -21,9 +21,9 @@ updated.
 In order to execute the tests, perform the following steps:
 
 1) Create the Python environment (assumption: current directory is the CrowNet home
-   directory `CROWNET_HOME`)
+   directory `CROWNET_HOME`) Note: the analysis make target must not be executed inside a container.
     ```
-    $> omnetpp exec make analysis-all
+    $> make analysis-all
     ```
 2) Activate the Python environment `crownet_user`
     ```

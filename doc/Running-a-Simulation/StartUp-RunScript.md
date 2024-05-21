@@ -3,11 +3,11 @@
 ## Prepare the virtual Python environment 
 
 Crownet uses multiple python frameworks to create simulation studies using a
-combination of multiple simulators. Use the following to create ready to use
-virtual environments:
+combination of multiple simulators. Use the following from the repo root directory
+to create ready to use virtual environments:
 
 ```
-omnetpp exec make analysis-all
+make analysis-all
 ```
 This will create two virtual environments `out/crownet_user` and `out/crownet_dev`.
 In the first, the three packages `crownetutils`, `flowcontrol` and `suqc` are

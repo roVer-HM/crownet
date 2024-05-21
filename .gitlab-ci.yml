@@ -20,7 +20,7 @@ stages:
   - simulation-campaign
   - deploy
 
-# TODO: fix the caching. Currently, old cached versions of (flowcontrol, crownetutils, suq-controller) are used instead of the updated versions despite "omnetpp exec make analysis-clean" 
+# TODO: fix the caching. Currently, old cached versions of (flowcontrol, crownetutils, suq-controller) are used instead of the updated versions despite "make analysis-clean" 
 # cache:
 #  key: ${CI_COMMIT_REF_SLUG}
 #  paths:
