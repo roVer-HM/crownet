@@ -28,9 +28,9 @@ Navigate to the crownet root directory
 cd $CROWNET_HOME
 
 ```
-Build the virtual Python environments using
+Build the virtual Python environments. Note: Do not use any container to execute that make-target
 ```
-omnetpp exec make analysis-all
+make analysis-all
 ```
 In `crownet/out` you find the two virtual environments
 * crownet_user
