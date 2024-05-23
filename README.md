@@ -1,4 +1,10 @@
 # *CrowNet*: *Crow*ds in *Net*works
+
+**Branch for publication: Adaptive Transmission Rate Control for Decentralized Sensing Applications!**
+
+**See publication based [README](crownet/simulations/2024_ieeeAccess_arc-dsa/README.md) for more 
+information about the publication. For usage of CrowNet please use the main-Branch.**
+
 CrowNet is an open source simulation framework for the development of new networked mobility concepts and intelligent transportation systems.
 CrowNet has been developed as part of the [roVer research project](https://www.hm.edu/forschung/forschungsprojekte/projektdetails/wischhof/wischhof_koester_rover.de.html) at [Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html) that is funded by the [Federal Ministry of Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html) (Grant number: 13FH669IX6).
 

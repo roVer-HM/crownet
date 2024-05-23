@@ -6,6 +6,7 @@ from __future__ import annotations
 import glob
 import os
 from argparse import ArgumentParser, Namespace
+from typing import List, Protocol
 from crownetutils.utils.json import NumpyEncoder
 from crownetutils.utils.plot import PlotUtil
 from crownetutils.utils.styles import load_matplotlib_style
@@ -34,8 +35,18 @@ class MyMultipleLocator(MultipleLocator):
         return super().tick_values(vmin, vmax)
 
 
-def get_seeds(path):
+class BonnmotionFileFilter:
+    def __call__(self, file_paths: List[str]) -> List[str]:
+        pass
+
+
+def all_files(file_paths: List[str]) -> List[str]:
+    return file_paths
+
+
+def get_seeds(path, filter: BonnmotionFileFilter):
     bm_files = glob.glob(f"{path}/**/*.bonnmotion.gz", recursive=True)
+    bm_files = filter(bm_files)
     bm = {}
     for b in bm_files:
         bid = int(os.path.basename(b)[0:3])
@@ -44,13 +55,11 @@ def get_seeds(path):
     return bm
 
 
-def parse_bonnmotion(study_dir):
-    bm_files = get_seeds(study_dir)
+def parse_bonnmotion(study_dir, filter: BonnmotionFileFilter):
+    bm_files = get_seeds(study_dir, filter)
     data = []
 
-    # for bid in range(10):
-    for bid in range(10):
-        b = bm_files[bid]
+    for bid, b in bm_files.items():
         d = frame_from_bm(b)
         d = d[d["time"] <= 1000.0].copy()
         d["seed"] = bid
@@ -60,11 +69,11 @@ def parse_bonnmotion(study_dir):
     return data
 
 
-def get_number_of_nodes(study_dir, cache_path):
+def get_number_of_nodes(study_dir, cache_path, filter: BonnmotionFileFilter):
     if os.path.exists(cache_path):
         return pd.read_csv(cache_path, index_col=["seed", "time"])
 
-    data = parse_bonnmotion(study_dir)
+    data = parse_bonnmotion(study_dir, filter)
     node_count: pd.DataFrame = data.groupby(["seed", "time"])["id"].count()
     node_count.to_csv(cache_path)
     stats = node_count[node_count.index.get_level_values("time") > 120].describe()
@@ -102,12 +111,12 @@ def plot_number_of_nodes(node_count: pd.DataFrame):
     return fig, ax
 
 
-def get_speed_hist_data(study_dir, cache_path):
+def get_speed_hist_data(study_dir, cache_path, filter: BonnmotionFileFilter):
     if os.path.exists(cache_path):
         with open(cache_path, "r", encoding="utf-8") as f:
             return json.load(fp=f)
 
-    bm = parse_bonnmotion(study_dir)
+    bm = parse_bonnmotion(study_dir, filter)
     bm = bm[bm["time"] > 120].copy()
 
     qs = np.percentile(bm["speed"], [25, 75])
@@ -133,15 +142,15 @@ def get_speed_hist_data(study_dir, cache_path):
     with open(cache_path, "w", encoding="utf-8") as f:
         json.dump(hist_data, f, cls=NumpyEncoder)
 
-    return get_speed_hist_data(study_dir, cache_path)
+    return get_speed_hist_data(study_dir, cache_path, filter)
 
 
-def get_trace_length_hist_data(study_dir, cache_path):
+def get_trace_length_hist_data(study_dir, cache_path, filter: BonnmotionFileFilter):
     if os.path.exists(cache_path):
         with open(cache_path, "r", encoding="utf-8") as f:
             return json.load(fp=f)
 
-    bm = parse_bonnmotion(study_dir)
+    bm = parse_bonnmotion(study_dir, filter)
     bm = bm.groupby(["seed", "id"])["dist"].sum().to_frame()
 
     qs = np.percentile(bm["dist"], [25, 75])
@@ -162,7 +171,7 @@ def get_trace_length_hist_data(study_dir, cache_path):
     with open(cache_path, "w", encoding="utf-8") as f:
         json.dump(hist_data, f, cls=NumpyEncoder)
 
-    return get_speed_hist_data(study_dir, cache_path)
+    return get_speed_hist_data(study_dir, cache_path, filter)
 
 
 class Labeloffset:
@@ -187,14 +196,23 @@ def main(ns: Namespace):
     study_dir = ns.input[0]
     analysis_dir = ns.output
 
+    def file_filter(bm_files: List[str]) -> List[str]:
+        seeds = [2, 3, 5, 6, 8, 9]
+        ret = []
+        for f in bm_files:
+            for s in seeds:
+                if f"00{s}___muc.bonnmotion.gz" in f:
+                    ret.append(f)
+        return ret
+
     node_count = get_number_of_nodes(
-        study_dir, os.path.join(analysis_dir, "num_nodes.csv")
+        study_dir, os.path.join(analysis_dir, "num_nodes.csv"), file_filter
     )
     hist_data_speed = get_speed_hist_data(
-        study_dir, os.path.join(analysis_dir, "speed_hist.json")
+        study_dir, os.path.join(analysis_dir, "speed_hist.json"), file_filter
     )
     hist_data_trace = get_trace_length_hist_data(
-        study_dir, os.path.join(analysis_dir, "trace_length_hist.json")
+        study_dir, os.path.join(analysis_dir, "trace_length_hist.json"), file_filter
     )
 
     col_pt = 242.67355 * 1.3
@@ -320,8 +338,9 @@ def main(ns: Namespace):
     ax_dist_hist.xaxis.set_label_coords(0.5, -0.24)
 
     h, l = ax_dist_hist.get_legend_handles_labels()
-    h = np.array(h)[[0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7]].tolist()
-    l = np.array(l)[[0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7]].tolist()
+    l = ["All seeds", "Seed 1", "Seed 2", "Seed 3", "Seed 4", "Seed 5", "Seed 6"]
+    h = np.array(h)[[0, 4, 1, 5, 2, 6, 3]].tolist()
+    l = np.array(l)[[0, 4, 1, 5, 2, 6, 3]].tolist()
     _h, _l = ax_count_ts.get_legend_handles_labels()
     h.append(_h[-1])
     l.append(_l[-1])
