@@ -1,6 +1,8 @@
 #include "BeaconService.h"
 #include "BeaconJSON.h"
 
+using namespace simu5g;
+
 Define_Module(BeaconService);
 
 BeaconService::BeaconService()

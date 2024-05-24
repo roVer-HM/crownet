@@ -19,6 +19,7 @@
 
 Define_Module(MECBeaconApp);
 
+using namespace simu5g;
 using namespace inet;
 using namespace omnetpp;
 

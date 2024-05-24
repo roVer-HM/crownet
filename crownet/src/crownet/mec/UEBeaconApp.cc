@@ -16,6 +16,7 @@
 #include "UEBeaconApp.h"
 
 using namespace inet;
+using namespace simu5g;
 
 Define_Module(UEBeaconApp);
 
