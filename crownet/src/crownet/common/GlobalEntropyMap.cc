@@ -16,7 +16,7 @@
 #include "crownet/common/GlobalEntropyMap.h"
 #include <inet/common/ModuleAccess.h>
 #include "crownet/crownet.h"
-
+#include <algorithm>
 
 using namespace omnetpp;
 using namespace inet;
@@ -28,7 +28,15 @@ Define_Module(GlobalEntropyMap);
 
 GlobalEntropyMap::~GlobalEntropyMap(){
     if (entropyTimer) cancelAndDelete(entropyTimer);
+    entropyTimer = nullptr;
     delete entropyProvider;
+    for (auto& e : _table){
+        if (e.second != nullptr && e.second->getOwner() == this){
+            delete e.second;
+            e.second = nullptr;
+        }
+    }
+    _table.clear();
 }
 
 
@@ -46,9 +54,12 @@ void GlobalEntropyMap::initialize(int stage) {
       entropyProvider = (EntropyProvider*)(par("entropyProvider").objectValue()->dup());
       take(entropyProvider);
       entropyProvider->initialize(getRNG(par("entropyRngGenerator").intValue()));
-      mapDataType = "entropyData";
+      mapDataType = DpmmMapType::ENTROPY;
   }
 }
+
+std::string GlobalEntropyMap::getMapName() const { return "global_entropyMap"; }
+
 
 void GlobalEntropyMap::visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) {
   const auto mobility = check_and_cast<inet::IMobility*>(mod->getModuleByPath(m_mobilityModule.c_str()));
@@ -101,6 +112,15 @@ void GlobalEntropyMap::updateMaps() {
     // log agent cell position. Will update _table with missing entires
     acceptNodeVisitor(this);
 
+    // update decentralized map
+    // perform update of node maps first before building ground truth
+    // because the 'sensor range' of the nodes defines the ground truth.
+    // Ground truth is build lazily as needed.
+    for (auto &handler : dezentralMaps) {
+      handler.second->updateLocalMap();
+      handler.second->computeValues();
+    }
+
     for(const auto& e: _table){
         const auto currentData = e.second->getCurrentData();
         const auto &posTraci = converter->position_cast_traci(currentData->getPosition());
@@ -114,11 +134,7 @@ void GlobalEntropyMap::updateMaps() {
     valueVisitor->setTime(simTime());
     dcdMapGlobal->computeValues(valueVisitor);
 
-    // update decentralized map
-    for (auto &handler : dezentralMaps) {
-      handler.second->updateLocalMap();
-      handler.second->computeValues();
-    }
+
 }
 
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const int sourceId){
@@ -153,6 +169,10 @@ NeighborhoodTableValue_t GlobalEntropyMap::getValue(const GridCellID& cellId){
 NeighborhoodTableValue_t GlobalEntropyMap::getValue(const inet::Coord& pos){
     auto id = -1*cellKeyProvider->getCellKey1D(pos);
     return getValue(id);
+}
+
+std::vector<GridCellID> GlobalEntropyMap::getCellsInRadius(const inet::Coord& pos, double distance) const{
+    return cellKeyProvider->getCellsInRadius(pos, distance);
 }
 
 void GlobalEntropyMap::updateEntropy(){

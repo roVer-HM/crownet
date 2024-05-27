@@ -149,7 +149,7 @@ function run_container_X11() {
 	if [[ "$OSTYPE" == "darwin"* ]]; then
 		CMD_ARR+=(--volume="/Users/$USER:/home/$USER")
 	else
-		CMD_ARR+=(--volume="/home/$USER:/home/$USER")
+		CMD_ARR+=(--volume="$HOME:$HOME")
 	fi
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		CMD_ARR+=(--volume="/etc/group:/etc/group:ro")
@@ -169,8 +169,8 @@ function run_container_X11() {
 		# location outside of /home/$USER/ the container cannot follow the link.
 		# Adding a volume at the location of the symlink will allow access to the
 		# new cache location. (e.g. DOCKER_VADERE_CACHE_LOCATION=/opt/vadere-cache)
-		log_ "container> mount cache location '${DOCKER_VADERE_CACHE_LOCATION}' to '/home/$USER/.cache/vadere'"
-		CMD_ARR+=(--volume="/home/$USER/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
+		log_ "container> mount cache location '${DOCKER_VADERE_CACHE_LOCATION}' to '$HOME/.cache/vadere'"
+		CMD_ARR+=(--volume="$HOME/.cache/vadere:${DOCKER_VADERE_CACHE_LOCATION}")
 	fi
 	CMD_ARR+=($@)
 	#log_ "${CMD_ARR[@]}"

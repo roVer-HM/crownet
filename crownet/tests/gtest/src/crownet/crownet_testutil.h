@@ -10,12 +10,41 @@
 
 #include "crownet/common/Entry.h"
 #include "crownet/dcd/regularGrid/RegularCell.h"
+#include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
+
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
 #include "crownet/dcd/regularGrid/RegularDcdMap.h"
 #include "main_test.h"
 
 using namespace crownet;
 
+
+template<typename Range1, typename Range2>
+inline
+bool equal(Range1 const& range1, Range2 const& range2)
+{
+    return std::equal(begin(range1), end(range1), begin(range2), end(range2));
+}
+
+template<typename Range1>
+inline
+std::string rstr(Range1 const& range){
+    std::stringstream s;
+    s << "[";
+    for(const auto& e : range){
+        s << e << ", ";
+    }
+    s.seekp(-2, s.cur);
+    s << "]";
+    return s.str();
+}
+
+template<typename StringableType>
+inline
+void cmp_vec(std::vector<StringableType>& v1, std::vector<StringableType>& v2, std::string msg = ""){
+    EXPECT_EQ(v1.size(), v2.size());
+    EXPECT_TRUE(equal(v1, v2)) << "expected equality of v1 == v2 but got \n " << rstr(v1) << "\n!=\n " << rstr(v2) << "\n"<<msg;
+}
 
 void expect_different_object_but_same_content(RegularCell::entry_t_ptr a, RegularCell::entry_t_ptr b);
 
@@ -89,6 +118,7 @@ public:
     void update(std::shared_ptr<RegularDcdMap> map, GridCellID cell, int id, int count, omnetpp::simtime_t t, EntryDist distEntry);
 
     void incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int i, double t);
+    void incr(std::shared_ptr<RegularDcdMap> map, GridCellID cell, int i, double t);
 
 
     void setup_local(std::shared_ptr<RegularDcdMap> mapLocal);

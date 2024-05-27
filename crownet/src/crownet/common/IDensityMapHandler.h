@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include "crownet/crownet.h"
 #include "crownet/common/util/Writer.h"
 
 namespace crownet {
@@ -37,6 +38,7 @@ class IDensityMapHandler : public IDensityMapHandlerBase<GRID> {
   virtual void setMapFactory(std::shared_ptr<RegularDcdMapFactory> factory) = 0;
   virtual void setCoordinateConverter(std::shared_ptr<OsgCoordinateConverter> converter) = 0;
   virtual omnetpp::cModule* getModule() = 0;
+  virtual DpmmMapType getMapType() const = 0;
   // todo mw
   //virtual void setSqlApi( std::shared_ptr<SqlApi> sqlapi) = 0;
 };

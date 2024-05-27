@@ -80,6 +80,10 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
                                      omnetpp::cObject *details) {
   if (signalId == initMap){
       auto mapHandler = check_and_cast<GridHandler *>(obj);
+      if (mapHandler->getMapType() != mapDataType){
+          EV_DEBUG << this->getFullPath() << " wrong map type for " << obj->getFullPath() << ". Ignore signal." << endl;
+          return;
+      }
       mapHandler->setMapFactory(dcdMapFactory);
       mapHandler->setCoordinateConverter(converter);
 
@@ -91,15 +95,24 @@ void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,
   }
   else if (signalId == registerMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
+    if (mapHandler->getMapType() != mapDataType){
+        EV_DEBUG << this->getFullPath() << " wrong map type for " << obj->getFullPath() << ". Ignore signal." << endl;
+        return;
+    }
+
     dezentralMaps[mapHandler->getMap()->getOwnerId()] = mapHandler;
-    EV_DEBUG << "register DensityMap for node: "
-             << mapHandler->getMap()->getOwnerId();
+    EV_DEBUG  << this->getFullPath() << " register DensityMap(Type: " << dpmmMapTypeToString(mapDataType) << ") for node: "
+             << mapHandler->getMap()->getOwnerId() << ": " << obj->getFullPath() << endl;
 
   } else if (signalId == removeMap) {
     auto mapHandler = check_and_cast<GridHandler *>(obj);
+    if (mapHandler->getMapType() != mapDataType){
+        EV_DEBUG << this->getFullPath() << " wrong map type for " << obj->getFullPath() << ". Ignore signal." << endl;
+        return;
+    }
     dezentralMaps.erase(mapHandler->getMap()->getOwnerId());
-    EV_DEBUG << "remove DensityMap for node: "
-             << mapHandler->getMap()->getOwnerId();
+    EV_DEBUG  << this->getFullPath() << "remove DensityMap(Type: " << dpmmMapTypeToString(mapDataType) << ") for node: "
+             << mapHandler->getMap()->getOwnerId() << ": " << obj->getFullPath() << endl;
   } else if (signalId == registerNodeAcceptor){
       auto acceptor = check_and_cast<ITraCiNodeVisitorAcceptor*>(obj);
       dynamicNodeVisitorAcceptors.push_back(acceptor);
@@ -111,6 +124,8 @@ void GlobalDensityMap::receiveSignal(cComponent *source, simsignal_t signalID,
       initializeMap();
   }
 }
+
+std::string GlobalDensityMap::getMapName() const { return "global_densityMap"; }
 
 void GlobalDensityMap::initializeMap(){
     // 1) setup map
@@ -130,38 +145,43 @@ void GlobalDensityMap::initializeMap(){
     cellKeyProvider = dcdMapFactory->getCellKeyProvider();
 
     // 2) setup writer.
+    ActiveFileWriterBuilder fBuilder{};
+    fBuilder.addMetadata("IDXCOL", 3);
+    fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+    fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
+    fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+    fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+    // todo cellsize in x and y
+    fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+    fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
+    fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
+    fBuilder.addMetadata<std::string>(
+        "MAP_TYPE",
+        mapCfg->getMapType());  // The global density map is the ground
+                                // truth. No algorihm needed.
+    fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
+    fBuilder.addMetadata<int>("NODE_ID", -1);
+    fBuilder.addMetadata("NODE_PATH", this->getFullPath());
+
+
     if (par("writerType").stdstringValue() == "csv"){
-        ActiveFileWriterBuilder fBuilder{};
-        fBuilder.addMetadata("IDXCOL", 3);
-        fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
-        fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
-        fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
-        fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
-        // todo cellsize in x and y
-        fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-        fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
-        fBuilder.addMetadata("DATATYPE", mapDataType);
-        fBuilder.addMetadata<std::string>(
-            "MAP_TYPE",
-            mapCfg->getMapType());  // The global density map is the ground
-                                    // truth. No algorihm needed.
-        fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
-        fBuilder.addMetadata<int>("NODE_ID", -1);
-        fBuilder.addPath("global");
+
+        fBuilder.addPath(getMapName());
 
         fileWriter.reset(fBuilder.build(
             std::make_shared<RegularDcdMapGlobalPrinter>(dcdMapGlobal)));
     } else if (par("writerType").stdstringValue() == "sql"){
-//      todo mw
-//
-//      create sqlApi <--- will be shared
-//      create sqlWriter/Printer for global map
-//          todo mw setup SqlLiteWriter
-//          auto sqlWriter = std::make_shared<SqlLiteWriter>();
-//          auto sqlPrinter = std::make_shared<RegularDcdMapSqlValuePrinter>(dcdMapGlobal);
-//          sqlWriter->setSqlApi(sqlApi);
-//          sqlWriter->setPrinter(sqlPrinter);
-//          filewriter = sqlWriter;
+        if (hasPar("mapSqlMaxCommitCount")){
+            dcdMapFactory->create_result_db(getMapName());
+        } else {
+            dcdMapFactory->create_result_db(getMapName(), par("mapSqlMaxCommitCount").intValue());
+        }
+        fileWriter.reset(
+                fBuilder.buildSqlGlobalWriter(
+                        std::make_shared<RegularDcdMapSqlGlobalPrinter>(dcdMapGlobal),
+                        dcdMapFactory->getSqlApi()
+                )
+        );
     } else {
         throw cRuntimeError("expected sql or csv as writer type got '%s'", par("writerType").stringValue());
     }
@@ -182,7 +202,7 @@ void GlobalDensityMap::initialize(int stage) {
       if (vectorNodeModule != ""){
           dynamicNodeVisitorAcceptors.push_back(this);
       }
-      mapDataType = "pedestrianCount";
+      mapDataType = DpmmMapType::PEDESTRIAN_COUNT;
       mapCfg = (MapCfg*)(par("mapCfg").objectValue()->dup());
       take(mapCfg);
 

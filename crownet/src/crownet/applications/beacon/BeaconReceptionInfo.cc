@@ -122,6 +122,10 @@ void BeaconReceptionInfo::processInbound(Packet *packetIn,
         currentData->setCreationTimeStamp(beacon->getTimestamp());
         currentData->setSequenceNumber(beacon->getSequenceNumber());
         currentData->setReceivedTime(arrivalTime);
+        auto rsdBeacon = dynamicPtrCast<const DynamicBeaconPacketWithSharingDominId>(packetIn->peekData());
+        if (rsdBeacon){
+            currentData->setRessourceSharingDomainId(rsdBeacon->getSharingDomainId());
+        }
     }
 }
 

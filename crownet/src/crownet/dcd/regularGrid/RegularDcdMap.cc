@@ -9,6 +9,13 @@
 #include "crownet/dcd/regularGrid/MapCellAggregationAlgorithms.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/regularGrid/RegularCellVisitors.h"
+#include "crownet/common/util/FileWriter.h"
+
+#include "crownet/dcd/generic/transmissionOrderStrategies/InsertionOrderedCellIdStream.h"
+#include "crownet/dcd/generic/transmissionOrderStrategies/OrderByCellIdStream.h"
+#include "crownet/dcd/generic/transmissionOrderStrategies/OrderdCellIdVectorProvider.h"
+
+
 
 namespace crownet {
 
@@ -51,6 +58,37 @@ RegularDcdMapFactory::RegularDcdMapFactory(std::shared_ptr<OsgCoordinateConverte
     cellIdStream_dispatcher["insertionOrder"] = [](){
         return std::make_shared<InsertionOrderedCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>();
     };
+    cellIdStream_dispatcher["orderBySentLastAsc_DistAsc"] = [](){
+        bool lastSentAscendingOrder = true;
+        bool distanceAscendingOrder = true;
+        using vecProvider_t = OrderByLastSentAndCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(lastSentAscendingOrder, distanceAscendingOrder);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
+    cellIdStream_dispatcher["orderByDistanceAscending"] = [](){
+        bool ascending = true;
+        using vecProvider_t = OrderByCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(ascending);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
+    cellIdStream_dispatcher["orderByDistanceDescending"] = [](){
+        bool ascending = false;
+        using vecProvider_t = OrderByCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(ascending);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
+
+    cellIdStream_dispatcher["orderBySentLastAsc_DistDesc"] = [](){
+        bool lastSentAscendingOrder = true;
+        bool distanceAscendingOrder = false; // descending order (5,4,3,2,1)
+        using vecProvider_t = OrderByLastSentAndCellDistance<GridCellID, IntIdentifer, omnetpp::simtime_t>;
+        auto vecProvider = std::make_shared<vecProvider_t>(lastSentAscendingOrder, distanceAscendingOrder);
+        return std::make_shared<OrderByCellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>>(vecProvider);
+    };
+
 }
 
 
@@ -79,6 +117,23 @@ std::shared_ptr<ICellIdStream<GridCellID, IntIdentifer, omnetpp::simtime_t>> Reg
         throw cRuntimeError("No CellIdStream defined for type %s", typeName.c_str());
     }
     return cellIdStream_dispatcher[typeName]();
+}
+void RegularDcdMapFactory::create_result_db(std::string path, int maxCommitCount){
+    sqlApi = std::make_shared<SqlLiteApi>(maxCommitCount); //max commit count
+    auto absPath = BaseFileWriter::getAbsOutputPath(path, ".db");
+    sqlApi->initialize(absPath.c_str());
+}
+
+bool RegularDcdMapFactory::use_result_db() const {
+    return sqlApi != nullptr;
+}
+
+
+std::shared_ptr<SqlLiteApi> RegularDcdMapFactory::getSqlApi(){
+    if (sqlApi == nullptr){
+        throw cRuntimeError("SqlApi not configured in RegularDcdMapFactory");
+    }
+    return sqlApi;
 }
 
 }  // namespace crownet

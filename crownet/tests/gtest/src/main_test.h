@@ -61,38 +61,48 @@ class GtestEnv : public omnetpp::cNullEnvir {
   virtual void sputn(const char *s, int n) { (void)::fwrite(s, 1, n, stdout); }
 };
 
+class OppHelper {
+public:
+  simtime_t incrementSimTime(double incr = 1.0){
+   auto sim = cSimulation::getActiveSimulation();
+   simtime_t old = sim->getSimTime();
+   sim->setSimTime(old+incr);
+   return old;
+ }
+
+ simtime_t setSimTime(simtime_t t) {
+   auto sim = cSimulation::getActiveSimulation();
+   simtime_t old = sim->getSimTime();
+   sim->setSimTime(t);
+   return old;
+ }
+
+ Packet* build(Ptr<Chunk> content){
+     auto pkt = new Packet();
+     pkt->insertAtFront(content);
+     return pkt;
+ }
+
+ Packet* build(b dataLength ){
+     auto pkt = new Packet();
+     auto content = makeShared<ApplicationPacket>();
+     content->setChunkLength(dataLength);
+     pkt->insertAtFront(content);
+     return pkt;
+ }
+
+};
+
 /**
  * Base test fixture to access currently active simulation.
  */
-class BaseOppTest : public ::testing::Test {
+class BaseOppTest : public ::testing::Test, public  OppHelper {
  public:
 
-  simtime_t incrementSimTime(double incr = 1.0){
-    auto sim = cSimulation::getActiveSimulation();
-    simtime_t old = sim->getSimTime();
-    sim->setSimTime(old+incr);
-    return old;
-  }
+};
 
-  simtime_t setSimTime(simtime_t t) {
-    auto sim = cSimulation::getActiveSimulation();
-    simtime_t old = sim->getSimTime();
-    sim->setSimTime(t);
-    return old;
-  }
+template <typename T>
+class BaseOppTestWithParameters : public ::testing::TestWithParam<T>, public OppHelper {
 
-  Packet* build(Ptr<Chunk> content){
-      auto pkt = new Packet();
-      pkt->insertAtFront(content);
-      return pkt;
-  }
-
-  Packet* build(b dataLength ){
-      auto pkt = new Packet();
-      auto content = makeShared<ApplicationPacket>();
-      content->setChunkLength(dataLength);
-      pkt->insertAtFront(content);
-      return pkt;
-  }
 
 };

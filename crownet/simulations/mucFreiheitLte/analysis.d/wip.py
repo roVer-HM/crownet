@@ -1,28 +1,22 @@
 # %%
+from crownetutils.analysis.dpmm import MapType
 import folium
-from folium.plugins import TimestampedGeoJson, TimeSliderChoropleth, HeatMapWithTime
-from matplotlib import projections
-import pandas as pd
-from pyproj import Proj
+from folium.plugins import HeatMapWithTime
 from crownetutils.analysis.omnetpp import PlotUtil
 from crownetutils.analysis.dpmm.builder import DpmmProviders
 import seaborn as sns
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from typing import Tuple
 
 from crownetutils.utils.misc import Project
-import contextily as ctx
 from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.analysis.plot.app_misc import PlotAppMisc
-import crownetutils.analysis.dpmm as Dmap
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.omnetpp.scave import CrownetSql
-import crownetutils.utils.plot as Plot
 from crownetutils.utils.logging import logger, timing, logging
-from IPython.display import display
 
 
 def run_data(
@@ -32,7 +26,14 @@ def run_data(
         data_root = kwargs["data_root"]
     else:
         data_root = f"{os.environ['HOME']}/repos/crownet/crownet/simulations/{sim}/analysis.d/results/{run}"
-    builder = DpmmHdfBuilder.get(hdf_file, data_root).epsg(Project.UTM_32N)
+
+    cfg = DpmmCfg(
+        base_dir=data_root,
+        hdf_file=hdf_file,
+        map_type=MapType.DENSITY,
+        epsg_base=Project.UTM_32N,
+    )
+    builder = DpmmHdfBuilder.get(cfg)
 
     sql = CrownetSql(
         vec_path=f"{data_root}/vars_rep_0.vec",

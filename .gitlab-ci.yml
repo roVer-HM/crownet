@@ -20,7 +20,7 @@ stages:
   - simulation-campaign
   - deploy
 
-# TODO: fix the caching. Currently, old cached versions of (flowcontrol, crownetutils, suq-controller) are used instead of the updated versions despite "omnetpp exec make analysis-clean" 
+# TODO: fix the caching. Currently, old cached versions of (flowcontrol, crownetutils, suq-controller) are used instead of the updated versions despite "make analysis-clean" 
 # cache:
 #  key: ${CI_COMMIT_REF_SLUG}
 #  paths:
@@ -93,10 +93,10 @@ build-analysis-tools:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - docker pull $CI_REGISTRY/rover/crownet/omnetpp
-    # ## build python project and setup user enviroment
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make analysis-clean"
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make analysis-build"
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make out/crownet_user"
+    # ## build python project and setup user environment. Do not use container to create python projects.
+    - make analysis-clean
+    - make analysis-build
+    - make out/crownet_user
   artifacts:
     paths:
     - ${CROWNET_HOME}/out
@@ -124,6 +124,7 @@ fingerprints:
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
@@ -147,6 +148,7 @@ fingerprints_crownet:
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
@@ -184,6 +186,7 @@ uq-unit-tests:
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq"
@@ -196,6 +199,7 @@ uq-integration-tests:
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
     - "cd ${CROWNET_HOME}/analysis/uq/simulation_studies"

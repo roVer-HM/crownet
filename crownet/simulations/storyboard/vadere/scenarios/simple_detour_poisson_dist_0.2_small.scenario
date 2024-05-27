@@ -1,8 +1,8 @@
 {
   "name" : "simple_detour_poisson_dist_0.2_small",
   "description" : "",
-  "release" : "2.4",
-  "commithash" : "eecc5fb8aebd57cd27c21ef5eac04e2094056f60",
+  "release" : "2.6",
+  "commithash" : "71e4cc56e0774efd45e57685680f8e4594d4183f",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -479,35 +479,7 @@
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
         "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
-      "teleporter" : null,
-      "attributesCar" : {
-        "id" : -1,
-        "shape" : {
-          "x" : 0.0,
-          "y" : 0.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "visible" : true,
-        "radius" : 0.2,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
-        "acceleration" : 2.0,
-        "footstepHistorySize" : 4,
-        "searchRadius" : 1.0,
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
+      "teleporter" : null
     },
     "stimulusInfos" : [ ]
   }

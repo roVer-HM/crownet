@@ -119,11 +119,20 @@ void MapTest::update(std::shared_ptr<RegularDcdMap> map, GridCellID cell, int id
   setSimTime(_t);
 }
 
-void MapTest::incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int i, double t) {
+void MapTest::incr(std::shared_ptr<RegularDcdMap> map, double x, double y, int id, double t) {
   auto _t = setSimTime(t);
   auto e = map->getEntry<GridGlobalEntry>(traci::TraCIPosition(x, y));
   e->incrementCount(t);
-  e->nodeIds.insert(IntIdentifer(i));
+  e->nodeIds.insert(IntIdentifer(id));
+  e->setResourceSharingDomainId(ownRessourceSharingDomainId);
+  setSimTime(_t);
+}
+
+void MapTest::incr(std::shared_ptr<RegularDcdMap> map, GridCellID cell, int id, double t) {
+  auto _t = setSimTime(t);
+  auto e = map->getEntry<GridGlobalEntry>(cell);
+  e->incrementCount(t);
+  e->nodeIds.insert(IntIdentifer(id));
   e->setResourceSharingDomainId(ownRessourceSharingDomainId);
   setSimTime(_t);
 }
@@ -149,6 +158,12 @@ void MapTest::setup_local(std::shared_ptr<RegularDcdMap> mapLocal){
     setSimTime(_t);
 }
 
+/**
+ * [1, 1] Local = 2 / Other = 4
+ * [3, 3] Local = 3 / Other = 3
+ * [4, 4] Local = 2 / Other = 0
+ * [6, 3] Local = 0 / Other = [5, 7, 9]
+ */
 void MapTest::setup_full(std::shared_ptr<RegularDcdMap> mapFull){
     auto _t = setSimTime(0.0);
 

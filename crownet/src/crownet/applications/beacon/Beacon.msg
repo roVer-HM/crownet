@@ -58,7 +58,7 @@ class DynamicBeaconPacket extends BaseDynamicBeacon
 
 class DynamicBeaconPacketWithSharingDominId extends DynamicBeaconPacket {
     chunkLength = chunkLength + b(16);
-    uint16_t sharingDominId = 0;
+    uint16_t sharingDomainId = 0;
 }
 
 
@@ -67,6 +67,7 @@ class BeaconData extends PacketInfo {
     inet::Coord epsilon;   
     uint16_t numberOfNeighbours; 
     double beaconValue= 1.0;
+    uint16_t ressourceSharingDomainId = 0;
 }
 
 class BeaconReceptionInfo extends AppRxInfoPerSource {

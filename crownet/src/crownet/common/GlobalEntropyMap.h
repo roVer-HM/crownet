@@ -39,6 +39,8 @@ public:
     // ITraciNodeVisitor
     virtual void visitNode(const std::string& traciNodeId, omnetpp::cModule* mod) override;
 
+    virtual std::string getMapName() const override;
+
 
     // IBaseNeighborhoodTable
     virtual NeighborhoodTableIter_t iter() override;
@@ -46,6 +48,9 @@ public:
     virtual NeighborhoodTableValue_t getValue(const GridCellID& cellId);
     virtual NeighborhoodTableValue_t getValue(const int sourceId);
     virtual NeighborhoodTableValue_t getValue(const inet::Coord& pos);
+    virtual std::vector<GridCellID> getCellsInRadius(const inet::Coord& pos, double distance) const;
+
+
 
 protected:
  virtual void handleMessage(cMessage *msg) override;

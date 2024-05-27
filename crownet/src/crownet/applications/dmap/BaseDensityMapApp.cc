@@ -14,6 +14,7 @@
 // 
 
 #include "crownet/applications/dmap/BaseDensityMapApp.h"
+#include "crownet/applications/dmap/MapPacketBurstInfoProvider.h"
 #include "crownet/applications/dmap/dmap_m.h"
 #include "inet/common/TimeTag_m.h"
 
@@ -46,8 +47,16 @@ void BaseDensityMapApp::initialize(int stage) {
       mainAppInterval = &par("mainAppInterval");
       mainAppTimer = new cMessage("mainAppTimer");
       mainAppTimer->setKind(FsmRootStates::APP_MAIN);
-      mapDataType = "pedestrianCount";
 
+      if (mapCfg->getAppendRessourceSharingDomainId()){
+          burstInfoProdiver = std::make_shared<MapPacketBurstInfoProvider>(
+                  std::make_shared<MapHeader>(),
+                  std::make_shared<SparseMapPacketWithSharingDomainId>());
+      } else {
+          burstInfoProdiver = std::make_shared<MapPacketBurstInfoProvider>(
+                  std::make_shared<MapHeader>(),
+                  std::make_shared<SparseMapPacket>());
+      }
     } else if (stage == INITSTAGE_APPLICATION_LAYER){
         // BaseApp schedules start operation first (see BaseApp::initialize(stage))
         if (mainAppInterval->doubleValue() > 0.){
@@ -119,33 +128,52 @@ void BaseDensityMapApp::initDcdMap(){
     // do not share valueVisitor between nodes.
     valueVisitor = dcdMapFactory->createValueVisitor(mapCfg);
     cellAgeHandler = std::make_shared<TTLCellAgeHandler>(dcdMap, mapCfg->getCellAgeTTL(), simTime());
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         rsdVisitor = std::make_shared<ApplyRessourceSharingDomainIdVisitor>(simTime());
     }
 
 
 }
+
+std::string BaseDensityMapApp::getMapBaseName() const{
+    return "dcdMap";
+}
+
+std::string  BaseDensityMapApp::getMapName() const{
+    std::stringstream s;
+    s << getMapBaseName() << "_" << hostId;
+    return s.str();
+}
+
 void BaseDensityMapApp::initWriter(){
     if (mapCfg->getWriteDensityLog()) {
-      ActiveFileWriterBuilder fBuilder{};
-      fBuilder.addMetadata("IDXCOL", 3);
-      fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
-      fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
-      fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
-      fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
-      fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
-      // todo cellsize in x and y
-      fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
-      fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
-      fBuilder.addMetadata("DATATYPE", mapDataType);
-      fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
-      fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
-      std::stringstream s;
-      s << "dcdMap_" << hostId;
-      fBuilder.addPath(s.str());
 
-      fileWriter.reset(fBuilder.build<RegularDcdMap>(
-              dcdMap, mapCfg));
+        ActiveFileWriterBuilder fBuilder{};
+        fBuilder.addMetadata("IDXCOL", 3);
+        fBuilder.addMetadata("XSIZE", converter->getGridSize().x);
+        fBuilder.addMetadata("YSIZE", converter->getGridSize().y);
+        fBuilder.addMetadata("XOFFSET", converter->getOffset().x);
+        fBuilder.addMetadata("YOFFSET", converter->getOffset().y);
+        fBuilder.addMetadata<const traci::Boundary&>("SIM_BBOX", converter->getSimBound());
+        // todo cellsize in x and y
+        fBuilder.addMetadata("CELLSIZE", converter->getCellSize().x);
+        fBuilder.addMetadata("VERSION", std::string("0.4")); // todo!!!
+        fBuilder.addMetadata("DATATYPE", dpmmMapTypeToString(mapDataType));
+        fBuilder.addMetadata("MAP_TYPE", std::string(mapCfg->getMapTypeLog()));
+        fBuilder.addMetadata("NODE_ID", dcdMap->getOwnerId().value());
+        fBuilder.addMetadata("NODE_PATH", this->getFullPath());
+
+
+        if(strcmp(mapCfg->getLogType(), "csv") == 0){
+
+            fBuilder.addPath(getMapName());
+            fileWriter.reset(fBuilder.build<RegularDcdMap>(
+                    dcdMap, mapCfg));
+        } else if (strcmp(mapCfg->getLogType(), "sql") == 0)  {
+            fileWriter.reset(fBuilder.buildSqlWriter<RegularDcdMap>(dcdMap, mapCfg, dcdMapFactory->getSqlApi()));
+        } else {
+            throw cRuntimeError("logType %s unknown. Supported types: 'csv', 'sql'", mapCfg->getLogType());
+        }
     } else {
         // do nothing
         fileWriter.reset(new DevNullWriter());
@@ -159,6 +187,7 @@ void BaseDensityMapApp::initWriter(){
 const bool BaseDensityMapApp::canProducePacket(){
     // todo still produce packet (header only if no data availabel?)
     computeValues(); // Idempotent. Will only be executed once
+
     bool hasData = dcdMap->getCellKeyStream()->hasNext(simTime());
     if (scheduledData.get() > 0){
         // if application is scheduled based on data size
@@ -169,33 +198,14 @@ const bool BaseDensityMapApp::canProducePacket(){
 }
 
 const inet::b BaseDensityMapApp::getMinPdu() const {
-    // todo check number of occupied cells and select the corresponding header type
-    return b(8*(24 + 6)); // SparseMapPacket header
+    return burstInfoProdiver->getMinPacketSize(); // header + 1 cell
 }
 
 BurstInfo BaseDensityMapApp::getBurstInfo(inet::b scheduled) const{
-    MapHeader h;
-    SparseMapPacket p;
-    int max_cells_per_pkt = ((getMaxPdu() - h.getChunkLength())/p.getCellSize()).get();
-
-    int num_cells_available = dcdMap->getCellKeyStream()->size(simTime());
-
-    int num_pkt_needed = (int)std::ceil((double)num_cells_available/max_cells_per_pkt);
-    int num_pkt_possible = (int)std::ceil(((double)scheduled.get()/getMaxPdu().get()));
-
-    inet::b burst_size;
-    int pkt_num;
-    if (num_pkt_needed <= num_pkt_possible){
-        // send num_pkt_needed *NEEDED* packets where the last one is most likly not full.
-        // Thus pkt_num times header plus all cells available.
-        burst_size = inet::b(num_pkt_needed*h.getChunkLength().get() + num_cells_available*p.getCellSize().get());
-        pkt_num = num_pkt_needed;
-    } else {
-        // send num_pkt_possible *FULL* packets
-        burst_size = inet::b(num_pkt_possible*(h.getChunkLength().get() + max_cells_per_pkt*p.getCellSize().get()));
-        pkt_num = num_pkt_possible;
-    }
-    return BurstInfo{pkt_num, burst_size};
+    return burstInfoProdiver->createBurstInfo(
+            scheduled,
+            dcdMap->getCellKeyStream()->size(simTime()),
+            getMaxPdu());
 }
 
 
@@ -206,7 +216,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
     header->setSequenceNumber(seqNo);
     header->addTagIfAbsent<SequenceIdTag>()->setSequenceNumber(seqNo);
     header->setSourceId(hostId);
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         header->setVersion(MapType::SPARSE_RSD);
     } else {
         header->setVersion(MapType::SPARSE);
@@ -219,7 +229,7 @@ Ptr<Chunk>  BaseDensityMapApp::buildHeader(){
 }
 
 Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData){
-    if (mapCfg->getAppendRessourceSharingDomoinId()){
+    if (mapCfg->getAppendRessourceSharingDomainId()){
         return buildPayload(maxData, makeShared<SparseMapPacketWithSharingDomainId>());
     } else {
         return buildPayload(maxData, makeShared<SparseMapPacket>());
@@ -227,25 +237,27 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData){
 }
 
 Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacket> payload){
-    // todo check map capacity and switch to DENSE Packet if needed.
-    maxData -= payload->getChunkLength();
+    maxData -= payload->getChunkLength(); // if payload already contains data. Note: Header size is already accounted for.
 
-    int maxCellCount;
-    int cellSize;
-    maxCellCount = (int)(maxData.get()/payload->getCellSize().get());
-    cellSize = payload->getCellSize().get();
-
-    int usedSpace = 0;
-    auto stream = dcdMap->getCellKeyStream();
     simtime_t now = simTime();
+    auto stream = dcdMap->getCellKeyStream();
 
-    payload->setCellsArraySize(maxCellCount);
+    int cellSize = payload->getCellSize().get();
+    int maxCellCount = (int)std::floor(maxData.get()/cellSize);
 
-    for (; usedSpace < maxCellCount; usedSpace++){
-        if(!stream->hasNext(now)){
-            break; // no more data present for transmission.
-        }
-        auto& cell = stream->nextCell(now);
+    // at most maxCellCount. Can be less if map does not have enough valid data.
+    auto selectedCellIds = stream->getNumCellsOrLess(now, maxCellCount);
+    if (selectedCellIds.size() < 1){
+        throw cRuntimeError("No data available but it should be. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
+
+    // set cell array
+    payload->setCellsArraySize(selectedCellIds.size());
+
+    for (int cellIndex = 0; cellIndex < selectedCellIds.size(); cellIndex++){
+
+        auto& cell = dcdMap->getCell(selectedCellIds[cellIndex]);
         cell.sentAt(now);
         auto count_100 = cell.val()->getCount()*100;
 
@@ -254,42 +266,47 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacket> payl
             (uint16_t)cell.getCellId().x(), // offsetX
             (uint16_t)cell.getCellId().y()  // offsetY
         };
+        c.setCount_dummy(cell.val()->getCount());//cell value in full precision (simulation use only)
+
+
         auto delta_t = now-cell.val()->getMeasureTime();
         c.setDeltaCreation(delta_t);
         c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
-        payload->setCells(usedSpace, c);
+        payload->setCells(cellIndex, c);
     }
 
-    if (usedSpace < maxCellCount ){
-        payload->setCellsArraySize(usedSpace);
-    }
     auto chunkLength = b(payload->getChunkLength().get() + payload->getCellsArraySize() *cellSize);
+    if (chunkLength < b(1)){
+        throw cRuntimeError("ChunkLength of packet is to samll. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
     payload->setChunkLength(chunkLength);
     return payload;
 }
 
 Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacketWithSharingDomainId> payload){
-    // todo check map capacity and switch to DENSE Packet if needed.
-    maxData -= payload->getChunkLength();
+    maxData -= payload->getChunkLength(); // if payload already contains data. Note: Header size is already accounted for.
 
-    int maxCellCount;
-    int cellSize;
-    maxCellCount = (int)(maxData.get()/payload->getCellSize().get());
-    cellSize = payload->getCellSize().get();
-
-    int usedSpace = 0;
-    auto stream = dcdMap->getCellKeyStream();
     simtime_t now = simTime();
+    auto stream = dcdMap->getCellKeyStream();
 
-    payload->setCellsArraySize(maxCellCount);
+    int cellSize = payload->getCellSize().get();
+    int maxCellCount = (int)std::floor(maxData.get()/cellSize);
 
-    for (; usedSpace < maxCellCount; usedSpace++){
-        if(!stream->hasNext(now)){
-            break; // no more data present for transmission.
-        }
+    // at most maxCellCount. Can be less if map does not have enough valid data.
+    auto selectedCellIds = stream->getNumCellsOrLess(now, maxCellCount);
+    if (selectedCellIds.size() < 1){
+        throw cRuntimeError("No data available but it should be. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
 
-        auto& cell = stream->nextCell(now);
-        cell.sentAt(now);
+    // set cell array
+    payload->setCellsArraySize(selectedCellIds.size());
+
+    for (int cellIndex = 0; cellIndex < selectedCellIds.size(); cellIndex++){
+
+        auto& cell = dcdMap->getCell(selectedCellIds[cellIndex]);
+        cell.sentAt(now); // todo: is already set.
         auto count_100 = cell.val()->getCount()*100;
 
         LocatedDcDCellWithSharingDomainId c {
@@ -298,16 +315,20 @@ Ptr<Chunk>  BaseDensityMapApp::buildPayload(b maxData, Ptr<SparseMapPacketWithSh
             (uint16_t)cell.getCellId().y(),  // offsetY
             cell.val()->getResourceSharingDomainId()
         };
+        c.setCount_dummy(cell.val()->getCount());//cell value in full precision (simulation use only)
+
+
         auto delta_t = now-cell.val()->getMeasureTime();
         c.setDeltaCreation(delta_t);
         c.setSourceEntryDist(cell.val()->getEntryDist().sourceEntry); // todo size
-        payload->setCells(usedSpace, c);
+        payload->setCells(cellIndex, c);
     }
 
-    if (usedSpace < maxCellCount ){
-        payload->setCellsArraySize(usedSpace);
-    }
     auto chunkLength = b(payload->getChunkLength().get() + payload->getCellsArraySize() *cellSize);
+    if (chunkLength < b(1)){
+        throw cRuntimeError("ChunkLength of packet is to samll. time: %s node: %s data_availabel: %s minPduSize: %s",
+                now.str().c_str(), this->getFullPath().c_str(), maxData.str().c_str(),  getMinPdu().str().c_str());
+    }
     payload->setChunkLength(chunkLength);
     return payload;
 }
@@ -389,7 +410,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<
         }
         // get or create entry shared pointer
         auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
-        _entry->setCount((double)cell.getCount()/100.0);
+//        _entry->setCount((double)cell.getCount()/100.0);
+        _entry->setCount(cell.getCount_dummy()); // use full precision count value for now.
         _entry->setMeasureTime(_measured);
         _entry->setReceivedTime(_received);
         _entry->setEntryDist(std::move(entryDist));
@@ -434,7 +456,8 @@ bool BaseDensityMapApp::mergeReceivedMap(Ptr<const MapHeader> header, const Ptr<
         }
         // get or create entry shared pointer
         auto _entry = dcdMap->getEntry<GridEntry>(entryCellId, sourceNodeId);
-        _entry->setCount((double)cell.getCount()/100.0);
+//        _entry->setCount((double)cell.getCount()/100.0);
+        _entry->setCount(cell.getCount_dummy()); // use full precision count value for now.
         _entry->setMeasureTime(_measured);
         _entry->setReceivedTime(_received);
         _entry->setEntryDist(std::move(entryDist));
@@ -451,6 +474,8 @@ void BaseDensityMapApp::updateLocalMap() {
 }
 
 void BaseDensityMapApp::writeMap() {
+    updateOwnLocationInMap();
+    this->dcdMap->setResourceSharingDomainId(getResourceSharingDomainId());
     fileWriter->writeData();
 }
 
@@ -473,6 +498,7 @@ void BaseDensityMapApp::setCoordinateConverter(std::shared_ptr<OsgCoordinateConv
 
 void BaseDensityMapApp::computeValues() {
    simtime_t now = simTime();
+   updateOwnLocationInMap();
    // cellAgeHandler is Idempotent
   cellAgeHandler->setTime(now);
   dcdMap->visitCells(*cellAgeHandler); //reference to cellAgeHandler needed
@@ -482,10 +508,11 @@ void BaseDensityMapApp::computeValues() {
   // dcdMap->computeValues is Idempotent
   dcdMap->computeValues(valueVisitor);
 
-  if (mapCfg->getAppendRessourceSharingDomoinId()){
+  if (mapCfg->getAppendRessourceSharingDomainId()){
       rsdVisitor->reset(now, getResourceSharingDomainId());
       dcdMap->visitCells(*rsdVisitor); //reference to cellAgeHandler needed
   }
+  dcdMap->getCellKeyStream()->update(now);
 }
 
 

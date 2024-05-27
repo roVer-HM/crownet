@@ -1,3 +1,4 @@
+from crownetutils.analysis.dpmm import MapType
 import matplotlib as mpl
 import pandas as pd
 import numpy as np
@@ -8,8 +9,8 @@ import contextily as ctx
 
 from crownetutils.utils.misc import Project
 import contextily as ctx
-from crownetutils.analysis.omnetpp import OppAnalysis
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.omnetpp.scave import CrownetSql
 
 
@@ -17,7 +18,13 @@ def run_data(run, sim, hdf_file="data.h5") -> Tuple[DpmmHdfBuilder, CrownetSql]:
     data_root = (
         f"{os.environ['HOME']}/repos/crownet/crownet/simulations/{sim}/results/{run}"
     )
-    builder = DpmmHdfBuilder.get(hdf_file, data_root).epsg(Project.UTM_32N)
+    cfg = DpmmCfg(
+        base_dir=data_root,
+        hdf_file=hdf_file,
+        map_type=MapType.DENSITY,
+        epsg_base=Project.UTM_32N,
+    )
+    builder = DpmmHdfBuilder.get(cfg).epsg(Project.UTM_32N)
     ctx.tile
     sql = CrownetSql(
         vec_path=f"{data_root}/vars_rep_0.vec",

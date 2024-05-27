@@ -12,7 +12,7 @@
 #include "crownet/dcd/generic/iterator/DcDMapIterator.h"
 #include "crownet/dcd/identifier/CellKeyProvider.h"
 #include "crownet/dcd/identifier/TimeProvider.h"
-#include "crownet/dcd/generic/ICellIdStream.h"
+#include "transmissionOrderStrategies/ICellIdStream.h"
 
 namespace crownet {
 
@@ -43,6 +43,7 @@ class DcDMap {
   }
 
   // getter
+  const int& getResourceSharingDomainId() const {return rsd_id;};
   const node_key_t& getOwnerId() const { return owner_id; }
   const cell_key_t& getOwnerCell() const { return owner_cell; }
   map_t& getCells() { return cells; }
@@ -60,6 +61,7 @@ class DcDMap {
   cell_t& createCell(const cell_key_t& cell_id);
 
   // setter
+  void setResourceSharingDomainId(const int id) {rsd_id = id;}
   void setOwnerId(node_key_t _owner_id) { owner_id = _owner_id; }
   void setOwnerCell(cell_key_t _owner_cell) { owner_cell = _owner_cell; }
   void setOwnerCell(const traci::TraCIPosition& pos);
@@ -122,10 +124,12 @@ class DcDMap {
   map_t cells;
   node_key_t owner_id;
   cell_key_t owner_cell; // owner position
+  int rsd_id;
   time_t lastComputedAt; // Zeitpunkt an dem der Wert berechnet wird
   std::shared_ptr<CellKeyProvider<C>> cellKeyProvider;
   std::shared_ptr<TimeProvider<T>> timeProvider;
   std::shared_ptr<ICellIdStream<C, N, T>> cellKeyStream;
+
 
  public:
 

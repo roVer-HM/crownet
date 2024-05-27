@@ -33,7 +33,8 @@ class MapCfg extends cOwnedObject {
      string mapTypeLog;
      simtime_t cellAgeTTL @editable;
      string idStreamType;
-     bool appendRessourceSharingDomoinId = false;
+     bool appendRessourceSharingDomainId = false;
+     string logType = "csv";
      
 }
 
@@ -74,6 +75,7 @@ cplusplus(MapCfgYmfPlusDistStep){{
 class DcDCell {
 	uint16_t count;         // 2B pedestrian count
 	uint16_t deltaCreation; // 2B delte to packet creation time in 1/10 seconds
+	double count_dummy;		// No size, contains count value for simulation processing only
 }
 
 cplusplus(DcDCell){{

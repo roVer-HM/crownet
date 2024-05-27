@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "ApplicationPacketMeterIn.h"
+#include "crownet/queueing/meter/ApplicationPacketMeterIn.h"
 #include "inet/common/TimeTag_m.h"
 #include "crownet/applications/common/AppCommon_m.h"
 #include "crownet/common/util/FilePrinter.h"
@@ -69,7 +69,14 @@ void ApplicationPacketMeterIn::meterPacket(Packet *packet)
     // todo how to handle self messages? aka hostId == sourceId
     GenericPacketMeter::meterPacket(packet);
     auto data = packet->peekData();
-    int sourceId = data->getAllTags<HostIdTag>().front().getTag()->getHostId();
+    auto tags =  data->getAllTags<HostIdTag>();
+    if (tags.size() == 0){
+        std::stringstream s;
+        data->printToStream(s, 0);
+        throw cRuntimeError("HostIdTag not found for %s at time %s packet: %s",
+                getFullPath().c_str(), simTime().str().c_str(), s.str().c_str());
+    }
+    int sourceId = tags.front().getTag()->getHostId();
     auto now = simTime();
 
     // process source level statistics

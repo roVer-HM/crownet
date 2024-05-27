@@ -25,9 +25,9 @@ Define_Module(EntropyMapAppSimple);
 void EntropyMapAppSimple::initialize(int stage) {
     BaseDensityMapApp::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-        entropyClient = inet::getModuleFromPar<EntropyNeigborhoodTableClient>(par("neighborhoodTableMobdule"), inet::getContainingNode(this));
+        entropyClient = inet::getModuleFromPar<EntropyNeigborhoodTableClient>(par("neighborhoodTableModule"), inet::getContainingNode(this));
         entropyClient->setOwnerId(hostId);
-        mapDataType = "entropyData";
+        mapDataType = DpmmMapType::ENTROPY;
     }
 }
 
@@ -35,6 +35,12 @@ void EntropyMapAppSimple::applyContentTags(Ptr<Chunk> content){
     BaseApp::applyContentTags(content);
     // mark packet as Entropy Packet and not pedestrian count
     content->addTagIfAbsent<EntropyMap>();
+}
+
+std::string  EntropyMapAppSimple::getMapName() const{
+    std::stringstream s;
+    s << "entropyMap_" << hostId;
+    return s.str();
 }
 
 void EntropyMapAppSimple::updateLocalMap() {
@@ -57,11 +63,14 @@ void EntropyMapAppSimple::updateLocalMap() {
         const auto info = entropyClient->updateGetGlobalValue(getPosition());
         auto ee = dcdMap->getEntry<GridEntry>(posTraci);
         ee->setValue(now, info.second->getCurrentData()->getBeaconValue());
-
+        // append own RSD id (my differ for same cell if cell is at the edge of the reception range of the RSD
+        ee->setResourceSharingDomainId(getResourceSharingDomainId());
     } else {
-        // interator has filters for distance
-        for(const auto& e : entropyClient->iter()){
+        // access cells within configured radius
+        auto cellIds = entropyClient->getCellsInRadius(getPosition());
+        for (const GridCellID& cellId : cellIds){
             ++count;
+            const auto e = entropyClient->getValue(cellId);
             const auto info = e.second;
             const auto &posTraci = converter->position_cast_traci(info->getCurrentData()->getPosition());
                     // IMPORTANT: Assume additive value. GlobalEntropyMap produces ONE info object
@@ -69,6 +78,8 @@ void EntropyMapAppSimple::updateLocalMap() {
             auto ee = dcdMap->getEntry<GridEntry>(posTraci);
             ee->setValue(now, info->getCurrentData()->getBeaconValue()); // entropy sever ensures that ther is at most on
                                                              // entry per cell. Thus increment works here.
+            // append own RSD id (my differ for same cell if cell is at the edge of the reception range of the RSD
+            ee->setResourceSharingDomainId(getResourceSharingDomainId()); // append own RSD id
          }
     }
 

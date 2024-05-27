@@ -1,8 +1,8 @@
 {
   "name" : "mf_dyn_exp_15",
   "description" : "",
-  "release" : "2.4",
-  "commithash" : "36a2a346d4bf274a0c90a53b60df62472ec2f9b8",
+  "release" : "2.6",
+  "commithash" : "71e4cc56e0774efd45e57685680f8e4594d4183f",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -1322,7 +1322,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1351,7 +1352,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1380,7 +1382,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1409,7 +1412,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1438,7 +1442,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1467,7 +1472,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1487,7 +1493,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1507,7 +1514,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1527,7 +1535,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1556,7 +1565,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1585,7 +1595,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1614,7 +1625,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1634,7 +1646,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1654,7 +1667,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1674,7 +1688,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -1694,7 +1709,8 @@
         },
         "waiter" : {
           "enabled" : false,
-          "distribution" : null
+          "distribution" : null,
+          "individualWaiting" : true
         },
         "leavingSpeed" : -1.0,
         "parallelEvents" : 0
@@ -2360,8 +2376,7 @@
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
         "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
-      "teleporter" : null,
-      "attributesCar" : null
+      "teleporter" : null
     },
     "stimulusInfos" : [ ]
   }

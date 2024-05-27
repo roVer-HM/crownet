@@ -27,6 +27,7 @@ void ArteryDensityMapApp::initialize(int stage) {
         identiyRegistry = inet::getModuleFromPar<artery::IdentityRegistry>(
             par("identiyRegistryModule"), this);
         mRouter = inet::getModuleFromPar<artery::Router>(par("routerModule"), this);
+        mapDataType = DpmmMapType::PEDESTRIAN_COUNT;
 
 
         // subscribe updateSignal at host module level (pedestrian, vehicle) to

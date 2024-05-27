@@ -28,4 +28,10 @@ simple IntervalScheduler extends AppSchedulerBase {
 		int maxNumberPackets = default(-1); // -1 unlmited number of packets
 		int maxData @unit(b) = default(-1B); // -1 unlimited number of data 
     	@class(crownet::IntervalScheduler);
+    	
+    	@signal[scheduledData_s](type=long);
+    	@signal[consumedData_s](type=long);	
+    	@statistic[scheduledData](title=""; unit=b; source="scheduledData_s"; record=vector; interpolationmode=none);
+    	@statistic[consumedData](title=""; unit=b; source="consumedData_s"; record=vector; interpolationmode=none);
+    	
 }

@@ -49,4 +49,9 @@ simtime_t timestamp_32_ms_to_simtime(uint32_t tstamp, simtime_t base){
     return SimTime(t, SimTimeUnit::SIMTIME_MS);
 }
 
+std::string dpmmMapTypeToString(const DpmmMapType& type){
+    return std::string(dpmmMapTpyeString[(int)type]);
+}
+
+
 }

@@ -1,19 +1,18 @@
 import os
+from crownetutils.analysis.dpmm import MapType
+from crownetutils.omnetpp.sql import SqlOp
 
 import matplotlib
 from matplotlib.lines import Line2D
 
+from crownetutils.analysis.dpmm.dpmm_cfg import DpmmCfg
 from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
-from crownetutils.analysis.dpmm.plot.interactive import (
-    InteractiveAreaPlot,
-    InteractiveValueOverDistance,
-)
 from crownetutils.utils.path import get_or_create
 
 matplotlib.use("TkAgg")
 
 
-from crownetutils.omnetpp.scave import ScaveTool, OppSql, SqlOp
+from crownetutils.omnetpp.scave import ScaveTool, OppSql
 
 from crownetutils.utils.path import PathHelper
 from crownetutils.analysis.dpmm.dpmm import DpmMap, DpmMapMulti
@@ -75,23 +74,6 @@ def read_app_data(root_path, run=0, *args, **kwargs):
     )
     _df = scave.load_df_from_scave(input_paths=inputs, scave_filter=scave_f)
     return _df
-
-
-def analyse_interactive(dcd, what):
-    if what == "map":
-
-        time = 2
-        id = 0
-        fig, ax = dcd.plot_area(
-            time_step=time, node_id=id, pcolormesh_dic=dict(vmin=0, vmax=4)
-        )
-        i = InteractiveAreaPlot(dcd, ax)
-    else:
-
-        fig, ax = dcd.plot_delay_over_distance(64, 2, "measurement_age", bins_width=5)
-        i = InteractiveValueOverDistance(dcd, ax)
-
-    i.show()
 
 
 def make_density_plot(path, dcd):
@@ -318,6 +300,7 @@ if __name__ == "__main__":
     # main()
 
     sim_path = os.path.abspath("results/vadere_120_20210825-08:40:00")
+    cfg = DpmmCfg(base_dir=sim_path, hdf_file="dcd_map.h5", map_type=MapType.DENSITY)
     hdf_builder = DpmmHdfBuilder.get("dcd_map.h5", sim_path)
     hdf_builder.single_df_filters.append(DpmmHdfBuilder.F_selected_only)
     # get dcd object (all data)

@@ -2,7 +2,7 @@ from crownetutils.analysis.dpmm.builder import DpmmHdfBuilder
 from crownetutils.analysis.dpmm.hdf.dpmm_global_positon_provider import (
     DpmmGlobalPosition,
     DpmmGlobal,
-    pos_density_from_csv,
+    create_and_save_position_and_global,
 )
 from crownetutils.analysis.dpmm.hdf.dpmm_provider import DpmmProvider
 from crownetutils.analysis.dpmm.hdf.dpmm_count_provider import DpmmCount
@@ -19,7 +19,7 @@ def from_csv(path):
         print("read from csv")
         dcd_provider.create_from_csv(map_paths)
 
-    g_pos, g_density = pos_density_from_csv(
+    g_pos, g_density = create_and_save_position_and_global(
         os.path.join(path, "global.csv"), os.path.join(path, "00_map.h5")
     )
 

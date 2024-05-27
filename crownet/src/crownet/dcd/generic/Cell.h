@@ -101,6 +101,7 @@ class Cell {
   const node_key_t& getOwnerId() const { return owner_id; }
   entry_t_ptr val() { return cell_value; }  // selected/calculated value
   const entry_t_ptr val() const {return cell_value;}
+  void reset_cell_value() {cell_value.reset();}
   const time_t lastSent() const { return last_sent; }
 
   // setter
