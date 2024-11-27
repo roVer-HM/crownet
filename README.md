@@ -42,6 +42,7 @@ Please check the licenses of the projects listed above for your use case and pur
 
 Please refer to this repository when you use CrowNet in scientific publications.
 Publications in which CrowNet was used:
+- S. Schuhbäck, L. Wischhof, J. Ott (2024): *Adaptive Transmission Rate Control for Decentralized Sensing Applications*, IEEE Access. [doi: 10.1109/ACCESS.2024.3495504](https://doi.org/10.1109/ACCESS.2024.3495504)
 - S. Schuhbäck, L. Wischhof, J. Ott (2023): *Cellular Sidelink Enabled Decentralized Pedestrian Sensing*, IEEE Access. [doi: 10.1109/access.2023.3242946](https://doi.org/10.1109/access.2023.3242946)
 - L. Wischhof, M. Kilian, S. Schuhbäck, M. Rupp, G. Köster (2023): *Mobility in Pedestrian Communication Simulations: Impact of Microscopic Models and Solutions for Integration*, Computer Communications, Volume 212, p. 90-103. [doi: 10.1016/j.comcom.2023.09.029](https://doi.org/10.1016/j.comcom.2023.09.029)
 - C. M. Mayr, A. Templeton, G. Köster (2023): *Designing mobile application messages to impact route choice: A survey and simulation study*, Plos One, 18(4), pp. 1-20. [doi: 10.1371/journal.pone.0284540](https://doi.org/10.1371/journal.pone.0284540)
