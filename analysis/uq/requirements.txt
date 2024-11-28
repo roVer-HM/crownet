@@ -1,4 +1,5 @@
 scipy>=1.7.3
 SALib>=1.4.5
 pykrige>=1.6.1
+numpoly==1.2.14
 chaospy==4.3.13
