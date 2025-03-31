@@ -53,7 +53,7 @@ Simply run:
 
 ```
 omnetpp exec make makefiles
-omnetpp exec make make=release
+omnetpp exec make MODE=release
 ```
 
 Notes:
