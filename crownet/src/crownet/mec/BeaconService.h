@@ -2,10 +2,10 @@
 #ifndef _BEACONSERVICE_H
 #define _BEACONSERVICE_H
 
-#include <nodes/mec/MECPlatform/MECServices/MECServiceBase/MecServiceBase.h>
+#include <nodes/mec/MECPlatform/MECServices/MECServiceBase/MecServiceBase2.h>
 #include "BeaconRepository.h"
 
-class BeaconService: public simu5g::MecServiceBase
+class BeaconService: public simu5g::MecServiceBase2
 {
   private:
     std::string baseUri = "/example/Beacon/v1";

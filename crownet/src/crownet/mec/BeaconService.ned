@@ -41,6 +41,7 @@ simple BeaconService like IMECService, IApp
 		string serviceName = default("BeaconService");
        	string serviceVersion = default("v1");
        	string serviceSerialize = default("JSON");
+       	string binderModule = default("binder");
        	
        	string transportId = default("LocAPI");
        	string transportName = default("LocAPI");
