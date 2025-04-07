@@ -13,7 +13,7 @@ has not changed.
 Fingerprints are fragile to NED changes and parameter value changes.
 
 When a fingerprint test fails, the simulation's correctness has to be
-verified by some other means, and the fingerprints in the tests
+verified by some other means, and the fingerprints in the tests need to be
 updated.
 
 ## Running the Fingerprint Tests
@@ -44,15 +44,15 @@ In order to execute the tests, perform the following steps:
 
 ## Containerized Fingerprint Tests
 
-For simulations in the rover research project coupled simulations with 
+For simulations modeling pedestrian and vehicular mobility, coupled simulations with 
 Vadere and Sumo are necessary. These simulations cannot be started in
-a single container but multiple container (one for each simulator) must
+a single container but multiple containers (one for each simulator) must
 be created. Therefore, the fingerprint script is adapted to allow these 
 tests.
 
 ### Container selection
 
-The test use the default csv file description of test. In the last column (`tag`)
+The test uses the default csv file description of test. In the last column (`tag`)
 the container tags are encoded in key-value pairs with `;` as delimiter
 
 ```
@@ -99,7 +99,7 @@ with path separators replaced with `_`.
 
 ## CROWNET Fingerprint Tests
 
-For CROWNET simulations utilizing the control system fingerprint test must be described with yaml files.
+For CROWNET simulations utilizing the control system, fingerprint test must be described with yaml files.
 Control simulations are configured and executed using a `run_script.py` which creates all necessary 
 containers, executes post and pre processing and configures the traci connections between all containers.
 
@@ -160,3 +160,9 @@ output files created by the given simulation. By default `container_[xxx].out`, 
 are excluded. If OMNeT++ is tested during the test case add the `[[omnet]]` key with the respective 
 fingerprint to test against (list of space or comma separated list is accepted, similar to the standard setup)
 
+### FAQ / Typical Problems
+
+#### Fingerprint test reports missing executable
+
+* Check that you have built the complete simulation environment (with `make MODE=release`).
+* Check that the `CROWNET_HOME` environment variable is set correctly.
