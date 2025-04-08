@@ -70,11 +70,8 @@ void IncidentRecorder::registerVectors(opp_string incident) {
   for (auto &v : resultNames) {
     opp_string vecName = incident + ":" + v;
     vectors[v] = getEnvir()->registerOutputVector(
-        getComponent()->getFullPath().c_str(), vecName.c_str());
+        getComponent()->getFullPath().c_str(), vecName.c_str(), &attr);
     ASSERT(vectors[v] != nullptr);
-    for (auto &a : attr)
-      getEnvir()->setVectorAttribute(vectors[v], a.first.c_str(),
-                                     a.second.c_str());
   }
   vectorMap.insert(std::pair<opp_string, IncidentVectors>(incident, vectors));
 }
