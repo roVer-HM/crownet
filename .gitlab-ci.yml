@@ -1,6 +1,8 @@
 variables:
  # CI parameters and options
  GIT_SUBMODULE_STRATEGY: recursive    # clone submodules
+ GIT_SUBMODULE_DEPTH: 3               # clone until a submodule depth as specified here is reached
+ GIT_SUBMODULE_UPDATE_FLAGS: --jobs 4 # speed-up submodule updates by running parallel jobs
  GIT_LFS_SKIP_SMUDGE: "1"             # ignore lfs (some problems with vadere submodule)
  CROWNET_HOME: '${CI_PROJECT_DIR}'    # all files relative to this
  DOCKER_CLIENT_TIMEOUT: '300'         # timeout for docker client (needs to be higher than default)
@@ -49,7 +51,10 @@ build-for-sim:
     - docker pull ${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}
+    # ## show submodule information
+    - git submodule status --recursive
     # ## build all models
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make cleanall"
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make MODE=${MODE}"
     # ## export inet version
