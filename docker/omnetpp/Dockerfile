@@ -19,10 +19,10 @@ ARG IMAGE_REG
 ARG BASE_IMAGE_TAG
 FROM ${IMAGE_REG}/crownet-base-cpp:${BASE_IMAGE_TAG}
 
-ENV GITHUB_TAG="omnetpp-6.0.3"
+ENV GITHUB_TAG="omnetpp-6.1.0"
 ENV RELEASE=$GITHUB_TAG
 
-LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.0.3)"
+LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.1.0)"
 LABEL maintainer  "wischhof@ieee.org"
 
 # Use bash shell
