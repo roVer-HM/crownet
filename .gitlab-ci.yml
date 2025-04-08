@@ -54,8 +54,9 @@ build-for-sim:
     # ## show submodule information
     - git submodule status --recursive
     # ## build all models
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make cleanall"
+    # note: currently we disable the cleanall before building - not required and increases build time
+    # - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
+    # - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make cleanall"
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make MODE=${MODE}"
     # ## export inet version
