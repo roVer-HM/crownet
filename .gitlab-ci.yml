@@ -58,7 +58,7 @@ build-for-sim:
     # - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
     # - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make cleanall"
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make makefiles"
-    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make MODE=${MODE}"
+    - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make MODE=${MODE} -j `nproc`"
     # ## export inet version
     - "cd ${INET_M}"
     - "export INET_VERSION=$(./_scripts/get_version)"
