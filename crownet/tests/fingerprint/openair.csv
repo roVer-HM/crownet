@@ -2,21 +2,21 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint,    expectedResult, tags
-/simulations/openair/,                  -f omnetpp.ini -c S1 		-r 0,    80s,              d763-ca4f/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S1-UA 	-r 0,    80s,              b5af-d73c/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S1-25 	-r 0,    80s,              3a79-5b2f/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S1-25-UA 	-r 0,    80s,              b5af-db30/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S2 		-r 0,    20s,              df6f-c6d8/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S2-UA 	-r 0,    20s,              5988-f23f/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S2-25 	-r 0,    80s,              b8a7-97e2/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              4662-e22a/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              80e1-bf6b/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              37a2-f1d3/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              83f5-3795/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              8fd5-2251/lstvz,  PASS,   omnetpp:6.0.3
+/simulations/openair/,                  -f omnetpp.ini -c S1 		-r 0,    80s,              73da-fc46/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S1-UA 	-r 0,    80s,              f7b8-05ea/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S1-25 	-r 0,    80s,              9c05-dcea/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S1-25-UA 	-r 0,    80s,              f7b8-05ea/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S2 		-r 0,    20s,              6633-a59a/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S2-UA 	-r 0,    20s,              ed83-cf79/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S2-25 	-r 0,    80s,              a698-0e97/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S2-25-UA 	-r 0,    80s,              229f-4214/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S3 		-r 0,    80s,              fb55-3e06/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S3-UA 	-r 0,    80s,              44ef-8d32/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S4 		-r 0,    20s,              7d53-8994/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              7173-9c50/lstvz,  PASS,   omnetpp:6.1.0
 
 # D2D scenarios
-/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              5a71-50c3/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              ff32-05ec/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              3282-aaa2/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              79d5-7b83/lstvz,  PASS,   omnetpp:6.0.3
+/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              d888-c246/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              0c15-d133/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              20d1-f592/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              378b-6264/lstvz,  PASS,   omnetpp:6.1.0

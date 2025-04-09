@@ -2,8 +2,8 @@
 
 # cellular scenarios (5G NR)
 # workingdir,                        args,                                     simtimelimit,    fingerprint,    expectedResult, tags
-/simulations/openair/,                  -f omnetpp-NR.ini -c S1-NR 	-r 0,    80s,              9af3-7714/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp-NR.ini -c S1-APP-NR 	-r 0,    80s,          3979-2607/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp-NR.ini -c S1-UP-NR 	-r 0,    80s,          3823-7fbe/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp-NR.ini -c S2-NR 	-r 0,    80s,              8067-1127/lstvz,  PASS,   omnetpp:6.0.3
-/simulations/openair/,                  -f omnetpp-NR.ini -c S2-UP-NR 	-r 0,    80s,          03ac-c854/lstvz,  PASS,   omnetpp:6.0.3
+/simulations/openair/,                  -f omnetpp-NR.ini -c S1-NR 	-r 0,    80s,              901b-d471/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S1-APP-NR 	-r 0,    80s,          877e-2206/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S1-UP-NR 	-r 0,    80s,          92c2-0934/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S2-NR 	-r 0,    80s,              fc66-1eb4/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S2-UP-NR 	-r 0,    80s,          dc31-8879/lstvz,  PASS,   omnetpp:6.1.0
