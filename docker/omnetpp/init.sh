@@ -9,6 +9,9 @@
 
 export PATH=/opt/omnetpp/omnetpp/bin:~/.local/bin:$PATH
 
+OPP_PATH=`readlink /opt/omnetpp/omnetpp`
+OPP_VERSION=`cat /opt/omnetpp/omnetpp/Version`
+
 # echo "Command: $1"
 
 if [ -z "$1" ]; then
@@ -22,7 +25,8 @@ fi
 
 
 if [ -z "$SILENT" ]; then
-     echo "Welcome to the CrowNet OMNeT++ Docker Container."
+     echo "Welcome to the CrowNet OMNeT++ ($OPP_VERSION) Docker Container."
+     echo " - OMNeT++ installation: $OPP_PATH"
 
      # check if ptrace_scope is enable  (for debugging it must not be enabled)
      read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)
