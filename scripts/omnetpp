@@ -20,7 +20,7 @@ COMMAND=omnetpp
 CONTNAME=omnetpp
 
 if [ -z "${CROWNET_OPP_CONT_TAG}" ]; then
-      echo "Variabel 'CROWNET_OPP_CONT_TAG' not set. Did you source $CROWNET_HOME/scrips/crownetenv?"
+      echo "Variable 'CROWNET_OPP_CONT_TAG' not set. Did you source $CROWNET_HOME/setup?"
       exit -1
 fi
 
