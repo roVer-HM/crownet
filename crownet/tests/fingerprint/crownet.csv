@@ -10,12 +10,12 @@
 /simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              6c4d-907b/tlv, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
 
 # Basic CAM DEN test scenario (via Artery)
-/simulations/vam_test/,          -f omnetpp.ini -c simple_cam_den -r 0,                           40s,    8064-ab4b/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vam_test/,          -f omnetpp.ini -c simple_cam_den -r 0,                           40s,    6a53-4267/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
 
 # Vulnerable Road User (VRU) Multi Access Edge Computing (MEC) scenarios
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    4bae-1b04/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_v2pp2v -r 0,                      20s,    faab-fe1e/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio -r 0,                        20s,    394e-693b/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_lgarea -r 0,                 20s,    c1f2-f930/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_singlearea -r 0,             20s,    6711-89db/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_D2D -r 0,                         20s,    bb07-999f/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    d861-356f/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_v2pp2v -r 0,                      20s,    2205-3f07/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio -r 0,                        20s,    36e1-3fba/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_lgarea -r 0,                 20s,    3076-9ee7/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_singlearea -r 0,             20s,    d2b5-1470/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_D2D -r 0,                         20s,    7f22-9700/lstvz, PASS, sumo:v1_20_0_hm;omnetpp:6.1.0
