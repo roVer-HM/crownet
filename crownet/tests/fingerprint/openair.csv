@@ -16,7 +16,7 @@
 /simulations/openair/,                  -f omnetpp.ini -c S4-UA 	-r 0,    20s,              b66f-5024/lstvz,  PASS,   omnetpp:6.1.0
 
 # D2D scenarios
-/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              c30d-5118/lstvz,  PASS,   omnetpp:6.1.0
-/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              d242-0d50/lstvz,  PASS,   omnetpp:6.1.0
-/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              be89-996e/lstvz,  PASS,   omnetpp:6.1.0
-/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              c692-92c9/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              9ccd-b9e8/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              d26b-0e6e/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              f513-1add/lstvz,  PASS,   omnetpp:6.1.0
+/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              906c-2c9b/lstvz,  PASS,   omnetpp:6.1.0
