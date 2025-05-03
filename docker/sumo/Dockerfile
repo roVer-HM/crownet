@@ -16,7 +16,7 @@
 
 FROM ubuntu:24.04
 
-ENV GITHUB_TAG="v1_20_0_hm"
+ENV GITHUB_TAG="v1_22_0_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)

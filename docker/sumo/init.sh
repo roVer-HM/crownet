@@ -1,7 +1,11 @@
 #!/bin/bash
 # IP=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'
 
-echo "Welcome to the crownet sumo Docker Container."
+SUMO_PATH=`readlink /opt/sumo/sumo`
+SUMO_VERSION=`ls /opt/sumo | grep v`
+
+echo "Welcome to the CrowNet SUMO ($SUMO_VERSION) Docker Container."
+echo " - SUMO installation: $SUMO_PATH"
 echo ""
 echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI'"
 echo ""
