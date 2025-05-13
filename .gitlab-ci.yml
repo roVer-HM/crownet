@@ -107,6 +107,7 @@ gtests:
   tags:
     - crownet-sim
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "cd ${CROWNET_HOME}/crownet"
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make test"
