@@ -41,15 +41,14 @@ if [ -z "$SILENT" ]; then
      fi
 fi
 
-# note: warning disabled since for fingerprint tests the CROWNET_HOME does not need to be defined at this point
-# if [ -z "$CROWNET_HOME" ]; then
-#      echo "CROWNET_HOME not set!"
-#      echo ""
-#      echo "Please include the following lines in your .bashrc file:"
-#      echo "  export CROWNET_HOME=\"$HOME/crownet\"        (assuming you installed CrowNet in your home dir)"
-#      echo "  source ${CROWNET_HOME}/setup -i"
-#      exit 1
-# fi
+if [ -z "$CROWNET_HOME" ]; then
+     echo "CROWNET_HOME not set!"
+     echo ""
+     echo "Please include the following lines in your .bashrc file:"
+     echo "  export CROWNET_HOME=\"$HOME/crownet\"        (assuming you installed CrowNet in your home dir)"
+     echo "  source ${CROWNET_HOME}/setup -i"
+     exit 1
+fi
 
 # source the inet environment
 source $CROWNET_HOME/inet4/setenv
