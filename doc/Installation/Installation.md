@@ -8,13 +8,8 @@ The CrowNet environment requires a Linux System. We are currently using Ubuntu 2
 
 ### Python
 
-CrowNet currently requires Python 3.8, which is not available in the default repositories of Ubuntu 24.04. Therfore, we recommend to install Python 3.8 via PPA:
-
-```
-sudo add-apt-repository ppa:deadsnakes/ppa -y
-sudo apt update
-sudo apt install python3.8 python3.8-venv
-```
+CrowNet requires identical Pyhton versions on the system and within the CrowNet containers. This will be checked and you will receive a warning
+message if there is a mismatch of the installed Python versions.
 
 ### Build Essential, git and curl
 
