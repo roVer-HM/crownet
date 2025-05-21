@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SHORTNAME=vadere
-COMMAND=idea.sh
+COMMAND=intellij-idea-community
 CONTNAME=vadere-ide
 
 if [ -z "${CROWNET_VADERE_CONT_TAG}" ]; then

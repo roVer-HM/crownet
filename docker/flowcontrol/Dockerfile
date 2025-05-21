@@ -2,16 +2,16 @@
 #
 # With this Dockerfile flowcontrol is installed based on the state of the crownet submodule flowcontrol
 
-ARG IMAGE_REG
-ARG BASE_IMAGE_TAG
-ARG CROWNET_COMMIT_HASH
+ARG IMAGE_REG=invalid
+ARG BASE_IMAGE_TAG=latest
 
 FROM ${IMAGE_REG}/crownet-base-min:${BASE_IMAGE_TAG}
 
-ENV RELEASE $CROWNET_COMMIT_HASH
+ARG CROWNET_COMMIT_HASH
+ENV RELEASE=$CROWNET_COMMIT_HASH
 
-LABEL description "flow controller (as used in roVer)"
-LABEL maintainer  "christina_maria.mayr@hm.edu"
+LABEL description="flow controller (as used in CrowNet)"
+LABEL maintainer="wischhof@ieee.org"
 
 # init script (triggered at container start)
 COPY docker/flowcontrol/init.sh /init.sh
@@ -27,8 +27,8 @@ WORKDIR /opt/flowcontrol
 # invalidate cached part by specifying a --build-arg NOCACHE_*=[random value]
 ARG NOCACHE_CLONE=0
 
-# add a symbolic link to /usr/bin/python3 from /usr/bin/python3.7
-RUN ln -f -s /usr/bin/python3.8 /usr/bin/python3
+# add a symbolic link to /usr/bin/python3 from the python version mandatory for CrowNet
+RUN ln -f -s /usr/bin/python3.12 /usr/bin/python3
 
 # remove old flowcontrol version
 RUN rm -rf /opt/flowcontrol/flowcontrol

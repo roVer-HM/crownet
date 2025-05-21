@@ -15,15 +15,20 @@
 # Common problems:
 # Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/omnetpp.git<.
 
-ARG IMAGE_REG
-ARG BASE_IMAGE_TAG
+ARG IMAGE_REG=invalid
+ARG BASE_IMAGE_TAG=latest
+
 FROM ${IMAGE_REG}/crownet-base-cpp:${BASE_IMAGE_TAG}
 
 ENV GITHUB_TAG="omnetpp-6.1.0"
 ENV RELEASE=$GITHUB_TAG
 
-LABEL description "OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.1.0)"
-LABEL maintainer  "wischhof@ieee.org"
+ENV OSGEARTH_TAG="osgearth-3.7.2"
+
+ENV ASN1C_HASH="9925dbbda86b436896108439ea3e0a31280a6065"
+
+LABEL description="OMNeT++ Simulation Framework (as used in CrowNet, tag omnetpp-6.1.0)"
+LABEL maintainer="wischhof@ieee.org"
 
 # Use bash shell
 SHELL ["/bin/bash", "-c"]
@@ -31,16 +36,35 @@ SHELL ["/bin/bash", "-c"]
 # setup image to use bash also as default shell
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-# install additionally needed Python modules
-RUN pip3 install numpy pandas matplotlib posix_ipc scipy
+# 
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        htop libcurl4-gnutls-dev libgl-dev libglfw3-dev libcurl4-gnutls-dev \
+        zipcmp libzip-dev zipmerge ziptool \
+        libopenscenegraph-dev libopenthreads-dev libgdal-dev libglew-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install the ASN1C Compiler (Version 0.9.29)
 WORKDIR /opt
 RUN git clone https://github.com/vlm/asn1c.git && \
-    cd asn1c && git checkout 9925dbbda86b436896108439ea3e0a31280a6065
+    cd asn1c && git checkout $ASN1C_HASH
 RUN cd asn1c && test -f configure || autoreconf -iv && \
     ./configure && \
     make install
+
+# Build and install osgearth (required for geocoding in CrowNet)
+WORKDIR /opt/osgearth
+RUN git clone --depth 1 --branch $OSGEARTH_TAG \ 
+    --recurse-submodules https://github.com/gwaldron/osgearth.git $OSGEARTH_TAG
+RUN ln -s /opt/osgearth/$OSGEARTH_TAG /opt/osgearth/osgearth
+WORKDIR /opt/osgearth/$OSGEARTH_TAG
+RUN mkdir build && \
+    cd build && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr .. && \
+    make -j $(nproc) && \
+    make install && \
+    ldconfig
 
 # clone the OMNeT++ sources (version/tag is specified in the git command at the end)
 WORKDIR /opt/omnetpp
@@ -61,10 +85,10 @@ WORKDIR /opt/omnetpp/omnetpp
 ARG NOCACHE_PULL=0
 RUN git pull https://github.com/roVer-HM/omnetpp.git $GITHUB_TAG
 
-# configure and compile
+# install, configure and compile
 ENV PATH /opt/omnetpp/omnetpp/bin:$PATH
 COPY docker/omnetpp/configure.user .
-RUN  source setenv -f && ./configure && \
+RUN  apt update && ./install.sh -y && source setenv -f && ./configure && \
      make -j $(nproc) && \
      find . -type f -name '*.o' -exec rm {} + && \
      find . -type f -name '*.o.d' -exec rm {} +

@@ -20,10 +20,10 @@ ENV GITHUB_TAG="v1_23_1_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)
-ENV VEINS_RELEASE hm_master
+ENV VEINS_RELEASE=hm_master
 
-LABEL description "SUMO - Simulation of Urban MObility (as used in CrowNet)"
-LABEL maintainer  "wischhof@ieee.org"
+LABEL description="SUMO - Simulation of Urban MObility (as used in CrowNet)"
+LABEL maintainer="wischhof@ieee.org"
 
 # install all dependencies
 RUN apt-get update && \
