@@ -435,7 +435,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # set simulation name, file, and read fingerprints
             sim["test_name"] = sim_name
             sim["file"] = file_path
-            file_name_base = re.sub("\.yml$", "", os.path.basename(sim["file"]))
+            file_name_base = re.sub("\\.yml$", "", os.path.basename(sim["file"]))
             hash_base_dir = (
                 f"{os.path.dirname(os.path.abspath(file_path))}/hash.d/{file_name_base}"
             )
@@ -511,7 +511,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
                 f_prints = sim["fingerprint"].setdefault(
                     "[[omnetpp]]", "ffff-ffff/tplx"
                 )
-                f_prints = re.sub("\s+", "", f_prints)
+                f_prints = re.sub("\\s+", "", f_prints)
                 arg_list.add_override(f"--opp.fingerprint={f_prints}")
                 # FIXME: Workaround due to results are saved based on config-name and experiment-label.
                 # The extra directory is created based on the settings in the omnetpp.ini file
