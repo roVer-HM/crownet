@@ -137,6 +137,7 @@ python-hint:
 	@echo "the CrowNet docker containers. This does only work, if the same python versions are"
 	@echo "available and used by default in and outside the container."
 	@echo ""
+	scripts/check_python_version.sh
 
 #-create source distributions of all python packages---------------------------
 
