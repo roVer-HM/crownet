@@ -6,3 +6,4 @@
 4. [Running Parameter Studies](./Parameterstudies/README.md)
 5. [Testing](./Testing/README.md)
 6. [Submodules](Submodules/README.md)
+7. [FAQ](./FAQ/README.md)
