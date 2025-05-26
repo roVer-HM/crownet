@@ -35,6 +35,7 @@ build-for-sim:
   stage: build
   tags:
     - crownet-sim
+  timeout: 3h
   variables:
     ARTERY_M: '${CI_PROJECT_DIR}/artery'
     INET_M: '${CI_PROJECT_DIR}/inet4'
