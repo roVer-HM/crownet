@@ -50,8 +50,8 @@ void TemaPacketMeter::meterPacket(Packet *packet){
         double pRate = f * stats.getPacketRate() + ff * 1/elapsedTime; // packet rate
         stats.setPacketRate(pRate);
 
-        double dRate;
-        dRate = f * stats.getDataRate().get() + ff * packet->getTotalLength().get()/elapsedTime;
+        double dRate = f * stats.getDataRate().get() + ff * packet->getTotalLength().get()/elapsedTime; // data rate
+        stats.setDataRate(bps(dRate));
 
         // reset count for packets that arrive at the same time
         setCurrentNumPackets(0);
