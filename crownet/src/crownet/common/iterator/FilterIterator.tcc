@@ -64,14 +64,14 @@ operator++(int) {
 }
 
 template <typename T, typename Iter, typename IterVal, typename Pred>
-bool FilterIterator<T, Iter, IterVal, Pred>::operator==(
+bool FilterIterator<T, Iter, IterVal, Pred>::operator== (
     const FilterIterator<T, Iter, IterVal, Pred>& rhs) {
   // compare pointer (iterator based on same data)
   return (this->data == rhs.data) && (this->iter == rhs.iter);
 }
 
 template <typename T, typename Iter, typename IterVal, typename Pred>
-bool FilterIterator<T, Iter, IterVal, Pred>::operator!=(
+bool FilterIterator<T, Iter, IterVal, Pred>::operator!= (
     const FilterIterator<T, Iter, IterVal, Pred>& rhs) {
   return !operator==(rhs);
 }
