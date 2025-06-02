@@ -62,7 +62,7 @@ build-for-sim:
     - "${CI_PROJECT_DIR}/scripts/omnetpp_rnd ${CROWNET_OPP_CONT_TAG} exec make MODE=${MODE} -j `nproc`"
     # ## export inet version
     - "cd ${INET_M}"
-    - "export INET_VERSION=$(./_scripts/get_version)"
+    - "export INET_VERSION=$(./bin/inet_version)"
     # inet> cleanup not needed directories
     - rm -rf doc examples showcases tutorials
     # ## cleanup not needed directories in veins
