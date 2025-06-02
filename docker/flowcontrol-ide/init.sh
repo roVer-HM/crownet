@@ -6,16 +6,16 @@
 #
 # Examples
 #
-# pycharm-community.sh (default)   starts the PyCharm IDE
-# /bin/bash                        starts an interactive shell
+# pycharm (default)   starts the PyCharm IDE
+# /bin/bash           starts an interactive shell
 
 # echo "Command: $1"
 
 if [ -z "$1" ]; then
-     CMD="pycharm-community.sh"
+     CMD="/usr/bin/pycharm"
 else
      CMD="$1"
-     if [[ "$CMD" != "pycharm-community.sh" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
+     if [[ "$CMD" != "/usr/bin/pycharm" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
           SILENT="y"
      fi
 fi
@@ -38,12 +38,12 @@ CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
-if [[ "$CMD" == "pycharm-community.sh" ]]; then
+if [[ "$CMD" == "/usr/bin/pycharm" ]]; then
      sleep 3
-     PID=`pidof pycharm-community.sh`
+     PID=`pidof pycharm`
 
-     # idea.sh is special since the start script in its bin directory returns immediately
-     # Therefore, we wait until the idea.sh process terminates. (cannot use wait since it is not a child process)
+     # pycharm is special since the start script in its bin directory returns immediately
+     # Therefore, we wait until the pycharm process terminates. (cannot use wait since it is not a child process)
 
      if [ -n "$PID" ]; then
           while [ -e /proc/$PID ]; do sleep 0.1; done

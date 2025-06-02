@@ -16,7 +16,7 @@ ARG CROWNET_COMMIT_HASH
 # Specify the version/tag of flowcontrol to be put in the container:
 ENV RELEASE=$CROWNET_COMMIT_HASH
 
-LABEL description="FlowControl Simulator (as used in CrowNet)"
+LABEL description="FlowControl Simulator with PyCharm IDE Community Edition (as used in CrowNet)"
 LABEL maintainer="wischhof@ieee.org"
 
 # init script (triggered at container start)
