@@ -11,6 +11,12 @@ The CrowNet environment requires a Linux System. We are currently using Ubuntu 2
 CrowNet requires identical Pyhton versions on the system and within the CrowNet containers. This will be checked and you will receive a warning
 message if there is a mismatch of the installed Python versions.
 
+Additionally, for running Python scripts on the host, a few other packages need to be installed:
+
+```
+sudo apt install black python3-venv python3-pip python3-tk
+```
+
 ### Build Essential, git and curl
 
 CrowNet requires basic make and compilations tools. We recommend to install the build-essentials package.
