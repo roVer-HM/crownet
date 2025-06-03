@@ -109,7 +109,7 @@ class SensitivityAnalysis(Analysis):
             sensitivity_index + sobol_indices[f"{index_type}_conf"]
         )
         df = pd.DataFrame(
-            data=np.row_stack(
+            data=np.vstack(
                 [sensitivity_index, sensitivity_index_CI_low, sensitivity_index_CI_high]
             ).transpose(),
             columns=SensitivityAnalysis.COL_NAMES,

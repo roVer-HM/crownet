@@ -1,5 +1,8 @@
-scipy>=1.7.3
-SALib>=1.4.5
-pykrige>=1.6.1
-numpoly==1.2.14
-chaospy==4.3.13
+scipy~=1.15.3
+SALib~=1.5.1
+pykrige~=1.7.2
+numpoly~=1.3.6
+chaospy~=4.3.18
+scikit-learn~=1.6.1
+docker~=7.1.0
+

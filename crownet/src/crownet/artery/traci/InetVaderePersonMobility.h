@@ -28,14 +28,14 @@ using namespace omnetpp;
 namespace crownet {
 
 //todo: check if still working after update?
-class InetVaderePersonMobility : public InetMobility,
+class InetVaderePersonMobility : public InetPersonMobility,
                             public VaderePersonSink,
                             public IPositionHistoryProvider {
  public:
   virtual ~InetVaderePersonMobility() = default;
 
   // traci::PersonSink interface
-  virtual void initializeSink(std::shared_ptr<traci::API> api, std::shared_ptr<VaderePersonCache>, const traci::Boundary&) override;
+  virtual void initializeSink(std::shared_ptr<traci::API> api, std::shared_ptr<PersonCache>, const traci::Boundary&) override;
   virtual void initializePerson(const TraCIPosition&, TraCIAngle, double speed) override;
   virtual void updatePerson(const TraCIPosition&, TraCIAngle, double speed) override;
 

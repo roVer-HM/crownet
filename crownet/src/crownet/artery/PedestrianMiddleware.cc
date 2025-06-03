@@ -7,7 +7,7 @@
 
 #include "PedestrianMiddleware.h"
 #include <artery/application/MovingNodeDataProvider.h>
-#include <artery/traci/MobilityBase.h>
+#include <artery/traci/PersonMobility.h>
 #include <artery/utility/InitStages.h>
 #include <vanetza/geonet/station_type.hpp>
 #include "inet/common/ModuleAccess.h"
@@ -34,7 +34,7 @@ void PedestrianMiddleware::initialize(int stage) {
 
     // emit will update mIdenity of Middelware base
     Identity identity;
-    identity.traci = mPersonController->getNodeId();
+    identity.traci = mPersonController->getTraciId();
     identity.application = mDataProvider.station_id();
     emit(Identity::changeSignal,
          Identity::ChangeTraCI | Identity::ChangeStationId, &identity);
@@ -49,8 +49,20 @@ void PedestrianMiddleware::finish() {
 
 void PedestrianMiddleware::initializeController(cPar& mobilityPar) {
   auto mobility =
-      inet::getModuleFromPar<ControllableObject>(mobilityPar, findHost());
-  mPersonController = mobility->getController<VaderePersonController>();
+      inet::getModuleFromPar<PersonMobility>(mobilityPar, findHost());
+
+  if (!mobility) {
+      error("Module not found on path '%s' defined by par '%s'",
+                  mobilityPar.stringValue(), mobilityPar.getFullPath().c_str());
+  }
+
+  auto personController = mobility->getPersonController();
+
+  mPersonController = dynamic_cast<VaderePersonController*>(personController);
+  if(!mPersonController){
+      error("Controller is not a valid VaderePersonController.");
+  };
+
   ASSERT(mPersonController);
   getFacilities().register_mutable(mPersonController);
 }

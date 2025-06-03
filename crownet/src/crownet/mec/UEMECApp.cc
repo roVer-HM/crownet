@@ -9,6 +9,7 @@
 #include <apps/mec/DeviceApp/DeviceAppMessages/DeviceAppPacket_Types.h>
 
 using namespace inet;
+using namespace simu5g;
 
 Define_Module(UEMECApp);
 

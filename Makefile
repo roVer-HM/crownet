@@ -31,7 +31,7 @@ models_l4 := $(mod_crownet)
 models :=  $(models_l4) $(models_l3) $(models_l2) $(models_l1)
 
 NUM_CPUS := $(shell grep -c ^processor /proc/cpuinfo)
-PYTHON := python3.8
+PYTHON := python3.12
 
 # prepare environment (sub-projects need to set env variables)
 IGNORE := $(shell bash -c "source $(mod_inet)/setenv; env | sed 's/=/:=/' | sed 's/^/export /' > .makeenv.tmp")
@@ -137,6 +137,7 @@ python-hint:
 	@echo "the CrowNet docker containers. This does only work, if the same python versions are"
 	@echo "available and used by default in and outside the container."
 	@echo ""
+	scripts/check_python_version.sh
 
 #-create source distributions of all python packages---------------------------
 

@@ -55,10 +55,8 @@ void EntropyMapAppSimple::updateLocalMap() {
     // until the map TTL removes them or the agent enters the cell again.
 
     // access entropy client based on distance configuration.
-    int count = 0;
     if (entropyClient->currentCellOnly()){
         // only 'sense' current cell
-        count = 1;
         const auto &posTraci = converter->position_cast_traci(getPosition());
         const auto info = entropyClient->updateGetGlobalValue(getPosition());
         auto ee = dcdMap->getEntry<GridEntry>(posTraci);
@@ -69,7 +67,6 @@ void EntropyMapAppSimple::updateLocalMap() {
         // access cells within configured radius
         auto cellIds = entropyClient->getCellsInRadius(getPosition());
         for (const GridCellID& cellId : cellIds){
-            ++count;
             const auto e = entropyClient->getValue(cellId);
             const auto info = e.second;
             const auto &posTraci = converter->position_cast_traci(info->getCurrentData()->getPosition());

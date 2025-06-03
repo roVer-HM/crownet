@@ -1,6 +1,8 @@
 #include "BeaconService.h"
 #include "BeaconJSON.h"
 
+using namespace simu5g;
+
 Define_Module(BeaconService);
 
 BeaconService::BeaconService()
@@ -15,7 +17,7 @@ BeaconService::~BeaconService()
 
 void BeaconService::initialize(int stage)
 {
-    MecServiceBase::initialize(stage);
+    MecServiceBase2::initialize(stage);
 
     if (stage != inet::INITSTAGE_APPLICATION_LAYER) return;
 }
@@ -27,7 +29,7 @@ void BeaconService::finish()
 
 void BeaconService::handleMessage(cMessage* msg)
 {
-    MecServiceBase::handleMessage(msg);
+    MecServiceBase2::handleMessage(msg);
 }
 
 void BeaconService::handleGETRequest(const HttpRequestMessage* msg, inet::TcpSocket* socket)

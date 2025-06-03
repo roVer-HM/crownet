@@ -24,6 +24,8 @@ simple Geo2Nic like INetworkLayer2CellularNic
         string interfaceTableModule;
         string routingTableModule;
         string interfaceName = default("cellular");
+        string binderModule = default("binder");
+        string handoverManagerModule = default("");
         @display("i=block/layer");
         @class(crownet::Geo2Nic);
     gates:

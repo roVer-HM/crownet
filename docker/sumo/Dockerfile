@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:experimental
 #
 # Scope:
-# build the SUMO Simulator based on our public omnetpp mirror >https://github.com/roVer-HM/sumo.git<.
+# build the SUMO Simulator based on our public sumo mirror >https://github.com/roVer-HM/sumo.git<.
 
 # Requirements/dependencies:
 # none
@@ -14,24 +14,25 @@
 # Common problems:
 # Cloning of the repo fails -> Make sure that the tag is available on >https://github.com/roVer-HM/sumo<.
 
-FROM ubuntu:18.04
+FROM ubuntu:24.04
 
-ENV GITHUB_TAG="v1_17_0_hm"
+ENV GITHUB_TAG="v1_23_1_hm"
 ENV SUMO_RELEASE=$GITHUB_TAG
 
 # VEINS release (for checking out the sumo-launchd.py script required for TraCI)
-ENV VEINS_RELEASE hm_master
+ENV VEINS_RELEASE=hm_master
 
-LABEL description "SUMO - Simulation of Urban MObility (as used in CrowNet)"
-LABEL maintainer  "wischhof@ieee.org"
+LABEL description="SUMO - Simulation of Urban MObility (as used in CrowNet)"
+LABEL maintainer="wischhof@ieee.org"
 
 # install all dependencies
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
        sudo net-tools \
        openssh-client git git-lfs \
-       cmake python libxerces-c-dev libfox-1.6-dev \
-       libgl1-mesa-dev libglu1-mesa-dev libgdal-dev libproj-dev libgl2ps-dev && \
+       cmake python3 python3-dev g++ libxerces-c-dev libfox-1.6-dev \
+       libgl1-mesa-dev libglu1-mesa-dev libgdal-dev libproj-dev libgl2ps-dev \ 
+       swig default-jdk maven libeigen3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -54,13 +55,13 @@ RUN git pull https://github.com/roVer-HM/sumo.git $SUMO_RELEASE
 
 # configure and compile
 ENV PATH /opt/sumo/sumo/bin:$PATH
-RUN mkdir build/cmake-build && cd build/cmake-build && \
-    cmake ../.. && \
-    make -j16
+ENV SUMO_HOME $PWD
+RUN cmake -B build . && \
+    cmake --build build -j$(nproc)
 
 # clean-up the build directory
 WORKDIR /opt/sumo/sumo
-RUN rm -rf build/cmake-build
+RUN rm -rf build
 
 
 COPY docker/sumo/veins_launchd /veins_launchd

@@ -12,8 +12,7 @@ if [[ -z "$1" || "$1" == "exec" ]]; then
     TAG_DIGEST=":${CROWNET_SUMO_CONT_TAG}"
     CONTNAME=$SHORTNAME
 else
-    TAG_DIGEST=$1
-    SHORTNAME=$SHORTNAME
+    TAG_DIGEST=":$1"
     CONTNAME=$SHORTNAME
 fi
 

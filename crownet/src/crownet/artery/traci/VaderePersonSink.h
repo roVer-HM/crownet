@@ -22,7 +22,7 @@ class VaderePersonCache;
 class VaderePersonSink
 {
 public:
-    virtual void initializeSink(std::shared_ptr<API>, std::shared_ptr<VaderePersonCache>, const Boundary&) = 0;
+    virtual void initializeSink(std::shared_ptr<API>, std::shared_ptr<PersonCache>, const Boundary&) = 0;
     virtual void initializePerson(const TraCIPosition&, TraCIAngle, double speed) = 0;
     virtual void updatePerson(const TraCIPosition&, TraCIAngle, double speed) = 0;
     virtual ~VaderePersonSink() = default;

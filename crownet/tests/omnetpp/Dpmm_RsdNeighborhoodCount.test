@@ -1,5 +1,8 @@
 %description:
 DcDMap sends data after neighborhood table is updated. 
+Note: If this test fails, check that the CrowNet patch to LtePhyUeD2D.cc in Simu5G is integrated
+which implements the separation of resource domains, i.e. guarantees that
+D2D packets sent in RSDs other than the own RSD are ignored.
 
 %file: package.ned 
 // 

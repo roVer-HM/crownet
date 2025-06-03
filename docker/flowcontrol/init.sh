@@ -1,14 +1,13 @@
 #!/bin/bash
 #
 
-echo "Welcome to the crownet flowcontrol Docker Container."
+echo "Welcome to the crownet flowcontrol Docker Container ($RELEASE)."
 echo ""
 echo "Using TRACI_PORT='$TRACI_PORT' TRACI_DEBUG='$TRACI_DEBUG' CONTROL_LOG_LEVEL='$CONTROL_LOG_LEVEL'  CONTROL_LOG='$CONTROL_LOG'"
 echo ""
 
-'' TODO
-
 CMD_ARR=(crownetctl)
+
 CMD_ARR+=(--bind 0.0.0.0)
 # default to traci port 9999 to allow simultanous use of vadere and sumo and control
 if [[ -z $TRACI_PORT ]];then

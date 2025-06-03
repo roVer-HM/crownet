@@ -142,6 +142,7 @@ class SampleBaseSaltelli(SampleBaseSobol):
         parameter = {
             "num_vars": len(self.parameters),
             "bounds": [[0, 1]] * len(self.parameters),
+            "names": [f"x{i}" for i in range(len(self.parameters))]
         }
         return parameter
 

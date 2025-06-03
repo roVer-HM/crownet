@@ -18,7 +18,7 @@
 
 using namespace omnetpp;
 
-class MECBeaconApp : public MecAppBase
+class MECBeaconApp : public simu5g::MecAppBase
 {
 
     inet::UdpSocket ueSocket;
@@ -37,8 +37,8 @@ class MECBeaconApp : public MecAppBase
     inet::TcpSocket* serviceSocket_;
     inet::TcpSocket* mp1Socket_;
 
-    HttpBaseMessage* mp1HttpMessage;
-    HttpBaseMessage* serviceHttpMessage;
+    simu5g::HttpBaseMessage* mp1HttpMessage;
+    simu5g::HttpBaseMessage* serviceHttpMessage;
 
     // State Recording
     cOutVector stateRecorderVector;

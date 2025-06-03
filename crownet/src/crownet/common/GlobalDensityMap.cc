@@ -67,6 +67,11 @@ void GlobalDensityMap::finish() {
   getSystemModule()->unsubscribe(removeMap, this);
   getSystemModule()->unsubscribe(traciConnected, this);
   fileWriter->finish();
+  auto ownedObject = dynamic_cast<omnetpp::cOwnedObject*>(fileWriter.get());
+  if(ownedObject){
+      take(ownedObject);
+  }
+  fileWriter.reset();
 }
 
 void GlobalDensityMap::receiveSignal(omnetpp::cComponent *source,

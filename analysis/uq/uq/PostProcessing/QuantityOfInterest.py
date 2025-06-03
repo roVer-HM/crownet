@@ -71,7 +71,7 @@ class QuantityOfInterest:
                         # fill with nan values, if there are missing sample values over time
                         # time 1: sample_1_val,  sample_2_val, sample_3_val
                         # time 2: sample_1_val,     nan      , sample_3_val
-                        values = values.unstack(QuantityOfInterest.TIME_INDEX_NAME).stack(level=1, dropna=False)
+                        values = values.unstack(QuantityOfInterest.TIME_INDEX_NAME).stack(level=1, future_stack=True)
             else:
                 raise ValueError(f"Multiindex must contain levels {self.get_multi_index()}. Got: {values.index}")
 

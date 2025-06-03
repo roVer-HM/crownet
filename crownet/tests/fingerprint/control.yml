@@ -6,7 +6,7 @@
 #     interpreted as the command to execute
 #   * if fingerprint starts with 'file:' read the given path. If path
 #     is relative it based on workingdir. An empty path will default
-#     to hasd./<testcase-name>.csv relative to the current files location
+#     to hash.d/<testcase-name>.csv relative to the current files location
 
 control001_aid:
   wd: simulations/testSim

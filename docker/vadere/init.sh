@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 
-echo "Welcome to the CrowNet vadere Docker Container."
+echo "Welcome to the CrowNet vadere Docker Container ($RELEASE)."
 echo ""
 echo "Using TRACI_PORT='$TRACI_PORT' TRACI_GUI='$TRACI_GUI' TRACI_DEBUG='$TRACI_DEBUG' VADERE_LOG_LEVEL='$VADERE_LOG_LEVEL'  VADERE_LOG='$VADERE_LOG'"
 echo ""

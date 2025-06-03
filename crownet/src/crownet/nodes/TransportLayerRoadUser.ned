@@ -77,9 +77,6 @@ module TransportLayerRoadUser like INetworkNode
         int nrMacNodeId @mutable = default(0);
         int nrMacCellId @mutable = default(0);
 
-        //# D2D capability
-        string nicType = default(ifTrueOrElse(useNR, "NRNicUe", "LteNicUe"));
-
         //# Network Layer specs
         bool hasIpv4 = default(true);
         bool hasIpv6 = default(false);
@@ -136,7 +133,7 @@ module TransportLayerRoadUser like INetworkNode
                 runtime.datetime = parent.middleware.datetime;
         }
         //# individual network layers (must be orderedfrom lower to upper layer)
-        cellularNic: <nicType> like ICellularNic if hasCellular {
+        cellularNic: <default(ifTrueOrElse(useNR, "NRNicUe", "LteNicUe"))> like ICellularNic if hasCellular {
             nodeType = parent.nodeType;
             ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;

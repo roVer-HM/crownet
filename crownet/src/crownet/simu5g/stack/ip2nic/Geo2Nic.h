@@ -13,7 +13,7 @@
 
 namespace crownet {
 
-class Geo2Nic : public ::IP2Nic {
+class Geo2Nic : public simu5g::IP2Nic {
  public:
   virtual ~Geo2Nic() = default;
 

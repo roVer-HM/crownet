@@ -10,13 +10,13 @@
 # The omnetpp release is specified by the base image "omnetpp". To build that, go to ../omnetpp/Dockerfile.
 # The release of the IDE is specified through the package release. To change the release, adjust the URL (RUN wget ... /download/omnetpp-6.0.1/omnetpp-6.0.1-linux-x86_64.tgz<)
 
-ARG IMAGE_REG
-ARG BASE_IMAGE_TAG
+ARG IMAGE_REG=invalid
+ARG BASE_IMAGE_TAG=latest
 
 FROM ${IMAGE_REG}/omnetpp:${BASE_IMAGE_TAG}
 
 ARG CROWNET_COMMIT_HASH
-ENV RELEASE $CROWNET_COMMIT_HASH
+ENV RELEASE=$CROWNET_COMMIT_HASH
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y rsync 
 
@@ -30,7 +30,7 @@ COPY docker/omnetpp-ide/waitfor.sh /waitfor.sh
 RUN chmod 555 /waitfor.sh
 
 RUN rm -rf /tmp/omnetpp.tgz
-RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.0.3/omnetpp-6.0.3-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
+RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.1.0/omnetpp-6.1.0-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
 
 # extract IDE and copy to omnetpp
 WORKDIR /tmp/
@@ -46,11 +46,14 @@ RUN rsync -aP --chmod=Du=rwx,Dg=rwx,Do=rwx,Fu=rwx,Fg=rwx,Fo=rwx //tmp/omnetpp/id
 # install embeded browser components
 RUN apt-get update -y
 RUN export SWT_GTK3=1
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gtk3.0
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libwebkit2gtk-4.0-37
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-0
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+       libgtk-3-dev libwebkit2gtk-4.1-0 \
+       libcanberra-gtk-module libcanberra-gtk3-module && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# installation of tools for code formatting and checks (cpplint and cppstyle eclipse plugin)
-RUN pip3 install cpplint
 # check if PID if is empty. If so this will create an infinte loop at while [ -e /proc/ ]
 #RUN /opt/omnetpp/omnetpp/bin/omnetpp -application org.eclipse.equinox.p2.director \
 #        -repository http://www.cppstyle.com/mars -installIU org.wangzw.cppstyle.feature.feature.group; \

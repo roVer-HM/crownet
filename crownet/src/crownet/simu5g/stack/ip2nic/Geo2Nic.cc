@@ -15,6 +15,7 @@
 using namespace std;
 using namespace inet;
 using namespace omnetpp;
+using namespace simu5g;
 
 namespace crownet {
 

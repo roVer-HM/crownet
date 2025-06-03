@@ -2,10 +2,10 @@
 #ifndef _BEACONSERVICE_H
 #define _BEACONSERVICE_H
 
-#include <nodes/mec/MECPlatform/MECServices/MECServiceBase/MecServiceBase.h>
+#include <nodes/mec/MECPlatform/MECServices/MECServiceBase/MecServiceBase2.h>
 #include "BeaconRepository.h"
 
-class BeaconService: public MecServiceBase
+class BeaconService: public simu5g::MecServiceBase2
 {
   private:
     std::string baseUri = "/example/Beacon/v1";
@@ -19,12 +19,12 @@ class BeaconService: public MecServiceBase
 
     virtual void initialize(int) override;
     virtual void finish() override;
-    virtual void handleMessage(cMessage*) override;
+    virtual void handleMessage(inet::cMessage*) override;
 
-    virtual void handleGETRequest(const HttpRequestMessage*, inet::TcpSocket*) override;
-    virtual void handlePOSTRequest(const HttpRequestMessage*, inet::TcpSocket*) override;
-    virtual void handlePUTRequest(const HttpRequestMessage*, inet::TcpSocket*) override;
-    virtual void handleDELETERequest(const HttpRequestMessage*, inet::TcpSocket*) override;
+    virtual void handleGETRequest(const simu5g::HttpRequestMessage*, inet::TcpSocket*) override;
+    virtual void handlePOSTRequest(const simu5g::HttpRequestMessage*, inet::TcpSocket*) override;
+    virtual void handlePUTRequest(const simu5g::HttpRequestMessage*, inet::TcpSocket*) override;
+    virtual void handleDELETERequest(const simu5g::HttpRequestMessage*, inet::TcpSocket*) override;
 
     virtual ~BeaconService();
 };

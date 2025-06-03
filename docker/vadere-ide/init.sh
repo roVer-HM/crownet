@@ -6,23 +6,23 @@
 #
 # Examples
 #
-# idea.sh (default)      starts the OMNeT++ IDE
-# /bin/bash              starts an interactive shell
+# intellij-idea-community (default)      starts the IntelliJ IDE
+# /bin/bash                              starts an interactive shell
 
 # echo "Command: $1"
 
 if [ -z "$1" ]; then
-     CMD="idea.sh"
+     CMD="intellij-idea-community"
 else
      CMD="$1"
-     if [[ "$CMD" != "idea.sh" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
+     if [[ "$CMD" != "intellij-idea-community" && "$CMD" != "/bin/sh" && "$CMD" != "sh" ]]; then
           SILENT="y"
      fi
 fi
 
 
 if [ -z "$SILENT" ]; then
-     echo "Welcome to the roVer Vadere Docker Container."
+     echo "Welcome to the roVer Vadere IDE Docker Container ($RELEASE)."
 
      # check if ptrace_scope is enable  (for debugging it must not be enabled)
      read _ _ value < <(/sbin/sysctl kernel.yama.ptrace_scope)
@@ -38,11 +38,11 @@ CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
-if [[ "$CMD" == "idea.sh" ]]; then
+if [[ "$CMD" == "intellij-idea-community" ]]; then
      sleep 3
-     PID=`pidof idea.sh`
+     PID=`pidof intellij-idea-community`
 
-     # idea.sh is special since the start script in its bin directory returns immediately
+     # iintellij-idea-community is special since the start script in its bin directory returns immediately
      # Therefore, we wait until the idea.sh process terminates. (cannot use wait since it is not a child process)
 
      if [ -n "$PID" ]; then

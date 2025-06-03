@@ -41,5 +41,5 @@ EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET${_Dbg} -lCROWNET${_Dbg} -I
 
 opp_test gen $OPT -v $TESTFILES || exit 1
 echo
-(cd work; opp_makemake -f --deep --no-deep-includes -I./lib -o work -i ../makefrag $EXTRA_INCLUDES; $MAKE) || exit 1
+(cd work; opp_makemake -f --deep -I./lib -o work -i ../makefrag $EXTRA_INCLUDES; $MAKE) || exit 1
 echo

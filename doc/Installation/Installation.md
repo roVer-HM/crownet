@@ -4,7 +4,26 @@ Setting up a simulation machine with the CrowNet environment is quite simple. Yo
 
 ## Required Hard- and Software
 
-The CrowNet environment requires a Linux System. We are currently using Ubuntu 18.04.2 LTS but any major distribution should do, since the required dependencies are all part of the respective Docker containers. A system with 8 GB of RAM is recommended.
+The CrowNet environment requires a Linux System. We are currently using Ubuntu 24.04 LTS but any major distribution should do, since the required dependencies are all part of the respective Docker containers. A system with 8 GB of RAM is recommended.
+
+### Python
+
+CrowNet requires identical Pyhton versions on the system and within the CrowNet containers. This will be checked and you will receive a warning
+message if there is a mismatch of the installed Python versions.
+
+Additionally, for running Python scripts on the host, a few other packages need to be installed:
+
+```
+sudo apt install black python3-venv python3-pip python3-tk
+```
+
+### Build Essential, git and curl
+
+CrowNet requires basic make and compilations tools. We recommend to install the build-essentials package.
+
+```
+sudo apt install build-essential git git-lfs curl
+```
 
 ## Repo setup
 
@@ -13,7 +32,7 @@ Clone the CrowNet repository including all submodules within your home directory
 cd ~
 git clone --recurse-submodules https://github.com/roVer-HM/crownet.git
 ```
-Note: if you are a developer, clone the gitlab repository instead: 
+Note: if you are an internal developer at HM, clone the gitlab repository instead: 
 ```
 cd ~
 git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.git
@@ -22,7 +41,8 @@ git clone --recurse-submodules ssh://git@sam-dev.cs.hm.edu:6000/rover/crownet.gi
 Install Docker (if not already available on your system):
 ```
 cd crownet/scripts
-install_docker.sh
+./install_docker.sh
+newgrp docker
 ```
 
 Configure CrowNet by running (do not overwrite the pre-configured images tags unless you provide the respective images yourself):
@@ -34,7 +54,17 @@ Get the required Docker images (due to the large size of some of them, this will
 ```
 ./scripts/get_images
 ```
-We recommended to include 'source ${CROWNET_HOME}/setup -i' in the startup file of your shell (~/.bashrc). 
+If getting the images fails with the error message that Docker cannot be connected to, please reboot the system and try again. (This is a user rights issue,
+since the user must be part of the Docker group and user rights are not 
+updated in all shells with the 'newgrp' command above.)
+
+
+We recommended to include 'source ${CROWNET_HOME}/setup -i' in the startup file of your shell (~/.bashrc). You can do this by editing the file '.bashrc' stored in the home directory of your user and adding the following lines:
+```
+# export the path to CrowNet (change according to the path in your setup!)
+export CROWNET_HOME=$HOME/crownet
+source ${CROWNET_HOME}/setup -i
+```
 
 Notes:
 * The start script will mount your home directory so that it is visible inside the Docker container. 
@@ -52,8 +82,9 @@ Preserving the required build-order, the top-level Makefile builds all the requi
 Simply run:
 
 ```
+cd $CROWNET_HOME
 omnetpp exec make makefiles
-omnetpp exec make MODE=release
+omnetpp exec make MODE=release -j$(nproc)
 ```
 
 Notes:

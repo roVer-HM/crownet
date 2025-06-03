@@ -1,7 +1,7 @@
 # Uncertainty Quantification (UQ)
 
 This repository contains scripts that allow users to conduct paramater studies for certain crownet simulations (../../crownet/crownet/simulations/).
-Python>=3.8 is required.
+Python>=3.12 is required.
 
 
 ## Run the simulations

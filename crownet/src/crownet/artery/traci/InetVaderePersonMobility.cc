@@ -50,12 +50,11 @@ void InetVaderePersonMobility::initialize(int stage) {
   }
 }
 
-void InetVaderePersonMobility::initializeSink(std::shared_ptr<API> api, std::shared_ptr<VaderePersonCache> cache, const Boundary& boundary) {
+void InetVaderePersonMobility::initializeSink(std::shared_ptr<API> api, std::shared_ptr<PersonCache> cache, const Boundary& boundary) {
   ASSERT(api);
   ASSERT(cache);
   mTraci = api;
   mNetBoundary = boundary;
-  mCache = cache;
   mObjectId = cache->getId(); //FIXME mPersonId
 
 
@@ -65,13 +64,12 @@ void InetVaderePersonMobility::initializeSink(std::shared_ptr<API> api, std::sha
   const auto& min = mNetBoundary.lowerLeftPosition();
   constrainedAreaMin = inet::Coord { min.x, min.y, min.z };
 
-  std::shared_ptr<crownet::VaderePersonCache> vehicleCache =
-      std::dynamic_pointer_cast<crownet::VaderePersonCache>(cache);
+  mCache = std::dynamic_pointer_cast<crownet::VaderePersonCache>(cache);
 
-  if (!vehicleCache) {
-    // todo
+  if (!mCache) {
+      throw cRuntimeError("Cannot create controller - unsupported cache type %s", typeid(cache).name());
   }
-  mController.reset(new VaderePersonController(vehicleCache));
+  mController.reset(new VaderePersonController(mCache));
 }
 
 

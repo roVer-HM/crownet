@@ -15,7 +15,7 @@
 import nodes.mec.MECPlatform.MECPackets;
 
 
-class SimpleMECBeacon extends MECPacket
+class SimpleMECBeacon extends simu5g::MECPacket
 {
     int nodeType;
     int nodeId;
@@ -38,7 +38,7 @@ class ReducedMECBeacon
     int additionalData[];
 }
 
-class ResponseBeaconMessage extends MECPacket
+class ResponseBeaconMessage extends simu5g::MECPacket
 {
 	ReducedMECBeacon beacons[];
 }
