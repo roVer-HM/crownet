@@ -15,10 +15,16 @@
 #CXX=g++
 
 #
-# Set to "no" if you want to use gcc/g++ instead of default clang/clang++ when both
-# compiler is installed.
+# Set to "no" if you want to use gcc/g++ instead of the default clang/clang++ when both
+# compilers are installed.
 #
 PREFER_CLANG=yes
+
+#
+# Set to "no" if you want to use the GNU linker instead of LLVM-LLD when both
+# linker is installed.
+#
+PREFER_LLD=yes
 
 #
 # On Windows, use the separately installed Visual C linker and Windows SDK. This will generate
@@ -61,13 +67,20 @@ WITH_OSG=yes
 #
 # Set to "yes" to enable osgEarth support in Qtenv (requires OpenScreenGraph enabled)
 #
-# WITH_OSGEARTH=yes
 WITH_OSGEARTH=no
 
 #
 # Set to "yes" to enable simulation executables to load NED files dynamically.
 #
 WITH_NETBUILDER=yes
+
+#
+# Python bindings for the scave native library allow direct loading of .sca and .vec files
+# from Python code outside of the IDE. Setting this parameter to "no" will prevent the
+# `opp_charttool` functioning properly. Setting to "yes" requires the python-dev package
+# to be installed.
+#
+WITH_SCAVE_PYTHON_BINDINGS=yes
 
 #
 # Set to "yes" to allow the use of LibXML2. OMNeT++ will only use LibXML for loading
@@ -79,7 +92,7 @@ WITH_LIBXML=no
 #
 # Set to "yes" to enable the parallel distributed simulation feature.
 #
-WITH_PARSIM=yes
+WITH_PARSIM=no
 
 #
 # Set to "yes" to use SQLite as default file format for output vector and
@@ -102,6 +115,11 @@ PREFER_SQLITE_RESULT_FILES=no
 WITH_SYSTEMC=no
 
 #
+# Set to "no" to disable backtrace printing on exceptions.
+#
+WITH_BACKTRACE=yes
+
+#
 # Set to no if you want to create static OMNeT++ libraries. Can be overriden
 # with "make SHARED_LIBS=no" but then simulation models also need to be built
 # with "make SHARED_LIBS=no"
@@ -109,17 +127,26 @@ WITH_SYSTEMC=no
 SHARED_LIBS=yes
 
 #
+# Adds the "ccache" prefix to the compiler commands ($CC,$CXX). This option
+# requires ccache to be installed on your system. It can significantly speed up
+# recompilations by caching already compiled object files. Note that turning
+# this option off does not necessarily disable ccache if it is installed to be
+# used system-wide.
+#
+USE_CCACHE_PREFIX=yes
+
+#
 # Compiler and linker options for Qt
 #
 # If you wish to use a custom Qt bundle (for example downloaded from the
 # official Qt web page, or built from source) instead of the one installed
 # on your system as the default (most likely by the package manager), set
-# this variable to the 'bin' directory of that bundle, where qmake is.
+# this variable to point to the 'qmake' program in that installation.
 # Leave it empty or commented out to use the default Qt installation.
 # Please note that on Windows and macOS it is highly recommended to just
 # use the Qt bundle included in the OMNeT++ release, and not change this.
 #
-#QT_PATH="/home/user/Qt/5.7/gcc_64/bin"
+#QMAKE="/home/user/Qt/5.12/gcc_64/bin/qmake"
 #
 # You can also explicitly tell 'configure' what compiler options (QT_CFLAGS)
 # and linker switches (QT_LIBS) are needed to build an application with Qt
@@ -153,13 +180,6 @@ SHARED_LIBS=yes
 #ZLIB_LIBS="-L$MSYS/lib -lz"
 
 #
-# Compiler flags used to compile JNI code.
-# -fno-strict-aliasing is needed for gcc when using -O2 otherwise Java
-# native calls don't work
-#
-#JAVA_CFLAGS=-fno-strict-aliasing
-
-#
 # Compiler and linker options for MPI (optional component).
 # On LAM/MPI, typing `mpic++ -showme' can give you a hint about MPI_LIBS.
 #
@@ -180,6 +200,11 @@ SHARED_LIBS=yes
 #  LIBXML_LIBS="-L$MSYS/bin -lxml2 -L$MSYS/bin -liconv"
 # If commented out, the configure script will try to autodetect it
 #
+
+#
+# Set to "yes" to enable AKAROA support.
+#
+WITH_AKAROA=no
 
 #
 # Compiler and linker options for Akaroa (optional component)
@@ -208,7 +233,6 @@ SHARED_LIBS=yes
 # makefiles will use. (They get default values if commented out.)
 #
 #MSGC="$OMNETPP_BIN_DIR/opp_msgc"
-#SMC="$OMNETPP_BIN_DIR/opp_smc"
 
 #
 #
