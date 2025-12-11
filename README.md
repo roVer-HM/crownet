@@ -40,13 +40,18 @@ Please check the licenses of the projects listed above for your use case and pur
 
 ### Scientific publications
 
-Please refer to this repository when you use CrowNet in scientific publications.
+Please cite the following journal paper when you use CrowNet in own scientific works:
+- S. Schuhbäck, C. M. Mayr, J. Ott, L. Wischhof (2025): *CrowNet: Open Source Modeling and Simulation of Pedestrian-2-X and Crowd Networks*, IEEE Access. [doi: 10.1109/ACCESS.2025.3585785](https://doi.org/10.1109/ACCESS.2025.3585785)
+
+
 Publications in which CrowNet was used:
+- S. Kiunke, L. Wischhof (2025): * Simulation of Distributed Sensing Applications: Tradeoff Between Accuracy and Simulation Time*, In: XS. Yang, S. Sherratt, N. Dey, A. Joshi (eds) Proceedings of Tenth International Congress on Information and Communication Technology. ICICT 2025. Lecture Notes in Networks and Systems, vol 1412. Springer, Singapore. [DOI: 10.1007/978-981-96-6429-0_4](https://doi.org/10.1007/978-981-96-6429-0_4)
 - S. Schuhbäck, L. Wischhof, J. Ott (2024): *Adaptive Transmission Rate Control for Decentralized Sensing Applications*, IEEE Access. [doi: 10.1109/ACCESS.2024.3495504](https://doi.org/10.1109/ACCESS.2024.3495504)
 - S. Schuhbäck, L. Wischhof, J. Ott (2023): *Cellular Sidelink Enabled Decentralized Pedestrian Sensing*, IEEE Access. [doi: 10.1109/access.2023.3242946](https://doi.org/10.1109/access.2023.3242946)
+- M. Rupp, L. Wischhof (2023): *Evaluation of the Effectiveness of Vulnerable Road User Clustering in C-V2X Systems*, 2023 IEEE International Conference on Omni-layer Intelligent Systems (COINS). [0.1109/COINS57856.2023.10189204](https://doi.org/10.1109/COINS57856.2023.10189204)
 - L. Wischhof, M. Kilian, S. Schuhbäck, M. Rupp, G. Köster (2023): *Mobility in Pedestrian Communication Simulations: Impact of Microscopic Models and Solutions for Integration*, Computer Communications, Volume 212, p. 90-103. [doi: 10.1016/j.comcom.2023.09.029](https://doi.org/10.1016/j.comcom.2023.09.029)
 - C. M. Mayr, A. Templeton, G. Köster (2023): *Designing mobile application messages to impact route choice: A survey and simulation study*, Plos One, 18(4), pp. 1-20. [doi: 10.1371/journal.pone.0284540](https://doi.org/10.1371/journal.pone.0284540)
-- L. Wischhof, M. Kilian, S. Schuhbäck, G. Köster (2022): *On the Influence of Microscopic Mobility in Modelling Pedestrian Communication*, UNet22, Montreal, Canada, [doi: 10.1007/978-3-031-29419-8_1](https://doi.org/10.1007/978-3-031-29419-8_1)
+- L. Wischhof, M. Kilian, S. Schuhbäck, G. Köster (2022): *On the Influence of Microscopic Mobility in Modelling Pedestrian Communication*, UNet22, Montreal, Canada. [doi: 10.1007/978-3-031-29419-8_1](https://doi.org/10.1007/978-3-031-29419-8_1)
 - C. M. Mayr, G. Köster (2022): *Guiding crowds when facing limited compliance: Simulating strategies*, Plos One, 17(11), pp. 1-24. [doi: 10.1371/journal.pone.0276229](https://doi.org/10.1371/journal.pone.0276229)
 - M. Rupp, L. Wischhof (2022): *Prioritization for Latency Reduction in 5G MEC-Based VRU Protection Systems*, IEEE WiMob 2022, [doi: 10.1109/wimob55322.2022.9941690](https://doi.org/10.1109/wimob55322.2022.9941690)
 - C. M. Mayr, S. Schuhbäck, L. Wischhof, G. Köster (2021): *Analysis of Information Dissemination through Direct Communication in a Moving Crowd*, Safety Science, Volume 142, [doi: 10.1016/j.ssci.2021.105386](https://doi.org/10.1016/j.ssci.2021.105386)
