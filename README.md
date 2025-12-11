@@ -45,7 +45,7 @@ Please cite the following journal paper when you use CrowNet in own scientific w
 
 
 Publications in which CrowNet was used:
-- S. Kiunke, L. Wischhof (2025): * Simulation of Distributed Sensing Applications: Tradeoff Between Accuracy and Simulation Time*, In: XS. Yang, S. Sherratt, N. Dey, A. Joshi (eds) Proceedings of Tenth International Congress on Information and Communication Technology. ICICT 2025. Lecture Notes in Networks and Systems, vol 1412. Springer, Singapore. [DOI: 10.1007/978-981-96-6429-0_4](https://doi.org/10.1007/978-981-96-6429-0_4)
+- S. Kiunke, L. Wischhof (2025): *Simulation of Distributed Sensing Applications: Tradeoff Between Accuracy and Simulation Time*, In: XS. Yang, S. Sherratt, N. Dey, A. Joshi (eds) Proceedings of Tenth International Congress on Information and Communication Technology. ICICT 2025. Lecture Notes in Networks and Systems, vol 1412. Springer, Singapore. [DOI: 10.1007/978-981-96-6429-0_4](https://doi.org/10.1007/978-981-96-6429-0_4)
 - S. Schuhbäck, L. Wischhof, J. Ott (2024): *Adaptive Transmission Rate Control for Decentralized Sensing Applications*, IEEE Access. [doi: 10.1109/ACCESS.2024.3495504](https://doi.org/10.1109/ACCESS.2024.3495504)
 - S. Schuhbäck, L. Wischhof, J. Ott (2023): *Cellular Sidelink Enabled Decentralized Pedestrian Sensing*, IEEE Access. [doi: 10.1109/access.2023.3242946](https://doi.org/10.1109/access.2023.3242946)
 - M. Rupp, L. Wischhof (2023): *Evaluation of the Effectiveness of Vulnerable Road User Clustering in C-V2X Systems*, 2023 IEEE International Conference on Omni-layer Intelligent Systems (COINS). [0.1109/COINS57856.2023.10189204](https://doi.org/10.1109/COINS57856.2023.10189204)
