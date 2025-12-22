@@ -26,70 +26,80 @@ extends = _default, D2D_General, DcDMapDynamicInterval, stationary_n1
 %postrun-command: grep -E "^0.*TestStationaryWorld\.misc\[0\].app\[1\].(scheduler|app)" test.out > test1.out
 
 %contains: test1.out
-0.02413303676 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell (prio increment): [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 24.13303676ms, pos.:(5, 2, 1.3) m] Entry{0, 0.02413303676, 0.02413303676, 14, rsd[-1]}
-0.02413303676 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell: [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 24.13303676ms, pos.:(5, 2, 1.3) m] Entry{1, 0.02413303676, 0.02413303676, 14, rsd[1]}
-0.058534780036 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 50ms, T_rnd: 58.534780036ms, ts: 0s, avg_pkt_size: 1400 B, pmember: 2, lastTxInterval: -1s)
-0.058534780036 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 50ms, T_rnd: 42.877188758ms, ts: 58.534780036ms, avg_pkt_size: 0 B, pmember: 2, lastTxInterval: -1s)
-0.058534780036 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
-0.058534780036 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
-0.058534780036 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
-0.058534780036 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 101.411968794ms
-0.082968034576 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 82.968034576ms, pos.:(5, 2, 1.3) m] Entry{1, 0.02413303676, 0.02413303676, 14, rsd[1]}
-0.082968034576 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 82.968034576ms, pos.:(5, 2, 1.3) m] Entry{1, 0.082, 0.082968034576, 14, rsd[1]}
-0.101411968794 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 50ms, T_rnd: 42.877188758ms, ts: 58.534780036ms, avg_pkt_size: 0 B, pmember: 2, lastTxInterval: 58.534780036ms)
-0.101411968794 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 59.379265687ms, ts: 101.411968794ms, avg_pkt_size: 20 b, pmember: 2, lastTxInterval: 58.534780036ms)
-0.101411968794 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 117.914045723ms
-0.117914045723 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 50ms, T_rnd: 42.877188758ms, ts: 58.534780036ms, avg_pkt_size: 0 B, pmember: 2, lastTxInterval: 58.534780036ms)
-0.117914045723 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 89.934741863ms, ts: 117.914045723ms, avg_pkt_size: 20 b, pmember: 2, lastTxInterval: 58.534780036ms)
-0.117914045723 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 148.469521899ms
-0.143229558548 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 143.229558548ms, pos.:(5, 2, 1.3) m] Entry{1, 0.082, 0.082968034576, 14, rsd[1]}
-0.143229558548 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 143.229558548ms, pos.:(5, 2, 1.3) m] Entry{1, 0.143, 0.143229558548, 14, rsd[1]}
-0.148469521899 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 50ms, T_rnd: 42.877188758ms, ts: 58.534780036ms, avg_pkt_size: 0 B, pmember: 2, lastTxInterval: 58.534780036ms)
-0.148469521899 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 80.229216895ms, ts: 148.469521899ms, avg_pkt_size: 20 b, pmember: 2, lastTxInterval: 58.534780036ms)
-0.148469521899 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
-0.148469521899 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
-0.148469521899 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
-0.148469521899 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 228.698738794ms
-0.203472481612 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 203.472481612ms, pos.:(5, 2, 1.3) m] Entry{1, 0.143, 0.143229558548, 14, rsd[1]}
-0.203472481612 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 203.472481612ms, pos.:(5, 2, 1.3) m] Entry{1, 0.203, 0.203472481612, 14, rsd[1]}
-0.228698738794 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 100ms, T_rnd: 80.229216895ms, ts: 148.469521899ms, avg_pkt_size: 20 b, pmember: 2, lastTxInterval: 89.934741863ms)
-0.228698738794 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 57.74058783ms, ts: 228.698738794ms, avg_pkt_size: 38 b, pmember: 2, lastTxInterval: 89.934741863ms)
-0.228698738794 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
-0.228698738794 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
-0.228698738794 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
-0.228698738794 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 286.439326624ms
-0.24703670426 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 247.03670426ms, pos.:(5, 2, 1.3) m] Entry{1, 0.203, 0.203472481612, 14, rsd[1]}
-0.24703670426 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 247.03670426ms, pos.:(5, 2, 1.3) m] Entry{1, 0.247, 0.24703670426, 14, rsd[1]}
-0.283040411267 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 283.040411267ms, pos.:(5, 2, 1.3) m] Entry{1, 0.247, 0.24703670426, 14, rsd[1]}
-0.283040411267 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 283.040411267ms, pos.:(5, 2, 1.3) m] Entry{1, 0.283, 0.283040411267, 14, rsd[1]}
-0.286439326624 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 100ms, T_rnd: 57.74058783ms, ts: 228.698738794ms, avg_pkt_size: 38 b, pmember: 2, lastTxInterval: 80.229216895ms)
-0.286439326624 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 112.250339077ms, ts: 286.439326624ms, avg_pkt_size: 55 b, pmember: 2, lastTxInterval: 80.229216895ms)
-0.286439326624 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 340.949077871ms
-0.309346315325 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 309.346315325ms, pos.:(5, 2, 1.3) m] Entry{1, 0.283, 0.283040411267, 14, rsd[1]}
-0.309346315325 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 309.346315325ms, pos.:(5, 2, 1.3) m] Entry{1, 0.309, 0.309346315325, 14, rsd[1]}
-0.340949077871 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 100ms, T_rnd: 57.74058783ms, ts: 228.698738794ms, avg_pkt_size: 38 b, pmember: 2, lastTxInterval: 80.229216895ms)
-0.340949077871 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 86.93085178ms, ts: 340.949077871ms, avg_pkt_size: 55 b, pmember: 2, lastTxInterval: 80.229216895ms)
-0.340949077871 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
-0.340949077871 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
-0.340949077871 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
-0.340949077871 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 427.879929651ms
-0.360936174214 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 360.936174214ms, pos.:(5, 2, 1.3) m] Entry{1, 0.309, 0.309346315325, 14, rsd[1]}
-0.360936174214 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 360.936174214ms, pos.:(5, 2, 1.3) m] Entry{1, 0.36, 0.360936174214, 14, rsd[1]}
-0.391076836549 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 391.076836549ms, pos.:(5, 2, 1.3) m] Entry{1, 0.36, 0.360936174214, 14, rsd[1]}
-0.391076836549 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 391.076836549ms, pos.:(5, 2, 1.3) m] Entry{1, 0.391, 0.391076836549, 14, rsd[1]}
-0.427879929651 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 100ms, T_rnd: 86.93085178ms, ts: 340.949077871ms, avg_pkt_size: 55 b, pmember: 2, lastTxInterval: 112.250339077ms)
-0.427879929651 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 47.453197906ms, ts: 427.879929651ms, avg_pkt_size: 71 b, pmember: 2, lastTxInterval: 112.250339077ms)
-0.427879929651 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
-0.427879929651 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
-0.427879929651 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
-0.427879929651 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 475.333127557ms
-0.437960409421 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 437.960409421ms, pos.:(5, 2, 1.3) m] Entry{1, 0.391, 0.391076836549, 14, rsd[1]}
-0.437960409421 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 437.960409421ms, pos.:(5, 2, 1.3) m] Entry{1, 0.437, 0.437960409421, 14, rsd[1]}
-0.475333127557 TestStationaryWorld.misc[0].app[1].scheduler : Prio interval: (T_det: 100ms, T_rnd: 47.453197906ms, ts: 427.879929651ms, avg_pkt_size: 71 b, pmember: 2, lastTxInterval: 86.93085178ms)
-0.475333127557 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 100ms, T_rnd: 80.553847184ms, ts: 475.333127557ms, avg_pkt_size: 86 b, pmember: 2, lastTxInterval: 86.93085178ms)
-0.475333127557 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 508.433776835ms
-0.494341986821 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:10|11, rxTime: 494.341986821ms, pos.:(5, 2, 1.3) m] Entry{1, 0.437, 0.437960409421, 14, rsd[1]}
-0.494341986821 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:10|11, rxTime: 494.341986821ms, pos.:(5, 2, 1.3) m] Entry{1, 0.494, 0.494341986821, 14, rsd[1]}
+.025042099237 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell (before increment): [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 25.042099237ms, pos.:(5, 2, 1.3) m] Entry{0, 0.025042099237, 0.025042099237, 14, rsd[-1]}
+0.025042099237 TestStationaryWorld.misc[0].app[1].app : 14 enter-cell: [1, 9] Beacon[id:14, SeqNo.:0|1, rxTime: 25.042099237ms, pos.:(5, 2, 1.3) m] Entry{1, 0.025042099237, 0.025042099237, 14, rsd[1]}
+0.026221820094 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 22.4ms, T_rnd: 26.221820094ms, ts: 0s, avg_pkt_size: 11200, pmember: 2, lastTxInterval: -1s)
+0.026221820094 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 0s, T_rnd: 0s, ts: 26.221820094ms, avg_pkt_size: 0, pmember: 2, lastTxInterval: -1s)
+0.026221820094 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 49.767988689ms
+0.049767988689 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 22.4ms, T_rnd: 26.221820094ms, ts: 0s, avg_pkt_size: 11200, pmember: 2, lastTxInterval: -1s)
+0.049767988689 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 0s, T_rnd: 0s, ts: 49.767988689ms, avg_pkt_size: 0, pmember: 2, lastTxInterval: -1s)
+0.049767988689 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 50.036998891ms
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 22.4ms, T_rnd: 26.221820094ms, ts: 0s, avg_pkt_size: 11200, pmember: 2, lastTxInterval: -1s)
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 0s, T_rnd: 0s, ts: 50.036998891ms, avg_pkt_size: 0, pmember: 2, lastTxInterval: -1s)
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 50.036998891ms
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 0s, T_rnd: 0s, ts: 50.036998891ms, avg_pkt_size: 0, pmember: 2, lastTxInterval: 50.036998891ms)
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 0s, T_rnd: 0s, ts: 50.036998891ms, avg_pkt_size: 0, pmember: 2, lastTxInterval: 50.036998891ms)
+0.050036998891 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 150.497872539ms
+0.074880613731 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 74.880613731ms, pos.:(5, 2, 1.3) m] Entry{1, 0.025042099237, 0.025042099237, 14, rsd[1]}
+0.074880613731 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:1|2, rxTime: 74.880613731ms, pos.:(5, 2, 1.3) m] Entry{1, 0.074, 0.074880613731, 14, rsd[1]}
+0.125348899253 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 125.348899253ms, pos.:(5, 2, 1.3) m] Entry{1, 0.074, 0.074880613731, 14, rsd[1]}
+0.125348899253 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:2|3, rxTime: 125.348899253ms, pos.:(5, 2, 1.3) m] Entry{1, 0.125, 0.125348899253, 14, rsd[1]}
+0.150497872539 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 0s, T_rnd: 0s, ts: 50.036998891ms, avg_pkt_size: 0, pmember: 2, lastTxInterval: 50.036998891ms)
+0.150497872539 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 40us, T_rnd: 23.981325us, ts: 150.497872539ms, avg_pkt_size: 20, pmember: 2, lastTxInterval: 50.036998891ms)
+0.150497872539 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
+0.150497872539 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
+0.150497872539 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
+0.150497872539 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 150.543853272ms
+0.150543853272 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 40us, T_rnd: 45.980733us, ts: 150.497872539ms, avg_pkt_size: 20, pmember: 2, lastTxInterval: 100.460873648ms)
+0.150543853272 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 77.5us, T_rnd: 70.642895us, ts: 150.543853272ms, avg_pkt_size: 38.75, pmember: 2, lastTxInterval: 100.460873648ms)
+0.150543853272 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 249.901293992ms
+0.175816657831 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 175.816657831ms, pos.:(5, 2, 1.3) m] Entry{1, 0.125, 0.125348899253, 14, rsd[1]}
+0.175816657831 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:3|4, rxTime: 175.816657831ms, pos.:(5, 2, 1.3) m] Entry{1, 0.175, 0.175816657831, 14, rsd[1]}
+0.225393444075 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 225.393444075ms, pos.:(5, 2, 1.3) m] Entry{1, 0.175, 0.175816657831, 14, rsd[1]}
+0.225393444075 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:4|5, rxTime: 225.393444075ms, pos.:(5, 2, 1.3) m] Entry{1, 0.225, 0.225393444075, 14, rsd[1]}
+0.249901293992 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 40us, T_rnd: 45.980733us, ts: 150.497872539ms, avg_pkt_size: 20, pmember: 2, lastTxInterval: 100.460873648ms)
+0.249901293992 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 77.5us, T_rnd: 84.619365us, ts: 249.901293992ms, avg_pkt_size: 38.75, pmember: 2, lastTxInterval: 100.460873648ms)
+0.249901293992 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 250.975535132ms
+0.250975535132 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 40us, T_rnd: 45.980733us, ts: 150.497872539ms, avg_pkt_size: 20, pmember: 2, lastTxInterval: 100.460873648ms)
+0.250975535132 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 77.5us, T_rnd: 85.429701us, ts: 250.975535132ms, avg_pkt_size: 38.75, pmember: 2, lastTxInterval: 100.460873648ms)
+0.250975535132 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
+0.250975535132 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
+0.250975535132 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
+0.250975535132 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 251.047466643ms
+0.251047466643 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 77.5us, T_rnd: 71.931511us, ts: 250.975535132ms, avg_pkt_size: 38.75, pmember: 2, lastTxInterval: 100.477662593ms)
+0.251047466643 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 112.65625us, T_rnd: 85.191459us, ts: 251.047466643ms, avg_pkt_size: 56.3281, pmember: 2, lastTxInterval: 100.477662593ms)
+0.251047466643 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 350.216399611ms
+0.275268822067 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 275.268822067ms, pos.:(5, 2, 1.3) m] Entry{1, 0.225, 0.225393444075, 14, rsd[1]}
+0.275268822067 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:5|6, rxTime: 275.268822067ms, pos.:(5, 2, 1.3) m] Entry{1, 0.275, 0.275268822067, 14, rsd[1]}
+0.325452604992 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 325.452604992ms, pos.:(5, 2, 1.3) m] Entry{1, 0.275, 0.275268822067, 14, rsd[1]}
+0.325452604992 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:6|7, rxTime: 325.452604992ms, pos.:(5, 2, 1.3) m] Entry{1, 0.325, 0.325452604992, 14, rsd[1]}
+0.350216399611 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 77.5us, T_rnd: 71.931511us, ts: 250.975535132ms, avg_pkt_size: 38.75, pmember: 2, lastTxInterval: 100.477662593ms)
+0.350216399611 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 112.65625us, T_rnd: 74.305303us, ts: 350.216399611ms, avg_pkt_size: 56.3281, pmember: 2, lastTxInterval: 100.477662593ms)
+0.350216399611 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
+0.350216399611 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
+0.350216399611 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
+0.350216399611 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 350.276355635ms
+0.350276355635 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 112.65625us, T_rnd: 59.956024us, ts: 350.216399611ms, avg_pkt_size: 56.3281, pmember: 2, lastTxInterval: 99.240864479ms)
+0.350276355635 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 145.615234us, T_rnd: 167.085729us, ts: 350.276355635ms, avg_pkt_size: 72.8076, pmember: 2, lastTxInterval: 99.240864479ms)
+0.350276355635 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 450.858130906ms
+0.375594876361 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 375.594876361ms, pos.:(5, 2, 1.3) m] Entry{1, 0.325, 0.325452604992, 14, rsd[1]}
+0.375594876361 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:7|8, rxTime: 375.594876361ms, pos.:(5, 2, 1.3) m] Entry{1, 0.375, 0.375594876361, 14, rsd[1]}
+0.426045212566 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 426.045212566ms, pos.:(5, 2, 1.3) m] Entry{1, 0.375, 0.375594876361, 14, rsd[1]}
+0.426045212566 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:8|9, rxTime: 426.045212566ms, pos.:(5, 2, 1.3) m] Entry{1, 0.426, 0.426045212566, 14, rsd[1]}
+0.450858130906 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 112.65625us, T_rnd: 59.956024us, ts: 350.216399611ms, avg_pkt_size: 56.3281, pmember: 2, lastTxInterval: 99.240864479ms)
+0.450858130906 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 145.615234us, T_rnd: 176.916129us, ts: 450.858130906ms, avg_pkt_size: 72.8076, pmember: 2, lastTxInterval: 99.240864479ms)
+0.450858130906 TestStationaryWorld.misc[0].app[1].scheduler : Transmit now
+0.450858130906 TestStationaryWorld.misc[0].app[1].scheduler :  schedule data quota 200000000 B
+0.450858130906 TestStationaryWorld.misc[0].app[1].scheduler :  consumed 40 B from 200000000 B scheduled
+0.450858130906 TestStationaryWorld.misc[0].app[1].scheduler : Schedule next transmission attempt at: 451.030189124ms
+0.451030189124 TestStationaryWorld.misc[0].app[1].scheduler : Prior interval: (T_det: 145.615234us, T_rnd: 172.058218us, ts: 450.858130906ms, avg_pkt_size: 72.8076, pmember: 2, lastTxInterval: 100.641731295ms)
+0.451030189124 TestStationaryWorld.misc[0].app[1].scheduler : Current interval: (T_det: 176.514282us, T_rnd: 119.769433us, ts: 451.030189124ms, avg_pkt_size: 88.2571, pmember: 2, lastTxInterval: 100.641731295ms)
+0.451030189124 TestStationaryWorld.misc[0].app[1].scheduler : Delay transmission until 550.668453018ms
+0.476485851176 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell (prio touch): [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 476.485851176ms, pos.:(5, 2, 1.3) m] Entry{1, 0.426, 0.426045212566, 14, rsd[1]}
+0.476485851176 TestStationaryWorld.misc[0].app[1].app : 14 stay-in-cell: [1, 9] Beacon[id:14, SeqNo.:9|10, rxTime: 476.485851176ms, pos.:(5, 2, 1.3) m] Entry{1, 0.476, 0.476485851176, 14, rsd[1]}
 
 
 

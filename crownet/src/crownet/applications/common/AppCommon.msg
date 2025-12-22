@@ -52,7 +52,7 @@ class RxPerSrcJitterTag extends inet::TagBase
 
 class RxPerSrcAvgSizeTag extends inet::TagBase
 {
-    inet::b size;
+    double size;  // unit: bits (cannot use inet::b due to required precision)
 }
 
 class RxPerSrcPktCountTag extends inet::TagBase
@@ -71,7 +71,7 @@ class RxPerSrcPktLossCountTag extends inet::TagBase
 
 class RxPerAppAvgSizeTag extends inet::TagBase
 {
-    inet::b size;
+    double size; // unit: bits (cannot use inet::b due to required precision)
 }
 
 class RxPerAppPktCountTag extends inet::TagBase

@@ -20,16 +20,20 @@ import crownet.applications.common.scheduler.IntervalScheduler;
 simple DynamicMaxBandwidthScheduler extends IntervalScheduler {
     parameters:
       	@class(crownet::DynamicMaxBandwidthScheduler);      
-		double rndIntervalLowerBound = default(0.5);
-		double rndIntervalUpperBound = default(1.5);
 		int maxApplicationBandwidth @unit(bps) = default(1kbps); // if numberPackets is -1 this must be set.
-		int estimatedAvgPaketSize @unit(b) = default(50B);		
+		int estimatedAvgPaketSize @unit(b) = default(50B);
+		
+		// upper and lower bounds for random timer calculation and reconciliation
+		// Note: Do not change unless you know what you are doing - changing these values might cause that
+		//       you also need to adapt the correction factor, otherwise you will not achieve the desired target rate.
+		double rndIntervalLowerBound = default(0.5);
+		double rndIntervalUpperBound = default(1.5);		
 		
 		string appRxInfoProviderModule = default("^.packetMeterIn");
 		string neighborhoodSizeProvider = default(""); // empty string -> do not use NT/Map. Use rxAppInfo object count.
 		
 		@signal[txInterval_s](type=simtime_t);
-		@statistic[txInterval](title="Transmission interval with random  portion between scheduling calls"; unit=s; source=txInterval_s; record=vector; interpolationmode=none);
+		@statistic[txInterval](title="Transmission interval with random portion between scheduling calls"; unit=s; source=txInterval_s; record=vector; interpolationmode=none);
     	@signal[txDetInterval_s](type=simtime_t);
 		@statistic[txDetInterval](title="Deterministic transmission interval between scheduling calls"; unit=s; source=txDetInterval_s; record=vector; interpolationmode=none);
     	@signal[txMemberValue_s](type=int);

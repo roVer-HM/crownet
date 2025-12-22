@@ -118,7 +118,7 @@ void RcvdPerSrcAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
         if (auto tag = packet->findTag<RxPerSrcAvgSizeTag>()){
-            fire(this, t, tag->getSize().get(), details);
+            fire(this, t, tag->getSize(), details);
         }
     }
 }
@@ -159,7 +159,7 @@ void RcvdAvgSize::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                                      cObject *object, cObject *details) {
     if (auto packet = dynamic_cast<Packet *>(object)) {
         if (auto tag = packet->findTag<RxPerAppAvgSizeTag>()){
-            fire(this, t, tag->getSize().get(), details);
+            fire(this, t, tag->getSize(), details);
         }
     }
 }

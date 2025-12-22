@@ -106,8 +106,8 @@ cplusplus(cc){{
 
 
 class LocatedDcDCell extends DcDCell {
-    uint16_t idOffsetX;   // 2B
-    uint16_t idOffsetY;   // 2B
+    int16_t idOffsetX;   // 2B
+    int16_t idOffsetY;   // 2B
     double sourceEntryDist = 0.; // 2B in meter
     
 }

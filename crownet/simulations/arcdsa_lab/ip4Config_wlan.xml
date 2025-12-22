@@ -1,0 +1,7 @@
+<config>
+    <interface hosts='*' address='10.x.x.x' netmask='255.255.255.0'/>
+
+    <!-- Add routes so that dynamic nodes can reach the server  -->
+    <route hosts='router' destination='20.0.0.0' netmask='255.0.0.0' interface='ppp1' metric='1'/>
+
+</config>

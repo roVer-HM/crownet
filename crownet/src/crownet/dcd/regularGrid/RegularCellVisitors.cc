@@ -140,7 +140,20 @@ void ApplyRessourceSharingDomainIdVisitor::applyIfChanged(RegularCell& cell) {
 
 }
 
-void RsdNeighborhoodCountVisitor::applyIfChanged(RegularCell& cell){
+/* void RsdNeighborhoodCountVisitor::applyIfChanged(RegularCell& cell){
+
+    if (rsdid < 0){
+        count = 1; // ego count only.
+        return;
+    }
+
+    if (cell.val() && cell.val()->getResourceSharingDomainId() == rsdid){
+        count = count + cell.val()->getCount();
+    }
+}
+*/
+
+void RsdNeighborhoodCountVisitor::applyTo(RegularCell& cell){
 
     if (rsdid < 0){
         count = 1; // ego count only.

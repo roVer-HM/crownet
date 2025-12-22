@@ -168,10 +168,25 @@ void DensityMapAppSimple::neighborhoodEntryLeaveCell(INeighborhoodTable* table, 
     }
 }
 
+const int DensityMapAppSimple::countNeighborhoodNodesInCell(BeaconReceptionInfo* info){
+    auto cellId = dcdMap->getCellKeyProvider()->getCellKey(info->getCurrentData()->getPosition());
+    int counter = 0;
+    for (const auto& el : nTable->iter()){
+        EV_INFO << "nodeId: " << this->getHostId() << " countNeighborhoodNodesInCell " << el.second->str() << endl;
+        if(!dcdMap->isInNeighborhood(el.first))
+            continue;
+        auto savedCellId = dcdMap->getNeighborCell(el.first);
+        if (savedCellId == cellId){
+            counter++;
+        }
+    }
+    return counter;
+}
+
 void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, BeaconReceptionInfo* info){
 /*
- * Node moved into a cell or this is the first beacon receivd from this node. The info object my contain
- * data from a prio position but this is not needed here. This method only uses the current data.
+ * This is the first beacon received from this node. The info object may contain
+ * data from a prior position but this is not needed here. This method only uses the current data.
  */
     Enter_Method_Silent();
     if (isRunning()){
@@ -181,6 +196,9 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
             //todo add info to error message
             throw cRuntimeError("Node already in neighborhood");
         }
+        // add node to neighborhood
+        dcdMap->addToNeighborhood((int)info->getNodeId(), cellId);
+
         // create distance measure
         auto dist = dcdMap->getCellKeyProvider()->getExactDist(
                 getPosition(),  // source
@@ -188,19 +206,24 @@ void DensityMapAppSimple::neighborhoodEntryEnterCell(INeighborhoodTable* table, 
                 cellId  // cell
         );
 
-        // increment new cell by 1, update time and distance measure
+
+        // increment new cell, update time and distance measure
         auto cellEntryLocal = dcdMap->getEntry<GridEntry>(cellId);
-        EV_INFO << LOG_MOD << hostId << " enter-cell (prio increment): " << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
+        EV_INFO << LOG_MOD << hostId << " enter-cell (before increment): " << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
+
+        // check: We might have already received information for this cell by communication that includes
+        //        the new node. Increment by 1 only, if the locally observed number of nodes is more than the already stored value.
+        //        Otherwise, only update creation and reception time
+        int nrLocallyKnown = countNeighborhoodNodesInCell(info);
         cellEntryLocal->incrementCount(
                 info->getCurrentData()->getCreationTime(),
                 info->getCurrentData()->getReceivedTime(),
-                1.0
+                cellEntryLocal->getCount() < nrLocallyKnown ? 1.0 : 0.0
         );
+
         cellEntryLocal->setEntryDist(std::move(dist));
         cellEntryLocal->setResourceSharingDomainId(info->getCurrentData()->getRessourceSharingDomainId());
-//        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
-        // add node to neighborhood
-        dcdMap->addToNeighborhood((int)info->getNodeId(), cellId);
+
         EV_INFO << LOG_MOD << hostId << " enter-cell: " << cellId << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
     }
 
@@ -244,7 +267,6 @@ void DensityMapAppSimple::neighborhoodEntryStayInCell(INeighborhoodTable* table,
         );
         cellEntryLocal->setEntryDist(std::move(dist));
         cellEntryLocal->setResourceSharingDomainId(info->getCurrentData()->getRessourceSharingDomainId());
-//        cellEntryLocal->setResourceSharingDomainId(getRsdIdPair());
         EV_INFO << LOG_MOD << hostId << " stay-in-cell: " << cellId_current << " " << info->logShort() << " " << cellEntryLocal->logShort() << endl;
     }
 }

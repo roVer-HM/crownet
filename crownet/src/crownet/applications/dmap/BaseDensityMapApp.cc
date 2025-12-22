@@ -185,15 +185,14 @@ void BaseDensityMapApp::initWriter(){
 }
 
 const bool BaseDensityMapApp::canProducePacket(){
-    // todo still produce packet (header only if no data availabel?)
     computeValues(); // Idempotent. Will only be executed once
 
     bool hasData = dcdMap->getCellKeyStream()->hasNext(simTime());
     if (scheduledData.get() > 0){
         // if application is scheduled based on data size
-        return hasData && (scheduledData  >= minPduLength);
+        return isRunning() && hasData && (scheduledData  >= minPduLength);
     } else {
-        return hasData;
+        return isRunning() && hasData;
     }
 }
 

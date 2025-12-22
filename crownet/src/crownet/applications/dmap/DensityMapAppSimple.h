@@ -59,6 +59,8 @@ protected:
 
  //
  virtual const int getNeighborhoodSize() override;
+ virtual const int countNeighborhoodNodesInCell(BeaconReceptionInfo* info);
+
 private:
   // application
  INeighborhoodTable *nTable  = nullptr;
