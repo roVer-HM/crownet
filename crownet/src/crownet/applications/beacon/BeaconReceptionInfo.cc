@@ -40,14 +40,14 @@ std::string BeaconReceptionInfo::str() const {
         s << "{id: " << getNodeId() \
                 << " tx_t:" << currentData->getReceivedTime().ustr()  \
                 << " age:" << age.ustr() << " jitter:" << jitter.ustr() \
-                << " avg_s:" << avg_packet_size.str() \
+                << " avg_s:" << avg_packet_size \
                 << " count:" << packetsReceivedCount \
                 << " loss_r:" <<  packetLossRate << "}";
     } else {
         s << "{id: " << getNodeId() \
                 << " tx_t: N/A"  \
                 << " age: N/A" << " jitter:" << jitter.ustr() \
-                << " avg_s:" << avg_packet_size.str() \
+                << " avg_s:" << avg_packet_size \
                 << " count:" << packetsReceivedCount \
                 << " loss_r:" <<  packetLossRate << "}";
 

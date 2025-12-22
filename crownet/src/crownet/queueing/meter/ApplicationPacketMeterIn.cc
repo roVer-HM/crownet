@@ -26,7 +26,6 @@ Define_Module(ApplicationPacketMeterIn);
 
 
 ApplicationPacketMeterIn::ApplicationPacketMeterIn() {
-    // TODO Auto-generated constructor stub
 
 }
 

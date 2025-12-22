@@ -35,7 +35,6 @@ simsignal_t DynamicMaxBandwidthScheduler::txMemberValue_s = cComponent::register
 Define_Module(DynamicMaxBandwidthScheduler)
 
 DynamicMaxBandwidthScheduler::DynamicMaxBandwidthScheduler() {
-    // TODO Auto-generated constructor stub
 
 }
 
@@ -78,7 +77,7 @@ void DynamicMaxBandwidthScheduler::initialize(int stage)
         hasSent = false;
         appBandwidth = maxApplicationBandwidth;
 
-        WATCH(txIntervalDataPrio);
+        WATCH(txIntervalDataPrior);
         WATCH(txIntervalDataCurrent);
     }
 }
@@ -100,19 +99,19 @@ void DynamicMaxBandwidthScheduler::scheduleGenerationTimer(){
             // The application start time is given as an absolute time. Relative offset is
             // set by using the scheduler startOffset parameter.
             simtime_t start_time = std::max(app->getStartTime(), now) + startOffset;
-            txIntervalDataPrio.avg_pkt_size = estimatedAvgPaketSize;
-            txIntervalDataPrio.pmembers = 2; // Allays assume at least 2 members. Otherwise there is no need for communication ;)
-            txIntervalDataPrio.timestamp = simTime();
-            computeInterval(txIntervalDataPrio);
-            simtime_t schedule_at = start_time + txIntervalDataPrio.rndInterval;
-            EV_INFO << "first  scheduling using (starttime + offset) + callculated randomIntervall: " << \
-                    start_time << " + " << txIntervalDataPrio << " = " << schedule_at << endl;
+            txIntervalDataPrior.avg_pkt_size = b(estimatedAvgPaketSize).get();
+            txIntervalDataPrior.pmembers = 2; // Allays assume at least 2 members. Otherwise there is no need for communication ;)
+            txIntervalDataPrior.timestamp = simTime();
+            computeInterval(txIntervalDataPrior);
+            simtime_t schedule_at = start_time + txIntervalDataPrior.rndInterval;
+            EV_INFO << "first  scheduling using (starttime + offset) + calculated randomIntervall: " << \
+                    start_time << " + " << txIntervalDataPrior << " = " << schedule_at << endl;
 
             scheduleClockEventAt(SIMTIME_AS_CLOCKTIME(schedule_at), generationTimer);
         } else {
-            computeInterval(txIntervalDataPrio);
-            EV_INFO << "next scheduling event at: " << txIntervalDataPrio << endl;
-            scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrio.rndInterval), generationTimer);
+            computeInterval(txIntervalDataPrior);
+            EV_INFO << "next scheduling event at: " << txIntervalDataPrior << endl;
+            scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrior.rndInterval), generationTimer);
         }
     }
 
@@ -127,11 +126,25 @@ void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
             EV_INFO << LOG_MOD << "Stop scheduling due to lost network connection. Resume when network is up." << endl;
             return;
         }
+        if ((app->getStopTime() > simtime_t::ZERO) && (simTime() > app->getStopTime())) {
+            EV_INFO << LOG_MOD << " App stop time reached. Do not schedule any more data" << endl;
+            stopScheduling = true;
+            return;
+        }
         updateTxIntervalDataCurrent();
-        EV_INFO << LOG_MOD << "Prio interval: " << txIntervalDataPrio << endl;
+
+        EV_INFO << LOG_MOD << "Prior interval: " << txIntervalDataPrior << endl;
         EV_INFO << LOG_MOD << "Current interval: " << txIntervalDataCurrent << endl;
-        auto updatedTxTime = txIntervalDataPrio.timestamp + txIntervalDataCurrent.rndInterval;
-        if (updatedTxTime < now){
+
+        auto updatedTxTime = txIntervalDataPrior.timestamp + txIntervalDataCurrent.rndInterval;
+        if (updatedTxTime - txIntervalDataPrior.timestamp < getMinTransmissionInterval()){
+            // apply minimum inter-transmission interval (with small randomization to avoid unrealistic synchronization)
+            updatedTxTime = txIntervalDataPrior.timestamp +
+                    uniform(0.99*getMinTransmissionInterval(), 1.01*getMinTransmissionInterval());
+            EV_DEBUG << LOG_MOD << "Resulting tx interval < min. tx interval: using minimum tx interval instead" << endl;
+        }
+
+        if (updatedTxTime <= now){
             EV_INFO << LOG_MOD << "Transmit now" << endl;
             // sent data now because updated transmission time lies in the past
             txIntervalDataCurrent.lastTransmisionInterval = simTime() - last_tx;
@@ -144,10 +157,12 @@ void DynamicMaxBandwidthScheduler::handleMessage(cMessage *message){
             }
             hasSent = true;
             last_tx = simTime();
-            // overide prio txIntervalDataPrio with current interval
-            txIntervalDataPrio = txIntervalDataCurrent;
-            EV_INFO << LOG_MOD << "Schedule next transmission attempt at: " << (simTime() + txIntervalDataPrio.rndInterval).ustr()  << endl;
-            scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrio.rndInterval), generationTimer);
+            // calculate T again (as in timer reconciliation algorithm in RFC 3550)
+            txIntervalDataCurrent.timestamp = -1;
+            updateTxIntervalDataCurrent();
+            txIntervalDataPrior = txIntervalDataCurrent;
+            EV_INFO << LOG_MOD << "Schedule next transmission attempt at: " << (simTime() + txIntervalDataPrior.rndInterval).ustr()  << endl;
+            scheduleClockEventAfter(SIMTIME_AS_CLOCKTIME(txIntervalDataPrior.rndInterval), generationTimer);
         } else {
             // wait with transmission to next updatedTxTime. Do not update txIntervalData yet.
             EV_INFO << LOG_MOD << "Delay transmission until " << updatedTxTime.ustr() << endl;
@@ -165,19 +180,24 @@ void DynamicMaxBandwidthScheduler::updateTxIntervalDataCurrent(){
         /*do nothing already updated*/
         return;
     }
+
     txIntervalDataCurrent.timestamp = now;
-    // Allays assume at least 2 members. Otherwise there is no need for communication ;)
+    // Allways assume at least 2 members. Otherwise there is no need for communication ;)
+    // Consider all nodes in the local neighborhood and ourself
     txIntervalDataCurrent.pmembers = std::max(2, ntSizeProvider->getNeighborhoodSize());
     txIntervalDataCurrent.avg_pkt_size = appRxInfoProvider->getAppRxInfo()->getAvg_packet_size();
+    EV_DEBUG << LOG_MOD << "Updating interval assuming " << txIntervalDataCurrent.pmembers << " "
+            << "(avg_pkt_size: " << txIntervalDataCurrent.avg_pkt_size << ") UEs in resource domain" << endl;
     computeInterval(txIntervalDataCurrent);
 
 }
 
 void DynamicMaxBandwidthScheduler::computeInterval(txInterval& tx){
-    simtime_t C = (tx.avg_pkt_size / appBandwidth).get(); // b/bps --> s
-    tx.dInterval = std::max(getMinTransmissionInterval(), tx.pmembers*C);
+    simtime_t C = tx.avg_pkt_size / (double) bps(appBandwidth).get(); // b/bps --> s
+    tx.dInterval = ((double) tx.pmembers) * C;
     // RFC 3550 p.30 (e-1.5)
-    tx.rndInterval = rndInterval(tx.dInterval)/1.2182;
+    tx.rndInterval = rndInterval(tx.dInterval) * ARCDSA_CORRECTION_FACTOR;
+    EV_DEBUG << LOG_MOD << "Computed tx interval: " << tx.rndInterval << " assuming " << tx.pmembers << " nodes in RSD" << endl;
 }
 
 simtime_t DynamicMaxBandwidthScheduler::getMinTransmissionInterval() const{

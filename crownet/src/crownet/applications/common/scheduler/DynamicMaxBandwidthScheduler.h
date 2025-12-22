@@ -17,6 +17,12 @@
 using namespace inet;
 using namespace crownet::queueing;
 
+/**
+ * Correction factor to adjust the randomized interval to achieve the desired average sending rate.
+ *
+ * RFC 3550 p.30 (e-1.5)
+ */
+#define ARCDSA_CORRECTION_FACTOR (1.0 / (M_E - 1.5))
 
 namespace crownet {
 
@@ -29,7 +35,7 @@ struct txInterval{
     simtime_t timestamp = -1.0;
     simtime_t lastTransmisionInterval = -1.0;
     int pmembers = 1;
-    b avg_pkt_size = b(0);
+    double avg_pkt_size = 0.0; // unit: b (cannot use inet::b due to required double precision)
 };
 
 std::ostream& operator<<(std::ostream& os, const txInterval& i);
@@ -69,8 +75,8 @@ protected:
     simtime_t last_tx;
     bool hasSent = false;
     bps appBandwidth;
-    txInterval txIntervalDataPrio;
-    txInterval txIntervalDataCurrent;
+    txInterval txIntervalDataPrior;     // tx interval calculated for the next transmission
+    txInterval txIntervalDataCurrent;  // tx interval calculated at the current point in time
 
     simtime_t minTransmissionIntervall;
     bps maxApplicationBandwidth;

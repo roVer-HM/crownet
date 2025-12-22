@@ -73,6 +73,7 @@ crownet/**/*_m.h
 # Python
 crownet/**/test.out
 **/*.pcy
+**/.ipynb_checkpoints
 __pycache__
 
 

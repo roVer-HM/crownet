@@ -86,7 +86,7 @@ class AppRxInfo extends AppRxInfoBase{
     uint32_t packetsReceivedCount = 0;  
     uint32_t packetsOctetCount = 0;
 	simtime_t jitter = 0.0;  //exp smoothing with gain=1/16
-	inet::b avg_packet_size = inet::b(0); //exp smoothing with gain=1/16
+	double avg_packet_size = 0.0; // unit: bits (cannot use inet::b due to required precision), exp smoothing with gain=1/16
 	// average computation based on RTPC (RFC 3350 page 31, 40)
 	double ema_smoothing_jitter = 1/16;
 	double ema_smoothing_packet_size = 1/16;

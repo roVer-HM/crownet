@@ -179,12 +179,12 @@ class ApplyRessourceSharingDomainIdVisitor : public IdenpotanceTimestampedVoidCe
    int count;
 };
 
-class RsdNeighborhoodCountVisitor : public IdenpotanceTimestampedVoidCellVisitor<RegularCell>{
+class RsdNeighborhoodCountVisitor : public TimestampedVoidCellVisitor<RegularCell>{
   public:
     RsdNeighborhoodCountVisitor(RegularCell::time_t time = 0.0, int rsdid = -1)
-        : IdenpotanceTimestampedVoidCellVisitor<RegularCell>(time, CellDataIterator<RegularCell>::getValidDataIter_pred()), rsdid(rsdid), count(0){}
+        : TimestampedVoidCellVisitor<RegularCell>(time), rsdid(rsdid), count(0){}
 
-    virtual void applyIfChanged(RegularCell& cell) override;
+    virtual void applyTo(RegularCell& cell) override;
     virtual void reset(RegularCell::time_t time, int rsdid);
     virtual int getCount() const {return count;}
 
