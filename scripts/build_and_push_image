@@ -16,13 +16,22 @@ print_usage() {
 set -e
 
 if [ -z "$CROWNET_HOME" ]; then
-      echo "Variabel 'CROWNET_HOME' not set."
+      echo "Variable 'CROWNET_HOME' not set."
       exit -1
 fi
 
 if [ -z "$CROWNET_IMAGE_BASE" ]; then
-      echo "Variabel 'CROWNET_IMAGE_BASE' not set."
+      echo "Variable 'CROWNET_IMAGE_BASE' not set."
       exit -1
+fi
+
+if [ -z "$SSH_AUTH_SOCK" ]; then
+      echo "Variable 'SSH_AUTH_SOCK' not set. Trying to start ssh-agent..."
+      eval "`ssh-agent`"
+      if [ -z "$SSH_AUTH_SOCK" ]; then
+        echo "Failed to start ssh-agent and set SSH_AUTH_SOCK - please set this environment variable manually."
+        exit -2
+      fi
 fi
 
 # proceed user input
