@@ -12,7 +12,7 @@
 package crownet.mec;
 
 import inet.applications.contract.IApp;
-import simu5g.nodes.mec.MECPlatform.IMECApp;
+import simu5g.mec.platform.IMecApp;
 
 //
 //  This is a simple MEC app that receives the coordinates and the radius from the UE app
@@ -30,35 +30,35 @@ import simu5g.nodes.mec.MECPlatform.IMECApp;
 //
 
 
-simple MECBeaconApp like IMECApp, IApp
+simple MECBeaconApp like IMecApp, IApp
 {
     parameters:
         @display("i=block/app;is=s");
   			
         string interfaceTableModule = default("");
-        
+
         int mecAppIndex;
         int mecAppId;
         int localUePort;
-        
+
         string mp1Address = default("");
         int mp1Port = default(10021);
-        
+
         // modules:
         string vimModule = default("^.vim");
         string mecPlatformModule = default("^.mecPlatform");
         string serviceRegistryModule = default("^.mecPlatform.serviceRegistry");
-        
+
 		 //resource required info
         double requiredRam @unit("B");
         double requiredDisk @unit("B");
         double requiredCpu;
-        
+
         string aggregationStrategy;
-        
+
         int prioAggregationGroups = default(0);
         int prioAggregationSize = default(0);
-        
+
         double period @unit("s") = default(1s);
 
 		// IApp parameters
@@ -69,9 +69,9 @@ simple MECBeaconApp like IMECApp, IApp
     gates:
 	  input mePlatformIn;
 	  output mePlatformOut;
-	  
+	
 	  input socketIn;
 	  output socketOut;
-                
+
 }
 

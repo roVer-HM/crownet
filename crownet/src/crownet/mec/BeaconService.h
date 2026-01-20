@@ -2,7 +2,7 @@
 #ifndef _BEACONSERVICE_H
 #define _BEACONSERVICE_H
 
-#include <nodes/mec/MECPlatform/MECServices/MECServiceBase/MecServiceBase2.h>
+#include <simu5g/mec/platform/services/base/MecServiceBase2.h>
 #include "BeaconRepository.h"
 
 class BeaconService: public simu5g::MecServiceBase2

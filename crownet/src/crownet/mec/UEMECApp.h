@@ -1,5 +1,5 @@
 #include <omnetpp.h>
-#include <common/binder/Binder.h>
+#include <simu5g/common/binder/Binder.h>
 #include <vector>
 #include <map>
 #include "inet/mobility/contract/IMobility.h"

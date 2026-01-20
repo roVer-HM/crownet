@@ -7,9 +7,9 @@
 #include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/transportlayer/common/L4PortTag_m.h"
 
-#include "nodes/mec/utils/httpUtils/httpUtils.h"
-#include "nodes/mec/utils/httpUtils/json.hpp"
-#include "nodes/mec/MECPlatform/MECServices/packets/HttpResponseMessage/HttpResponseMessage.h"
+#include "simu5g/mec/utils/httpUtils/httpUtils.h"
+#include "simu5g/mec/utils/httpUtils/json.hpp"
+#include "simu5g/mec/platform/services/messages/HttpResponseMessage.h"
 
 #include "inet/transportlayer/contract/tcp/TcpSocket.h"
 

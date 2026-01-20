@@ -22,7 +22,7 @@ namespace crownet {
 Define_Module(Geo2Nic);
 
 void Geo2Nic::initialize(int stage) {
-    IP2Nic::initialize(stage);
+    Ip2Nic::initialize(stage);
     if (stage == inet::INITSTAGE_LOCAL){
         geonetProtocol = artery::getGeoNetProtocol();
     }
@@ -36,7 +36,7 @@ void Geo2Nic::toStackUe(inet::Packet* pkt) {
   // if IP let parent handle it.
   auto pTag = pkt->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2Nic::toStackUe(pkt);
+    Ip2Nic::toStackUe(pkt);
   } else if (pTag->getProtocol() == geonetProtocol) {
     auto geoTag = pkt->getTag<crownet::GeoNetTag>();
     // if needed, create a new structure for the flow
@@ -62,7 +62,7 @@ void Geo2Nic::toStackBs(inet::Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2Nic::toStackUe(datagram);
+    Ip2Nic::toStackUe(datagram);
   } else {
     error("GeoProtocol not supported from backend (Enb->UE)");
   }
@@ -73,7 +73,7 @@ void Geo2Nic::toIpUe(Packet* datagram) {
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   auto geoTag = datagram->findTag<crownet::GeoNetTag>();
   if (!geoTag && pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2Nic::toIpUe(datagram);
+    Ip2Nic::toIpUe(datagram);
   } else {
     EV << "Geo2Nic::toIpUe - message from stack: send to Geo layer" << endl;
     datagram->removeTagIfPresent<inet::PacketProtocolTag>();
@@ -86,7 +86,7 @@ void Geo2Nic::toIpBs(inet::Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
   if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    IP2Nic::toIpBs(datagram);
+    Ip2Nic::toIpBs(datagram);
   } else {
     error("GeoProtocol not supported from backend (Enb->to IP->to core net)");
   }
