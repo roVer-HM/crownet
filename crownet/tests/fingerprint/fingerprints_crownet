@@ -1,4 +1,0 @@
-#!/bin/bash
-
-./crownet_fingerprinttest crownet -C ../.. -vv --random-container-name --output-dir yml_out.d $*
-

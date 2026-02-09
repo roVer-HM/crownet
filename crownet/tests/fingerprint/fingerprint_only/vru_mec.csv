@@ -1,0 +1,9 @@
+# Vulnerable Road User (VRU) Multi Access Edge Computing (MEC) scenarios
+
+# workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    e844-9596/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_v2pp2v -r 0,                      20s,    020c-1de7/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio -r 0,                        20s,    c668-a48d/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_lgarea -r 0,                 20s,    384b-8215/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_singlearea -r 0,             20s,    08e2-c13a/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_D2D -r 0,                         20s,    7cbb-ca71/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.1.0
