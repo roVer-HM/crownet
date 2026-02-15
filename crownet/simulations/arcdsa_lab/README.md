@@ -22,6 +22,21 @@ The `omnetpp.ini` file includes configurations for three different activity scen
 2. Scenario 2 - "Ramp Up, Ramp Down" (upto-14-ue-ramp-WLAN, upto-14-ue-ramp-NR): Here, we model a scenario where more and more UEs become active/are coming into the modeled resource domain (ramp-up). Afterwards, all UEs are active for a while. Then, the number of active UEs gradually decreases (ramp-down).
 3. Scenario 3 - "Bursts" (upto-14-ue-burst-WLAN, upto-14-ue-burst-NR): Here we model that UEs do not become active individually but instead a group of UEs becomes joins or leaves the considered resource domain. This is particularly demanding for rate control due to the sudden "spikes" in demanded resources and evaluates how well the rate control can adapt to rapid changes in the local area.
 
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-1.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Lab layout with 14 UEs positioned along the walls</em></td>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-2.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: UE[0] broadcasting beacon signals to neighboring nodes</em></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-3.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Concurrent beacon reception across multiple UEs</em></td>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-4.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Beacon signals propagating from all active UEs to all nodes</em></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-ramp-NR-1.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Ramp NR scenario: Lab layout with gNB base station and 5G NR infrastructure</em></td>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-ramp-NR-2.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Ramp NR scenario: All 14 UEs exchanging feedback packets via the gNB base station using 5G NR sidelink</em></td>
+  </tr>
+</table>
+
 ### Running in the OMNeT++ IDE
 As with most other CrowNet++ simulations, simply do a right click on the `omnetpp.ini` file and select "Debug as > OMNeT++ Simulation" for running in debug mode or "Run as > OMNeT++ Simulation" for running in release mode.
 
