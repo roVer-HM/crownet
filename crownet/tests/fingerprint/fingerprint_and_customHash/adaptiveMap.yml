@@ -85,8 +85,8 @@ vadere_corridor:
     - --override-host-config
     - --opp.-c
     - final_corridor_2x5m_d20
-    - --opp.--sim-time-limit=30s
-  simtimelimit: 30s
+    - --opp.--sim-time-limit=20s
+  simtimelimit: 20s
   expectedResult: PASS
   fingerprint: "file:"
   tags:
@@ -102,8 +102,8 @@ vadere_corridor_5perSpawn:
     - --override-host-config
     - --opp.-c
     - final_corridor_2x5m_d20_5perSpawn
-    - --opp.--sim-time-limit=30s
-  simtimelimit: 30s
+    - --opp.--sim-time-limit=20s
+  simtimelimit: 20s
   expectedResult: PASS
   fingerprint: "file:"
   tags:
@@ -119,8 +119,8 @@ vadere_corridor_ramp_down:
     - --override-host-config
     - --opp.-c
     - final_corridor_2x5m_d20_5perSpawn_ramp_down
-    - --opp.--sim-time-limit=30s
-  simtimelimit: 30s
+    - --opp.--sim-time-limit=20s
+  simtimelimit: 20s
   expectedResult: PASS
   fingerprint: "file:"
   tags:
