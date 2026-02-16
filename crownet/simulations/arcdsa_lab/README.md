@@ -25,11 +25,11 @@ The `omnetpp.ini` file includes configurations for three different activity scen
 <table>
   <tr>
     <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-1.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Lab layout with 14 UEs positioned along the walls</em></td>
-    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-2.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: UE[0] broadcasting beacon signals to neighboring nodes</em></td>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-2.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: UEs broadcasting beacon signals to neighboring nodes</em></td>
   </tr>
   <tr>
-    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-3.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Concurrent beacon reception across multiple UEs</em></td>
-    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-4.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Beacon signals propagating from all active UEs to all nodes</em></td>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-3.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: UEs concurrently transmitting beacons to all nodes</em></td>
+    <td align="center" width="50%"><img src="screenshots/upto-14-ue-burst-WLAN-4.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Burst WLAN scenario: Beacon signals propagating across UEs</em></td>
   </tr>
   <tr>
     <td align="center" width="50%"><img src="screenshots/upto-14-ue-ramp-NR-1.png" style="width:400px;height:300px;object-fit:contain"/><br/><em>Ramp NR scenario: Lab layout with gNB base station and 5G NR infrastructure</em></td>
