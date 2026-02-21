@@ -1,0 +1,111 @@
+# Fingerprint tests for the "arcdsa_lab" scenario.
+# See crownet_fingerprinttest crownet --help
+#   * workingdir is relative to the given '-C' flag of crownet_fingerprinttest
+#   * each toplevel key will be one test case
+#   * if first item in `args` does not start with an `-` it will be
+#     interpreted as the command to execute
+#   * if fingerprint starts with 'file:' read the given path. If path
+#     is relative it based on workingdir. An empty path will default
+#     to hash.d/<testcase-name>.csv relative to the current files location
+
+upto_14_ue_NR:
+  wd: simulations/arcdsa_lab
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-NR
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+upto_14_ue_WLAN:
+  wd: simulations/arcdsa_lab
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-WLAN
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+upto_14_ue_ramp_NR:
+  wd: simulations/arcdsa_lab
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-ramp-NR
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+upto_14_ue_ramp_WLAN:
+  wd: simulations/arcdsa_lab
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-ramp-WLAN
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+upto_14_ue_burst_NR:
+  wd: simulations/arcdsa_lab
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-burst-NR
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+upto_14_ue_burst_WLAN:
+  wd: simulations/arcdsa_lab
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-burst-WLAN
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
