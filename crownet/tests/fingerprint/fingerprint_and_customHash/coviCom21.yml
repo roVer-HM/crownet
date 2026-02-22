@@ -1,0 +1,81 @@
+# Fingerprint tests for the "coviCom21" scenario.
+# See crownet_fingerprinttest crownet --help
+#   * workingdir is relative to the given '-C' flag of crownet_fingerprinttest
+#   * each toplevel key will be one test case
+#   * if first item in `args` does not start with an `-` it will be
+#     interpreted as the command to execute
+#   * if fingerprint starts with 'file:' read the given path. If path
+#     is relative it based on workingdir. An empty path will default
+#     to hash.d/<testcase-name>.csv relative to the current files location
+
+vadere_120:
+  wd: simulations/coviCom21
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - vadere_120
+    - --opp.--sim-time-limit=30s
+    - --opp.repeat=1
+  simtimelimit: 30s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+vadere_60:
+  wd: simulations/coviCom21
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - vadere_60
+    - --opp.--sim-time-limit=30s
+    - --opp.repeat=1
+  simtimelimit: 30s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+vadere_base_96:
+  wd: simulations/coviCom21
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - vadere_base_96
+    - --opp.--sim-time-limit=30s
+    - --opp.repeat=1
+  simtimelimit: 30s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+vadere_base_72:
+  wd: simulations/coviCom21
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - vadere_base_72
+    - --opp.--sim-time-limit=30s
+    - --opp.repeat=1
+  simtimelimit: 30s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
