@@ -42,6 +42,9 @@ The scenario models a crowd control system where:
 | `flowcontrol` | D2D + AID applications with flow controller |
 | `final` | Coupled Vadere+OMNeT++ with AID applications |
 | `final_control` | Coupled Vadere+OMNeT++ with AID applications and flow controller |
+| `ide_vadere_signs` | IDE-runnable: Vadere with navigation signs |
+| `ide_final` | IDE-runnable: Coupled Vadere+OMNeT++ |
+| `ide_final_control` | IDE-runnable: Coupled Vadere+OMNeT++ with flow control |
 
 ## How to Run
 
@@ -62,3 +65,51 @@ python3 run_script.py vadere-opp-control --create-vadere-container --opp.-c fina
 # Vadere + flow control (no OMNeT++)
 python3 run_script.py vadere-control --create-vadere-container --control-use-local --override-host-config --with-control control.py --scenario-file vadere/scenarios/test001.scenario
 ```
+
+### Using the OMNeT++ IDE
+
+The `ide_*` configs extend `withVadere` for proper TraCI setup and can be run directly from the IDE.
+
+#### Running `ide_final` or `ide_vadere_signs` (without flow control)
+
+1. **Terminal 1** — Start the OMNeT++ IDE:
+   ```bash
+   omnetpp-ide
+   ```
+2. **Terminal 2** — Start the Vadere mobility container:
+   ```bash
+   vadere
+   ```
+
+3. **In the OMNeT++ IDE**:
+   - Navigate to `crownet/simulations/guiding_crowds_test/omnetpp.ini`
+   - Right-click → **Run As** → **OMNeT++ Simulation**
+   - Select `ide_final` or `ide_vadere_signs` from the config dropdown
+
+#### Running `ide_final_control` (with flow control)
+
+1. **Terminal 1** — Start the OMNeT++ IDE:
+   ```bash
+   omnetpp-ide
+   ```
+2. **Terminal 2** — Start the FlowControl IDE (PyCharm):
+   ```bash
+   flowcontrol-ide
+   ```
+3. **Terminal 3** — Start the Vadere mobility container:
+   ```bash
+   vadere
+   ```
+
+4. **In PyCharm**:
+   - Verify the Python interpreter is set to `crownet_dev`.
+   - Open `crownet/simulations/guiding_crowds_test/control.py`
+   - Set up a Run Configuration: **Run** → **Edit Configurations** → **+** → **Python**
+     - **Script path**: `control.py`
+     - **Parameters**: `--port 9997 --host-name 0.0.0.0`
+     - **Working directory**: `crownet/simulations/guiding_crowds_test`
+   - Run the configuration. The controller starts listening for connections.
+
+5. **In the OMNeT++ IDE**:
+   - Right-click `omnetpp.ini` → **Run As** → **OMNeT++ Simulation**
+   - Select `ide_final_control`
