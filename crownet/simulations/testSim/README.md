@@ -3,6 +3,12 @@ This folder contains several simulations which test different functionalities of
 The main purpose is to verify the correct behaviour of the models - therefore, these
 simulations are also run as part of our daily continuous integration pipeline (CI pipeline).
 
+![](screenshots/sumo_crossing_peds.png)
+*SUMO-based crossing simulation with pedestrians and LTE communication in the OMNeT++ IDE*
+
+![](screenshots/test_DcD_3_bonnMotion.png)
+*BonnMotion-based simulation with pedestrian nodes in an urban environment, connected via LTE to a server*
+
 ## Manually Running the Simulations in this Folder
 
 If you want to test the simulations in this folder manually or via the OMNeT++ IDE, 
