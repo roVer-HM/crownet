@@ -5,43 +5,30 @@ The CoviCom21 simulations model pedestrians exchanging crowd density information
 - Communication performance in realistic urban pedestrian scenarios
 - The effectiveness of different map aggregation strategies
 
-## Simulation Context
-
-The scenario models the München Freiheit subway station area in Munich, with:
-- Pedestrian mobility provided by Vadere simulator
-- LTE D2D communication for peer-to-peer data exchange
-- Decentralized density map application running on each mobile device
-
 ## Applications
 
 Each pedestrian node runs:
-1. **DensityMapApp**: Collects and distributes crowd density observations
-2. **BeaconApp**: Periodic beacon messages for neighbor discovery
+1. **Density Map**: Collects and distributes crowd density observations
+2. **Beacon**: Periodic beacon messages for neighbor discovery
 
 ## Network Configuration
-
-The scenario simulates 4G LTE D2D Sidelink communication natively.
 
 - **Network Type**: LTE D2D
 - **Channel Model**: Urban Microcell
 - **Carrier Frequency**: 2.6 GHz
-- **Number of Resource Blocks**: 25 (5 MHz bandwidth)
+- **Number of Resource Blocks**: 25
 - **TX Power**: 20 dBm
 
-## Available Configurations
+## Available Simulation Configurations
 
 | Configuration | Description |
-|--------------|-------------|
-| `AidSetup` | Base configuration with AID (Awareness and Information Distribution) applications |
-| `env_mf_001_small_60` | Small München Freiheit scenario, 60s simulation |
-| `env_mf_001_small_120` | Small München Freiheit scenario, 120s simulation |
-| `env_mf_001_base_96` | Base scenario with 96 pedestrians |
-| `env_mf_001_base_72` | Base scenario with 72 pedestrians |
-| `vadere_120` | Vadere mobility, 120s duration |
-| `vadere_60` | Vadere mobility, 60s duration |
-| `vadere_base_96` | Vadere with 96 pedestrians |
-| `vadere_base_72` | Vadere with 72 pedestrians |
-| `vadere_120_maptypes` | Test different map aggregation types |
+|---|---|
+| `AidSetup` | Abstract config: sets up Vadere connection and apps (DensityMap + Beacon) |
+| `vadere_120` | Small area, extends `AidSetup` + `env_mf_001_small_120` |
+| `vadere_60` | Small area, extends `AidSetup` + `env_mf_001_small_60` |
+| `vadere_base_96` | Base area, extends `AidSetup` + `env_mf_001_base_96` |
+| `vadere_base_72` | Base area, extends `AidSetup` + `env_mf_001_base_72` |
+| `vadere_120_maptypes` | Extends `vadere_120`, tests different map aggregation strategies |
 
 <table>
   <tr>
@@ -52,26 +39,37 @@ The scenario simulates 4G LTE D2D Sidelink communication natively.
   </tr>
 </table>
 
-## Running the simulation
+## Running the Simulation
 
-The simulation can either be run in the OMNeT++ IDE or via command line.
-
-### Running in the OMNeT++ IDE
-As with most other CrowNet simulations, simply right click on the `omnetpp.ini` file and select "Debug as > OMNeT++ Simulation" for running in debug mode or "Run as > OMNeT++ Simulation" for running in release mode.
+All configs require the Vadere pedestrian simulator.
 
 ### Running via Command Line
-A small script is provided: simply execute `./run -u Cmdenv -c [ConfigName]` in the simulation folder.
 
 ```bash
-# Run base configuration
-./run -u Cmdenv -c AidSetup
+# Default (vadere_120)
+python3 run_script.py vadere-opp --create-vadere-container --opp.-c vadere_120
 
-# Run specific environment configuration
-./run -u Cmdenv -c vadere_120
+# Specific configuration
+python3 run_script.py vadere-opp --create-vadere-container --opp.-c vadere_base_96
 ```
 
-### Evaluating Simulation Results
-In order to evaluate the simulation results, two steps need to be performed:
+### Running in the OMNeT++ IDE
 
-* The `.vec` simulation trace files need to be converted to `.csv` format, so they can be read by the Python analysis script.
-* The Python analysis script `analysis.py` is called to calculate the results and create corresponding graphs.
+All configs require the Vadere container to be running.
+
+1. **Terminal 1** — Start the OMNeT++ IDE:
+   ```bash
+   omnetpp-ide
+   ```
+2. **Terminal 2** — Start the Vadere mobility container:
+   ```bash
+   vadere
+   ```
+
+3. **In the OMNeT++ IDE**:
+   - Right-click `omnetpp.ini` → **Run As** → **OMNeT++ Simulation**
+   - Select a runnable config from the list
+
+## Evaluating Simulation Results
+
+The `analysis.py` script processes simulation results. The `.vec` trace files need to be converted to `.csv` format first for the analysis.
