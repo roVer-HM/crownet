@@ -2,5 +2,5 @@
 
 # workingdir,                                args,                                          simtimelimit,    fingerprint,       expectedResult, tags
 
-/simulations/separation_slow_fast/,          -f omnetpp.ini -c basic -r 0,                  100s,             9ab0-1145/lstvz,    PASS,           omnetpp:6.1.0
+/simulations/separation_slow_fast/,          -f omnetpp.ini -c basic -r 0,                  100s,             9ab0-1145/lstvz,    PASS,           vadere:CFG;omnetpp:6.1.0
 /simulations/separation_slow_fast/,          -f omnetpp.ini -c vadere-01 -r 0,              100s,             44c4-ae4f/lstvz,    PASS,           vadere:CFG;omnetpp:6.1.0
