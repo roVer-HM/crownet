@@ -964,7 +964,7 @@ class FingerprintTestCase(SimulationTestCase):
                     "runtime error with exitcode="
                     + str(result.exitcode)
                     + ": "
-                    + result.errormsg
+                    + result.errorMsg
                 )
             elif result.cpuTimeLimitReached:
                 raise Exception("cpu time limit exceeded")
@@ -1042,7 +1042,7 @@ class FingerprintCrowNetTestCase(SimulationTestCase):
                     "runtime error with exitcode="
                     + str(result.exitcode)
                     + ": "
-                    + result.errormsg
+                    + result.errorMsg
                 )
             elif result.cpuTimeLimitReached:
                 raise Exception("cpu time limit exceeded")
