@@ -122,8 +122,8 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
   auto geo_tag = packet->addTagIfAbsent<crownet::GeoNetTag>();
   geo_tag->setSrcAddrMac(convert(request->source_addr));
   geo_tag->setDstAddrMac(convert(request->destination_addr));
-  geo_tag->setSrcAddrIp(interfaceEntry->getIpv4Address().getInt());
-  geo_tag->setDstAddrIp(inet::Ipv4Address::ALL_HOSTS_MCAST.getInt());
+  geo_tag->setSrcAddrIp(interfaceEntry->getIpv4Address());
+  geo_tag->setDstAddrIp(inet::Ipv4Address::ALL_HOSTS_MCAST);
 
   //
   //  auto up_tag = packet->addTag<inet::UserPriorityReq>();

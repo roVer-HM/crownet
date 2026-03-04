@@ -17,6 +17,7 @@
 #define CROWNET_QUEUEING_CROWNETPASSIVEPACKETSOURCEBASE_H_
 
 #include "inet/queueing/contract/IActivePacketSink.h"
+#include "inet/queueing/common/ActivePacketSinkRef.h"
 #include "inet/queueing/contract/IPassivePacketSource.h"
 
 #include "crownet/queueing/CrownetPacketSourceBase.h"
@@ -32,28 +33,28 @@ class CrownetPassivePacketSourceBase : public CrownetPacketSourceBase,
 
 protected:
     cGate *outputGate = nullptr;
-    inet::queueing::IActivePacketSink *collector = nullptr;
+    inet::queueing::ActivePacketSinkRef collector;
 
     mutable Packet *nextPacket = nullptr;
 
   protected:
     virtual void initialize(int stage) override;
-    virtual Packet *providePacket(cGate *gate);
+    virtual Packet *providePacket(const cGate *gate);
 
   public:
     // inet::queueing::IPacketProcessor
-    virtual bool supportsPacketPushing(cGate *gate) const override { return false; }
-    virtual bool supportsPacketPulling(cGate *gate) const override { return outputGate == gate; }
+    virtual bool supportsPacketPushing(const cGate *gate) const override { return false; }
+    virtual bool supportsPacketPulling(const cGate *gate) const override { return outputGate == gate; }
 
     // inet::queueing::IPassivePacketSource
-    virtual bool canPullSomePacket(cGate *gate) const override { return true; }
+    virtual bool canPullSomePacket(const cGate *gate) const override { return true; }
 
-    virtual Packet *canPullPacket(cGate *gate) const override;
+    virtual Packet *canPullPacket(const cGate *gate) const override;
 
-    virtual Packet *pullPacket(cGate *gate) override;
-    virtual Packet *pullPacketStart(cGate *gate, bps datarate) override { throw cRuntimeError("Invalid operation"); }
-    virtual Packet *pullPacketEnd(cGate *gate) override { throw cRuntimeError("Invalid operation"); }
-    virtual Packet *pullPacketProgress(cGate *gate, bps datarate, b position, b extraProcessableLength = b(0)) override { throw cRuntimeError("Invalid operation"); }
+    virtual Packet *pullPacket(const cGate *gate) override;
+    virtual Packet *pullPacketStart(const cGate *gate, bps datarate) override { throw cRuntimeError("Invalid operation"); }
+    virtual Packet *pullPacketEnd(const cGate *gate) override { throw cRuntimeError("Invalid operation"); }
+    virtual Packet *pullPacketProgress(const cGate *gate, bps datarate, b position, b extraProcessableLength = b(0)) override { throw cRuntimeError("Invalid operation"); }
 
 };
 

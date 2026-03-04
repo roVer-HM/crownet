@@ -58,7 +58,7 @@ void BaseSocketManager::setupSocket(){
 
 }
 
-void BaseSocketManager::pushPacket(Packet *packet, cGate *gate) {
+void BaseSocketManager::pushPacket(Packet *packet, const cGate *gate) {
     // called by application (using some shaper)
     take(packet);
     sendTo(packet);

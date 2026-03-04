@@ -35,14 +35,14 @@ class CrownetActivePacketSourceBase : public CrownetPacketSourceBase,
 {
 
 protected:
-  cGate *outputGate = nullptr;
-  inet::queueing::IPassivePacketSink *consumer = nullptr;
+  cGate *outputGate;
+  inet::queueing::PassivePacketSinkRef consumer;
 
 protected:
   virtual void initialize(int stage) override;
 
 public:
-  virtual inet::queueing::IPassivePacketSink *getConsumer(cGate *gate) override { return consumer; }
+  virtual inet::queueing::IPassivePacketSink *getConsumer(const cGate *gate) override { return consumer; }
 
   // ICrownetActivePacketSource
   virtual void producePacket() override;
@@ -51,11 +51,11 @@ public:
   virtual void producePackets(inet::b maxData) override { throw cRuntimeError("Not Implemented here");};
 
 
-  virtual bool supportsPacketPushing(cGate *gate) const override { return outputGate == gate; }
-  virtual bool supportsPacketPulling(cGate *gate) const override { return false; }
+  virtual bool supportsPacketPushing(const cGate *gate) const override { return outputGate == gate; }
+  virtual bool supportsPacketPulling(const cGate *gate) const override { return false; }
 
-  virtual void handleCanPushPacketChanged(cGate *gate) override;
-  virtual void handlePushPacketProcessed(Packet *packet, cGate *gate, bool successful) override;
+  virtual void handleCanPushPacketChanged(const cGate *gate) override;
+  virtual void handlePushPacketProcessed(Packet *packet, const cGate *gate, bool successful) override;
 
 };
 

@@ -36,7 +36,7 @@ simple BeaconService like IMecService, IApp
 
         bool loadGenerator = default(false);
     	double betaa  = default(0);  // used only if loadGenerator is true
-    	int numBGApps = default(0); // used only if loadGenerator is true
+    	int numBgApps = default(0); // used only if loadGenerator is true
 
 		string serviceName = default("BeaconService");
        	string serviceVersion = default("v1");
