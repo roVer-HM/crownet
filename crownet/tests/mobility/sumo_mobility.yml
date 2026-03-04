@@ -1,0 +1,45 @@
+# SUMO Mobility Trace Fingerprint Tests
+# These tests run SUMO standalone (no OMNeT++ coupling) and verify
+# that mobility traces remain identical across container upgrades.
+
+bottleneck_sumo:
+  wd: simulations/cmp_vadere_sumo
+  args:
+    - ../../tests/mobility/gen_mobility_traces.py
+    - --sumo
+    - --scenario
+    - bottleneck_sumo
+  simtimelimit: 110s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+combined:
+  wd: simulations/cmp_vadere_sumo
+  args:
+    - ../../tests/mobility/gen_mobility_traces.py
+    - --sumo
+    - --scenario
+    - combined
+  simtimelimit: 110s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+luitpoldpark:
+  wd: simulations/vruMec
+  args:
+    - ../../tests/mobility/gen_mobility_traces.py
+    - --sumo
+    - --scenario
+    - luitpoldpark
+  simtimelimit: 110s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell

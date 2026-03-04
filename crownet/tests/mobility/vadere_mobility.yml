@@ -1,0 +1,45 @@
+# Vadere Mobility Trace Fingerprint Tests
+# These tests run Vadere standalone (no OMNeT++ coupling) and verify
+# that mobility traces remain identical across container upgrades.
+
+corridor_ramp_down:
+  wd: simulations/adaptiveMap
+  args:
+    - ../../tests/mobility/gen_mobility_traces.py
+    - --vadere
+    - --scenario
+    - corridor_ramp_down
+  simtimelimit: 110s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+simple_detour:
+  wd: simulations/simple_detoure_suqc_traffic
+  args:
+    - ../../tests/mobility/gen_mobility_traces.py
+    - --vadere
+    - --scenario
+    - simple_detour
+  simtimelimit: 110s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+bottleneck:
+  wd: simulations/cmp_vadere_sumo
+  args:
+    - ../../tests/mobility/gen_mobility_traces.py
+    - --vadere
+    - --scenario
+    - bottleneck
+  simtimelimit: 110s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell

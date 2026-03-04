@@ -87,7 +87,9 @@ class SimulationRun(BaseSimulationRunner):
         import glob
         import os
         import shutil
-        res_dir = self.ns["opp_args"].get_value("--result-dir")
+        res_dir = None
+        if "opp_args" in self.ns:
+            res_dir = self.ns["opp_args"].get_value("--result-dir")
         if not res_dir:
             res_dir = self.ns.get("result_dir")
             if not res_dir:
