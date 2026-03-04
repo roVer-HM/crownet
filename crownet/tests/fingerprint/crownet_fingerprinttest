@@ -500,17 +500,10 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             )
             arg_list.add_override(f"--experiment-label", timestamp)
 
-            test_type = parse_testcase_type(
-                sim["tags"], TestCaseType.SHELL
-            )
-            if test_type == TestCaseType.SHELL and not any(
-                [arg_list.contains_key(k) for k in ["vadere", "vadere-control"]]
-            ):
-                sim["data_dir"] = ""
             # Crownet test can run without OMNeT++
             # todo change to parse run_script.py <subcommand> and check <sub> contains "vadere-only"
             #  * check each key to contain it "vadere-only" or "vadere-control"
-            elif not any(
+            if not any(
                 [arg_list.contains_key(k) for k in ["vadere", "vadere-control"]]
             ):
                 # get OMNeT++ fingerprint hashes (if missing add dummy value)
@@ -810,11 +803,6 @@ class SimulationResultCrowNet(SimulationResult):
                 self.crownet_computed.setdefault(
                     "[[omnetpp]]", self.computedFingerprint
                 )
-        else:
-            # No OMNeT++ simulation
-            self.errorMsg = ""
-            self.simulatedTime = 1  # non-zero to avoid "zero time simulated" check
-            self.cpuTimeLimitReached = False
 
         # prase Vadere/FlowControll results
         self.crownet_computed.update(
