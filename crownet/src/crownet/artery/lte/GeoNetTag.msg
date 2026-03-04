@@ -17,13 +17,14 @@ import inet.common.INETDefs;
 import inet.common.TagBase;
 import inet.common.packet.chunk.Chunk;
 import inet.linklayer.common.MacAddress;
+import inet.networklayer.contract.ipv4.Ipv4Address;
 
 namespace crownet;
 
 class GeoNetTag extends inet::TagBase
 {
- 	  uint32 srcAddrIp;
- 	  uint32 dstAddrIp;
+ 	  inet::Ipv4Address srcAddrIp;
+ 	  inet::Ipv4Address dstAddrIp;
  	  inet::MacAddress srcAddrMac;
  	  inet::MacAddress dstAddrMac;
 }

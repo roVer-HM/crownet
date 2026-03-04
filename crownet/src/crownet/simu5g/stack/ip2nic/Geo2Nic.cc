@@ -40,11 +40,19 @@ void Geo2Nic::toStackUe(inet::Packet* pkt) {
   } else if (pTag->getProtocol() == geonetProtocol) {
     auto geoTag = pkt->getTag<crownet::GeoNetTag>();
     // if needed, create a new structure for the flow
-    int headerSize = B(10).get();  // todo: set correct
+    // int headerSize = B(10).get();  // todo: set correct
 
-    pkt->addTagIfAbsent<FlowControlInfo>()->setSrcAddr(geoTag->getSrcAddrIp());
-    pkt->addTagIfAbsent<FlowControlInfo>()->setDstAddr(geoTag->getDstAddrIp());
-    pkt->addTagIfAbsent<FlowControlInfo>()->setHeaderSize(headerSize);
+    // pkt->addTagIfAbsent<FlowControlInfo>()->setSrcAddr(geoTag->getSrcAddrIp());
+    // pkt->addTagIfAbsent<FlowControlInfo>()->setDstAddr(geoTag->getDstAddrIp());
+    // pkt->addTagIfAbsent<FlowControlInfo>()->setHeaderSize(headerSize);
+
+
+    auto ipFlowInd = pkt->addTagIfAbsent<IpFlowInd>();
+    ipFlowInd->setSrcAddr(geoTag->getSrcAddrIp());
+    ipFlowInd->setDstAddr(geoTag->getDstAddrIp());
+    // ipFlowInd->setTypeOfService(tos);
+    printControlInfo(pkt);
+
 
     printControlInfo(pkt);
 
