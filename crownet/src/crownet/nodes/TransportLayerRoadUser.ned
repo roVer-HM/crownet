@@ -66,15 +66,15 @@ module TransportLayerRoadUser like INetworkNode
 
         //# Node specs
         string nodeType = "UE";     // DO NOT CHANGE
-        
-        int masterId @mutable = default(0);
+
+        int servingNodeId @mutable = default(0);  // the initial serving eNodeB of the UE; 0 if none
         int macNodeId @mutable = default(0); // TODO: this is not a real parameter
         int macCellId @mutable = default(0); // TODO: this is not a real parameter
-        
+
         bool useNR = default(false);
 
-        int nrMasterId @mutable = default(0); // Note: must be 0 if useNR is false
-        int nrMacNodeId @mutable = default(0);
+        int nrServingNodeId @mutable = default(0); // the initial serving gNodeB of the UE; 0 if none or useNR is false
+        int nrMacNodeId @mutable = default(2049+simu5g_seq("NrUe_macNodeId"));
         int nrMacCellId @mutable = default(0);
 
         //# Network Layer specs
@@ -85,7 +85,7 @@ module TransportLayerRoadUser like INetworkNode
         bool hasCellular = default(true);
         bool hasWlan = default(false);
         int numWlanNic = default(0);
-        
+
         //# IPv4 configurator
         ipv4.configurator.typename = "HostAutoConfigurator";
         ipv4.configurator.interfaces = default(ifTrueOrElse(hasCellular, ifTrueOrElse(hasWlan,"cellular, wlan0", "cellular"), ifTrueOrElse(hasWlan, "wlan0", "")));
