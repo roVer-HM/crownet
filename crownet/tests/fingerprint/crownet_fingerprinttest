@@ -504,7 +504,7 @@ class FingerprintTestCaseGeneratorCrowNet(FingerprintTestCaseGenerator):
             # todo change to parse run_script.py <subcommand> and check <sub> contains "vadere-only"
             #  * check each key to contain it "vadere-only" or "vadere-control"
             if not any(
-                [arg_list.contains_key(k) for k in ["vadere", "vadere-control"]]
+                [arg_list.contains_key(k) for k in ["vadere", "vadere-control", "--vadere-mobility", "--sumo-mobility"]]
             ):
                 # get OMNeT++ fingerprint hashes (if missing add dummy value)
                 # FIXME Multiple Fingerprints, Alternative Values (see p.361)
@@ -746,7 +746,7 @@ class SimulationResultCrowNet(SimulationResult):
         self.vadere_out_path = os.path.join(self.output_path, "container_vadere.out")
         self.control_out_path = os.path.join(self.output_path, "container_control.out")
         self.with_opp = os.path.exists(self.opp_out_path)
-        self.errormsg = ""
+        self.errorMsg = ""
         # write command output
         os.makedirs(self.output_path, exist_ok=True)
         with open(
@@ -1042,7 +1042,7 @@ class FingerprintCrowNetTestCase(SimulationTestCase):
                     "runtime error with exitcode="
                     + str(result.exitcode)
                     + ": "
-                    + result.errorMsg
+                    + (result.errorMsg or "")
                 )
             elif result.cpuTimeLimitReached:
                 raise Exception("cpu time limit exceeded")

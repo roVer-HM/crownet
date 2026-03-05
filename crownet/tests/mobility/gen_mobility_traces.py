@@ -4,7 +4,7 @@ Generate mobility traces for Vadere and SUMO simulators and create
 ground-truth MD5 hashes for fingerprint comparison.
 
 Usage:
-    python3 gen_mobility_traces.py [--vadere] [--sumo] [--scenario NAME] [--resultdir DIR]
+    python3 gen_mobility_traces.py [--vadere-mobility] [--sumo-mobility] [--scenario NAME] [--resultdir DIR]
 """
 
 import argparse
@@ -206,32 +206,25 @@ def generate_vadere_traces(result_dir=None, scenario_filter=None):
             print(f"  trace.bonnMotion not found in {sim_dir}")
             continue
 
-        output_dir = SCRIPT_DIR / "output" / "vadere" / name
-        if output_dir.exists():
-            shutil.rmtree(output_dir)
-        os.makedirs(output_dir, exist_ok=True)
+        target_dir = Path(result_dir) if result_dir else SCRIPT_DIR / "output" / "vadere" / name
+        if target_dir.exists():
+            shutil.rmtree(target_dir)
+        os.makedirs(target_dir, exist_ok=True)
 
         for f in sorted(vadere_result_dir.iterdir()):
             if f.is_file():
-                shutil.copy2(str(f), str(output_dir / f.name))
+                shutil.copy2(str(f), str(target_dir / f.name))
 
-        trace_path = output_dir / "trace.bonnMotion"
+        trace_path = target_dir / "trace.bonnMotion"
         verify_bonnmotion_trace(str(trace_path), scenario.get("bounds"))
 
-        print(f"  Output files in {output_dir}:")
-        for f in sorted(output_dir.iterdir()):
+        print(f"  Output files in {target_dir}:")
+        for f in sorted(target_dir.iterdir()):
             if f.is_file():
                 print(f"    {f.name}: {f.stat().st_size:,} bytes")
 
-        if result_dir:
-            os.makedirs(result_dir, exist_ok=True)
-            for f in sorted(output_dir.iterdir()):
-                if f.is_file():
-                    dst = Path(result_dir) / f.name
-                    shutil.copy2(str(f), str(dst))
-            print(f"  Copied output to resultdir")
-        else:
-            diff = create_dir_diff(f"{output_dir}/**", remove_front=str(output_dir) + "/")
+        if not result_dir:
+            diff = create_dir_diff(f"{target_dir}/**", remove_front=str(target_dir) + "/")
             csv_path = str(hash_dir / f"{name}.csv")
             write_hashes(diff, csv_path)
 
@@ -248,8 +241,7 @@ def generate_sumo_traces(result_dir=None, scenario_filter=None):
         name = scenario["name"]
         if scenario_filter and name != scenario_filter:
             continue
-        sim_dir = SIMULATIONS_DIR / scenario["sim_dir"]
-        sumo_dir = sim_dir / scenario["sumo_subdir"]
+        sumo_dir = SIMULATIONS_DIR / scenario["sim_dir"] / scenario["sumo_subdir"]
         sumo_cfg = scenario["sumo_cfg"]
         net_file = scenario["net_file"]
         sim_end = scenario["sim_end"]
@@ -257,11 +249,6 @@ def generate_sumo_traces(result_dir=None, scenario_filter=None):
         print(f"\n--- {name} ---")
         print(f"  SUMO dir: {sumo_dir}")
         print(f"  Config:   {sumo_cfg}")
-
-        output_dir = SCRIPT_DIR / "output" / "sumo" / name
-        if output_dir.exists():
-            shutil.rmtree(output_dir)
-        os.makedirs(output_dir, exist_ok=True)
 
         cfg_path = str(sumo_dir / sumo_cfg)
         net_path = str(sumo_dir / net_file)
@@ -320,24 +307,21 @@ def generate_sumo_traces(result_dir=None, scenario_filter=None):
 
         fcd_local = Path(fcd_path)
         bm_local = Path(bm_path)
+        target_dir = Path(result_dir) if result_dir else SCRIPT_DIR / "output" / "sumo" / name
+        if target_dir.exists():
+            shutil.rmtree(target_dir)
+        os.makedirs(target_dir, exist_ok=True)
 
         if bm_local.exists():
-            dst = output_dir / bm_local.name
-            shutil.copy2(str(bm_local), str(dst))
+            shutil.copy2(str(bm_local), str(target_dir / bm_local.name))
             print(f"   Copied {bm_local.name}: {bm_local.stat().st_size:,} bytes")
 
-        bm_output = output_dir / "trace.bonnMotion"
+        bm_output = target_dir / "trace.bonnMotion"
         if bm_output.exists():
             verify_bonnmotion_trace(str(bm_output))
 
-        if result_dir:
-            os.makedirs(result_dir, exist_ok=True)
-            if bm_output.exists():
-                dst = Path(result_dir) / bm_output.name
-                shutil.copy2(str(bm_output), str(dst))
-                print(f"  Copied to resultdir: {bm_output.name}")
-        else:
-            diff = create_dir_diff(f"{output_dir}/**", remove_front=str(output_dir) + "/")
+        if not result_dir:
+            diff = create_dir_diff(f"{target_dir}/**", remove_front=str(target_dir) + "/")
             csv_path = str(hash_dir / f"{name}.csv")
             write_hashes(diff, csv_path)
 
@@ -351,10 +335,10 @@ def main():
         description="Generate mobility traces and ground-truth hashes"
     )
     parser.add_argument(
-        "--vadere", action="store_true", help="Generate Vadere traces only"
+        "--vadere-mobility", action="store_true", help="Generate Vadere traces only"
     )
     parser.add_argument(
-        "--sumo", action="store_true", help="Generate SUMO traces only"
+        "--sumo-mobility", action="store_true", help="Generate SUMO traces only"
     )
 
     parser.add_argument(
@@ -367,8 +351,8 @@ def main():
     )
     args, _unknown = parser.parse_known_args()
 
-    run_vadere = args.vadere or (not args.vadere and not args.sumo)
-    run_sumo = args.sumo or (not args.vadere and not args.sumo)
+    run_vadere = args.vadere_mobility or (not args.vadere_mobility and not args.sumo_mobility)
+    run_sumo = args.sumo_mobility or (not args.vadere_mobility and not args.sumo_mobility)
 
     if run_vadere:
         generate_vadere_traces(

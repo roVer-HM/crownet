@@ -6,7 +6,7 @@ corridor_ramp_down:
   wd: simulations/adaptiveMap
   args:
     - ../../tests/mobility/gen_mobility_traces.py
-    - --vadere
+    - --vadere-mobility
     - --scenario
     - corridor_ramp_down
   simtimelimit: 110s
@@ -20,7 +20,7 @@ simple_detour:
   wd: simulations/simple_detoure_suqc_traffic
   args:
     - ../../tests/mobility/gen_mobility_traces.py
-    - --vadere
+    - --vadere-mobility
     - --scenario
     - simple_detour
   simtimelimit: 110s
@@ -34,7 +34,7 @@ bottleneck:
   wd: simulations/cmp_vadere_sumo
   args:
     - ../../tests/mobility/gen_mobility_traces.py
-    - --vadere
+    - --vadere-mobility
     - --scenario
     - bottleneck
   simtimelimit: 110s
