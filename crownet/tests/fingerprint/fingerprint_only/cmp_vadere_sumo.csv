@@ -3,11 +3,11 @@
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
 
 /simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoSimple -r 0,        80s,             13e6-60ed/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
-/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoSimpleTcp -r 0,     80s,             a4e0-475b/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
-/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoBottleneck -r 0,    80s,             8e85-09cc/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
-/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoBottleneckTcp -r 0, 80s,             f56c-557b/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoSimpleTcp -r 0,     80s,             76ac-5074/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoBottleneck -r 0,    80s,             f165-19c2/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoBottleneckTcp -r 0, 80s,             7f2c-cd7a/lstvz,   PASS,          sumo:v1_23_1_hm;omnetpp:6.1.0
 
-/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereSimple -r 0,      80s,             25d6-b55d/lstvz,   PASS,          vadere:CFG;omnetpp:6.1.0
-/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereSimpleTcp -r 0,   80s,             0e71-3cdc/lstvz,   PASS,          vadere:CFG;omnetpp:6.1.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereSimple -r 0,      80s,             3556-b54d/lstvz,   PASS,          vadere:CFG;omnetpp:6.1.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereSimpleTcp -r 0,   80s,             1321-694c/lstvz,   PASS,          vadere:CFG;omnetpp:6.1.0
 /simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereBottleneck -r 0,  80s,             c56e-daf0/lstvz,   PASS,          vadere:CFG;omnetpp:6.1.0
 /simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereBottleneckTcp -r 0,80s,            92a2-3354/lstvz,   PASS,          vadere:CFG;omnetpp:6.1.0
