@@ -71,9 +71,9 @@ module TransportLayerRoadUser like INetworkNode
         int macNodeId @mutable = default(0); // TODO: this is not a real parameter
         int macCellId @mutable = default(0); // TODO: this is not a real parameter
 
-        bool useNR = default(false);
+        bool useNr = default(false);
 
-        int nrServingNodeId @mutable = default(0); // the initial serving gNodeB of the UE; 0 if none or useNR is false
+        int nrServingNodeId @mutable = default(0); // the initial serving gNodeB of the UE; 0 if none or useNr is false
         int nrMacNodeId @mutable = default(2049+simu5g_seq("NrUe_macNodeId"));
         int nrMacCellId @mutable = default(0);
 
@@ -133,7 +133,7 @@ module TransportLayerRoadUser like INetworkNode
                 runtime.datetime = parent.middleware.datetime;
         }
         //# individual network layers (must be orderedfrom lower to upper layer)
-        cellularNic: <default(ifTrueOrElse(useNR, "NRNicUe", "LteNicUe"))> like ICellularNic if hasCellular {
+        cellularNic: <default(ifTrueOrElse(useNr, "NrNicUe", "LteNicUe"))> like ICellularNic if hasCellular {
             nodeType = parent.nodeType;
             ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;
@@ -184,8 +184,8 @@ module TransportLayerRoadUser like INetworkNode
 
     connections allowunconnected:
         //# LTE Nic
-        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic) && !useNR;
-        cellularNic.nrRadioIn <-- nrRadioIn if exists(cellularNic) && useNR;
+        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic) && !useNr;
+        cellularNic.nrRadioIn <-- nrRadioIn if exists(cellularNic) && useNr;
 
         cellularNic.upperLayerOut --> nl.in++ if exists(cellularNic);
         cellularNic.upperLayerIn <-- nl.out++ if exists(cellularNic);

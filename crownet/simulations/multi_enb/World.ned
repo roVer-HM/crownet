@@ -67,7 +67,7 @@ network World
         bool hasCellularCoreNetwork = default(hasCellular);
         bool hasStoryboard = default(false);
         bool hasWlan = default(false);
-        bool useNR = default(false);
+        bool useNr = default(false);
         int numMisc = default(0);
         int numEnb = default(1);
         int numGnb = default(1);
@@ -115,16 +115,16 @@ network World
         carrierAggregation: CarrierAggregation if hasCellular {
             @display("p=411.99374,319.43625;is=s");
         }
-        eNB[numEnb]: eNodeB if hasCellular && useNR == false {
+        eNB[numEnb]: eNodeB if hasCellular && useNr == false {
             @display("p=39.50625,54.18");
         }
-        gNB[numGnb]: gNodeB if hasCellular && useNR == true {
+        gNB[numGnb]: gNodeB if hasCellular && useNr == true {
             @display("p=39.50625,54.18");
         }
-        upf: Upf if hasCellular && useNR == true {
+        upf: Upf if hasCellular && useNr == true {
             @display("p=308.14874,190.75874;is=s");
         }
-        iUpf: Upf if hasCellular && useNR == true {
+        iUpf: Upf if hasCellular && useNr == true {
             @display("p=308.14874,252.84;is=s");
         }
         server: StandardHost if hasCellularCoreNetwork {
@@ -133,7 +133,7 @@ network World
         router: Router if hasCellularCoreNetwork {
             @display("p=308.14874,89.17125;is=s;i=device/smallrouter");
         }
-        pgw: PgwStandard if hasCellularCoreNetwork && useNR == false {
+        pgw: PgwStandard if hasCellularCoreNetwork && useNr == false {
             @display("p=308.14874,136.57875;is=s");
         }
         // WLAN
@@ -182,20 +182,20 @@ network World
 
     connections:
         server.pppg++ <--> Eth10G <--> router.pppg++ if hasCellularCoreNetwork;
-        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasCellularCoreNetwork && useNR == false;
-        router.pppg++ <--> Eth10G <--> upf.filterGate if hasCellularCoreNetwork && useNR == true;
-        upf.pppg++ <--> Eth10G <--> iUpf.pppg++ if hasCellularCoreNetwork && useNR == true;
+        router.pppg++ <--> Eth10G <--> pgw.filterGate if hasCellularCoreNetwork && useNr == false;
+        router.pppg++ <--> Eth10G <--> upf.filterGate if hasCellularCoreNetwork && useNr == true;
+        upf.pppg++ <--> Eth10G <--> iUpf.pppg++ if hasCellularCoreNetwork && useNr == true;
 
         for i=0..numEnb-1 {
-            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasCellularCoreNetwork && hasCellular && useNR == false;
+            pgw.pppg++ <--> Eth10G <--> eNB[i].ppp if hasCellularCoreNetwork && hasCellular && useNr == false;
         }
         for i=0..numGnb-1 {
-            iUpf.pppg++ <--> Eth10G <--> gNB[i].ppp if hasCellular && useNR == true;
+            iUpf.pppg++ <--> Eth10G <--> gNB[i].ppp if hasCellular && useNr == true;
         }
 
 		//# X2 connections (full mesh)
 //        for i=0..numEnb-1, for j=0..numEnb-1 {
-//            eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j && useNR == false;
+//            eNB[i].x2++ <--> Eth10G <--> eNB[j].x2++ if i < j && useNr == false;
 //        }
 //        for i=0..numGnb-1, for j=0..numGnb-1 {
 //            gNB[i].x2++ <--> Eth10G <--> gNB[j].x2++ if i < j;
