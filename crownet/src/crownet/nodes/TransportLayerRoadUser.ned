@@ -68,14 +68,12 @@ module TransportLayerRoadUser like INetworkNode
         string nodeType = "UE";     // DO NOT CHANGE
 
         int servingNodeId @mutable = default(0);  // the initial serving eNodeB of the UE; 0 if none
-        int macNodeId @mutable = default(0); // TODO: this is not a real parameter
-        int macCellId @mutable = default(0); // TODO: this is not a real parameter
+        int macNodeId @mutable = default(1025+simu5g_seq("LteUe_macNodeId"));
 
         bool useNr = default(false);
 
         int nrServingNodeId @mutable = default(0); // the initial serving gNodeB of the UE; 0 if none or useNr is false
         int nrMacNodeId @mutable = default(2049+simu5g_seq("NrUe_macNodeId"));
-        int nrMacCellId @mutable = default(0);
 
         //# Network Layer specs
         bool hasIpv4 = default(true);
