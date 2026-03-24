@@ -40,7 +40,7 @@ void InetVaderePersonMobility::initialize(int stage) {
     WATCH(lastPosition);
     WATCH(lastVelocity);
     WATCH(lastOrientation);
-  } else if (stage == inet::INITSTAGE_PHYSICAL_ENVIRONMENT) {
+  } else if (stage == inet::INITSTAGE_SINGLE_MOBILITY) {
     if (mVisualRepresentation) {
       auto visualizationTarget = mVisualRepresentation->getParentModule();
       mCanvasProjection = inet::CanvasProjection::getCanvasProjection(
@@ -185,7 +185,6 @@ void InetVaderePersonMobility::update(const Position& pos, Angle heading,
 
   recoredTimeCoord(lastUpdate, lastPosition);
 
-  //  initialize(pos, heading, speed);
   emitMobilityStateChangedSignal();
 }
 
@@ -198,7 +197,7 @@ omnetpp::simtime_t InetVaderePersonMobility::getUpdateTime() {
 void InetVaderePersonMobility::emitMobilityStateChangedSignal() {
   ASSERT(inet::IMobility::mobilityStateChangedSignal ==
          artery::MobilityBase::stateChangedSignal);
-  emit(artery::MobilityBase::stateChangedSignal, this);
+  emit(inet::IMobility::mobilityStateChangedSignal, this);
 }
 
 void InetVaderePersonMobility::refreshDisplay() const {
