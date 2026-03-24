@@ -131,7 +131,7 @@ module TransportLayerRoadUser like INetworkNode
                 runtime.datetime = parent.middleware.datetime;
         }
         //# individual network layers (must be orderedfrom lower to upper layer)
-        cellularNic: <default(ifTrueOrElse(useNr, "NrNicUe", "LteNicUe"))> like ICellularNic if hasCellular {
+        cellularNic: <default(ifTrueOrElse(useNr, "NrNicUe", "LteNicUeD2D"))> like ICellularNic if hasCellular {
             nodeType = parent.nodeType;
             ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;
