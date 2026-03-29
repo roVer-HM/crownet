@@ -8,7 +8,7 @@
 #include "Geo2Nic.h"
 
 #include <inet/networklayer/ipv4/Ipv4Header_m.h>
-#include "crownet/artery/lte/GeoNetTag_m.h"
+#include "crownet/artery/lte/GeoNetHeader_m.h"
 #include <inet/linklayer/common/InterfaceTag_m.h>
 #include "inet/common/IProtocolRegistrationListener.h"
 
@@ -32,38 +32,41 @@ void Geo2Nic::initialize(int stage) {
     }
 }
 
-void Geo2Nic::toStackUe(inet::Packet* pkt) {
-  // if IP let parent handle it.
-  auto pTag = pkt->findTag<inet::PacketProtocolTag>();
-  if (pTag->getProtocol() == &inet::Protocol::ipv4) {
-    Ip2Nic::toStackUe(pkt);
-  } else if (pTag->getProtocol() == geonetProtocol) {
-    auto geoTag = pkt->getTag<crownet::GeoNetTag>();
-    // if needed, create a new structure for the flow
-    // int headerSize = B(10).get();  // todo: set correct
+void Geo2Nic::toStackUe(inet::Packet *pkt) {
+    // if IP let parent handle it.
+    auto pTag = pkt->findTag<inet::PacketProtocolTag>();
+    if (pTag->getProtocol() == &inet::Protocol::ipv4) {
+        Ip2Nic::toStackUe(pkt);
+    } else if (pTag->getProtocol() == geonetProtocol) {
+        auto geoNetHeader = pkt->peekAtFront<GeoNetHeader>();
 
-    // pkt->addTagIfAbsent<FlowControlInfo>()->setSrcAddr(geoTag->getSrcAddrIp());
-    // pkt->addTagIfAbsent<FlowControlInfo>()->setDstAddr(geoTag->getDstAddrIp());
-    // pkt->addTagIfAbsent<FlowControlInfo>()->setHeaderSize(headerSize);
+        auto ipFlowInd = pkt->addTagIfAbsent<IpFlowInd>();
+        ipFlowInd->setSrcAddr(geoNetHeader->getSrcAddrIp());
+        ipFlowInd->setDstAddr(geoNetHeader->getDstAddrIp());
+        // ipFlowInd->setTypeOfService(tos);
+        printControlInfo(pkt);
 
+        auto srcAddr = geoNetHeader->getSrcAddrIp();
+        auto destAddr = geoNetHeader->getDstAddrIp();
+        short int tos = 0;
 
-    auto ipFlowInd = pkt->addTagIfAbsent<IpFlowInd>();
-    ipFlowInd->setSrcAddr(geoTag->getSrcAddrIp());
-    ipFlowInd->setDstAddr(geoTag->getDstAddrIp());
-    // ipFlowInd->setTypeOfService(tos);
-    printControlInfo(pkt);
+        // mark packet for using NR
+        bool useNR;
+        if (!markPacket(srcAddr, destAddr, tos, useNR)) {
+            EV << "Geo2Nic::toStackUe - UE is not attached to any serving node. Delete packet."
+               << endl;
+            delete pkt;
+            return;
+        }
 
+        // Set useNR on the packet control info
+        pkt->addTagIfAbsent<TechnologyReq>()->setUseNR(useNR);
 
-    printControlInfo(pkt);
-
-    //** Send datagram to lte stack or LteIp peer **
-    send(pkt, stackGateOut_);
-
-  } else {
-    error("Only ipv4 and geo protocols supported");
-  }
-  // todo: handle geo, create FlowControlInfo
-  //
+        //** Send datagram to cellular stack or LteIp peer **
+        send(pkt, stackGateOut_);
+    } else {
+        error("Only ipv4 and geo protocols supported");
+    }
 }
 
 void Geo2Nic::toStackBs(inet::Packet* datagram) {
@@ -79,11 +82,15 @@ void Geo2Nic::toStackBs(inet::Packet* datagram) {
 void Geo2Nic::toIpUe(Packet* datagram) {
   // if IP let parent handle it.
   auto pTag = datagram->findTag<inet::PacketProtocolTag>();
-  auto geoTag = datagram->findTag<crownet::GeoNetTag>();
-  if (!geoTag && pTag->getProtocol() == &inet::Protocol::ipv4) {
+
+  // FIXME: Since Simu5G has no model of using different protocols on L3,
+  //        We use the name of the packet to decide if a packet is plain
+  //        IP or GeoNet. This should be implemented in a better way.
+  if (std::strstr(datagram->getName(), "GeoNet") == nullptr) {   // This is an ugly hack...
+    EV << "Geo2Nic::toIpUe - message " << datagram << " from stack: send to normal IPv4 layer" << endl;
     Ip2Nic::toIpUe(datagram);
   } else {
-    EV << "Geo2Nic::toIpUe - message from stack: send to Geo layer" << endl;
+    EV << "Geo2Nic::toIpUe - message " << datagram << " from stack: send to Geo layer" << endl;
     datagram->removeTagIfPresent<inet::PacketProtocolTag>();
     prepareForGeo(datagram, geonetProtocol);
     send(datagram, ipGateOut_);
