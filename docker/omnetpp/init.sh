@@ -47,6 +47,9 @@ fi
 #      exit 1
 # fi
 
+# source the omnetpp environment
+source $OPP_PATH/setenv
+
 # source the inet environment
 source $CROWNET_HOME/inet4/setenv
 
