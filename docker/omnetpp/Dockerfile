@@ -20,7 +20,6 @@ ARG BASE_IMAGE_TAG=latest
 
 FROM ${IMAGE_REG}/crownet-base-cpp:${BASE_IMAGE_TAG}
 
-ENV DEBIAN_FRONTEND=noninteractive
 ENV GITHUB_TAG="omnetpp-6.3.0"
 ENV RELEASE=$GITHUB_TAG
 
@@ -37,14 +36,9 @@ SHELL ["/bin/bash", "-c"]
 # setup image to use bash also as default shell
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-# use a suitabe mirror for apt-get to speed up installation of dependencies and update the package list
-RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://de.archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list \
- && apt-get update \
- && apt-get install -y --no-install-recommends curl ca-certificates \
- && rm -rf /var/lib/apt/lists/*
-
+# 
 RUN apt-get update && \
-    apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
         htop libcurl4-gnutls-dev libgl-dev libglfw3-dev libcurl4-gnutls-dev \
         zipcmp libzip-dev zipmerge ziptool \
         libopenscenegraph-dev libopenthreads-dev libgdal-dev libglew-dev && \
