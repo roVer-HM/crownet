@@ -93,6 +93,11 @@ RUN  apt update && ./install.sh -y && source setenv -f && ./configure && \
      find . -type f -name '*.o' -exec rm {} + && \
      find . -type f -name '*.o.d' -exec rm {} +
 
+# in CrowNet, we use separate virtual environments in the user's home directory - rename generic one
+WORKDIR /opt/omnetpp/omnetpp
+RUN type deactivate >/dev/null 2>&1 && deactivate
+RUN [ -d .venv ] && mv -- .venv .venv_oppdefault
+
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
 
