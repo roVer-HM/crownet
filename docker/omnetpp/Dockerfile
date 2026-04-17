@@ -96,7 +96,6 @@ RUN  apt update && ./install.sh -y && source setenv -f && ./configure && \
 # in CrowNet, we use separate virtual environments in the user's home directory 
 # - rename the generic one so it is not activated automatically when starting the container
 WORKDIR /opt/omnetpp/omnetpp
-RUN type deactivate >/dev/null 2>&1 && deactivate
 RUN [ -d .venv ] && mv .venv .venv_oppdefault
 
 # update permissions so that the omnetpp directory becomes writable
