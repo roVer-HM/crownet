@@ -30,15 +30,23 @@ function log_() {
 function wrap_command() {
         # We try to guess if we need to connect the console: For all exept omnetpp
         # we currently connect a console - behavior might need to change in future
+	BASH_OPTS=""
 	if [[ $1 == *"omnetpp"* ]]; then
-           WRAPPER="/waitfor.sh "
-           WRAPPER_END=""
+           WRAPPED_CMD="/waitfor.sh $@"
 	else
-           WRAPPER="/bin/bash -c \"cd $(pwd);"
-           WRAPPER_END="\""
+           if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+			  BASH_OPTS+=" --rcfile \"$VIRTUAL_ENV/bin/activate\" "
+		   fi	
+		   C_ARG="'cd $(pwd); $@'"
+		   if [[ "$1" == *bash* ]]; then
+		   	  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+		   	  	  C_ARG="${C_ARG//bash/bash --rcfile \"$VIRTUAL_ENV/bin/activate\" }"
+		   	  fi 
+		   fi
+		   WRAPPED_CMD="/bin/bash ${BASH_OPTS} -c ${C_ARG}"
     fi
-    # not printet to shell
-    echo "$WRAPPER $@ $WRAPPER_END"
+    # not printed to shell but returned as string to be used in docker run command
+	echo "${WRAPPED_CMD}"
 }
 
 # Create name for container by adding incrementing numbers to the base name.
@@ -214,7 +222,7 @@ function run_container_X11() {
 # @param $4 - $9 are passed to the container
 function run_individual_container() {
 	COMMAND="${@:4:${#@}+1-4}"
-	CMD4="$(wrap_command $COMMAND)"
+	CMD4="'$(wrap_command $COMMAND)'"
     log_ $CMD4
     if [[ "$1" == *_rnd ]];then
         # let docker create random names.

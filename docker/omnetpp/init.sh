@@ -63,13 +63,14 @@ else
           echo "Activating Python virtual environment in $VIRTUAL_ENV"
      fi
      source $VIRTUAL_ENV/bin/activate
-     if [[ "$CMD" == *bash* ]]; then
-          CMD+=" --rcfile \"$VIRTUAL_ENV/bin/activate\" "
-     fi
 fi
 
 # execute command
 CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
+
+if [ -z "$SILENT" ]; then
+     echo "Running \"$CMD\" in container..."
+fi
 
 eval $CMD; TEST_STATUS=${PIPESTATUS[0]}
 
