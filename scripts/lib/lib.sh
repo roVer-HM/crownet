@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Script method library for the roVer project
+# Script method library for the CrowNet project
 #
 # This bash script contains bash functions/methods used in various other
 # scripts in order to avoid redundant code.
 
-INTNET="rovernet"
+INTNET="crownet"
 
 #
 function check_create_network() {
@@ -13,7 +13,7 @@ function check_create_network() {
 	  log_ "Creating $INTNET network ..."
 	  docker network create $INTNET
 	# else
-	  # log_ "Network $INTNET for communication between the roVer containers exists."
+	  # log_ "Network $INTNET for communication between the CrowNet containers exists."
 	fi
 }
 
@@ -113,6 +113,10 @@ function run_container_X11() {
 		CMD_ARR+=(--env DISPLAY="host.docker.internal:0")
 	else
 		CMD_ARR+=(--env DISPLAY=$DISPLAY)
+	fi
+	if [[ ! -z ${VIRTUAL_ENV} ]];then
+	  # set VIRTUAL_ENV in container to use the same python environment as outside container.
+		CMD_ARR+=(--env VIRTUAL_ENV=$VIRTUAL_ENV)
 	fi
 	if [[ ! -z ${NEDPATH} ]];then
 	  # set NEDPATH in container to simplify opp_run commands.

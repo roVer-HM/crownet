@@ -53,6 +53,18 @@ source $OPP_PATH/setenv
 # source the inet environment
 source $CROWNET_HOME/inet4/setenv
 
+# activate virtual python environment
+if [ -z "VIRTUAL_ENV" ]; then
+     if [ -z "$SILENT" ]; then
+          echo "Environment variable VIRTUAL_ENV is NOT set. No Python virtual environment used."
+     fi
+else
+     if [ -z "$SILENT" ]; then
+          echo "Activating Python virtual environment in $VIRTUAL_ENV."
+     fi
+     source $VIRTUAL_ENV/bin/activate
+fi
+
 # execute command
 CMD="$CMD $2 $3 $4 $5 $6 $7 $8 $9 ${10}"
 
