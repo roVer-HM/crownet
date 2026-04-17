@@ -31,6 +31,7 @@ function wrap_command() {
         # We try to guess if we need to connect the console: For all exept omnetpp
         # we currently connect a console - behavior might need to change in future
 	BASH_OPTS=""
+	args=("$@")
 	if [[ $1 == *"omnetpp"* ]]; then
            WRAPPED_CMD="/waitfor.sh $@"
 	else
@@ -40,6 +41,8 @@ function wrap_command() {
 		   C_ARG="'cd $(pwd); $@'"
 		   if [[ "$1" == *bash* ]]; then
 		   	  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+			  	  args+=("-i")
+				  C_ARG="'cd $(pwd); ${args[@]}'"
 		   	  	  C_ARG="${C_ARG//bash/bash --rcfile \"$VIRTUAL_ENV/bin/activate\" }"
 		   	  fi 
 		   fi
