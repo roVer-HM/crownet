@@ -36,7 +36,7 @@ SHELL ["/bin/bash", "-c"]
 # setup image to use bash also as default shell
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-# 
+# update package database
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         htop libcurl4-gnutls-dev libgl-dev libglfw3-dev libcurl4-gnutls-dev \
@@ -93,10 +93,11 @@ RUN  apt update && ./install.sh -y && source setenv -f && ./configure && \
      find . -type f -name '*.o' -exec rm {} + && \
      find . -type f -name '*.o.d' -exec rm {} +
 
-# in CrowNet, we use separate virtual environments in the user's home directory - rename generic one
+# in CrowNet, we use separate virtual environments in the user's home directory 
+# - rename the generic one so it is not activated automatically when starting the container
 WORKDIR /opt/omnetpp/omnetpp
 RUN type deactivate >/dev/null 2>&1 && deactivate
-RUN [ -d .venv ] && mv -- .venv .venv_oppdefault
+RUN [ -d .venv ] && mv .venv .venv_oppdefault
 
 # update permissions so that the omnetpp directory becomes writable
 RUN chmod -R a+rw /opt/omnetpp/omnetpp
