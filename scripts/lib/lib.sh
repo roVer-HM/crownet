@@ -46,7 +46,7 @@ function wrap_command() {
 		   	  	  C_ARG="${C_ARG//bash/bash --rcfile \"$VIRTUAL_ENV/bin/activate\" }"
 		   	  fi 
 		   fi
-		   WRAPPED_CMD="/bin/bash ${BASH_OPTS} -c ${C_ARG}"
+		   WRAPPED_CMD="'/bin/bash ${BASH_OPTS} -c ${C_ARG}'"
     fi
     # not printed to shell but returned as string to be used in docker run command
 	echo "${WRAPPED_CMD}"
@@ -190,7 +190,6 @@ function run_container_X11() {
 	CMD_ARR+=($@)
 	#log_ "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
-
 }
 
 # Deprecated.
