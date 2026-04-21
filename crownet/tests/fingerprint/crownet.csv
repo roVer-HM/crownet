@@ -2,20 +2,20 @@
 
 # cellular scenarios
 # workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              a515-b333/tlv, PASS, vadere:CFG;omnetpp:6.3.0
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              5ad2-21e6/tlv, PASS, omnetpp:6.3.0
-/simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              b86a-e35b/tlv, PASS, omnetpp:6.3.0
-/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              4e6f-31e8/tlv, PASS, vadere:CFG;omnetpp:6.3.0
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              0fbf-374a/tlv, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
-/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              6c4d-907b/tlv, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD -r 0,   80s,              f74e-5a73/tlv, PASS, vadere:CFG;omnetpp:6.3.0
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD_2_bonnMotion -r 0,   80s,              d717-6b05/tlv, PASS, omnetpp:6.3.0
+/simulations/testSim/,           -f omnetpp.ini -c test_DcD_3_bonnMotion -r 0,   80s,              85de-73b8/tlv, PASS, omnetpp:6.3.0
+/simulations/testSim/,           -f omnetpp.ini -c test_DcDwArtery -r 0,   80s,              472d-65e3/tlv, PASS, vadere:CFG;omnetpp:6.3.0
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds -r 0,   80s,              096c-05cc/tlv, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/testSim/,           -f omnetpp.ini -c sumo_crossing_peds_cars -r 0,   80s,              5a10-b2a4/tlv, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
 
 # Basic CAM DEN test scenario (via Artery)
-/simulations/vam_test/,          -f omnetpp.ini -c simple_cam_den -r 0,                           40s,    bf87-bf4f/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vam_test/,          -f omnetpp.ini -c simple_cam_den -r 0,                           40s,    d889-c833/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
 
 # Vulnerable Road User (VRU) Multi Access Edge Computing (MEC) scenarios
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    e844-9596/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_v2pp2v -r 0,                      20s,    020c-1de7/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio -r 0,                        20s,    c668-a48d/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_lgarea -r 0,                 20s,    384b-8215/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_singlearea -r 0,             20s,    08e2-c13a/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
-/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_D2D -r 0,                         20s,    7cbb-ca71/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki22 -r 0,                           20s,    5df8-8854/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_v2pp2v -r 0,                      20s,    5df8-8854/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio -r 0,                        20s,    5df8-8854/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_lgarea -r 0,                 20s,    5df8-8854/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_prio_singlearea -r 0,             20s,    5df8-8854/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
+/simulations/vruMec/,            -f omnetpp.ini -c thessaloniki_D2D -r 0,                         20s,    5df8-8854/lstvz, PASS, sumo:v1_23_1_hm;omnetpp:6.3.0
