@@ -38,7 +38,7 @@ int CountQuadTree::insert(const cObject* elementData, const Coord& pos){
     while(treeNodesToProcess.size() > 0){
         int nodeIdx = treeNodesToProcess.back();
         treeNodesToProcess.pop_back();
-        QuadTreeNode& node = treeNodes[nodeIdx];
+        QuadTreeNode node = treeNodes[nodeIdx];
         if (node.contains(pos)){
             if (node.isLeaf()){
                 if (node.count < quadrantCapacity){
@@ -54,6 +54,7 @@ int CountQuadTree::insert(const cObject* elementData, const Coord& pos){
                 } else {
                     // split and move points
                     splitNode(node);
+                    node = treeNodes[nodeIdx];
                     node.count = -1; // node is now a branch node.
                     treeNodes[nodeIdx] = node;
                     // check children to insert
