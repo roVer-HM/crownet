@@ -53,8 +53,7 @@ int CountQuadTree::insert(const cObject* elementData, const Coord& pos){
                     return node.firstChild;
                 } else {
                     // split and move points
-                    splitNode(node);
-                    node = treeNodes[nodeIdx];
+                    node = splitNode(node);
                     node.count = -1; // node is now a branch node.
                     treeNodes[nodeIdx] = node;
                     // check children to insert
@@ -88,7 +87,7 @@ std::vector<ElementNode> CountQuadTree::getList(int qNodeIdx){
 }
 
 
-void CountQuadTree::splitNode(QuadTreeNode& node){
+QuadTreeNode CountQuadTree::splitNode(QuadTreeNode node){
     // create 4 new bounding boxes
     Coord minBoundaries[4], maxBoundaries[4];
     node.setBoundary(minBoundaries, maxBoundaries);
@@ -129,6 +128,7 @@ void CountQuadTree::splitNode(QuadTreeNode& node){
         ++newQuad.count; // increment node count managed by this leafe
         treeNodes[quadrant] = newQuad;
     }
+    return node;
 }
 
 int CountQuadTree::getQuadrant(QuadTreeNode& node, const Coord& pos){
@@ -145,8 +145,8 @@ int CountQuadTree::getQuadrant(QuadTreeNode& node, const Coord& pos){
 
 
 bool QuadTreeNode::contains(const Coord& pos) const {
-    return pos.x <= boundaryMax.x && pos.x >= boundaryMin.x &&
-           pos.y <= boundaryMax.y && pos.y >= boundaryMin.y;
+    return pos.x < boundaryMax.x && pos.x >= boundaryMin.x &&
+           pos.y < boundaryMax.y && pos.y >= boundaryMin.y;
 }
 
 void QuadTreeNode::setBoundary(Coord *minBoundaries, Coord *maxBoundaries) const{
