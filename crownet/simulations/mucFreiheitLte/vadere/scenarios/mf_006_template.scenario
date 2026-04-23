@@ -1,8 +1,8 @@
 {
   "name" : "mf_006_template",
   "description" : "",
-  "release" : "2.6",
-  "commithash" : "71e4cc56e0774efd45e57685680f8e4594d4183f",
+  "release" : "3.0",
+  "commithash" : "No version control commit hash available!",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
