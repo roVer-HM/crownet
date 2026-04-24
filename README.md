@@ -43,6 +43,9 @@ Please check the licenses of the projects listed above for your use case and pur
 Please cite the following journal paper when you use CrowNet in own scientific works:
 - S. Schuhbäck, C. M. Mayr, J. Ott, L. Wischhof (2025): *CrowNet: Open Source Modeling and Simulation of Pedestrian-2-X and Crowd Networks*, IEEE Access. [doi: 10.1109/ACCESS.2025.3585785](https://doi.org/10.1109/ACCESS.2025.3585785)
 
+You can also refer to the individual releases of CrowNet using its DOI on Zenodo:
+
+* CrowNet Version 1.0.0 [doi: 10.5281/zenodo.19728417](https://doi.org/10.5281/zenodo.19728417)
 
 Publications in which CrowNet was used:
 - S. Kiunke, L. Wischhof (2025): *Simulation of Distributed Sensing Applications: Tradeoff Between Accuracy and Simulation Time*, In: XS. Yang, S. Sherratt, N. Dey, A. Joshi (eds) Proceedings of Tenth International Congress on Information and Communication Technology. ICICT 2025. Lecture Notes in Networks and Systems, vol 1412. Springer, Singapore. [DOI: 10.1007/978-981-96-6429-0_4](https://doi.org/10.1007/978-981-96-6429-0_4)
