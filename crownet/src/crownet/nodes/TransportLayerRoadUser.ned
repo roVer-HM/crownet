@@ -66,16 +66,14 @@ module TransportLayerRoadUser like INetworkNode
 
         //# Node specs
         string nodeType = "UE";     // DO NOT CHANGE
-        
-        int masterId @mutable = default(0);
-        int macNodeId @mutable = default(0); // TODO: this is not a real parameter
-        int macCellId @mutable = default(0); // TODO: this is not a real parameter
-        
-        bool useNR = default(false);
 
-        int nrMasterId @mutable = default(0); // Note: must be 0 if useNR is false
-        int nrMacNodeId @mutable = default(0);
-        int nrMacCellId @mutable = default(0);
+        int servingNodeId @mutable = default(0);  // the initial serving eNodeB of the UE; 0 if none
+        int macNodeId @mutable = default(1025+simu5g_seq("LteUe_macNodeId"));
+
+        bool useNr = default(false);
+
+        int nrServingNodeId @mutable = default(0); // the initial serving gNodeB of the UE; 0 if none or useNr is false
+        int nrMacNodeId @mutable = default(2049+simu5g_seq("NrUe_macNodeId"));
 
         //# Network Layer specs
         bool hasIpv4 = default(true);
@@ -85,7 +83,7 @@ module TransportLayerRoadUser like INetworkNode
         bool hasCellular = default(true);
         bool hasWlan = default(false);
         int numWlanNic = default(0);
-        
+
         //# IPv4 configurator
         ipv4.configurator.typename = "HostAutoConfigurator";
         ipv4.configurator.interfaces = default(ifTrueOrElse(hasCellular, ifTrueOrElse(hasWlan,"cellular, wlan0", "cellular"), ifTrueOrElse(hasWlan, "wlan0", "")));
@@ -133,7 +131,7 @@ module TransportLayerRoadUser like INetworkNode
                 runtime.datetime = parent.middleware.datetime;
         }
         //# individual network layers (must be orderedfrom lower to upper layer)
-        cellularNic: <default(ifTrueOrElse(useNR, "NRNicUe", "LteNicUe"))> like ICellularNic if hasCellular {
+        cellularNic: <default(ifTrueOrElse(useNr, "NrNicUe", "LteNicUeD2D"))> like ICellularNic if hasCellular {
             nodeType = parent.nodeType;
             ip2nic.typename = "Geo2Nic";
             //d2dCapable = d2dCapable;
@@ -184,8 +182,8 @@ module TransportLayerRoadUser like INetworkNode
 
     connections allowunconnected:
         //# LTE Nic
-        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic) && !useNR;
-        cellularNic.nrRadioIn <-- nrRadioIn if exists(cellularNic) && useNR;
+        cellularNic.radioIn <-- lteRadioIn if exists(cellularNic) && !useNr;
+        cellularNic.nrRadioIn <-- nrRadioIn if exists(cellularNic) && useNr;
 
         cellularNic.upperLayerOut --> nl.in++ if exists(cellularNic);
         cellularNic.upperLayerIn <-- nl.out++ if exists(cellularNic);

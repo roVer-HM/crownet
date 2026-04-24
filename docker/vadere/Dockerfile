@@ -43,9 +43,13 @@ RUN ls -a
 
 COPY vadere/pom.xml /opt/vadere/vadere/
 COPY vadere/LICENSE /opt/vadere/vadere/
+COPY vadere/CHANGELOG.md /opt/vadere/vadere/
+COPY vadere/CONTRIBUTING.md /opt/vadere/vadere/
 COPY vadere/README.md /opt/vadere/vadere/
+COPY vadere/codemeta.json /opt/vadere/vadere/
 COPY vadere/vadere.png /opt/vadere/vadere/
-COPY vadere/Documentation /opt/vadere/vadere/Documentation  
+COPY vadere/Documentation /opt/vadere/vadere/Documentation
+COPY vadere/Scenarios /opt/vadere/vadere/Scenarios  
 COPY vadere/VadereAnnotation /opt/vadere/vadere/VadereAnnotation
 COPY vadere/VadereManager /opt/vadere/vadere/VadereManager
 COPY vadere/VadereSimulator /opt/vadere/vadere/VadereSimulator

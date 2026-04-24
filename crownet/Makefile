@@ -176,6 +176,8 @@ makefiles-test: src/libCROWNET$(_D)
 		-I. \
 		-I$$\(CROWNET_PORJ\)/src \
 		-L$$\(CROWNET_PORJ\)/src \
+		-lasan \
+		-lubsan \
 		-lCROWNET$$\(D\) \
 		$(ARTERY_) \
 	   	$(VEINS_) \

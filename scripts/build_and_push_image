@@ -6,6 +6,7 @@ print_usage() {
    where:
     -i  name of the required simulator (omnetpp, vadere, sumo, flowcontrol) or system setup (crownet-base-min, *-java, *-cpp) REQUIRED
     -b  tag of the parent image from which the container inherits OPTIONAL (default: latest)
+    -m  URL of Ubuntu mirror to be used for crownet-base-min (default: \"https://mirror.netcologne.de/ubuntu/\")
     -f  force non-interactive mode OPTIONAL (default: false)
     -u  update the latest image by creating a copy of the container with the tag >latest< (default: true)
     -p  push container to the container registry (default: false)
@@ -16,13 +17,22 @@ print_usage() {
 set -e
 
 if [ -z "$CROWNET_HOME" ]; then
-      echo "Variabel 'CROWNET_HOME' not set."
+      echo "Variable 'CROWNET_HOME' not set."
       exit -1
 fi
 
 if [ -z "$CROWNET_IMAGE_BASE" ]; then
-      echo "Variabel 'CROWNET_IMAGE_BASE' not set."
+      echo "Variable 'CROWNET_IMAGE_BASE' not set."
       exit -1
+fi
+
+if [ -z "$SSH_AUTH_SOCK" ]; then
+      echo "Variable 'SSH_AUTH_SOCK' not set. Trying to start ssh-agent..."
+      eval "`ssh-agent`"
+      if [ -z "$SSH_AUTH_SOCK" ]; then
+        echo "Failed to start ssh-agent and set SSH_AUTH_SOCK - please set this environment variable manually."
+        exit -2
+      fi
 fi
 
 # proceed user input
@@ -31,7 +41,9 @@ fi
 NON_INTERACTIVE='false'
 UPDATE_LATEST='true'
 PUSH_TO_REGISTRY='false'
+UBUNTU_MIRROR="https://mirror.netcologne.de/ubuntu/"
 QUIET=''
+
 unset -v IMAGE_NAME
 unset -v BASE_IMAGE_TAG
 	
@@ -40,6 +52,7 @@ do
     case "${flag}" in
         i) IMAGE_NAME=${OPTARG};;
         b) BASE_IMAGE_TAG=${OPTARG};;
+        m) UBUNTU_MIRROR=${OPTARG};;
         f) NON_INTERACTIVE='true';;
         u) UPDATE_LATEST='false';;
         p) PUSH_TO_REGISTRY='true';;
@@ -62,6 +75,17 @@ if ! [[ " ${ALLOWED_IMAGE_NAMES[*]} " =~ " ${IMAGE_NAME} " ]]; then
       exit -1 
 fi 
 
+## check if the Ubuntu mirror URL looks valid
+case "${UBUNTU_MIRROR}" in
+  http://*|https://*/)
+    ;;
+  *)
+    echo "Error: mirror URL must start with http:// or https:// and end with /"
+    exit 1
+    ;;
+esac
+
+echo "Using Ubuntu mirror: ${UBUNTU_MIRROR}"
 
 ## check whether the tag of parent image is configured or not (default: latest)
 if [ "$IMAGE_NAME" = "crownet-base-min" ] || [ "$IMAGE_NAME" = "sumo" ]; then
@@ -157,7 +181,7 @@ esac
 
 
 
-echo "Start the build process docker build $QUIET --no-cache ${tags} -f $dockerfilepath --ssh=default --build-arg NOCACHE_PULL=$RANDOM --build-arg $CONTAINER_REG --build-arg $RELEASE --build-arg $BASE_IMAGE_TAG . "
+echo "Start the build process docker build $QUIET --no-cache ${tags} -f $dockerfilepath --ssh=default --build-arg NOCACHE_PULL=$RANDOM --build-arg UBUNTU_MIRROR="${UBUNTU_MIRROR}" --build-arg $CONTAINER_REG --build-arg $RELEASE --build-arg $BASE_IMAGE_TAG . "
 
 docker build $QUIET --no-cache ${tags} -f $dockerfilepath --ssh=default --build-arg NOCACHE_PULL=$RANDOM --build-arg $CONTAINER_REG --build-arg $RELEASE --build-arg $BASE_IMAGE_TAG . 
 

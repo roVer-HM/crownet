@@ -26,7 +26,7 @@ void CrownetActivePacketSourceBase::initialize(int stage)
     CrownetPacketSourceBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         outputGate = gate("out");
-        consumer = findConnectedModule<inet::queueing::IPassivePacketSink>(outputGate);
+        consumer.reference(outputGate, false);
     }
     else if (stage == INITSTAGE_QUEUEING)
         checkPacketOperationSupport(outputGate);
@@ -46,17 +46,17 @@ void CrownetActivePacketSourceBase::producePacket()
     EV_INFO << "Producing packet" << EV_FIELD(packet) << EV_ENDL;
     handlePacketProcessed(packet);
     pushOrSendPacket(packet, outputGate, consumer);
-    updateDisplayString();
+    refreshDisplay();
 }
 
-void CrownetActivePacketSourceBase::handleCanPushPacketChanged(cGate *gate)
+void CrownetActivePacketSourceBase::handleCanPushPacketChanged(const cGate *gate)
 {
     Enter_Method("handleCanPushPacketChanged");
     producePacket();
 
 }
 
-void CrownetActivePacketSourceBase::handlePushPacketProcessed(Packet *packet, cGate *gate, bool successful)
+void CrownetActivePacketSourceBase::handlePushPacketProcessed(Packet *packet, const cGate *gate, bool successful)
 {
     Enter_Method("handlePushPacketProcessed");
 }

@@ -1,7 +1,7 @@
 {
   "name" : "mf_003_circle3",
   "description" : "",
-  "release" : "3.0",
+  "release" : "4.0",
   "commithash" : "No version control commit hash available!",
   "processWriters" : {
     "files" : [ {

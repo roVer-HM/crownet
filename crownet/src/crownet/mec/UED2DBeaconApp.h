@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 
 #include <omnetpp.h>
-#include <common/binder/Binder.h>
+#include <simu5g/common/binder/Binder.h>
 #include "inet/mobility/contract/IMobility.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
 

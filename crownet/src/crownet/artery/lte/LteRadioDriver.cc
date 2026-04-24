@@ -20,7 +20,7 @@
 #include "inet/linklayer/common/MacAddressTag_m.h"
 #include "inet/linklayer/common/UserPriorityTag_m.h"
 #include "inet/linklayer/ieee80211/mac/Ieee80211Mac.h"
-#include "crownet/artery/lte/GeoNetTag_m.h"
+#include "crownet/artery/lte/GeoNetHeader_m.h"
 
 using namespace inet;
 
@@ -55,7 +55,6 @@ void LteRadioDriver::initialize(int stage) {
     // sense to me
 
     geonetProtocol = artery::getGeoNetProtocol();
-
 
     numSent = 0;
     numPassedUp = 0;
@@ -97,7 +96,7 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
   auto request =
       check_and_cast<artery::GeoNetRequest*>(msg->removeControlInfo());
   auto packet = new inet::Packet(
-      "INET GeoNet over LTE",
+      "INET GeoNet over 4G/5G",
       inet::makeShared<inet::cPacketChunk>(check_and_cast<cPacket*>(msg)));
 
   // tag: MacAddressReq
@@ -118,12 +117,18 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
   packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(
       interfaceEntry->getInterfaceId());
 
-  // tag: GeoNetTag
-  auto geo_tag = packet->addTagIfAbsent<crownet::GeoNetTag>();
-  geo_tag->setSrcAddrMac(convert(request->source_addr));
-  geo_tag->setDstAddrMac(convert(request->destination_addr));
-  geo_tag->setSrcAddrIp(interfaceEntry->getIpv4Address().getInt());
-  geo_tag->setDstAddrIp(inet::Ipv4Address::ALL_HOSTS_MCAST.getInt());
+  // header: GeoNetHeader (not a real header - models adaptation layer)
+  auto geonetHeader = makeShared<GeoNetHeader>();
+  geonetHeader->setChunkLength(B(20));
+
+  EV << "LteRadioDriver::handleDataRequest - message " << packet << " has GeoNetTag " << endl;
+
+  geonetHeader->setSrcAddrMac(convert(request->source_addr));
+  geonetHeader->setDstAddrMac(convert(request->destination_addr));
+  geonetHeader->setSrcAddrIp(interfaceEntry->getIpv4Address());
+  geonetHeader->setDstAddrIp(inet::Ipv4Address::ALL_HOSTS_MCAST);
+
+  packet->insertAtFront(geonetHeader);
 
   //
   //  auto up_tag = packet->addTag<inet::UserPriorityReq>();
@@ -151,16 +156,16 @@ void LteRadioDriver::handleDataRequest(omnetpp::cMessage* msg) {
 
 void LteRadioDriver::handleDataIndication(omnetpp::cMessage* msg) {
   auto packet = check_and_cast<inet::Packet*>(msg);
+  auto geoHdr = packet->popAtFront<GeoNetHeader>();
 
   auto chunk = packet->peekData<inet::cPacketChunk>();
   auto gn_packet = chunk->getPacket()->dup();
 
   packet->removeTagIfPresent<inet::PacketProtocolTag>();
-  auto geoTag = packet->getTag<crownet::GeoNetTag>();
 
   auto* indication = new artery::GeoNetIndication();
-  indication->source = convert(geoTag->getSrcAddrMac());
-  indication->destination = convert(geoTag->getDstAddrMac());
+  indication->source = convert(geoHdr->getSrcAddrMac());
+  indication->destination = convert(geoHdr->getDstAddrMac());
   gn_packet->setControlInfo(indication);
   delete msg;
 

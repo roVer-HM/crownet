@@ -32,13 +32,13 @@ void CrownetPassivePacketSourceBase::initialize(int stage)
     CrownetPacketSourceBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         outputGate = gate("out");
-        collector = findConnectedModule<inet::queueing::IActivePacketSink>(outputGate);
+        collector.reference(outputGate, false);
     }
     else if (stage == INITSTAGE_QUEUEING)
         checkPacketOperationSupport(outputGate);
 }
 
-Packet *CrownetPassivePacketSourceBase::canPullPacket(cGate *gate) const {
+Packet *CrownetPassivePacketSourceBase::canPullPacket(const cGate *gate) const {
     Enter_Method("canPullPacket");
     if (nextPacket == nullptr){
         nextPacket = const_cast<CrownetPassivePacketSourceBase *>(this)->createPacket();
@@ -47,20 +47,20 @@ Packet *CrownetPassivePacketSourceBase::canPullPacket(cGate *gate) const {
     return nextPacket;
 }
 
-Packet *CrownetPassivePacketSourceBase::pullPacket(cGate *gate)
+Packet *CrownetPassivePacketSourceBase::pullPacket(const cGate *gate)
 {
     Enter_Method("pullPacket");
 
     auto packet = providePacket(gate);
     // statistics
     handlePacketProcessed(packet);
-    animatePullPacket(packet, outputGate);
+    animatePullPacket(packet, outputGate, collector.getReferencedGate());
     emit(packetPulledSignal, packet);
-    updateDisplayString();
+    refreshDisplay();
     return packet;
 }
 
-Packet *CrownetPassivePacketSourceBase::providePacket(cGate *gate)
+Packet *CrownetPassivePacketSourceBase::providePacket(const cGate *gate)
 {
     Packet *packet;
     if (nextPacket == nullptr)
@@ -70,7 +70,7 @@ Packet *CrownetPassivePacketSourceBase::providePacket(cGate *gate)
         nextPacket = nullptr;
     }
     EV_INFO << "Providing packet" << EV_FIELD(packet) << EV_ENDL;
-    updateDisplayString();
+    refreshDisplay();
     return packet;
 }
 

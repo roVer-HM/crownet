@@ -211,7 +211,7 @@ void BaseApp::producePackets(inet::b maxData){
         EV_INFO << "Producing packet" << EV_FIELD(packet) << EV_ENDL;
         handlePacketProcessed(packet);
         pushOrSendPacket(packet, outputGate, consumer);
-        updateDisplayString();
+        refreshDisplay();
     }
 }
 
@@ -243,7 +243,7 @@ void BaseApp::producePackets(int number){
         EV_INFO << "Producing packet" << EV_FIELD(p) << EV_ENDL;
         handlePacketProcessed(p);
         pushOrSendPacket(p, outputGate, consumer);
-        updateDisplayString();
+        refreshDisplay();
     }
     // packet mode. All resources used.
     scheduledData = inet::b(0);

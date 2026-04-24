@@ -81,7 +81,7 @@ void IntervalScheduler::handleMessage(cMessage *message)
                 scheduleGenerationTimer();
             }
         }
-        updateDisplayString();
+        refreshDisplay();
     } else{
        throw cRuntimeError("Unknown message");
     }

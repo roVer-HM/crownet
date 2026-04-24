@@ -4,7 +4,14 @@ MSGC:=$(MSGC) --msg6
 #
 # compiler warning for c-style cast
 #
-#CFLAGS += -Wold-style-cast
-#CFLAGS += -save-temps
+# CFLAGS += -Wold-style-cast
+# CFLAGS += -save-temps
 CXXFLAGS += -Wno-format-security
 
+# use the following options to debug memory allocation problems 
+# (disabled by default since it leads to long runtimes)
+# CXXFLAGS +="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wno-format-security"
+# COPTS += -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wno-format-security
+# COPTS += -O1 -g -fsanitize=address -fno-omit-frame-pointer
+# LDFLAGS  += -fsanitize=undefined
+# LIBS += -lubsan

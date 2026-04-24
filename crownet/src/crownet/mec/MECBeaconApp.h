@@ -7,13 +7,13 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 
 #include "packets/SimpleMECBeacon_m.h"
-#include <apps/mec/DeviceApp/DeviceAppMessages/DeviceAppPacket_m.h>
-#include <apps/mec/DeviceApp/DeviceAppMessages/DeviceAppPacket_Types.h>
+#include <simu5g/apps/mec/DeviceApp/messages/DeviceAppPacket_m.h>
+#include <simu5g/apps/mec/DeviceApp/messages/DeviceAppPacket_Types.h>
 
 
-#include <nodes/mec/MECPlatform/ServiceRegistry/ServiceRegistry.h>
+#include <simu5g/mec/platform/ServiceRegistry/ServiceRegistry.h>
 
-#include <apps/mec/MecApps/MecAppBase.h>
+#include <simu5g/apps/mec/MecApps/MecAppBase.h>
 #include "aggregation/BeaconAggregationStrategy.h"
 
 using namespace omnetpp;

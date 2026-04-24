@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Script method library for the roVer project
+# Script method library for the CrowNet project
 #
 # This bash script contains bash functions/methods used in various other
 # scripts in order to avoid redundant code.
 
-INTNET="rovernet"
+INTNET="crownet"
 
 #
 function check_create_network() {
@@ -13,7 +13,7 @@ function check_create_network() {
 	  log_ "Creating $INTNET network ..."
 	  docker network create $INTNET
 	# else
-	  # log_ "Network $INTNET for communication between the roVer containers exists."
+	  # log_ "Network $INTNET for communication between the CrowNet containers exists."
 	fi
 }
 
@@ -30,15 +30,26 @@ function log_() {
 function wrap_command() {
         # We try to guess if we need to connect the console: For all exept omnetpp
         # we currently connect a console - behavior might need to change in future
+	BASH_OPTS=""
+	args=("$@")
 	if [[ $1 == *"omnetpp"* ]]; then
-           WRAPPER="/waitfor.sh "
-           WRAPPER_END=""
+           WRAPPED_CMD="/waitfor.sh $@"
 	else
-           WRAPPER="/bin/bash -c \"cd $(pwd);"
-           WRAPPER_END="\""
+           if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+			  BASH_OPTS+=" --rcfile \"$VIRTUAL_ENV/bin/activate\" "
+		   fi	
+		   C_ARG="'cd $(pwd); $@'"
+		   if [[ "$1" == *bash* ]]; then
+		   	  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+			  	  args+=("-i")
+				  C_ARG="'cd $(pwd); ${args[@]}'"
+		   	  	  C_ARG="${C_ARG//bash/bash --rcfile \"$VIRTUAL_ENV/bin/activate\" }"
+		   	  fi 
+		   fi
+		   WRAPPED_CMD="'/bin/bash ${BASH_OPTS} -c ${C_ARG}'"
     fi
-    # not printet to shell
-    echo "$WRAPPER $@ $WRAPPER_END"
+    # not printed to shell but returned as string to be used in docker run command
+	echo "${WRAPPED_CMD}"
 }
 
 # Create name for container by adding incrementing numbers to the base name.
@@ -114,6 +125,10 @@ function run_container_X11() {
 	else
 		CMD_ARR+=(--env DISPLAY=$DISPLAY)
 	fi
+	if [[ ! -z ${VIRTUAL_ENV} ]];then
+	  # set VIRTUAL_ENV in container to use the same python environment as outside container.
+		CMD_ARR+=(--env VIRTUAL_ENV=$VIRTUAL_ENV)
+	fi
 	if [[ ! -z ${NEDPATH} ]];then
 	  # set NEDPATH in container to simplify opp_run commands.
 		CMD_ARR+=(--env NEDPATH=$NEDPATH)
@@ -175,7 +190,6 @@ function run_container_X11() {
 	CMD_ARR+=($@)
 	#log_ "${CMD_ARR[@]}"
 	eval ${CMD_ARR[@]}
-
 }
 
 # Deprecated.
@@ -210,7 +224,7 @@ function run_container_X11() {
 # @param $4 - $9 are passed to the container
 function run_individual_container() {
 	COMMAND="${@:4:${#@}+1-4}"
-	CMD4="$(wrap_command $COMMAND)"
+	CMD4="'$(wrap_command $COMMAND)'"
     log_ $CMD4
     if [[ "$1" == *_rnd ]];then
         # let docker create random names.

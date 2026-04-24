@@ -55,8 +55,8 @@ protected:
     void assertAppRunning() const;
 
 public:
-    virtual bool supportsPacketPushing(cGate *gate) const override { return true; }
-    virtual bool supportsPacketPulling(cGate *gate) const override { return false; }
+    virtual bool supportsPacketPushing(const cGate *gate) const override { return true; }
+    virtual bool supportsPacketPulling(const cGate *gate) const override { return false; }
 
 protected:
     int eNBId = -1; // < 0 no information, = 0 not connected to any base station, > 0 connected to a base station.
