@@ -18,12 +18,12 @@
 #define __SIMU5G_UEBEACONAPP_H_
 
 #include <omnetpp.h>
-#include "common/binder/Binder.h"
+#include "simu5g/common/binder/Binder.h"
 #include "inet/mobility/contract/IMobility.h"
 
 #include "packets/SimpleMECBeacon_m.h"
-#include <apps/mec/DeviceApp/DeviceAppMessages/DeviceAppPacket_m.h>
-#include <apps/mec/DeviceApp/DeviceAppMessages/DeviceAppPacket_Types.h>
+#include <simu5g/apps/mec/DeviceApp/messages/DeviceAppPacket_m.h>
+#include <simu5g/apps/mec/DeviceApp/messages/DeviceAppPacket_Types.h>
 
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
 #include "inet/networklayer/common/L3Address.h"

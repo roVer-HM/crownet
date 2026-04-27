@@ -9,11 +9,11 @@
 
 #include "inet/networklayer/common/NetworkInterface.h"
 #include "artery/inet/InetRadioDriver.h"
-#include "stack/ip2nic/IP2Nic.h"
+#include "simu5g/stack/ip2nic/Ip2Nic.h"
 
 namespace crownet {
 
-class Geo2Nic : public simu5g::IP2Nic {
+class Geo2Nic : public simu5g::Ip2Nic {
  public:
   virtual ~Geo2Nic() = default;
 

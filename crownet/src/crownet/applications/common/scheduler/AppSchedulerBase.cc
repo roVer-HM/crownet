@@ -63,7 +63,7 @@ void AppSchedulerBase::handleMessage(cMessage *message)
     } else{
        throw cRuntimeError("Unknown message");
     }
-    updateDisplayString();
+    refreshDisplay();
 }
 
 }

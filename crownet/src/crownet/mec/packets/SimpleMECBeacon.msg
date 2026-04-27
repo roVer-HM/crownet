@@ -12,10 +12,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
-import nodes.mec.MECPlatform.MECPackets;
+import simu5g.mec.platform.MecPackets;
 
 
-class SimpleMECBeacon extends simu5g::MECPacket
+class SimpleMECBeacon extends simu5g::MecPacket
 {
     int nodeType;
     int nodeId;
@@ -38,7 +38,7 @@ class ReducedMECBeacon
     int additionalData[];
 }
 
-class ResponseBeaconMessage extends simu5g::MECPacket
+class ResponseBeaconMessage extends simu5g::MecPacket
 {
 	ReducedMECBeacon beacons[];
 }

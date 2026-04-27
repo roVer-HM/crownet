@@ -16,11 +16,11 @@
 package crownet.nodes;
 
 import crownet.nodes.IMobileUe;
-import simu5g.nodes.Ue;
+import simu5g.nodes.NrUe;
 import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
 
 // see lte.corenetwork.nodes.cars;
-module MobileUe extends Ue like IMobileUe{
+module MobileUe extends NrUe like IMobileUe{
 
 	parameters:
 	    @display("i=misc/smartphone;is=vs");

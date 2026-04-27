@@ -17,7 +17,7 @@
 #include "inet/networklayer/common/FragmentationTag_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
-#include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
+#include "inet/transportlayer/contract/udp/UdpCommand_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "crownet/applications/detour/DetourAppPacket_m.h"
 #include "inet/common/ModuleAccess.h"

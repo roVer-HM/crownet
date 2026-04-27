@@ -17,7 +17,7 @@ import inet.node.inet.StandardHost;
 import inet.common.misc.ThruputMeteringChannel;
 import simu5g.common.binder.Binder;
 import simu5g.common.carrierAggregation.CarrierAggregation;
-import simu5g.nodes.Ue;
+import simu5g.nodes.LteUe;
 import simu5g.nodes.eNodeB;
 import simu5g.world.radio.LteChannelControl;
 import simu5g.nodes.PgwStandard;
@@ -45,7 +45,7 @@ network LabSingleCellLte extends LabSingleCellBase
         	pgw: PgwStandard {
             	@display("p=1.0293758,4.4116106;is=l");
         	}
-        	ue[numUe]: Ue {
+        	ue[numUe]: LteUe {
             	@display("p=6,3");
         	}
         	

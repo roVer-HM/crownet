@@ -2,7 +2,7 @@
 #define BEACONJSON_H
 
 #include "packets/SimpleMECBeacon_m.h"
-#include <nodes/mec/utils/httpUtils/httpUtils.h>
+#include <simu5g/mec/utils/httpUtils/httpUtils.h>
 
 #include <vector>
 

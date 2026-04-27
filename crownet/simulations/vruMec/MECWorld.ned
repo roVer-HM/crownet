@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 package crownet.simulations.vruMec;
 
@@ -28,13 +28,13 @@ import simu5g.common.binder.Binder;
 import simu5g.common.carrierAggregation.CarrierAggregation;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import simu5g.nodes.Upf;
-import simu5g.nodes.NR.gNodeB;
-import simu5g.nodes.NR.NRUe;
-import simu5g.nodes.mec.MECHost;
+import simu5g.nodes.gNodeB;
+import simu5g.nodes.NrUe;
+import simu5g.nodes.MecHost;
 import inet.environment.common.PhysicalEnvironment;
 
-import simu5g.nodes.mec.MECOrchestrator.MecOrchestrator;
-import simu5g.nodes.mec.UALCMP.UALCMP;
+import simu5g.mec.orchestrator.MecOrchestrator;
+import simu5g.mec.ualcmp.Ualcmp;
 
 network MecWorld
 {
@@ -76,10 +76,10 @@ network MecWorld
         gNodeB1: gNodeB {
             @display("p=352.60202,480.446;is=l");
         }
-        mecHost: MECHost {
+        mecHost: MecHost {
             @display("p=588.2,762.93");
         }
-        ualcmp: UALCMP {
+        ualcmp: Ualcmp {
             @display("p=55.359997,98.61");
         }
         upf: Upf {

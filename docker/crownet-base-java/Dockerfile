@@ -31,9 +31,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # install specific maven version
-RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz -P /opt/vadere/ 
-RUN tar xzvf /opt/vadere/apache-maven-3.9.9-bin.tar.gz
-ENV PATH=/opt/vadere/apache-maven-3.9.9/bin:$PATH
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.14/binaries/apache-maven-3.9.14-bin.tar.gz -P /opt/vadere/ 
+RUN tar xzvf /opt/vadere/apache-maven-3.9.14-bin.tar.gz
+ENV PATH=/opt/vadere/apache-maven-3.9.14/bin:$PATH
 
 
 

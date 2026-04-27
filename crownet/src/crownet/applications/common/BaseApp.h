@@ -156,7 +156,7 @@ public:
   // ICrownetActivePacketSource
   virtual void producePackets(inet::b maxData) override;
   virtual void producePackets(int number) override;
-  virtual void handleCanPushPacketChanged(cGate *gate) override { throw cRuntimeError("Packet generation managed by scheduler");}
+  virtual void handleCanPushPacketChanged(const cGate *gate) override { throw cRuntimeError("Packet generation managed by scheduler");}
 
 };
 

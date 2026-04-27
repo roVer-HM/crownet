@@ -8,7 +8,7 @@
 
 # Release control (how to specify an omnetpp release):
 # The omnetpp release is specified by the base image "omnetpp". To build that, go to ../omnetpp/Dockerfile.
-# The release of the IDE is specified through the package release. To change the release, adjust the URL (RUN wget ... /download/omnetpp-6.0.1/omnetpp-6.0.1-linux-x86_64.tgz<)
+# The release of the IDE is specified through the package release. To change the release, adjust the URL (RUN wget ... /download/omnetpp-6.3.0/omnetpp-6.3.0-linux-x86_64.tgz<)
 
 ARG IMAGE_REG=invalid
 ARG BASE_IMAGE_TAG=latest
@@ -30,7 +30,7 @@ COPY docker/omnetpp-ide/waitfor.sh /waitfor.sh
 RUN chmod 555 /waitfor.sh
 
 RUN rm -rf /tmp/omnetpp.tgz
-RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.1.0/omnetpp-6.1.0-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
+RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-6.3.0/omnetpp-6.3.0-linux-x86_64.tgz --output-document /tmp/omnetpp.tgz
 
 # extract IDE and copy to omnetpp
 WORKDIR /tmp/

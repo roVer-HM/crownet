@@ -73,7 +73,7 @@ private:
 
 
 private:
-    void splitNode(QuadTreeNode& node);
+    QuadTreeNode splitNode(QuadTreeNode node);
     int getQuadrant(QuadTreeNode& node, const Coord& pos);
 
 public:

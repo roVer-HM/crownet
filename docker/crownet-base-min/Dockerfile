@@ -3,15 +3,29 @@
 
 FROM ubuntu:24.04
 
+ARG UBUNTU_MIRROR=https://mirror.netcologne.de/ubuntu/
+
 ARG CROWNET_COMMIT_HASH=unknown
 ENV RELEASE=${CROWNET_COMMIT_HASH}
 
 LABEL description="CrowNet base container"
 LABEL maintainer="wischhof@ieee.org"
 
-# setup using mirrors
-COPY docker/crownet-base-min/mirrors.txt /etc/apt/
-RUN cat /etc/apt/mirrors.txt /etc/apt/sources.list > /etc/apt/temp_sources.list && mv /etc/apt/temp_sources.list /etc/apt/sources.list
+# bootstrap: update ca-certificates (before changing to the mirror)
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+       ca-certificates
+
+# setup using mirror for all packages (uses https)
+RUN set -eux; \
+    codename="$(. /etc/os-release && printf '%s' "$VERSION_CODENAME")"; \
+    cat > /etc/apt/sources.list.d/ubuntu.sources <<EOF
+Types: deb
+URIs: ${UBUNTU_MIRROR}
+Suites: ${codename} ${codename}-updates ${codename}-backports ${codename}-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+EOF
 
 # install all packages required
 RUN apt-get update && \
