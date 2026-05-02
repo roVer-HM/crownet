@@ -196,6 +196,30 @@ fingerprints_mobility:
     - "${CROWNET_HOME}/crownet/tests/mobility/*.out"
     expire_in: 8 weeks
 
+# run result comparison regression tests (opt-in)
+result_compare:
+  stage: test
+  tags:
+    - crownet-sim
+  rules:
+    - if: '$RESULT_COMPARE_ENABLED == "1"'
+  variables:
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - "source setup -i"
+    - "source ./out/crownet_user/bin/activate"
+    - "cd ${CROWNET_HOME}/crownet/tests/result_compare"
+    - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
+    - "export COMPOSE_HTTP_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
+    - "./result_compare_test"
+  artifacts:
+    when: always
+    paths:
+    - "${CROWNET_HOME}/crownet/tests/result_compare/output"
+    - "${CROWNET_HOME}/crownet/tests/result_compare/baselines"
+    expire_in: 8 weeks
+
 # run the opp tests
 opp-tests:
   stage: test
