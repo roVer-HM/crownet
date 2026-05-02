@@ -6,7 +6,7 @@ openair_s4:
     - omnet
     - --override-host-config
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp.ini
     - --opp.-c
@@ -44,6 +44,7 @@ openair_s4:
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
       abs_threshold: 327614.5
   baseline: baselines/openair_s4
+
 openair_s4_ua:
   wd: simulations/openair
   run:
@@ -52,7 +53,7 @@ openair_s4_ua:
     - omnet
     - --override-host-config
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp.ini
     - --opp.-c
@@ -90,6 +91,7 @@ openair_s4_ua:
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
       abs_threshold: 330952.7
   baseline: baselines/openair_s4_ua
+
 openair_nr_s1_nr:
   wd: simulations/openair
   run:
@@ -98,7 +100,7 @@ openair_nr_s1_nr:
     - omnet
     - --override-host-config
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp-NR.ini
     - --opp.-c
@@ -141,6 +143,7 @@ openair_nr_s1_nr:
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
       abs_threshold: 668.0
   baseline: baselines/openair_nr_s1_nr
+
 openair_nr_s1_app_nr:
   wd: simulations/openair
   run:
@@ -149,7 +152,7 @@ openair_nr_s1_app_nr:
     - omnet
     - --override-host-config
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp-NR.ini
     - --opp.-c
@@ -192,6 +195,7 @@ openair_nr_s1_app_nr:
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
       abs_threshold: 503368.3
   baseline: baselines/openair_nr_s1_app_nr
+
 openair_nr_s1_up_nr:
   wd: simulations/openair
   run:
@@ -200,7 +204,7 @@ openair_nr_s1_up_nr:
     - omnet
     - --override-host-config
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp-NR.ini
     - --opp.-c
