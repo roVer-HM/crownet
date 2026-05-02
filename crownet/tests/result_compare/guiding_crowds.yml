@@ -1,0 +1,64 @@
+guiding_crowds_final_test_2:
+  wd: simulations/guiding_crowds_test
+  run:
+    args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - final
+    - --opp.--sim-time-limit=100s
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: mac_received_from_lower_bytes
+      vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      max_abs_threshold: 1.0
+      rmse_threshold: 0.5
+    scalars:
+    - id: mac_received_from_lower_bytes_total
+      scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 35.0
+    - id: mac_received_from_lower_count_total
+      scalar_name: receivedPacketFromLowerLayer:count
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 35.0
+  baseline: baselines/guiding_crowds_final_test_2
+
+guiding_crowds_final_test_3:
+  wd: simulations/guiding_crowds_test
+  run:
+    args:
+    - run_script.py
+    - vadere-opp-control
+    - --create-vadere-container
+    - --opp.-c
+    - final_control
+    - --control-use-local
+    - --override-host-config
+    - --with-control
+    - control.py
+    - --opp.--sim-time-limit=100s
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: mac_received_from_lower_bytes
+      vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      max_abs_threshold: 1.0
+      rmse_threshold: 0.5
+    scalars:
+    - id: mac_received_from_lower_bytes_total
+      scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 116.3
+    - id: mac_received_from_lower_count_total
+      scalar_name: receivedPacketFromLowerLayer:count
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 116.3
+  baseline: baselines/guiding_crowds_final_test_3
