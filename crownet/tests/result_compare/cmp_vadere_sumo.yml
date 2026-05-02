@@ -7,9 +7,9 @@ cmp_vadere_sumo_sumo_simple_tcp:
     - --create-sumo-container
     - --override-host-config
     - --sumo-tag
-    - v1_23_1_hm
+    - v1_26_0_hm
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp.ini
     - --opp.-c
@@ -60,9 +60,9 @@ cmp_vadere_sumo_sumo_bottleneck:
     - --create-sumo-container
     - --override-host-config
     - --sumo-tag
-    - v1_23_1_hm
+    - v1_26_0_hm
     - --omnet-tag
-    - 6.1.0
+    - 6.3.0
     - --opp.-f
     - omnetpp.ini
     - --opp.-c
