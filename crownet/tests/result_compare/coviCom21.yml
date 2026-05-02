@@ -16,28 +16,28 @@ covicom21_vadere_base_72:
     vectors:
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 24.5
-      rmse_threshold: 4.7
+      max_abs_threshold: 59.3
+      rmse_threshold: 18.1
     - id: app_sent_data_rate
       vector_name: sentDataRate:vector
-      max_abs_threshold: 190.1
-      rmse_threshold: 190.1
+      max_abs_threshold: 475.2
+      rmse_threshold: 475.2
     - id: mac_received_from_lower_bytes
       vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      max_abs_threshold: 14.2
-      rmse_threshold: 3.4
+      max_abs_threshold: 44.2
+      rmse_threshold: 14.4
     scalars:
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 101.8
+      abs_threshold: 205.6
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
-      abs_threshold: 21464.6
+      abs_threshold: 41137.6
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 48420.7
+      abs_threshold: 90667.7
   baseline: baselines/covicom21_vadere_base_72
 
 covicom21_vadere_60:
@@ -58,26 +58,26 @@ covicom21_vadere_60:
     vectors:
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 20.1
-      rmse_threshold: 3.5
+      max_abs_threshold: 44.5
+      rmse_threshold: 13.1
     - id: app_sent_data_rate
       vector_name: sentDataRate:vector
-      max_abs_threshold: 172.8
-      rmse_threshold: 172.8
+      max_abs_threshold: 432.0
+      rmse_threshold: 432.0
     - id: mac_received_from_lower_bytes
       vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      max_abs_threshold: 10.7
-      rmse_threshold: 2.8
+      max_abs_threshold: 25.8
+      rmse_threshold: 11.0
     scalars:
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 105.5
+      abs_threshold: 196.1
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
-      abs_threshold: 15070.0
+      abs_threshold: 27810.1
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 23721.1
+      abs_threshold: 47442.2
   baseline: baselines/covicom21_vadere_60

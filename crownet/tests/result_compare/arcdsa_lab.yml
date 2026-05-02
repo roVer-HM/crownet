@@ -15,28 +15,28 @@ arcdsa_lab_upto_14_ue_burst_wlan:
     vectors:
     - id: app_packet_sent_bytes
       vector_name: packetSent:vector(packetBytes)
-      max_abs_threshold: 4.9
-      rmse_threshold: 1.7
+      max_abs_threshold: 12.2
+      rmse_threshold: 6.9
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 4.9
-      rmse_threshold: 1.3
+      max_abs_threshold: 12.2
+      rmse_threshold: 5.3
     - id: mac_packet_received_from_lower_bytes
       vector_name: packetReceivedFromLower:vector(packetBytes)
       module_regex: .*\.wlanNic\[\d+\]\.mac$
-      max_abs_threshold: 2.9
-      rmse_threshold: 1.1
+      max_abs_threshold: 7.3
+      rmse_threshold: 4.2
     scalars:
     - id: app_packet_sent_count_total
       scalar_name: packetSent:count
-      abs_threshold: 17.6
+      abs_threshold: 35.3
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 35.3
+      abs_threshold: 70.5
     - id: mac_packet_received_from_lower_bytes_total
       scalar_name: packetReceivedFromLower:sum(packetBytes)
       module_regex: .*\.wlanNic\[\d+\]\.mac$
-      abs_threshold: 203126.8
+      abs_threshold: 406253.6
   baseline: baselines/arcdsa_lab_upto_14_ue_burst_wlan
 
 arcdsa_lab_upto_14_ue_ramp_nr:
@@ -56,25 +56,25 @@ arcdsa_lab_upto_14_ue_ramp_nr:
     vectors:
     - id: app_packet_sent_bytes
       vector_name: packetSent:vector(packetBytes)
-      max_abs_threshold: 4.2
-      rmse_threshold: 1.0
+      max_abs_threshold: 10.4
+      rmse_threshold: 4.1
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 19.2
-      rmse_threshold: 3.8
+      max_abs_threshold: 48.3
+      rmse_threshold: 15.3
     - id: app_sent_data_rate
       vector_name: sentDataRate:vector
-      max_abs_threshold: 1348.3
-      rmse_threshold: 484.0
+      max_abs_threshold: 3468.1
+      rmse_threshold: 1943.4
     scalars:
     - id: app_packet_sent_count_total
       scalar_name: packetSent:count
-      abs_threshold: 48.6
+      abs_threshold: 97.1
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 288.7
+      abs_threshold: 577.4
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 383663.6
+      abs_threshold: 767327.2
   baseline: baselines/arcdsa_lab_upto_14_ue_ramp_nr

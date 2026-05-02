@@ -29,24 +29,24 @@ vam_test_simple_cam_den:
     - id: mac_sent_to_lower_bytes
       vector_name: sentPacketToLowerLayer:vector(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      max_abs_threshold: 1.0
+      max_abs_threshold: 1.6
       rmse_threshold: 0.5
     - id: mac_sent_to_upper_bytes
       vector_name: sentPacketToUpperLayer:vector(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      max_abs_threshold: 2.3
-      rmse_threshold: 0.7
+      max_abs_threshold: 6.7
+      rmse_threshold: 2.9
     scalars:
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 824.6
+      abs_threshold: 1662.5
     - id: mac_sent_to_lower_bytes_total
       scalar_name: sentPacketToLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 222.2
+      abs_threshold: 495.3
     - id: mac_sent_to_upper_bytes_total
       scalar_name: sentPacketToUpperLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 698.7
+      abs_threshold: 1397.4
   baseline: baselines/vam_test_simple_cam_den

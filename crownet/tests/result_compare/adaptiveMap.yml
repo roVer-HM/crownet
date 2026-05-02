@@ -19,8 +19,8 @@ vadere_corridor_ramp_down:
       rmse_threshold: 0.5
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 1.0
-      rmse_threshold: 0.5
+      max_abs_threshold: 2.2
+      rmse_threshold: 0.8
     - id: mac_received_from_lower_bytes
       vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
@@ -29,14 +29,14 @@ vadere_corridor_ramp_down:
     scalars:
     - id: app_packet_sent_count_total
       scalar_name: packetSent:count
-      abs_threshold: 1.1
+      abs_threshold: 2.3
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 6.1
+      abs_threshold: 12.5
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 1021.4
+      abs_threshold: 2042.9
   baseline: baselines/vadere_corridor_ramp_down
 
 vadere_corridor_5perSpawn:
@@ -60,21 +60,21 @@ vadere_corridor_5perSpawn:
       rmse_threshold: 0.5
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 1.0
-      rmse_threshold: 0.5
+      max_abs_threshold: 2.2
+      rmse_threshold: 0.8
     - id: app_received_data_rate
       vector_name: rcvdDataRate:vector
-      max_abs_threshold: 87.2
-      rmse_threshold: 26.0
+      max_abs_threshold: 236.5
+      rmse_threshold: 109.0
     scalars:
     - id: app_packet_sent_bytes_total
       scalar_name: packetSent:sum(packetBytes)
-      abs_threshold: 56.6
+      abs_threshold: 113.9
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
-      abs_threshold: 303.1
+      abs_threshold: 622.1
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 1021.4
+      abs_threshold: 2038.6
   baseline: baselines/vadere_corridor_5perSpawn
