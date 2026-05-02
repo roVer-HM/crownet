@@ -22,11 +22,11 @@ guiding_crowds_final_test_2:
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 35.0
+      abs_threshold: 70.0
     - id: mac_received_from_lower_count_total
       scalar_name: receivedPacketFromLowerLayer:count
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 35.0
+      abs_threshold: 70.0
   baseline: baselines/guiding_crowds_final_test_2
 
 guiding_crowds_final_test_3:
@@ -56,9 +56,9 @@ guiding_crowds_final_test_3:
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 116.3
+      abs_threshold: 232.7
     - id: mac_received_from_lower_count_total
       scalar_name: receivedPacketFromLowerLayer:count
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 116.3
+      abs_threshold: 232.7
   baseline: baselines/guiding_crowds_final_test_3

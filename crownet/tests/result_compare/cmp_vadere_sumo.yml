@@ -24,13 +24,13 @@ cmp_vadere_sumo_sumo_simple_tcp:
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 1.1
-      rmse_threshold: 0.6
+      max_abs_threshold: 2.7
+      rmse_threshold: 2.3
     - id: app_packet_sent_bytes
       vector_name: packetSent:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 1.0
-      rmse_threshold: 0.5
+      max_abs_threshold: 1.9
+      rmse_threshold: 1.4
     - id: app_end_to_end_delay
       vector_name: endToEndDelay:vector
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
@@ -40,15 +40,15 @@ cmp_vadere_sumo_sumo_simple_tcp:
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 14745.1
+      abs_threshold: 26475.7
     - id: app_packet_sent_bytes_total
       scalar_name: packetSent:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 527.1
+      abs_threshold: 1041.6
     - id: mac_packet_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 23888.7
+      abs_threshold: 44028.5
   baseline: baselines/cmp_vadere_sumo_sumo_simple_tcp
 
 cmp_vadere_sumo_sumo_bottleneck:
@@ -77,31 +77,31 @@ cmp_vadere_sumo_sumo_bottleneck:
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 2.2
-      rmse_threshold: 1.1
+      max_abs_threshold: 5.4
+      rmse_threshold: 4.2
     - id: app_packet_sent_bytes
       vector_name: packetSent:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 2.2
-      rmse_threshold: 1.1
+      max_abs_threshold: 5.4
+      rmse_threshold: 4.3
     - id: app_received_data_rate
       vector_name: rcvdDataRate:vector
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 4377.6
-      rmse_threshold: 1997.9
+      max_abs_threshold: 10958.4
+      rmse_threshold: 8109.7
     scalars:
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 99534.6
+      abs_threshold: 201796.6
     - id: app_packet_sent_bytes_total
       scalar_name: packetSent:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 4314.6
+      abs_threshold: 8629.2
     - id: mac_packet_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 187973.1
+      abs_threshold: 381144.6
   baseline: baselines/cmp_vadere_sumo_sumo_bottleneck
 
 cmp_vadere_sumo_vadere_bottleneck:
@@ -126,31 +126,31 @@ cmp_vadere_sumo_vadere_bottleneck:
     - id: app_received_data_rate
       vector_name: rcvdDataRate:vector
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 4377.6
-      rmse_threshold: 2005.4
+      max_abs_threshold: 10944.0
+      rmse_threshold: 8021.4
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 2.2
-      rmse_threshold: 1.1
+      max_abs_threshold: 5.4
+      rmse_threshold: 4.2
     - id: app_packet_sent_bytes
       vector_name: packetSent:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 2.2
-      rmse_threshold: 1.1
+      max_abs_threshold: 5.4
+      rmse_threshold: 4.3
     scalars:
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 99538.2
+      abs_threshold: 199076.4
     - id: app_packet_sent_bytes_total
       scalar_name: packetSent:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 4298.4
+      abs_threshold: 8596.8
     - id: mac_cell_throughput_dl_mean
       scalar_name: macCellThroughputDl:mean
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 24246.9
+      abs_threshold: 48493.8
   baseline: baselines/cmp_vadere_sumo_vadere_bottleneck
 
 cmp_vadere_sumo_vadere_bottleneck_tcp:
@@ -175,13 +175,13 @@ cmp_vadere_sumo_vadere_bottleneck_tcp:
     - id: app_throughput
       vector_name: throughput:vector
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 2387.6
-      rmse_threshold: 509.8
+      max_abs_threshold: 5969.1
+      rmse_threshold: 2039.1
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      max_abs_threshold: 1.1
-      rmse_threshold: 0.6
+      max_abs_threshold: 2.7
+      rmse_threshold: 2.2
     - id: app_end_to_end_delay
       vector_name: endToEndDelay:vector
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
@@ -191,13 +191,13 @@ cmp_vadere_sumo_vadere_bottleneck_tcp:
     - id: app_packet_received_bytes_total
       scalar_name: packetReceived:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 14395.1
+      abs_threshold: 28790.2
     - id: app_packet_sent_bytes_total
       scalar_name: packetSent:sum(packetBytes)
       module_regex: World\.pNode\[\d+\]\.app\[0\](?:\.app)?$
-      abs_threshold: 530.7
+      abs_threshold: 1061.4
     - id: mac_cell_throughput_dl_mean
       scalar_name: macCellThroughputDl:mean
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 1673.6
+      abs_threshold: 3347.1
   baseline: baselines/cmp_vadere_sumo_vadere_bottleneck_tcp

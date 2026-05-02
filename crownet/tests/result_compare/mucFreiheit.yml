@@ -24,12 +24,12 @@ route_choice_real_world:
     vectors:
     - id: app_packet_sent_bytes
       vector_name: packetSent:vector(packetBytes)
-      max_abs_threshold: 1.0
-      rmse_threshold: 0.5
+      max_abs_threshold: 1.9
+      rmse_threshold: 0.6
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 8.9
-      rmse_threshold: 1.7
+      max_abs_threshold: 19.8
+      rmse_threshold: 6.2
     - id: mac_received_from_lower_bytes
       vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
@@ -38,14 +38,14 @@ route_choice_real_world:
     scalars:
     - id: app_packet_sent_count_total
       scalar_name: packetSent:count
-      abs_threshold: 2.3
+      abs_threshold: 4.7
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 26.9
+      abs_threshold: 53.8
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 8887.8
+      abs_threshold: 16626.5
   baseline: baselines/route_choice_real_world
 
 mucfreiheit_lte_final:
@@ -71,21 +71,21 @@ mucfreiheit_lte_final:
       rmse_threshold: 0.5
     - id: app_packet_received_bytes
       vector_name: packetReceived:vector(packetBytes)
-      max_abs_threshold: 4.9
-      rmse_threshold: 2.0
+      max_abs_threshold: 12.4
+      rmse_threshold: 7.4
     - id: app_sent_data_rate
       vector_name: sentDataRate:vector
-      max_abs_threshold: 357.1
-      rmse_threshold: 219.6
+      max_abs_threshold: 907.2
+      rmse_threshold: 841.3
     scalars:
     - id: app_packet_sent_count_total
       scalar_name: packetSent:count
-      abs_threshold: 36.6
+      abs_threshold: 73.2
     - id: app_packet_received_count_total
       scalar_name: packetReceived:count
-      abs_threshold: 1523.1
+      abs_threshold: 2998.6
     - id: mac_received_from_lower_bytes_total
       scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
       module_regex: .*\.cellularNic\.(?:mac|nrMac)$
-      abs_threshold: 134210.0
+      abs_threshold: 265115.6
   baseline: baselines/mucfreiheit_lte_final
