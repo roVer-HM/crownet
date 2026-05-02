@@ -216,7 +216,7 @@ fingerprints_mobility:
     - "${CROWNET_HOME}/crownet/tests/mobility/*.out"
     expire_in: 8 weeks
 
-# run simulation result-based tests
+# run tests based on result comparisons
 result_compare:
   stage: test
   tags:
