@@ -196,13 +196,11 @@ fingerprints_mobility:
     - "${CROWNET_HOME}/crownet/tests/mobility/*.out"
     expire_in: 8 weeks
 
-# run result comparison regression tests (opt-in)
+# run simulation result-based tests
 result_compare:
   stage: test
   tags:
     - crownet-sim
-  rules:
-    - if: '$RESULT_COMPARE_ENABLED == "1"'
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
   script:
