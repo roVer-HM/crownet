@@ -1,0 +1,38 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+usage() {
+  cat <<'EOF'
+Generate baseline CSV files for result_compare test cases.
+
+Usage:
+  ./generate_baselines
+  ./generate_baselines --config-file <config.yml>
+  ./generate_baselines --case <case_name>
+  ./generate_baselines --case <case_a> --case <case_b>
+
+Options:
+  --config-file <name>   Limit loaded YAML files (repeatable)
+  --case <name>          Only generate baseline for selected test case (repeatable)
+  -h, --help             Show this help
+
+Examples:
+  ./generate_baselines
+  ./generate_baselines --config-file openair.yml
+  ./generate_baselines --case vadere_corridor_ramp_down
+EOF
+}
+
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+echo "Generating baselines with args: $*"
+"$SCRIPT_DIR/result_compare_test" --update-baseline "$@"
+
+echo "Baseline generation finished."
+echo "Summary: $SCRIPT_DIR/output/summary.json"

@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Auto-discover and load all *.yml files in the directory
+python3 "$SCRIPT_DIR/result_compare_runner.py" --output-dir "$SCRIPT_DIR/output" "$@"

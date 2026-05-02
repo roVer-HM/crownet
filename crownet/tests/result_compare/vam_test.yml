@@ -1,0 +1,52 @@
+vam_test_simple_cam_den:
+  wd: simulations/vam_test
+  run:
+    args:
+    - run_script.py
+    - sumo
+    - --create-sumo-container
+    - --override-host-config
+    - --sumo-tag
+    - v1_23_1_hm
+    - --omnet-tag
+    - 6.1.0
+    - --opp.-f
+    - omnetpp.ini
+    - --opp.-c
+    - simple_cam_den
+    - --opp.-r
+    - "0"
+    - --opp.--sim-time-limit=40s
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: mac_received_from_lower_bytes
+      vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      max_abs_threshold: 1.0
+      rmse_threshold: 0.5
+    - id: mac_sent_to_lower_bytes
+      vector_name: sentPacketToLowerLayer:vector(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      max_abs_threshold: 1.0
+      rmse_threshold: 0.5
+    - id: mac_sent_to_upper_bytes
+      vector_name: sentPacketToUpperLayer:vector(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      max_abs_threshold: 2.3
+      rmse_threshold: 0.7
+    scalars:
+    - id: mac_received_from_lower_bytes_total
+      scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 824.6
+    - id: mac_sent_to_lower_bytes_total
+      scalar_name: sentPacketToLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 222.2
+    - id: mac_sent_to_upper_bytes_total
+      scalar_name: sentPacketToUpperLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 698.7
+  baseline: baselines/vam_test_simple_cam_den
