@@ -8,6 +8,19 @@ print_usage() {
     -u  use image version based on the current commit."
 }
 
+add_ld_library_path_if_missing() {
+  local path_to_add="$1"
+  local current_path=":${LD_LIBRARY_PATH:-}:"
+
+  case "$current_path" in
+    *":$path_to_add:"*)
+      ;; # already in library path
+    *)
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$path_to_add"
+      ;;
+  esac
+}
+
 
 ##################################### MAIN SCRIPT ######################################
 
@@ -37,7 +50,7 @@ DIR_PATH=$(dirname $SCRIPT_PATH)
 
 export CROWNET_HOME=$DIR_PATH
 if [[ ! $PATH =~ $CROWNET_HOME ]]; then
-   echo "Add CROWNET_HOME to your system PATH."
+   echo "Adding CROWNET_HOME to your system PATH."
    export PATH="${PATH}:${CROWNET_HOME}/scripts"
 fi
 
@@ -55,6 +68,19 @@ fi
 
 source ${CROWNET_HOME}/config/CONTAINER_REGISTRY.config
 source ${CROWNET_HOME}/config/CONTAINER_VERSION.config
+
+########################## Setup path for shared libraries  #############################
+
+add_ld_library_path_if_missing "${CROWNET_HOME}/inet4/src/"
+add_ld_library_path_if_missing "${CROWNET_HOME}/simu5g/src"
+add_ld_library_path_if_missing "${CROWNET_HOME}/artery/build/Release/lib"
+add_ld_library_path_if_missing "${CROWNET_HOME}/artery/extern/vanetza/build/Release/lib"
+add_ld_library_path_if_missing "${CROWNET_HOME}/artery/build/Release/extern/vanetza/lib"
+add_ld_library_path_if_missing "${CROWNET_HOME}/veins/src"
+add_ld_library_path_if_missing "${CROWNET_HOME}/veins/subprojects/veins_inet/src"
+
+########################## if NON_INTERACTIV then exit now: #############################
+
 
 # exit here if NON_INTERACTIVE_MODE is used
 if [ "$skip_user_input" = true ]; then
