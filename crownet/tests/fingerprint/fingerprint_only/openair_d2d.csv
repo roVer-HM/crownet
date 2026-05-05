@@ -1,0 +1,8 @@
+# Fingerprint tests for the "Mobile Communications Lab (R1.009a@MUAS)" scenario
+
+# D2D scenarios
+# workingdir,                        args,                                     simtimelimit,    fingerprint,    expectedResult, tags
+/simulations/openair/,                  -f omnetpp.ini -c D1    	-r 0,    80s,              c821-197b/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp.ini -c D2    	-r 0,    80s,              1c48-de09/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp.ini -c D3    	-r 0,    80s,              d42c-1a38/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp.ini -c D4    	-r 0,    80s,              fe9e-948e/lstvz,  PASS,   omnetpp:6.3.0

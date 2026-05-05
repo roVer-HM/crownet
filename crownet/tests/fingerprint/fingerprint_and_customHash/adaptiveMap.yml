@@ -1,0 +1,129 @@
+# Fingerprint tests for the "adaptiveMap" scenario.
+# See crownet_fingerprinttest crownet --help
+#   * workingdir is relative to the given '-C' flag of crownet_fingerprinttest
+#   * each toplevel key will be one test case
+#   * if first item in `args` does not start with an `-` it will be
+#     interpreted as the command to execute
+#   * if fingerprint starts with 'file:' read the given path. If path
+#     is relative it based on workingdir. An empty path will default
+#     to hash.d/<testcase-name>.csv relative to the current files location
+
+# ── BonnMotion trace-based tests ─────────────────────────────
+
+corridor_short:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - final_bm_const_short_2x5m_d20
+    - --opp.--sim-time-limit=100s
+  simtimelimit: 100s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+corridor:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - final_bm_corridor_2x5m_d20
+    - --opp.--sim-time-limit=70s
+  simtimelimit: 70s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+corridor_5perSpawn:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - final_bm_corridor_2x5m_d20_5perSpawn
+    - --opp.--sim-time-limit=70s
+  simtimelimit: 70s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+corridor_ramp_down:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - final_bm_corridor_2x5m_d20_5perSpawn_ramp_down
+    - --opp.--sim-time-limit=70s
+  simtimelimit: 70s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+# ── Live Vadere coupling tests ───────────────────────────────
+
+vadere_corridor:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - final_corridor_2x5m_d20
+    - --opp.--sim-time-limit=20s
+  simtimelimit: 20s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+vadere_corridor_5perSpawn:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - final_corridor_2x5m_d20_5perSpawn
+    - --opp.--sim-time-limit=20s
+  simtimelimit: 20s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+
+vadere_corridor_ramp_down:
+  wd: simulations/adaptiveMap
+  args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - final_corridor_2x5m_d20_5perSpawn_ramp_down
+    - --opp.--sim-time-limit=20s
+  simtimelimit: 20s
+  expectedResult: PASS
+  fingerprint: "file:"
+  tags:
+    exec: python3
+    type: shell
+

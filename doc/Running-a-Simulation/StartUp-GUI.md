@@ -32,7 +32,7 @@ In order for the simulation to run, make sure all the necessary services are run
  * Open up the omnetpp-ide
    * terminal-1: `omnetpp-ide`
   * start the flowcontrol-container
-    * terminal-2: `control-ide`
+    * terminal-2: `flowcontrol-ide`
     * opens pycharm (later used to start mobility provider)
   * start a mobility container (sumo|vadere):
     * terminal-3: `sumo`
@@ -108,9 +108,9 @@ Seems good, both application are configured on the correct port.
 
 4. Start the flowcontrol service
    
-   to start the flowcontrol ide (pycharm), run `control-ide` in a new terminal
+   to start the flowcontrol ide (pycharm), run `flowcontrol-ide` in a new terminal
 
-The different control strategies are implemented in a controller, that can be started within the control-ide. The `control_x.py` script inside the simulation folder provides a control controller for this simulation. This script needs to be run with the `control-ide` we opened not a while ago. 
+The different control strategies are implemented in a controller, that can be started within the flowcontrol-ide. The `control_x.py` script inside the simulation folder provides a control controller for this simulation. This script needs to be run with the `flowcontrol-ide` we opened not a while ago. 
 
 First, we need to make sure, that we have configured the right python environment for our project. (We builded the venvs with `analysis-all` in a previous tutorial)
 

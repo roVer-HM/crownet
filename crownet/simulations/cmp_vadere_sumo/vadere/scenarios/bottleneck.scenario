@@ -16,6 +16,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.BonnMotionTrajectoryFile",
+      "filename" : "trace.bonnMotion",
+      "processors" : [ 200 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -32,6 +36,30 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.BonnMotionTrajectoryProcessor",
+      "id" : 200,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesBonnMotionTrajectoryProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 201,
+        "scale" : {
+          "x" : 1.0,
+          "y" : 1.0
+        },
+        "translate" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "applyOffset" : false,
+        "origin" : "upper left"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 201,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
       }
     } ],
     "isTimestamped" : true,

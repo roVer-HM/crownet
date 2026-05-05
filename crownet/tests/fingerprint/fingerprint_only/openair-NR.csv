@@ -1,0 +1,9 @@
+# Fingerprint tests for the "Mobile Communications Lab (R1.009a@MUAS)" scenario
+
+# cellular scenarios (5G NR)
+# workingdir,                        args,                                     simtimelimit,    fingerprint,    expectedResult, tags
+/simulations/openair/,                  -f omnetpp-NR.ini -c S1-NR 	-r 0,    80s,              d8a9-4389/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S1-APP-NR 	-r 0,    80s,          0a63-166d/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S1-UP-NR 	-r 0,    80s,          3a84-60dd/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S2-NR 	-r 0,    80s,              3986-31bb/lstvz,  PASS,   omnetpp:6.3.0
+/simulations/openair/,                  -f omnetpp-NR.ini -c S2-UP-NR 	-r 0,    80s,          5f26-f1b9/lstvz,  PASS,   omnetpp:6.3.0

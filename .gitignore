@@ -157,7 +157,8 @@ omnetpp-ws
 build
 dist
 
-/crownet/tests/fingerprint/yml_out.d/
+/crownet/tests/fingerprint/fingerprint_and_customHash/yml_out.d/
+/crownet/tests/mobility/yml_out.d/
 analysis/uq/simulation_studies/unittest_sim_output/
 
 simulation-campaigns/.pydevproject

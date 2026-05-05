@@ -10,7 +10,7 @@ from crownetutils.dockerrunner.simulationrunner import (
 from crownetutils.analysis.omnetpp import HdfExtractor, OppAnalysis
 from crownetutils.analysis.plot import PlotDpmMap, PlotEnb
 
-from analysis.crownetutils.crownetutils.analysis.vadere import VadereAnalysis
+from crownetutils.analysis.vadere import VadereAnalysis
 
 
 class SimulationRun(BaseSimulationRunner):

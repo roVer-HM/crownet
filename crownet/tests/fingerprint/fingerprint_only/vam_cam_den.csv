@@ -1,0 +1,4 @@
+# Basic CAM DEN test scenario (via Artery)
+
+# workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
+/simulations/vam_test/,          -f omnetpp.ini -c simple_cam_den -r 0,                           40s,    d889-c833/lstvz, PASS, sumo:v1_26_0_hm;omnetpp:6.3.0

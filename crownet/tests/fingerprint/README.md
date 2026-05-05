@@ -31,8 +31,11 @@ In order to execute the tests, perform the following steps:
     ```
 3) Change to the fingerprint folder and start the fingerprint tests.
     ```
-    (crownet_user) $> cd crownet/tests/fingerprint
+    (crownet_user) $> cd crownet/tests/fingerprint/fingerprint_only
     (crownet_user) $> ./fingerprints
+    ```
+    ```
+    (crownet_user) $> cd crownet/tests/fingerprint/fingerprint_and_customHash
     (crownet_user) $> ./fingerprints_crownet
     ```
     As you might notice, the fingerprint scripts are *not* specifically run within an
@@ -140,7 +143,7 @@ test case.
 6. **simtimelimit:** OMNeT++ based simulation time limit after which the test is considered failed.
 7. **expectedResult:** Test is successfull if result matches the set value.
 8. **fingerprint:** Path to fingerprint file for this test. The default location if only `"file:"` is given will be 
-   `hash.d/<yaml-file-name>/<test-name>.csv` relative to the yaml file in which this test is defined. Structure of this 
+   `fingerprint_and_customHash/hash.d/<yaml-file-name>/<test-name>.csv` relative to the yaml file in which this test is defined. Structure of this 
    see below. If the file does not exist the first run of the test will fail but 
    `hash.d/<yaml-file-name>/<test-name>.csv.UPDATED` will be created.
 9. **tags:** Free key-value store to configure test.  

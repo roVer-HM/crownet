@@ -1,0 +1,6 @@
+# Fingerprint tests for the separation_slow_fast scenario
+
+# workingdir,                                args,                                          simtimelimit,    fingerprint,       expectedResult, tags
+
+/simulations/separation_slow_fast/,          -f omnetpp.ini -c basic -r 0,                  100s,             5382-6998/lstvz,    PASS,           vadere:CFG;omnetpp:6.3.0
+/simulations/separation_slow_fast/,          -f omnetpp.ini -c vadere-01 -r 0,              100s,             0378-2584/lstvz,    PASS,           vadere:CFG;omnetpp:6.3.0

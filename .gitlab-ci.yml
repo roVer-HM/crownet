@@ -122,7 +122,7 @@ gtests:
   artifacts:
     when: always
     paths:
-    - ${CROWNET_HOME}/crownet/tests/fingerprint
+    - ${CROWNET_HOME}/crownet/tests/gtest
     expire_in: 8 weeks
 
 # run the fingerprint tests
@@ -136,17 +136,17 @@ fingerprints:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_only"
     - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
     - "export COMPOSE_HTTP_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
     - "./fingerprints"
   artifacts:
     when: always
     paths:
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/results"
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/*csv*"
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/*.csv"
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/*.out"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_only/results"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_only/*csv*"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_only/*.csv"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_only/*.out"
     expire_in: 8 weeks
 
 # run the fingerprint tests
@@ -160,16 +160,40 @@ fingerprints_crownet:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
     - "source ./out/crownet_user/bin/activate"
-    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint"
+    - "cd ${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_and_customHash"
     - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
     - "export COMPOSE_HTTP_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
     - "./fingerprints_crownet"
   artifacts:
     when: always
     paths:
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/yml_out.d"
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/hash.d"
-    - "${CROWNET_HOME}/crownet/tests/fingerprint/*.yml"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_and_customHash/yml_out.d"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_and_customHash/hash.d"
+    - "${CROWNET_HOME}/crownet/tests/fingerprint/fingerprint_and_customHash/*.yml"
+    expire_in: 8 weeks
+
+# run the mobility trace fingerprint tests
+fingerprints_mobility:
+  stage: test
+  tags:
+    - crownet-sim
+  variables:
+    ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - "source setup -i"
+    - "source ./out/crownet_user/bin/activate"
+    - "cd ${CROWNET_HOME}/crownet/tests/mobility"
+    - "export DOCKER_CLIENT_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
+    - "export COMPOSE_HTTP_TIMEOUT=${DOCKER_CLIENT_TIMEOUT}"
+    - "./fingerprints_mobility"
+  artifacts:
+    when: always
+    paths:
+    - "${CROWNET_HOME}/crownet/tests/mobility/yml_out.d"
+    - "${CROWNET_HOME}/crownet/tests/mobility/hash.d"
+    - "${CROWNET_HOME}/crownet/tests/mobility/output"
+    - "${CROWNET_HOME}/crownet/tests/mobility/*.out"
     expire_in: 8 weeks
 
 # run the opp tests

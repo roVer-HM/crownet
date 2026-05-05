@@ -13,7 +13,7 @@ ENDREV=topic/failover
 STARTREV=topic/tcp
 
 # the command to run on each commit
-COMMAND="./fingerprints -m ospf"
+COMMAND="./fingerprint_only/fingerprints -m ospf"
 
 # the label (actually, branch) names added to commits where command output changes
 LABEL=error

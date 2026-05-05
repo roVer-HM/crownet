@@ -1,0 +1,13 @@
+# Fingerprint tests for the simulation scenario comparing Vadere and SUMO configurations
+
+# workingdir,                        args,                                     simtimelimit,    fingerprint, expectedResult, tags
+
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoSimple -r 0,        80s,             30c6-4559/lstvz,   PASS,          sumo:v1_26_0_hm;omnetpp:6.3.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoSimpleTcp -r 0,     80s,             05ae-27c8/lstvz,   PASS,          sumo:v1_26_0_hm;omnetpp:6.3.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoBottleneck -r 0,    80s,             ff1e-c3f3/lstvz,   PASS,          sumo:v1_26_0_hm;omnetpp:6.3.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c sumoBottleneckTcp -r 0, 80s,             3400-0865/lstvz,   PASS,          sumo:v1_26_0_hm;omnetpp:6.3.0
+
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereSimple -r 0,      80s,             fe38-27f5/lstvz,   PASS,          vadere:CFG;omnetpp:6.3.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereSimpleTcp -r 0,   80s,             6c2f-e20e/lstvz,   PASS,          vadere:CFG;omnetpp:6.3.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereBottleneck -r 0,  80s,             c5e5-f869/lstvz,   PASS,          vadere:CFG;omnetpp:6.3.0
+/simulations/cmp_vadere_sumo/,       -f omnetpp.ini -c vadereBottleneckTcp -r 0,80s,            2edf-12a1/lstvz,   PASS,          vadere:CFG;omnetpp:6.3.0
