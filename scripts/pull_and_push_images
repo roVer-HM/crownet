@@ -71,7 +71,7 @@ missing_containers=()
 if [ "$all" = "true" ]; then
 	for REPO in omnetpp vadere flowcontrol sumo omnetpp-ide vadere-ide flowcontrol-ide
 	   do  
-	      echo "Pull containers from repo ${source_reg}/${REPO}"
+	      echo "Pulling containers from repo ${source_reg}/${REPO}. Please wait..."
 	      containers_=$(docker image pull --all-tags "${source_reg}/${REPO}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re=$REPO '{ print re "/" $1}')
 	      pulled_containers+=${containers_}  
 	   done
@@ -87,44 +87,44 @@ else
 	[[ -z "$CROWNET_CONTROL_IDE_CONT_TAG" ]] && echo "Control IDE $TAG_ERR" && exit -1
         
         IMAGE_LOC="${source_reg}/omnetpp:${CROWNET_OPP_CONT_TAG}"
-        printf "Pull image ${IMAGE_LOC} from container registry. "
+        printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
 	CONTAINER=$(docker image pull "${IMAGE_LOC}" | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="omnetpp" '{ print re ":" $1 " "}') 
 	echo ""
 	if [ "${CONTAINER}" = "" ]; then missing_containers+="omnetpp "; else pulled_containers+=$CONTAINER; fi
 	
 	IMAGE_LOC="${source_reg}/sumo:${CROWNET_SUMO_CONT_TAG}"
-	printf "Pull image ${IMAGE_LOC} from container registry. "
+	printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
 	CONTAINER=$(docker image pull "${IMAGE_LOC}" | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="sumo" '{ print re ":" $1 " "}' ) 
 	echo "" 
 	if [ "${CONTAINER}" = "" ]; then missing_containers+="sumo "; else pulled_containers+=$CONTAINER; fi
 		
 	IMAGE_LOC="${source_reg}/vadere:${CROWNET_VADERE_CONT_TAG}"
-	printf "Pull image ${IMAGE_LOC} from container registry. "
+	printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
 	CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="vadere" '{ print re ":" $1 " "}') 
 	echo ""
 	if [ "${CONTAINER}" = "" ]; then missing_containers+="vadere "; else pulled_containers+=$CONTAINER ; fi 
         
         IMAGE_LOC="${source_reg}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}"
-        printf "Pull image ${IMAGE_LOC} from container registry. "
+        printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
         CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="flowcontrol" '{ print re ":" $1 " "}') 
         echo ""
         if [ "${CONTAINER}" = "" ]; then missing_containers+="flowcontrol "; else pulled_containers+=$CONTAINER; fi 
         
         # IDEs make optional
         IMAGE_LOC="${source_reg}/vadere-ide:${CROWNET_VADERE_IDE_CONT_TAG}"
-        printf "Pull image ${IMAGE_LOC} from container registry. "
+        printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
         CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="vadere-ide" '{ print re ":" $1 " "}') 
         echo ""
         if [ "${CONTAINER}" = "" ]; then missing_containers+="vadere-ide "; else pulled_containers+=$CONTAINER; fi 
         
         IMAGE_LOC="${source_reg}/omnetpp-ide:${CROWNET_OPP_IDE_CONT_TAG}"
-        printf "Pull image ${IMAGE_LOC} from container registry: "
+        printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
         CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="omnetpp-ide" '{ print re ":" $1 " "}') 
         echo ""
         if [ "${CONTAINER}" = "" ]; then missing_containers+="omnetpp-ide "; else pulled_containers+=$CONTAINER; fi 
         	
 	IMAGE_LOC="${source_reg}/flowcontrol-ide:${CROWNET_CONTROL_IDE_CONT_TAG}"
-	printf "Pull image ${IMAGE_LOC} from container registry. "
+	printf "Pulling image ${IMAGE_LOC} from container registry. Please wait..."
 	CONTAINER=$(docker image pull "${IMAGE_LOC}"  | grep ": Pulling from" | cut -d ':' -f1 | awk -v re="flowcontrol-ide" '{print re ":" $1 " "}') 
 	echo ""
 	if [ "${CONTAINER}" = "" ]; then missing_containers+="flowcontrol-ide "; else pulled_containers+=$CONTAINER; fi 
