@@ -22,6 +22,15 @@ stages:
   - simulation-campaign
   - deploy
 
+.venv_preparation:
+  before_script:
+    # Since the Python environment includes the absolute path, we need to re-create (since we might be running on a different runner)
+    - echo "Preparing Python virtual environment..."
+    - rm -rf out/crownet_user
+    - "source setup -i"
+    - make out/crownet_user
+
+
 # TODO: fix the caching. Currently, old cached versions of (flowcontrol, crownetutils, suq-controller) are used instead of the updated versions despite "make analysis-clean" 
 # cache:
 #  key: ${CI_COMMIT_REF_SLUG}
@@ -114,6 +123,7 @@ gtests:
   stage: test
   tags:
     - crownet-sim
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -132,6 +142,7 @@ fingerprints:
     - crownet-sim
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -156,6 +167,7 @@ fingerprints_crownet:
     - crownet-sim
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -179,6 +191,7 @@ fingerprints_mobility:
     - crownet-sim
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -201,6 +214,7 @@ opp-tests:
   stage: test
   tags:
     - crownet-sim
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -219,6 +233,7 @@ uq-unit-tests:
     - crownet-sim
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -232,6 +247,7 @@ uq-integration-tests:
     - crownet-sim
   variables:
     ANALYSIS_UQ_M: '${CROWNET_HOME}/analysis/uq'
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
@@ -254,6 +270,7 @@ simulation-campaign:
     - crownet-sim
   rules:
     - if: '$SIM_TRIGGER'
+  extends: .venv_preparation
   script:
     - "source setup -i"
     - "/bin/bash ${CROWNET_HOME}/$SIM_SCRIPT"
