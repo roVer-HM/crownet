@@ -47,7 +47,7 @@ if [ -z "$CROWNET_HOME" ]; then
 fi
 
 # source the setup script again - since we are in the container we might need to reset the required environment variables
-source $CROWNET_HOME/setup -i
+source $CROWNET_HOME/setup -i -q
 
 # source the omnetpp environment
 source $OPP_PATH/setenv
