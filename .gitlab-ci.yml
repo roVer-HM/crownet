@@ -29,6 +29,7 @@ stages:
     - rm -rf out/crownet_user
     - "source setup -i"
     # Pull all containers in the required versions
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker pull ${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}
     - docker pull ${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}
