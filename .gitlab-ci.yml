@@ -28,6 +28,12 @@ stages:
     - echo "Preparing Python virtual environment..."
     - rm -rf out/crownet_user
     - "source setup -i"
+    # Pull all containers in the required versions
+    - docker pull ${CROWNET_IMAGE_BASE}/omnetpp:${CROWNET_OPP_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/sumo:${CROWNET_SUMO_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/vadere:${CROWNET_VADERE_CONT_TAG}
+    - docker pull ${CROWNET_IMAGE_BASE}/flowcontrol:${CROWNET_CONTROL_CONT_TAG}
+    # Build the Python environment itself
     - make out/crownet_user
 
 
