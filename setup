@@ -1,11 +1,26 @@
 
 
 print_usage() {
-   echo "$(basename "$0") [-h] [-i NON_INTERACTIVE] [-u USE_CURRENT_COMMIT]
+   echo "$(basename "$0") [-h] [-q] [-i NON_INTERACTIVE] [-u USE_CURRENT_COMMIT]
    Source this script to configure crownet
    where 
     -i  skip user input (non interactive) OPTIONAL
-    -u  use image version based on the current commit."
+    -u  use image version based on the current commit OPTIONAL
+	-q  quiet mode (no output on standard out)
+	-h   help (display this information)"
+}
+
+add_ld_library_path_if_missing() {
+  local path_to_add="$1"
+  local current_path=":${LD_LIBRARY_PATH:-}:"
+
+  case "$current_path" in
+    *":$path_to_add:"*)
+      ;; # already in library path
+    *)
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$path_to_add"
+      ;;
+  esac
 }
 
 
@@ -15,13 +30,15 @@ print_usage() {
 
 skip_user_input='false'
 use_tags_associated_to_commit='false'
+quiet_mode='false'
 
 unset opt OPTARG OPTIND	
-while getopts 'iuhv' flag
+while getopts 'iquhv' flag
 do
     case "${flag}" in
         i) skip_user_input='true';;
         u) use_tags_associated_to_commit='true';;
+		q) quiet_mode='true';;
 	h) print_usage; return 1;;
         *) print_usage; return 1;;
     esac
@@ -37,7 +54,9 @@ DIR_PATH=$(dirname $SCRIPT_PATH)
 
 export CROWNET_HOME=$DIR_PATH
 if [[ ! $PATH =~ $CROWNET_HOME ]]; then
-   echo "Add CROWNET_HOME to your system PATH."
+   if [ "$quiet_mode" = false ]; then	
+      echo "Adding CROWNET_HOME to your system PATH."
+   fi
    export PATH="${PATH}:${CROWNET_HOME}/scripts"
 fi
 
@@ -47,21 +66,38 @@ source ${CROWNET_HOME}/config/USER_ENV.config
 if [ "$use_tags_associated_to_commit" = true ]; then
    cd $CROWNET_HOME
    COMMIT=$(git rev-parse HEAD | head -c 8) # commit hash (use first 8 characters)
-   echo "(!) INFO: work with the current commit. Overwrite image versions in ${CROWNET_HOME}/config/CONTAINER_VERSION.config with the current commit (= $COMMIT)."
-   echo "(!) INFO: Exclude >omnetpp< -> Keep the omnetpp version, since omnetpp is not part of the crownet repository."
-   echo "(!) INFO: Exclude >sumo< -> Keep the sumo version, since sumo is not part of the crownet repository."
+   if [ "$quiet_mode" = false ]; then
+      echo "(!) INFO: work with the current commit. Overwrite image versions in ${CROWNET_HOME}/config/CONTAINER_VERSION.config with the current commit (= $COMMIT)."
+      echo "(!) INFO: Exclude >omnetpp< -> Keep the omnetpp version, since omnetpp is not part of the crownet repository."
+      echo "(!) INFO: Exclude >sumo< -> Keep the sumo version, since sumo is not part of the crownet repository."
+   fi
    bash ${CROWNET_HOME}/scripts/write_config.sh $COMMIT $COMMIT $COMMIT $COMMIT $COMMIT $COMMIT $COMMIT
 fi
 
 source ${CROWNET_HOME}/config/CONTAINER_REGISTRY.config
 source ${CROWNET_HOME}/config/CONTAINER_VERSION.config
 
+########################## Setup path for shared libraries  #############################
+
+add_ld_library_path_if_missing "${CROWNET_HOME}/inet4/src/"
+add_ld_library_path_if_missing "${CROWNET_HOME}/simu5g/src"
+add_ld_library_path_if_missing "${CROWNET_HOME}/artery/build/Release/lib"
+add_ld_library_path_if_missing "${CROWNET_HOME}/artery/extern/vanetza/build/Release/lib"
+add_ld_library_path_if_missing "${CROWNET_HOME}/artery/build/Release/extern/vanetza/lib"
+add_ld_library_path_if_missing "${CROWNET_HOME}/veins/src"
+add_ld_library_path_if_missing "${CROWNET_HOME}/veins/subprojects/veins_inet/src"
+
+########################## if NON_INTERACTIV then exit now: #############################
+
+
 # exit here if NON_INTERACTIVE_MODE is used
 if [ "$skip_user_input" = true ]; then
-  # print configuration
-  sh ${CROWNET_HOME}/scripts/print_environment
-  sh ${CROWNET_HOME}/scripts/print_container_registry
-  sh ${CROWNET_HOME}/scripts/print_container_versions
+  if [ "$quiet_mode" = false ]; then
+     # print configuration
+     sh ${CROWNET_HOME}/scripts/print_environment
+     sh ${CROWNET_HOME}/scripts/print_container_registry
+     sh ${CROWNET_HOME}/scripts/print_container_versions
+  fi
   return 0
 fi
 
@@ -71,12 +107,10 @@ fi
 ################## Note: user interaction required #####################################
 ########################################################################################
 
-
 echo " ##################### Container version configuration #####################"
+echo "Crownet couples several models from different simulators. Each simulator is run in an individual docker container that each has a certain version number (tag):"
 
 CONFIG_FILE="${CROWNET_HOME}/config/CONTAINER_VERSION.config"
-
-echo "Crownet couples several models from different simulators. Each simulator is run in an individual docker container that each has a certain version number (tag):"
 
 sh ${CROWNET_HOME}/scripts/print_container_versions
 
