@@ -223,6 +223,7 @@ result_compare:
     - crownet-sim
   variables:
     ANALYZER_M: '${CI_PROJECT_DIR}/analysis/crownetutils/'
+  extends: .venv_preparation
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - "source setup -i"
