@@ -1,0 +1,80 @@
+arcdsa_lab_upto_14_ue_burst_wlan:
+  wd: simulations/arcdsa_lab
+  run:
+    args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-burst-WLAN
+    - --opp.--sim-time-limit=60s
+    - --opp.repeat=1
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: app_packet_sent_bytes
+      vector_name: packetSent:vector(packetBytes)
+      max_abs_threshold: 12.2
+      rmse_threshold: 6.9
+    - id: app_packet_received_bytes
+      vector_name: packetReceived:vector(packetBytes)
+      max_abs_threshold: 12.2
+      rmse_threshold: 5.3
+    - id: mac_packet_received_from_lower_bytes
+      vector_name: packetReceivedFromLower:vector(packetBytes)
+      module_regex: .*\.wlanNic\[\d+\]\.mac$
+      max_abs_threshold: 7.3
+      rmse_threshold: 4.2
+    scalars:
+    - id: app_packet_sent_count_total
+      scalar_name: packetSent:count
+      abs_threshold: 35.3
+    - id: app_packet_received_count_total
+      scalar_name: packetReceived:count
+      abs_threshold: 70.5
+    - id: mac_packet_received_from_lower_bytes_total
+      scalar_name: packetReceivedFromLower:sum(packetBytes)
+      module_regex: .*\.wlanNic\[\d+\]\.mac$
+      abs_threshold: 406253.6
+  baseline: baselines/arcdsa_lab_upto_14_ue_burst_wlan
+
+arcdsa_lab_upto_14_ue_ramp_nr:
+  wd: simulations/arcdsa_lab
+  run:
+    args:
+    - run_script.py
+    - omnet
+    - --override-host-config
+    - --opp.-c
+    - upto-14-ue-ramp-NR
+    - --opp.--sim-time-limit=100s
+    - --opp.repeat=1
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: app_packet_sent_bytes
+      vector_name: packetSent:vector(packetBytes)
+      max_abs_threshold: 10.4
+      rmse_threshold: 4.1
+    - id: app_packet_received_bytes
+      vector_name: packetReceived:vector(packetBytes)
+      max_abs_threshold: 48.3
+      rmse_threshold: 15.3
+    - id: app_sent_data_rate
+      vector_name: sentDataRate:vector
+      max_abs_threshold: 3468.1
+      rmse_threshold: 1943.4
+    scalars:
+    - id: app_packet_sent_count_total
+      scalar_name: packetSent:count
+      abs_threshold: 97.1
+    - id: app_packet_received_count_total
+      scalar_name: packetReceived:count
+      abs_threshold: 577.4
+    - id: mac_received_from_lower_bytes_total
+      scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 767327.2
+  baseline: baselines/arcdsa_lab_upto_14_ue_ramp_nr

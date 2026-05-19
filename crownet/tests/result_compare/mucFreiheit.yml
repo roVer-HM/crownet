@@ -1,0 +1,91 @@
+route_choice_real_world:
+  wd: simulations/mucFreiheit_route_choice_app
+  run:
+    args:
+    - run_script.py
+    - vadere-opp-control
+    - --write-container-log
+    - --create-vadere-container
+    - --override-host-config
+    - --experiment-label
+    - output
+    - --with-control
+    - control.py
+    - --ctrl.controller-type
+    - AvoidShort
+    - --opp.-c
+    - test
+    - --log-docker-stats
+    - --qoi
+    - test_omnetpp_output.csv
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: app_packet_sent_bytes
+      vector_name: packetSent:vector(packetBytes)
+      max_abs_threshold: 1.9
+      rmse_threshold: 0.6
+    - id: app_packet_received_bytes
+      vector_name: packetReceived:vector(packetBytes)
+      max_abs_threshold: 19.8
+      rmse_threshold: 6.2
+    - id: mac_received_from_lower_bytes
+      vector_name: receivedPacketFromLowerLayer:vector(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      max_abs_threshold: 1.0
+      rmse_threshold: 0.5
+    scalars:
+    - id: app_packet_sent_count_total
+      scalar_name: packetSent:count
+      abs_threshold: 4.7
+    - id: app_packet_received_count_total
+      scalar_name: packetReceived:count
+      abs_threshold: 53.8
+    - id: mac_received_from_lower_bytes_total
+      scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 16626.5
+  baseline: baselines/route_choice_real_world
+
+mucfreiheit_lte_final:
+  wd: simulations/mucFreiheitLte
+  run:
+    args:
+    - run_script.py
+    - vadere-opp
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-f
+    - omnetpp_ymfd4s.ini
+    - --opp.-c
+    - final
+    - --opp.--sim-time-limit=15s
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: app_packet_sent_bytes
+      vector_name: packetSent:vector(packetBytes)
+      max_abs_threshold: 1.0
+      rmse_threshold: 0.5
+    - id: app_packet_received_bytes
+      vector_name: packetReceived:vector(packetBytes)
+      max_abs_threshold: 12.4
+      rmse_threshold: 7.4
+    - id: app_sent_data_rate
+      vector_name: sentDataRate:vector
+      max_abs_threshold: 907.2
+      rmse_threshold: 841.3
+    scalars:
+    - id: app_packet_sent_count_total
+      scalar_name: packetSent:count
+      abs_threshold: 73.2
+    - id: app_packet_received_count_total
+      scalar_name: packetReceived:count
+      abs_threshold: 2998.6
+    - id: mac_received_from_lower_bytes_total
+      scalar_name: receivedPacketFromLowerLayer:sum(packetBytes)
+      module_regex: .*\.cellularNic\.(?:mac|nrMac)$
+      abs_threshold: 265115.6
+  baseline: baselines/mucfreiheit_lte_final

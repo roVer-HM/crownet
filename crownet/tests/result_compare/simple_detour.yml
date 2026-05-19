@@ -1,0 +1,51 @@
+simple_detour_wlan:
+  wd: simulations/simple_detoure_suqc_traffic
+  run:
+    args:
+    - run_script.py
+    - vadere-opp
+    - --write-container-log
+    - --qoi
+    - poisson_parameter.txt
+    - time_95_informed_redirection_area.txt
+    - time_95_informed_all.txt
+    - packet_age.txt
+    - number_of_peds.txt
+    - --create-vadere-container
+    - --override-host-config
+    - --opp.-c
+    - final
+    - --opp.--sim-time-limit=400s
+    - --opp.outputvectormanager-class=omnetpp::envir::SqliteOutputVectorManager
+    - --opp.outputscalarmanager-class=omnetpp::envir::SqliteOutputScalarManager
+  extract:
+    vectors:
+    - id: app_packet_sent_bytes
+      vector_name: packetSent:vector(packetBytes)
+      module_regex: World_Wlan\.(?:pNode\[\d+\]|misc\[\d+\])\.app\[0\](?:\.app)?$
+      max_abs_threshold: 15.0
+      rmse_threshold: 12.0
+    - id: app_packet_received_bytes
+      vector_name: packetReceived:vector(packetBytes)
+      module_regex: World_Wlan\.(?:pNode\[\d+\]|misc\[\d+\])\.app\[0\](?:\.app)?$
+      max_abs_threshold: 15.0
+      rmse_threshold: 12.0
+    - id: mac_packet_received_from_upper_bytes
+      vector_name: packetReceivedFromUpper:vector(packetBytes)
+      module_regex: World_Wlan\.(?:pNode\[\d+\]|misc\[\d+\])\.wlanNic\[\d+\]\.mac$
+      max_abs_threshold: 15.3
+      rmse_threshold: 12.3
+    scalars:
+    - id: app_packet_sent_bytes_total
+      scalar_name: packetSent:sum(packetBytes)
+      module_regex: World_Wlan\.(?:pNode\[\d+\]|misc\[\d+\])\.app\[0\](?:\.app)?$
+      abs_threshold: 45630.0
+    - id: app_packet_received_bytes_total
+      scalar_name: packetReceived:sum(packetBytes)
+      module_regex: World_Wlan\.(?:pNode\[\d+\]|misc\[\d+\])\.app\[0\](?:\.app)?$
+      abs_threshold: 458850.0
+    - id: mac_packet_received_from_upper_bytes_total
+      scalar_name: packetReceivedFromUpper:sum(packetBytes)
+      module_regex: World_Wlan\.(?:pNode\[\d+\]|misc\[\d+\])\.wlanNic\[\d+\]\.mac$
+      abs_threshold: 46603.4
+  baseline: baselines/simple_detour_wlan
