@@ -1,6 +1,6 @@
 # *CrowNet*: *Crow*ds in *Net*works
 CrowNet is an open source simulation framework for the development of new networked mobility concepts and intelligent transportation systems.
-CrowNet has been developed as part of the [roVer research project](https://www.hm.edu/forschung/forschungsprojekte/projektdetails/wischhof/wischhof_koester_rover.de.html) at [Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html) that is funded by the [Federal Ministry of Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html) (Grant number: 13FH669IX6).
+CrowNet has been developed as part of the [roVer research project](https://hm.edu/en/research/projects/project_details/wischhof_koester/rover.en.html) at [Munich University of Applied Sciences](https://www.hm.edu/en/index.en.html) that is funded by the [Federal Ministry of Education and Research](https://www.bmftr.bund.de/EN/Home/home_node.html) (Grant number: 13FH669IX6).
 
 <img align="center" width="60%" src="doc/img/crownet_sketch.png">
 
@@ -18,7 +18,7 @@ CrowNet extends these frameworks with several features.
 
 ### Quick start
 
-Please see the [quick start example](doc/Installation/Installation.md) in our [documentation](doc/README.md).
+Please see the [quick start example](doc/Installation/Installation.md) in our [documentation](doc/index.md).
 
 ### License and dependencies
 
@@ -26,7 +26,7 @@ Within the CrowNet simulation environment, four open-source simulation framework
 * [OMNeT++](https://omnetpp.org/) - The simulation framework used
   for modelling communication and information dissemination
 * [VADERE](http://www.vadere.org/) - VADERE Crowd Simulation
-* [SUMO](https://dlr.de/ts/en/sumo/) - Simulation of Urban Mobility
+* [SUMO](https://sumo.dlr.de/docs/index.html) - Simulation of Urban Mobility
 * [flowcontrol](https://github.com/roVer-HM/flowcontrol) - Simulation of crowd management strategies
 
 The OMNeT++ simulation of communication and networking for disseminating mobility information is based on four open source simulation projects:

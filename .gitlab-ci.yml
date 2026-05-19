@@ -20,6 +20,7 @@ stages:
   - test
   - uq-test
   - simulation-campaign
+  - build_documentation
   - deploy
 
 .venv_preparation:
@@ -337,3 +338,27 @@ build_images:
     - "bash -x ${CROWNET_HOME}/scripts/pull_and_push_images -s ${CROWNET_IMAGE_BASE} -t ghcr.io/rover-hm -p -k"
 
 
+# GitLab Pages: build documentation
+pages:
+  stage: build_documentation
+  tags:
+    - sam-docker
+  image: python:3.14-bookworm
+  variables:
+    GIT_LFS_SKIP_SMUDGE: 0
+  before_script:
+    - apt-get update && apt-get install -y git-lfs
+    - git lfs pull
+    - pip install zensical --break-system-packages
+  script:
+    - zensical build --clean --strict
+  after_script: []
+  artifacts:
+    paths:
+      - public
+  rules:
+    # Run only on default branch (develop)
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
+      when: always
+    # Otherwise, don't run
+    - when: never

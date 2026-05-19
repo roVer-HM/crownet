@@ -165,3 +165,7 @@ simulation-campaigns/.pydevproject
 
 # ignore user-specific output in the root repo 
 output_*
+
+# Zensical / MkDocs documentation build output
+public/
+site/

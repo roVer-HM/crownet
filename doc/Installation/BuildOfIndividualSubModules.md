@@ -1,13 +1,13 @@
 
 # Individually building the models
 Instead of using the top-level Makefile, the models can also be built individually. Therefore, one must
-first switch to the model subdirectory and than execute make locally.
+first switch to the model subdirectory and then execute make locally.
 
 *Example: Building the INET and Simu5G Frameworks*
 
 Assuming that you have added the "omnetpp" script to your search path for executables and cloned the CrowNet project with all its submodules (see installation instructions above), you can build the INET and Simu5G models by the following commands:
 ```
-cd inet
+cd inet4
 omnetpp exec make makefiles
 omnetpp exec make -j4 MODE=release
 omnetpp exec make -j4 MODE=debug
@@ -29,7 +29,7 @@ omnetpp exec ./configure
 omnetpp exec make -j4
 ```
 
-Veins includes of several subprojects - for CrowNet the veins_inet project is required. It needs to have access to the folder where INET 4 is located. The location is specified by the option `--with-inet=../../../inet4` of the *configure* script:
+Veins includes several subprojects. For CrowNet, the `veins_inet` project is required. It needs access to the folder where INET 4 is located. The location is specified by the option `--with-inet=../../../inet4` of the *configure* script:
 
 ```
 cd subprojects/veins_inet

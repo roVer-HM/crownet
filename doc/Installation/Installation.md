@@ -8,7 +8,7 @@ The CrowNet environment requires a Linux System. We are currently using Ubuntu 2
 
 ### Python
 
-CrowNet requires identical Pyhton versions on the system and within the CrowNet containers. This will be checked and you will receive a warning
+CrowNet requires identical Python versions on the system and inside the CrowNet containers. This is checked automatically, and you will receive a warning
 message if there is a mismatch of the installed Python versions.
 
 Additionally, for running Python scripts on the host, a few other packages need to be installed:
@@ -19,7 +19,7 @@ sudo apt install black python3-venv python3-pip python3-tk
 
 ### Build Essential, git and curl
 
-CrowNet requires basic make and compilations tools. We recommend to install the build-essentials package.
+CrowNet requires basic build and compilation tools. We recommend installing the `build-essential` package.
 
 ```
 sudo apt install build-essential git git-lfs curl
@@ -59,7 +59,7 @@ since the user must be part of the Docker group and user rights are not
 updated in all shells with the 'newgrp' command above.)
 
 
-We recommended to include 'source ${CROWNET_HOME}/setup -i' in the startup file of your shell (~/.bashrc). You can do this by editing the file '.bashrc' stored in the home directory of your user and adding the following lines:
+We recommend adding `source ${CROWNET_HOME}/setup -i` to your shell startup file (`~/.bashrc`). You can do this by editing `.bashrc` in your home directory and adding the following lines:
 ```
 # export the path to CrowNet (change according to the path in your setup!)
 export CROWNET_HOME=$HOME/crownet
@@ -69,7 +69,7 @@ source ${CROWNET_HOME}/setup -i
 Notes:
 * The start script will mount your home directory so that it is visible inside the Docker container. 
 * The OMNeT++ IDE uses the workspace directory to store its preferences and development artifacts.
-* Disable SELinux (Fedoara, RedHat, ...) with `sudo setenforce 0` for the installation, since it blocks X11 Forwarding. 
+* Disable SELinux (Fedora, RedHat, ...) with `sudo setenforce 0` for the installation, since it blocks X11 forwarding.
 
 ### For developers only
 Please follow our [coding style instructions](./CodingStyle.md), and see our [recommendations](./Recommendations.md).
@@ -77,7 +77,7 @@ Please follow our [coding style instructions](./CodingStyle.md), and see our [re
 ## Build CrowNet 
 
 You can either build each [component individually](BuildOfIndividualSubModules.md) or use the top-level Makefile.
-The simplest way to build the system is to use the top-level Makefile which we descrive in the following.
+The simplest way to build the system is to use the top-level Makefile, which we describe below.
 Preserving the required build-order, the top-level Makefile builds all the required components.
 Simply run:
 
@@ -89,9 +89,8 @@ omnetpp exec make MODE=release -j$(nproc)
 
 Notes:
 * the flag "release" forces "release" mode. To switch to "debug" mode, use "debug".
-* the number of available processor cores are auto-detected during the build process and a sufficient number of threads is started.
+* the number of available processor cores is auto-detected during the build process, and a suitable number of threads is started.
 
-That's all - now you can change to [simulations](../../crownet/simulations) and start running the simulations.
 
 ## Quick start
 
@@ -126,7 +125,7 @@ Vadere 1.15 (Commit Hash: 05e16522ef78086194e58fee6c713cb713faa6f7) [TraCI: Vade
 INFO:root> vadere launcher listening on port 9998 ..
 ```
 
-The container will now be listening for incoming TraCi commands and start mobiliy simulator. The 
+The container will now listen for incoming TraCI commands and start the mobility simulator. The
 TraCI port for sumo defaults to `9999` and for vadere to `9998`.
 
 ### Step 2: Start the omnetpp container and open workspace
@@ -134,11 +133,11 @@ Start the omnetpp container:
 ```
 omnetpp-ide
 ```
-Setup the Omnet++ IDE as described [here](../Running-a-Simulation/StartUp-GUI.md) and build the project in release or debug mode.
+Set up the OMNeT++ IDE as described [here](../Running-a-Simulation/StartUp-GUI.md) and build the project in release or debug mode.
 
 ### Step 3: Run the simulation
-Got to `crownet/simulations/testSim` in the project view and search for the `omentpp.ini` file.
-Run the simulation by doing a right-click and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible, 
+Go to `crownet/simulations/testSim` in the project view and open the `omnetpp.ini` file.
+Run the simulation by right-clicking it and selecting "Run as OMNeT++ simulation". When the simulation GUI is visible,
 select one of the following configurations and start the simulation:
 
 1. vadere_test001 ("requires that you started the vadere container as described above")
@@ -147,7 +146,7 @@ select one of the following configurations and start the simulation:
 4. test_control00* ("requires that you started the vadere and the flowcontrol container")
 
 Note: 
-* See crownet/simulations/networks/default_configs.ini for common settings such as traci host and port setup.
+* See `crownet/simulations/networks/default_configs.ini` for common settings such as TraCI host and port setup.
 
 
 

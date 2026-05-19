@@ -1,12 +1,16 @@
 # Density maps: Sidelink based crowd monitoring
 
-A density map is a map that shows spatial distribution of pedestrian density $d$ that is defined as:
-$$ d = N / A $$
-where $N$ is the number of pedestrians and $A$ is the area of the measurement area.
+A density map represents the spatial distribution of pedestrian density $d$, defined as
+
+$$
+d = \frac{N}{A}
+$$
+
+where $N$ is the number of pedestrians and $A$ is the measurement area.
 
 A density map can be used to identify areas where crowding occurs.
-For this purpose, the topography is divided into cells (see the red grid in the image). For each cell (i),
-the density $d$ is estimated and updated in periodic time intervals.
+For this purpose, the topography is divided into cells (see the red grid in the image). For each cell $i$,
+the density $d_i$ is estimated and updated at periodic time intervals.
 
 ![](../img/discretized_topography.png)
 
@@ -19,8 +23,6 @@ The density map itself does not contain any information like position data which
 
 ![](../img/density_map_processoverview.png)
 
-## Tutorial
-Please find an example [here](../../crownet/simulations/densityMap)
 
 ## Further information
 Please find a detailed description of the density map in [our publication](https://doi.org/10.1109/ACCESS.2023.3242946)

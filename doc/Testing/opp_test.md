@@ -1,17 +1,17 @@
 # opp_test tool
 
-The opp_test tool is a python tool developed to test the OMNeT++ simulation kernel. It's a python script that converts a .test-file into a runnable executable. Each .test-file will be compiled into a subfolder with the same name (`sample.test` -> `sample/`)
+The `opp_test` tool is a Python tool used to test the OMNeT++ simulation kernel. It converts a `.test` file into a runnable executable. Each `.test` file is compiled into a subfolder with the same name (`sample.test` -> `sample/`).
 
-The crownet opp_tests can be found under `crownet/crownet/tests/omnetpp`
-The whole opp_test process is wrapped with a shell script called `runtest`. This script sets variables to build the executable and runs all tests.
+CrowNet `opp_test` files can be found under `crownet/tests/omnetpp`.
+The whole `opp_test` process is wrapped by a shell script called `runtest`. This script sets variables to build the executable and runs all tests.
 
 ## Debugging
-1. to debug .test-files it is important to build all modules in debug mode and make changes in the `runtest`-script. To debug .test-files, the `runtest` needs to build in debug mode (`MAKE="make MODE=debug"`),  the linked libraries need to be in debug mode as well (f.e. `EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET_dbg -lCROWNET_dbg"`)
+1. To debug `.test` files, build all modules in debug mode and adjust the `runtest` script accordingly. The `runtest` script must build in debug mode (`MAKE="make MODE=debug"`), and linked libraries must also be built in debug mode (for example, `EXTRA_INCLUDES="$CROWNET_INCLUDE $INET_INCLUDE -lINET_dbg -lCROWNET_dbg"`).
 
-2. execute `./runtest` (creates a c++-executable and subfolders for each .test-file)
+2. Execute `./runtest` (creates a C++ executable and subfolders for each `.test` file).
 
-3. to debug a specific test (`/subfolder`) the debug configuration needs to be edited (in omnetpp-ide: right-click the executeable (work_dbg) -> Debug as -> Debug Configuration):
-    * at the arguments section, copy the arguments from the created file `<subfolder>/run` (f.e. `-u Cmdenv _defaults.ini` without the `export`-line and the `"$@"` at the end)
+3. To debug a specific test (`/subfolder`), edit the debug configuration (in `omnetpp-ide`: right-click the executable (`work_dbg`) -> Debug as -> Debug Configuration):
+    * in the arguments section, copy the arguments from the generated file `<subfolder>/run` (for example, `-u Cmdenv _defaults.ini`, without the `export` line and the `"$@"` at the end)
     * IMPORTANT: uncheck the checkbox `Use default` and set it to the directory of the `subfolder`
 
 ![Image of the opp_test app debug configuration](../img/opp_test_debug_config.png)
@@ -30,15 +30,15 @@ network = Test
 cmdenv-express-mode = false
 cmdenv-log-prefix = ""
 ```
-Its not recommended calling your network `Test`.
+It is not recommended to call your network `Test`.
 ### %global
 Used to write c++ code and make it global to the created module. Can be a function that can be run in the %activity section.
 ### %activity
-Used to run own code. Omnet generates a new net and ini file for this module. Useful for testing single units, with less to none omnetpp dependencies. Make sure to print important logic to the stdout for validation.
+Used to run custom code. OMNeT++ generates a new NED and INI file for this module. This is useful for testing single units with little to no OMNeT++ dependencies. Make sure to print important logic to stdout for validation.
 ### %contains %not-contains
 Checks if a block of text is/is not present in the file (stdout/stderr). If one wants to test multiple lines with any amount of lines between them, multiple %contains/%not-contains are needed.
 ### %contains-regex %not-contains-regex
-Checks if a certain regex is/is not present in a given file. Uses perl syntax for regex. (See perl cheat sheet in [useful links](#usefull-links))
+Checks if a certain regex is/is not present in a given file. Uses perl syntax for regex. (See perl cheat sheet in [useful links](#useful-links))
 
 # Useful links
 * opp_test source file: [opp_test.py](https://github.com/omnetpp/omnetpp/blob/master/src/utils/opp_test)

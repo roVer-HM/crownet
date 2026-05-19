@@ -3,36 +3,36 @@
 The standard BonnMotion mobility module in INET will create all nodes at the 
 beginning and will not remove nodes after the end of the traces is reached. 
 
-The singleton module 'BonnMotionMobilityServer' as well as the per node 
-mobility module 'BonnMotionMobilityClient' will allow this behavior. 
+The singleton module `BonnMotionMobilityServer` together with the per-node
+mobility module `BonnMotionMobilityClient` enables this behavior.
 Each node is created at the first time stamp mentioned in a given trace.
 The order of traces in the files is not important. The BonnMotionMobilityServer
 will sort the lines accordingly. 
 
 ## BonnMotionMobilityClient
 
-Simple mobility module based the LineSegmentsMobilityBase class. The nodes 
-provided by the Traces must have this mobility module. No further settings needed.  
+Simple mobility module based on the `LineSegmentsMobilityBase` class. The nodes
+provided by the traces must use this mobility module. No further settings are needed.
 
 ## BonnMotionMobilityServer
 
-A top level module which will manage a vector of nodes with one node for 
+A top-level module that manages a vector of nodes with one node for 
 each trace in the given BonnMotion file. 
 
 Parameters:
 
-* traceFile: BonnMotion trace file. Will be loaded only once
-* vectorNode: Name of vector node to use for dynamic node creation. The vector 
-              does not have to exist. 
-* moduleType: Type of Node which should be created. These nodes must have a 
-                mobility module of the type `BonnMotionMobilityServer`
+* traceFile: BonnMotion trace file. Loaded only once.
+* vectorNode: Name of the vector node to use for dynamic node creation. The vector 
+              does not need to exist beforehand.
+* moduleType: Type of node that should be created. These nodes must have a 
+              mobility module of type `BonnMotionMobilityClient`.
 * mobilityModulePath: Path to the mobility module
 
 
 ## Example Setup
 
-If trance files are use there is no mobility simulation framework to proved 
-a coordinate conversion. Therefore it is a good idea to use a local converter.
+If trace files are used, there is no mobility simulation framework to provide
+coordinate conversion. Therefore, using a local converter is recommended.
 
 ```
 [Config bonnMotion]
@@ -55,20 +55,20 @@ extends=noTraCI
 
 ## Export from Vadere
 
-To export BonnMotion traces for OMNeT++ from Vadere add the following 
-files and processors in the vadere configuration file. Ensure the 
-reference id's match and do not overlap with existing processors. 
+To export BonnMotion traces for OMNeT++ from Vadere, add the following
+files and processors in the Vadere configuration file. Ensure that the
+reference IDs match and do not overlap with existing processors.
 
-The BonnMotion processors relies on the PedestrianPositionProcessor but 
-this processor does not need to be match in any file. Ensure that there is 
-no meta data at the beginning of the file. If present delete it.
+The BonnMotion processor relies on the `PedestrianPositionProcessor`, but
+this processor does not need to be mapped in any output file. Ensure that there is
+no metadata at the beginning of the file. If present, delete it.
 
 
 Attributes:
 
-* offset: will add the offset (translation) set in the  referenceCoordinateSystem
-  if it is present. This is not needed when use wit OMNeT++
-* origin: will change the coordinate origin. OMNeT uses the origin 'upper left' and 
+* offset: adds the offset (translation) set in `referenceCoordinateSystem`
+  if it is present. This is not needed when used with OMNeT++.
+* origin: changes the coordinate origin. OMNeT++ uses `upper left` and
   Vadere (as well as Sumo) uses 'lower left'. 
 
 ```

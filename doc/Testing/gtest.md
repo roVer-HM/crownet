@@ -1,20 +1,20 @@
 # GoogleTest and GoogleMock
 
-The GoogleTest library is used to test C++ code and the GoogleMock Library is used to mock dependencies inside those tests.
-We are currently using the version 1.10, but facing an issue, that the new syntax for mocking in GoogleMock does not work.
+GoogleTest is used to test C++ code, and GoogleMock is used to mock dependencies in those tests.
+CrowNet currently uses version 1.10 because parts of the newer GoogleMock syntax are not yet compatible with this code base.
 
-For more documentation about GoogleTest and Google mock please read the [official documentation](https://github.com/google/googletest/tree/master/docs)
+For more information about GoogleTest and GoogleMock, read the [official documentation](https://github.com/google/googletest/tree/master/docs).
 
-Unfortunately the latest version is having a new syntax. But there is a [chromium page](https://chromium.googlesource.com/external/github.com/google/googletest/+/refs/tags/release-1.8.0/googlemock/docs/ForDummies.md) for the old syntax
+The latest versions use a newer syntax. For the older syntax used here, see this [Chromium page](https://chromium.googlesource.com/external/github.com/google/googletest/+/refs/tags/release-1.8.0/googlemock/docs/ForDummies.md).
 
-To run the GoogleTests in our project navigate to `crownet/crownet` run them with the omnetpp container via `omnetpp exec make make-test MODE=debug` 
+To run the GoogleTests in this project, navigate to `crownet` and execute them with the OMNeT++ container via `omnetpp exec make make-test MODE=debug`.
 
-## testing
+## Testing
 
-To write a new GoogleTest class create a file named `<unit_name>Test.cc` in the test directory.
-For our project we also inherit from BaseOppTest to get some functionalities for the omnet library.
+To write a new GoogleTest class, create a file named `<unit_name>Test.cc` in the test directory.
+In this project, tests often inherit from `BaseOppTest` to reuse OMNeT++-related helper functionality.
 
-### example
+### Example
 
 ```c++
 #include "main_test.h" // includes #include "gtest/gtest.h"
@@ -42,7 +42,7 @@ TEST(HelloTest, BasicAssertions) {
 
 ### Assertions
 
-There are two types of assertions on that is fatal (<b>ASSERT</b>) and one that is not (<b>EXPECT</b>). The fatal assertion stops the current test if the expected condition is false. The non-fatal one continues the test and marks it as failed.
+There are two assertion types: fatal (`ASSERT`) and non-fatal (`EXPECT`). A fatal assertion stops the current test when the expected condition is false. A non-fatal assertion continues the test and marks it as failed.
 
 ### Basic Assertions
 For basic true/false conditions.
@@ -71,16 +71,16 @@ For comparing two strings.
 | ASSERT_STRCASEEQ(str1,str2); | EXPECT_STRCASEEQ(str1,str2); | same content and ignore case |
 | ASSERT_STRCASENE(str1,str2); | EXPECT_STRCASENE(str1,str2); | different content and ignore case |
 
-## mocking
+## Mocking
 
-When testing a units business logic, it's recommended to mock external dependencies, because in most cases their logic is already tested somewhere else. Because our unit depends on them, we have to make sure that the unit calls it, that is when mocking comes in useful.
+When testing a unit's business logic, it is recommended to mock external dependencies, because in most cases their own logic is already tested elsewhere. Since the unit depends on those components, we need to verify that the unit calls them correctly. This is where mocking is useful.
 
-In google mock we can mock by inheriting from the class to be mocked and wrapping functions in GoogleMock macros.
+In GoogleMock, we create mocks by inheriting from the class to be mocked and wrapping functions with GoogleMock macros.
 
 ### example
 
-Let's test a small sample unit (`client.uploadData(string data)`) that is calling an api (`api.post(string data)`).
-Since we don't want to test the api and its response, we decide to mock the whole api call.
+Let's test a small sample unit (`client.uploadData(string data)`) that calls an API (`api.post(string data)`).
+Since we do not want to test the API and its response here, we mock the API call.
 
 ```c++
 #include "gmock/gmock.h"  // bring in in Google Mock.
@@ -106,11 +106,11 @@ TEST_F(client, uploadData) {
 }
 ```
 
-In this example, the whole logic of the client.uploadData() is tested without touching any api calls.
+In this example, the logic of `client.uploadData()` is tested without executing real API calls.
 
-If our unit handles with broken api responses it's recommended mocking those as well. This can be done by telling our mock what to return on a call. We can then test if the function that called the api throws the correct exception (the unit needs to be inherited for that)
+If the unit handles broken API responses, those cases should also be mocked. This can be done by configuring what the mock returns on a call. You can then test whether the function that calls the API throws the correct exception (the unit needs to be inherited for that).
 
-For cleaner code it's nice to use `using ::testing::Return;` at the top of the test if using the Return-Action.
+For cleaner code, add `using ::testing::Return;` at the top of the test when using the `Return` action.
 ```c++
 #include "gmock/gmock.h" 
 using ::testing::Return;

@@ -1,9 +1,8 @@
 
 # Configuration of simulations
 
-CrowNet is build on several well-documented simulation frameworks. 
-Please find the following manuals to understand how a basic simulation is setup:
-- [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/)
+CrowNet is built on several well-documented simulation frameworks.
+Use the following manuals to understand how a basic simulation is set up:
 - [OMNeT++ Simulation Manual](https://doc.omnetpp.org/omnetpp/manual/)
 - [INET User's Guide](https://inet.omnetpp.org/docs/users-guide/)
 - [INET Developer's Guide](https://inet.omnetpp.org/docs/developers-guide/)
@@ -13,9 +12,9 @@ Please find the following manuals to understand how a basic simulation is setup:
 
 ### omnetpp.ini
 Contains network specific configuration.
-Every simulation in omnetpp needs a `omnetpp-ini` file as starting point. Here we will set up network specific parameters. This file may also include shared configuration via `include ../networks/default_configs.ini` command to include shared configurations.
+Every OMNeT++ simulation needs an `omnetpp.ini` file as a starting point. Here you set network-specific parameters. This file may also include shared configuration via `include ../networks/default_configs.ini`.
 
-The simulations and their `omnetpp.ini` file can be found in: `crownet/crownet/simulations`
+The simulations and their `omnetpp.ini` files can be found in `crownet/crownet/simulations`.
 
 ```yaml
 [Config star_wars_simulation]
@@ -32,7 +31,7 @@ name = "Luke"
 bad_guy = False
 ```
 
-The square brackets signal the beginning of a new configuration. The `extends` parameter includes existing configuration into the current configuration. This configuration can be either in the same `omnetpp.ini` file or in the `default_configs.ini` file. The other lines are setting up network parameters. Reassigning a parameter to a child will override their parent parameter.
+Square brackets signal the beginning of a new configuration. The `extends` parameter includes existing configurations into the current configuration. This configuration can be defined in the same `omnetpp.ini` file or in `default_configs.ini`. The other lines set network parameters. Reassigning a parameter in a child configuration overrides the parent parameter.
 
 With the setup above, the `simple_star_wars` network would consist of the following parameters
 
@@ -45,7 +44,7 @@ bad_guy = False
 
 ### default_configs.ini
 Contains configuration shared between multiple simulations.
-This file follows the same scheme as the normal omnetpp.ini file, but this file is only used to derive existing configuration. This file is located in 
+This file follows the same scheme as `omnetpp.ini`, but it is only used to derive existing configurations. It is located in
 `crownet/crownet/simulations/networks/default_configs.ini`.
 
 **Note:** Simulation networks should always be in the simulation's own `omnetpp.ini` file and not in the `default_configs.ini`.
@@ -54,11 +53,11 @@ This file follows the same scheme as the normal omnetpp.ini file, but this file 
 
 There are two ways to consider mobility, that is, dynamic positions in the mobile networks simulation. 
 1. use pre-computed mobility traces 
-2. update the node position online (Simultaneous executions of Omnet++ and the mobility simulator)
+2. update the node position online (simultaneous execution of OMNeT++ and the mobility simulator)
 
 Using pre-computed mobility traces reduces the complexity of the simulation: 
-The mobility traces is created by a mobility simulator such as "vadere" or "sumo" beforehand and 
-afterwards the communication models are run independently. 
+The mobility traces are created by a mobility simulator such as Vadere or SUMO beforehand, and
+afterwards the communication models are run independently.
 However, if you want to model a system where the mobility behaviour depends on information received via wireless simulation, 
 pre-computed mobility traces cannot be used. In this case, a coupled simulation of mobility and communication needs to be performed.
 
@@ -106,8 +105,8 @@ To use the Vadere simulator as mobility provider, include the following config:
 *.coordConverter.srs_code = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 *.coordConverter.offset_x = -692273.8894735108m
 *.coordConverter.offset_y = -5337503.5661007995m
-*.coordConverter.xBound = 164.10m # USE BOUNDS froms scenario file
-*.coordConverter.yBound = 215.10m # USE BOUNDS froms scenario file
+*.coordConverter.xBound = 164.10m # USE BOUNDS from scenario file
+*.coordConverter.yBound = 215.10m # USE BOUNDS from scenario file
 
 *.traci.nodes.personNode = "pNode"
 *.traci.nodes.typename = "VadereNodeManager"
