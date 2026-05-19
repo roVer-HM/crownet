@@ -14,7 +14,7 @@ for examples):
 
 ## Motivation
 
-**State-of-the-Art does not provide robust information dissemination.**
+**The state of the art does not provide robust information dissemination.**
 
 The current state of the art is based on the classical TCP/IP protocol stack
 and a client-server based architecture: The mobile person uses a smartphone-app
@@ -31,7 +31,7 @@ TODO: diagram of classic stack and system structure
 * Overload within the cellular networks: Depending on the local density of
   users, individual cells or the core-network components can be overloaded.
 * Overload at the central server(s) within the Internet, examples include:
-    * assassination in Munich in July 2016 [Greiner2016]
+    * assassination in Munich in July 2016 (Greiner2016)
     * nationwide alert day 2020 (https://warnung-der-bevoelkerung.de/en/)
 * Unicast TCP does not scale well and suffers drastically in case of high
   packet error rates or only partially connected networks with short
@@ -41,7 +41,7 @@ TODO: diagram of classic stack and system structure
   Therefore, a (centralized) server (whose address is known beforehand) is used
   to store and disseminate the information.
 * Geographic routing protocols (as known from numerous works in the scientific
-  community) suffers in situations with high mobility. Furthermore, the
+  community) suffer in situations with high mobility. Furthermore, the
   geographic position of potentially interested receivers is often not known.
 * Locally available data-rate varies by several orders of magnitude due to the
   location-dependent availability of communication networks (2G...5G),
@@ -51,7 +51,7 @@ TODO: diagram of classic stack and system structure
 * Locally available communication technologies (cellular/direct,
   2G/3G/4G/5G/WLAN/Bluetooth) vary significantly - in these heterogeneous
   networks the state-of-the-art protocol stack does not support a dynamic
-  adaption to the locally available technologies in these heterogeneous
+  adaptation to the locally available technologies in these heterogeneous
   networks.
 
 ## Overview of roVer Protocol Stack
@@ -61,6 +61,6 @@ modifications (e.g. AID-service)
 
 ## References
 
-* [Greiner2016]
+* Greiner2016
 * Lena Greiner, „So funktioniert Katwarn - oder auch nicht“,
-  Spiegel Online, 23-Juli-2016. [Online]. Verfügbar unter: http://www.spiegel.de/netzwelt/apps/katwarn-so-funktioniert-das-warnsystem-und-das-sind-die-probleme-a-1104421.html. [Zuge-griffen: 16-Feb-2017].
+  Spiegel Online, 23-Juli-2016. (Online). Verfügbar unter: http://www.spiegel.de/netzwelt/apps/katwarn-so-funktioniert-das-warnsystem-und-das-sind-die-probleme-a-1104421.html. (Zugegriffen: 16-Feb-2017).

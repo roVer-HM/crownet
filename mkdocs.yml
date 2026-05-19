@@ -1,0 +1,126 @@
+site_name: CrowNet Documentation
+site_url: https://develop.crownet.org
+site_description: >-
+  CrowNet – Open source simulation framework for networked
+  mobility concepts and intelligent transportation systems.
+site_author: Munich University of Applied Sciences – roVer Research Project
+repo_url: https://github.com/roVer-HM/crownet
+repo_name: roVer-HM/crownet
+
+docs_dir: doc
+site_dir: public
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+nav:
+  - Home: index.md
+  - Installation:
+      - Getting Started: Installation/Installation.md
+      - Build Individual Submodules: Installation/BuildOfIndividualSubModules.md
+      - Coding Style: Installation/CodingStyle.md
+      - Recommendations: Installation/Recommendations.md
+  - Simulation Configuration:
+      - Configuration: Simulation-configuration/Configuration.md
+      - Dynamic BonnMotion Traces: Simulation-configuration/use-dynamic-bonnMotion-traces.md
+  - Running a Simulation:
+      - Overview: Running-a-Simulation/README.md
+      - Using the GUI: Running-a-Simulation/StartUp-GUI.md
+      - Using a Run Script: Running-a-Simulation/StartUp-RunScript.md
+      - Using the Terminal: Running-a-Simulation/StartUp-Terminal.md
+  - Parameter Studies: Parameterstudies/README.md
+  - Testing:
+      - Overview: Testing/README.md
+      - Google Tests: Testing/gtest.md
+      - OMNeT++ Tests: Testing/opp_test.md
+      - Fingerprint Tests: Testing/fingerprint-tests.md
+      - Mobility Trace Tests: Testing/mobility-trace-tests.md
+      - Result-Based Tests: Testing/result-based-tests.md
+  - Submodules:
+      - Overview: Submodules/README.md
+      - OMNeT++: Submodules/omnetpp.md
+  - Features:
+      - Pedestrian Mobility: features/AccuratePedestrianMobility.md
+      - Density Maps: features/DensityMap.md
+      - Interactions: features/Interactions.md
+      - Route Recommendation: features/RouteRecommendation.md
+  - FAQ: FAQ/README.md
+  - Archive:
+      - Crowd Control: archive/How-to-implement-and-test-crowd-control-in-CrowNet.md
+      - Application Layer: archive/layer_application.md
+      - Mac Setup: archive/mac_setup.md
+      - Protocol Stack: archive/protocol_stack.md
+      - Service AID: archive/service_aid.md
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/roVer-HM/crownet
+  generator: false
+
+plugins:
+  - search

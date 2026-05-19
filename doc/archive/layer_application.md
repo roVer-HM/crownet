@@ -20,7 +20,7 @@ Within roVer, the focus is on the first two categories.
 
 ## Assumptions
 * Dissemination of location-dependent information for a mobile person
-  (pedestrian, public transport, idividual transport)
+  (pedestrian, public transport, individual transport)
 * Information can be associated with a time-stamp. More recent information
   (larger value of associated time-stamp) is a more accurate representation of
   the current situation.
@@ -33,7 +33,7 @@ Within roVer, the focus is on the first two categories.
 
 ## General Model 
 
-* The geographic area is subdevided into (rectangular) cells of length *a*.
+* The geographic area is subdivided into (rectangular) cells of length *a*.
 * Each cell *i* has an associated value *v_i* and time-stamp *t_i*.
 * A value *v_i* of a cell changes within random time-intervals (random variable
   with a pdf that is application specific).
@@ -44,17 +44,17 @@ Within roVer, the focus is on the first two categories.
 
 ### Extension: Confidence Value
 * Motivation: In many applications, using the time-stamp as sole indication for the correctness of a measurement is not sufficient.
-* In addition to the data and time-stamp values, each cell also has an associated confidence value *c_i* in the interval [0,1]. 
+* In addition to the data and time-stamp values, each cell also has an associated confidence value *c_i* in the interval \[0,1\].
 * The initial *c_i* is set when a new data value for a cell is measured. It indicates the confidence of the generating node in the measured value and can, for example, depend on:
   * geographical distance of the measuring node to the cell
   * signal strength of nodes contributing to the measurement (e.g. in case of the density map the estimation of the number of nodes within the cell)
   * confidence values of measurement input (e.g. GPS position)
   * etc..
-* The confidence value is disseminated within the network in addtion to the data value and the time-stamp. When aggegating received maps into the own cell map of the node, the confidence value is taken into account. This allows a receiving node to keep an older received value for a cell even if a newer value is received, if the confidence of the newer received data value is low. (Optimal relation of information age and confidence is an open issue.)
+* The confidence value is disseminated within the network in addition to the data value and the time-stamp. When aggregating received maps into the node's own cell map, the confidence value is taken into account. This allows a receiving node to keep an older value for a cell even if a newer value is received, when the confidence of the newer value is low. (The optimal relation between information age and confidence is an open issue.)
 
 ### Extension - optimized variant:
 * Motivation: Reduce amount of data to disseminated for a map.
-* In order to reduce the amount of information to be disseminated, the time-stamp value for a cell is not disseminated. Instead, the infomation age is taken into account when calculating the confidence of a cell -- with increasing age the confidence decreases. Data aggregation is based on confidence only.
+* In order to reduce the amount of information to be disseminated, the time-stamp value for a cell is not disseminated. Instead, the information age is taken into account when calculating the confidence of a cell -- with increasing age, the confidence decreases. Data aggregation is based on confidence only.
 * Nodes periodically (e.g. every second) decrease the confidence value of all cells in the map. Open issue: Should confidence decrease linearly with increasing information age? 
 
 

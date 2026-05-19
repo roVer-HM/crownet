@@ -1,6 +1,6 @@
 # Parameter studies
 
-For conducting parameter studies, we use the Python framework [suq-controller](../../analysis/suq-controller) which stands for `Surrogante and Uncertainty Quantification controller`.
+For parameter studies, we use the Python framework [suq-controller](../../analysis/suq-controller), which stands for `Surrogate and Uncertainty Quantification controller`.
 
 ## Setup and running parameter studies
 To test parameter combinations (samples), the parameter values need to be specified in a list:
@@ -14,8 +14,8 @@ To test parameter combinations (samples), the parameter values need to be specif
                    '*.radioMedium.obstacleLoss.typename': 'DielectricObstacleLoss'}}
     ]
 ```
-Note that each list item is a dictionary that assigns the parameters to the respective simulator. For example,
-`*.misc[0].app[0].incidentTime` is a parameter of a network model (Omnet++ simulator) and `sources.[id==1].distributionParameters.numberPedsPerSecond` 
+Note that each list item is a dictionary that assigns parameters to the respective simulator. For example,
+`*.misc[0].app[0].incidentTime` is a parameter of a network model (OMNeT++ simulator), while `sources.[id==1].distributionParameters.numberPedsPerSecond`
 is a parameter of the mobility provider Vadere.
 
 The quantities of interest (output variable) are also specified in a list:
@@ -28,8 +28,8 @@ The quantities of interest (output variable) are also specified in a list:
 ```
 The corresponding quantities of interest will be automatically collected.
 
-Before running the simulation, the corresponding simulation type needs to be specified. 
-For example, a coupled simulation (Vadere, Omnet++) is specified over the command
+Before running the simulation, the corresponding simulation type must be specified.
+For example, a coupled simulation (Vadere, OMNeT++) is specified with the following command:
 ```
     sim_type = VadereOppCommand() \
         .create_vadere_container() \
@@ -38,7 +38,7 @@ For example, a coupled simulation (Vadere, Omnet++) is specified over the comman
         .qoi(qoi) \
         .experiment_label("out") \
 ```
-To run the parameter studies, simply run
+To run the parameter studies, execute:
 
 ```
         setup = CoupledDictVariation(

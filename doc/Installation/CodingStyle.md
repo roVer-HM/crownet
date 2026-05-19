@@ -12,7 +12,7 @@ Install pre-commit if missing locally
 pip3 install pre-commit
 ```
 
-Configure pre-commit to activate all git-hooks defined in `pre-commit-config.yaml`. From now on all commit will be checked before the commit takes place.
+Configure pre-commit to activate all git hooks defined in `.pre-commit-config.yaml`. From now on, all commits will be checked before they are created.
 
 ## C++
 
@@ -20,14 +20,14 @@ Configure pre-commit to activate all git-hooks defined in `pre-commit-config.yam
 
 Within the omnetpp Docker container, [clang-format](https://clang.llvm.org/docs/ClangFormat.html) and the Style Checker [cpplint.py](https://github.com/cpplint/cpplint) are already installed.
 
-If you additionally want to guarantee that only correctly formatted code is committed, you can set-up a git pre-commit hook
+If you additionally want to guarantee that only correctly formatted code is committed, you can set up a git pre-commit hook
 which checks the files you are about to commit. A suitable script is available within the `scripts` subdirectory. Execute:
 
 ```
 user@host:~/crownet$ scripts/git-format/git-pre-commit-format install
 ```
 
-If your are using the (recommended) execution of the simulation based on the provided Docker containers, you are done now. In order to disable the style check for individual projects (for example containing legacy code or code of other projects not conforming to the style guide), go to
+If you are using the recommended simulation workflow based on the provided Docker containers, you are done now. To disable style checks for individual projects (for example, legacy code or imported code that does not conform to the style guide), go to
 **Project properties -> C/C++ General -> Formatter** and disable the style checks.
 
 
@@ -59,11 +59,11 @@ There is an installer for Windows: https://llvm.org/builds/
 
 To configure CppStyle globally, go to **Preferences -> C/C++ -> CppStyle** dialog.
 
-To configure CppSytle for a C/C++ project, go to **Project properties -> CppStyle** dialog.
+To configure CppStyle for a C/C++ project, go to **Project properties -> CppStyle** dialog.
 
-To enable CppStyle(clang-format) as default C/C++ code formatter, go to **Preferences -> C/C++ -> Code Style -> Formatter** page and switch **"Code Formatter"** from **[built-in]** to **"CppStyle (clang-format)"**
+To enable CppStyle(clang-format) as default C/C++ code formatter, go to **Preferences -> C/C++ -> Code Style -> Formatter** page and switch **"Code Formatter"** from **`built-in`** to **"CppStyle (clang-format)"**
 
-To enable CppStyle(clang-format) as C/C++ code formatter for a project, go to **Project properties -> C/C++ General -> Formatter** page and switch **"Code Formatter"** from **[built-in] **to **"CppStyle (clang-format)"**
+To enable CppStyle(clang-format) as C/C++ code formatter for a project, go to **Project properties -> C/C++ General -> Formatter** page and switch **"Code Formatter"** from **`built-in`** to **"CppStyle (clang-format)"**
 
 ### How to use CppStyle
 
@@ -72,7 +72,7 @@ By pressing the  **Run C/C++ Code Analysis** when you right-click a file, cpplin
 In the Properties of CppStyle an automatic analysis can be set to trigger when saving the file.
 
 #### Formatting Code with clang-format
-The whole file or marked code can be formated using the shortcut **Command + Shift + f** on MacOS or **Ctrl + Shift + f** on Linux and other systems.
+The whole file or selected code can be formatted using the shortcut **Command + Shift + f** on macOS or **Ctrl + Shift + f** on Linux and other systems.
 
 Further information: https://github.com/wangzw/CppStyle, http://www.cppstyle.com/
 

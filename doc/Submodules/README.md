@@ -1,10 +1,10 @@
 # Submodules
 
-CrowNet contains several submodules that we have extended on respective `hm_master` branches.
+CrowNet contains several submodules that we maintain and extend on corresponding `hm_master` branches.
 
 
 ## Adjustments
 
-We documented adjustments for each  separately:
-- [omnetpp](omnetpp.md)
-- [inet](./inet_patches)
+We documented project-specific adjustments for each submodule separately:
+- [OMNeT++](omnetpp.md)
+- [INET](./inet_patches)
